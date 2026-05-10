@@ -71,7 +71,7 @@ export const SkillCard = ({
                 <span className={cn("text-2xl font-black tabular-nums leading-none tracking-tight", colors.iconText)}>
                     {currentPoints}
                 </span>
-                <span className="text-zinc-500 text-xs font-bold uppercase tracking-wider">XP</span>
+                <img src="/images/points.png" alt="points" className="h-3.5 w-3.5 object-contain opacity-50" />
              </div>
            </div>
         </div>

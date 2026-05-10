@@ -29,7 +29,6 @@ import { Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
-import { FaGem } from "react-icons/fa";
 import {
   FaTrophy,
 } from "react-icons/fa";
@@ -113,7 +112,7 @@ const ItemTooltipCard = ({
           className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
           style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
         >
-          <FaGem size={7} />
+          <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
           {itemRarity}
         </span>
       </div>
@@ -194,7 +193,7 @@ const FirebaseLogsCaseOpenItem = ({
                       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
                       style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
                     >
-                      <FaGem size={8} />
+                      <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
                       {itemRarity}
                     </span>
                     <span className="font-bold text-sm" style={{ color }}>
@@ -469,9 +468,9 @@ const FirebaseLogsItem = ({
             />
           </span>{" "}
           <span className='text-secondText text-sm'>{t("common:logsBox.get")}</span>
-          <span className='mr-1 text-main text-sm'>
+          <span className='mr-1 flex items-center gap-1 text-main text-sm'>
             +{points}
-            <span className='text-secondText'> {t("common:logsBox.points")}</span>
+            <img src="/images/points.png" alt="points" className="h-4 w-4 object-contain" />
           </span>
 
           {newLevel?.isNewLevel && (
@@ -520,7 +519,7 @@ const FirebaseLogsItem = ({
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
                 <span className="flex items-center gap-1">
                     <span className="font-bold text-main">{micPerformance.score}</span>
-                    <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-tighter">pts</span>
+                    <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
                 </span>
                 <span className="w-px h-2.5 bg-blue-500/30" />
                 <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold">
@@ -533,6 +532,7 @@ const FirebaseLogsItem = ({
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
                 <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
                 <span className="font-bold">{earTrainingPerformance.score}</span>
+                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
               </span>
           )}
 

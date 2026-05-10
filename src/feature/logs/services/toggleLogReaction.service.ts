@@ -36,6 +36,10 @@ export const toggleLogReaction = async (logId: string, userId: string, isRemovin
       if (recipientId && recipientId !== userId) {
         // Update Fame
         transaction.update(recipientRef, {
+          "statistics.fame": increment(isRemoving ? -10 : 10)
+        });
+
+        transaction.update(reactorDocRef, {
           "statistics.fame": increment(isRemoving ? -1 : 1)
         });
 

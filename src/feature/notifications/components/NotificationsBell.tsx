@@ -31,9 +31,14 @@ const typeConfig = {
     label: (_n: any) => "commented on your recording",
   },
   reaction: {
-    icon: <Zap className="h-3 w-3 text-white fill-current" />,
-    bg: "bg-blue-500",
-    label: (_n: any) => "reacted to your post",
+    icon: <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />,
+    bg: "bg-amber-500/20",
+    label: (_n: any) => (
+      <span className="inline-flex items-center gap-1">
+        motivated you and gave you +10
+        <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+      </span>
+    ),
   },
   season_reward: {
     icon: <Trophy className="h-3 w-3 text-white fill-current" />,

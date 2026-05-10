@@ -70,7 +70,10 @@ export const LevelBar = ({
             {!showBadge && <span className='font-semibold text-white'>Level {lvl}</span>}
             <div className="flex items-center gap-1.5">
               <span className='font-bold text-cyan-400'>
-                {Math.round(progressPercent)}% XP
+                <span className="flex items-center gap-1">
+                  {Math.round(progressPercent)}% 
+                  <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+                </span>
               </span>
               <span className={cn("font-medium text-white/40", isMini ? "text-[9px]" : "text-xs")}>
                   ({pointsInThisLevel.toLocaleString()} / {levelXpDifference.toLocaleString()})
@@ -96,7 +99,10 @@ export const LevelBar = ({
           <div className={cn("hidden text-white/80 sm:block", isMini ? "text-xs" : "text-sm")}>
             <span>
               {pointsInThisLevel.toLocaleString()} /{" "}
-              {levelXpDifference.toLocaleString()} XP
+              <span className="flex items-center gap-1">
+                {levelXpDifference.toLocaleString()} 
+                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+              </span>
             </span>
           </div>
         )}

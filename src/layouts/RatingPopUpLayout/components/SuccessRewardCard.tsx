@@ -1,7 +1,7 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import React, { useEffect } from "react";
-import { FaGem,FaSync } from "react-icons/fa";
+import { FaSync } from "react-icons/fa";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;
@@ -91,7 +91,7 @@ export const SuccessRewardCard = ({
                  className="flex items-end gap-2 text-white"
               >
                  <span className="text-5xl sm:text-6xl font-bold tabular-nums tracking-tight">+{displayedPoints}</span>
-                 <span className="text-lg font-bold text-orange-500 mb-1 tracking-wider">XP</span>
+                 <img src="/images/points.png" alt="points" className="h-10 w-10 object-contain mb-2" />
               </motion.div>
               {fameEarned != null && fameEarned > 0 && (
                 <motion.div
@@ -100,7 +100,7 @@ export const SuccessRewardCard = ({
                   transition={{ delay: 0.8 }}
                   className="flex items-center gap-1.5 mt-1"
                 >
-                  <FaGem className="text-amber-400" size={13} />
+                  <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />
                   <span className="text-sm font-black text-amber-400 tracking-widest">+{fameEarned} Fame</span>
                 </motion.div>
               )}

@@ -14,10 +14,8 @@ import {
   FaClock,
   FaExternalLinkAlt,
   FaFire,
-  FaGem,
   FaLeaf,
   FaMusic,
-  FaStar,
   FaTrophy,
 } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
@@ -133,7 +131,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   )}h`}
                 />
                 <StatsBox
-                  Icon={FaStar}
+                  Icon={() => <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />}
                   label={t("tooltip.points")}
                   value={userData.statistics.totalPoints}
                 />
@@ -143,7 +141,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   value={userData.statistics.level}
                 />
                 <StatsBox
-                  Icon={FaGem}
+                  Icon={() => <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />}
                   label={"Fame"}
                   value={userData.statistics.fame}
                 />
