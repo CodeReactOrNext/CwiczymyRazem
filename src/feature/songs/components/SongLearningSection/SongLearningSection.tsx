@@ -3,13 +3,10 @@ import type {
   DragStartEvent} from "@dnd-kit/core";
 import {
   closestCorners,
-  DndContext,
-  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
@@ -133,6 +130,7 @@ export const SongLearningSection = ({
   onOpenDetails,
   onExploreLibrary,
   isLibraryActive,
+  activeId,
   disableDnd = false,
   isMobile = false,
 }: SongLearningSectionProps) => {
@@ -144,9 +142,7 @@ export const SongLearningSection = ({
     onTableStatusChange: onStatusChange,
   });
   
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  // --- Filtering State ---
+   // --- Filtering State ---
   const [searchQuery, setSearchQuery] = useState("");
   const [tierFilters, setTierFilters] = useState<string[]>([]);
   const _hasActiveFilters = searchQuery.length > 0 || tierFilters.length > 0;
@@ -252,15 +248,17 @@ export const SongLearningSection = ({
           onPracticeWithGp={onPracticeWithGp}
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
-           isCollapsedInitially={false}
+          isCollapsedInitially={false}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          onSongRemove={handleSongRemoval}
         />
         <SongStatusCard
           id="learning"
           title={t("learning", "In Progress") as string}
           songs={filteredSongs.learning}
           onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
           progressMap={progressMap}
           isPremium={isPremium}
           onPracticeWithGp={onPracticeWithGp}
@@ -275,6 +273,7 @@ export const SongLearningSection = ({
           title={t("learned", "Mastered") as string}
           songs={filteredSongs.learned}
           onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
           progressMap={progressMap}
           isPremium={isPremium}
           onPracticeWithGp={onPracticeWithGp}
@@ -286,33 +285,6 @@ export const SongLearningSection = ({
         />
       </div>
 
-      <DragOverlay dropAnimation={{
-          sideEffects: defaultDropAnimationSideEffects({
-            styles: {
-              active: {
-                opacity: "0.5",
-              },
-            },
-          }),
-        }}>
-        {activeId && activeSong && (
-          <div className="w-[280px] cursor-grabbing">
-             <div className="flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-zinc-900/90 p-3 shadow-2xl backdrop-blur-xl">
-               <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
-                 {activeSong.coverUrl ? (
-                   <img src={activeSong.coverUrl} alt="" className="h-full w-full object-cover" />
-                 ) : (
-                   <Music className="h-5 w-5 text-zinc-600" />
-                 )}
-               </div>
-               <div className="flex-1 min-w-0">
-                 <p className="truncate text-xs font-bold text-white">{activeSong.title}</p>
-                 <p className="truncate text-[10px] text-zinc-500">{activeSong.artist}</p>
-               </div>
-             </div>
-          </div>
-        )}
-      </DragOverlay>
     </div>
   );
 };
