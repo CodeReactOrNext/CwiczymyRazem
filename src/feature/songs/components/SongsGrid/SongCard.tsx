@@ -20,6 +20,7 @@ import {
   Trophy,
   Users,
   Loader2,
+  ArrowRight,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,6 +33,7 @@ interface SongCardProps {
   userStatus?: SongStatus;
   footerAction?: { label: string; icon: ReactNode };
   onStatusChange?: (status: SongStatus | undefined) => void;
+  isPracticeMode?: boolean;
 }
 
 export const SongCard = ({
@@ -40,6 +42,7 @@ export const SongCard = ({
   userStatus,
   footerAction,
   onStatusChange,
+  isPracticeMode,
 }: SongCardProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -184,13 +187,22 @@ export const SongCard = ({
               onOpenDetails();
             }}
             variant="ghost"
-            className="h-9 flex-1 group/btn justify-between rounded-lg px-4 text-[11px] font-bold text-zinc-300 transition-all hover:bg-white/5 hover:text-white"
+            className={cn(
+              "h-9 flex-1 group/btn justify-between rounded-lg px-4 text-[11px] font-bold transition-all",
+              isPracticeMode
+                ? "bg-white text-black hover:bg-zinc-100 group-hover/btn:text-black"
+                : "text-zinc-300 hover:bg-white/5"
+            )}
           >
-            <span className="tracking-wide">View Details</span>
-            <Settings2 className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:rotate-90 group-hover:opacity-100" />
+            <span className={cn("tracking-wide", isPracticeMode && "!text-black")}>{isPracticeMode ? "Practice" : "View Details"}</span>
+            {isPracticeMode ? (
+              <ArrowRight className="h-3.5 w-3.5 opacity-70 transition-transform group-hover/btn:translate-x-0.5 !text-black ml-2" />
+            ) : (
+              <Settings2 className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:rotate-90 group-hover:opacity-100" />
+            )}
           </Button>
 
-          {!userStatus && onStatusChange && (
+          {!userStatus && !isPracticeMode && onStatusChange && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -209,7 +221,7 @@ export const SongCard = ({
                     className={cn(
                       "h-9 w-10 shrink-0 rounded-lg transition-all active:scale-95 border-none shadow-lg overflow-hidden relative",
                       (isProcessing || isAdded)
-                        ? "bg-emerald-500 text-white shadow-emerald-500/40 hover:bg-emerald-500" 
+                        ? "bg-emerald-500 text-white shadow-emerald-500/40 hover:bg-emerald-500"
                         : "bg-white text-black hover:bg-zinc-200 shadow-white/10"
                     )}
                   >

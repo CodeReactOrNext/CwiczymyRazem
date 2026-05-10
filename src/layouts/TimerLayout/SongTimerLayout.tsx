@@ -355,31 +355,44 @@ export const SongTimerLayout = ({
             )}
           </div>
 
-          {/* Shortcuts Legend */}
-          <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-            <div className="flex items-center gap-2 text-zinc-500">
-              <Keyboard className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Shortcuts</span>
+          {/* Shortcuts Legend - only show when YouTube URL exists */}
+          {youtubeUrl && (
+            <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+              <div className="flex items-center gap-2 text-zinc-500">
+                <Keyboard className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">Shortcuts</span>
+              </div>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">Space</kbd>
+                  <span className="text-xs text-zinc-500">Play/Pause</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">M</kbd>
+                  <span className="text-xs text-zinc-500">Mark Section</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">L</kbd>
+                  <span className="text-xs text-zinc-500">Toggle Loop</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">← →</kbd>
+                  <span className="text-xs text-zinc-500">Seek 5s</span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              <div className="flex items-center gap-2">
-                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">Space</kbd>
-                <span className="text-xs text-zinc-500">Play/Pause</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">M</kbd>
-                <span className="text-xs text-zinc-500">Mark Section</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">L</kbd>
-                <span className="text-xs text-zinc-500">Toggle Loop</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">← →</kbd>
-                <span className="text-xs text-zinc-500">Seek 5s</span>
+          )}
+
+          {/* CTA for YouTube link - show when no URL */}
+          {!youtubeUrl && (
+            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6 text-center">
+              <h3 className="text-base font-bold text-white mb-2">Link a YouTube video to unlock features</h3>
+              <p className="text-sm text-zinc-400 mb-4">Add a YouTube link above to use sections, mark passages, loop sections, and keyboard shortcuts for an enhanced practice experience.</p>
+              <div className="inline-block px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-lg text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                ↑ Paste a YouTube link in the player above
               </div>
             </div>
-          </div>
+          )}
 
           {/* Notes Section */}
           <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
