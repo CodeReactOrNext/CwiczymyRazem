@@ -1,15 +1,18 @@
 import MainContainer from "components/MainContainer";
 import SongsView from "feature/songs/SongsView";
 import AppLayout from "layouts/AppLayout";
+import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
+  const router = useRouter();
+  const view = (router.query.view as string) || "explore";
 
   return (
     <MainContainer noBorder>
-      <SongsView />
+      <SongsView view={view} />
     </MainContainer>
   );
 };

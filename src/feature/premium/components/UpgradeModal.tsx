@@ -256,21 +256,7 @@ export function UpgradeContent() {
             >
               {loading === "master" ? <Loader2 size={18} className="animate-spin" /> : <span className="flex items-center gap-2">{isPro ? "Upgrade to Master" : "Get Master Access"} <Crown size={14} fill="currentColor" /></span>}
             </button>
-            {!isPro && (
-              <button
-                onClick={() => handleCheckout("master", true)}
-                disabled={loading !== null}
-                className="w-full flex flex-col items-center justify-center gap-0.5 border border-amber-500/20 hover:border-amber-500/50 hover:bg-amber-500/5 py-3.5 rounded-md transition-all disabled:opacity-50 group"
-              >
-                {loading === "master-trial"
-                  ? <Loader2 size={18} className="animate-spin text-amber-400" />
-                  : <>
-                      <span className="text-sm font-semibold text-amber-400 group-hover:text-amber-300 transition-colors">Try free for 7 days</span>
-                      <span className="text-[10px] text-zinc-600 font-normal">Card required · Cancel anytime</span>
-                    </>
-                }
-              </button>
-            )}
+
           </div>
         </div>
       </div>
