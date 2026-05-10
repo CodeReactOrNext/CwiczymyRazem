@@ -100,9 +100,6 @@ const EmptyState = () => (
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-800/50 text-zinc-500">
           <Music size={40} />
         </div>
-        <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500 text-black shadow-lg shadow-cyan-500/20">
-          <Plus size={18} strokeWidth={3} />
-        </div>
      </div>
      <h3 className="text-xl font-bold text-white mb-2">Build your practice list</h3>
      <p className="max-w-md text-sm text-zinc-400 mb-8">
