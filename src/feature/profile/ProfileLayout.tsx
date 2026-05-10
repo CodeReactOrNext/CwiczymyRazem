@@ -195,12 +195,6 @@ const ProfileLayout = ({
                 guitarYear={selectedGuitarYear}
                 guitarCountry={selectedGuitarCountry}
               />
-              <div className='absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-black/80 backdrop-blur-md border border-white/20 shadow-2xl'>
-                <div className='flex flex-col items-center justify-center leading-none'>
-                  <span className='text-[7px] font-black tracking-tighter text-zinc-400'>LVL</span>
-                  <span className='text-sm font-black text-white' style={{ textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>{statistics.lvl}</span>
-                </div>
-              </div>
             </div>
 
             {/* Info */}
