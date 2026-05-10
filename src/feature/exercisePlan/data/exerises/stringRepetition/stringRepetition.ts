@@ -6,7 +6,7 @@ export const stringRepetitionExercise: Exercise = {
   description: "Advanced rhythm exercise moving across all strings using open notes.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 3,
+  timeInMinutes: 1.5,
   instructions: [
     "Navigate through all strings from Low E to High E.",
     "Maintain a steady eighth-note pulse throughout.",

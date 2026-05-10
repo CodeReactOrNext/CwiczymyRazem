@@ -105,6 +105,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     { id: "songs", name: "Songs", href: "/songs?view=management", icon: <Music size={18} /> },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     { id: "seasons", name: "Seasons", href: "/seasons", icon: <Calendar size={18} /> },
+    { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={18} /> },
   ];
 
   const toolsNavigation = [
@@ -114,7 +115,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
-    { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={16} /> },
     { id: "recordings", name: "Recordings", href: "/recordings", icon: <Video size={16} /> },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
   ];
