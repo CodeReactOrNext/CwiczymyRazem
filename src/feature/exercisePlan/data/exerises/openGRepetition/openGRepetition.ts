@@ -6,7 +6,7 @@ export const openGRepetitionExercise: Exercise = {
   description: "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 2.90,
+  timeInMinutes: 1.5,
   instructions: [
     "Play the open G string (3rd string) repeatedly.",
     "Focus on maintaining a steady rhythm and even volume.",

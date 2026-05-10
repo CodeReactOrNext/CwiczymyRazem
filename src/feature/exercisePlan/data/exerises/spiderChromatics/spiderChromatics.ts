@@ -6,7 +6,7 @@ export const spiderChromaticsExercise: Exercise = {
   description: "Classic chromatic spider exercise involving fingers 1-2-3-4 moving across all strings.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Position your fingers on consecutive frets (1-2-3-4).",
     "Play each fret sequentially on one string before moving to the next.",
