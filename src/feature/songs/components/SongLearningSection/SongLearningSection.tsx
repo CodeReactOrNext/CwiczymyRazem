@@ -67,6 +67,8 @@ interface SongLearningSectionProps {
   onExploreLibrary?: () => void;
   isLibraryActive?: boolean;
   activeId?: string | null;
+  disableDnd?: boolean;
+  isMobile?: boolean;
 }
 
 const FilterBar = ({ 
@@ -131,6 +133,8 @@ export const SongLearningSection = ({
   onOpenDetails,
   onExploreLibrary,
   isLibraryActive,
+  disableDnd = false,
+  isMobile = false,
 }: SongLearningSectionProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -237,7 +241,7 @@ export const SongLearningSection = ({
 
 
 
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-10 space-y-4">
+      <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth">
         <SongStatusCard
           id="wantToLearn"
           title={t("want_to_learn", "Want to Learn") as string}
@@ -248,7 +252,9 @@ export const SongLearningSection = ({
           onPracticeWithGp={onPracticeWithGp}
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
-          isCollapsedInitially={false}
+           isCollapsedInitially={false}
+          disableDnd={disableDnd}
+          isMobile={isMobile}
         />
         <SongStatusCard
           id="learning"
@@ -261,6 +267,8 @@ export const SongLearningSection = ({
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
           isCollapsedInitially={false}
+          disableDnd={disableDnd}
+          isMobile={isMobile}
         />
         <SongStatusCard
           id="learned"
@@ -273,6 +281,8 @@ export const SongLearningSection = ({
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
           isCollapsedInitially={true}
+          disableDnd={disableDnd}
+          isMobile={isMobile}
         />
       </div>
 

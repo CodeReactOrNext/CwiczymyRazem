@@ -67,8 +67,13 @@ import type { SongStatus } from "feature/songs/types/songs.type";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 
 
-const SongsView = () => {
+interface SongsViewProps {
+  view?: "explore" | "management" | string;
+}
+
+const SongsView = ({ view = "explore" }: SongsViewProps) => {
   const { t } = useTranslation("songs");
+  const isManagementView = view === "management";
 
 
   const userAuth = useAppSelector(selectUserAuth);
@@ -140,6 +145,17 @@ const SongsView = () => {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'explore' | 'collection'>('explore');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1024px)");
+    setIsMobile(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  const disableDnd = isMobile;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -151,6 +167,8 @@ const SongsView = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const activeSensors = disableDnd ? [] : sensors;
 
   const findContainer = (id: string): SongStatus | undefined => {
     if (userSongs.wantToLearn.find((s) => s.id === id)) return "wantToLearn";
@@ -268,7 +286,7 @@ const SongsView = () => {
         )}
 
         <DndContext
-          sensors={sensors}
+          sensors={activeSensors}
           collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
@@ -278,7 +296,7 @@ const SongsView = () => {
           <aside id="sidebar-root" className="hidden xl:flex w-[300px] shrink-0 bg-zinc-900/30 border-r border-white/5 flex-col overflow-hidden">
              <div className="flex-1 overflow-y-auto no-scrollbar py-6 px-3">
                 <SongLearningSection
-                
+
                   isLanding={false}
                   userSongs={userSongs}
                   onChange={updateUserSongsCache}
@@ -292,6 +310,8 @@ const SongsView = () => {
                   onExploreLibrary={() => setDetailsTarget(null)}
                   isLibraryActive={!detailsTarget}
                   activeId={activeId}
+                  disableDnd={disableDnd}
+                  isMobile={isMobile}
                 />
              </div>
           </aside>
@@ -316,7 +336,7 @@ const SongsView = () => {
                 />
               </div>
             ) : mobileTab === 'collection' ? (
-              <div className="xl:hidden h-full overflow-y-auto no-scrollbar p-4 bg-zinc-900/20">
+              <div className="xl:hidden h-full overflow-y-auto p-4 bg-zinc-900/20 overscroll-none scroll-smooth">
                  <SongLearningSection
                   isLanding={false}
                   userSongs={userSongs}
@@ -331,6 +351,8 @@ const SongsView = () => {
                   onExploreLibrary={() => setMobileTab('explore')}
                   isLibraryActive={false}
                   activeId={activeId}
+                  disableDnd={disableDnd}
+                  isMobile={isMobile}
                 />
               </div>
             ) : (

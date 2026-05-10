@@ -26,6 +26,7 @@ interface SortableSongItemProps {
   isPremium?: boolean;
   onPracticeWithGp?: (song: Song) => void;
   onOpenDetails?: (song: Song) => void;
+  disableDnd?: boolean;
 }
 
 function formatPracticeMs(ms: number): string {
@@ -177,6 +178,7 @@ export const SortableSongItem = ({
   isPremium = false,
   onPracticeWithGp,
   onOpenDetails,
+  disableDnd = false,
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
   const router = useRouter();
@@ -192,7 +194,7 @@ export const SortableSongItem = ({
   } = useSortable({
     id: song.id,
     data: { song, index: 0, containerId: droppableId },
-    disabled: isMobile
+    disabled: isMobile || disableDnd
   });
 
   const style = {
@@ -209,7 +211,8 @@ export const SortableSongItem = ({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex items-center gap-2 px-3 py-1.5 cursor-default transition-colors touch-none select-none",
+        "group relative flex items-center gap-2 px-3 py-1.5 cursor-default transition-colors select-none",
+        (!disableDnd && !isMobile) && "touch-none",
         isDragging ? "bg-zinc-800 z-[9999] opacity-100 shadow-2xl" : "hover:bg-zinc-800/60 active:bg-zinc-800",
         isDragging && "scale-[1.02]"
       )}

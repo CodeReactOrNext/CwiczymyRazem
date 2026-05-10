@@ -28,6 +28,7 @@ interface SongStatusCardProps {
   isPremium?: boolean;
   onPracticeWithGp?: (song: Song) => void;
   isCollapsedInitially?: boolean;
+  disableDnd?: boolean;
 }
 
 export const SongStatusCard = ({
@@ -44,6 +45,7 @@ export const SongStatusCard = ({
   onPracticeWithGp,
   onOpenDetails,
   activeOverContainer,
+  disableDnd = false,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[id as keyof typeof STATUS_CONFIG];
@@ -122,8 +124,8 @@ export const SongStatusCard = ({
                   />
                 )}
               </AnimatePresence>
-              <SortableContext 
-                items={songs.map(s => s.id)} 
+              <SortableContext
+                items={songs.map(s => s.id)}
                 strategy={verticalListSortingStrategy}
               >
                 {songs?.length === 0 ? (
@@ -148,6 +150,7 @@ export const SongStatusCard = ({
                       isPremium={isPremium}
                       onPracticeWithGp={onPracticeWithGp}
                       onOpenDetails={onOpenDetails}
+                      disableDnd={disableDnd}
                     />
                   ))
                 )}
