@@ -137,11 +137,6 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
             <span className="text-sm font-medium text-zinc-500">
               {isEditing ? "Change video" : "No video linked yet"}
             </span>
-            {!isEditing && (
-              <span className="text-[10px] uppercase tracking-wider font-bold text-cyan-500/50 bg-cyan-500/5 px-2 py-0.5 rounded-full border border-cyan-500/10 ml-auto">
-                Mappable
-              </span>
-            )}
           </div>
           {!isEditing && (
             <p className="text-xs text-zinc-500 leading-relaxed mb-2">
