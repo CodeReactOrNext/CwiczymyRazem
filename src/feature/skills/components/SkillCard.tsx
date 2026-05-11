@@ -67,12 +67,11 @@ export const SkillCard = ({
              <h3 className="text-base font-bold tracking-tight text-white truncate mb-1">
                {skill.name || t(`skills.${skill.id}.name` as any)}
              </h3>
-             <div className="flex items-baseline gap-1.5">
-                <span className={cn("text-2xl font-black tabular-nums leading-none tracking-tight", colors.iconText)}>
-                    {currentPoints}
-                </span>
-                <img src="/images/points.png" alt="points" className="h-3.5 w-3.5 object-contain opacity-50" />
-             </div>
+              <div className="flex items-baseline gap-1.5">
+                 <span className={cn("text-2xl font-black tabular-nums leading-none tracking-tight", colors.iconText)}>
+                     {currentPoints}
+                 </span>
+              </div>
            </div>
         </div>
 

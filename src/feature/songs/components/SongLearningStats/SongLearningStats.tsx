@@ -34,7 +34,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       {/* Total Songs */}
       <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center gap-2 mb-6">
-            <Music2 className="h-4 w-4 text-cyan-400" />
+            <Music2 className="h-4 w-4 text-zinc-500" />
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("total_songs")}</span>
          </div>
          <div className="mt-auto">
@@ -49,7 +49,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-               <Trophy className="h-4 w-4 text-emerald-400" />
+               <Trophy className="h-4 w-4 text-zinc-500" />
                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("completion_rate")}</span>
             </div>
             <span className="text-[10px] font-bold text-zinc-500 tabular-nums">{userSongs.learned.length} / {totalSongs}</span>
@@ -68,22 +68,25 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       {/* Player Tier */}
       <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center gap-2 mb-6">
-            <Star className="h-4 w-4" style={{ color: playerTier?.color || '#52525b' }} />
+            <Star className="h-4 w-4 text-zinc-500" />
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("your_skill_tier", "Skill Tier")}</span>
          </div>
          
          <div className="mt-auto">
             {playerTier ? (
-               <div className="flex flex-col">
-                  <div className="flex items-baseline gap-2">
-                     <h3 className="text-4xl font-black leading-none" style={{ color: playerTier?.color }}>
-                         {playerTier.tier}
-                     </h3>
-                     <span className="text-lg font-black text-white/90 uppercase tracking-tighter">Tier</span>
+               <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg"
+                    style={{ color: playerTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${playerTier.color}40` }}
+                  >
+                    {playerTier.tier}
                   </div>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mt-1.5">
-                      Power Score: <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
-                  </span>
+                  <div className="flex flex-col">
+                     <span className="text-lg font-black text-white/90 uppercase tracking-tighter leading-none">Tier</span>
+                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mt-1">
+                        Power Score: <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
+                     </span>
+                  </div>
                </div>
             ) : (
                <div className="flex flex-col">
