@@ -47,15 +47,15 @@ export const DailyQuestWidget = () => {
                         <Swords size={18}  className="text-lg transition-all duration-500 text-zinc-700"/>
                     <div>
                         <h3 className="text-[11px] font-semibold text-zinc-400">Daily Quests</h3>
-
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
-                        <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20">
-                            <span className="flex items-center gap-0.5 text-[9px] font-bold text-orange-400 tracking-wider leading-none">
-                                +30 <img src="/images/points.png" alt="points" className="h-3.5 w-3.5 object-contain" />
+                        <div className="flex items-center gap-1.5 mr-1">
+                            <span className="text-xs font-black text-cyan-400 tracking-tight">
+                                +30
                             </span>
+                            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
                         </div>
                     )}
                     <div className="text-xs font-bold text-zinc-400">

@@ -148,7 +148,7 @@ export const SuccessRewardCard = ({
             <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-end px-1">
                     <div className="flex flex-col gap-1">
-                       <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Level Progress</span>
+                       <span className="text-[11px] font-semibold tracking-[0.1em] text-zinc-500">Level Progress</span>
                        <h4 className="text-[15px] font-medium text-white tracking-wide">Level {currentLevel} <span className="text-zinc-600 mx-1">→</span> {currentLevel+1}</h4>
                     </div>
                     <span className="text-base font-bold text-zinc-300 tabular-nums leading-none mb-1">{Math.round(currProgressPercent)}%</span>
