@@ -59,7 +59,7 @@ export const SeasonRewards = () => {
           marginBottom: "14px",
         }}
       >
-        <Gem style={{ width: 13, height: 13, color: "#FFD700", flexShrink: 0 }} />
+        <img src="/images/coin.png" alt="coin" style={{ width: 14, height: 14, flexShrink: 0 }} />
         <span
           style={{
             fontSize: "12px",
@@ -124,7 +124,7 @@ export const SeasonRewards = () => {
                 {rank.label}
               </span>
 
-              {/* Gem + amount */}
+              {/* Coin + amount */}
               <span
                 style={{
                   display: "flex",
@@ -136,11 +136,12 @@ export const SeasonRewards = () => {
                   lineHeight: 1,
                 }}
               >
-                <Gem
+                <img
+                  src="/images/coin.png"
+                  alt="coin"
                   style={{
-                    width: i === 0 ? 14 : 11,
-                    height: i === 0 ? 14 : 11,
-                    color: rank.gemColor,
+                    width: i === 0 ? 16 : 13,
+                    height: i === 0 ? 16 : 13,
                     flexShrink: 0,
                   }}
                 />

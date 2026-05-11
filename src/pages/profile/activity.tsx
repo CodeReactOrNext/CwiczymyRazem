@@ -50,7 +50,7 @@ const ProfileActivityPage = () => {
           </div>
         }
 
-        className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[260px] !flex-col md:!flex-row"
+        className="w-full !rounded-none !shadow-none min-h-[140px] md:min-h-[120px] lg:min-h-[160px] !flex-col md:!flex-row"
       />
 
 
