@@ -66,6 +66,10 @@ const userSlice = createSlice({
       { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.currentUserStats = payload;
+      // TEMP: Unlock premium for all users. Remove this block to restore Stripe/role-based access.
+      if (state.userInfo) {
+        state.userInfo.role = "pro";
+      }
     },
     addPracticeData: (
       state,
@@ -431,6 +435,10 @@ const userSlice = createSlice({
           state.isFetching = null;
           state.autoLogInFailed = false;
           state.userInfo = action.payload.userInfo;
+          // TEMP: Unlock premium for all users. Remove this block to restore Stripe/role-based access.
+          if (state.userInfo) {
+            state.userInfo.role = "pro";
+          }
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
         }
