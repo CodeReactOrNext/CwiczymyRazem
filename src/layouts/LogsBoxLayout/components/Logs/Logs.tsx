@@ -112,7 +112,6 @@ const ItemTooltipCard = ({
           className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
           style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
         >
-          <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
           {itemRarity}
         </span>
       </div>
@@ -193,7 +192,6 @@ const FirebaseLogsCaseOpenItem = ({
                       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
                       style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
                     >
-                      <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
                       {itemRarity}
                     </span>
                     <span className="font-bold text-sm" style={{ color }}>
@@ -470,7 +468,7 @@ const FirebaseLogsItem = ({
           <span className='text-secondText text-sm'>{t("common:logsBox.get")}</span>
           <span className='mr-1 flex items-center gap-1 text-main text-sm'>
             +{points}
-            <img src="/images/points.png" alt="points" className="h-4 w-4 object-contain" />
+            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
           </span>
 
           {newLevel?.isNewLevel && (
@@ -515,11 +513,11 @@ const FirebaseLogsItem = ({
               </span>
           )}
 
-          {micPerformance && (
+          {micPerformance && !(micPerformance.score === 0 && micPerformance.accuracy === 100) && (
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
                 <span className="flex items-center gap-1">
+                    <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest mr-0.5">Score:</span>
                     <span className="font-bold text-main">{micPerformance.score}</span>
-                    <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
                 </span>
                 <span className="w-px h-2.5 bg-blue-500/30" />
                 <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold">
@@ -532,7 +530,6 @@ const FirebaseLogsItem = ({
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
                 <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
                 <span className="font-bold">{earTrainingPerformance.score}</span>
-                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
               </span>
           )}
 
@@ -759,7 +756,7 @@ const FirebaseLogsDailyQuestItem = ({
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
           </span>
           <p className='text-secondText text-sm'>
-            completed all <span className="text-yellow-400 font-bold italic tracking-tighter">Daily Quests!</span>
+            completed all <span className="text-zinc-200 font-semibold">Daily Quests!</span>
           </p>
         </div>
 
@@ -767,7 +764,8 @@ const FirebaseLogsDailyQuestItem = ({
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] ">
               <FaTrophy className="h-2.5 w-2.5" />
-              Claimed +{points} Pt
+              Claimed +{points}
+              <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
             </span>
           </div>
           {log.id && (

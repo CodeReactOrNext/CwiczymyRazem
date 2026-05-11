@@ -166,13 +166,10 @@ export const PracticeStatsWidget = ({
             <span className="text-[11px] font-semibold text-zinc-400">This week</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-zinc-500">
-              <span className="text-white font-bold">{practicedDaysThisWeek}</span>/7 days
-            </span>
             {dayWithoutBreak > 0 && (
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-[8px] bg-orange-500/10 border border-orange-500/20">
-                <span className="text-sm font-black text-orange-400 tabular-nums">{dayWithoutBreak}</span>
-                <span className="text-[10px] text-orange-400/70 font-semibold">streak</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-black text-orange-500 tabular-nums">{dayWithoutBreak}</span>
+                <span className="text-[11px] text-orange-500/80 font-bold tracking-tight">Streak</span>
               </div>
             )}
           </div>
