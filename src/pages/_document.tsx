@@ -3,19 +3,8 @@ import Document, { Head, Html, Main, NextScript } from "next/document";
 class MyDocument extends Document {
   render(): React.JSX.Element {
     return (
-      <Html lang='en' className='dark'>
+      <Html lang='pl' className='dark'>
         <Head>
-          {/* Google Fonts - Inter for professional typography */}
-          <link rel='preconnect' href='https://fonts.googleapis.com' />
-          <link
-            rel='preconnect'
-            href='https://fonts.gstatic.com'
-            crossOrigin='anonymous'
-          />
-          <link
-            href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
-            rel='stylesheet'
-          />
           <link
             rel='icon'
             type='image/svg+xml'
@@ -48,6 +37,7 @@ class MyDocument extends Document {
           <meta name="msapplication-TileColor" content="#0a0a0a" />
           <meta name="msapplication-tap-highlight" content="no" />
           <meta name="theme-color" content="#0a0a0a" />
+          <meta name="authoriflow-verification" content="authoriflow-site-verification=vzoxwsa3l2pcr7fm5ycwo" />
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
         </Head>
         <body>

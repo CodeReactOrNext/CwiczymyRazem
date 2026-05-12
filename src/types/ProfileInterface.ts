@@ -9,6 +9,8 @@ export interface ProfileInterface {
   band?: string;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
   userAuth: string;
   statistics: StatisticsDataInterface;
   createdAt: Timestamp;

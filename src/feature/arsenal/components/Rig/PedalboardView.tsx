@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Plus, X } from "lucide-react";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { Plus, X } from "lucide-react";
+import { useCallback, useEffect,useRef, useState } from "react";
+
+import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
-import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
 
 const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;
@@ -280,10 +281,10 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           {/* Add pedal button */}
           <button
             onClick={() => setShowPicker(true)}
-            className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-3 py-1 rounded-sm border border-dashed border-zinc-700 text-zinc-700 hover:text-zinc-400 hover:border-zinc-500 transition-colors z-10"
-            style={{ fontSize: 8 }}
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-sm border border-zinc-500 bg-zinc-800/80 text-zinc-300 hover:text-white hover:border-zinc-300 hover:bg-zinc-700/80 transition-all duration-150 z-10"
+            style={{ fontSize: 9, boxShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
           >
-            <Plus size={9} strokeWidth={2.5} />
+            <Plus size={10} strokeWidth={2.5} />
             <span className="font-black uppercase tracking-[0.2em]">Add Pedal</span>
           </button>
         </div>

@@ -1,17 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
-import { BlogSection } from "feature/landing/components/BlogSection";
-import { CookieBanner } from "feature/landing/components/CookieBanner";
-import { FaqSection } from "feature/landing/components/FaqSection";
-import { FeaturesSection } from "feature/landing/components/FeaturesSection";
-import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
-import { WhySection } from "feature/landing/components/WhySection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
-import { FinalCTASection } from "feature/landing/components/FinalCTASection";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
-import { BlogFrontmatter } from "lib/blog";
+import type { BlogFrontmatter } from "lib/blog";
+
+const WhySection = dynamic(() => import("feature/landing/components/WhySection").then(m => m.WhySection));
+const InteractiveExercisesSection = dynamic(() => import("feature/landing/components/InteractiveExercisesSection").then(m => m.InteractiveExercisesSection));
+const StatisticsSection = dynamic(() => import("feature/landing/components/StatisticsSection").then(m => m.StatisticsSection));
+const SongsLibrarySection = dynamic(() => import("feature/landing/components/SongsLibrarySection").then(m => m.SongsLibrarySection));
+const PracticePlansSection = dynamic(() => import("feature/landing/components/PracticePlansSection").then(m => m.PracticePlansSection));
+const RoadmapSection = dynamic(() => import("feature/landing/components/RoadmapSection").then(m => m.RoadmapSection));
+const SessionSummarySection = dynamic(() => import("feature/landing/components/SessionSummarySection").then(m => m.SessionSummarySection));
+const FaqSection = dynamic(() => import("feature/landing/components/FaqSection").then(m => m.FaqSection));
+const BlogSection = dynamic(() => import("feature/landing/components/BlogSection").then(m => m.BlogSection));
+const FinalCTASection = dynamic(() => import("feature/landing/components/FinalCTASection").then(m => m.FinalCTASection));
+const Footer = dynamic(() => import("feature/landing/components/Footer").then(m => m.Footer));
+const CookieBanner = dynamic(() => import("feature/landing/components/CookieBanner").then(m => m.CookieBanner), { ssr: false });
 
 interface LandingPageProps {
   blogs: BlogFrontmatter[];
@@ -61,13 +68,16 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
     <>
       <LandingSEO faqQuestions={faqQuestions} />
       <main className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden'>
-        {/* Aggressive Global Noise to eliminate banding */}
-        <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.08] bg-[url('/static/images/old_effect_dark.webp')] mix-blend-overlay scale-[1.5]"></div>
         
         <HeroSection />
         <ProductDemo />
         <WhySection />
-        <FeaturesSection />
+        <InteractiveExercisesSection />
+        <StatisticsSection />
+        <SongsLibrarySection />
+        <PracticePlansSection />
+        <RoadmapSection />
+        <SessionSummarySection />
         <FaqSection questions={faqQuestions} />
         <BlogSection blogs={blogs} />
         <FinalCTASection />

@@ -1,12 +1,11 @@
 import { Separator } from "assets/components/ui/separator";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import UserNav from "components/UserNav";
+import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
+import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
+import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
 import Image from "next/image";
 import type { StatisticsDataInterface } from "types/api.types";
-import { ActivitySheet } from "./components/ActivitySheet";
-import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
-import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
-import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -14,7 +13,7 @@ interface UserHeaderProps {
   avatar?: string;
 }
 
-export const UserHeader = ({
+const UserHeader = ({
   userStats,
   userName,
 }: UserHeaderProps) => {
@@ -59,7 +58,6 @@ export const UserHeader = ({
             <div className='flex items-center gap-2'>
               {/* Desktop Actions */}
               <div className='hidden sm:flex items-center gap-1'>
-                <ActivitySheet />
                 <CopyLinkProfile />
                 <Separator orientation='vertical' className='mx-2 h-6 bg-white/10' />
                 <UserNav />
@@ -67,7 +65,6 @@ export const UserHeader = ({
               
               {/* Mobile Actions */}
               <div className='flex items-center gap-1 sm:hidden'>
-                 <ActivitySheet />
                  <UserNav showOnlyLogout />
               </div>
             </div>

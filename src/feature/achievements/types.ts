@@ -69,7 +69,8 @@ export type AchievementList =
   | "learned20"
   | "learned30"
   | "learned50"
-  | "learned100";
+  | "learned100"
+  | "performance";
 
 export interface AchievementContext {
   statistics: StatisticsDataInterface;
@@ -95,4 +96,4 @@ export interface AchievementsDataInterface extends AchievementsRarityType {
   getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }
 
-export type AchievementCheckerReturnType = AchievementList | undefined;
+type AchievementCheckerReturnType = AchievementList | undefined;

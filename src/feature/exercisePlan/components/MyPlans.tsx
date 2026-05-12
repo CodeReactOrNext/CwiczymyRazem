@@ -66,7 +66,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const { t } = useTranslation(["exercises", "common"]);
   const [plans, setPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
   const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
@@ -81,20 +80,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     setInternalTab(tab);
     onTabChange?.(tab);
   };
-
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const { view } = router.query;
-    if (view === "create") {
-      if (isPremium) {
-        setIsCreating(true);
-        setActiveTab("my_plans");
-      } else {
-        setShowUpgradeModal(true);
-      }
-    }
-  }, [router.isReady, router.query, isPremium]);
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -146,7 +131,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       };
 
       setPlans((prevPlans) => [...prevPlans, newPlan]);
-      setIsCreating(false);
 
       toast.success(t("exercises:my_plans.create_success") as string);
     } catch (error) {
@@ -193,19 +177,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     return (
       <div className='flex h-[400px] items-center justify-center'>
         <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-primary' />
-      </div>
-    );
-  }
-
-  if (isCreating) {
-    return (
-      <div className='container mx-auto px-4 lg:px-8 py-8 md:py-12'>
-        <div className='mb-4 px-4'>
-          <Button variant='ghost' onClick={() => setIsCreating(false)}>
-            {t("common:back")}
-          </Button>
-        </div>
-        <CreatePlan onSubmit={handleCreatePlan} />
       </div>
     );
   }
@@ -314,7 +285,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               subtitle={t("exercises:my_plans.custom_plans_description") as string}
               action={
                 <Button
-                  onClick={() => isPremium ? setIsCreating(true) : setShowUpgradeModal(true)}
+                  onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
                   className="bg-white hover:bg-zinc-100 text-black font-bold uppercase tracking-widest text-[11px] h-9 px-5 rounded-lg transition-all"
                 >
                   <FaPlus className="mr-2 h-3 w-3" />
@@ -327,7 +298,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             <div className="rounded-2xl border border-dashed border-white/[0.08] bg-zinc-900/20 p-12 text-center">
               <p className="text-zinc-500 text-sm">{t("exercises:my_plans.no_custom_plans")}</p>
               <Button
-                onClick={() => isPremium ? setIsCreating(true) : setShowUpgradeModal(true)}
+                onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
                 className="mt-6"
               >
                 {t("exercises:my_plans.create_first")}

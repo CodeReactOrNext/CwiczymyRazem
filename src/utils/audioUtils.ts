@@ -1,15 +1,30 @@
-export const playCompletionSound = () => {
+let _completionCtx: AudioContext | null = null;
+
+function getCompletionCtx(): AudioContext | null {
   try {
     const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) return;
+    if (!AudioContextClass) return null;
+    if (!_completionCtx || _completionCtx.state === "closed") {
+      _completionCtx = new AudioContextClass();
+    }
+    return _completionCtx;
+  } catch {
+    return null;
+  }
+}
 
-    const ctx = new AudioContextClass();
+export const playCompletionSound = async () => {
+  try {
+    const ctx = getCompletionCtx();
+    if (!ctx) return;
+    if (ctx.state === "suspended") await ctx.resume();
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = "sine";
-    osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
-    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.1); // Slide up to E6
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.1);
 
     gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
@@ -20,11 +35,6 @@ export const playCompletionSound = () => {
 
     osc.start();
     osc.stop(ctx.currentTime + 1);
-
-    // Close context after playback
-    setTimeout(() => {
-      ctx.close();
-    }, 1100);
   } catch (e) {
     console.warn("Failed to play completion sound:", e);
   }

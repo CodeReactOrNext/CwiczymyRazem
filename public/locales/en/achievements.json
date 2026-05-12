@@ -249,5 +249,9 @@
   "learned100": {
     "title": "Ace of Diamonds",
     "description": "You have learned one hundred songs - you are a true ace!"
+  },
+  "performance": {
+    "title": "Stage Debut",
+    "description": "Log a full performance session — practice a song, put in 1h of technique, and hit record."
   }
 }

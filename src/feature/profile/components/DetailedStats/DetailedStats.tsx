@@ -55,15 +55,6 @@ export const RecordsList = ({ statistics }: RecordsListProps) => {
 
   return (
     <Card className='h-full'>
-      <div className='mb-4'>
-        <h4 className='text-lg font-semibold text-white'>
-          {t("detailed_stats.records_title")}
-        </h4>
-        <p className='text-sm text-zinc-400'>
-          {t("detailed_stats.records_description")}
-        </p>
-      </div>
-
       <div className='divide-y divide-white/5'>
         {statRows.map((row, index) => (
           <div
@@ -124,7 +115,7 @@ interface DetailedStatsProps {
     | undefined;
 }
 
-export const DetailedStats = ({
+const DetailedStats = ({
   statistics,
   userSongs,
 }: DetailedStatsProps) => {

@@ -1,163 +1,91 @@
 import "react-circular-progressbar/dist/styles.css";
-import posthog from "posthog-js";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "assets/components/ui/accordion";
-import { TooltipProvider } from "assets/components/ui/tooltip";
-import { cn } from "assets/lib/utils";
-import { motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { selectUserInfo} from "feature/user/store/userSlice";
+import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
-import { Drum, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaInfoCircle, FaLightbulb } from "react-icons/fa";
+import { createPortal } from "react-dom";
+import { useAppSelector } from "store/hooks";
 
-import { useBpmProgress } from "../../hooks/useBpmProgress";
-import { updateMicHighScore, updateEarTrainingHighScore, saveLeaderboardEntry } from "../../services/bpmProgressService";
-import { playCompletionSound } from "utils/audioUtils";
+import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import type { ExercisePlan } from "../../types/exercise.types";
-
-import { ExerciseProgress } from "./components/ExerciseProgress";
-import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
-import { ExerciseContentArea } from "./components/ExerciseContentArea";
-import { MainTimerSection } from "./components/MainTimerSection";
-import { MicHud } from "./components/MicHud";
-import { ScaleSelectionDialog } from "./components/ScaleSelectionDialog";
-import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
-import { SessionBottomBar } from "./components/SessionBottomBar";
-import { SessionDialogs } from "./components/SessionDialogs";
-import { SessionSidebar } from "./components/SessionSidebar";
-
-import { useImageHandling } from "./hooks/useImageHandling";
-import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
-import { useNoteMatching } from "./hooks/useNoteMatching";
-import { useStrummingMatcher } from "./hooks/useStrummingMatcher";
+import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
+import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
+import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
+import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
+import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
-import ImageModal from "./modals/ImageModal";
+import { useGpFileLoader } from "./hooks/useGpFileLoader";
+import { useScoreSaving } from "./hooks/useScoreSaving";
+import { useSessionAudio } from "./hooks/useSessionAudio";
+import { useSessionControls } from "./hooks/useSessionControls";
+import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
+import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
+import { DesktopSessionView } from "./components/DesktopSessionView";
+import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
+import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
+import { SessionUIProvider } from "./contexts/SessionUIContext";
+import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import SessionModal from "./modals/SessionModal";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
-import { selectUserAuth, selectUserName, selectUserAvatar, selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
-import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
-import { AlphaTabScoreViewer } from "./components/AlphaTabScoreViewer";
-import { useTablatureAudio, AudioTrackConfig } from "../../hooks/useTablatureAudio";
-import { useAlphaTabPlayer } from "../../hooks/useAlphaTabPlayer";
-import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
-import { getNoteFromFrequency } from "utils/audio/noteUtils";
-import { useCalibration } from "./hooks/useCalibration";
-import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
-import { parseGpFile } from "feature/songs/services/gp5Parser.service";
-import type { BackingTrack } from "../../types/exercise.types";
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const GUITAR_PLAYBACK_KEY = "guitar_playback_enabled";
-
-function loadGuitarPlaybackPreference(): boolean | null {
-  try {
-    const raw = localStorage.getItem(GUITAR_PLAYBACK_KEY);
-    if (raw === null) return null;
-    return raw === "true";
-  } catch { return null; }
-}
-
-function saveGuitarPlaybackPreference(enabled: boolean): void {
-  try { localStorage.setItem(GUITAR_PLAYBACK_KEY, String(enabled)); } catch {}
-}
+import { SessionDialogs } from "./components/SessionDialogs";
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 interface PracticeSessionProps {
-  plan: ExercisePlan;
-  /** Raw GP file — when present AlphaTab's built-in synthesizer is used for audio */
-  rawGpFile?: File;
-  onFinish: () => void;
-  onClose?: () => void;
-  isFinishing?: boolean;
-  autoReport?: boolean;
-  forceFullDuration?: boolean;
-  /** Free mode: no countdown, elapsed time shown, session never auto-completes */
-  freeMode?: boolean;
+  plan:                ExercisePlan;
+  rawGpFile?:          File;
+  onFinish:            () => void;
+  onClose:             () => void;
+  isFinishing?:        boolean;
+  autoReport?:         boolean;
+  forceFullDuration?:  boolean;
+  freeMode?:           boolean;
   skillRewardSkillId?: string;
-  skillRewardAmount?: number;
+  skillRewardAmount?:  number;
+  examMode?:           boolean | { requiredBpm: number; nodeId?: string };
+  examBpm?:            number;
+  onExamComplete?:     (accuracy: number) => void;
+  skipExitDialog?:     boolean;
 }
+
+const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
+  const { formattedTimeLeft } = useTimerContext();
+  return <Head><title>{formattedTimeLeft} | {exerciseTitle}</title></Head>;
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export const PracticeSession = ({
-  plan,
-  rawGpFile,
-  onFinish,
-  onClose,
-  isFinishing,
-  autoReport,
-  forceFullDuration,
-  freeMode,
-  skillRewardSkillId,
-  skillRewardAmount,
+  plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
+  forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
+  examMode, onExamComplete, skipExitDialog = false,
 }: PracticeSessionProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
-  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // ── Session state (navigation, timer, report) ─────────────────────────────
-
   const {
-    currentExerciseIndex,
-    exerciseKey,
-    showCompleteDialog,
-    isMobileView,
-    isFullSessionModalOpen,
-    isImageModalOpen,
-    isMounted,
-    currentExercise,
-    nextExercise,
-    isLastExercise,
-    isPlaying,
-    formattedTimeLeft,
-    timerProgressValue,
-    setShowCompleteDialog,
-    setIsImageModalOpen,
-    handleNextExercise,
-    timeLeft,
-    startTimer,
-    stopTimer,
-    resetTimer,
-    showSuccessView,
-    resetSuccessView,
-    setVideoDuration,
-    setTimerTime,
-    autoSubmitReport,
-    isSubmittingReport,
-    reportResult,
-    currentUserStats,
-    previousUserStats,
-    planTitleString,
-    sessionTimerData,
-    exerciseTimeSpent,
-    activityDataToUse,
-    jumpToExercise,
-    canSkipExercise,
-    canFinishSession,
-    isSkillExercise,
-    completedExercises,
-    restartFullSession,
+    currentExerciseIndex, exerciseKey, showCompleteDialog, isMobileView,
+    isFullSessionModalOpen, isMounted, currentExercise,
+    isLastExercise, setShowCompleteDialog, handleNextExercise,
+    startTimer, stopTimer, resetTimer, showSuccessView, resetSuccessView,
+    videoDuration, setVideoDuration, setTimerTime, autoSubmitReport,
+    isSubmittingReport, reportResult, currentUserStats, previousUserStats,
+    planTitleString,  timer, activityDataToUse,
+    jumpToExercise,  canFinishSession, isSkillExercise,
+    completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
-  const userAuth   = useAppSelector(selectUserAuth);
-  const userName   = useAppSelector(selectUserName);
-  const userAvatar = useAppSelector(selectUserAvatar);
+  const isPlaying = timer.timerEnabled;
+  const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
+  const examModeObject = typeof examMode === 'object' ? examMode : undefined;
+
   const userInfo   = useAppSelector(selectUserInfo);
-
-  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
-
+  const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
 
   if (planHasGpFile && !isPremium) {
@@ -165,1103 +93,336 @@ export const PracticeSession = ({
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
           <PremiumGate feature="gp-practice" children={<div />} />
-          <button 
-            onClick={() => router.back()} 
-            className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold uppercase tracking-widest text-[10px]"
-          >
-            ← Wróć do biblioteki
+          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold uppercase tracking-widest text-[10px]">
+            ← Return
           </button>
         </div>
       </div>
     );
   }
 
-  const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
+  // ── GP file loading ───────────────────────────────────────────────────────
 
-  // ── Fetch GP file for exercises created from GP ────────────────────────────
-
-  const [fetchedGpFile, setFetchedGpFile] = useState<File | null>(null);
-  const [isFetchingGpFile, setIsFetchingGpFile] = useState(false);
-
-  useEffect(() => {
-    if (!currentExercise.gpFileUrl) {
-      setFetchedGpFile(null);
-      return;
-    }
-    const fileName = currentExercise.title.replace(/[^a-zA-Z0-9._-]/g, "_") + ".gp5";
-    setIsFetchingGpFile(true);
-    fetchGpFileAsFile(currentExercise.gpFileUrl, fileName)
-      .then(file => { setFetchedGpFile(file); setIsFetchingGpFile(false); })
-      .catch(() => { setFetchedGpFile(null); setIsFetchingGpFile(false); });
-  }, [currentExercise.gpFileUrl]);
-
-  const effectiveRawGpFile = rawGpFile ?? fetchedGpFile ?? undefined;
-
-  // ── Parse GP file to get all tracks ───────────────────────────────────────
-
-  const [parsedGpTracks, setParsedGpTracks] = useState<BackingTrack[] | null>(null);
+  const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks } = useGpFileLoader({
+    rawGpFile, gpFileUrl: currentExercise.gpFileUrl, exerciseTitle: currentExercise.title,
+  });
 
   useEffect(() => {
-    if (!effectiveRawGpFile) { setParsedGpTracks(null); return; }
-    parseGpFile(effectiveRawGpFile).then(data => {
-      setParsedGpTracks(data.tracks.map((t, idx) => ({
-        id: `track-${idx}`,
-        name: t.name,
-        measures: t.measures,
-        trackType: t.trackType as BackingTrack["trackType"],
-        pan: t.pan,
-      })));
-    }).catch(() => setParsedGpTracks(null));
-  }, [effectiveRawGpFile]);
-
-  // Track session start once
-  useEffect(() => {
-    posthog.capture("practice_session_started", {
-      plan_title: plan.title,
-      exercise_count: plan.exercises.length,
-    });
+    posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── UI state ──────────────────────────────────────────────────────────────
-
-  const [leaderboardOpen,   setLeaderboardOpen]   = useState(false);
-  const [isAudioMuted,      setIsAudioMuted]      = useState(true);
-  const [isMetronomeMuted,  setIsMetronomeMuted]  = useState(false);
-  const [isHalfSpeed,       setIsHalfSpeed]       = useState(false);
-  const [showAlphaTabScore, setShowAlphaTabScore] = useState(false);
-  const isPlayingRef = useRef(isPlaying);
-  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
-  const [tabRestartKey,     setTabRestartKey]     = useState(0);
-
-  const handleToggleAlphaTabScore = () => {
-    setShowAlphaTabScore(prev => {
-      const next = !prev;
-      if (next) setIsAudioMuted(false);
-      return next;
-    });
-  };
-
-  // ── Generated exercise (scale / chord dialogs) ────────────────────────────
+  // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    showScaleDialog, setShowScaleDialog,
-    showChordDialog, setShowChordDialog,
-    activeExercise,
-    handleGenerated,
-  } = useGeneratedExercise({ currentExercise });
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
+    setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
+    toggleAlphaTabScore, resetForExercise
+  } = usePlaybackReducer();
+  const [tabRepeatCount] = useState(0);
+  const loopsCompletedRef = useRef(0);
 
-  // ── Ear training / riddle ─────────────────────────────────────────────────
+  // ── Generated exercise ────────────────────────────────────────────────────
 
-  // Bridge ref: filled after useAlphaTabPlayer runs, read by metronome's onPlayStart.
-  // This avoids a React render cycle between count-in end and AlphaTab start.
-  const alphaTabPlayRef = useRef<(() => void) | null>(null);
-  // Bridge ref: filled after useTablatureAudio runs, driven by metronome's onTick.
-  // Shares the ~25ms AudioWorklet tick so tablature audio stays locked to the metronome clock.
+  const { showScaleDialog, setShowScaleDialog, showChordDialog, setShowChordDialog, activeExercise, handleGenerated } =
+    useGeneratedExercise({ currentExercise });
+
+  // ── AlphaTab AudioContext + metronome bridge ───────────────────────────────
+
   const tabTickBridgeRef = useRef<(() => void) | null>(null);
-
-  // AlphaTab's internal AudioContext — captured via api.player.output.context after playerReady.
-  // Passed to the metronome so metronome clicks and GP audio share the same audio graph and clock.
-  // Reset to null when the GP file changes so a new context is captured on the next playerReady.
-  const [alphaTabAudioContext, setAlphaTabAudioContext] = useState<AudioContext | null>(null);
-  useEffect(() => { setAlphaTabAudioContext(null); }, [effectiveRawGpFile]);
-
-  // Tracks whether GP audio is actively playing (post count-in). Updated one render after
-  // isAudioPlaying to break the circular dependency with useDeviceMetronome's isMuted prop.
-  // Used to silence our custom metronome clicks once AlphaTab's built-in metronome takes over.
-  const [gpAudioActive, setGpAudioActive] = useState(false);
+  const [audioSystem, setAudioSystem] = useState<{ context: AudioContext | null; isActive: boolean }>({
+    context: null,
+    isActive: false,
+  });
+  useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     activeExercise.metronomeSpeed?.recommended || 60,
-    minBpm:         activeExercise.metronomeSpeed?.min,
-    maxBpm:         activeExercise.metronomeSpeed?.max,
-    recommendedBpm: activeExercise.metronomeSpeed?.recommended,
-    // During GP playback AlphaTab's built-in metronome handles clicks — silence ours.
-    // During count-in (gpAudioActive=false) our metronome still clicks normally.
-    isMuted:        isMetronomeMuted || gpAudioActive,
-    speedMultiplier: isHalfSpeed ? 0.5 : 1,
-    onPlayStart:    useCallback(() => { alphaTabPlayRef.current?.(); }, []),
+    initialBpm:     examModeObject ? examModeObject.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.min,
+    maxBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.max,
+    recommendedBpm: examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.recommended,
+    isMuted:        isMetronomeMuted || audioSystem.isActive,
+    speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
-    // GP file: share AlphaTab's AudioContext so metronome clicks and GP audio are in the same graph.
-    // Non-GP: undefined → metronome creates its own context (already shared with useTablatureAudio).
-    externalAudioContext: effectiveRawGpFile ? alphaTabAudioContext : undefined,
+    externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
   });
 
-  const effectiveBpm = isHalfSpeed ? metronome.bpm / 2 : metronome.bpm;
+  const effectiveBpm           = Math.round(metronome.bpm * speedMultiplier);
+  const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
-  // Re-anchors the TablatureViewer cursor to the metronome audio clock on every
-  // AlphaTab loop restart, preventing cumulative drift between cursor and GP audio.
-  const [alphaTabLoopAnchor, setAlphaTabLoopAnchor] = useState<number | null>(null);
+  // ── Ear training ──────────────────────────────────────────────────────────
 
   const {
-    riddleMeasures,
-    isRiddleRevealed, isRiddleGuessed, setIsRiddleGuessed,
-    earTrainingScore, setEarTrainingScore,
-    earTrainingHighScore,
-    hasPlayedRiddleOnce, setHasPlayedRiddleOnce,
-    tabResetKey,
+    riddleMeasures, isRiddleRevealed, isRiddleGuessed, setIsRiddleGuessed,
+    earTrainingScore, setEarTrainingScore, earTrainingHighScore,
+    hasPlayedRiddleOnce, setHasPlayedRiddleOnce, tabResetKey,
     handleNextRiddle, handleRevealRiddle,
-  } = useEarTraining({
-    currentExercise,
-    userAuth,
-    restartMetronome: metronome.restartMetronome,
-    startMetronome:   metronome.startMetronome,
-    currentBpm:     metronome.bpm,
-    setBpm:         metronome.setBpm,
-  });
+  } = useEarTraining({ currentExercise, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
-  // ── GP track selection (in-session) ───────────────────────────────────────
-
-  const [selectedGpTrackIdx, setSelectedGpTrackIdx] = useState(0);
-
-  // Reset per-exercise UI flags alongside ear training
   useEffect(() => {
-    const pref = loadGuitarPlaybackPreference();
-    if (pref !== null) {
-      setIsAudioMuted(!pref);
+    let nextAudioMuted = true;
+    if (isExamMode) {
+      nextAudioMuted = true;
+    } else if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      nextAudioMuted = false;
     } else {
-      setIsAudioMuted(
-        !(currentExercise.riddleConfig?.mode === "sequenceRepeat" ||
-          (currentExercise.tablature && currentExercise.tablature.length > 0))
-      );
+      const pref = loadGuitarPlaybackPreference();
+      nextAudioMuted = pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0);
     }
-    setIsMetronomeMuted(false);
-    setIsHalfSpeed(false);
-    setSelectedGpTrackIdx(0);
+
+    resetForExercise({ isAudioMuted: nextAudioMuted });
   }, [currentExercise.id]);
 
-  const allGpTracks = parsedGpTracks;
-
   const activeTablature = riddleMeasures
-    || (allGpTracks ? allGpTracks[selectedGpTrackIdx]?.measures : undefined)
+    || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
     || activeExercise.tablature;
 
   const dynamicBackingTracks = useMemo(() => {
-    if (allGpTracks && allGpTracks.length > 1) {
-      return allGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
-    }
+    if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
     return activeExercise.backingTracks;
-  }, [allGpTracks, selectedGpTrackIdx, activeExercise.backingTracks]);
+  }, [parsedGpTracks, selectedGpTrackIdx, activeExercise.backingTracks]);
 
-  // ── Audio playback ────────────────────────────────────────────────────────
+  const planHasTablature = useMemo(() => plan.exercises.some(ex => (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
+  const planHasStrumming = useMemo(() => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0), [plan.exercises]);
 
-  const [trackConfigs, setTrackConfigs] = useState<Record<string, { volume: number; isMuted: boolean }>>({});
+  // ── Audio subsystem ───────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const configs: Record<string, { volume: number; isMuted: boolean }> = {
-      main: { volume: 1.0, isMuted: isAudioMuted },
-    };
-    if (dynamicBackingTracks) {
-      dynamicBackingTracks.forEach(track => {
-        configs[track.id] = { volume: 0.8, isMuted: false };
-      });
-    }
-    setTrackConfigs(configs);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeExercise.id, selectedGpTrackIdx]);
-
-  // Keep main track mute in sync with global toggle
-  useEffect(() => {
-    setTrackConfigs(prev => ({
-      ...prev,
-      main: { ...prev.main, isMuted: isAudioMuted },
-    }));
-  }, [isAudioMuted]);
-
-  const audioTracks = useMemo((): AudioTrackConfig[] => {
-    const tracks: AudioTrackConfig[] = [{
-      id: "main",
-      name: "Główny Instrument",
-      measures: activeTablature || [],
-      volume:   trackConfigs.main?.volume ?? 1,
-      isMuted:  trackConfigs.main?.isMuted ?? isAudioMuted,
-      trackType: "guitar",
-      pan: 0,
-    }];
-    if (dynamicBackingTracks) {
-      dynamicBackingTracks.forEach(track => {
-        tracks.push({
-          id:        track.id,
-          name:      track.name,
-          measures:  track.measures,
-          volume:    trackConfigs[track.id]?.volume ?? 0.8,
-          isMuted:   trackConfigs[track.id]?.isMuted ?? false,
-          trackType: track.trackType,
-          pan:       track.pan,
-        });
-      });
-    }
-    return tracks;
-  }, [activeTablature, dynamicBackingTracks, trackConfigs, isAudioMuted]);
-
-  const isAudioPlaying = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
-
-  // Keep gpAudioActive in sync. This drives the isMuted prop on useDeviceMetronome above:
-  // true  → our click sounds are silenced; AlphaTab's built-in metronome plays instead.
-  // false → our metronome plays click sounds (count-in phase or non-GP exercise).
-  useEffect(() => {
-    setGpAudioActive(!!effectiveRawGpFile && isAudioPlaying);
-  }, [effectiveRawGpFile, isAudioPlaying]);
-
-  // Reset loop anchor when playback stops so the next session starts clean.
-  useEffect(() => {
-    if (!isAudioPlaying) setAlphaTabLoopAnchor(null);
-  }, [isAudioPlaying]);
-
-  // Prefer the loop anchor (re-set on each AlphaTab loop restart) over the fixed
-  // metronome start time so cursor re-syncs to beat 0 every loop without drift.
-  const effectiveAudioStartTime = alphaTabLoopAnchor ?? metronome.audioStartTime;
-
-  const alphaTabTrackConfigs = useMemo(() =>
-    Object.fromEntries(Object.entries(trackConfigs).map(([k, v]) => [k, { isMuted: v.isMuted, volume: v.volume }])),
-  [trackConfigs]);
-
-  const alphaTabBackingTrackIds = useMemo(() =>
-    (dynamicBackingTracks ?? []).map(t => t.id),
-  [dynamicBackingTracks]);
-
-  // AlphaTab synthesizer (GP files) — disabled while notation view is active
-  const { playRef: atPlayRef } = useAlphaTabPlayer({
-    rawGpFile:      effectiveRawGpFile ?? null,
-    bpm:            effectiveBpm,
-    isPlaying:      !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
-    startTime:      metronome.startTime,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true),
-    onLoopRestart:  useCallback(() => {
-      // Re-anchor cursor to the current metronome audio clock on each AlphaTab loop
-      // restart. Without this, the small scheduling delay of each api.stop()/api.play()
-      // call accumulates across loops causing visible drift.
-      if (metronome.audioContext) setAlphaTabLoopAnchor(metronome.audioContext.currentTime);
-    }, [metronome.audioContext]),
-    onAudioContextReady: useCallback((ctx: AudioContext) => {
-      // Capture AlphaTab's AudioContext so the metronome can be re-initialised on it,
-      // placing metronome clicks and GP audio in the same audio graph and clock domain.
-      setAlphaTabAudioContext(ctx);
-    }, []),
-    // Relay user mute preference to AlphaTab's built-in metronome click track.
-    metronomeVolume: isMetronomeMuted ? 0 : 1,
-    trackConfigs:   alphaTabTrackConfigs,
-    backingTrackIds: alphaTabBackingTrackIds,
+  const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
+    activeTablature, dynamicBackingTracks, effectiveRawGpFile,
+    isAudioMuted, isAudioPlaying, effectiveBpm,
+    currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
+    isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
+    examBacking: activeExercise.examBacking,
+    metronomeAudioContext: metronome.audioContext,
+    metronomeStartTime: metronome.startTime,
+    metronomeAudioStartTime: metronome.audioStartTime,
+    stopMetronome: metronome.stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
+    onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
   });
-  // AlphaTab is driven solely by the isPlaying prop / playback control effect.
-  // Do NOT wire alphaTabPlayRef → atPlayRef here: onPlayStart fires before the React
-  // render cycle, causing api.play() to be called twice (once imperatively, once from
-  // the effect) which triggers api.stop() on an unstarted AlphaTab worklet node.
-  alphaTabPlayRef.current = null;
 
-  // Custom synthesis fallback — used when no GP file is present
-  const { soundfontsReady, schedulerTickRef: tabSchedulerTickRef } = useTablatureAudio({
-    tracks:         audioTracks,
-    bpm:            effectiveBpm,
-    isPlaying:      !effectiveRawGpFile && isAudioPlaying,
-    startTime:      metronome.startTime,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true),
-    audioContext:   metronome.audioContext,
-    audioStartTime: effectiveAudioStartTime,
-    disabled:       !!effectiveRawGpFile,
-  });
-  // Sync bridge — keeps tabTickBridgeRef pointing at the live tablature scheduler.
-  // The metronome's onTick calls tabTickBridgeRef, which calls tabSchedulerTickRef.current,
-  // so useTablatureAudio is driven by the AudioWorklet clock instead of window.setTimeout.
-  // Always point at the latest tabSchedulerTickRef value (ref is stable; .current is set by effect).
+  useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
   tabTickBridgeRef.current = () => tabSchedulerTickRef.current?.();
 
-  // ── Image handling ────────────────────────────────────────────────────────
+  // ── Calibration + mic ─────────────────────────────────────────────────────
+
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useAudioAnalyzer();
 
   const {
-    imageScale, setImageScale,
-    handleZoomIn, handleZoomOut, resetImagePosition,
-  } = useImageHandling();
-
-  const planHasTablature = useMemo(
-    () => plan.exercises.some(ex =>
-      (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig?.mode === "sequenceRepeat"
-    ),
-    [plan.exercises]
-  );
-
-  const planHasStrumming = useMemo(
-    () => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0),
-    [plan.exercises]
-  );
-
-  // ── Keyboard shortcuts ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.code === "Space") {
-        e.preventDefault();
-        if (isPlaying) {
-          stopTimer();
-          metronome.stopMetronome();
-        } else {
-          startTimer();
-          if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
-            metronome.startMetronome();
-          }
-        }
-        return;
-      }
-      if (e.key === "ArrowRight" && !isLastExercise) handleNextExerciseClick();
-      if (e.key === "ArrowLeft" && currentExerciseIndex > 0) {
-        stopTimer();
-        metronome.restartMetronome();
-        jumpToExercise(currentExerciseIndex - 1);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLastExercise, currentExerciseIndex, isPlaying, startTimer, stopTimer, currentExercise, metronome]);
-
-  // ── Timer controls ────────────────────────────────────────────────────────
-
-  const handleToggleTimer = () => {
-    if (isPlaying) {
-      stopTimer();
-      metronome.stopMetronome();
-    } else {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
-        metronome.startMetronome();
-      }
-    }
-  };
-
-  const handleRestart = () => {
-    stopTimer();
-    metronome.restartMetronome();
-    resetTimer();
-    setTabRestartKey(prev => prev + 1);
-    setEarTrainingScore(0);
-    resetGame();
-    setTimeout(() => {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
-        metronome.startMetronome();
-      }
-    }, 100);
-  };
-
-  const handleRestartFullSession = useCallback(() => {
-    restartFullSession();
-    setTabRestartKey(prev => prev + 1);
-  }, [restartFullSession]);
-
-  const handleHalfSpeedToggle = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-    setIsHalfSpeed(prev => {
-      const next = typeof value === 'function' ? value(prev) : value;
-      if (next !== prev) {
-        // Restart audio and tablature from beginning when toggling speed (timer keeps running)
-        const wasMetronomePlaying = metronome.isPlaying;
-        metronome.restartMetronome();
-        setTabRestartKey(k => k + 1);
-        if (wasMetronomePlaying) {
-          setTimeout(() => {
-            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
-              metronome.startMetronome();
-            }
-          }, 100);
-        }
-      }
-      return next;
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stopTimer, resetTimer, startTimer, metronome, currentExercise]);
-
-  // ── Score saving ──────────────────────────────────────────────────────────
-
-  const exerciseRecordsRef = useRef<{
-    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
-    earTrainingHighScore?: { exerciseTitle: string; score: number };
-  }>({});
-
-  const saveCurrentScores = async () => {
-    const exId       = activeExercise.id;
-    const exTitle    = activeExercise.title;
-    const exCategory = activeExercise.category;
-    if (userAuth && isMicEnabled && gameState.score > 0) {
-      const result = await updateMicHighScore(userAuth, exId, gameState.score, sessionAccuracy, exTitle, exCategory);
-      saveLeaderboardEntry(userAuth, exId, gameState.score, userName || "Anonymous", userAvatar || "");
-      if (result.isNewRecord) {
-        exerciseRecordsRef.current = {
-          ...exerciseRecordsRef.current,
-          micHighScore: { exerciseTitle: exTitle, score: gameState.score, accuracy: sessionAccuracy },
-        };
-      }
-    }
-    if (userAuth && currentExercise.riddleConfig?.mode === "sequenceRepeat" && earTrainingScore > 0) {
-      const result = await updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
-      saveLeaderboardEntry(userAuth, exId, earTrainingScore, userName || "Anonymous", userAvatar || "");
-      if (result.isNewRecord) {
-        exerciseRecordsRef.current = {
-          ...exerciseRecordsRef.current,
-          earTrainingHighScore: { exerciseTitle: exTitle, score: earTrainingScore },
-        };
-      }
-    }
-  };
-
-  const handleNextExerciseClick = async () => {
-    await saveCurrentScores();
-    stopTimer();
-    metronome.restartMetronome();
-    handleNextExercise(resetTimer);
-  };
-
-  // ── Audio analyzer + calibration ──────────────────────────────────────────
-
-  const {
-    frequency, volume, isListening,
-    init: initAudio, close: closeAudio,
-    audioRefs, getLatencyMs,
-    inputGain, setInputGain,
-  } = useAudioAnalyzer();
-
-  const {
-    sessionPhase,
-    isMicEnabled: _isMicEnabled,
-    handleEnableMic, handleSkipMic,
-    handleReuseCalibration, handleRecalibrate,
-    handleCalibrationComplete, handleCalibrationCancel,
-    getAdjustedTargetFreq,
-    existingCalibrationTimestamp,
-    setIsMicEnabled: updateMicPersistence,
-    setSessionPhase,
+    sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
+    handleReuseCalibration, handleRecalibrate, handleCalibrationComplete, handleCalibrationCancel,
+    getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
   } = useCalibration(planHasTablature);
 
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
+  useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { if (isMicEnabled && !isListening) initAudio(); }, [isMicEnabled]);
 
-  // Auto-init audio when mic enabled
-  useEffect(() => {
-    if (isMicEnabled && !isListening) initAudio();
-  }, [isMicEnabled]);
-
-  const detectedNoteData = useMemo(() => {
-    if (!frequency || frequency < 50) return null;
-    return getNoteFromFrequency(frequency);
-  }, [frequency]);
-
-  // ── Note matching (RAF game loop) ─────────────────────────────────────────
-
-  const { hitNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
-    isPlaying,
-    startTime:          metronome.startTime,
-    effectiveBpm,
-    rawBpm:             metronome.bpm,
-    activeTablature,
-    isMicEnabled,
-    currentExerciseIndex,
-    isHalfSpeed,
-    getLatencyMs,
-    audioRefs,
-    getAdjustedTargetFreq,
-    onReset: () => setEarTrainingScore(0),
-  });
-
-  // ── Strumming rhythm matcher ──────────────────────────────────────────────
+  // ── Note matching ─────────────────────────────────────────────────────────
 
   const activeStrumPattern = currentExercise.strummingPatterns?.[0];
-  const {
-    slotFeedback: strumSlotFeedback,
-    gameState:    strumGameState,
-    sessionAccuracy: strumAccuracy,
-  } = useStrummingMatcher({
-    isPlaying,
-    startTime:  metronome.startTime,
-    bpm:        effectiveBpm,
-    pattern:    activeStrumPattern,
-    isMicEnabled,
-    audioRefs,
-    getLatencyMs,
-    currentExerciseIndex,
+  const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
+  const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
+  useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
+
+  // ── Score saving ──────────────────────────────────────────────────────────
+
+  const { saveCurrentScores, exerciseRecordsRef } = useScoreSaving({
+    activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
   });
 
-  // Pick the active game state depending on exercise type
-  const isStrummingExercise = !!activeStrumPattern;
-  const gameState     = isStrummingExercise ? strumGameState  : tabGameState;
-  const sessionAccuracy = isStrummingExercise ? strumAccuracy : tabAccuracy;
+  // ── Controls & handlers ───────────────────────────────────────────────────
 
-  // ── Completion notification ───────────────────────────────────────────────
+  const {
+    tabRestartKey, handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleNextExerciseClick, handleMicToggle, handleAudioToggle,
+    handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
+  } = useSessionControls({
+    isPlaying, stopTimer, startTimer, resetTimer, metronome,
+    currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
+    handleNextExercise, restartFullSession,
+    isMicEnabled, closeAudio, updateMicPersistence,
+    isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
+    setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
+    saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+  });
 
-  const [showCompletionNotification, setShowCompletionNotification] = useState(false);
+  // ── Misc effects ──────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (timeLeft <= 0 && isMounted && !showCompleteDialog && !reportResult && !showSuccessView && !isLastExercise) {
-      playCompletionSound();
-      setShowCompletionNotification(true);
-      const timer = setTimeout(() => setShowCompletionNotification(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [timeLeft, isMounted, showCompleteDialog, reportResult, showSuccessView, isLastExercise]);
+    const duration = videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60;
+    if (freeMode || duration === 0) return;
 
-  // Auto-stop timer when time runs out
-  useEffect(() => {
-    if (timeLeft > 0) return;
-    if (isPlaying) stopTimer();
-    if (metronome.isPlaying) metronome.toggleMetronome();
-  }, [timeLeft, isPlaying, metronome.isPlaying, stopTimer]);
-
-  // ── Hide site header during session ───────────────────────────────────────
+    return timer.subscribe((time) => {
+      const remaining = Math.max(0, Math.floor((duration * 1000 - time) / 1000));
+      if (remaining > 0) return;
+      if (isPlaying) stopTimer();
+      if (metronome.isPlaying) metronome.toggleMetronome();
+    });
+  }, [timer, isPlaying, metronome, stopTimer, freeMode, videoDuration, activeExercise.timeInMinutes]);
 
   useEffect(() => {
     const header = document.querySelector("header.sticky") as HTMLElement | null;
     if (header) header.style.display = "none";
-    return () => {
-      if (header) header.style.display = "";
-    };
+    return () => { if (header) header.style.display = ""; };
   }, []);
-
-  // ── Derived ───────────────────────────────────────────────────────────────
-
-  const category = currentExercise.category || "mixed";
 
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <NoteMatchingProvider
+      handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
+      effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
+      isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
+      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
+      getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
+      onReset={handleNoteMatchingReset}
+    >
+    <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
+    <BpmProgressProvider exercise={currentExercise}>
+    <SessionUIProvider>
     <>
-      <Head>
-        <title>{formattedTimeLeft} | {activeExercise.title}</title>
-      </Head>
+      <SessionPageHead exerciseTitle={activeExercise.title} />
 
-      {/* Generated Exercise Dialogs */}
-      <ScaleSelectionDialog
-        isOpen={showScaleDialog}
-        onClose={() => setShowScaleDialog(false)}
-        onExerciseGenerated={handleGenerated}
-      />
-      <ChordSelectionDialog
-        isOpen={showChordDialog}
-        onClose={() => setShowChordDialog(false)}
+      <GeneratedExerciseDialogs
+        showScaleDialog={showScaleDialog} setShowScaleDialog={setShowScaleDialog}
+        showChordDialog={showChordDialog} setShowChordDialog={setShowChordDialog}
         onExerciseGenerated={handleGenerated}
       />
 
-      {/* Mobile: report overlay */}
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
-          <RatingPopUp
-            ratingData={reportResult}
-            currentUserStats={currentUserStats}
-            previousUserStats={previousUserStats}
-            onClick={() => router.push("/dashboard")}
-            activityData={activityDataToUse}
-            onRestart={handleRestartFullSession}
+          <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
+            onClick={() => router.push("/dashboard")} activityData={activityDataToUse} onRestart={handleRestartFullSession}
           />
         </div>
       )}
 
-      {/* GP file loading overlay */}
-      {isFetchingGpFile && (
-        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center gap-4 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin" />
-          <p className="text-sm font-bold uppercase tracking-widest text-zinc-400">
-            Loading track…
-          </p>
-        </div>
-      )}
+      <GpLoadingOverlay isLoading={isFetchingGpFile} />
 
-      {/* Success view */}
-      {showSuccessView && !reportResult && (
+      {showSuccessView && !reportResult && successSnapshot && (
         <ExerciseSuccessView
-          planTitle={planTitleString}
+          planTitle={planTitleString} examMode={isExamMode}
+          score={successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
+          stats={{ accuracy: successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
+          timeline={successSnapshot.noteTimeline}
           onFinish={async () => {
-            metronome.stopMetronome();
-            await saveCurrentScores();
-            autoSubmitReport(
-              exerciseRecordsRef.current,
-              isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
-              currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
-            );
+            metronome.stopMetronome(); await saveCurrentScores();
+            autoSubmitReport(exerciseRecordsRef.current,
+              isMicEnabled ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
+              currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
+            if (isExamMode) onExamComplete?.(successSnapshot.accuracy);
           }}
           onRestart={() => {
-            resetSuccessView();
-            resetTimer();
-            metronome.restartMetronome();
-            startTimer();
-            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
-              metronome.startMetronome();
-            }
+            resetSuccessView(); resetTimer(); metronome.restartMetronome(); startTimer();
+            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();
           }}
           isLoading={isFinishing || isSubmittingReport}
         />
       )}
 
-      {/* Mobile modals */}
-      {isMobileView && (
-        <>
-          <ImageModal
-            isOpen={isImageModalOpen}
-            onClose={() => setIsImageModalOpen(false)}
-            imageSrc={currentExercise.imageUrl || currentExercise.image || ""}
-            imageAlt={currentExercise.title}
-          />
-          <SessionModal
-            isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
-            onClose={onClose || (() => router.push("/report"))}
-            onFinish={isLastExercise ? async () => {
-              metronome.stopMetronome();
-              await saveCurrentScores();
-              autoSubmitReport(
-                exerciseRecordsRef.current,
-                isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
-                currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
-              );
-            } : onFinish}
-            onImageClick={() => setIsImageModalOpen(true)}
-            isMounted={isMounted}
-            currentExercise={currentExercise}
-            nextExercise={nextExercise}
-            currentExerciseIndex={currentExerciseIndex}
-            totalExercises={plan.exercises.length}
-            isLastExercise={isLastExercise}
-            isPlaying={isPlaying}
-            formattedTimeLeft={formattedTimeLeft}
-            toggleTimer={handleToggleTimer}
-            handleNextExercise={handleNextExerciseClick}
-            handleBackExercise={() => {
-              stopTimer();
-              metronome.restartMetronome();
-              jumpToExercise(currentExerciseIndex - 1);
-            }}
-            sessionTimerData={sessionTimerData}
-            exerciseTimeSpent={exerciseTimeSpent}
-            setVideoDuration={setVideoDuration}
-            setTimerTime={setTimerTime}
-            startTimer={startTimer}
-            stopTimer={stopTimer}
-            isFinishing={isFinishing}
-            isSubmittingReport={isSubmittingReport}
-            canSkipExercise={canSkipExercise}
-            metronome={metronome}
-            effectiveBpm={effectiveBpm}
-            isMicEnabled={isMicEnabled}
-            toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-            gameState={gameState}
-            maxPossibleScore={maxPossibleScore}
-            sessionAccuracy={sessionAccuracy}
-            detectedNoteData={detectedNoteData}
-            isListening={isListening}
-            hitNotes={hitNotes}
-            currentBeatsElapsed={currentBeatsElapsed}
-            isAudioMuted={isAudioMuted}
-            setIsAudioMuted={setIsAudioMuted}
-            isMetronomeMuted={isMetronomeMuted}
-            setIsMetronomeMuted={setIsMetronomeMuted}
-            isHalfSpeed={isHalfSpeed}
-            onHalfSpeedToggle={handleHalfSpeedToggle}
-            activeTablature={activeTablature}
-            isRiddleRevealed={isRiddleRevealed}
-            isRiddleGuessed={isRiddleGuessed}
-            hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-            handleNextRiddle={handleNextRiddle}
-            handleRevealRiddle={handleRevealRiddle}
-            earTrainingScore={earTrainingScore}
-            earTrainingHighScore={earTrainingHighScore}
-            exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
-            onEarTrainingGuessed={() => {
-              setEarTrainingScore(s => s + 1);
-              setIsRiddleGuessed(true);
-              handleRevealRiddle();
-            }}
-            bpmStages={bpmStages}
-            completedBpms={completedBpms}
-            isBpmLoading={isBpmLoading}
-            onBpmToggle={handleToggleBpm}
-            onRecordsClick={() => setLeaderboardOpen(true)}
-          />
-        </>
+      {isMobileView && createPortal(
+        <SessionModal
+          examMode={isExamMode}
+          isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
+          onClose={onClose}
+          onFinish={isLastExercise ? async () => {
+            const snap = noteMatchingHandle.current?.snapshot();
+            metronome.stopMetronome(); await saveCurrentScores();
+            autoSubmitReport(exerciseRecordsRef.current,
+              isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+              currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
+            if (isExamMode && snap) onExamComplete?.(snap.accuracy);
+          } : onFinish}
+          isMounted={isMounted} currentExercise={currentExercise}
+          currentExerciseIndex={currentExerciseIndex} totalExercises={plan.exercises.length}
+          isLastExercise={isLastExercise} isPlaying={isPlaying}
+          handleNextExercise={handleNextExerciseClick}
+          handleBackExercise={() => { stopTimer(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1); }}
+          setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
+          startTimer={startTimer} stopTimer={stopTimer}
+          isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
+          metronome={metronome} effectiveBpm={effectiveBpm}
+          isMicEnabled={isMicEnabled} toggleMic={handleMicToggle}
+          frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef} isListening={isListening}
+          onRecalibrate={handleRecalibrate}
+          isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
+          isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+          speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
+          activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
+          isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
+          handleNextRiddle={handleNextRiddle} handleRevealRiddle={handleRevealRiddle}
+          earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
+          onEarTrainingGuessed={handleEarTrainingGuessed}
+        />,
+        document.body,
       )}
 
-      {/* ── Desktop view ──────────────────────────────────────────────────── */}
-      <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", reportResult ? "overflow-y-auto" : "overflow-hidden", isMobileView && "hidden")}>
+      <DesktopSessionView
+        reportResult={reportResult}
+        currentUserStats={currentUserStats} previousUserStats={previousUserStats}
+        activityDataToUse={activityDataToUse} router={router}
+        handleRestartFullSession={handleRestartFullSession}
+        plan={plan} currentExercise={currentExercise} activeExercise={activeExercise}
+        category={currentExercise.category || "mixed"}
+        currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
+        handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
+        allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
+        selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
+        handleToggleAlphaTabScore={toggleAlphaTabScore}
+        effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
+        isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}
+        effectiveBpm={effectiveBpm} isAudioMuted={isAudioMuted}
+      
+        countInRemaining={(metronome as any).countInRemaining ?? 0}
+        frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef}
+        isListening={isListening} metronomeAudioContext={metronome.audioContext}
+        effectiveAudioStartTime={effectiveAudioStartTime}
+        tabResetKey={tabResetKey + tabRestartKey}
+        isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
+        hasPlayedRiddleOnce={hasPlayedRiddleOnce} earTrainingScore={earTrainingScore}
+        earTrainingHighScore={earTrainingHighScore}
+        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
+        handleEarTrainingGuessed={handleEarTrainingGuessed}
+        isPlaying={isPlaying} handleToggleTimer={handleToggleTimer}
+        startTimer={startTimer} stopTimer={stopTimer}
+        setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
+        handleNextExerciseClick={handleNextExerciseClick}
+        onAudioToggle={handleAudioToggle} onMicToggle={handleMicToggle}
+        onRecalibrate={handleRecalibrate} speedMultiplier={speedMultiplier}
+        handleSpeedMultiplierChange={handleSpeedMultiplierChange}
+        metronome={metronome} isMetronomeMuted={isMetronomeMuted}
+        setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
+        trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
+        examMode={examModeObject} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
+        handleRestart={handleRestart}
+        canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
+        jumpToExercise={jumpToExercise} isFinishing={isFinishing}
+        isSubmittingReport={isSubmittingReport}
+        onFinishSession={async () => { metronome.stopMetronome(); await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
+        onClose={onClose} skipExitDialog={skipExitDialog}
+        planHasTablature={planHasTablature} planHasGpFile={planHasGpFile} planHasStrumming={planHasStrumming}
+      />
 
-        {/* Background ambiance glows */}
-        {!reportResult && (
-          <>
-            <div className={cn(
-              "absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-20 transition-all duration-1000",
-              category === "technique"  && "bg-blue-500",
-              category === "theory"     && "bg-emerald-500",
-              category === "creativity" && "bg-purple-500",
-              category === "hearing"    && "bg-orange-500",
-              category === "mixed"      && "bg-cyan-500",
-              currentExercise.isPlayalong && "bg-red-600 opacity-30 blur-[150px]"
-            )} />
-            <div className={cn(
-              "absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 transition-all duration-1000",
-              category === "technique"  && "bg-indigo-500",
-              category === "theory"     && "bg-green-500",
-              category === "creativity" && "bg-pink-500",
-              category === "hearing"    && "bg-amber-500",
-              category === "mixed"      && "bg-blue-500"
-            )} />
-          </>
-        )}
-
-        <TooltipProvider>
-          <div>
-            <div className={cn(
-              "mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10",
-              reportResult && "max-w-7xl px-4 pt-8"
-            )}>
-
-              {/* ── Report result ── */}
-              {reportResult && currentUserStats && previousUserStats ? (
-                <div className="animate-in fade-in duration-700 slide-in-from-bottom-4">
-                  <RatingPopUp
-                    ratingData={reportResult}
-                    currentUserStats={currentUserStats}
-                    previousUserStats={previousUserStats}
-                    onClick={() => router.push("/dashboard")}
-                    activityData={activityDataToUse}
-                    hideWrapper={true}
-                    onRestart={handleRestartFullSession}
-                  />
-                </div>
-              ) : (
-                <>
-                  {/* 1. Progress bar */}
-                  <div className="mb-8">
-                    <ExerciseProgress
-                      plan={plan}
-                      currentExerciseIndex={currentExerciseIndex}
-                      completedExercises={completedExercises}
-                      onExerciseSelect={(idx) => {
-                        stopTimer();
-                        metronome.restartMetronome();
-                        jumpToExercise(idx);
-                      }}
-                    />
-                  </div>
-
-                  {/* 2. Hero section */}
-                  <div className={cn(
-                    "flex flex-col items-center justify-center text-center",
-                    currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-8"
-                  )}>
-                    <h2 className={cn(
-                      "font-bold text-white tracking-tight flex flex-wrap items-center justify-center gap-3 mb-8",
-                      currentExercise.isPlayalong ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
-                    )}>
-                      {currentExercise.isPlayalong && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10 backdrop-blur-sm">
-                          <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                          <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
-                        </div>
-                      )}
-                      {activeExercise.title}
-                    </h2>
-
-                    {activeExercise.customGoal && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        key={currentExercise.customGoal}
-                        className="mb-12 flex flex-col items-center gap-4"
-                      >
-                        <div className="relative group">
-                          <div className="absolute -inset-8 bg-cyan-500/20 blur-[40px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-                          <div className="relative w-32 h-32 rounded-3xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-                            <span className="text-6xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-                              {currentExercise.customGoal}
-                            </span>
-                          </div>
-                        </div>
-                        {currentExercise.customGoalDescription && (
-                          <p className="text-xs text-zinc-500 font-semibold tracking-wide mt-2">
-                            {currentExercise.customGoalDescription}
-                          </p>
-                        )}
-                      </motion.div>
-                    )}
-
-                    {!!(plan as any).streakDays && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-10 w-full max-w-2xl px-6 py-4 rounded-xl bg-main/10 border border-main/20 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-lg bg-main text-white"><Timer size={20} /></div>
-                          <div>
-                            <h3 className="text-lg font-bold text-white tracking-tight">
-                              Challenge: {(plan as any).title}
-                            </h3>
-                            <p className="text-sm text-zinc-400 leading-relaxed">{(plan as any).description}</p>
-                            <p className="text-xs text-main font-semibold tracking-wide">
-                              Reward: {(plan as any).rewardDescription}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-1.5">
-                          {Array.from({ length: (plan as any).streakDays }).map((_, i) => (
-                            <div key={i} className="h-1.5 w-6 rounded-full bg-main/20 border border-main/10" />
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Mic game HUD */}
-                    {isMicEnabled && (
-                      <MicHud
-                        gameState={gameState}
-                        maxPossibleScore={maxPossibleScore}
-                        sessionAccuracy={sessionAccuracy}
-                      />
-                    )}
-
-                    {/* GP track selector */}
-                    {allGpTracks && allGpTracks.length > 1 && !showAlphaTabScore && (
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Track:</span>
-                        {allGpTracks.map((track, idx) => (
-                          <button
-                            key={track.id}
-                            onClick={() => setSelectedGpTrackIdx(idx)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
-                              selectedGpTrackIdx === idx
-                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                                : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
-                            )}
-                          >
-                            {track.trackType === "drums" ? <Drum className="h-3 w-3" /> : <Music className="h-3 w-3" />}
-                            {track.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* 3. Content area (tab / notation / video / image) */}
-                    <ExerciseContentArea
-                      activeTablature={activeTablature}
-                      currentExercise={currentExercise}
-                      activeExercise={activeExercise}
-                      rawGpFile={effectiveRawGpFile}
-                      showAlphaTabScore={showAlphaTabScore}
-                      onToggleAlphaTabScore={handleToggleAlphaTabScore}
-                      isAudioPlaying={isAudioPlaying}
-                      startTime={metronome.startTime}
-                      effectiveBpm={effectiveBpm}
-                      isAudioMuted={isAudioMuted}
-                      isMobileView={isMobileView}
-                      isMetronomePlaying={metronome.isPlaying}
-                      countInRemaining={(metronome as any).countInRemaining ?? 0}
-                      detectedNoteData={detectedNoteData}
-                      isListening={isListening}
-                      hitNotes={hitNotes}
-                      currentBeatsElapsed={currentBeatsElapsed}
-                      audioContext={metronome.audioContext}
-                      audioStartTime={effectiveAudioStartTime}
-                      tabResetKey={tabResetKey + tabRestartKey}
-                      isRiddleRevealed={isRiddleRevealed}
-                      isRiddleGuessed={isRiddleGuessed}
-                      hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-                      earTrainingScore={earTrainingScore}
-                      earTrainingHighScore={earTrainingHighScore}
-                      onPlayRiddle={handleToggleTimer}
-                      onRevealRiddle={handleRevealRiddle}
-                      onNextRiddle={handleNextRiddle}
-                      onEarTrainingGuessed={() => {
-                        setEarTrainingScore(s => s + 1);
-                        setIsRiddleGuessed(true);
-                        handleRevealRiddle();
-                      }}
-                      onLeaderboardClick={() => setLeaderboardOpen(true)}
-                      imageScale={imageScale}
-                      setImageScale={setImageScale}
-                      containerRef={containerRef}
-                      setIsImageModalOpen={setIsImageModalOpen}
-                      handleZoomIn={handleZoomIn}
-                      handleZoomOut={handleZoomOut}
-                      resetImagePosition={resetImagePosition}
-                      startTimer={startTimer}
-                      stopTimer={stopTimer}
-                      setVideoDuration={setVideoDuration}
-                      setTimerTime={setTimerTime}
-                      onVideoEnd={handleNextExerciseClick}
-                      isPlaying={isPlaying}
-                      isMicEnabled={isMicEnabled}
-                      strumSlotFeedback={strumSlotFeedback}
-                    />
-                  </div>
-
-                  {/* 4. Controls & Instructions */}
-                  {/* 4. Controls & Instructions */}
-                  {/* 4. Controls & Instructions */}
-                  {(() => {
-                    const instructionsNode = activeExercise.instructions && activeExercise.instructions.length > 0 && (
-                      <Accordion type="single" collapsible defaultValue="instructions" className="w-full">
-                        <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-                                <FaInfoCircle />
-                              </div>
-                              <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-6 pb-6 pt-2">
-                            <div className={cn(
-                              "prose prose-invert max-w-none",
-                              currentExercise.isPlayalong && "text-sm leading-relaxed opacity-70"
-                            )}>
-                              {activeExercise.instructions.map((instruction, idx) => (
-                                <p key={idx} className="mb-4 last:mb-0">{instruction}</p>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    );
-
-                    const tipsNode = activeExercise.tips && activeExercise.tips.length > 0 && (
-                      <Accordion type="single" collapsible defaultValue="tips" className="w-full">
-                        <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-                                <FaLightbulb />
-                              </div>
-                              <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-6 pb-6 pt-2">
-                            <ul className={cn(
-                              "list-inside list-disc",
-                              currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
-                            )}>
-                              {activeExercise.tips.map((tip, idx) => (
-                                <li key={idx} className="marker:text-amber-500/50">{tip}</li>
-                              ))}
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    );
-
-                    return (
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 w-full max-w-[1800px] mx-auto items-start">
-                        {currentExercise.metronomeSpeed ? (
-                          <div className="w-full flex flex-col gap-6 lg:col-span-4">
-                            {instructionsNode}
-                            {tipsNode}
-                          </div>
-                        ) : (
-                          <>
-                            {instructionsNode && (
-                              <div className={cn("w-full flex flex-col", !activeExercise.tips?.length ? "lg:col-span-9" : "lg:col-span-5")}>
-                                {instructionsNode}
-                              </div>
-                            )}
-                            {tipsNode && (
-                              <div className={cn("w-full flex flex-col", !activeExercise.instructions?.length ? "lg:col-span-9" : "lg:col-span-4")}>
-                                {tipsNode}
-                              </div>
-                            )}
-                          </>
-                        )}
-
-                        <SessionSidebar
-                          currentExercise={currentExercise}
-                          activeExercise={activeExercise}
-                          metronome={metronome}
-                          effectiveBpm={effectiveBpm}
-                          isMetronomeMuted={isMetronomeMuted}
-                          setIsMetronomeMuted={setIsMetronomeMuted}
-                          isHalfSpeed={isHalfSpeed}
-                          setIsHalfSpeed={handleHalfSpeedToggle}
-                          isAudioMuted={isAudioMuted}
-                          setIsAudioMuted={setIsAudioMuted}
-                          saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
-                          soundfontsReady={soundfontsReady}
-                          isMicEnabled={isMicEnabled}
-                          showMicControls={planHasTablature || planHasGpFile || planHasStrumming}
-                          toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-                          setSessionPhase={setSessionPhase}
-                          audioTracks={audioTracks}
-                          trackConfigs={trackConfigs}
-                          setTrackConfigs={setTrackConfigs}
-                          bpmStages={bpmStages}
-                          completedBpms={completedBpms}
-                          isBpmLoading={isBpmLoading}
-                          onBpmToggle={handleToggleBpm}
-                        />
-                      </div>
-                    );
-                  })()}
-
-                  {/* 5. Bottom bar */}
-                  {!reportResult && (
-                    <SessionBottomBar
-                      onClose={onClose}
-                      exerciseKey={exerciseKey}
-                      currentExercise={currentExercise}
-                      isLastExercise={isLastExercise}
-                      isPlaying={isPlaying}
-                      timerProgressValue={timerProgressValue}
-                      formattedTimeLeft={formattedTimeLeft}
-                      toggleTimer={handleToggleTimer}
-                      handleRestart={handleRestart}
-                      handleNextExerciseClick={handleNextExerciseClick}
-                      sessionTimerData={sessionTimerData}
-                      exerciseTimeSpent={exerciseTimeSpent}
-                      canSkipExercise={canSkipExercise}
-                      canFinishSession={canFinishSession}
-                      isSkillExercise={isSkillExercise}
-                      timeLeft={timeLeft}
-                      currentExerciseIndex={currentExerciseIndex}
-                      onGoToPreviousExercise={() => {
-                        stopTimer();
-                        metronome.restartMetronome();
-                        jumpToExercise(currentExerciseIndex - 1);
-                      }}
-                      isFinishing={isFinishing}
-                      isSubmittingReport={isSubmittingReport}
-                      onFinishSession={async () => {
-                        metronome.stopMetronome();
-                        await saveCurrentScores();
-                        autoSubmitReport(exerciseRecordsRef.current);
-                      }}
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </TooltipProvider>
-      </div>
-
-      {/* ── Session dialogs ─────────────────────────────────────────────── */}
       <SessionDialogs
-        showCompleteDialog={showCompleteDialog}
-        setShowCompleteDialog={setShowCompleteDialog}
-        exerciseTitle={currentExercise.title}
-        exerciseDuration={currentExercise.timeInMinutes}
-        onFinish={onFinish}
-        resetTimer={resetTimer}
-        startTimer={startTimer}
-        sessionPhase={sessionPhase}
-        handleEnableMic={handleEnableMic}
-        handleSkipMic={handleSkipMic}
+        showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
+        exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
+        onFinish={onFinish} resetTimer={resetTimer} startTimer={startTimer}
+        sessionPhase={sessionPhase} examMode={isExamMode}
+        handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
-        handleReuseCalibration={handleReuseCalibration}
-        handleRecalibrate={handleRecalibrate}
-        handleCalibrationCancel={handleCalibrationCancel}
-        handleCalibrationComplete={handleCalibrationComplete}
-        audioInit={initAudio}
-        audioClose={closeAudio}
-        audioRefs={audioRefs}
-        isListening={isListening}
-        inputGain={inputGain}
-        setInputGain={setInputGain}
-        leaderboardOpen={leaderboardOpen}
-        setLeaderboardOpen={setLeaderboardOpen}
-        exerciseId={activeExercise.id}
-        showCompletionNotification={showCompletionNotification}
+        handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}
+        handleCalibrationCancel={handleCalibrationCancel} handleCalibrationComplete={handleCalibrationComplete}
+        audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
+        isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
+        exerciseId={activeExercise.id} isMounted={isMounted}
+        hasReportResult={!!reportResult} showSuccessView={showSuccessView}
+        isLastExercise={isLastExercise}
       />
     </>
+    </SessionUIProvider>
+    </BpmProgressProvider>
+    </TimerProvider>
+    </NoteMatchingProvider>
   );
 };
+

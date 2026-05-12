@@ -34,6 +34,10 @@ export const updateSeasonalPoints = async (
     points: (currentSeasonData.points || 0) + pointsDelta,
     displayName: userData?.displayName || "Unknown User",
     avatar: userData?.avatar || "",
+    selectedFrame: userData?.selectedFrame || 0,
+    selectedGuitar: userData?.selectedGuitar || "",
+    selectedGuitarYear: userData?.selectedGuitarYear || 0,
+    selectedGuitarCountry: userData?.selectedGuitarCountry || "",
     seasonId: season.seasonId,
   }, { merge: true });
 };

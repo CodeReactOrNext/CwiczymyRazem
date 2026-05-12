@@ -1,5 +1,4 @@
 import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
-import { useTranslation } from "hooks/useTranslation";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";

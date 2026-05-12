@@ -1,15 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
+import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import type {
   ArsenalUserData,
-  GuitarRarity,
   InventoryItem,
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;

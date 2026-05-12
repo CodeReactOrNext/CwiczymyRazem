@@ -4,13 +4,13 @@ import { z } from "zod";
 
 const VECTOR_STORE_ID = "vs_69a3216531448191af85bd88fbe35695";
 
-const ExerciseSchema = z.object({ exercise_id: z.string() });
+const ExerciseSchema = z.object({ exercise_ids: z.array(z.string()).min(1).max(2) });
 
 const agent = new Agent({
   name: "Exercise search agent",
   instructions:
-    "You are a guitar exercise search agent. Search the knowledge base and choose the single best exercise that matches the given roadmap step context. Return ONLY valid JSON: { \"exercise_id\": \"<id>\" }. No explanation. One ID only.",
-  model: "gpt-4.1",
+    "You are a guitar exercise search agent. Search the knowledge base and choose the top 2 best exercises that match the given context. Return ONLY valid JSON: { \"exercise_ids\": [\"<id1>\", \"<id2>\"] }. No explanation. Two IDs only, or one if only one matches well.",
+  model: "gpt-5-mini",
   tools: [fileSearchTool([VECTOR_STORE_ID])],
   outputType: ExerciseSchema,
   modelSettings: {
@@ -81,9 +81,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return runResult.finalOutput;
     });
 
-    return res.status(200).json({ exercise_id: result.exercise_id });
+    return res.status(200).json({ exercise_ids: result.exercise_ids });
   } catch (err: any) {
     console.warn("search-exercise error:", err);
-    return res.status(200).json({ exercise_id: null });
+    return res.status(200).json({ exercise_ids: [] });
   }
 }

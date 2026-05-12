@@ -7,7 +7,7 @@ export interface UserSongLists {
   lastUpdated: Timestamp;
 }
 
-export interface SongDifficulty {
+interface SongDifficulty {
   userId: string;
   rating: number;
   date: Timestamp;
@@ -34,9 +34,11 @@ export interface Song {
   artist_lowercase?: string;
   tier?: string;
   spotifyId?: string;
+  masteryProgress?: number;
+  totalSections?: number;
 }
 
-export interface UserSongStatus {
+interface UserSongStatus {
   userId: string;
   songId: string;
   status: SongStatus;

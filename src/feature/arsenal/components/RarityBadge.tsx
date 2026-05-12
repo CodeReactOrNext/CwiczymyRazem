@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+
 import type { GuitarRarity } from "../types/arsenal.types";
 
 export const RARITY_STYLES: Record<GuitarRarity, { 

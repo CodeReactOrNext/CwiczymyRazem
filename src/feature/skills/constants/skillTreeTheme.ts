@@ -1,6 +1,6 @@
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 
-export type SkillColorTheme = {
+type SkillColorTheme = {
   primary: string; // Text/Border/Glow (e.g. text-red-400)
   bg: string; // Background tint (e.g. bg-red-500/10)
   border: string; // Border color (e.g. border-red-500)
@@ -9,7 +9,7 @@ export type SkillColorTheme = {
   line: string; // SVG Line color
 };
 
-export const SKILL_CATEGORY_THEMES: Record<CategoryKeys, SkillColorTheme> = {
+const SKILL_CATEGORY_THEMES: Record<CategoryKeys, SkillColorTheme> = {
   technique: {
     primary: "text-red-400",
     bg: "bg-red-900/20",

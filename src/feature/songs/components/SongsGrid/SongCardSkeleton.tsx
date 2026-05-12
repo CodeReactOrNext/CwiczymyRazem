@@ -5,14 +5,14 @@ export const SongCardSkeleton = () => {
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-md",
+        "relative flex flex-col justify-between overflow-hidden rounded-[8px] border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-md",
         "w-full h-[236px]"
       )}
     >
       {/* Header Section */}
       <div className="flex items-start gap-4">
         {/* Cover Image Skeleton */}
-        <Skeleton className="h-20 w-20 rounded-2xl shrink-0" />
+        <Skeleton className="h-20 w-20 rounded-[8px] shrink-0" />
         
         <div className="min-w-0 flex-1 pt-1 space-y-2">
             {/* Title Skeleton */}
@@ -38,7 +38,7 @@ export const SongCardSkeleton = () => {
 
       {/* Footer Section */}
       <div className="mt-auto pt-4">
-        <Skeleton className="h-8 w-full rounded-xl" />
+        <Skeleton className="h-8 w-full rounded-[8px]" />
       </div>
     </div>
   );

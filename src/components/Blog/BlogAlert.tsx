@@ -1,7 +1,7 @@
+import { AlertTriangle, Info, Lightbulb, Zap, Star } from 'lucide-react';
 import React from 'react';
-import { Info, AlertTriangle, Lightbulb, Zap } from 'lucide-react';
 
-type AlertType = 'info' | 'warning' | 'tip' | 'important';
+type AlertType = 'info' | 'warning' | 'tip' | 'important' | 'takeaway';
 
 interface BlogAlertProps {
   type?: AlertType;
@@ -32,6 +32,12 @@ const config = {
     baseClass: 'border-purple-500/30 bg-purple-500/5 text-purple-200',
     iconClass: 'text-purple-400',
     title: 'Important'
+  },
+  takeaway: {
+    icon: Star,
+    baseClass: 'border-rose-500/30 bg-rose-500/5 text-rose-200',
+    iconClass: 'text-rose-400',
+    title: 'Takeaway'
   }
 };
 

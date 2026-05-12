@@ -84,6 +84,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
 
   // Tick countdown
   useEffect(() => {
+    
     if (!isRunning) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);

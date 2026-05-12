@@ -1,6 +1,6 @@
 import { addZeroToTime, convertMsToHMObject } from "utils/converter";
 
-export interface StopwatchProps {
+interface StopwatchProps {
   time: number;
   timerData: {
     creativity: number;
@@ -99,7 +99,7 @@ const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
 
       <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full text-white'>
         <div className='text-center'>
-          <p className='font-sans text-5xl font-semibold tracking-wider'>
+          <p translate="no" className='font-sans text-5xl font-semibold tracking-wider'>
             {convertMsToHMObject(time).minutes}:
             {addZeroToTime(convertMsToHMObject(time).seconds)}
           </p>
@@ -109,4 +109,4 @@ const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
   );
 };
 
-export default Stopwatch;
+Stopwatch;

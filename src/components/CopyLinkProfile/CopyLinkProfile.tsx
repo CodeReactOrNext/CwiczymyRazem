@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Link2 } from "lucide-react";
+import { Link2, User } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { MdCheck, MdCopyAll } from "react-icons/md";
+import { MdCheck } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 
 export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {
@@ -27,16 +27,26 @@ export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon
     }, 1500);
   };
 
+  if (mode === "default") {
+    return (
+      <Link href={`/user/${profilePath}`}>
+        <Button
+          variant="outline"
+          className="z-40 click-behavior m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed text-center text-[0.7rem] xs:text-xs"
+        >
+          <User className="text-[1rem]" />
+          See your profile
+        </Button>
+      </Link>
+    );
+  }
+
   return (
     <Button
-      variant={mode === "icon" ? "ghost" : "outline"}
-      size={mode === "icon" ? "icon" : "default"}
+      variant="ghost"
+      size="icon"
       onClick={handleCopyLink}
-      className={cn(
-        "z-40 click-behavior",
-        mode === "default" && "m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed text-center text-[0.7rem] xs:text-xs",
-        mode === "icon" && "h-8 w-8"
-      )}
+      className="z-40 click-behavior h-8 w-8"
     >
       <AnimatePresence mode='wait'>
         {isCopied ? (
@@ -50,7 +60,7 @@ export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon
               stiffness: 300,
               damping: 15,
             }}>
-            <MdCheck className={cn("text-green-500", mode === "icon" ? "text-sm" : "text-[1rem]")} />
+            <MdCheck className="text-green-500 text-sm" />
           </motion.div>
         ) : (
           <motion.div
@@ -63,12 +73,10 @@ export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon
               stiffness: 300,
               damping: 15,
             }}>
-            {mode === "icon" ? <Link2 size={14} /> : <MdCopyAll className='text-[1rem]' />}
+            <Link2 size={14} />
           </motion.div>
         )}
       </AnimatePresence>
-      {mode === "default" && t("common:button.link_copy_profile")}
     </Button>
-
   );
 };

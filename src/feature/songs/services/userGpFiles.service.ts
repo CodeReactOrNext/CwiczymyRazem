@@ -1,3 +1,4 @@
+import { getIdToken } from "firebase/auth";
 import {
   addDoc,
   collection,
@@ -8,9 +9,8 @@ import {
   query,
   serverTimestamp,
 } from "firebase/firestore";
-import { getIdToken } from "firebase/auth";
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { db, storage, auth } from "utils/firebase/client/firebase.utils";
+import { auth,db, storage } from "utils/firebase/client/firebase.utils";
 
 
 export interface UserGpFile {

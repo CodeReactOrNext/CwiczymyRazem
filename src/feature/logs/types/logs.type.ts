@@ -93,7 +93,7 @@ export interface FirebaseLogsInterface {
   earTrainingPerformance?: { score: number };
 }
 
-export interface FirebaseLogsAchievementsInterface {
+interface FirebaseLogsAchievementsInterface {
   uid: string;
   userName: string;
   achievements: AchievementList[];
@@ -102,7 +102,7 @@ export interface FirebaseLogsAchievementsInterface {
   avatarUrl: string | null;
 }
 
-export interface FirebaseLogsLvlInterface {
+interface FirebaseLogsLvlInterface {
   uid: string;
   userName: string;
   lvl: number;

@@ -1,4 +1,4 @@
-export const padTo2Digits = (number: number) => {
+const padTo2Digits = (number: number) => {
   return number.toString().padStart(2, "0");
 };
 

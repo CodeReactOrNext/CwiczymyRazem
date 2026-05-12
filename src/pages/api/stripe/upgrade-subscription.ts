@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 const MASTER_PRICE_IDS = {

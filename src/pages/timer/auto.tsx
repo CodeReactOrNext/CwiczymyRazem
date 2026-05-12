@@ -1,11 +1,12 @@
 import MainContainer from "components/MainContainer";
+import { HeroBanner } from "components/UI/HeroBanner";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import AppLayout from "layouts/AppLayout";
-import posthog from "posthog-js";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import type { ReactElement } from "react";
 import { useEffect,useState } from "react";
 import type { NextPageWithLayout } from "types/page";
@@ -50,11 +51,27 @@ const TimerAuto: NextPageWithLayout = () => {
           <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
         </MainContainer>
       ) : (
-        <AutoPlanGenerator
-          onBack={handleBack}
-          onSelectPlan={handleAutoPlanSelect}
-          isStarting={isStarting}
-        />
+        <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+          <HeroBanner
+            title="Exercises"
+            subtitle="Build your skills with focused practice exercises"
+            eyebrow="Exercise Hub"
+            className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+            rightContent={
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
+              >
+                Back
+              </button>
+            }
+          />
+          <AutoPlanGenerator
+            onBack={handleBack}
+            onSelectPlan={handleAutoPlanSelect}
+            isStarting={isStarting}
+          />
+        </div>
       )}
     </PremiumGate>
   );

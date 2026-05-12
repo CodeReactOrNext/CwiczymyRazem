@@ -103,7 +103,7 @@ export const EarTrainingLeaderboardDialog = ({
                     </div>
 
                     {/* Name */}
-                    <span className={cn(
+                    <span translate="no" className={cn(
                       "flex-1 text-sm font-bold truncate",
                       isCurrentUser ? "text-cyan-300" : "text-zinc-300"
                     )}>

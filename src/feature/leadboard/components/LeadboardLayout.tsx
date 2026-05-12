@@ -1,17 +1,17 @@
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import { useTranslation } from "hooks/useTranslation";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
+import { SeasonRewards } from "./SeasonRewards";
 import SeasonSelect from "./SeasonSelect";
-import UserStats from "./UserStats";
-import { HeroBanner } from "components/UI/HeroBanner";
 
 export type SortByType = "points" | "sessionCount";
 
-export interface LeaderboardProps {
+interface LeaderboardProps {
   usersData: FirebaseUserDataInterface[];
   currentUserId: string | null;
   isLoading: boolean;
@@ -54,17 +54,13 @@ export const LeadboardLayout = ({
       {isSeasonalView ? (
         <HeroBanner
           title={currentSeason?.name ?? "Season"}
-          subtitle={currentSeason ? `Current season started on ${formatDate(currentSeason.startDate)} and ends on ${formatDate(currentSeason.endDate)}.` : "Practice to climb the leaderboard."}
-          characterImage="/images/3d/seasons.png"
+          subtitle={currentSeason ? `${formatDate(currentSeason.startDate)} – ${formatDate(currentSeason.endDate)}` : "Practice to climb the leaderboard."}
           eyebrow="Seasonal ranking"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           rightContent={
-            <div className='flex items-center gap-4 bg-black/20 backdrop-blur-md rounded-xl px-6 py-4 border border-white/5'>
-              <UserStats
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                totalUsers={totalUsers}
-              />
+            <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
+
+              <SeasonRewards />
             </div>
           }
         />
@@ -79,17 +75,15 @@ export const LeadboardLayout = ({
       )}
 
       <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
-        <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-8'>
-          <div className='flex flex-wrap items-center gap-6'>
-            {isSeasonalView && (
-              <SeasonSelect
-                seasons={seasons}
-                selectedSeason={selectedSeason}
-                setSelectedSeason={setSelectedSeason}
-                isLoading={isLoading}
-              />
-            )}
-          </div>
+        <div className='flex flex-wrap items-center gap-6 mb-8'>
+          {isSeasonalView && (
+            <SeasonSelect
+              seasons={seasons}
+              selectedSeason={selectedSeason}
+              setSelectedSeason={setSelectedSeason}
+              isLoading={isLoading}
+            />
+          )}
         </div>
 
         {/* Enhanced Content Container */}
@@ -133,6 +127,8 @@ export const LeadboardLayout = ({
                     currentUserId={currentUserId}
                     selectedFrame={user.selectedFrame}
                     selectedGuitar={user.selectedGuitar}
+                    selectedGuitarYear={user.selectedGuitarYear}
+                    selectedGuitarCountry={user.selectedGuitarCountry}
                   />
                 ))}
               </ul>

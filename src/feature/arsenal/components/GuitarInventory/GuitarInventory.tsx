@@ -1,9 +1,10 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
-import { useQueryClient } from "@tanstack/react-query";
 import { PackageOpen } from "lucide-react";
 import { useEffect } from "react";
-import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
+
 import type { ArsenalUserData } from "../../types/arsenal.types";
 import { GuitarCard } from "./GuitarCard";
 
@@ -43,7 +44,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
           key={item.id}
           item={item}
           isEquipped={data.equippedGuitarId === item.guitarId}
-          onEquip={equip}
+          onEquip={(guitarId, year, country) => equip({ guitarId, year, country })}
           isEquipping={isEquipping}
         />
       ))}

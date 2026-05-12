@@ -1,6 +1,5 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
-import spiderPermutation3412Image from "./image.png";
 
 export const spiderPermutation3412Exercise: Exercise = {
   id: "spider_permutation_3412",

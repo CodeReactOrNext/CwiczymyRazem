@@ -19,7 +19,18 @@ const FaqPage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
+        <title>Guitar Practice FAQ — Questions Answered | Riff Quest</title>
+        <meta name="description" content="Answers to the most common Riff Quest questions — how it works, practice tracking, song library, pricing, and more." />
         <link rel='canonical' href={siteUrl} />
+        <meta property="og:title" content="Guitar Practice FAQ | Riff Quest" />
+        <meta property="og:description" content="Answers to the most common questions about Riff Quest guitar practice app." />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Guitar Practice FAQ | Riff Quest" />
+        <meta name="twitter:description" content="Answers to the most common questions about Riff Quest guitar practice app." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
       <FaqView />
     </>

@@ -7,13 +7,9 @@ import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateProfileCust
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
 import { signIn, signOut } from "next-auth/react";
 import posthog from "posthog-js";
-import type { RootState } from "store/store";
 import type {
-  // Challenges removed
-  DailyQuestTaskType,
   FetchedReportDataInterface,
   updateSocialInterface,
   updateUserInterface,
@@ -21,7 +17,6 @@ import type {
 } from "types/api.types";
 import {
   auth,
-  db,
   firebaseCheckUsersNameIsNotUnique,
   firebaseCreateAccountWithEmail,
   firebaseGetUserProviderData,
@@ -32,8 +27,6 @@ import {
   firebaseSignInWithGooglePopup,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
-import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
@@ -136,9 +129,9 @@ export const createAccount = createAsyncThunk(
       }
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const token = await user.getIdToken();
-      await signIn("credentials", { idToken: token, redirect: false });
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
+      await signIn("credentials", { idToken: token, redirect: false });
       posthog.identify(user.uid, { email: user.email ?? undefined, name: login });
       posthog.capture("user_signed_up", { method: "email", email: user.email, login });
       signUpSuccess();
@@ -320,7 +313,7 @@ export const uploadUserSocialData = createAsyncThunk(
 
 
 
-export interface RateSongPayload {
+interface RateSongPayload {
   songId: string;
   rating: number;
   title: string;
@@ -367,111 +360,3 @@ export const rateSong = createAsyncThunk(
 // checkAndSaveChallengeProgress removed
 
 // resetChallenge removed
-
-export const saveDailyQuestAction = createAsyncThunk(
-  "user/saveDailyQuest",
-  async (_, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as RootState;
-      const dailyQuest = state.user.currentUserStats?.dailyQuest;
-      const userId = auth.currentUser?.uid;
-
-      if (!userId || !dailyQuest) {
-        return;
-      }
-
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, {
-        "statistics.dailyQuest": dailyQuest
-      });
-
-      return dailyQuest;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to save daily quest"
-      );
-    }
-  }
-);
-
-/**
- * Thunk to update quest progress and persist it to Firebase
- */
-export const updateQuestProgress = createAsyncThunk(
-  "user/updateQuestProgress",
-  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch }) => {
-    const { completeQuestTask } = await import("./userSlice");
-    dispatch(completeQuestTask(payload));
-    dispatch(saveDailyQuestAction());
-  }
-);
-
-export const initializeDailyQuestAction = createAsyncThunk(
-  "user/initializeDailyQuest",
-  async (_, { dispatch, getState }) => {
-    const { generateDailyQuest } = await import("./userSlice");
-    const { exercisesAgregat } = await import("../../exercisePlan/data/exercisesAgregat");
-
-    // Filter exercises based on user plan
-    const state = getState() as RootState;
-    const role = state.user.userInfo?.role;
-    const isPremium = role === "pro" || role === "master" || role === "admin";
-    const availableExercises = isPremium
-      ? exercisesAgregat
-      : exercisesAgregat.filter((e) => !e.premium);
-
-    // Select random exercise from available pool
-    const randomExercise = availableExercises[Math.floor(Math.random() * availableExercises.length)];
-
-    dispatch(generateDailyQuest({
-      randomExercise: {
-        id: randomExercise.id,
-        title: randomExercise.title
-      }
-    }));
-    dispatch(saveDailyQuestAction());
-  }
-);
-
-export const claimQuestRewardAction = createAsyncThunk(
-  "user/claimQuestReward",
-  async (_, { dispatch, getState, rejectWithValue }) => {
-    try {
-      const { claimQuestReward } = await import("./userSlice");
-      const stateBefore = getState() as RootState;
-      const quest = stateBefore.user.currentUserStats?.dailyQuest;
-
-      if (!quest || quest.isRewardClaimed) {
-        return;
-      }
-
-      dispatch(claimQuestReward());
-      dispatch(saveDailyQuestAction());
-
-      const state = getState() as RootState;
-      const userId = auth.currentUser?.uid;
-      if (userId && state.user.currentUserStats) {
-        const userRef = doc(db, "users", userId);
-
-        // Update seasonal points
-        await updateSeasonalPoints(userId, 30);
-
-        // Update user document
-        await updateDoc(userRef, {
-          "statistics.points": state.user.currentUserStats.points,
-          "statistics.lvl": state.user.currentUserStats.lvl,
-        });
-
-        // Add quest log
-        const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");
-        await firebaseAddQuestLog(userId);
-
-        posthog.capture("daily_quest_claimed", {
-          points: state.user.currentUserStats.points,
-        });
-      }
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to claim reward");
-    }
-  }
-);

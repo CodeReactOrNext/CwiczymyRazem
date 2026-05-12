@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { ArrowLeft, Loader2, Map, Plus, Sparkles } from "lucide-react";
@@ -12,7 +13,6 @@ import { firebaseDeleteRoadmap, firebaseGetUserRoadmaps, firebaseSaveRoadmap } f
 import type { Roadmap } from "../types/roadmap.types";
 import RoadmapCard from "./RoadmapCard/RoadmapCard";
 import RoadmapView from "./RoadmapView/RoadmapView";
-import { Button } from "assets/components/ui/button";
 
 const PLAN_GEN_MESSAGES = [
   "Planning your learning journey...",
@@ -41,15 +41,15 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
   return (
     <div className="flex flex-col items-center gap-5 py-6">
       <div className="relative flex items-center justify-center">
-        <span className="absolute h-20 w-20 animate-ping rounded-full bg-emerald-500/8" />
-        <span className="absolute h-14 w-14 animate-pulse rounded-full bg-emerald-500/15" />
-        <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
-          <Sparkles className="h-6 w-6 text-emerald-400" />
+        <span className="absolute h-20 w-20 animate-ping rounded-full bg-cyan-500/8" />
+        <span className="absolute h-14 w-14 animate-pulse rounded-full bg-cyan-500/15" />
+        <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/40">
+          <Sparkles className="h-6 w-6 text-cyan-400" />
         </div>
       </div>
 
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-cyan-500/70">
           Roadmap is building your plan
         </p>
         <p
@@ -68,7 +68,7 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="h-1.5 w-1.5 rounded-full bg-emerald-500/60"
+            className="h-1.5 w-1.5 rounded-full bg-cyan-500/60"
             style={{ animation: `aicoach-bounce 1.2s ease-in-out ${i * 0.2}s infinite` }}
           />
         ))}
@@ -270,7 +270,7 @@ const AiCoachView = () => {
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-zinc-300">Your guitar goal</label>
                 <textarea
-                  className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                   rows={3}
                   maxLength={500}
                   placeholder="E.g. I want to learn blues improvisation, play solos like SRV..."
@@ -292,7 +292,7 @@ const AiCoachView = () => {
                         onClick={() => setLevel(l)}
                         className={`rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
                           level === l
-                            ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                            ? "border-cyan-500 bg-cyan-500/10 text-cyan-400"
                             : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
                         }`}
                       >
@@ -316,7 +316,7 @@ const AiCoachView = () => {
                 </button>
                 <button
                   onClick={handleGenerate}
-                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
+                  className="flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-500"
                 >
                   <Sparkles className="h-4 w-4" />
                   Generate plan
@@ -330,7 +330,7 @@ const AiCoachView = () => {
       {/* Roadmap cards */}
       {loadingRoadmaps ? (
         <div className="flex justify-center py-16">
-          <Loader2 className="h-7 w-7 animate-spin text-emerald-500" />
+          <Loader2 className="h-7 w-7 animate-spin text-cyan-500" />
         </div>
       ) : roadmaps.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -47,6 +47,6 @@ export const getGlobalLeaderboard = async (
   }
 };
 
-export const invalidateLeaderboardCache = () => {
+const invalidateLeaderboardCache = () => {
   memoryCache.clear('leaderboard');
 };

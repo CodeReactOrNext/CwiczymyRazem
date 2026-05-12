@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { ChevronRight, Info,Music, Play, Plus, Star, Users } from "lucide-react";
+import { ChevronRight, Info,Music, Plus, Star, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import React from "react";
 

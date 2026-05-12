@@ -1,7 +1,57 @@
 import type { Exercise } from '../types/exercise.types';
-import { scaleDefinitions, type ScaleType, rootNotes } from './scaleDefinitions';
-import { getScalePatternForPosition } from './fretboardMapper';
-import { generatePattern, type PatternType, getPatternName } from './patternGenerators';
+import { getScalePatternForPosition, getScaleOnString } from './fretboardMapper';
+import { generatePattern, getPatternName,type PatternType } from './patternGenerators';
+import { rootNotes,scaleDefinitions, type ScaleType } from './scaleDefinitions';
+
+const STRING_NAMES = ["high E", "B", "G", "D", "A", "low E"] as const;
+
+export interface SingleStringScaleConfig {
+  rootNote: string;
+  scaleType: ScaleType;
+  stringNum: number; // 1=high E, 2=B, 3=G, 4=D, 5=A, 6=low E
+}
+
+export function generateSingleStringScaleExercise(config: SingleStringScaleConfig): Exercise {
+  const { rootNote, scaleType, stringNum } = config;
+  const scaleDef = scaleDefinitions[scaleType];
+  const rootIndex = rootNotes.indexOf(rootNote);
+  const rootMidi = 60 + rootIndex;
+  const stringName = STRING_NAMES[stringNum - 1] ?? `String ${stringNum}`;
+
+  const positions = getScaleOnString(rootMidi, scaleDef.intervals, stringNum, 0, 15);
+
+  const tablature = generatePattern({
+    patternType: "ascending_descending",
+    positions,
+    noteDuration: 0.5,
+    beatsPerMeasure: 4,
+  });
+
+  return {
+    id: `scale_c_${scaleType}_string_${stringNum}`,
+    title: `${rootNote} ${scaleDef.name} – struna ${stringName}`,
+    description: `Zagraj gamę ${scaleDef.name} liniowo wzdłuż struny ${stringName}. Przejdź przez wszystkie nuty skali na jednej strunie.`,
+    difficulty: "easy",
+    category: "theory",
+    timeInMinutes: 5,
+    instructions: [
+      `Zagraj gamę ${rootNote} ${scaleDef.name} wzdłuż struny ${stringName} (struna ${stringNum}).`,
+      `Przesuwaj się po gryfie – nie zmieniaj struny.`,
+      `Graj w górę i w dół: od najniższej do najwyższej nuty i z powrotem.`,
+      `Użyj alternate picking (dół–góra–dół–góra).`,
+      `Zacznij powoli, skup się na czystości dźwięku.`,
+    ],
+    tips: [
+      `Granie na jednej strunie pomaga zrozumieć interwały skali i układ nut na gryfie.`,
+      `${scaleDef.description}`,
+      `Śledź wzrokiem gdzie są nuty skali – to buduje mapy gryfu w głowie.`,
+    ],
+    metronomeSpeed: { min: 50, max: 120, recommended: 70 },
+    relatedSkills: ["scales"],
+    tablature,
+    _generatorConfig: { rootNote, scaleType, patternType: "ascending_descending" as PatternType, position: 0 },
+  };
+}
 
 export interface ScaleExerciseConfig {
   rootNote: string; // 'C', 'D', 'E', etc.
@@ -128,7 +178,8 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
       recommended: baseRec
     },
     relatedSkills: ['scales'],
-    tablature
+    tablature,
+    _generatorConfig: config
   };
 }
 

@@ -1,4 +1,4 @@
-import { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const earTrainingEasy: Exercise = {
   id: "earTrainingEasy",

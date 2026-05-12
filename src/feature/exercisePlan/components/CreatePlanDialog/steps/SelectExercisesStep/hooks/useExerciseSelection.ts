@@ -1,6 +1,6 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useMemo, useState } from "react";
 
 interface UseExerciseSelectionProps {

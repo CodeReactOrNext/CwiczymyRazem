@@ -1,13 +1,14 @@
 import { cn } from "assets/lib/utils";
-import { Check } from "lucide-react";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+import { Check } from "lucide-react";
+
 import type { InventoryItem } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarCardProps {
   item: InventoryItem;
   isEquipped: boolean;
-  onEquip: (guitarId: number | string) => void;
+  onEquip: (guitarId: number | string, year?: number, country?: string) => void;
   isEquipping: boolean;
 }
 
@@ -108,7 +109,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
 
       {/* Equip button */}
       <button
-        onClick={() => onEquip(guitar.id)}
+        onClick={() => onEquip(guitar.id, item.year, item.country)}
         disabled={isEquipped || isEquipping}
         className={cn(
           "w-full py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",

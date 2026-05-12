@@ -12,7 +12,8 @@ import {
   selectUserAuth,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
-import { updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
@@ -58,6 +59,7 @@ const ReportView = () => {
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
 
@@ -492,7 +494,7 @@ const ReportView = () => {
                               placeholder='e.g. Practicing major scales'
                               className={`h-11 border-white/10 bg-zinc-900/40 text-sm shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
                               value={values.reportTitle}
-                              onChange={(e) => setFieldValue("reportTitle", e.target.value)}
+                              onChange={(e) => { setSelectedTags([]); setFieldValue("reportTitle", e.target.value); }}
                             />
                             {errors.reportTitle && (
                               <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-500">
@@ -501,32 +503,88 @@ const ReportView = () => {
                             )}
                           </div>
                           
-                          <div className='space-y-3 pt-2'>
-                            <div className='flex flex-wrap gap-2'>
-                                {[
-                                  { label: "Warmup", icon: "🎸", cat: "basic" },
-                                  { label: "Technique", icon: "⚡", cat: "basic" },
-                                  { label: "New Song", icon: "🎵", cat: "creative" },
-                                  { label: "Theory", icon: "📚", cat: "theory" },
-                                  { label: "Improvisation", icon: "✨", cat: "creative" },
-                                  { label: "Ear Training", icon: "👂", cat: "theory" },
-                                  { label: "Song Writing", icon: "✍️", cat: "creative" },
-                                  { label: "Speed Building", icon: "🏎️", cat: "basic" },
-                                  { label: "Jamming", icon: "🔊", cat: "creative" },
-                                  { label: "Night practice", icon: "🌙", cat: "basic" }
-                                ].map((tag) => (
-                                  <button
-                                    key={tag.label}
-                                    type="button"
-                                    onClick={() => setFieldValue("reportTitle", tag.label)}
-                                    className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold tracking-wide text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
-                                  >
-                                    <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
-                                    {tag.label}
-                                  </button>
-                                ))}
+                          <div className='space-y-5 pt-2'>
+                            {[
+                              { label: "Goal", icon: "🎯", tags: [
+                                { label: "Warmup", icon: "🎸" },
+                                { label: "Technique", icon: "⚡" },
+                                { label: "Speed Building", icon: "🏎️" },
+                                { label: "Ear Training", icon: "👂" },
+                              ]},
+                              { label: "Playing Style", icon: "🎸", tags: [
+                                { label: "Fingerpicking", icon: "🖐️" },
+                                { label: "Rhythm Training", icon: "🥁" },
+                                { label: "Vibrato", icon: "〰️" },
+                                { label: "Bends", icon: "🎯" },
+                              ]},
+                              { label: "Techniques", icon: "🧩", tags: [
+                                { label: "Legato", icon: "🌊" },
+                                { label: "Alt Picking", icon: "🔄" },
+                                { label: "Sweep Picking", icon: "🌪️" },
+                                { label: "Tapping", icon: "👆" },
+                                { label: "Hybrid Picking", icon: "🤏" },
+                                { label: "String Skipping", icon: "⏩" },
+                                { label: "Down Picking", icon: "⬇️" },
+                              ]},
+                              { label: "Theory & Knowledge", icon: "🎼", tags: [
+                                { label: "Scales", icon: "🎹" },
+                                { label: "Arpeggios", icon: "🎼" },
+                                { label: "Chords", icon: "🔗" },
+                                { label: "Theory", icon: "📚" },
+                                { label: "Sight Reading", icon: "👁️" },
+                                { label: "Transcribing", icon: "🎧" },
+                              ]},
+                              { label: "Creative", icon: "🎵", tags: [
+                                { label: "Improvisation", icon: "✨" },
+                                { label: "New Song", icon: "🎵" },
+                                { label: "Song Writing", icon: "✍️" },
+                                { label: "Composition", icon: "🖊️" },
+                                { label: "Jamming", icon: "🔊" },
+                              ]},
+                              { label: "Performance", icon: "🎤", tags: [
+                                { label: "Performance Prep", icon: "🎭" },
+                                { label: "Performing", icon: "🎤" },
+                                { label: "Cover Song", icon: "🎵" },
+                                { label: "Soloing", icon: "🌟" },
+                                { label: "Recording", icon: "⏺️" },
+                              ]},
+                            ].map((group) => (
+                              <div key={group.label} className="space-y-2">
+                                <p className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">
+                                  {group.icon} {group.label}
+                                </p>
+                                <div className='flex flex-wrap gap-2'>
+                                  {group.tags.map((tag) => {
+                                    const isActive = selectedTags.includes(tag.label);
+                                    return (
+                                      <button
+                                        key={tag.label}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedTags(prev => {
+                                            const newTags = prev.includes(tag.label)
+                                              ? prev.filter(t => t !== tag.label)
+                                              : [...prev, tag.label];
+                                            setFieldValue("reportTitle", newTags.join(" + "));
+                                            return newTags;
+                                          });
+                                        }}
+                                        className={cn(
+                                          "group flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[10px] font-bold tracking-wide transition-all",
+                                          isActive
+                                            ? "border-cyan-500/50 bg-cyan-500/20 text-cyan-300"
+                                            : "border-white/5 bg-zinc-900 text-zinc-500 hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                        )}
+                                      >
+                                        <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")}>{tag.icon}</span>
+                                        {tag.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
+                            ))}
+                          </div>
                           </div>
                        </div>
 

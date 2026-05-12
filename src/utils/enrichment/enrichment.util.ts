@@ -133,7 +133,7 @@ export async function fetchEnrichmentData(artist: string, title: string) {
   return { coverUrl: null, isVerified: false, source: "none" };
 }
 
-export async function fetchArtistSongs(artist: string): Promise<Array<{
+async function fetchArtistSongs(artist: string): Promise<Array<{
   title: string;
   artist: string;
   album?: string;

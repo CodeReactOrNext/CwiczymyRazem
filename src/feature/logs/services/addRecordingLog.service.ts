@@ -31,7 +31,7 @@ export const firebaseAddRecordingLog = async (
   const logData: FirebaseLogsRecordingsInterface = {
     uid,
     userName: userData.displayName,
-    userAvatarUrl: userData.photoURL || null,
+    userAvatarUrl: userData.avatar || null,
     videoUrl,
     recordingTitle,
     recordingId: recordingId,
@@ -41,7 +41,7 @@ export const firebaseAddRecordingLog = async (
     timestamp: new Date().toISOString(),
     type: "recording_added",
     data: videoUrl,
-    avatarUrl: userData.photoURL || null,
+    avatarUrl: userData.avatar || null,
     userAvatarFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
   };
 

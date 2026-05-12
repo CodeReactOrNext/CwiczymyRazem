@@ -1,6 +1,7 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+
 import type { ArsenalUserData } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface EffectCollectionProps {
   data: ArsenalUserData;

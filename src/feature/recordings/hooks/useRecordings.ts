@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getRecordings } from "feature/recordings/services/getRecordings";
 import { useEffect, useState } from "react";
 

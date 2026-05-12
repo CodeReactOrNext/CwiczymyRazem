@@ -1,22 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "assets/components/ui/pagination";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import posthog from "posthog-js";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import posthog from "posthog-js";
 import { useState } from "react";
-import { useAppSelector } from "store/hooks";
 
 interface SongsGridProps {
   songs: Song[];
@@ -53,6 +42,10 @@ export const SongsGrid = ({
     onTableStatusChange: onStatusChange,
   });
 
+  if (!userSongs) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
       {songs.length === 0 ? (
@@ -60,7 +53,7 @@ export const SongsGrid = ({
           <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in duration-500'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-in fade-in duration-500'>
           {songs.map((song) => {
             let userStatus: SongStatus | undefined;
             if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
@@ -76,6 +69,11 @@ export const SongsGrid = ({
                   posthog.capture("song_library_action", { action: "open_details", song_id: song.id });
                   setSelectedSong(song);
                   setIsDetailsOpen(true);
+                }}
+                onStatusChange={(status) => {
+                  if (status) {
+                    handleStatusChange(song.id, status, song.title, song.artist);
+                  }
                 }}
               />
             );

@@ -30,8 +30,8 @@ export const scalePracticeExercise: Exercise = {
     "Move the same pattern across all 12 positions to master the fretboard."
   ],
   metronomeSpeed: {
-    min: 60,
-    max: 140,
+    min: 30,
+    max: 200,
     recommended: 90
   },
   relatedSkills: ["scales" ],

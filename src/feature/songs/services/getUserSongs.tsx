@@ -25,11 +25,21 @@ export const getUserSongs = async (userId: string) => {
       lastUpdated: Timestamp.now(),
     };
 
-    const userSongs = userSongsSnapshot.docs.map((docSnap) => ({
-      id: docSnap.data().songId,
-      status: docSnap.data().status as SongStatus,
-      order: docSnap.data().order ?? 0,
-    })).sort((a, b) => a.order - b.order);
+    const userSongs = userSongsSnapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      const sections = data.sections || [];
+      const weights: Record<number, number> = { 0: 0, 1: 0.2, 2: 0.5, 3: 1, 4: 0 };
+      const totalWeighted = sections.reduce((acc: number, s: any) => acc + (weights[s.mastery] ?? 0), 0);
+      const masteryProgress = sections.length > 0 ? Math.round((totalWeighted / sections.length) * 100) : 0;
+
+      return {
+        id: data.songId,
+        status: data.status as SongStatus,
+        order: data.order ?? 0,
+        masteryProgress,
+        totalSections: sections.length
+      };
+    }).sort((a, b) => a.order - b.order);
 
     if (userSongs.length === 0) return songLists;
 
@@ -65,9 +75,14 @@ export const getUserSongs = async (userId: string) => {
     userSongs.forEach((us) => {
       const fullSong = idToSongMap.get(us.id);
       if (fullSong) {
-        if (us.status === "wantToLearn") songLists.wantToLearn.push(fullSong);
-        else if (us.status === "learning") songLists.learning.push(fullSong);
-        else if (us.status === "learned") songLists.learned.push(fullSong);
+        const songWithProgress = {
+          ...fullSong,
+          masteryProgress: us.masteryProgress,
+          totalSections: us.totalSections
+        };
+        if (us.status === "wantToLearn") songLists.wantToLearn.push(songWithProgress);
+        else if (us.status === "learning") songLists.learning.push(songWithProgress);
+        else if (us.status === "learned") songLists.learned.push(songWithProgress);
       }
     });
 

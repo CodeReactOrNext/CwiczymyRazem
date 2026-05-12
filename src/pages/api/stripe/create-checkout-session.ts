@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import { auth } from "utils/firebase/api/firebase.config";
+import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 const APP_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
@@ -27,10 +27,11 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, plan, billing } = req.body as {
+  const { idToken, plan, billing, trial } = req.body as {
     idToken: string;
     plan?: "pro" | "master";
     billing?: "monthly" | "yearly";
+    trial?: boolean;
   };
 
   if (!idToken) return res.status(400).json({ error: "Missing idToken" });
@@ -54,6 +55,13 @@ export default async function handler(
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  if (trial) {
+    const userDoc = await firestore.collection("users").doc(userId).get();
+    if (userDoc.data()?.hadTrial) {
+      return res.status(400).json({ error: "Trial already used" });
+    }
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -67,6 +75,7 @@ export default async function handler(
       metadata: { userId },
       subscription_data: {
         metadata: { userId, plan: selectedPlan },
+        ...(trial ? { trial_period_days: 7 } : {}),
       },
       customer_email: userEmail,
       success_url: `${APP_URL}/premium/success?session_id={CHECKOUT_SESSION_ID}`,

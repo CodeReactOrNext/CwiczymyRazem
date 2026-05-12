@@ -1,34 +1,57 @@
-import { Bell, MessageSquare, Heart, Clock, Zap } from "lucide-react";
-import { useState } from "react";
-import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
-import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar";
-import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar";
+import { formatDistanceToNow } from "date-fns";
+import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { Bell, Clock, Gem, Heart, MessageSquare, Trophy, Zap } from "lucide-react";
+import { useState } from "react";
+import { useAppSelector } from "store/hooks";
+
+const placeSuffix = (place: number) => {
+  if (place === 1) return "st";
+  if (place === 2) return "nd";
+  if (place === 3) return "rd";
+  return "th";
+};
 
 const typeConfig = {
   like: {
     icon: <Heart className="h-3 w-3 text-white fill-current" />,
     bg: "bg-red-500",
-    label: "liked your recording",
+    label: (_n: any) => "liked your recording",
   },
   comment: {
     icon: <MessageSquare className="h-3 w-3 text-white fill-current" />,
     bg: "bg-cyan-500",
-    label: "commented on your recording",
+    label: (_n: any) => "commented on your recording",
   },
   reaction: {
-    icon: <Zap className="h-3 w-3 text-white fill-current" />,
-    bg: "bg-blue-500",
-    label: "reacted to your post",
+    icon: <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />,
+    bg: "bg-amber-500/20",
+    label: (_n: any) => (
+      <span className="inline-flex items-center gap-1">
+        motivated you and gave you +10
+        <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+      </span>
+    ),
   },
-} as const;
+  season_reward: {
+    icon: <Trophy className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-amber-500",
+    label: (n: any) =>
+      `You earned ${n.fameAwarded} fame for ${n.place}${placeSuffix(n.place)} place!`,
+  },
+  season_start: {
+    icon: <Zap className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-green-500",
+    label: (_n: any) => "A new season has started!",
+  },
+};
 
 export const NotificationsBell = () => {
   const userId = useAppSelector(selectUserAuth);
@@ -111,6 +134,7 @@ export const NotificationsBell = () => {
             <div>
               {notifications.map((n) => {
                 const config = typeConfig[n.type as keyof typeof typeConfig] ?? typeConfig.reaction;
+                const isSystemNotif = n.type === "season_reward" || n.type === "season_start";
                 return (
                   <button
                     key={n.id}
@@ -121,36 +145,52 @@ export const NotificationsBell = () => {
                         : "bg-cyan-500/5 hover:bg-cyan-500/8"
                     )}
                     onClick={() => markAsRead(n.id)}>
-                    {/* Avatar + type badge */}
+                    {/* Avatar or system icon + type badge */}
                     <div className="relative w-10 h-10 shrink-0 mt-0.5">
-                      <div className="absolute inset-0">
-                        <Avatar
-                          name={n.senderName}
-                          avatarURL={n.senderAvatarUrl || undefined}
-                          lvl={n.senderFrame}
-                          size="sm"
-                        />
-                      </div>
-                      <div
-                        className={cn(
-                          "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-zinc-900/95 z-10",
-                          config.bg
-                        )}>
-                        {config.icon}
-                      </div>
+                      {isSystemNotif ? (
+                        <div className={cn("absolute inset-0 rounded-full flex items-center justify-center", config.bg)}>
+                          {config.icon}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="absolute inset-0">
+                            <Avatar
+                              name={n.senderName ?? ""}
+                              avatarURL={n.senderAvatarUrl || undefined}
+                              lvl={n.senderFrame}
+                              size="sm"
+                            />
+                          </div>
+                          <div
+                            className={cn(
+                              "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-zinc-900/95 z-10",
+                              config.bg
+                            )}>
+                            {config.icon}
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-zinc-300 leading-snug">
-                        <span className="font-semibold text-white">
-                          {n.senderName}
-                        </span>{" "}
-                        {config.label}
+                        {!isSystemNotif && n.senderName && (
+                          <>
+                            <span className="font-semibold text-white">{n.senderName}</span>{" "}
+                          </>
+                        )}
+                        {config.label(n)}
                       </p>
                       {n.recordingTitle && n.type !== "reaction" && (
                         <p className="text-xs text-zinc-500 truncate mt-1 italic">
                           &ldquo;{n.recordingTitle}&rdquo;
+                        </p>
+                      )}
+                      {n.type === "season_reward" && (
+                        <p className="text-xs text-amber-400/70 flex items-center gap-1 mt-1">
+                          <Gem className="h-3 w-3" />
+                          Season {n.seasonId}
                         </p>
                       )}
                       <div className="flex items-center gap-1.5 mt-1.5">

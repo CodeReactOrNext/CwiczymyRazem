@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { getUserStatsField } from "assets/stats/profileStats";
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
@@ -5,9 +6,12 @@ import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
-import { StatsSection } from "feature/profile/components/StatsSection";
+import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
+import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import { StatsSection } from "feature/profile/components/StatsSection";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import {
   selectCurrentUserStats,
@@ -17,8 +21,6 @@ import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
-
-import { useQuery } from "@tanstack/react-query";
 
 const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -39,9 +41,19 @@ const ProfileActivityPage = () => {
         title="Your Activity"
         subtitle="Track your practice history and progress over time"
         eyebrow="Practice stats"
-        characterImage="/images/3d/activity.png"
-        className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+        rightContent={
+          <div className="w-full h-full flex items-center md:justify-end">
+            <LevelProgressHero 
+              lvl={userStats?.lvl ?? 1} 
+              points={userStats?.points ?? 0}
+            />
+          </div>
+        }
+
+        className="w-full !rounded-none !shadow-none min-h-[140px] md:min-h-[120px] lg:min-h-[160px] !flex-col md:!flex-row"
       />
+
+
       <div className='p-4'>
         <div className='font-openSans flex flex-col gap-6'>
 
@@ -81,6 +93,19 @@ const ProfileActivityPage = () => {
 
           {/* 4. Activity Log calendar */}
           <ActivityLog userAuth={userAuth as string} />
+
+          {/* 5. Achievement Sections */}
+          <div className='space-y-8 mt-4'>
+                <SeasonalAchievements userId={userAuth as string} />
+
+              <div className='flex items-center gap-2 mb-1'>
+               <h3 className='text-xl font-semibold text-white mr-2'>Achievements</h3>
+                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
+                  {userStats?.achievements?.length || 0}
+                </span>
+              </div>
+              <AchievementWrapper userAchievements={userStats?.achievements ?? []} />
+          </div>
         </div>
       </div>
     </MainContainer>

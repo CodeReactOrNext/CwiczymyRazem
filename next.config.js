@@ -15,6 +15,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
         urlPattern: /\/monitoring.*/i,
         handler: "NetworkOnly",
       },
+      {
+        urlPattern: /\/ingest.*/i,
+        handler: "NetworkOnly",
+      },
     ],
   },
 });

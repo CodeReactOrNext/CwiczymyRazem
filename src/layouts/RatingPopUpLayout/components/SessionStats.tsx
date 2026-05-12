@@ -5,7 +5,7 @@ import TechniqueIcon from "components/Icon/TechniqueIcon";
 import TheoryIcon from "components/Icon/TheoryIcon";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Clock, Minus, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
+import { Clock, Minus, TrendingDown, TrendingUp } from "lucide-react";
 import type { ComponentType } from "react";
 import { convertMsToHM } from "utils/converter";
 

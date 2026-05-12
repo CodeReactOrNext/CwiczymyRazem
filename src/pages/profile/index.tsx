@@ -1,6 +1,6 @@
+import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
-import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import AppLayout from "layouts/AppLayout";
 import { BarChart2 } from "lucide-react";
 import type { ReactElement } from "react";

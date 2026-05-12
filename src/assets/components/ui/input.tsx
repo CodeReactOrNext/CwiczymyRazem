@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import * as React from "react";
 
-export interface InputProps
+interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;

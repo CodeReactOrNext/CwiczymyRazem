@@ -1,36 +1,37 @@
 import {
   addDoc,
   collection,
-  onSnapshot,
-  query,
-  where,
-  orderBy,
-  limit,
   doc,
-  updateDoc,
-  serverTimestamp,
   getDocs,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
   writeBatch
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-export type NotificationType = "like" | "comment" | "reaction";
+type NotificationType = "like" | "comment" | "reaction" | "season_reward" | "season_start";
 
 export interface AppNotification {
   id: string;
   userId: string; // Recipient
   type: NotificationType;
-  senderId: string;
-  senderName: string;
+  senderId?: string;
+  senderName?: string;
   senderAvatarUrl?: string | null;
   senderFrame?: number;
-  recordingId: string;
-  recordingTitle: string;
+  recordingId?: string;
+  recordingTitle?: string;
+  // Season reward fields
+  fameAwarded?: number;
+  place?: number;
+  seasonId?: string;
   timestamp: any;
   isRead: boolean;
 }
 
-export const addNotification = async (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
+const addNotification = async (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
   // Basic avoid self-notification
   if (notification.userId === notification.senderId) return;
 

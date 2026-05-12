@@ -1,5 +1,6 @@
 import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExercisePlan";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -14,6 +15,8 @@ export default function PracticePage() {
   const router = useRouter();
   const { id } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
   useEffect(() => {
@@ -33,23 +36,14 @@ export default function PracticePage() {
     loadPlan();
   }, [id, userAuth, router, t]);
 
-  if (!plan) {
-    return (
-      <div className='flex h-[400px] items-center justify-center'>
-        <div className='text-center'>
-          <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-primary' />
-          <p className='mt-4 text-muted-foreground'>{t("common.loading")}</p>
-        </div>
-      </div>
-    );
+  if (!sessionReady) {
+    return <PracticeLoadingScreen isReady={!!plan} onDone={() => setSessionReady(true)} />;
   }
-
-  const [isFinishing, setIsFinishing] = useState(false);
 
   return (
     <PremiumGate feature="practice" requiredPlan="master">
       <PracticeSession
-        plan={plan}
+        plan={plan!}
         onClose={() => router.push("/exercises")}
         onFinish={() => {
           setIsFinishing(true);

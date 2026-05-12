@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Import all translation files
 import not_found from '../../public/locales/en/404.json';
@@ -156,16 +156,3 @@ export function useTranslation(
   };
 }
 
-/**
- * Trans component replacement for react-i18next Trans
- * For now, just renders children or the translation key
- */
-export function Trans({ 
-  i18nKey,
-  children,
-}: { 
-  i18nKey?: string;
-  children?: React.ReactNode;
-}) {
-  return <>{children || i18nKey}</>;
-}

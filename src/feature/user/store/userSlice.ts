@@ -4,6 +4,7 @@ import { statisticsInitial } from "constants/userStatisticsInitialData";
 import type { RootState } from "store/store";
 import type {
   DailyQuest,
+  DailyQuestTask,
   DailyQuestTaskType,
   StatisticsDataInterface,
   StatisticsTime,
@@ -11,6 +12,7 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
+import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import {
   autoLogIn,
@@ -23,14 +25,13 @@ import {
   logUserOff,
   rateSong,
   restartUserStats,
+  updateProfileCustomization,
   updateUserEmail,
   updateUserPassword,
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
-  updateProfileCustomization,
 } from "./userSlice.asyncThunk";
-import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 
 
@@ -53,7 +54,7 @@ const initialState: userSliceInitialState = {
   currentActivity: null,
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -65,6 +66,10 @@ export const userSlice = createSlice({
       { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.currentUserStats = payload;
+      // TEMP: Unlock master for all users. Remove this block to restore Stripe/role-based access.
+      if (state.userInfo) {
+        state.userInfo.role = "master";
+      }
     },
     addPracticeData: (
       state,
@@ -157,7 +162,7 @@ export const userSlice = createSlice({
       const selected = shuffled.slice(0, 3);
 
       const tasks = selected.map((t, index) => {
-        const taskObj: import("types/api.types").DailyQuestTask = {
+        const taskObj: DailyQuestTask = {
           id: `quest_${today}_${index}`,
           type: t.type,
           title: t.title,
@@ -234,9 +239,11 @@ export const userSlice = createSlice({
         state.userInfo.role = payload;
       }
     },
-    setSelectedGuitar: (state, { payload }: PayloadAction<string | number | null>) => {
+    setSelectedGuitar: (state, { payload }: PayloadAction<{ imageId: string | number | null; year?: number; country?: string }>) => {
       if (state.userInfo) {
-        state.userInfo.selectedGuitar = payload ?? undefined;
+        state.userInfo.selectedGuitar = payload.imageId ?? undefined;
+        state.userInfo.selectedGuitarYear = payload.year;
+        state.userInfo.selectedGuitarCountry = payload.country;
       }
     },
   },
@@ -428,6 +435,10 @@ export const userSlice = createSlice({
           state.isFetching = null;
           state.autoLogInFailed = false;
           state.userInfo = action.payload.userInfo;
+          // TEMP: Unlock master for all users. Remove this block to restore Stripe/role-based access.
+          if (state.userInfo) {
+            state.userInfo.role = "master";
+          }
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
         }
@@ -436,8 +447,6 @@ export const userSlice = createSlice({
 });
 
 export const {
-  addUserAuth,
-  addUserData,
   updateTimerTime,
   increaseTimerTime,
   updateLocalTimer,

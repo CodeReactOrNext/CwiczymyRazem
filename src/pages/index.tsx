@@ -1,12 +1,14 @@
-import type { GetStaticProps, NextPage } from "next";
 import LandingPage from "feature/landing/LandingPage";
-import { getAllBlogs, BlogFrontmatter } from "lib/blog";
+import type { BlogFrontmatter} from "lib/blog";
+import {getAllBlogs } from "lib/blog";
+import type { GetStaticProps } from "next";
+import type { NextPageWithLayout } from "types/page";
 
 interface HomeProps {
   blogs: BlogFrontmatter[];
 }
 
-const Home: NextPage<HomeProps> = ({ blogs }) => {
+const Home: NextPageWithLayout<HomeProps> = ({ blogs }) => {
   return <LandingPage blogs={blogs} />;
 };
 
@@ -18,6 +20,8 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   };
 };
+
+Home.minimalLayout = true;
 
 export default Home;
 

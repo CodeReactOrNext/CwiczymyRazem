@@ -183,6 +183,6 @@ export const getSongs = async (
   }
 };
 
-export const invalidateSongsCache = () => {
+const invalidateSongsCache = () => {
   memoryCache.clear('songs');
 };

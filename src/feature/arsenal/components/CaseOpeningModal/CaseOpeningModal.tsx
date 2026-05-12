@@ -1,14 +1,15 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
-import { RarityBadge, RARITY_STYLES, RARITY_GLOW_CLASS } from "../RarityBadge";
+import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
-import type { OpenCaseResult, CaseDefinition, GuitarDefinition, EffectDefinition, GuitarRarity } from "../../types/arsenal.types";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import type { CaseDefinition, EffectDefinition, GuitarDefinition, GuitarRarity,OpenCaseResult } from "../../types/arsenal.types";
+import { RARITY_GLOW_CLASS,RARITY_STYLES, RarityBadge } from "../RarityBadge";
 
 const ITEM_WIDTH = 180;
 const VISIBLE_ITEMS = 60;
@@ -104,7 +105,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
     <AnimatePresence>
       {isOpen && strip.length > 0 && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center font-openSans"
+          className="fixed inset-0 z-[100] flex flex-col items-center overflow-y-auto py-6 font-openSans"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -124,7 +125,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             />
           )}
 
-          <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-4xl px-4">
+          <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-4xl px-4 my-auto">
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -211,7 +212,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                 >
                   <div className="relative flex items-center justify-center">
                     <motion.div
-                      className="absolute w-80 h-80 rounded-full blur-[100px]"
+                      className="absolute w-52 h-52 sm:w-80 sm:h-80 rounded-full blur-[100px]"
                       style={{ backgroundColor: `${rarityStyles.baseColor}40` }}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1.5 }}
@@ -219,7 +220,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     />
                     <motion.div
                       className={cn(
-                        "relative flex h-80 w-80 items-center justify-center rounded-3xl bg-zinc-950/90 border-b-8",
+                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded-3xl bg-zinc-950/90 border-b-8",
                         RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{ borderBottomColor: rarityStyles.baseColor }}
@@ -237,13 +238,13 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                         <img
                           src={`/static/images/rank/${winDef.def.imageId}.png`}
                           alt={winDef.def.name}
-                          className="relative z-10 h-64 w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                          className="relative z-10 h-44 w-44 sm:h-64 sm:w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
                         />
                       ) : (
                         <img
                           src={`/static/images/effects/${winDef.def.imageId}.png`}
                           alt={winDef.def.name}
-                          className="relative z-10 h-60 w-60 object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                          className="relative z-10 h-40 w-40 sm:h-60 sm:w-60 object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
                         />
                       )}
                     </motion.div>
@@ -260,7 +261,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       <span className="text-sm font-bold text-zinc-400 uppercase tracking-[0.3em] leading-none">
                         {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
                       </span>
-                      <h3 className="text-4xl md:text-5xl font-black uppercase tracking-wider text-white drop-shadow-lg text-center leading-tight">
+                      <h3 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-white drop-shadow-lg text-center leading-tight">
                         {winDef.def.name}
                       </h3>
                       {winDef.kind === "guitar" && result?.newItem?.year && result?.newItem?.country && (
@@ -286,7 +287,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                 >
                   {winDef.kind === "guitar" && guitar && (
                     <Button
-                      onClick={() => equip(guitar.id, { onSuccess: onClose })}
+                      onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
                       disabled={isEquipping}
                       className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black uppercase tracking-widest h-12 text-sm"
                     >

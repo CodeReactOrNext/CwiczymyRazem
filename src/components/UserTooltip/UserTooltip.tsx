@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -13,10 +14,8 @@ import {
   FaClock,
   FaExternalLinkAlt,
   FaFire,
-  FaGem,
   FaLeaf,
   FaMusic,
-  FaStar,
   FaTrophy,
 } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
@@ -72,14 +71,14 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md'>
+        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
           {loading ? (
             <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
           ) : userData ? (
-            <div className='flex flex-col gap-5 text-gray-900'>
+            <div className='relative flex flex-col gap-5 text-gray-900'>
                {/* Activity Section */}
                {currentActivity && (
-                <div className="mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
+                <div className="relative z-10 mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
                   <div className="flex items-center gap-2 text-cyan-600 font-bold text-[12px]  mb-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
                     Live Now
@@ -97,7 +96,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                 </div>
               )}
 
-              <div className='flex items-center gap-8'>
+              <div className='relative z-10 flex items-center gap-8'>
                 {userData.avatar ? (
                   <Avatar
                     name={userData.displayName}
@@ -106,10 +105,12 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     lvl={userData.statistics.level}
                     selectedFrame={userData.selectedFrame}
                     selectedGuitar={userData.selectedGuitar}
+                    guitarYear={userData.selectedGuitarYear}
+                    guitarCountry={userData.selectedGuitarCountry}
                   />
                 ) : (
                   <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
-                    {userData.displayName[0]}
+                    {userData.displayName?.[0] ?? "?"}
                   </div>
                 )}
                 <div>
@@ -121,7 +122,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   </h3>
                 </div>
               </div>
-              <div className='grid grid-cols-2 gap-2'>
+              <div className='relative z-10 grid grid-cols-2 gap-2'>
                 <StatsBox
                   Icon={FaClock}
                   label={t("tooltip.totalTime")}
@@ -130,7 +131,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   )}h`}
                 />
                 <StatsBox
-                  Icon={FaStar}
+                  Icon={() => <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />}
                   label={t("tooltip.points")}
                   value={userData.statistics.totalPoints}
                 />
@@ -140,7 +141,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   value={userData.statistics.level}
                 />
                 <StatsBox
-                  Icon={FaGem}
+                  Icon={() => <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />}
                   label={"Fame"}
                   value={userData.statistics.fame}
                 />
@@ -160,6 +161,24 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   value={userData.statistics.habitCount}
                 />
               </div>
+
+              {/* Guitar Absolute */}
+              {(() => {
+                const lvl = userData.statistics.level ?? 0;
+                const imgPath = userData.selectedGuitar ?? (lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : lvl);
+                const isSpecial = typeof imgPath === "string" && imgPath.includes("special/");
+
+                if (isSpecial) {
+                  return (
+                    <img
+                      className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
+                      src={`/static/images/rank/${imgPath}.png`}
+                      alt='equipped guitar'
+                    />
+                  );
+                }
+                return null;
+              })()}
             </div>
           ) : (
             <div className='flex items-center gap-2 text-gray-500'>

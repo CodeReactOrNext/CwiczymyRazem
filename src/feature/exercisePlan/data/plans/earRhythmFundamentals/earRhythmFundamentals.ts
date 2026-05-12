@@ -1,6 +1,6 @@
 import { earTrainingEasy } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
-import { rhythmTrainingEasy } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
+import { rhythmTrainingEasy } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 
 import type { ExercisePlan } from "../../../types/exercise.types";

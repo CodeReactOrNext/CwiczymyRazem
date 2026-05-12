@@ -1,7 +1,8 @@
-import { Plus, X } from "lucide-react";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+import { Guitar, Plus, X } from "lucide-react";
+
 import type { InventoryItem } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarSlotProps {
   slotIndex: number;
@@ -20,12 +21,24 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
     return (
       <button
         onClick={() => onOpenPicker(slotIndex)}
-        className="flex flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-zinc-700/60 bg-zinc-900/30 min-h-[260px] w-full transition-colors hover:border-zinc-500 hover:bg-zinc-900/60 group"
+        className="relative flex flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-zinc-700/50 bg-zinc-900/20 min-h-[260px] w-full transition-all duration-200 hover:border-zinc-500/70 hover:bg-zinc-900/50 group overflow-hidden"
       >
-        <Plus size={24} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" strokeWidth={1.5} />
-        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 group-hover:text-zinc-400 transition-colors">
-          Add Guitar
-        </span>
+        {/* Guitar icon with glow on hover */}
+        <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-zinc-800/40 border border-zinc-700/40 group-hover:border-zinc-600/60 group-hover:bg-zinc-800/70 transition-all duration-200">
+          <Guitar size={28} className="text-zinc-600 group-hover:text-zinc-300 transition-colors duration-200" strokeWidth={1.2} />
+          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-zinc-700/10" />
+        </div>
+
+        {/* Label */}
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-zinc-300 transition-colors duration-200">
+            Add Guitar
+          </span>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <Plus size={10} className="text-zinc-400" />
+            <span className="text-[8px] font-semibold uppercase tracking-widest text-zinc-400">Choose from collection</span>
+          </div>
+        </div>
       </button>
     );
   }

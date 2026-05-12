@@ -1,9 +1,9 @@
+import { Index } from "@upstash/vector";
+import type { YouTubeLesson, YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 import { collection, doc, getDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { Index } from "@upstash/vector";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { YouTubeLesson, YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
 const TOP_K = 8;

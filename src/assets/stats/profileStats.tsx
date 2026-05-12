@@ -14,6 +14,10 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 import { i18n } from "utils/translation";
 
+const PointsIcon = ({ className }: { className?: string }) => (
+  <img src="/images/points.png" alt="points" className={className} />
+);
+
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {
   const {
     points,
@@ -61,7 +65,7 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     },
     {
       id: "points",
-      Icon: FaStar,
+      Icon: PointsIcon,
       description: i18n?.t("profile:stats.num_points"),
       value: points,
     },

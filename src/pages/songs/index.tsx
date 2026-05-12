@@ -1,16 +1,19 @@
+import MainContainer from "components/MainContainer";
 import SongsView from "feature/songs/SongsView";
-import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
+  const router = useRouter();
+  const view = (router.query.view as string) || "explore";
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
-      <SongsView />
-    </div>
+    <MainContainer noBorder>
+      <SongsView view={view} />
+    </MainContainer>
   );
 };
 

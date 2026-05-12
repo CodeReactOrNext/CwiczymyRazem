@@ -4,7 +4,6 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import { firebaseGetRating, firebaseSaveRating } from "../services/rating.service";
 import {
   CheckCircle2,
   Sparkles,
@@ -12,6 +11,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
+import type { StatisticsDataInterface } from "types/api.types";
+
+import { firebaseGetRating, firebaseSaveRating } from "../services/rating.service";
 import type { DailySummaryResponse, SessionGrade, SessionRatingResponse } from "../types/summary.types";
 
 // ─── Mood config (used by DailyAssessmentCard) ────────────────────────────────
@@ -34,7 +36,7 @@ const MOOD_LABEL: Record<DailySummaryResponse["mood"], string> = {
 
 // ─── Score ring ───────────────────────────────────────────────────────────────
 
-const GRADE_COLOR: Record<SessionGrade, { ring: string; text: string; bg: string; border: string }> = {
+export const GRADE_COLOR: Record<SessionGrade, { ring: string; text: string; bg: string; border: string }> = {
   S:   { ring: "#f59e0b", text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/25" },
   "A+":{ ring: "#10b981", text: "text-emerald-400",  bg: "bg-emerald-500/10", border: "border-emerald-500/25" },
   A:   { ring: "#10b981", text: "text-emerald-400",  bg: "bg-emerald-500/10", border: "border-emerald-500/25" },
@@ -48,7 +50,7 @@ const GRADE_COLOR: Record<SessionGrade, { ring: string; text: string; bg: string
   F:   { ring: "#ef4444", text: "text-red-400",      bg: "bg-red-500/10",     border: "border-red-500/25" },
 };
 
-function ScoreRing({ score, grade, animated }: { score: number; grade: SessionGrade; animated: boolean }) {
+export function ScoreRing({ score, grade, animated }: { score: number; grade: SessionGrade; animated: boolean }) {
   const r = 38;
   const circ = 2 * Math.PI * r;
   const fill = animated ? (score / 10) * circ : 0;
@@ -83,23 +85,64 @@ function ScoreRing({ score, grade, animated }: { score: number; grade: SessionGr
   );
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+// ─── Loading animation ────────────────────────────────────────────────────────
 
-function RatingSkeleton() {
+const SESSION_LOADING_MESSAGES = [
+  "Reading your session…",
+  "Analyzing practice patterns…",
+  "Checking technique depth…",
+  "Writing your feedback…",
+  "Almost there…",
+];
+
+export const WEEKLY_LOADING_MESSAGES = [
+  "Reviewing your full week…",
+  "Comparing daily progress…",
+  "Analyzing consistency patterns…",
+  "Finalizing your weekly report…",
+  "Preparing your plan for next week…",
+];
+
+export function RatingSkeleton({ messages = SESSION_LOADING_MESSAGES }: { messages?: string[] }) {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setPhase(p => (p + 1) % messages.length), 2000);
+    return () => clearInterval(t);
+  }, [messages.length]);
+
+  const circ = 2 * Math.PI * 38;
+
   return (
-    <div className="animate-pulse space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-      <div className="flex items-center gap-4">
-        <div className="w-28 h-28 rounded-full bg-zinc-800 shrink-0" />
-        <div className="flex-1 space-y-2">
-          <div className="h-5 w-32 rounded-full bg-zinc-800" />
-          <div className="h-3.5 w-full rounded-full bg-zinc-800" />
-          <div className="h-3.5 w-11/12 rounded-full bg-zinc-800" />
-          <div className="h-3.5 w-4/5 rounded-full bg-zinc-800" />
+    <div className="flex flex-col items-center justify-center gap-4 py-6">
+      <div className="relative flex items-center justify-center w-24 h-24">
+        <div className="absolute inset-0 animate-spin" style={{ animationDuration: "1.6s" }}>
+          <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#27272a" strokeWidth="7" />
+            <circle
+              cx="50" cy="50" r="38"
+              fill="none" stroke="#0891b2" strokeWidth="7"
+              strokeLinecap="round"
+              strokeDasharray={`${circ * 0.28} ${circ * 0.72}`}
+              style={{ filter: "drop-shadow(0 0 8px #0891b2aa)" }}
+            />
+          </svg>
         </div>
+        <Sparkles size={16} className="relative text-zinc-600" />
       </div>
-      <div className="space-y-2 pt-2">
-        <div className="h-3 w-3/4 rounded-full bg-zinc-800" />
-        <div className="h-3 w-2/3 rounded-full bg-zinc-800" />
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-sm text-zinc-400">{messages[phase]}</p>
+        <div className="flex gap-1.5">
+          {messages.map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "w-1 h-1 rounded-full transition-colors duration-500",
+                i === phase ? "bg-main" : "bg-zinc-700"
+              )}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -168,9 +211,27 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
         )}
       </div>
 
+      {rating.nextSessionTip && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-zinc-700/50 bg-zinc-800/40 px-4 py-3">
+          <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
+          <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
+        </div>
+      )}
 
     </>
   );
+}
+
+// ─── Player experience helper ─────────────────────────────────────────────────
+
+function getPlayerExperience(userStats: StatisticsDataInterface | null | undefined) {
+  const totalLoggedHours = userStats?.time
+    ? Math.round((userStats.time.technique + userStats.time.theory + userStats.time.hearing + userStats.time.creativity) / 3600000)
+    : undefined;
+  const yearsPlaying = userStats?.guitarStartDate != null
+    ? Math.max(0, Math.floor((Date.now() - (userStats.guitarStartDate as any).seconds * 1000) / (365.25 * 24 * 3600 * 1000)))
+    : undefined;
+  return { totalLoggedHours, yearsPlaying };
 }
 
 // ─── Main card ────────────────────────────────────────────────────────────────
@@ -180,7 +241,7 @@ interface SessionRatingCardProps {
   onClose?: () => void;
 }
 
-export function SessionRatingCard({ log }: SessionRatingCardProps) {
+function SessionRatingCard({ log }: SessionRatingCardProps) {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth  = useAppSelector(selectUserAuth) as string | null;
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
@@ -189,9 +250,10 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
   const [ringAnimated, setRingAnimated] = useState(false);
   const hasFetched = useRef(false);
 
-  const ratingId = `session-${log.reportDate?.seconds ?? Date.now()}`;
+  const ratingId = `session-v2-${log.reportDate?.seconds ?? Date.now()}`;
 
   const fetchRating = async () => {
+    setRating(null);
     setLoading(true);
     setError(null);
     setRingAnimated(false);
@@ -208,6 +270,7 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
         }
       }
 
+      const { totalLoggedHours, yearsPlaying } = getPlayerExperience(userStats);
       const res = await fetch("/api/rate-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -219,10 +282,12 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
           creativityTime: (log.timeSumary?.creativityTime || 0) / 1000,
           totalTime: (log.timeSumary?.sumTime || 0) / 1000,
           points: log.totalPoints || 0,
-          streak: userStats?.actualDayWithoutBreak || 0,
+          streak: log.bonusPoints?.streak || 0,
           userLevel: userStats?.lvl || 1,
           songTitle: log.songTitle,
           songArtist: log.songArtist,
+          totalLoggedHours,
+          yearsPlaying,
         }),
       });
       if (!res.ok) throw new Error("Failed");
@@ -238,12 +303,9 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
   };
 
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchRating();
-    }
+    fetchRating();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ratingId]);
 
   const cfg = rating ? GRADE_COLOR[rating.grade] : null;
 
@@ -270,9 +332,10 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
 
 // ─── Period rating card (whole day / whole week) ───────────────────────────────
 
-export interface PeriodRatingCardProps {
+interface PeriodRatingCardProps {
   ratingId: string;
   label: string;
+  sessionTitles?: string[];
   techniqueTime: number;
   theoryTime: number;
   hearingTime: number;
@@ -284,11 +347,12 @@ export interface PeriodRatingCardProps {
   compact?: boolean;
   practiceStyle?: "professional" | "hobby";
   goal?: string;
+  recentSessions?: Array<{ daysAgo: number; totalMinutes: number }>;
 }
 
 // ─── Daily assessment card (merged: rating + coach summary) ───────────────────
 
-export interface DailyAssessmentCardProps extends PeriodRatingCardProps {
+interface DailyAssessmentCardProps extends PeriodRatingCardProps {
   daily: DailySummaryResponse | null;
   dailyLoading: boolean;
   onRatingReady?: () => void;
@@ -296,11 +360,12 @@ export interface DailyAssessmentCardProps extends PeriodRatingCardProps {
 }
 
 export function DailyAssessmentCard({
-  ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime,
+  ratingId, label, sessionTitles, techniqueTime, theoryTime, hearingTime, creativityTime,
   totalTime, points, streak = 0, userLevel = 1,
-  daily, dailyLoading, onRatingReady, practiceStyle, goal,
+  daily, dailyLoading, onRatingReady, practiceStyle, goal, recentSessions,
 }: DailyAssessmentCardProps) {
   const userAuth = useAppSelector(selectUserAuth) as string | null;
+  const userStats = useAppSelector(selectCurrentUserStats);
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
   const [ratingLoading, setRatingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -308,6 +373,7 @@ export function DailyAssessmentCard({
   const hasFetched = useRef(false);
 
   const fetchRating = async () => {
+    setRating(null);
     setRatingLoading(true);
     setError(null);
     setRingAnimated(false);
@@ -322,10 +388,11 @@ export function DailyAssessmentCard({
           return;
         }
       }
+      const { totalLoggedHours, yearsPlaying } = getPlayerExperience(userStats);
       const res = await fetch("/api/rate-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal }),
+        body: JSON.stringify({ exerciseTitle: label, sessionTitles, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal, recentSessions, totalLoggedHours, yearsPlaying }),
       });
       if (!res.ok) throw new Error("Failed");
       const data = await res.json() as SessionRatingResponse;
@@ -343,12 +410,9 @@ export function DailyAssessmentCard({
   };
 
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchRating();
-    }
+    fetchRating();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ratingId, practiceStyle, goal]);
 
   const isLoading = ratingLoading || dailyLoading;
   const cfg = rating ? GRADE_COLOR[rating.grade] : null;
@@ -403,6 +467,13 @@ export function DailyAssessmentCard({
             )}
           </div>
 
+          {rating.nextSessionTip && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-zinc-700/50 bg-zinc-800/40 px-4 py-3">
+              <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
+              <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
+            </div>
+          )}
+
         </div>
       )}
     </div>
@@ -415,6 +486,7 @@ export function PeriodRatingCard({
   ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak = 0, userLevel = 1, compact = false, practiceStyle, goal,
 }: PeriodRatingCardProps) {
   const userAuth = useAppSelector(selectUserAuth) as string | null;
+  const userStats = useAppSelector(selectCurrentUserStats);
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -422,6 +494,7 @@ export function PeriodRatingCard({
   const hasFetched = useRef(false);
 
   const fetchRating = async () => {
+    setRating(null);
     setLoading(true);
     setError(null);
     setRingAnimated(false);
@@ -438,10 +511,11 @@ export function PeriodRatingCard({
         }
       }
 
+      const { totalLoggedHours, yearsPlaying } = getPlayerExperience(userStats);
       const res = await fetch("/api/rate-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal }),
+        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal, totalLoggedHours, yearsPlaying }),
       });
       if (!res.ok) throw new Error("Failed");
       const data = await res.json() as SessionRatingResponse;
@@ -456,12 +530,9 @@ export function PeriodRatingCard({
   };
 
   useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchRating();
-    }
+    fetchRating();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ratingId, practiceStyle, goal]);
 
   const cfg = rating ? GRADE_COLOR[rating.grade] : null;
 

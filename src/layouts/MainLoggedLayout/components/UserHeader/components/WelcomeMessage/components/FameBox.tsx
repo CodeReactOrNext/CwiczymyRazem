@@ -1,13 +1,13 @@
-import { FaGem } from "react-icons/fa";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import { useTranslation } from "hooks/useTranslation";
-import { useAppSelector } from "store/hooks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+
+import { useAppSelector } from "store/hooks";
 
 export const FameBox = () => {
   const { t } = useTranslation("common");
@@ -19,7 +19,11 @@ export const FameBox = () => {
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
           <div className='hidden h-10 cursor-help items-center justify-center gap-2 rounded-lg bg-amber-500/10  px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
-            <FaGem size={18} className='text-xs text-amber-500' />
+            <img 
+              src="/images/coin.png" 
+              alt="coin" 
+              className="h-6 w-6 object-contain" 
+            />
             <span className='text-xs font-bold text-amber-400'>
               {fame.toLocaleString()}
             </span>

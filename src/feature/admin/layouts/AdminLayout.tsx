@@ -9,12 +9,12 @@ import {
   Music,
   SearchCheck,
   ShieldCheck,
-  Users,
-  Youtube} from "lucide-react";
+  Users} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode} from "react";
 import { useState } from "react";
+import { FaYoutube } from "react-icons/fa6";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -30,7 +30,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
     { name: "Users",     href: "/admin/users",    icon: Users        },
     { name: "Premium",   href: "/admin/premium",  icon: Crown        },
     { name: "Discovery", href: "/admin/discovery",icon: SearchCheck  },
-    { name: "YT Scraper", href: "/admin/youtube-scraper", icon: Youtube },
+    { name: "YT Scraper", href: "/admin/youtube-scraper", icon: FaYoutube },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

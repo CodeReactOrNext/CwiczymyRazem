@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame } from "feature/user/store/userSlice";
-import { useAppDispatch } from "store/hooks";
 import { toast } from "sonner";
-import { openCase } from "../services/arsenal.service";
-import { ARSENAL_QUERY_KEY } from "./useArsenalData";
-import type { CaseType } from "../types/arsenal.types";
+import { useAppDispatch } from "store/hooks";
+
 import { CASE_DEFINITIONS } from "../data/caseDefinitions";
+import { openCase } from "../services/arsenal.service";
+import type { CaseType } from "../types/arsenal.types";
+import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 export const useOpenCase = () => {
   const queryClient = useQueryClient();

@@ -13,12 +13,14 @@ const firebaseConfig = {
 // Safety check for build environment without valid API key
 const isConfigValid = !!firebaseConfig.apiKey;
 
+export const isDatabaseEnabled = !!firebaseConfig.databaseURL;
+
 export const firebaseApp =
   getApps().length > 0
     ? getApp()
     : initializeApp(isConfigValid ? firebaseConfig : { ...firebaseConfig, apiKey: "dummy-key-for-build" });
 
-export const messaging = async () => {
+const messaging = async () => {
   const { getMessaging, isSupported } = await import("firebase/messaging");
   const supported = await isSupported();
   if (supported) {

@@ -29,7 +29,7 @@ export const MiniTrendChart = ({
             </linearGradient>
           </defs>
           <Area
-            type='monotone'
+            type='linear'
             dataKey='value'
             stroke={color}
             fill='url(#colorGradient)'

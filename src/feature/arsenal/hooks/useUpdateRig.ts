@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { setSelectedGuitar } from "feature/user/store/userSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { setSelectedGuitar } from "feature/user/store/userSlice";
+
 import { updateRig } from "../services/arsenal.service";
 import type { RigSetup } from "../types/arsenal.types";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
@@ -9,6 +10,8 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 interface UpdateRigPayload {
   rig: RigSetup;
   selectedGuitar?: string | number | null;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
 }
 
 export const useUpdateRig = () => {
@@ -16,11 +19,12 @@ export const useUpdateRig = () => {
   const dispatch = useDispatch();
 
   return useMutation({
-    mutationFn: ({ rig, selectedGuitar }: UpdateRigPayload) => updateRig(rig, selectedGuitar),
-    onSuccess: (_, { selectedGuitar }) => {
+    mutationFn: ({ rig, selectedGuitar, selectedGuitarYear, selectedGuitarCountry }: UpdateRigPayload) =>
+      updateRig(rig, selectedGuitar, selectedGuitarYear, selectedGuitarCountry),
+    onSuccess: (_, { selectedGuitar, selectedGuitarYear, selectedGuitarCountry }) => {
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
       if (selectedGuitar !== undefined) {
-        dispatch(setSelectedGuitar(selectedGuitar ?? null));
+        dispatch(setSelectedGuitar({ imageId: selectedGuitar ?? null, year: selectedGuitarYear, country: selectedGuitarCountry }));
       }
     },
     onError: (error: any) => {
