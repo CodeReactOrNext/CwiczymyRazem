@@ -121,6 +121,7 @@ const commitToGitHub = async (
       path,
       message,
       content: Buffer.from(mdxContent).toString('base64'),
+      branch: 'master',
       ...(sha && { sha }),
     });
   } catch (error) {
