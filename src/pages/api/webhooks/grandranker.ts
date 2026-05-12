@@ -1,13 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Octokit } from '@octokit/rest';
 
 interface Article {
   id: string;
   title: string;
   subtitle?: string;
-  author_name?: string;
+  meta_description?: string;
+  content_html?: string;
+  content_markdown?: string;
   publish_date: string;
+  image_url?: string;
+  author_name?: string;
   slug: string;
 }
 
@@ -35,150 +38,98 @@ const validateAuthorization = (authHeader: string | undefined): boolean => {
   return providedToken === token;
 };
 
-const getMonthYearFolder = (dateStr: string): string => {
-  try {
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}`;
-  } catch {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}`;
-  }
-};
-
-const getMonthHeader = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric'
-  });
-};
-
 const formatDate = (dateStr: string): string => {
   try {
     const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
+    return date.toISOString().split('T')[0];
   } catch {
-    return new Date().toLocaleDateString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).replace(/\//g, '.');
+    return new Date().toISOString().split('T')[0];
   }
 };
 
-const formatArticleEntry = (article: Article): string => {
-  const author = article.author_name ? ` — ${article.author_name}` : '';
-  return `📚 ${article.title}${author}`;
+const generateMdxContent = (article: Article): string => {
+  const title = article.title.replace(/"/g, '\\"');
+  const description = (article.meta_description || article.subtitle || '').replace(/"/g, '\\"');
+  const date = formatDate(article.publish_date);
+  const author = article.author_name || 'Riff Quest';
+  const image = article.image_url || '/images/blog/default.webp';
+
+  const frontmatter = `---
+title: "${title}"
+description: "${description}"
+date: "${date}"
+image: "${image}"
+slug: "${article.slug}"
+author: "${author}"
+---
+
+`;
+
+  const content = article.content_markdown || article.content_html || '';
+
+  return frontmatter + content;
 };
 
-const ensureChangelogFile = (filePath: string): void => {
-  if (!fs.existsSync(filePath)) {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(filePath, '');
+const getGitHubClient = () => {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error('GITHUB_TOKEN not configured');
   }
+
+  return new Octokit({ auth: token });
 };
 
-const readChangelogContent = (filePath: string): string => {
+const commitToGitHub = async (
+  octokit: InstanceType<typeof Octokit>,
+  article: Article,
+  mdxContent: string
+): Promise<void> => {
+  const owner = process.env.GITHUB_OWNER;
+  const repo = process.env.GITHUB_REPO;
+
+  if (!owner || !repo) {
+    throw new Error('GITHUB_OWNER or GITHUB_REPO not configured');
+  }
+
+  const path = `src/content/blog/${article.slug}.mdx`;
+  const message = `📚 Add blog post: ${article.title}`;
+
   try {
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return '';
+    // Check if file exists
+    let sha: string | undefined;
+    try {
+      const existing = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path,
+      });
+      if (Array.isArray(existing.data)) {
+        throw new Error('Path is a directory');
+      }
+      sha = existing.data.sha;
+    } catch (error: any) {
+      if (error.status !== 404) {
+        throw error;
+      }
+      // File doesn't exist, that's fine
+    }
+
+    // Create or update file
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner,
+      repo,
+      path,
+      message,
+      content: Buffer.from(mdxContent).toString('base64'),
+      ...(sha && { sha }),
+    });
+  } catch (error) {
+    console.error('GitHub commit error:', error);
+    throw error;
   }
 };
 
-const appendArticlesToChangelog = (filePath: string, articles: Article[]): void => {
-  ensureChangelogFile(filePath);
-
-  let content = readChangelogContent(filePath);
-
-  // Group articles by date
-  const articlesByDate = new Map<string, Article[]>();
-  articles.forEach(article => {
-    const formattedDate = formatDate(article.publish_date);
-    if (!articlesByDate.has(formattedDate)) {
-      articlesByDate.set(formattedDate, []);
-    }
-    articlesByDate.get(formattedDate)!.push(article);
-  });
-
-  // Build new content
-  const monthYear = getMonthHeader(articles[0].publish_date);
-
-  // Check if file is empty or needs header
-  if (!content.trim()) {
-    content = `# ${monthYear}\n\n`;
-  } else if (!content.includes(`# ${monthYear}`)) {
-    // Add header if it doesn't exist
-    content = `# ${monthYear}\n\n${content}`;
-  }
-
-  // Add entries for each date (in reverse chronological order)
-  const sortedDates = Array.from(articlesByDate.keys()).sort().reverse();
-
-  sortedDates.forEach(date => {
-    const dateArticles = articlesByDate.get(date) || [];
-
-    // Check if date section already exists
-    const dateHeaderRegex = new RegExp(`^## ${date}$`, 'm');
-    if (!dateHeaderRegex.test(content)) {
-      // Add new date section at the appropriate place
-      const lines = content.split('\n');
-      let insertIndex = 0;
-
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('## ')) {
-          insertIndex = i;
-          break;
-        }
-      }
-
-      if (insertIndex === 0) {
-        // No date section exists, add after header
-        const headerIndex = lines.findIndex(line => line.startsWith('# '));
-        insertIndex = headerIndex + 2;
-      }
-
-      const newSection = `## ${date}\n${dateArticles.map(a => `- ${formatArticleEntry(a)}`).join('\n')}\n`;
-      lines.splice(insertIndex, 0, newSection);
-      content = lines.join('\n');
-    } else {
-      // Append to existing date section
-      const lines = content.split('\n');
-      const dateHeaderIndex = lines.findIndex(line => line === `## ${date}`);
-
-      if (dateHeaderIndex !== -1) {
-        // Find where this section ends
-        let sectionEndIndex = dateHeaderIndex + 1;
-        while (sectionEndIndex < lines.length &&
-               !lines[sectionEndIndex].startsWith('## ') &&
-               !lines[sectionEndIndex].startsWith('# ')) {
-          sectionEndIndex++;
-        }
-
-        dateArticles.forEach(article => {
-          lines.splice(sectionEndIndex, 0, `- ${formatArticleEntry(article)}`);
-          sectionEndIndex++;
-        });
-
-        content = lines.join('\n');
-      }
-    }
-  });
-
-  fs.writeFileSync(filePath, content, 'utf-8');
-};
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -206,32 +157,46 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'No articles provided' });
     }
 
-    // Group articles by month
-    const articlesByMonth = new Map<string, Article[]>();
-    articles.forEach(article => {
-      const monthFolder = getMonthYearFolder(article.publish_date);
-      if (!articlesByMonth.has(monthFolder)) {
-        articlesByMonth.set(monthFolder, []);
-      }
-      articlesByMonth.get(monthFolder)!.push(article);
-    });
+    const octokit = getGitHubClient();
+    const results = [];
 
-    // Save articles to changelog files
-    articlesByMonth.forEach((monthArticles, monthFolder) => {
-      const changelogPath = path.join(process.cwd(), 'public', 'changelogs', `${monthFolder}.md`);
-      appendArticlesToChangelog(changelogPath, monthArticles);
-    });
+    // Process each article
+    for (const article of articles) {
+      try {
+        const mdxContent = generateMdxContent(article);
+        await commitToGitHub(octokit, article, mdxContent);
+        results.push({
+          slug: article.slug,
+          status: 'success',
+          message: `Article "${article.title}" committed successfully`,
+        });
+      } catch (error) {
+        results.push({
+          slug: article.slug,
+          status: 'error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
+    const successCount = results.filter(r => r.status === 'success').length;
+    const errorCount = results.filter(r => r.status === 'error').length;
 
     res.status(200).json({
       success: true,
-      message: `Successfully processed ${articles.length} article(s)`,
-      articlesCount: articles.length,
+      message: `Processed ${articles.length} article(s)`,
+      summary: {
+        total: articles.length,
+        successful: successCount,
+        failed: errorCount,
+      },
+      details: results,
     });
   } catch (error) {
     console.error('Webhook error:', error);
     res.status(500).json({
       error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
