@@ -1,4 +1,5 @@
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
@@ -24,6 +25,8 @@ interface LeaderboardProps {
   selectedSeason: string;
   setSelectedSeason: (value: string) => void;
   lastAccessiblePage: number;
+  userRank?: number | null;
+  isRankLoading?: boolean;
 }
 
 export const LeadboardLayout = ({
@@ -39,6 +42,8 @@ export const LeadboardLayout = ({
   selectedSeason,
   setSelectedSeason,
   lastAccessiblePage,
+  userRank,
+  isRankLoading,
 }: LeaderboardProps) => {
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
@@ -58,8 +63,20 @@ export const LeadboardLayout = ({
           eyebrow="Seasonal ranking"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           rightContent={
-            <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
-
+            <div className='flex flex-col sm:flex-row items-end sm:items-center gap-6'>
+              {isRankLoading ? (
+                <Skeleton className="h-20 w-40" />
+              ) : userRank ? (
+                <div className="flex flex-col items-end gap-2">
+                  <span className="text-xs uppercase tracking-widest text-zinc-400">Your position</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
+                  </div>
+                  {totalUsers > 0 && (
+                    <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
+                  )}
+                </div>
+              ) : null}
               <SeasonRewards />
             </div>
           }
@@ -69,8 +86,22 @@ export const LeadboardLayout = ({
           title="Leaderboard"
           subtitle="See how you rank against other players"
           eyebrow="All-time ranking"
-          characterImage="/images/3d/leaderboard.png"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+          rightContent={
+            isRankLoading ? (
+              <Skeleton className="h-20 w-40" />
+            ) : userRank ? (
+              <div className="flex flex-col items-end gap-2">
+                <span className="text-xs uppercase tracking-widest text-zinc-400">Your position</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
+                </div>
+                {totalUsers > 0 && (
+                  <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
+                )}
+              </div>
+            ) : null
+          }
         />
       )}
 
