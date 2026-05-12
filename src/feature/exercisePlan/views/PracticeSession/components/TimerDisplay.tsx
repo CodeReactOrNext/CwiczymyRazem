@@ -50,7 +50,7 @@ export const TimerDisplay = ({
 
       <div
         className={cn(
-          "relative rounded-full backdrop-blur-sm",
+          "relative rounded-full bg-zinc-900/50",
           sizeClasses[size]
         )}>
         <AnimatePresence>

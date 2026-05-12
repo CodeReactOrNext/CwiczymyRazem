@@ -57,7 +57,7 @@ export const updateSongStatus = async (
       title,
       artist,
       lastUpdated: Timestamp.now(),
-    });
+    }, { merge: true });
 
     firebaseAddSongsLog(
       userId,

@@ -8,7 +8,6 @@ import type { NavPagesTypes } from "types/layout.types";
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
 import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";
-
 import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {
@@ -17,7 +16,7 @@ interface LandingLayoutProps {
   userName: string;
   userAvatar?: string;
   pageId: NavPagesTypes;
-  variant: "primary" | "secondary" | "landing";
+  variant: "primary" | "secondary" | "landing" | "fullscreen";
   children: React.ReactNode;
 }
 
@@ -28,6 +27,7 @@ const MainLoggedLayout = ({
   userAvatar,
   children,
   pageId,
+  variant,
 }: LandingLayoutProps) => {
   const { t } = useTranslation();
 
@@ -100,12 +100,19 @@ const MainLoggedLayout = ({
             </DesktopHeaderWrapper>
 
 
-            <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 md:pt-8 md:pb-8 lg:px-8'>
-                <div
-                  className='relative z-10'>
+            {variant === "fullscreen" ? (
+              <div className='z-20 w-full flex-1 h-full'>
+                <div className='relative w-full h-full'>
                   {children}
                 </div>
-            </div>
+              </div>
+            ) : (
+              <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 md:pt-8 md:pb-8 lg:px-8'>
+                  <div className='relative'>
+                    {children}
+                  </div>
+              </div>
+            )}
           </MainLoggedWrapper>
         </div>
       </div>

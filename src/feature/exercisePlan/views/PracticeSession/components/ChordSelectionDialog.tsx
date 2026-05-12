@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Badge } from 'assets/components/ui/badge';
+import { Button } from 'assets/components/ui/button';
+import { Checkbox } from 'assets/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { Button } from 'assets/components/ui/button';
+import { Label } from 'assets/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -16,33 +18,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'assets/components/ui/select';
-import { Label } from 'assets/components/ui/label';
-import { Checkbox } from 'assets/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'assets/components/ui/tabs';
 import {
-  getCategorizedChords,
-  generateChordExercise,
   type ChordExerciseConfig,
+  generateChordExercise,
+  getCategorizedChords,
 } from 'feature/exercisePlan/chords/chordExerciseGenerator';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
-import { Badge } from 'assets/components/ui/badge';
 import { X } from 'lucide-react';
+import { useEffect,useState } from 'react';
 
 interface ChordSelectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onExerciseGenerated: (exercise: Exercise) => void;
+  initialExercise?: Exercise;
 }
 
 export function ChordSelectionDialog({
   isOpen,
   onClose,
   onExerciseGenerated,
+  initialExercise,
 }: ChordSelectionDialogProps) {
   const [selectedChords, setSelectedChords] = useState<string[]>(['G', 'C']);
   const [hideNotes, setHideNotes] = useState(false);
   const [changesPerMeasure, setChangesPerMeasure] = useState(1);
   const categorizedChords = getCategorizedChords();
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialExercise && initialExercise._generatorConfig) {
+        const conf = initialExercise._generatorConfig as ChordExerciseConfig;
+        setSelectedChords(conf.chords || []);
+        setHideNotes(initialExercise.hideTablatureNotes ?? false);
+        setChangesPerMeasure(conf.changesPerMeasure || 1);
+      } else {
+        setSelectedChords(['G', 'C']);
+        setHideNotes(false);
+        setChangesPerMeasure(1);
+      }
+    }
+  }, [isOpen, initialExercise]);
 
   const handleAddChord = (chord: string) => {
     if (selectedChords.length < 8) {

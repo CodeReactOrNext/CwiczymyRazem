@@ -14,6 +14,8 @@ export interface FirebaseUserDataInterface {
   guitarStartDate?: Timestamp;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
   fcmData?: {
@@ -22,12 +24,12 @@ export interface FirebaseUserDataInterface {
   };
 }
 
-export interface FirebaseEventsInteface {
+interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
   link: string;
 }
-export interface FirebaseDiscordEventsInteface {
+interface FirebaseDiscordEventsInteface {
   title: string;
   deadline: string;
   description: string;

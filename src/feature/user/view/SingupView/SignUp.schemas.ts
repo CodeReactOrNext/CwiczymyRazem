@@ -17,6 +17,6 @@ export const signupSchema = yup.object().shape({
     .required("Required"),
   repeat_password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must be the same")
+    .oneOf([yup.ref("password")], "Passwords must be the same")
     .required("Required"),
 });

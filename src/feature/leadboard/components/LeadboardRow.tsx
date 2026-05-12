@@ -17,6 +17,8 @@ interface LeadboardColumnProps {
   currentUserId: string | null;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
 }
 
 export const LeadboardRow = ({
@@ -28,6 +30,8 @@ export const LeadboardRow = ({
   currentUserId,
   selectedFrame,
   selectedGuitar,
+  selectedGuitarYear,
+  selectedGuitarCountry,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -63,11 +67,12 @@ export const LeadboardRow = ({
            {/* Card Header: Rank, Avatar, Name */}
            <div className="flex items-center gap-3">
               {/* Rank Badge */}
-              <div 
+              <div
+                translate="no"
                 className={cn(
                   "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-lg font-black italic tracking-tighter",
-                   profileId === currentUserId 
-                    ? "bg-cyan-500 text-black" 
+                   profileId === currentUserId
+                    ? "bg-cyan-500 text-black"
                     : "bg-balck/40 text-zinc-400"
                 )}
               >
@@ -77,12 +82,13 @@ export const LeadboardRow = ({
               {/* Avatar & Identity */}
               <div className="flex flex-1 items-center gap-3 overflow-hidden">
                   <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
-                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} />
+                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
                   </Link>
 
                  <div className="flex flex-col min-w-0 gap-0.5">
                     <Link href={`/user/${profileId}`} className="block truncate">
-                       <span 
+                       <span
+                         translate="no"
                          className={cn(
                            "flex items-center gap-2 truncate text-sm font-bold tracking-tight hover:underline",
                             profileId === currentUserId ? "text-cyan-400" : "text-white"
@@ -94,19 +100,20 @@ export const LeadboardRow = ({
                     </Link>
                     
                     <div className="flex items-center gap-2 text-[10px] font-medium text-zinc-500">
-                       <div 
+                       <div
+                          translate="no"
                           className={cn(
                             "flex items-center rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
-                            profileId === currentUserId 
-                             ? "bg-cyan-500/10 text-cyan-400" 
+                            profileId === currentUserId
+                             ? "bg-cyan-500/10 text-cyan-400"
                              : "bg-zinc-800 text-zinc-400"
                           )}
                        >
                          LVL {lvl}
                        </div>
-                       <span className="truncate">
-                         <DaySinceMessage date={new Date(statistics.lastReportDate)} />
-                       </span>
+                        <div translate="no" className="truncate">
+                          <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+                        </div>
                     </div>
                  </div>
               </div>
@@ -151,6 +158,7 @@ export const LeadboardRow = ({
 
         <div className='relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
           <div
+            translate="no"
             className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
               profileId === currentUserId
                 ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]"
@@ -164,7 +172,7 @@ export const LeadboardRow = ({
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
-              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} />
+              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
             </div>
           </Link>
 
@@ -173,6 +181,7 @@ export const LeadboardRow = ({
             <div className='mb-1.5 flex items-center gap-4'>
               <Link href={`/user/${profileId}`} className="flex items-center gap-2 group/link">
                 <h3
+                  translate="no"
                   className={`text-lg font-bold tracking-tight transition-colors lg:text-xl group-hover/link:underline ${
                     profileId === currentUserId
                       ? "text-cyan-300"
@@ -184,6 +193,7 @@ export const LeadboardRow = ({
               </Link>
 
               <div
+                translate="no"
                 className={`flex w-fit items-center gap-1.5 rounded-sm px-3 py-1 ${
                   profileId === currentUserId
                     ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
@@ -198,7 +208,7 @@ export const LeadboardRow = ({
               </div>
             </div>
 
-            <div className='text-xs font-medium text-zinc-500 group-hover:text-zinc-400'>
+            <div translate="no" className='font-medium'>
               <DaySinceMessage date={new Date(statistics.lastReportDate)} />
             </div>
           </div>
@@ -214,7 +224,7 @@ export const LeadboardRow = ({
                 }`}>
                 {statistics.points.toLocaleString()}
               </div>
-              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("points")}
               </div>
             </div>
@@ -230,7 +240,7 @@ export const LeadboardRow = ({
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </div>
-              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("exercise_time")}
               </div>
             </div>

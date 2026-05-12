@@ -1,8 +1,8 @@
 import { RecordingsGrid } from "feature/recordings/components/RecordingsGrid";
-import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
-import { useState } from "react";
+import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { Video } from "lucide-react";
+import { useState } from "react";
 
 interface UserRecordingsSectionProps {
   userId: string;

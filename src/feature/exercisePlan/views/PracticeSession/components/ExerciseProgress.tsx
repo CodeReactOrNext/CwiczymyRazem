@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { memo } from "react";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -9,12 +10,12 @@ interface ExerciseProgressProps {
   onExerciseSelect: (index: number) => void;
 }
 
-export const ExerciseProgress = ({
+export const ExerciseProgress = memo(function ExerciseProgress({
   plan,
   currentExerciseIndex,
   completedExercises,
   onExerciseSelect,
-}: ExerciseProgressProps) => {
+}: ExerciseProgressProps) {
   return (
     <div className='w-full max-w-none py-4 px-1'>
       <div className="flex items-center justify-between mb-2 px-1">
@@ -60,4 +61,4 @@ export const ExerciseProgress = ({
       </div>
     </div>
   );
-};
+});

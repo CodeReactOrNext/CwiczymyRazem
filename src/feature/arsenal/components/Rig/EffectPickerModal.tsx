@@ -1,7 +1,8 @@
-import { X } from "lucide-react";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+import { X } from "lucide-react";
+
 import type { EffectInventoryItem } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface EffectPickerModalProps {
   effectInventory: EffectInventoryItem[];

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { isMobileDevice } from "../utils/deviceDetection";
 import { useMetronome } from "./useMetronome";
@@ -11,7 +11,6 @@ interface UseDeviceMetronomeProps {
   recommendedBpm?: number;
   isMuted?: boolean;
   speedMultiplier?: number;
-  onPlayStart?: () => void;
   onTick?: () => void;
   /** Shared AudioContext — forwarded to the underlying metronome hook (e.g. AlphaTab's context). */
   externalAudioContext?: AudioContext | null;
@@ -48,7 +47,5 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
     }
   }, [isMobile, mobileMetronome]);
 
-  const metronome = isMobile ? mobileMetronome : desktopMetronome;
-
-  return metronome;
+  return useMemo(() => (isMobile ? mobileMetronome : desktopMetronome), [isMobile, mobileMetronome, desktopMetronome]);
 }; 

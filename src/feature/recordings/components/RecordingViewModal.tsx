@@ -1,21 +1,19 @@
-import Avatar from "components/UI/Avatar";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
+import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import { getComments } from "feature/recordings/services/comments.service"; 
 import { getRecordingById } from "feature/recordings/services/getRecordings";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Loader2, MessageSquare, Send, Heart, Video, Calendar, User } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { Calendar, Heart, Loader2, MessageSquare, Send, User,Video } from "lucide-react";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { cn } from "assets/lib/utils";
 
 interface RecordingViewModalProps {
   isOpen: boolean;
@@ -168,7 +166,7 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
                                 </div>
                                 <div className="flex-1 min-w-0 bg-zinc-800/50 rounded-lg p-2.5 border border-white/5">
                                     <div className="flex justify-between items-start mb-1">
-                                        <span className="font-bold text-xs text-cyan-400 truncate pr-2">{comment.userName}</span>
+                                        <span translate="no" className="font-bold text-xs text-cyan-400 truncate pr-2">{comment.userName}</span>
                                         <span className="text-[9px] text-zinc-500 shrink-0 mt-0.5">
                                             {comment.createdAt ? new Date((comment.createdAt as any).toDate ? (comment.createdAt as any).toDate() : comment.createdAt).toLocaleDateString() : ""}
                                         </span>

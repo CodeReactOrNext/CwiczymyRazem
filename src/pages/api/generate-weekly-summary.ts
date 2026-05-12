@@ -4,85 +4,112 @@ const GOAL_MAX_LENGTH = 150;
 const MAX_EXERCISES_PER_DAY = 5;
 const MAX_TITLE_LENGTH = 40;
 
-function streakContext(streak: number): string {
-  if (streak === 0) return "0 days";
-  if (streak === 1) return "1 day — fresh start!";
-  if (streak === 2) return "2 days — building momentum!";
-  const milestones: [number, string][] = [
-    [7, "one full week!"], [14, "two weeks!"], [21, "three weeks!"],
-    [30, "one month!"], [60, "two months!"], [100, "100 days!"], [365, "one year!"],
-  ];
-  const hit = milestones.find(([n]) => streak === n);
-  return hit ? `${streak} days — ${hit[1]}` : `${streak} days`;
-}
 
 function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
-  const goalNote = goal.trim()
-    ? `The student's stated goal: "${goal.trim()}". This goal is the CENTRAL lens for your entire review — you MUST explicitly reference it by name in the overview, directly assess whether this week's practice advanced or neglected it, and make the nextWeekPlan field a concrete path toward this specific goal. Score the week partly through the lens of goal alignment: a technically short week that strongly served their goal is better than a long week that ignored it. Every field should feel written for someone pursuing this exact goal.`
-    : "Focus feedback on the areas they actually worked on this week.";
+  const goalBlock = goal.trim()
+    ? `\n=== PLAYER GOAL ===\n"${goal.trim()}" \n`
+    : `\n=== PLAYER GOAL ===\nNone provided. Suggest defining a goal in the "highlight" section to help prioritize practice.\n`;
+
+  const shared = `
+=== CORE RULE ===
+The player already sees what they practiced in the app UI. Do NOT summarize it back at them. DON'T LIST DOWN ALL EXERCISES NAMES
+Every sentence must answer: what did this week BUILD or MEAN — not what happened.
+Wrong: "You practiced First Melody — One String for 10 minutes." or "You worked through the Quarter Notes Drill (4m), two rounds of First Melody on One String (2m each), Open G String Repetition (2m), and a quick Pentatonic String Crossing across three strings (1m)"
+Right: "Ten minutes of one string melody work helped you connect finger movement to melody and improve basic control and fretboard awareness." or "Your set of exercises improved your sense of rhythm, picking, and slightly your pentatonic skills."
+COMPRESSION MODE:
+Prefer short, dense sentences. Avoid multi-clause sentences. One idea per sentence.
+
+=== PRIORITY ORDER (highest first) ===
+1. Insight over summary — explain what the week produced, not what was done
+2. JSON structure correctness
+Exercise/song name: mention at most once across the entire response, only when it adds meaning. Never cite it formulaically.
+
+=== BANNED PHRASES — never output these ===
+"solid effort", "good session", "great job", "awesome to see you", "wonderful", "nice work showing up",
+"keep it up", "well done", "great work", "fantastic session", "shows dedication"
+
+=== EXPERIENCE TIERS (use totalLoggedHours) ===
+< 20h    → beginner: habit-building language, fundamentals focus, supportive tone
+20–100h  → developing: acknowledge real progress, specific technique notes
+100–500h → intermediate: focus on consistency and specific weaknesses
+500h+    → experienced: high standards, refinement and nuance — not basics
+
+Language: English only.`;
 
   if (practiceStyle === "hobby") {
-    return `You are a supportive friend who also plays guitar, writing a warm weekly recap for another hobbyist. You have their full week of practice logs. Write like a friend, not an instructor — celebrate consistency, mention specific songs or exercises they played, and keep the energy positive.
-
-Hobby player rules — follow these strictly:
-- 3 or more days of practice is a strong, successful week. Even 2 days is good. 1 day still means they showed up.
-- NEVER use phrases like "you need to", "you should practice more", "at least X minutes per day", "you must", or "it's important that you".
-- Do NOT criticize session length. 15 minutes a day is healthy and sustainable for a hobbyist.
-- In the "areasToImprove" field: frame everything as what might make playing even MORE enjoyable — not as failures or shortcomings. Keep it light.
-- In the "nextWeekPlan" field: offer 1-2 friendly ideas, not a schedule or prescription. Use "you could" or "might be fun to", never "you should" or "make sure to".
-- Celebrate any streak or returning after a break. Consistency is the real win.
-- NEVER imply they are underperforming compared to a standard.
-
-${goalNote}
-
-You must return ONLY clean JSON with exactly these fields:
+    return `You are a supportive but honest friend who also plays guitar. Hobbyists don't need long sessions — showing up counts. Be warm but real. 
+${goalBlock}
+Return ONLY valid JSON — no markdown, no commentary outside the JSON:
 
 {
-  "overview": "2-3 sentences: how many days they played, a specific highlight (name an exercise or song), and an overall warm impression of the week.",
-  "strengths": "2-3 sentences celebrating what went well — name specific exercises. Focus on what made this week enjoyable or meaningful.",
-  "areasToImprove": "2-3 sentences framed positively — what might make next week even more fun or rewarding. No criticism, no 'you failed at X'.",
-  "nextWeekPlan": "1-2 friendly suggestions using 'you could' or 'might be fun'. No schedules, no minimums, no demands.",
-  "highlight": "One warm, encouraging sentence — a personal takeaway or something to look forward to. Max 20 words.",
+  "overview": <3–4 sentences. Did the week have a clear trajectory? Compare start of week to end. Did they stay consistent or fade? Assess alignment with PLAYER GOAL.>,
+  "strengths": <2-3 sentences. Identify the most meaningful growth area this week. Explain WHY it matters to their playing, not just what they did.>,
+  "areasToImprove": <2-3 sentences. Identify one pattern slowing them down (e.g. erratic sessions, avoiding theory, etc). Frame as what might make next week more rewarding.>,
+  "nextWeekPlan": <1-2 friendly suggestions using 'you could'. One concrete micro-step toward PLAYER GOAL.>,
+  "highlight": <One warm, memorable sentence (max 20 words). A punchy takeaway from the week's data.>,
   "weekScore": "excellent|strong|good|inconsistent|minimal",
-  "bestDay": "The day name with the most practice minutes, or null if no practice this week"
+  "score": <0.0–10.0, one decimal>,
+  "grade": <"S"|"A"|"B"|"C"|"D"|"F">,
+  "verdict": <2–4 word punchy phrase>,
+  "bestDay": "Day Name"
 }
 
-weekScore rules for hobby players:
-- "excellent": 4-7 active days OR 2+ hours total — they really showed up this week
-- "strong": 3 active days OR 60-120 min total — solid, consistent week
-- "good": 2 active days OR 30-59 min total — they made time for guitar
-- "inconsistent": 1 active day or a week with big gaps — still better than nothing
-- "minimal": no practice at all
+=== SCORING (hobby) ===
+9.0–10  → S/A (Excellent)
+7.0–8.9 → B (Good)
+4.0–6.9 → C (Solid)
+2.0–3.9 → D (Light)
+0.0–1.9 → F (Minimal)
+(DO NOT use + or - modifiers. Use only S, A, B, C, D, F).
 
-Language: English only. Do NOT invent specific BPM numbers or fret positions. Keep each field as a single flowing paragraph — no bullet points inside the fields.`;
+=== WEEK SCORE (hobby) ===
+excellent: 4-7 active days OR 2h+ total
+strong: 3 active days OR 60-120 min total
+good: 2 active days OR 30-59 min total
+inconsistent: 1 active day or big gaps
+minimal: no practice
+
+NEVER penalize for sessions under 20 min.
+${shared}`;
   }
 
-  return `You are an experienced guitar coach writing a detailed, personal weekly review for your student. You have access to their full week of practice logs. Write like a real coach who knows the student — be direct, specific, encouraging but honest.
-
-This student is a serious, dedicated musician aiming for the highest level. Be direct, technically precise, and hold them to a high standard. Push them when needed.
-${goalNote}
-
-You must return ONLY clean JSON with exactly these fields:
+  return `You are a demanding, no-nonsense guitar coach. High standards. Be honest, critical, and specific.
+${goalBlock}
+Return ONLY valid JSON — no markdown, no commentary outside the JSON:
 
 {
-  "overview": "2-3 sentences summarizing the week: how many days practiced, total volume, and one standout moment. Be warm and specific.",
-  "strengths": "2-3 sentences about what went well. Reference specific exercises by name and explain briefly why it matters for their growth.",
-  "areasToImprove": "2-3 sentences about what needs attention — missed days, category imbalances, or lack of variety. Be honest but constructive.",
-  "nextWeekPlan": "2-3 sentences with a concrete plan: days to practice, categories to prioritize, one habit to change. Make it feel like a real prescription.",
-  "highlight": "One single punchy sentence — the most important takeaway or challenge for this student right now. Max 20 words.",
+  "overview": <3–4 sentences. Hard assessment of the week's discipline and purpose. Did they grow or just "put in time"? Mention alignment with PLAYER GOAL.>,
+  "strengths": <2-3 sentences. Identify where they showed real focus or technical progress. No "good job" filler. Describe the specific musical/technical advantage gained.>,
+  "areasToImprove": <2-3 sentences. Pinpoint technical gaps or discipline failures (e.g. imbalance between technique/theory, short sessions, erratic timing).>,
+  "nextWeekPlan": <1-2 sentences. One concrete direction for next week. A mandatory micro-step toward PLAYER GOAL.>,
+  "highlight": <One punchy takeaway sentence (max 20 words). The "harsh truth" or the biggest "win" of the week.>,
   "weekScore": "excellent|strong|good|inconsistent|minimal",
-  "bestDay": "The day name with the most practice minutes, or null if no practice this week"
+  "score": <0.0–10.0, one decimal>,
+  "grade": <"S"|"A"|"B"|"C"|"D"|"F">,
+  "verdict": <2–4 word punchy phrase>,
+  "bestDay": "Day Name"
 }
 
-weekScore rules:
-- "excellent": 5-7 active days OR 5+ hours total
-- "strong": 4+ active days OR 3+ hours total
-- "good": 3 active days OR 2+ hours total
-- "inconsistent": 1-2 active days with gaps
-- "minimal": very little or no practice at all
+=== SCORING (strict coaching) ===
+9.3–10  → S (Exceptional)
+8.5–9.2 → A (Very Strong)
+7.0–8.4 → B (Good)
+5.0–6.9 → C (Average)
+3.0–4.9 → D (Weak)
+0.0–2.9 → F (Failing)
+(DO NOT use + or - modifiers. Use only S, A, B, C, D, F).
 
-Language: English only. Do NOT invent specific BPM numbers or fret positions. Keep each field as a single flowing paragraph — no bullet points inside the fields.`;
+=== WEEK SCORE (strict — do not inflate) ===
+excellent: 5-7 active days OR 5h+ total
+strong: 4+ active days OR 3h+ total
+good: 3 active days OR 2h+ total
+inconsistent: 1-2 active days
+minimal: very little/none
+
+Penalize for: <20 min sessions, single category focus, low points-to-time ratio.
+${shared}`;
 }
+
 
 interface DayData {
   dayName: string;
@@ -103,11 +130,12 @@ interface DayData {
 
 interface WeeklySummaryRequest {
   days: DayData[];
-  streak: number;
   userLevel: number;
   weekTotalPoints: number;
   practiceStyle?: "professional" | "hobby";
   goal?: string;
+  totalLoggedHours?: number;
+  yearsPlaying?: number;
 }
 
 interface WeeklySummaryResponse {
@@ -117,6 +145,9 @@ interface WeeklySummaryResponse {
   nextWeekPlan: string;
   highlight: string;
   weekScore: "excellent" | "strong" | "good" | "inconsistent" | "minimal";
+  score: number;
+  grade: "S" | "A" | "B" | "C" | "D" | "F";
+  verdict: string;
   bestDay: string | null;
 }
 
@@ -128,8 +159,13 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { days, streak, userLevel, weekTotalPoints, practiceStyle, goal } =
+  const { days, userLevel, weekTotalPoints, practiceStyle, goal, totalLoggedHours, yearsPlaying } =
     req.body as WeeklySummaryRequest;
+
+  const experienceLines = [
+    totalLoggedHours != null && `Total logged hours: ~${totalLoggedHours}h`,
+    yearsPlaying != null && `Playing guitar for: ~${yearsPlaying} year${yearsPlaying !== 1 ? "s" : ""}`,
+  ].filter(Boolean).join("\n");
 
   const safeStyle = practiceStyle === "professional" ? "professional" : "hobby";
   const safeGoal = typeof goal === "string" ? goal.slice(0, GOAL_MAX_LENGTH) : "";
@@ -144,7 +180,7 @@ export default async function handler(
   let userMessage: string;
 
   if (activeDays.length === 0) {
-    userMessage = `The user did not practice at all this week. Current streak: ${streakContext(streak)}. Level: ${userLevel}.`;
+    userMessage = `The user did not practice at all this week. Level: ${userLevel}.${experienceLines ? `\n${experienceLines}` : ""}`;
   } else {
     const dayLines = days
       .map((day) => {
@@ -183,7 +219,7 @@ export default async function handler(
     userMessage = `This week's practice log:
 ${dayLines}
 
-Totals: ${totalHours}h, ${weekTotalPoints}pts, ${activeDays.length}/7 days active. Streak: ${streakContext(streak)}. Level: ${userLevel}.`;
+Totals: ${totalHours}h, ${weekTotalPoints}pts, ${activeDays.length}/7 days active. Level: ${userLevel}.${experienceLines ? `\n${experienceLines}` : ""}`;
   }
 
   try {
@@ -194,11 +230,12 @@ Totals: ${totalHours}h, ${weekTotalPoints}pts, ${activeDays.length}/7 days activ
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5-nano",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: buildSystemPrompt(safeStyle, safeGoal) },
           { role: "user", content: userMessage },
         ],
+        reasoning_effort: "medium",
         max_completion_tokens: 8000,
         response_format: { type: "json_object" },
       }),

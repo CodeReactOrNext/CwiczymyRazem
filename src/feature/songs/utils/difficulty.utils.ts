@@ -1,4 +1,4 @@
-export interface DifficultyRating {
+interface DifficultyRating {
   rating: number;
 }
 

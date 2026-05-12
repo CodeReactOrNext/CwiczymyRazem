@@ -3,7 +3,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { getFocusSuggestion } from "./getFocusSuggestion";
 import type { PracticeArea } from "./types";
 
-export interface MetricsResult {
+interface MetricsResult {
   totalTime: number;
   avgSessionLength: number;
   avgPointsPerHour: number;

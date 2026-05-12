@@ -1,4 +1,5 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
 import spiderPermutation1234Image from "./image.png";
 
 export const spiderPermutation1234Exercise: Exercise = {
@@ -27,6 +28,7 @@ export const spiderPermutation1234Exercise: Exercise = {
     max: 200,
     recommended: 80
   },
+  examBacking: { url: "/static/sounds/exercise/spider_exercise___1_2_3_4_permutation_backing_track%20(3)%20(1).mp3", sourceBpm: 80 },
   relatedSkills: ["finger_independence"],
   tablature: [
     {

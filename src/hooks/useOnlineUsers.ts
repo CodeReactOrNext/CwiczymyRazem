@@ -1,10 +1,8 @@
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
+import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
-import { firebaseApp } from "utils/firebase/client/firebase.config";
+import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
 
-export interface OnlineUser {
+interface OnlineUser {
   uid: string;
   displayName: string;
   avatar: string;
@@ -25,6 +23,8 @@ export const useOnlineUsers = () => {
 
   // Listen to all users
   useEffect(() => {
+    if (!isDatabaseEnabled) return;
+
     let db;
     try {
       db = getDatabase(firebaseApp);

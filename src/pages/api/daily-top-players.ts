@@ -1,15 +1,19 @@
+import {SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import { SeasonService } from "feature/discordBot/services/seasonService";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
 import {
   assignSeasonalAchievements,
+  awardSeasonFame,
   hasSeasonalAchievement
 } from "feature/profile/services/seasonalAchievementsService";
 import {
+  addDoc,
   collection,
   doc,
   getDocs,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
@@ -136,9 +140,33 @@ const checkSeasonEndAndAssignAchievements = async (
 
   logger.info(`Assigned ${assignedCount} seasonal achievements`, {
     context: "dailyTopPlayersUpdate",
-    extra: {
-      seasonId
-    }
+    extra: { seasonId }
+  });
+
+  await awardSeasonFame(topPlayers, seasonId);
+
+  // Send in-app notifications to top 5
+  const notifPromises = topFivePlayers
+    .filter((p) => p.uid && !p.uid.startsWith("player-"))
+    .map((player, i) => {
+      const place = i + 1;
+      const fameAmount = SEASON_FAME_REWARDS[i];
+      return addDoc(collection(db, "notifications"), {
+        userId: player.uid,
+        type: "season_reward",
+        place,
+        fameAwarded: fameAmount,
+        seasonId,
+        isRead: false,
+        timestamp: serverTimestamp(),
+      });
+    });
+
+  await Promise.all(notifPromises);
+
+  logger.info("Season reward notifications sent", {
+    context: "dailyTopPlayersUpdate",
+    extra: { seasonId, count: notifPromises.length }
   });
 };
 

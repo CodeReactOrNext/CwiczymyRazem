@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
 import {
   attachGpFileToSong,
   detachGpFileFromSong,
@@ -6,6 +5,7 @@ import {
   recordPracticeSession,
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
+import { useCallback, useEffect, useState } from "react";
 
 interface UseUserSongProgressReturn {
   progressMap: Record<string, UserSongProgress>;

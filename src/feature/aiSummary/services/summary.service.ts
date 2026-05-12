@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import type { DailySummaryResponse, PromptConfig, WeeklySummaryResponse } from "../types/summary.types";
 
 const promptConfigDocRef = (userId: string) =>

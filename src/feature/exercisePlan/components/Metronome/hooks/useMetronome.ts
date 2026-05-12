@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
 // Using an inline Blob URL avoids the need to serve a separate .js file.
@@ -122,7 +122,7 @@ export const useMetronome = ({
     };
   // externalAudioContext intentionally included: when AlphaTab's context becomes
   // available we reinitialise the worklet on that context (happens before first play).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [enabled, externalAudioContext]);
 
   const playSound = useCallback((time: number, isAccent: boolean = false) => {
@@ -273,7 +273,7 @@ export const useMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
-  return {
+  return useMemo(() => ({
     bpm,
     isPlaying,
     countInRemaining,
@@ -289,5 +289,9 @@ export const useMetronome = ({
     startTime: startTimeRef.current,
     audioContext: audioContextRef.current,
     audioStartTime: audioStartTimeRef.current,
-  };
+  }), [
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm, 
+    setBpm, toggleMetronome, startMetronome, stopMetronome, 
+    restartMetronome, handleSetRecommendedBpm, recommendedBpm
+  ]);
 };

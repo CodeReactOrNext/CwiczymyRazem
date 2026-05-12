@@ -8,27 +8,27 @@ import {
 } from "feature/user/store/userSlice.asyncThunk";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
-import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  ArrowLeft,
   ChevronRight,
   Eye,
   EyeOff,
+  Guitar,
+  Headphones,
   Loader2,
   Lock,
   Mail,
+  Music,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { toast } from "sonner";
+import { TbGuitarPick } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { firebaseSendPasswordResetEmail } from "utils/firebase/client/firebase.utils";
 
 
-export interface logInCredentials {
+interface logInCredentials {
   email: string;
   password: string;
 }
@@ -49,21 +49,6 @@ const LoginView = () => {
     dispatch(logInViaEmail(credentials));
   }
 
-  const handleForgotPassword = async (email: string) => {
-    if (!email) {
-      toast.error(t("login:enter_email_error"));
-      return;
-    }
-
-    try {
-      await firebaseSendPasswordResetEmail(email);
-      toast.success(t("login:reset_password_success"));
-    } catch  {
-      toast.error(t("login:reset_password_error"));
-    }
-  };
-
-
   const formikInitialValues = {
     email: "",
     password: "",
@@ -72,86 +57,83 @@ const LoginView = () => {
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center'>
       {/* Premium Background */}
-      <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute -left-[10%] -top-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-500/10 blur-[120px]' />
-        <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/10 blur-[120px]' />
+      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
+        <div className='absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[60vh] w-[80vw] bg-cyan-500/5 blur-[120px] rounded-[100%]' />
+        
+        {/* Tiled Pattern Background */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.03]">
+          <defs>
+            <pattern id="auth-bg-pattern" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-15)">
+              <g transform="translate(20, 20) scale(1)">
+                 <Guitar size={32} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(100, 40) scale(1)">
+                 <Music size={28} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(40, 100) scale(1)">
+                 <TbGuitarPick size={30} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(110, 110) scale(1)">
+                 <Headphones size={32} className="text-white" strokeWidth={1.5} />
+              </g>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#auth-bg-pattern)" />
+        </svg>
       </div>
 
-      <div className='relative z-10 w-full max-w-md p-6'>
-        <motion.div
-           initial={{ opacity: 0, x: -20 }}
-           animate={{ opacity: 1, x: 0 }}
-           transition={{ duration: 0.6, delay: 0.1 }}
-           className='mb-6'>
-           <Link
-             href='/'
-             className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
-             <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-             {t("common:back")}
-           </Link>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex flex-col gap-6"
-        >
+      <div className='relative z-10 w-full max-w-md p-4 sm:p-6 mt-4 sm:mt-0'>
+        <div className="flex flex-col gap-4 sm:gap-6">
           {/* Header Section */}
           <div className="text-center">
-             <div className="flex justify-center mb-6">
-                 <div className="relative p-3 rounded-2xl bg-zinc-900/50 border border-white/10 shadow-2xl shadow-cyan-500/10">
-                    <Image
-                      src='/images/logolight.svg'
-                      alt='Logo'
-                      width={48}
-                      height={48}
-                      className='h-12 w-12' priority
-                    />
-                 </div>
+             <div className="flex justify-center mb-2 sm:mb-6">
+                <Image
+                  src='/images/logolight.svg'
+                  alt='Logo'
+                  width={56}
+                  height={56}
+                  className='h-10 w-10 sm:h-14 sm:w-14' priority
+                />
              </div>
-             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1 sm:mb-2">
                {t("login:title")}
              </h1>
-             <p className="text-zinc-400 text-sm">
+             <p className="text-zinc-400 text-xs sm:text-sm">
                {t("login:subtitle")}
              </p>
           </div>
 
           {/* Card */}
-          <div className="rounded-2xl glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
-            {/* Tab Switcher */}
-            <div className="flex border-b border-white/10">
-              <Link 
-                href="/login" 
-                className="flex-1 py-4 text-center text-sm font-bold transition-all relative text-white bg-white/5"
-              >
-                {t("login:submit_button")}
-                <motion.div 
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500" 
-                />
-              </Link>
-              <Link 
-                href="/signup" 
-                className="flex-1 py-4 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
-              >
-                {t("login:signup_link")}
-              </Link>
-            </div>
+          <div className="rounded-lg  overflow-hidden shadow-2xl border border-white/5 bg-zinc-900/80">
+            <div className="p-2">
+              {/* Tab Switcher */}
+              <div className="flex p-1 bg-zinc-900/50 rounded-lg mb-4 border border-white/5">
+                <Link 
+                  href="/login" 
+                  className="flex-1 py-2.5 text-center text-sm font-bold transition-all bg-zinc-800/80 text-white rounded-lg shadow-sm border border-white/5"
+                >
+                  {t("login:submit_button")}
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="flex-1 py-2.5 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 rounded-lg hover:bg-white/5"
+                >
+                  {t("login:signup_link")}
+                </Link>
+              </div>
 
-            <div className="p-6">
+            <div className="px-4 pb-4">
             <Formik
               initialValues={formikInitialValues}
               validationSchema={loginSchema}
               onSubmit={onSubmit}>
               {({ values, errors, touched, handleChange, handleBlur }) => (
-                <Form className='space-y-4'>
+                <Form className='space-y-3 sm:space-y-4'>
                   {/* Email Field */}
                     <div className="space-y-2">
                         <Label
                           htmlFor='email'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("login:email_label")}
                         </Label>
                         <div className='relative group'>
@@ -164,7 +146,7 @@ const LoginView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='pl-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -179,16 +161,15 @@ const LoginView = () => {
                     <div className="flex items-center justify-between">
                          <Label
                           htmlFor='password'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("login:password_label")}
                         </Label>
-                        <button
-                          type="button"
-                          onClick={() => handleForgotPassword(values.email)}
-                          className="text-[10px] text-cyan-500 hover:text-cyan-400 font-bold uppercase tracking-wider transition-colors"
+                        <Link
+                          href="/forgot-password"
+                          className="text-[10px] text-cyan-500 hover:text-cyan-400 font-bold transition-colors"
                         >
                           {t("login:forgot_password")}
-                        </button>
+                        </Link>
                     </div>
 
                     <div className='relative group'>
@@ -201,7 +182,7 @@ const LoginView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
@@ -226,8 +207,9 @@ const LoginView = () => {
                   <div className="pt-2">
                     <Button
                       type='submit'
+                      size='lg'
                       disabled={isFetching}
-                      className='w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold h-10 shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]'>
+                      className='w-full'>
                         {isFetching ? (
                           <Loader2 className='h-5 w-5 animate-spin' />
                         ) : (
@@ -241,12 +223,12 @@ const LoginView = () => {
               )}
             </Formik>
 
-            <div className="relative my-6">
+            <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-white/10"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-zinc-900 px-2 text-zinc-500">{t("login:or_continue_with")}</span>
+                <div className="relative flex justify-center text-xs">
+                    <span className="bg-zinc-900 px-2 text-zinc-400">{t("login:or_continue_with")}</span>
                 </div>
             </div>
 
@@ -255,7 +237,7 @@ const LoginView = () => {
                 onClick={googleLogInHandler}
                 disabled={isGoogleFetching}
                 variant='outline'
-                className='w-full border-white/10 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors h-10 text-zinc-300'>
+                className='w-full border-white/5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors h-11 text-zinc-300'>
                 <span className='flex items-center justify-center gap-2'>
                   {isGoogleFetching ? (
                     <Loader2 className='h-5 w-5 animate-spin' />
@@ -266,9 +248,10 @@ const LoginView = () => {
                 </span>
               </Button>
             </div>
+            </div>
           </div>
 
-        </motion.div>
+        </div>
       </div>
     </div>
   );

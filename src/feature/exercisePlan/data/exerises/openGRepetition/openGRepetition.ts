@@ -6,7 +6,7 @@ export const openGRepetitionExercise: Exercise = {
   description: "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 2,
+  timeInMinutes: 1.5,
   instructions: [
     "Play the open G string (3rd string) repeatedly.",
     "Focus on maintaining a steady rhythm and even volume.",
@@ -22,8 +22,35 @@ export const openGRepetitionExercise: Exercise = {
     max: 120,
     recommended: 60
   },
+  examBacking: { url: "/static/sounds/exercise/open_g_string_repetition_backing_track.mp3", sourceBpm: 60 },
   relatedSkills: ["rhythm", 'alternate_picking'],
   tablature: [
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] }
+      ]
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] }
+      ]
+    },
     {
       timeSignature: [4, 4],
       beats: [

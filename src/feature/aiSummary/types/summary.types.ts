@@ -1,6 +1,6 @@
 export type SessionGrade = "S" | "A+" | "A" | "A-" | "B+" | "B" | "B-" | "C+" | "C" | "D" | "F";
 
-export type PracticeStyle = "professional" | "hobby";
+type PracticeStyle = "professional" | "hobby";
 
 export interface PromptConfig {
   practiceStyle: PracticeStyle;
@@ -12,14 +12,9 @@ export interface SessionRatingResponse {
   grade: SessionGrade;
   verdict: string;
   feedback: string;
-  categoryFeedback?: {
-    technique?: string;
-    theory?: string;
-    hearing?: string;
-    creativity?: string;
-  };
   strengths: string[];
   improvements: string[];
+  nextSessionTip?: string;
 }
 
 export interface DailySummaryResponse {
@@ -35,5 +30,8 @@ export interface WeeklySummaryResponse {
   nextWeekPlan: string;
   highlight: string;
   weekScore: "excellent" | "strong" | "good" | "inconsistent" | "minimal";
+  score: number;
+  grade: SessionGrade;
+  verdict: string;
   bestDay: string | null;
 }

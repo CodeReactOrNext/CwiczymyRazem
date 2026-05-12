@@ -1,8 +1,8 @@
 import { fireEvent,render, screen } from "@testing-library/react";
+import { useChat } from "feature/chat/hooks/useChat";
 import { beforeEach,describe, expect, it, vi } from "vitest";
 
 import Chat from "../Chat";
-import { useChat } from "feature/chat/hooks/useChat";
 
 vi.mock("feature/chat/hooks/useChat");
 

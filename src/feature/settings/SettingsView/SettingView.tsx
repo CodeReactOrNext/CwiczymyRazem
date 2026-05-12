@@ -16,7 +16,7 @@ import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { User, Palette, Share2, Settings as SettingsIcon, ShieldAlert, Lock, CreditCard } from "lucide-react";
+import { CreditCard,Lock, Share2, ShieldAlert, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 

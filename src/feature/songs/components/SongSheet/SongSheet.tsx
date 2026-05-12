@@ -154,7 +154,7 @@ const SongSheet = ({
     <Sheet open={isOpen} onOpenChange={(v) => !v && onClose()}>
       <SheetContent 
         side="right" 
-        className="w-full sm:max-w-md border-l border-white/5 bg-zinc-950 p-0 shadow-2xl overflow-hidden flex flex-col [&>button]:z-[70] [&>button]:bg-black/50 [&>button]:backdrop-blur-md [&>button]:opacity-100 [&>button]:hover:bg-black/70 [&>button]:text-white [&>button]:transition-all [&>button]:border [&>button]:border-white/10 [&>button]:right-6 [&>button]:top-6"
+        className="w-full sm:max-w-md border-l border-white/5 bg-zinc-950 p-0 shadow-2xl overflow-hidden flex flex-col [&>button]:z-[70] [&>button]:bg-black/50 [&>button]:backdrop-blur-md [&>button]:opacity-100 [&>button]:hover:bg-black/70 [&>button]:text-white [&>button]:transition-all [&>button]:border [&>button]:border-white/10 [&>button]:right-4 [&>button]:top-4 [&>button]:h-11 [&>button]:w-11 [&>button]:rounded-full [&>button]:flex [&>button]:items-center [&>button]:justify-center [&>button_svg]:h-5 [&>button_svg]:w-5"
       >
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {/* Hero Section with Cover */}
@@ -177,12 +177,12 @@ const SongSheet = ({
             
             <div className="absolute bottom-6 left-6 right-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
+                  <h2 translate="no" className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
                     {song.title}
                   </h2>
                  
                 </div>
-                <p className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
+                <p translate="no" className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
                 
                 {/* Genres List */}
                 {song.genres && song.genres.length > 0 && (

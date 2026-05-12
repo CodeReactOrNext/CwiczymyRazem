@@ -1,44 +1,13 @@
 import { PracticeModeSelector } from "feature/practice/components/PracticeModeSelector/PracticeModeSelector";
 import AppLayout from "layouts/AppLayout";
-import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useState } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const Timer: NextPageWithLayout = () => {
-  const router = useRouter();
-  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | "skills" | "gp" | null>(null);
-
-  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song" | "skills" | "gp") => {
-    setLoadingMode(mode);
-    switch (mode) {
-      case "timer":
-        router.push("/timer/practice");
-        break;
-      case "plan":
-        router.push("/timer/plans");
-        break;
-      case "auto":
-        router.push("/timer/auto");
-        break;
-      case "song":
-        router.push("/timer/song-select");
-        break;
-      case "skills":
-        router.push("/profile/skills");
-        break;
-      case "gp":
-        router.push("/gp-tabs");
-        break;
-      default:
-        setLoadingMode(null);
-    }
-  };
-
   return (
     <div className="flex flex-col w-full h-full">
-      <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+      <PracticeModeSelector />
     </div>
   );
 };

@@ -15,13 +15,12 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
-import { PageHeader } from "constants/PageHeader";
 import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
@@ -250,6 +249,7 @@ const AnimatedTimerDisplay = ({
         <div className='absolute inset-0 z-20 flex flex-col items-center justify-center rounded-full text-white'>
           <div className='text-center'>
             <p
+              translate="no"
               className='font-sans text-5xl font-semibold tracking-wider'
               style={{
                 textShadow: activeSkill
@@ -296,8 +296,21 @@ const TimerLayout = ({
   isFinishing
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
-  const { time, startTimer, stopTimer, timerEnabled } = timer;
+  const { startTimer, stopTimer, timerEnabled } = timer;
+  const [time, setTime] = useState(() => timer.getTime());
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setTime(timer.getTime());
+    return timer.subscribe((t) => setTime(t));
+  }, [timer]);
+
+  useEffect(() => {
+    document.title = `${formatTime(time)} — Riff Quest`;
+    return () => {
+      document.title = "Riff Quest";
+    };
+  }, [time]);
 
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
@@ -356,11 +369,8 @@ const TimerLayout = ({
   };
 
   return (
-    <MainContainer>
+    <MainContainer noBorder>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
-        <div className="pl-14 sm:pl-0">
-          <PageHeader title='Practice' onBack={onBack} />
-        </div>
         <Card>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
@@ -380,7 +390,7 @@ const TimerLayout = ({
                 </span>
                 <div className='flex items-center gap-2'>
                   <BlinkingDot isActive={timerEnabled} />
-                  <span className=' font-medium text-white sm:text-base'>
+                  <span translate="no" className=' font-medium text-white sm:text-base'>
                     {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
                   </span>
                 </div>
@@ -392,7 +402,7 @@ const TimerLayout = ({
                 </span>
                 <div className='flex items-center'>
                   <IconBox Icon={MdAccessTime} small />
-                  <span className='ml-1  text-base font-medium text-white sm:text-lg'>
+                  <span translate="no" className='ml-1  text-base font-medium text-white sm:text-lg'>
                     {convertMsToHMS(sumTime)}
                   </span>
                 </div>
@@ -445,15 +455,15 @@ const TimerLayout = ({
               disabled={isFinishing}
             >
               {isFinishing ? (
-                  <div className="flex items-center gap-2">
+                  <div translate="no" className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Saving...</span>
                   </div>
               ) : (
-                  <>
+                  <span translate="no" className="flex items-center gap-2">
                     {t("end_button")}
                     <ArrowRight />
-                  </>
+                  </span>
               )}
             </Button>
           </div>

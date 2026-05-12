@@ -109,8 +109,7 @@
     "description": "Complete overview of your achievements and learning progress",
     "songs_title": "Songs",
     "songs_description": "Learning status of songs in your library",
-    "records_title": "Records and Achievements",
-    "records_description": "Your best results and long-term statistics"
+    "records_title": "Records and Achievements"
   },
   "no_songs_title": "No songs yet",
   "no_songs_description": "Add your first songs to the library to track your progress.",

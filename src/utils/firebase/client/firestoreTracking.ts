@@ -1,6 +1,6 @@
 import * as firestore from "firebase/firestore";
 
-export const firestoreStats = {
+const firestoreStats = {
   reads: 0,
   writes: 0,
   deletes: 0,
@@ -135,12 +135,12 @@ export const trackedUpdateDoc = async (docRef: firestore.DocumentReference, data
   return firestore.updateDoc(docRef, data);
 };
 
-export const trackedAddDoc = async (colRef: firestore.CollectionReference, data: any) => {
+const trackedAddDoc = async (colRef: firestore.CollectionReference, data: any) => {
   logStats('write', colRef.path);
   return firestore.addDoc(colRef, data);
 };
 
-export const trackedDeleteDoc = async (docRef: firestore.DocumentReference) => {
+const trackedDeleteDoc = async (docRef: firestore.DocumentReference) => {
   docCache.delete(docRef.path);
   queryCache.clear();
   logStats('delete', docRef.path);

@@ -1,15 +1,15 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
-import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
+import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import type {
   CaseType,
+  EffectInventoryItem,
   GuitarRarity,
   InventoryItem,
-  EffectInventoryItem,
 } from "feature/arsenal/types/arsenal.types";
+import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-import type { Transaction, DocumentReference } from "firebase-admin/firestore";
 
 // 60% guitar, 40% effect
 const GUITAR_CHANCE = 0.6;
@@ -122,7 +122,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type: "case_open",
         uid: userId,
         userName: capturedUserData?.displayName || "Unknown",
-        avatarUrl: capturedUserData?.avatarUrl || null,
+        avatarUrl: capturedUserData?.avatar || null,
         userAvatarFrame: capturedUserData?.selectedFrame ?? capturedUserData?.statistics?.lvl ?? 0,
         timestamp: new Date().toISOString(),
         data: new Date().toISOString(),

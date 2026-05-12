@@ -3,6 +3,7 @@ import { AlertTriangle, Home,RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
+import * as Sentry from "@sentry/nextjs";
 
 interface Props {
   children: ReactNode;
@@ -11,20 +12,28 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  componentStack: string | null;
 }
 
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
-    error: null
+    error: null,
+    componentStack: null,
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, componentStack: null };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+    Sentry.captureException(error, {
+      contexts: {
+        react: { componentStack: errorInfo.componentStack },
+      },
+    });
+    this.setState({ componentStack: errorInfo.componentStack ?? null });
   }
 
   private handleReset = () => {
@@ -50,9 +59,12 @@ class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="p-4 rounded-xl bg-zinc-900 border border-white/5 text-left overflow-auto max-h-40">
+            {this.state.error && (
+              <div className="p-4 rounded-xl bg-zinc-900 border border-white/5 text-left overflow-auto max-h-60 space-y-2">
                 <p className="text-xs font-mono text-red-400">{this.state.error.toString()}</p>
+                {this.state.componentStack && (
+                  <pre className="text-xs font-mono text-zinc-400 whitespace-pre-wrap">{this.state.componentStack}</pre>
+                )}
               </div>
             )}
 
@@ -75,9 +87,7 @@ class ErrorBoundary extends Component<Props, State> {
               </Link>
             </div>
             
-            <p className="text-xs text-zinc-600">
-              Technical details have been logged to the console.
-            </p>
+          
           </div>
         </div>
       );

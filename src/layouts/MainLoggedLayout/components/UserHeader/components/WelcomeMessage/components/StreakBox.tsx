@@ -1,9 +1,9 @@
 import { cn } from "assets/lib/utils";
-import { FaFire } from "react-icons/fa";
-import { addDays, isSameDay, startOfWeek } from "date-fns";
-import { useAppSelector } from "store/hooks";
-import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { addDays, isSameDay, startOfWeek } from "date-fns";
+import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { FaFire } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
 
 export const StreakBox = () => {

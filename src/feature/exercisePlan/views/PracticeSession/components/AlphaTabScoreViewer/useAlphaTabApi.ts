@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import * as alphaTabLib from "@coderline/alphatab";
+import { useEffect, useRef, useState } from "react";
+
 import type { Track } from "./types";
 
 interface UseAlphaTabApiOptions {
@@ -14,7 +15,7 @@ interface UseAlphaTabApiOptions {
   speedMultiplierRef: React.MutableRefObject<number>;
 }
 
-export interface UseAlphaTabApiReturn {
+interface UseAlphaTabApiReturn {
   apiRef: React.MutableRefObject<any>;
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
   containerRef: React.MutableRefObject<HTMLDivElement | null>;

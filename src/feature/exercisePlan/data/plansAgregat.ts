@@ -1,9 +1,15 @@
 import { advancedImprovisationPlan } from "feature/exercisePlan/data/plans/advancedImprovisation/advancedImprovisation";
 import { basicImprovisationPractice } from "feature/exercisePlan/data/plans/basicImprovisationPractice/basicImprovisationPractice";
+import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/completeDailyPractice/completeDailyPractice";
 import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
+import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
+import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
 import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
 import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
+import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
 import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
+import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
+import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
 import { musicianFitnessLvl1S1Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S1";
 import { musicianFitnessLvl1S2Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S2";
 import { musicianFitnessLvl1S3Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S3";
@@ -26,19 +32,13 @@ import { musicianFitnessLvl2S19Plan } from "feature/exercisePlan/data/plans/meta
 import { musicianFitnessLvl2S20Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S20";
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
 import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
-import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
+import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
+import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
 import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPlan/spiderMasterPlan";
+import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
 import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
-import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
-import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
-import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
-import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
-import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
-import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
-import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
-import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/completeDailyPractice/completeDailyPractice";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -54,6 +54,8 @@ const FREE_PLAN_IDS = new Set([
   "ear_rhythm_fundamentals",
   "daily_dexterity_starter",
   "warm_up_15_minutes",
+  "soloing_explorer",
+  "spider_master_plan",
   // Playalong plans — free
   "pentatonic_playalong_best_of_plan",
   "metal_guitar_exercises",

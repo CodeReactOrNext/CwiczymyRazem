@@ -1,6 +1,6 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
-export const getRandomNote = () => {
+const getRandomNote = () => {
   const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   return notes[Math.floor(Math.random() * notes.length)];
 };
@@ -29,7 +29,7 @@ export const randomNoteHuntExercise: Exercise = {
   description: "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
   difficulty: "easy",
   category: "theory",
-  timeInMinutes: 3,
+  timeInMinutes: 2,
   instructions: [
     "Find and play the selected note on every string where it occurs, starting from the low E string and moving up.",
     "Repeat the process, but this time start from the highest string and move down.",

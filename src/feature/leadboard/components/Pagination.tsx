@@ -1,9 +1,7 @@
 import {
   Pagination as ShadcnPagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "assets/components/ui/pagination";

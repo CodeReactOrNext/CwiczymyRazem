@@ -6,7 +6,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect,useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 21;
 
 export const useSongs = () => {
   const [titleQuery, setTitleQuery] = useState("");

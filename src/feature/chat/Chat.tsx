@@ -9,7 +9,7 @@ import { useTranslation } from "hooks/useTranslation";
 import { SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-export const Chat = () => {
+const Chat = () => {
   const {
     error,
     messages,

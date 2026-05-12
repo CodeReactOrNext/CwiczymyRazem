@@ -1,4 +1,4 @@
-import type { TablatureMeasure, SequenceRepeatRiddleConfig } from "feature/exercisePlan/types/exercise.types";
+import type { SequenceRepeatRiddleConfig,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
 export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMeasure[] => {
   const { noteCount, difficulty, range } = config;

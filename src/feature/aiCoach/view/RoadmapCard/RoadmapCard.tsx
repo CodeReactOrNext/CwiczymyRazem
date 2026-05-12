@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle2, Circle, Clock, Trash2 } from "lucide-react";
 import React from "react";
+
 import type { Roadmap } from "../../types/roadmap.types";
 
 interface RoadmapCardProps {

@@ -1,8 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, Ear, Eye, EyeOff, HelpCircle, Music, Play, RefreshCw, Trophy, Volume2 } from "lucide-react";
-import { useState } from "react";
+import { Ear, Eye, Music, RefreshCw, Trophy, Volume2 } from "lucide-react";
 import { FaPlay } from "react-icons/fa";
 
 interface EarTrainingViewProps {
@@ -12,7 +11,6 @@ interface EarTrainingViewProps {
   onGuessed: () => void;
   score: number;
   highScore?: number | null;
-  exerciseUrl?: string;
   isRevealed: boolean;
   isGuessed?: boolean;
   isPlaying: boolean;
@@ -29,7 +27,6 @@ export const EarTrainingView = ({
   onGuessed,
   score,
   highScore,
-  exerciseUrl,
   isRevealed,
   isGuessed,
   isPlaying,
@@ -59,7 +56,7 @@ export const EarTrainingView = ({
               <span className={cn("text-lg sm:text-xl font-black", score > highScore ? "text-amber-400" : "text-purple-300")}>{highScore}</span>
             </div>
           )}
-          {(exerciseUrl || onRecordsClick) && (
+          {(onRecordsClick) && (
             <button
               onClick={onRecordsClick}
               className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:border-white/20 transition-colors"

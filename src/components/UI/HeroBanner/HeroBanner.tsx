@@ -7,13 +7,16 @@ interface HeroBannerProps {
   buttonText?: string;
   rightContent?: React.ReactNode;
   backgroundImage?: string;
+  backgroundContent?: ReactNode;
   characterImage?: string;
   secondaryImage?: string;
   eyebrow?: string;
+  eyebrowClassName?: string;
   onClick?: () => void;
   className?: string;
   leftContent?: ReactNode;
   children?: ReactNode;
+  compact?: boolean;
 }
 
 export const HeroBanner = ({
@@ -22,37 +25,46 @@ export const HeroBanner = ({
   buttonText,
   rightContent,
   backgroundImage,
+  backgroundContent,
   characterImage,
   secondaryImage,
   eyebrow = "Daily practice",
+  eyebrowClassName = "text-orange-400/80",
   onClick,
   className = "",
   leftContent,
   children,
+  compact = false,
 }: HeroBannerProps) => {
   return (
     <div
-      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible min-h-[220px] md:min-h-[160px] lg:min-h-[180px] ${className}`}
+      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${compact ? '' : 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]'} ${className}`}
     >
-      {/* Base background — matches page bg so it bleeds in */}
-      <div className="absolute inset-0 bg-background" />
+      {/* Backgrounds Container (Clipped) */}
+      <div className="absolute inset-0 rounded-none md:rounded-xl overflow-hidden pointer-events-none z-0">
+        {/* Base background — matches page bg so it bleeds in */}
+        <div className="absolute inset-0 bg-background" />
 
-      {/* Background Image */}
-      {backgroundImage && (
-        <div
-          className="absolute inset-0 bg-no-repeat bg-cover bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
-      )}
+        {/* Background Image */}
+        {backgroundImage && (
+          <div
+            className="absolute inset-0 bg-no-repeat bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        )}
 
-      {/* Warm spot on the right — more prominent orange glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
+        {/* Warm spot on the right — more prominent orange glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
 
-      {/* Left-to-right fade so text stays readable — only rounded on desktop */}
-      <div className="absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
+        {/* Left-to-right fade so text stays readable — only rounded on desktop */}
+        <div className="absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
 
-      {/* Bottom edge fade — ties the banner into the cards below */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+        {/* Renders after the fade so custom elements remain highly visible */}
+        {backgroundContent}
+
+        {/* Bottom edge fade — ties the banner into the cards below */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+      </div>
 
       {/* Glow blob behind the figures */}
       {(characterImage || secondaryImage) && (
@@ -82,14 +94,16 @@ export const HeroBanner = ({
       )}
 
       {/* Content */}
-      <div 
-        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-end justify-between p-6 md:p-8 lg:px-10 lg:py-8 gap-6 md:gap-8 ${
+      <div
+        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-start justify-between gap-6 md:gap-8 ${
+          compact ? 'p-4 md:p-5 lg:px-6 lg:py-4' : 'p-6 md:p-8 lg:px-10 lg:py-8'
+        } ${
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""
         }`}
       >
-        <div className="space-y-2 max-w-xl w-full">
+        <div className="space-y-2 max-w-xl min-w-0 flex-1">
           {eyebrow && (
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400/80 md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none">
+            <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
               {eyebrow}
             </p>
           )}
@@ -109,7 +123,7 @@ export const HeroBanner = ({
         </div>
 
         {(buttonText || rightContent || children) && (
-          <div className="flex flex-col items-start md:items-end shrink-0 z-10 w-full md:w-auto gap-4 md:gap-0">
+          <div className="flex flex-col items-start md:items-end shrink-0 z-10 w-auto gap-4 md:gap-0">
             {rightContent && (
               <div className="pt-1">{rightContent}</div>
             )}

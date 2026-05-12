@@ -181,6 +181,7 @@ const CategoryBox = ({
           {renderCategoryIcon()}
         </div>
         <span
+          translate="no"
           className={`text-sm font-medium md:text-base ${
             isActive ? "text-white" : "text-gray-300"
           }`}>
@@ -191,18 +192,20 @@ const CategoryBox = ({
       <div className='relative z-10 mb-6 flex items-end justify-between'>
         <div className='flex items-baseline'>
           <h3
+            translate="no"
             className={`text-xl font-bold tracking-wide md:text-3xl ${
               isActive ? "text-white" : "text-gray-200"
             }`}>
             {timeObject.hours}:{timeObject.minutes}
           </h3>
-          <span className={`text-sm font-bold opacity-40 ml-1 md:text-lg ${isActive ? "text-white" : "text-gray-400"}`}>
+          <span translate="no" className={`text-sm font-bold opacity-40 ml-1 md:text-lg ${isActive ? "text-white" : "text-gray-400"}`}>
             :{timeObject.seconds.toString().padStart(2, '0')}
           </span>
         </div>
 
         <div className='flex items-center gap-1 text-base'>
           <span
+            translate="no"
             className={`rounded-md px-2 py-0.5 text-sm font-medium ${
               chosen ? "" : "bg-gray-700/30 text-gray-400"
             }`}
@@ -234,15 +237,15 @@ const CategoryBox = ({
           handleCardClick();
         }}>
         {isActive ? (
-          <>
+          <span translate="no" className="flex items-center">
             <VscDebugPause className='mr-2 h-4 w-4' />
             {t("pause")}
-          </>
+          </span>
         ) : (
-          <>
+          <span translate="no" className="flex items-center">
             <VscDebugStart className='mr-2 h-4 w-4' />
             {t("start")}
-          </>
+          </span>
         )}
       </Button>
 

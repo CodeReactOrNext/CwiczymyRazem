@@ -1,6 +1,6 @@
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -32,11 +32,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
-    const inventory: { guitarId: number | string }[] = data.arsenal?.inventory || [];
+    const inventory: { guitarId: number | string; year?: number; country?: string }[] = data.arsenal?.inventory || [];
 
     // Validate ownership
-    const owns = inventory.some((item) => item.guitarId === guitarId);
-    if (!owns) {
+    const ownedItem = inventory.find((item) => item.guitarId === guitarId);
+    if (!ownedItem) {
       return res.status(403).json({ error: "Guitar not in inventory" });
     }
 
@@ -46,6 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await userRef.update({
       "arsenal.equippedGuitarId": guitarId,
       selectedGuitar: imageId,
+      selectedGuitarYear: ownedItem.year ?? null,
+      selectedGuitarCountry: ownedItem.country ?? null,
     });
 
     return res.status(200).json({ success: true });

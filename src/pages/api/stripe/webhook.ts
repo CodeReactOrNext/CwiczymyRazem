@@ -1,14 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { Readable } from "stream";
-import Stripe from "stripe";
 import * as admin from "firebase-admin";
+import type { NextApiRequest, NextApiResponse } from "next";
+import type { Readable } from "stream";
+import Stripe from "stripe";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 // Disable Next.js body parsing — Stripe needs the raw body to verify signature
 export const config = { api: { bodyParser: false } };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 /** Read the raw request body as a Buffer */
@@ -110,6 +110,13 @@ export default async function handler(
           premiumUntil,
           plan
         );
+
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+          if (sub.status === "trialing") {
+            await firestore.collection("users").doc(userId).update({ hadTrial: true });
+          }
+        }
         break;
       }
 

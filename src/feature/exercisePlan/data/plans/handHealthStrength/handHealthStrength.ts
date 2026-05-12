@@ -1,7 +1,7 @@
-import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
-import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
-import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pinkyPowerDrill/pinkyPowerDrill";
 import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
+import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
+import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
+import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pinkyPowerDrill/pinkyPowerDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 

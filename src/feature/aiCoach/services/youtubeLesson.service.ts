@@ -1,19 +1,20 @@
-import { db } from "utils/firebase/client/firebase.utils";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
+  limit,
+  query,
   setDoc,
   updateDoc,
-  query,
   where,
-  limit,
 } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+
 import type {
+  ScraperConfig,
   YouTubeLesson,
   YouTubeLessonStatus,
-  ScraperConfig,
 } from "../types/youtubeLesson.types";
 import { DEFAULT_SCRAPER_CONFIG } from "../types/youtubeLesson.types";
 
@@ -21,14 +22,14 @@ const LESSONS_COLLECTION = "youtubeLessons";
 const ADMIN_CONFIG_COLLECTION = "adminConfig";
 const SCRAPER_CONFIG_DOC = "youtubeScraper";
 
-export const firebaseGetScraperConfig = async (): Promise<ScraperConfig> => {
+const firebaseGetScraperConfig = async (): Promise<ScraperConfig> => {
   const configRef = doc(db, ADMIN_CONFIG_COLLECTION, SCRAPER_CONFIG_DOC);
   const snap = await getDoc(configRef);
   if (!snap.exists()) return DEFAULT_SCRAPER_CONFIG;
   return snap.data() as ScraperConfig;
 };
 
-export const firebaseSaveScraperConfig = async (config: ScraperConfig) => {
+const firebaseSaveScraperConfig = async (config: ScraperConfig) => {
   const configRef = doc(db, ADMIN_CONFIG_COLLECTION, SCRAPER_CONFIG_DOC);
   await setDoc(configRef, config);
 };

@@ -10,7 +10,8 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
 
 export interface TimeInputBoxProps {
@@ -45,6 +46,25 @@ const TimeInputBox = ({
 }: TimeInputBoxProps) => {
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [editingHours, setEditingHours] = useState(false);
+  const [editingMinutes, setEditingMinutes] = useState(false);
+  const [editHoursValue, setEditHoursValue] = useState("");
+  const [editMinutesValue, setEditMinutesValue] = useState("");
+  const hoursInputRef = useRef<HTMLInputElement>(null);
+  const minutesInputRef = useRef<HTMLInputElement>(null);
+  const timePickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = timePickerRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", handler, { passive: false, capture: true });
+    return () => el.removeEventListener("wheel", handler, { capture: true });
+  }, []);
   const error =
     errors.hasOwnProperty(hoursName) || errors.hasOwnProperty(minutesName);
 
@@ -72,6 +92,30 @@ const TimeInputBox = ({
   };
 
   const skillColor = getSkillColor();
+
+  const startEditHours = () => {
+    setEditHoursValue(String(hoursValue).padStart(2, "0"));
+    setEditingHours(true);
+    setTimeout(() => hoursInputRef.current?.select(), 0);
+  };
+
+  const commitHours = (raw: string) => {
+    const n = parseInt(raw, 10);
+    if (!isNaN(n)) setFieldValue(hoursName, Math.min(23, Math.max(0, n)).toString());
+    setEditingHours(false);
+  };
+
+  const startEditMinutes = () => {
+    setEditMinutesValue(String(minutesValue).padStart(2, "0"));
+    setEditingMinutes(true);
+    setTimeout(() => minutesInputRef.current?.select(), 0);
+  };
+
+  const commitMinutes = (raw: string) => {
+    const n = parseInt(raw, 10);
+    if (!isNaN(n)) setFieldValue(minutesName, Math.min(59, Math.max(0, n)).toString());
+    setEditingMinutes(false);
+  };
 
   const getGradientStyle = () => {
     if (!hasValue) {
@@ -118,62 +162,100 @@ const TimeInputBox = ({
           />
         )}
 
-        <div className='relative mb-5 flex items-center gap-4'>
-          <motion.div
-            animate={{ scale: isHovered ? 1.05 : 1 }}
-            transition={{ duration: 0.3 }}
-            className={`flex h-12 w-12 items-center justify-center rounded-full opacity-90 ${
-              hasValue ? "" : "opacity-60"
-            }`}
-            style={{
-              background: hasValue
-                ? `linear-gradient(135deg, ${skillColor}20, ${skillColor}10)`
-                : "linear-gradient(135deg, #33333320, #22222210)",
-              border: hasValue
-                ? `1px solid ${skillColor}30`
-                : "1px solid #33333330",
-              boxShadow:
-                isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
-            }}>
-            <Icon
-              className='text-2xl'
-              style={{ color: hasValue ? skillColor : "#666666" }}
-            />
-          </motion.div>
-          <div className='flex items-center gap-1.5'>
-            <span
-              className={`md:text-md font-openSans text-sm ${
-                hasValue ? "text-white" : "text-gray-400"
-              }`}>
-              {title}
-            </span>
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
+        <div
+          className={`relative flex items-center justify-between gap-4 cursor-pointer sm:cursor-default ${isOpen ? 'mb-5' : 'mb-0 sm:mb-5'}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className='flex items-center gap-4'>
+            <motion.div
+              animate={{ scale: isHovered ? 1.05 : 1 }}
+              transition={{ duration: 0.3 }}
+              className={`flex h-12 w-12 items-center justify-center rounded-full opacity-90 ${
+                hasValue ? "" : "opacity-60"
+              }`}
+              style={{
+                background: hasValue
+                  ? `linear-gradient(135deg, ${skillColor}20, ${skillColor}10)`
+                  : "linear-gradient(135deg, #33333320, #22222210)",
+                border: hasValue
+                  ? `1px solid ${skillColor}30`
+                  : "1px solid #33333330",
+                boxShadow:
+                  isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
               }}>
-              <QuestionMark description={questionMarkProps.description} />
+              <Icon
+                className='text-2xl'
+                style={{ color: hasValue ? skillColor : "#666666" }}
+              />
+            </motion.div>
+            <div className='flex items-center gap-1.5'>
+              <span
+                className={`md:text-md font-openSans text-sm ${
+                  hasValue ? "text-white" : "text-gray-400"
+                }`}>
+                {title}
+              </span>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}>
+                <QuestionMark description={questionMarkProps.description} />
+              </div>
             </div>
+          </div>
+
+          {/* Mobile: time preview + expand chevron */}
+          <div className='flex items-center gap-2 sm:hidden'>
+            {hasValue && (
+              <span
+                className='font-mono text-sm font-bold'
+                style={{ color: skillColor }}>
+                {String(hoursValue).padStart(2, '0')}:{String(minutesValue).padStart(2, '0')}
+              </span>
+            )}
+            <ChevronDown
+              className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            />
           </div>
         </div>
 
-        <div className='mt-auto flex w-full items-center justify-center gap-3'>
-          <div className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
+        <div className={`${isOpen ? 'flex' : 'hidden sm:flex'} mt-auto w-full items-center justify-center gap-3`}>
+          <div ref={timePickerRef} className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
             {/* Hours */}
             <div className='flex flex-1 flex-col items-center gap-2'>
-              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
-                <WheelPicker
-                  options={hourOptions}
-                  value={parseInt(hoursValue.toString(), 10).toString()}
-                  onValueChange={(value) =>
-                    setFieldValue(hoursName, value)
-                  }
-                  infinite
-                  classNames={{
+              <div
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                onDoubleClick={startEditHours}
+                title="Double-click to type">
+                {editingHours ? (
+                  <input
+                    ref={hoursInputRef}
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={editHoursValue}
+                    onChange={(e) => setEditHoursValue(e.target.value)}
+                    onBlur={(e) => commitHours(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitHours(editHoursValue);
+                      if (e.key === "Escape") setEditingHours(false);
+                    }}
+                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    autoFocus
+                  />
+                ) : (
+                  <WheelPicker
+                    options={hourOptions}
+                    value={parseInt(hoursValue.toString(), 10).toString()}
+                    onValueChange={(value) => setFieldValue(hoursName, value)}
+                    infinite
+                    classNames={{
                       optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
                       highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-slate-500'>
                 HOURS
@@ -186,19 +268,38 @@ const TimeInputBox = ({
 
             {/* Minutes */}
             <div className='flex flex-1 flex-col items-center gap-2'>
-              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
-                <WheelPicker
-                  options={minuteOptions}
-                  value={parseInt(minutesValue.toString(), 10).toString()}
-                  onValueChange={(value) =>
-                    setFieldValue(minutesName, value)
-                  }
-                  infinite
+              <div
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                onDoubleClick={startEditMinutes}
+                title="Double-click to type">
+                {editingMinutes ? (
+                  <input
+                    ref={minutesInputRef}
+                    type="number"
+                    min={0}
+                    max={59}
+                    value={editMinutesValue}
+                    onChange={(e) => setEditMinutesValue(e.target.value)}
+                    onBlur={(e) => commitMinutes(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitMinutes(editMinutesValue);
+                      if (e.key === "Escape") setEditingMinutes(false);
+                    }}
+                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    autoFocus
+                  />
+                ) : (
+                  <WheelPicker
+                    options={minuteOptions}
+                    value={parseInt(minutesValue.toString(), 10).toString()}
+                    onValueChange={(value) => setFieldValue(minutesName, value)}
+                    infinite
                     classNames={{
                       optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
                       highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-slate-500'>
                 MIN

@@ -2,7 +2,7 @@ import { removeUserSong } from "feature/songs/services/removeUserSong";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar, updatePoints } from "feature/user/store/userSlice";
-import { updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";

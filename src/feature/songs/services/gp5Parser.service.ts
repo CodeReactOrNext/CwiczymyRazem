@@ -1,7 +1,7 @@
 import * as alphaTab from '@coderline/alphatab';
-import { TablatureMeasure, TablatureBeat, TablatureNote, BendPoint } from 'feature/exercisePlan/types/exercise.types';
+import type { BendPoint,TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
 
-export interface GpTrack {
+interface GpTrack {
   name: string;
   measures: TablatureMeasure[];
   trackType: 'guitar' | 'bass' | 'drums' | 'vocals';
@@ -14,12 +14,12 @@ export interface ParsedGp {
 }
 
 // Legacy aliases
-export type Gp5Track = GpTrack;
-export type ParsedGp5 = ParsedGp;
+type Gp5Track = GpTrack;
+type ParsedGp5 = ParsedGp;
 
 /** Supported Guitar Pro file extensions */
 export const GP_EXTENSIONS = ['.gp3', '.gp4', '.gp5', '.gpx', '.gp'] as const;
-export type GpExtension = typeof GP_EXTENSIONS[number];
+type GpExtension = typeof GP_EXTENSIONS[number];
 
 export function isGpFile(filename: string): boolean {
   const lower = filename.toLowerCase();
@@ -317,4 +317,4 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
 };
 
 /** @deprecated Use parseGpFile instead */
-export const parseGp5File = parseGpFile;
+const parseGp5File = parseGpFile;

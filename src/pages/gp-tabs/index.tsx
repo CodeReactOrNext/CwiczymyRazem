@@ -1,11 +1,18 @@
-import { useEffect, useRef, useState } from "react";
-import type { ReactElement } from "react";
-import type { NextPageWithLayout } from "types/page.d";
-import AppLayout from "layouts/AppLayout";
+import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
+import type {
+  Exercise,
+  ExercisePlan,
+} from "feature/exercisePlan/types/exercise.types";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import {
+  GP_EXTENSIONS,
+  isGpFile,
+  type ParsedGp,
+  parseGpFile,
+} from "feature/songs/services/gp5Parser.service";
 import {
   deleteUserGpFile,
   fetchGpFileAsFile,
@@ -14,19 +21,10 @@ import {
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
-import {
-  GP_EXTENSIONS,
-  isGpFile,
-  parseGpFile,
-  type ParsedGp,
-} from "feature/songs/services/gp5Parser.service";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import type {
-  Exercise,
-  ExercisePlan,
-} from "feature/exercisePlan/types/exercise.types";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import AppLayout from "layouts/AppLayout";
+import {  Gauge,Music } from "lucide-react";
 import {
   Clock,
   Drum,
@@ -35,7 +33,6 @@ import {
   FolderOpen,
   Infinity,
   Loader2,
-  Music,
   Music2,
   Play,
   Trash2,
@@ -43,11 +40,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import { toast } from "sonner";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import type { ReactElement } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+import type { NextPageWithLayout } from "types/page.d";
+import { db } from "utils/firebase/client/firebase.utils";
 
 interface LinkedSong {
   songId: string;
@@ -130,6 +130,7 @@ const GpTabsPage: NextPageWithLayout = () => {
   const [sessionRawFile, setSessionRawFile] = useState<File | null>(null);
   const [sessionFreeMode, setSessionFreeMode] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -179,7 +180,7 @@ const GpTabsPage: NextPageWithLayout = () => {
       setStaged({ gpFile: file, rawFile, parsed, selectedTrackIndex: 0 });
       setShowConfigModal(true);
     } catch {
-      toast.error("Failed to load file. It may be corrupted.");
+      toast.error("Nie udało się załadować pliku. Może być uszkodzony.");
     } finally {
       setLoadingFileId(null);
     }
@@ -192,24 +193,29 @@ const GpTabsPage: NextPageWithLayout = () => {
 
   const startSession = (config: SessionConfig) => {
     if (!staged) return;
-    const { parsed, rawFile, gpFile, selectedTrackIndex } = staged;
-    const trackName = parsed.tracks[selectedTrackIndex].name;
-    const exercise = buildExercise(gpFile.name, parsed.tempo, trackName);
-    exercise.timeInMinutes = config.freeMode ? 999 : config.timeInMinutes;
-    const plan: ExercisePlan = {
-      id: "quick_session_" + Date.now(),
-      title: "Quick Practice: " + exercise.title,
-      difficulty: "medium",
-      description: "Temporary practice plan from imported file",
-      category: "mixed",
-      exercises: [exercise],
-      userId: "system",
-      image: null,
-    };
-    setSessionFreeMode(config.freeMode);
-    setSessionPlan(plan);
-    setSessionRawFile(rawFile);
-    setShowConfigModal(false);
+    setIsStarting(true);
+
+    setTimeout(() => {
+      const { parsed, rawFile, gpFile, selectedTrackIndex } = staged;
+      const trackName = parsed.tracks[selectedTrackIndex].name;
+      const exercise = buildExercise(gpFile.name, parsed.tempo, trackName);
+      exercise.timeInMinutes = config.freeMode ? 999 : config.timeInMinutes;
+      const plan: ExercisePlan = {
+        id: "quick_session_" + Date.now(),
+        title: "Quick Practice: " + exercise.title,
+        difficulty: "medium",
+        description: "Temporary practice plan from imported file",
+        category: "mixed",
+        exercises: [exercise],
+        userId: "system",
+        image: null,
+      };
+      setSessionFreeMode(config.freeMode);
+      setSessionPlan(plan);
+      setSessionRawFile(rawFile);
+      setShowConfigModal(false);
+      setIsStarting(false);
+    }, 100);
   };
 
   const handleUpload = async (file: File) => {
@@ -276,6 +282,40 @@ const GpTabsPage: NextPageWithLayout = () => {
     );
   }
 
+  // ── Show premium preview for non-premium users ──────────────────────────────
+  if (!isPremium) {
+    return (
+      <PremiumFeaturePreview
+        eyebrow="Practice Files"
+        title="GP Tabs"
+        description="Upload your own Guitar Pro files and practice them with tempo control, track selection, and real-time note detection. Build custom practice sessions from your favorite songs."
+        features={[
+          {
+            icon: <Upload className="h-5 w-5" />,
+            label: "Upload Your Files",
+            description: "Import any Guitar Pro file (.gp, .gp5) from your collection",
+          },
+          {
+            icon: <Music className="h-5 w-5" />,
+            label: "Track Selection",
+            description: "Choose which instrument track to practice on",
+          },
+          {
+            icon: <Gauge className="h-5 w-5" />,
+            label: "Tempo Control",
+            description: "Practice at any speed with custom tempo settings",
+          },
+          {
+            icon: <Zap className="h-5 w-5" />,
+            label: "Real-time Detection",
+            description: "Get real-time note feedback while practicing",
+          },
+        ]}
+        availableIn="both"
+      />
+    );
+  }
+
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <HeroBanner
@@ -283,10 +323,8 @@ const GpTabsPage: NextPageWithLayout = () => {
         subtitle="Your Guitar Pro file library"
         eyebrow="Practice Files"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        {...(isPremium && {
-          buttonText: "Upload File",
-          onClick: () => fileInputRef.current?.click(),
-        })}
+        buttonText="Upload File"
+        onClick={() => fileInputRef.current?.click()}
       />
 
       <input
@@ -297,7 +335,7 @@ const GpTabsPage: NextPageWithLayout = () => {
         onChange={handleFileInput}
       />
 
-      <PremiumGate feature="gp-tabs">
+      <div>
 
       <div className="px-4 md:px-8 pb-8 space-y-4">
         {/* Upload progress */}
@@ -390,17 +428,12 @@ const GpTabsPage: NextPageWithLayout = () => {
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         onClick={() => handleLoadForPractice(file)}
+                        loading={isThisLoading}
                         disabled={!!loadingFileId}
                         className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-wider border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 transition-all"
                       >
-                        {isThisLoading ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <Play className="h-3.5 w-3.5 mr-1.5 fill-current" />
-                            Practice
-                          </>
-                        )}
+                        <Play className="h-3.5 w-3.5 mr-1.5 fill-current" />
+                        <span>Practice</span>
                       </Button>
                       <Button
                         size="sm"
@@ -449,10 +482,10 @@ const GpTabsPage: NextPageWithLayout = () => {
         )}
       </div>
 
-      </PremiumGate>
+      </div>
 
       {/* ── Session config modal ─────────────────────────────────────────── */}
-      {isPremium && showConfigModal && staged && (
+      {showConfigModal && staged && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
@@ -572,10 +605,11 @@ const GpTabsPage: NextPageWithLayout = () => {
               onClick={() =>
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
+              loading={isStarting}
               className="w-full h-12 rounded-xl bg-cyan-500 text-black font-bold hover:bg-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.3)] transition-all group"
             >
-              Start Practice
-              <Zap className="h-4 w-4 ml-2 fill-current group-hover:scale-125 transition-transform" />
+              <span>Start Practice</span>
+              <Zap className={cn("h-4 w-4 ml-2 fill-current group-hover:scale-125 transition-transform", isStarting && "hidden")} />
             </Button>
           </div>
         </div>

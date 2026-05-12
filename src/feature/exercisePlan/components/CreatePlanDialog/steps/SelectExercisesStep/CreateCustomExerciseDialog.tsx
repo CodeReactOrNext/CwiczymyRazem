@@ -30,10 +30,11 @@ import { ImportTablature } from "feature/songs/components/ImportTablature/Import
 import { uploadUserGpFile } from "feature/songs/services/userGpFiles.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { AlignLeft, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X, Youtube } from "lucide-react";
+import { AlignLeft, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;
@@ -334,7 +335,7 @@ export const CreateCustomExerciseDialog = ({
                 {!gpTablature && (
                   <div className="space-y-2">
                       <Label htmlFor="videoUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
-                          <Youtube className="h-4 w-4 text-red-500" />
+                          <FaYoutube className="h-4 w-4 text-red-500" />
                           {t("exercises:custom_exercise.video_url", { defaultValue: "YouTube Link" })}
                       </Label>
                       <Input

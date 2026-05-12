@@ -1,5 +1,6 @@
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
-import { Clock, Youtube } from "lucide-react";
+import { Clock } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -13,10 +14,10 @@ function formatDuration(seconds: number): string {
 }
 
 const LEVEL_STYLES: Record<string, string> = {
-  beginner: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30",
-  intermediate: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30",
-  advanced: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30",
-  all: "bg-zinc-700/60 text-zinc-300 ring-1 ring-zinc-600/40",
+  beginner: "bg-cyan-500/10 text-cyan-400 ring-1 ring-cyan-500/20",
+  intermediate: "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20",
+  advanced: "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20",
+  all: "bg-zinc-800/60 text-zinc-400 ring-1 ring-zinc-700/40",
 };
 
 interface YouTubeLessonCardProps {
@@ -46,7 +47,7 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
         />
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600/90">
-            <Youtube className="h-5 w-5 text-white" />
+            <FaYoutube className="h-5 w-5 text-white" />
           </div>
         </div>
       </div>

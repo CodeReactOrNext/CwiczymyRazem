@@ -1,5 +1,4 @@
 import SettingsView from "feature/settings/SettingsView";
-import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";

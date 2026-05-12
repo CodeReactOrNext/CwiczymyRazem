@@ -1,6 +1,6 @@
 import RecordingsView from "feature/recordings/components/RecordingsView";
-import Head from "next/head";
 import AppLayout from "layouts/AppLayout"; // Import Layout
+import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";

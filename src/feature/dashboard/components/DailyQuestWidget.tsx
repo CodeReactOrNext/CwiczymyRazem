@@ -2,8 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { selectDailyQuest } from "feature/user/store/userSlice";
-import { claimQuestRewardAction,initializeDailyQuestAction } from "feature/user/store/userSlice.asyncThunk";
-import { useTranslation } from "hooks/useTranslation";
+import { claimQuestRewardAction, initializeDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { ArrowRight, CheckCircle2, Gift, Swords } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -45,20 +44,18 @@ export const DailyQuestWidget = () => {
         <Card className="flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-sm bg-orange-500/5 text-zinc-400">
-                        <Swords size={18} />
-                    </div>
+                        <Swords size={18}  className="text-lg transition-all duration-500 text-zinc-700"/>
                     <div>
-                        <h3 className="text-sm font-bold text-zinc-200 tracking-wider">Daily Quests</h3>
-
+                        <h3 className="text-[11px] font-semibold text-zinc-400">Daily Quests</h3>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
-                        <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20">
-                            <span className="text-[9px] font-bold text-orange-400 tracking-wider leading-none">
-                                +30 XP
+                        <div className="flex items-center gap-1.5 mr-1">
+                            <span className="text-xs font-black text-cyan-400 tracking-tight">
+                                +30
                             </span>
+                            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
                         </div>
                     )}
                     <div className="text-xs font-bold text-zinc-400">
@@ -126,7 +123,7 @@ export const DailyQuestWidget = () => {
                 >
                     <span className="flex items-center gap-2">
                         <Gift size={14} className="animate-bounce" /> 
-                        Claim 30 XP
+                        Claim 30 <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
                     </span>
                 </Button>
             )}

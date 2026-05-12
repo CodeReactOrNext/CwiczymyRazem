@@ -45,6 +45,8 @@ export interface UserDataInterface {
     band?: string;
     selectedFrame?: number;
     selectedGuitar?: number | string;
+    selectedGuitarYear?: number;
+    selectedGuitarCountry?: string;
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -104,7 +106,7 @@ export interface TimerInterface {
   creativity: number;
 }
 
-export interface ReportTimeData {
+interface ReportTimeData {
   techniqueTime: number;
   theoryTime: number;
   hearingTime: number;
@@ -121,7 +123,7 @@ export interface ReportListInterface {
   planId?: string;
 }
 
-export interface UserSliceProviderData {
+interface UserSliceProviderData {
   providerId: string | null;
   uid: string | null;
   displayName: string | null;
@@ -139,8 +141,13 @@ export interface userSliceInitialState {
     band?: string;
     selectedFrame?: number;
     selectedGuitar?: number | string;
+    selectedGuitarYear?: number;
+    selectedGuitarCountry?: string;
     role?: "admin" | "pro" | "master" | "user";
     premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
+    feedbackAskedAt?: Timestamp | null;
+    feedbackDismissCount?: number;
+    feedbackLastDismissedAt?: Timestamp | null;
   } | null;
   timer: TimerInterface;
   currentActivity: {
@@ -168,7 +175,7 @@ export interface updateReprotInterface {
   inputData: ReportFormikInterface;
 }
 
-export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
+type MediaType = "youTubeLink" | "soundCloudLink" | "band";
 
 export interface updateSocialInterface {
   value: string;
@@ -188,6 +195,6 @@ export interface SeasonDataInterface {
   };
 }
 
-export interface SeasonalStatsInterface extends StatisticsDataInterface {
+interface SeasonalStatsInterface extends StatisticsDataInterface {
   seasonId: string;
 }

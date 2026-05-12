@@ -1,13 +1,15 @@
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Target, X, Zap } from "lucide-react";
+import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, YoutubeIcon, Zap } from "lucide-react";
-import { useRouter } from "next/router";
+import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
-import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
+import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
 import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────
@@ -42,16 +44,16 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
       <div className="flex flex-col items-center gap-4 py-4">
         <div className="relative flex items-center justify-center">
           {/* Outer glow rings */}
-          <span className="absolute h-16 w-16 animate-ping rounded-full bg-emerald-500/10" />
-          <span className="absolute h-12 w-12 animate-pulse rounded-full bg-emerald-500/15" />
+          <span className="absolute h-16 w-16 animate-ping rounded-full bg-cyan-500/10" />
+          <span className="absolute h-12 w-12 animate-pulse rounded-full bg-cyan-500/15" />
           {/* Icon */}
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
-            <MapIcon className="h-5 w-5 text-emerald-400" />
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/20 ring-1 ring-cyan-500/40">
+            <MapIcon className="h-5 w-5 text-cyan-400" />
           </div>
         </div>
 
         <div className="flex flex-col items-center gap-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-cyan-500/70">
             Roadmap is thinking
           </p>
           <p
@@ -67,7 +69,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-1.5 w-1.5 rounded-full bg-emerald-500/60"
+              className="h-1.5 w-1.5 rounded-full bg-cyan-500/60"
               style={{
                 animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
               }}
@@ -96,7 +98,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
               className="h-full w-full rounded-full"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.12) 50%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, rgba(6,182,212,0.12) 50%, transparent 100%)",
                 backgroundSize: "200% 100%",
                 animation: `shimmer 1.8s ease-in-out ${i * 0.15}s infinite`,
               }}
@@ -134,13 +136,13 @@ const STEP_CLS: Record<StepStatus, string> = {
     "border-zinc-700/80 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/80",
   "in-progress":
     "border-amber-500/50 bg-amber-500/10 text-amber-200 hover:border-amber-400/70",
-  done: "border-emerald-800/50 bg-emerald-950/30 text-zinc-500",
+  done: "border-cyan-800/50 bg-cyan-950/30 text-zinc-500",
 };
 
 const STATUS_DOT: Record<StepStatus, string> = {
   "not-started": "bg-zinc-600",
   "in-progress": "bg-amber-400 shadow-sm shadow-amber-500/40",
-  done: "bg-emerald-500",
+  done: "bg-cyan-500",
 };
 
 const STATUS_LABEL: Record<StepStatus, string> = {
@@ -158,7 +160,7 @@ const STATUS_BTNS: { status: StepStatus; label: string }[] = [
 const PATH_COLOR: Record<StepStatus, string> = {
   "not-started": "#3f3f46",
   "in-progress": "#78350f",
-  done: "#14532d",
+  done: "#164E63",
 };
 
 const PHASE_COLORS = [
@@ -166,7 +168,7 @@ const PHASE_COLORS = [
   { badge: "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30", border: "border-sky-500/30" },
   { badge: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30", border: "border-amber-500/30" },
   { badge: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30", border: "border-rose-500/30" },
-  { badge: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30", border: "border-emerald-500/30" },
+  { badge: "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/30", border: "border-cyan-500/30" },
   { badge: "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30", border: "border-orange-500/30" },
 ];
 
@@ -435,7 +437,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
         }),
       });
       const exData = await exRes.json();
-      if (!exData.exercise_id) return;
+      const firstExId = exData.exercise_ids?.[0] ?? null;
+      if (!firstExId) return;
 
       setPhases((prev) => {
         const phasesWithEx = prev.map((p) =>
@@ -444,7 +447,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
             : {
                 ...p,
                 steps: p.steps.map((s) =>
-                  s.id !== step.id ? s : { ...s, suggestedExerciseId: exData.exercise_id }
+                  s.id !== step.id ? s : { ...s, suggestedExerciseId: firstExId }
                 ),
               }
         );
@@ -499,8 +502,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
             <span className="flex items-center gap-1.5">
-              <Zap className="h-4 w-4 text-emerald-500" />
-              <span className="font-semibold text-emerald-500">{progress}%</span>
+              <Zap className="h-4 w-4 text-cyan-500" />
+              <span className="font-semibold text-cyan-500">{progress}%</span>
             </span>
             <span className="text-zinc-700">·</span>
             <span>{doneCount}/{allSteps.length} steps</span>
@@ -524,7 +527,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
         {/* ─── Progress bar ─── */}
         <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all duration-700"
+            className="h-full rounded-full bg-cyan-500 transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -536,7 +539,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
             [
               { dot: "bg-zinc-600", label: "To do" },
               { dot: "bg-amber-400", label: "In progress" },
-              { dot: "bg-emerald-500", label: "Done" },
+              { dot: "bg-cyan-500", label: "Done" },
             ] as { dot: string; label: string }[]
           ).map(({ dot, label }) => (
             <span key={label} className="flex items-center gap-1.5 text-xs text-zinc-400">
@@ -600,7 +603,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
               <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
               {/* Progress fill — desktop only */}
               <div
-                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-700 sm:block"
+                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-cyan-600/50 transition-all duration-700 sm:block"
                 style={{ height: `${progress}%` }}
               />
 
@@ -616,7 +619,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                     <div className="flex w-full flex-col gap-3 sm:hidden">
                       {/* Phase header */}
                       <div className="flex items-center gap-2.5">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
@@ -636,7 +639,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                                 px-3 py-2.5 text-xs font-medium transition-all
                                 duration-150 text-left
                                 ${STEP_CLS[status]}
-                                ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
                               `}
                             >
                               {isLoading ? (
@@ -673,7 +676,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                                   px-3 py-2.5 text-xs font-medium transition-all
                                   duration-150 text-right
                                   ${STEP_CLS[status]}
-                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                  ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
                                 `}
                               >
                                 {isLoading ? (
@@ -695,7 +698,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                         }}
                         className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">
@@ -723,7 +726,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                                   px-3 py-2.5 text-xs font-medium transition-all
                                   duration-150 text-left
                                   ${STEP_CLS[status]}
-                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                  ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
                                 `}
                               >
                                 {isLoading ? (
@@ -747,7 +750,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
               <div
                 className={`rounded-2xl border px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
                   progress === 100
-                    ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400 shadow-lg shadow-emerald-950/30"
+                    ? "border-cyan-500/30 bg-cyan-950/20 text-cyan-400 shadow-lg shadow-cyan-950/30"
                     : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
                 }`}
               >
@@ -819,7 +822,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                               ? "border-zinc-500 bg-zinc-700 text-zinc-100"
                               : s === "in-progress"
                                 ? "border-amber-500/60 bg-amber-500/15 text-amber-300"
-                                : "border-emerald-600/50 bg-emerald-900/40 text-emerald-400"
+                                : "border-cyan-600/50 bg-cyan-900/40 text-cyan-400"
                             : "border-zinc-800 bg-zinc-900/60 text-zinc-600 hover:border-zinc-600 hover:text-zinc-300"
                         }`}
                       >
@@ -856,7 +859,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                     <div className="border-b border-zinc-800/60 px-6 py-5">
                       {loadingExerciseIds.has(drawerInfo.step.id) ? (
                         <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-500" />
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
                           <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
                         </div>
                       ) : (() => {
@@ -865,17 +868,17 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                         return (
                           <>
                             <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                              <Dumbbell className="h-3 w-3 text-emerald-500" />
+                              <Dumbbell className="h-3 w-3 text-cyan-500" />
                               Recommended exercise
                             </p>
                             <button
                               onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
-                              className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-emerald-800/40 bg-emerald-950/30 px-4 py-4 text-left transition-all hover:border-emerald-600/50 hover:bg-emerald-950/50"
+                              className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-cyan-800/40 bg-cyan-950/30 px-4 py-4 text-left transition-all hover:border-cyan-600/50 hover:bg-cyan-950/50"
                             >
                               {/* glow */}
-                              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent" />
-                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/30 transition group-hover:bg-emerald-500/25 group-hover:ring-emerald-500/50">
-                                <Dumbbell className="h-5 w-5 text-emerald-400" />
+                              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
+                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 ring-1 ring-cyan-500/30 transition group-hover:bg-cyan-500/25 group-hover:ring-cyan-500/50">
+                                <Dumbbell className="h-5 w-5 text-cyan-400" />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
@@ -883,7 +886,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                                   <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>
                                 )}
                               </div>
-                              <ChevronRight className="h-4 w-4 shrink-0 text-emerald-600 transition group-hover:translate-x-0.5 group-hover:text-emerald-400" />
+                              <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
                             </button>
                           </>
                         );
@@ -921,10 +924,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                   {drawerInfo.step.successCriteria && (
                     <div className="border-b border-zinc-800/60 px-6 py-5">
                       <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                        <Target className="h-3.5 w-3.5 text-emerald-500" />
+                        <Target className="h-3.5 w-3.5 text-cyan-500" />
                         Success criteria
                       </p>
-                      <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/25 px-4 py-3.5">
+                      <div className="rounded-xl border border-cyan-900/50 bg-cyan-950/25 px-4 py-3.5">
                         <p className="text-sm leading-relaxed text-zinc-200">
                           {drawerInfo.step.successCriteria}
                         </p>
@@ -937,7 +940,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                     (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
                     <div className="px-6 py-5">
                       <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                        <YoutubeIcon className="h-3.5 w-3.5 text-red-500" />
+                        <FaYoutube className="h-3.5 w-3.5 text-red-500" />
                         YouTube Lessons
                       </p>
                       {loadingLessonsId === drawerInfo.step.id ? (
@@ -964,6 +967,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                       )}
                     </div>
                   )}
+
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 py-12 text-center">

@@ -32,7 +32,10 @@ export function NextMilestone({ currentUserStats }: NextMilestoneProps) {
 
           {multiplier > 0 && (
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-[11px] font-bold text-orange-400">+{Math.round(multiplier * 100)}% XP</span>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-orange-400">
+                +{Math.round(multiplier * 100)}% 
+                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+              </span>
               <span className="text-[10px] font-bold text-zinc-600 uppercase">bonus</span>
             </div>
           )}

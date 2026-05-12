@@ -1,10 +1,8 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Coffee, Send, ChevronRight } from "lucide-react";
-import { Badge } from "assets/components/ui/badge";
 
 export const Footer = () => {
     return (
@@ -43,40 +41,28 @@ export const Footer = () => {
                                 </div>
                             </div>
                         </Link>
-                        
-                        <Link href="https://www.buymeacoffee.com/riffquest" target="_blank">
-                            <div className="relative p-[1px] overflow-hidden rounded-lg group">
-                                <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#f59e0b_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex items-center gap-2 px-5 py-2.5 rounded-[7px] bg-zinc-900 border border-white/5 group-hover:bg-zinc-950 transition-all font-black uppercase tracking-widest text-xs text-amber-500 group-hover:text-white">
-                                     <Coffee className="w-4 h-4" /> Support
-                                </div>
-                            </div>
-                        </Link>
                     </div>
                   </div>
 
                   {/* Navigation Links */}
-                  <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-12">
-                      <div className="space-y-6">
-                          <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Platform</h4>
-                          <ul className="space-y-4">
-                              <li><Link href="/exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Exercises <Badge className="ml-2 bg-cyan-500/10 text-cyan-500 text-[8px] h-3 px-1 border-none">NEW</Badge> <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                              <li><Link href="/guitar-practice-builder" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Practice Builder <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                          </ul>
-                      </div>
+                  <div className="md:col-span-7 grid grid-cols-2 gap-12">
                       <div className="space-y-6">
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Community</h4>
                         <ul className="space-y-4">
                             <li><Link href="/blog" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Blog <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                            <li><Link href="/what-guitar-song-to-learn" className="text-sm font-bold text-cyan-500/80 hover:text-cyan-400 transition-colors flex items-center group">Song Suggester <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/song-library" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Song Library <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/about" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">About <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/how-it-works" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">How it works <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Exercises <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                         </ul>
                       </div>
                       <div className="space-y-6">
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Social</h4>
                         <ul className="space-y-4">
                             <li><Link href="https://discord.gg/6yJmsZW2Ne" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Discord</Link></li>
-                            <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Legal</Link></li>
+                            <li><Link href="/contact" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Contact <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Privacy Policy <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/terms-of-service" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Terms of Service <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                         </ul>
                       </div>
                   </div>

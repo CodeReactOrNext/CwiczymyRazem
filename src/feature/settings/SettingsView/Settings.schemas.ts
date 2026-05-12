@@ -11,10 +11,10 @@ export const updateCredsSchema = yup.object().shape({
   password: yup.string().min(8, "Password must be at least 8 characters"),
   repeat_password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must be the same"),
+    .oneOf([yup.ref("password")], "Passwords must be the same"),
 });
 
-export const mediaSchema = yup.object().shape({
+const mediaSchema = yup.object().shape({
   youtube: yup
     .string()
     .matches(

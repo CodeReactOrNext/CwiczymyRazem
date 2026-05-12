@@ -9,17 +9,18 @@ import {
 } from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { Form, Formik } from "formik";
-import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  ArrowLeft,
   CheckCircle,
   ChevronRight,
   Eye,
   EyeOff,
+  Guitar,
+  Headphones,
   Loader2,
   Lock,
   Mail,
+  Music,
   Shield,
   User,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { TbGuitarPick } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export interface SignUpCredentials {
@@ -95,11 +97,7 @@ const SingupView = () => {
           <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/20 blur-[120px]' />
         </div>
         
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="relative z-10 w-full max-w-md rounded-2xl glass-card p-8 text-center border border-white/10 shadow-2xl"
-        >
+        <div className="relative z-10 w-full max-w-md rounded-lg p-8 text-center border border-white/10 shadow-2xl">
           <div className="flex justify-center mb-6">
             <div className="h-20 w-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
               <CheckCircle className="h-10 w-10" />
@@ -118,7 +116,7 @@ const SingupView = () => {
             Go to Dashboard
             <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -126,77 +124,72 @@ const SingupView = () => {
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center'>
       {/* Premium Background */}
-      <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute -left-[10%] -top-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-500/10 blur-[120px]' />
-        <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/10 blur-[120px]' />
+      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
+        <div className='absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[60vh] w-[80vw] bg-cyan-500/5 blur-[120px] rounded-[100%]' />
+
+        {/* Tiled Pattern Background */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.03]">
+          <defs>
+            <pattern id="auth-bg-pattern-signup" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-15)">
+              <g transform="translate(20, 20) scale(1)">
+                 <Guitar size={32} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(100, 40) scale(1)">
+                 <Music size={28} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(40, 100) scale(1)">
+                 <TbGuitarPick size={30} className="text-white" strokeWidth={1.5} />
+              </g>
+              <g transform="translate(110, 110) scale(1)">
+                 <Headphones size={32} className="text-white" strokeWidth={1.5} />
+              </g>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#auth-bg-pattern-signup)" />
+        </svg>
       </div>
 
-      <div className='relative z-10 w-full max-w-md p-6'>
-         <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className='mb-6'>
-            <div className='flex items-center justify-between'>
-            <Link
-              href='/'
-              className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
-              <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-              {t("common:back")}
-            </Link>
-            </div>
-          </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex flex-col gap-6"
-        >
+      <div className='relative z-10 w-full max-w-md p-4 sm:p-6 mt-4 sm:mt-0'>
+        <div className="flex flex-col gap-4 sm:gap-6">
           {/* Header Section */}
           <div className="text-center">
-             <div className="flex justify-center mb-6">
-                 <div className="relative p-3 rounded-2xl bg-zinc-900/50 border border-white/10 shadow-2xl shadow-cyan-500/10">
-                    <Image
-                      src='/images/logolight.svg'
-                      alt='Logo'
-                      width={48}
-                      height={48}
-                      className='h-12 w-12' priority
-                    />
-                 </div>
+             <div className="flex justify-center mb-2 sm:mb-6">
+                <Image
+                  src='/images/logolight.svg'
+                  alt='Logo'
+                  width={56}
+                  height={56}
+                  className='h-10 w-10 sm:h-14 sm:w-14' priority
+                />
              </div>
-             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1 sm:mb-2">
                {t("signup:title")}
              </h1>
-             <p className="text-zinc-400 text-sm">
+             <p className="text-zinc-400 text-xs sm:text-sm">
                {t("signup:subtitle")}
              </p>
           </div>
 
           {/* Card */}
-          <div className="rounded-2xl glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
-            {/* Tab Switcher */}
-            <div className="flex border-b border-white/10">
-              <Link 
-                href="/login" 
-                className="flex-1 py-4 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
-              >
-                {t("signup:login_link")}
-              </Link>
-              <Link 
-                href="/signup" 
-                className="flex-1 py-4 text-center text-sm font-bold transition-all relative text-white bg-white/5"
-              >
-                {t("signup:submit_button")}
-                <motion.div 
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500" 
-                />
-              </Link>
-            </div>
+          <div className="rounded-lg  overflow-hidden shadow-2xl border border-white/5 bg-zinc-900/80">
+            <div className="p-2">
+              {/* Tab Switcher */}
+              <div className="flex p-1 bg-zinc-900/50 border border-white/5 rounded-lg mb-4">
+                <Link 
+                  href="/login" 
+                  className="flex-1 py-2.5 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 rounded-lg hover:bg-white/5"
+                >
+                  {t("signup:login_link")}
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="flex-1 py-2.5 text-center text-sm font-bold transition-all bg-zinc-800/80 text-white rounded-lg shadow-sm border border-white/5"
+                >
+                  {t("signup:submit_button")}
+                </Link>
+              </div>
 
-            <div className="p-6">
+            <div className="px-4 pb-4">
             <Formik
               initialValues={formikInitialValues}
               validationSchema={signupSchema}
@@ -204,12 +197,12 @@ const SingupView = () => {
               {({ values, errors, touched, handleChange, handleBlur }) => {
                 const strength = getPasswordStrength(values.password);
                 return (
-                <Form className='space-y-4'>
+                <Form className='space-y-3 sm:space-y-4'>
                    {/* Username Field */}
                    <div className="space-y-2">
                         <Label
                           htmlFor='login'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("signup:username_label")}
                         </Label>
                         <div className='relative group'>
@@ -222,7 +215,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder={t("signup:username_placeholder")}
-                            className='pl-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.login && touched.login && (
@@ -230,14 +223,14 @@ const SingupView = () => {
                             {errors.login}
                           </p>
                         )}
-                        <p className="text-[10px] text-zinc-500">This is how others will see you.</p>
+                        <p className="text-xs text-zinc-400">This is how others will see you.</p>
                     </div>
 
                   {/* Email Field */}
                     <div className="space-y-2">
                         <Label
                           htmlFor='email'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("signup:email_label")}
                         </Label>
                         <div className='relative group'>
@@ -250,7 +243,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='pl-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -264,7 +257,7 @@ const SingupView = () => {
                   <div className="space-y-2">
                          <Label
                           htmlFor='password'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("signup:password_label")}
                         </Label>
 
@@ -278,7 +271,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
@@ -297,18 +290,17 @@ const SingupView = () => {
                     {values.password && (
                         <div className="space-y-1.5 px-0.5">
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Security</span>
+                                <span className="text-[10px] font-bold text-zinc-400">Security</span>
                                 <span className={cn(
-                                    "text-[10px] font-bold uppercase",
+                                    "text-[10px] font-bold",
                                     strength < 50 ? "text-red-400" : strength < 75 ? "text-amber-400" : "text-emerald-400"
                                 )}>
                                     {strength < 50 ? "Weak" : strength < 75 ? "Medium" : "Strong"}
                                 </span>
                             </div>
                             <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${strength}%` }}
+                                <div 
+                                    style={{ width: `${strength}%` }}
                                     className={cn(
                                         "h-full transition-all duration-500",
                                         strength < 50 ? "bg-red-500" : strength < 75 ? "bg-amber-500" : "bg-emerald-500"
@@ -329,7 +321,7 @@ const SingupView = () => {
                   <div className="space-y-2">
                          <Label
                           htmlFor='repeat_password'
-                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          className='text-xs font-semibold text-zinc-400'>
                           {t("signup:repeat_password_label")}
                         </Label>
 
@@ -343,7 +335,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
@@ -371,13 +363,13 @@ const SingupView = () => {
                   <div className="pt-2">
                     <Button
                       type='submit'
+                      size='lg'
                       disabled={isFetching}
-                      className='w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold h-10 shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]'>
+                      className='w-full'>
                         {isFetching ? (
                           <Loader2 className='h-5 w-5 animate-spin' />
                         ) : (
                           <span className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4" />
                             {t("signup:submit_button")}
                             <ChevronRight className="w-4 h-4" />
                           </span>
@@ -388,12 +380,12 @@ const SingupView = () => {
               )}}
             </Formik>
 
-            <div className="relative my-6">
+            <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-white/10"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-zinc-900 px-2 text-zinc-500">{t("signup:or_continue_with")}</span>
+                <div className="relative flex justify-center text-xs">
+                    <span className="bg-zinc-900 px-2 text-zinc-400">{t("signup:or_continue_with")}</span>
                 </div>
             </div>
 
@@ -402,7 +394,7 @@ const SingupView = () => {
                 onClick={googleLogInHandler}
                 disabled={isGoogleFetching}
                 variant='outline'
-                className='w-full border-white/10 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors h-10 text-zinc-300'>
+                className='w-full border-white/5 bg-zinc-900/50 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors h-11 text-zinc-300'>
                 <span className='flex items-center justify-center gap-2'>
                   {isGoogleFetching ? (
                     <Loader2 className='h-5 w-5 animate-spin' />
@@ -413,9 +405,10 @@ const SingupView = () => {
                 </span>
               </Button>
             </div>
+            </div>
           </div>
 
-        </motion.div>
+        </div>
       </div>
     </div>
   );

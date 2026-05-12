@@ -2,7 +2,7 @@ import type { NavPagesTypes } from "types/layout.types";
 
 import NavLink from "../NavLink";
 
-export interface LandingNavLinkInterface {
+interface LandingNavLinkInterface {
   id: NavPagesTypes;
   name: string;
   href: string;
@@ -14,7 +14,7 @@ export interface LandingNavObjectInterface {
   rightSideLinks: LandingNavLinkInterface[];
 }
 
-export interface LandingNavProps {
+interface LandingNavProps {
   leftSideLinks: LandingNavLinkInterface[];
   rightSideLinks: LandingNavLinkInterface[];
   pageId: NavPagesTypes;
@@ -53,4 +53,4 @@ const LandingNav = ({
   );
 };
 
-export default LandingNav;
+LandingNav;

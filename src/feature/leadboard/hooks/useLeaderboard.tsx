@@ -1,6 +1,5 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
-import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useMemo,useState } from "react";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";

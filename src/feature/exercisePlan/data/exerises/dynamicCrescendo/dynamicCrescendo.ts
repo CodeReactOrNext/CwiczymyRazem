@@ -24,6 +24,7 @@ export const dynamicCrescendoExercise: Exercise = {
     "This skill separates expressive players from mechanical ones.",
   ],
   metronomeSpeed: { min: 50, max: 100, recommended: 70 },
+  examBacking: { url: "/static/sounds/exercise/dynamic-control.mp3", sourceBpm: 70 },
   relatedSkills: ["articulation", "alternate_picking"],
   tablature: [
     // M1: Crescendo (pp → ff) — gradual volume increase

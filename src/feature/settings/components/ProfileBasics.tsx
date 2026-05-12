@@ -18,10 +18,10 @@ import { Label } from "assets/components/ui/label";
 import { Slider } from "assets/components/ui/slider";
 import Avatar from "components/UI/Avatar";
 import {
+  selectCurrentUserStats,
   selectIsFetching,
   selectUserAvatar,
   selectUserInfo,
-  selectCurrentUserStats,
   selectUserName,
 } from "feature/user/store/userSlice";
 import {
@@ -146,7 +146,6 @@ const ProfileBasics = () => {
                 size="2xl"
                 lvl={userStats?.lvl}
                 selectedFrame={userInfo?.selectedFrame}
-                selectedGuitar={userInfo?.selectedGuitar}
               />
               <div className="flex flex-col items-center">
                 <Label

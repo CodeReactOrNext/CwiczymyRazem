@@ -18,7 +18,7 @@ import { useActivityLog } from "./hooks/useActivityLog";
 
 const CALENDAR_HEIGHT = 7 * 19;
 
-export interface ActivityLogViewProps {
+interface ActivityLogViewProps {
   year: number;
   setYear: (year: number) => void;
   datasWithReports: DateWithReport[];
@@ -180,7 +180,7 @@ export const ActivityLogView = ({
       {hoveredItem?.report &&
         createPortal(
           <div
-            className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm sm:block hidden'
+            className='pointer-events-none fixed z-50 rounded-xl border border-[#e8e4db] bg-[#fcfbf7] p-3 shadow-2xl backdrop-blur-md sm:block hidden'
             style={{
               left: tooltipPosition.x,
               top: tooltipPosition.y - 16,
@@ -195,17 +195,19 @@ export const ActivityLogView = ({
         )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-none sm:max-w-[425px] border-white/10 bg-neutral-900 text-white h-full sm:h-auto">
-          <DialogHeader>
-            <DialogTitle>Activity Details</DialogTitle>
-          </DialogHeader>
-          {selectedDay?.report && (
-            <ExerciseShortInfo
-              date={selectedDay.date}
-              report={selectedDay.report}
-              isModal={true}
-            />
-          )}
+        <DialogContent className="max-w-none sm:max-w-[425px] border-[#e8e4db] bg-[#fcfbf7] text-zinc-900 h-full sm:h-auto max-h-[90dvh] !p-0 flex flex-col">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-stone-300">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-zinc-900">Activity Details</DialogTitle>
+            </DialogHeader>
+            {selectedDay?.report && (
+              <ExerciseShortInfo
+                date={selectedDay.date}
+                report={selectedDay.report}
+                isModal={true}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </Card>

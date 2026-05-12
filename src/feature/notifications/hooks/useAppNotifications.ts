@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
 import {
   collection,
+  limit,
   onSnapshot,
-  query,
-  where,
   orderBy,
-  limit
-} from "firebase/firestore";
+  query,
+  where} from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import type { AppNotification } from "../services/notification.service";
 import { markAllNotificationsAsRead, markNotificationAsRead } from "../services/notification.service";
 

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import { UpgradeContent } from "./UpgradeModal";
 
 interface PremiumGateProps {

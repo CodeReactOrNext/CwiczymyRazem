@@ -1,5 +1,4 @@
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
-import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
@@ -16,12 +15,11 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
   limit,
   orderBy,
+  persistentLocalCache,
+  persistentSingleTabManager,
   query,
   startAfter,
   Timestamp,
@@ -57,10 +55,10 @@ export const firebaseSignInWithCredential = (credential: any) =>
 export const db =
   typeof window !== "undefined"
     ? initializeFirestore(firebaseApp, {
-        localCache: persistentLocalCache({
-          tabManager: persistentMultipleTabManager(),
-        }),
-      })
+      localCache: persistentLocalCache({
+        tabManager: persistentSingleTabManager(undefined),
+      }),
+    })
     : initializeFirestore(firebaseApp, {});
 
 export const storage = getStorage(firebaseApp);
@@ -84,7 +82,7 @@ export const firebaseSendPasswordResetEmail = (email: string) =>
 
 
 
-export const firebaseGetUserAvatarURL = async () => {
+const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;
@@ -214,6 +212,8 @@ export interface UserTooltipData {
   band: string;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
   statistics: {
     totalPracticeTime: number;
     totalPoints: number;
@@ -254,6 +254,8 @@ export const firebaseGetUserTooltipData = async (
       band: userData.band,
       selectedFrame: userData.selectedFrame,
       selectedGuitar: userData.selectedGuitar,
+      selectedGuitarYear: userData.selectedGuitarYear,
+      selectedGuitarCountry: userData.selectedGuitarCountry,
       statistics: {
         totalPracticeTime:
           userData.statistics.time.creativity +

@@ -1,26 +1,26 @@
 import { cn } from "assets/lib/utils";
-import { FaGem } from "react-icons/fa";
-import { RARITY_STYLES } from "../RarityBadge";
-import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
 
-const CASE_ACCENT: Record<string, { border: string; glow: string; button: string; bg: string }> = {
+import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
+
+const CASE_ACCENT: Record<string, { cardBg: string; button: string; header: string; iconColor: string }> = {
   standard: {
-    border: "border-zinc-700/60",
-    glow: "hover:shadow-[0_0_30px_rgba(161,161,170,0.15)]",
-    button: "bg-zinc-700 hover:bg-zinc-600 text-white border border-zinc-500",
-    bg: "bg-gradient-to-b from-zinc-800/80 to-zinc-950",
+    cardBg: "bg-zinc-900/40 border-zinc-800",
+    button: "bg-zinc-200 hover:bg-white text-zinc-900",
+    header: "text-zinc-100",
+    iconColor: "text-zinc-400",
   },
   premium: {
-    border: "border-blue-700/60",
-    glow: "hover:shadow-[0_0_40px_rgba(59,130,246,0.25)]",
-    button: "bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]",
-    bg: "bg-gradient-to-b from-blue-950/40 to-zinc-950",
+    cardBg: "bg-slate-900/40 border-blue-900/30",
+    button: "bg-blue-600 hover:bg-blue-500 text-white",
+    header: "text-blue-100",
+    iconColor: "text-blue-400",
   },
   elite: {
-    border: "border-amber-600/60",
-    glow: "hover:shadow-[0_0_50px_rgba(251,191,36,0.3)]",
-    button: "bg-amber-500 hover:bg-amber-400 text-amber-950 font-black border border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.4)]",
-    bg: "bg-gradient-to-b from-amber-950/40 to-zinc-950",
+    cardBg: "bg-amber-950/20 border-amber-900/30",
+    button: "bg-amber-500 hover:bg-amber-400 text-amber-950",
+    header: "text-amber-100",
+    iconColor: "text-amber-500",
   },
 };
 
@@ -38,57 +38,46 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
   const probs = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
 
   return (
-    <div
-      className={cn(
-        "group relative flex flex-col gap-4 rounded-xl border p-5 transition-all duration-300 hover:-translate-y-1",
-        accent.bg,
-        accent.border,
-        accent.glow
-      )}
-    >
+    <div className={cn("flex flex-col gap-6 rounded-xl border p-6", accent.cardBg)}>
+      {/* Header */}
       <div className="flex flex-col gap-1 items-center text-center">
-        <h3 className="text-lg font-black tracking-wide text-white uppercase drop-shadow-md">{caseDef.name}</h3>
+        <h3 className={cn("text-base font-bold tracking-widest uppercase", accent.header)}>
+          {caseDef.name}
+        </h3>
       </div>
 
       {/* Package image */}
-      <div className="flex items-center justify-center py-2">
+      <div className="flex items-center justify-center py-4">
         <img
           src={`/static/images/package/${caseDef.id}.png`}
           alt={caseDef.name}
-          className="h-36 object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+          className="h-32 object-contain opacity-90"
         />
       </div>
 
       {/* Probabilities */}
-      <div className="space-y-1 bg-zinc-950/50 rounded-lg p-2.5 border border-zinc-800/50">
+      <div className="space-y-2 mt-2">
         {probs.map(([rarity, prob]) => {
           const rs = RARITY_STYLES[rarity];
           return (
-            <div key={rarity} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-2 w-2 rounded-sm"
-                  style={{ backgroundColor: rs.baseColor }}
-                />
-                <span
-                  className="text-[11px] font-bold uppercase tracking-wider"
-                  style={{ color: rs.baseColor }}
-                >
-                  {rarity}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-16 rounded-full bg-zinc-800 overflow-hidden">
+            <div key={rarity} className="flex items-center justify-between text-xs">
+              <span
+                className="font-semibold uppercase tracking-wider"
+                style={{ color: rs.baseColor }}
+              >
+                {rarity}
+              </span>
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-24 rounded-full bg-black/40 overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all"
+                    className="h-full rounded-full"
                     style={{
                       width: `${Math.min(prob * 100, 100)}%`,
                       backgroundColor: rs.baseColor,
-                      opacity: 0.7,
                     }}
                   />
                 </div>
-                <span className="text-[11px] font-black text-zinc-300 w-10 text-right">
+                <span className="font-medium text-zinc-400 w-10 text-right">
                   {(prob * 100).toFixed(1)}%
                 </span>
               </div>
@@ -98,19 +87,27 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
       </div>
 
       {/* Cost & Open */}
-      <div className="flex flex-col gap-2 mt-auto pt-1">
-        <div className="flex items-center justify-center gap-1.5 text-sm font-black tracking-wider bg-zinc-950/50 py-1.5 rounded-lg border border-zinc-800/50">
-          <FaGem className="text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]" size={14} />
-          <span className={cn(canAfford ? "text-amber-400" : "text-red-400", "drop-shadow-md")}>
-            {caseDef.fameCost} Fame
-          </span>
+      <div className="flex flex-col gap-4 mt-auto pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm font-medium text-zinc-400">Cost</span>
+          <div className="flex items-center gap-1.5 text-sm font-bold">
+            <img 
+              src="/images/coin.png" 
+              alt="coin" 
+              className={cn("h-5 w-5 object-contain", !canAfford && "grayscale opacity-50")} 
+            />
+            <span className={canAfford ? "text-zinc-100" : "text-red-400"}>
+              {caseDef.fameCost} Fame
+            </span>
+          </div>
         </div>
         <button
           onClick={() => onOpen(caseDef.id)}
           disabled={!canAfford || isOpening}
           className={cn(
-            "w-full rounded-lg py-3 text-sm font-bold uppercase tracking-widest transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 active:scale-95",
-            accent.button
+            "w-full rounded-lg py-3 text-xs font-bold uppercase tracking-widest transition-colors",
+            !canAfford ? "opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500" : accent.button,
+            isOpening && "opacity-70 cursor-wait"
           )}
         >
           {isOpening ? "Opening..." : "Open Case"}
