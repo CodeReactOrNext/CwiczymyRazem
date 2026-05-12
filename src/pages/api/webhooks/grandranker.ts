@@ -65,7 +65,7 @@ author: "${author}"
 
 `;
 
-  const content = article.content_markdown || article.content_html || '';
+  const content = article.content_markdown || '';
 
   return frontmatter + content;
 };
