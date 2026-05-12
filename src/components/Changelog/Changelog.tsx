@@ -105,7 +105,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
     return (
       <DashboardSection compact>
         <div className="text-center py-8 text-zinc-400">
-          Brak wpisów w changelogu
+         No entries this month
         </div>
       </DashboardSection>
     );
