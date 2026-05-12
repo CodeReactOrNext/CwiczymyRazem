@@ -6,6 +6,7 @@ interface LogsBoxButtonProps {
   onClick: () => void;
   notificationCount?: number;
   hasNewMessages?: boolean;
+  hasNewDot?: boolean;
   Icon: IconType;
 }
 
@@ -16,6 +17,7 @@ const LogsBoxButton = ({
   Icon,
   notificationCount,
   hasNewMessages,
+  hasNewDot,
 }: LogsBoxButtonProps) => {
   return (
     <div className='relative'>
@@ -31,6 +33,9 @@ const LogsBoxButton = ({
           </span>
         )}
       </button>
+      {hasNewDot && !hasNewMessages && (
+        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full shadow-md" />
+      )}
     </div>
   );
 };
