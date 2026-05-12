@@ -47,6 +47,26 @@ const formatDate = (dateStr: string): string => {
   }
 };
 
+const cssToJs = (cssString: string): string => {
+  const styles: Record<string, string> = {};
+  cssString.split(';').forEach(rule => {
+    const [property, value] = rule.split(':').map(s => s.trim());
+    if (property && value) {
+      const jsProperty = property.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+      styles[jsProperty] = value;
+    }
+  });
+
+  return JSON.stringify(styles);
+};
+
+const transformStyleAttributes = (content: string): string => {
+  return content.replace(/style="([^"]*)"/g, (match, styleString) => {
+    const jsStyles = cssToJs(styleString);
+    return `style={${jsStyles}}`;
+  });
+};
+
 const generateMdxContent = (article: Article): string => {
   const title = article.title.replace(/"/g, '\\"');
   const description = (article.meta_description || article.subtitle || '').replace(/"/g, '\\"');
@@ -65,7 +85,8 @@ author: "${author}"
 
 `;
 
-  const content = article.content_markdown || '';
+  let content = article.content_markdown || '';
+  content = transformStyleAttributes(content);
 
   return frontmatter + content;
 };
