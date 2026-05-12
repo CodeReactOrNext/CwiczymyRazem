@@ -3,6 +3,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useLeaderboard } from "./hooks/useLeaderboard";
+import { useUserRank } from "./hooks/useUserRank";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -32,6 +33,11 @@ export const LeadboardView = ({
     defaultView,
   });
 
+  const { userRank, isLoading: isRankLoading } = useUserRank(
+    isSeasonalView,
+    selectedSeason
+  );
+
   if (!usersData.length && !isLoading) {
     return <PageLoadingLayout />;
   }
@@ -50,6 +56,8 @@ export const LeadboardView = ({
       selectedSeason={selectedSeason}
       setSelectedSeason={handleSeasonChange}
       lastAccessiblePage={lastAccessiblePage}
+      userRank={userRank}
+      isRankLoading={isRankLoading}
     />
   );
 };
