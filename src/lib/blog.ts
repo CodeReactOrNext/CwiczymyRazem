@@ -4,6 +4,25 @@ import path from 'path';
 
 const BLOG_DIR = path.join(process.cwd(), 'src/content/blog');
 
+const cssToJs = (cssString: string): string => {
+  const styles: Record<string, string> = {};
+  cssString.split(';').forEach(rule => {
+    const [property, value] = rule.split(':').map(s => s.trim());
+    if (property && value) {
+      const jsProperty = property.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+      styles[jsProperty] = value;
+    }
+  });
+  return JSON.stringify(styles);
+};
+
+const transformStyleAttributes = (content: string): string => {
+  return content.replace(/style="([^"]*)"/g, (_match, styleString) => {
+    const jsStyles = cssToJs(styleString);
+    return `style={${jsStyles}}`;
+  });
+};
+
 export interface BlogFrontmatter {
   title: string;
   description: string;
@@ -38,9 +57,10 @@ export const getBlogBySlug = async (slug: string) => {
   const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
+  const transformedContent = transformStyleAttributes(content);
 
   return {
     frontmatter: data as BlogFrontmatter,
-    content,
+    content: transformedContent,
   };
 };
