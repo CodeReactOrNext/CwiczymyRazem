@@ -12,8 +12,10 @@ import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
+import { FiBook } from "react-icons/fi";
 
 import Chat from "../../feature/chat/Chat";
+import Changelog, { useChangelogData, hasRecentChanges } from "components/Changelog/Changelog";
 import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
@@ -29,7 +31,7 @@ interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "discord" | "excerise" | "chat"
+    "logs" | "achievements" | "discord" | "excerise" | "chat" | "changelog"
   >("logs");
 
   const {
@@ -43,6 +45,9 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
     hasNewMessages: hasNewLogs,
     markAsRead: markLogsAsRead,
   } = useUnreadMessages("logs");
+
+  const { changelog } = useChangelogData("2026-05");
+  const hasNewChangelog = changelog?.entries ? hasRecentChanges(changelog.entries) : false;
 
   const { t } = useTranslation("common");
 
@@ -78,16 +83,30 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
           hasNewMessages={hasNewChats}
         />
         {!className.includes("border-none") && (
-          <LogsBoxButton
-            title={t("logsBox.achievements_map")}
-            active={showedCategory === "achievements"}
-            onClick={() => handleCategoryChange("achievements")}
-            Icon={FaMedal}
-          />
+          <>
+            <LogsBoxButton
+              title={t("logsBox.achievements_map")}
+              active={showedCategory === "achievements"}
+              onClick={() => handleCategoryChange("achievements")}
+              Icon={FaMedal}
+            />
+            <LogsBoxButton
+              title="Changelog"
+              active={showedCategory === "changelog"}
+              onClick={() => handleCategoryChange("changelog")}
+              Icon={FiBook}
+              hasNewDot={hasNewChangelog}
+            />
+          </>
         )}
       </div>
       {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
+      )}
+      {showedCategory === "changelog" && (
+        <div className='h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 mb-2 scrollbar-track-transparent p-4'>
+          <Changelog month="2026-05" />
+        </div>
       )}
       <div className='h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 mb-2 scrollbar-track-transparent'>
         {showedCategory === "logs" && logs && (
