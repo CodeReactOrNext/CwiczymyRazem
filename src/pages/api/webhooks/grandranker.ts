@@ -49,17 +49,12 @@ const getMonthYearFolder = (dateStr: string): string => {
   }
 };
 
-const getPolishMonth = (dateStr: string): string => {
-  const months: Record<number, string> = {
-    0: 'Styczeń', 1: 'Luty', 2: 'Marzec', 3: 'Kwiecień',
-    4: 'Maj', 5: 'Czerwiec', 6: 'Lipiec', 7: 'Sierpień',
-    8: 'Wrzesień', 9: 'Październik', 10: 'Listopad', 11: 'Grudzień'
-  };
-
+const getMonthHeader = (dateStr: string): string => {
   const date = new Date(dateStr);
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-  return `${month} ${year}`;
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric'
+  });
 };
 
 const formatDate = (dateStr: string): string => {
@@ -117,7 +112,7 @@ const appendArticlesToChangelog = (filePath: string, articles: Article[]): void 
   });
 
   // Build new content
-  const monthYear = getPolishMonth(articles[0].publish_date);
+  const monthYear = getMonthHeader(articles[0].publish_date);
 
   // Check if file is empty or needs header
   if (!content.trim()) {
