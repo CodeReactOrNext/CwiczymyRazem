@@ -23,6 +23,23 @@ const transformStyleAttributes = (content: string): string => {
   });
 };
 
+const transformDirectives = (content: string): string => {
+  const typeMap: Record<string, string> = {
+    tip: 'tip',
+    warning: 'warning',
+    bestfor: 'tip',
+    important: 'important',
+    note: 'info',
+  };
+
+  return content.replace(/:::([\w]+)\n([\s\S]*?)\n:::/g, (_match, type, blockContent) => {
+    const alertType = typeMap[type] || 'info';
+    const cleanContent = blockContent.trim();
+
+    return `\n<BlogAlert type="${alertType}">\n${cleanContent}\n</BlogAlert>\n`;
+  });
+};
+
 export interface BlogFrontmatter {
   title: string;
   description: string;
@@ -57,7 +74,8 @@ export const getBlogBySlug = async (slug: string) => {
   const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
-  const transformedContent = transformStyleAttributes(content);
+  let transformedContent = transformDirectives(content);
+  transformedContent = transformStyleAttributes(transformedContent);
 
   return {
     frontmatter: data as BlogFrontmatter,

@@ -98,6 +98,7 @@
     "react-redux": "^9.2.0",
     "react-youtube": "^10.1.0",
     "recharts": "^3.8.1",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "soundfont-player": "^0.12.0",
     "stripe": "^22.1.0",
