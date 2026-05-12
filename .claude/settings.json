@@ -9,7 +9,9 @@
       "Read(//c/Users/Krokon/.claude/projects/c--cw-CwiczymyRazem/bdab00ad-dfa9-44e5-a6c4-2b3337f1b00b/tool-results/**)",
       "Read(//c/cw/CwiczymyRazem/**)",
       "Bash(xargs grep -l \"collection\\(\"\"users\"\"\\)\")",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'style: capitalize '\\\\''Your Position'\\\\'' label in leaderboard header *)"
     ]
   }
 }
