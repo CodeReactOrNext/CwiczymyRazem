@@ -23,6 +23,10 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    // Ignore Google Translator + React DOM removeChild error (known issue, doesn't break functionality)
+    if (error.name === 'NotFoundError' || error.message?.includes("removeChild")) {
+      return { hasError: false, error: null, componentStack: null };
+    }
     return { hasError: true, error, componentStack: null };
   }
 

@@ -57,17 +57,19 @@ export const GeneratedPlan = ({
             className='ml-auto bg-primary hover:bg-primary/90'
             disabled={isStarting}
           >
-            {isStarting ? (
-                <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
+              {isStarting ? (
+                  <>
                     <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Loading...</span>
-                </div>
-            ) : (
-                <>
+                  </>
+              ) : (
+                  <>
                     <FaPlay className='mr-2 h-3.5 w-3.5' />
-                    {t("common:start")}
-                </>
-            )}
+                    <span>{t("common:start")}</span>
+                  </>
+              )}
+            </span>
           </Button>
         </div>
       </div>
@@ -103,17 +105,19 @@ export const GeneratedPlan = ({
             variant='default'
             disabled={isStarting}
           >
-            {isStarting ? (
-                <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
+              {isStarting ? (
+                  <>
                     <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Loading...</span>
-                </div>
-            ) : (
-                <>
+                  </>
+              ) : (
+                  <>
                     <FaPlay className='mr-2 h-4 w-4' />
-                    {t("common:start")}
-                </>
-            )}
+                    <span>{t("common:start")}</span>
+                  </>
+              )}
+            </span>
           </Button>
         </div>
       </Card>

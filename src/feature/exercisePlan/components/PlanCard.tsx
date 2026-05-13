@@ -266,17 +266,19 @@ export const PlanCard = ({
             }}
             disabled={isLoading}
            >
-            {isLoading ? (
-                <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
+              {isLoading ? (
+                  <>
                     <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Loading...</span>
-                </div>
-            ) : (
-                <>
-                    {startButtonText || t("common:start")}
+                  </>
+              ) : (
+                  <>
+                   <span>{startButtonText || "Start"}</span>
                     <FaPlay className="ml-2 h-2 w-2" />
-                </>
-            )}
+                  </>
+              )}
+            </span>
            </Button>
         )}
       </div>
