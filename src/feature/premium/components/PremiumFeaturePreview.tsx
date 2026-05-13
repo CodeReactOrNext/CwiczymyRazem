@@ -85,7 +85,9 @@ export function PremiumFeaturePreview({
               className="group p-6 rounded-md bg-white/5 hover:bg-white/[0.08] transition-all duration-300 backdrop-blur-sm"
             >
               <div className="mb-6 h-12 w-12 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
-                {feature.icon}
+                <span className="flex items-center justify-center">
+                  {feature.icon}
+                </span>
               </div>
               <div>
                 <h3 className="text-base font-semibold text-white mb-2">

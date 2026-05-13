@@ -119,9 +119,13 @@ export const SessionBottomBar = memo(({
                 {(isFinishing || isSubmittingReport) ? (
                   <span>Saving...</span>
                 ) : isLastExercise ? (
-                  <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+                  <>
+                    <span className="flex items-center gap-2">{t("common:finish_session")}</span> <FaCheck />
+                  </>
                 ) : (
-                  <span className="flex items-center gap-2">{t("skip") || "Skip"} <FaStepForward /></span>
+                  <>
+                    <span className="flex items-center gap-2">{t("skip") || "Skip"}</span> <FaStepForward />
+                  </>
                 )}
               </Button>
               {isLastExercise && !canFinishSession && (

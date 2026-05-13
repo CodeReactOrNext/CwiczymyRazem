@@ -134,9 +134,11 @@ const PracticeFinderView: React.FC = () => {
             {loading ? (
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
             ) : (
-              <Search className="h-4 w-4" />
+              <>
+                <Search className="h-4 w-4" />
+                <span className="flex items-center gap-2">Search</span>
+              </>
             )}
-            Search
           </button>
         </div>
 
