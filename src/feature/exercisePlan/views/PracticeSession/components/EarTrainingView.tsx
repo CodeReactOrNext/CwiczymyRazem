@@ -153,9 +153,9 @@ export const EarTrainingView = ({
             onClick={onPlayRiddle}
           >
              {isPlaying ? (
-                 <>Stop</>
+                 <span>Stop</span>
              ) : (
-                 <><FaPlay className="mr-2 w-3 h-3 sm:w-4 sm:h-4" /> Play</>
+                 <><FaPlay className="mr-2 w-3 h-3 sm:w-4 sm:h-4" /> <span>Play</span></>
              )}
           </Button>
 
@@ -168,7 +168,7 @@ export const EarTrainingView = ({
                 onClick={onReveal}
               >
                   <Eye className="mr-2 w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
-                  Reveal
+                  <span>Reveal</span>
               </Button>
                 <Button 
                     className="h-12 sm:h-14 px-4 sm:px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
@@ -176,7 +176,7 @@ export const EarTrainingView = ({
                     onClick={onGuessed}
                 >
                     <RefreshCw className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                    Guessed! (+1)
+                    <span>Guessed! (+1)</span>
                 </Button>
             </div>
           ) : (
@@ -188,7 +188,7 @@ export const EarTrainingView = ({
                         onClick={onNextRiddle}
                     >
                         <RefreshCw className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                        Next Riddle
+                        <span>Next Riddle</span>
                     </Button>
                 </div>
           )}
