@@ -13,21 +13,26 @@ import {
   Map,
   Music,
   Route,
+  Search,
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FaClock, FaGuitar } from "react-icons/fa";
+import { SiGuitarpro } from "react-icons/si";
+import { GiAudioCassette } from "react-icons/gi";
+import { PiCassetteTapeLight, PiTreeView, PiMagicWandDuotone } from "react-icons/pi";
+import { LuTimer } from "react-icons/lu";
 import { useAppSelector } from "store/hooks";
 
 const colorMap = {
-  sky:     { iconBg: "bg-sky-800/30",     iconText: "text-sky-400/90",     blur: "bg-sky-700/15",     ring: "hover:ring-sky-700/30"     },
-  amber:   { iconBg: "bg-amber-800/30",   iconText: "text-amber-400/90",   blur: "bg-amber-700/15",   ring: "hover:ring-amber-700/30"   },
-  rose:    { iconBg: "bg-rose-800/30",    iconText: "text-rose-400/90",    blur: "bg-rose-700/15",    ring: "hover:ring-rose-700/30"    },
-  emerald: { iconBg: "bg-emerald-800/30", iconText: "text-emerald-400/90", blur: "bg-emerald-700/15", ring: "hover:ring-emerald-700/30" },
-  cyan:    { iconBg: "bg-cyan-800/30",    iconText: "text-cyan-400/90",    blur: "bg-cyan-700/15",    ring: "hover:ring-cyan-700/30"    },
-  violet:  { iconBg: "bg-violet-800/30",  iconText: "text-violet-400/90",  blur: "bg-violet-700/15",  ring: "hover:ring-violet-700/30"  },
-  indigo:  { iconBg: "bg-indigo-800/30",  iconText: "text-indigo-400/90",  blur: "bg-indigo-700/15",  ring: "hover:ring-indigo-700/30"  },
+  sky:     { iconBg: "bg-sky-500/10",     iconText: "text-sky-400",     blur: "bg-sky-500/5",     ring: "group-hover:ring-sky-500/30"     },
+  amber:   { iconBg: "bg-amber-500/10",   iconText: "text-amber-400",   blur: "bg-amber-500/5",   ring: "group-hover:ring-amber-500/30"   },
+  rose:    { iconBg: "bg-rose-500/10",    iconText: "text-rose-400",    blur: "bg-rose-500/5",    ring: "group-hover:ring-rose-500/30"    },
+  emerald: { iconBg: "bg-emerald-500/10", iconText: "text-emerald-400", blur: "bg-emerald-500/5", ring: "group-hover:ring-emerald-500/30" },
+  cyan:    { iconBg: "bg-cyan-500/10",    iconText: "text-cyan-400",    blur: "bg-cyan-500/5",    ring: "group-hover:ring-cyan-500/30"    },
+  violet:  { iconBg: "bg-violet-500/10",  iconText: "text-violet-400",  blur: "bg-violet-500/5",  ring: "group-hover:ring-violet-500/30"  },
+  indigo:  { iconBg: "bg-indigo-500/10",  iconText: "text-indigo-400",  blur: "bg-indigo-500/5",  ring: "group-hover:ring-indigo-500/30"  },
 } as const;
 
 type ColorKey = keyof typeof colorMap;
@@ -66,7 +71,13 @@ export const PracticeModeSelector = () => {
     const loading = loadingMode === id;
     return (
       <div
-        className={`group relative flex items-center gap-4 rounded-xl border border-transparent p-3 transition-all duration-200 ${lockLabel === "Soon" ? "cursor-default" : locked ? "opacity-50 cursor-default" : "cursor-pointer hover:bg-white/[0.03] hover:border-white/5"}`}
+        className={`group relative flex items-center gap-4 rounded-lg bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 ${
+          lockLabel === "Soon" 
+            ? "cursor-default grayscale opacity-50" 
+            : locked 
+              ? "opacity-60 cursor-default" 
+              : "cursor-pointer hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-black/20"
+        }`}
         onClick={() => {
           if (lockLabel === "Soon") return;
           if (!loading) nav(href, id, locked);
@@ -74,27 +85,27 @@ export const PracticeModeSelector = () => {
         tabIndex={0}
         role="button"
       >
-        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${c.iconBg} backdrop-blur-sm transition-all duration-300 group-hover:scale-105`}>
+        <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg ${c.iconBg} transition-all duration-300 group-hover:scale-110`}>
           {loading
-            ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            : <Icon className={`h-5 w-5 ${c.iconText}`} />
+            ? <div className="h-8 w-8 animate-spin rounded-full border-4 border-white border-t-transparent" />
+            : <Icon className={`h-10 w-10 ${c.iconText} transition-colors duration-300`} />
           }
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-bold text-zinc-200 group-hover:text-white transition-colors">{title}</h3>
+          <div className="flex items-center gap-2 mb-0.5">
+            <h3 className="truncate text-[15px] font-bold text-zinc-100 group-hover:text-white transition-colors">{title}</h3>
             {locked && (
-              <div className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/20">
+              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/20">
                 <Lock className="h-2.5 w-2.5 text-amber-500/80" />
                 <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80">{lockLabel}</span>
               </div>
             )}
           </div>
-          <p className="truncate text-[11px] text-zinc-500 group-hover:text-zinc-400 transition-colors">{description}</p>
+          <p className="truncate text-[13px] text-zinc-500 group-hover:text-zinc-400 transition-colors">{description}</p>
         </div>
         {!locked && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/0 transition-all group-hover:bg-white/5">
-            <ArrowRight className="h-4 w-4 text-zinc-700 transition-all group-hover:translate-x-0.5 group-hover:text-zinc-400" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/0 transition-all duration-300">
+            <ArrowRight className="h-5 w-5 text-zinc-700 transition-all group-hover:translate-x-1 group-hover:text-zinc-200" />
           </div>
         )}
       </div>
@@ -104,20 +115,20 @@ export const PracticeModeSelector = () => {
   return (
     <>
       <div className="mb-8 w-full">
-        <div className="font-openSans container mx-auto max-w-5xl px-3 py-4 sm:px-6 sm:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+        <div className="font-openSans container mx-auto max-w-6xl px-4 py-8 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("routine",  ListChecks,    "Daily Routine", "Follow your guided routine",   "/timer/plans",   "indigo")}
-                {listItem("song",      Music,    "Songs",      "Practice songs from library", "/timer/song-select",  "rose")}
+                {listItem("song",      PiCassetteTapeLight,    "Songs",      "Track practice time for songs", "/timer/song-select",  "rose")}
                 {listItem("log",     ClipboardList, "Log Practice", "Manually log your session",  "/report",         "emerald")}
-                {listItem("smart", Sparkles, "Auto plan", "Automatically generated session", "/timer/auto", "violet", !isMaster, "Master")}
-                {listItem("timer",  FaClock,  "Free Timer", "Practice with a timer", "/timer/practice", "sky")}
-                {listItem("finder", Compass, "Practice Finder", "AI suggestions", "/practice-finder", "rose", !isMaster, "Master")}
-                {listItem("journey",  Route,      "Learning Path", "Step-by-step progress",   "/journey",       "amber")}
+                {listItem("smart", PiMagicWandDuotone, "Auto plan", "Automatically generated session", "/timer/auto", "violet", !isMaster, "Master")}
+                {listItem("timer",  LuTimer,  "Free Timer", "Practice with a timer", "/timer/practice", "sky")}
+                {listItem("finder", Search, "Practice Finder", "Lessons and exercises", "/practice-finder", "amber", !isMaster, "Master")}
+                {listItem("journey",  Route,      "Learning Path", "Step-by-step progress",   "/journey",       "rose")}
                 {listItem("roadmap", Map, "Roadmaps", "AI-powered learning paths", "/ai-coach", "cyan", !isMaster, "Master")}
-                {listItem("skills",    Brain,    "Skills", "Specific skill focus",         "/profile/skills",     "rose")}
-                {listItem("exercises", Dumbbell, "Exercises",  "Full exercise library",             "/profile/skills?tab=browse",  "indigo")}
-                {listItem("gp",     FaGuitar, "GP file", "Practice GP files", "/gp-tabs", "amber", !isPremium, "Premium")}
-                {listItem("scales", Layers, "Scale Map", "Coming Soon", "#", "sky", true, "Soon")}
+                {listItem("skills",    Brain,    "Skills", "Specific skill focus",         "/profile/skills",     "violet")}
+                {listItem("exercises", Dumbbell, "Exercises",  "Full exercise library",             "/profile/skills?tab=browse",  "emerald")}
+                {listItem("gp",     SiGuitarpro, "GP file", "Practice GP files", "/gp-tabs", "amber", !isPremium, "Premium")}
+                {listItem("scales", PiTreeView, "Scale Map", "Coming Soon", "#", "sky", true, "Soon")}
                 {hasLastSession && listItem("resume", History, "Resume Last", "Continue playing", "/timer/practice", "cyan")}
           </div>
         </div>
@@ -127,3 +138,4 @@ export const PracticeModeSelector = () => {
     </>
   );
 };
+
