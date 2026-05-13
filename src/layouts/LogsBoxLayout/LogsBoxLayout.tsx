@@ -9,13 +9,13 @@ import type {
 import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { FiBook } from "react-icons/fi";
 
 import Chat from "../../feature/chat/Chat";
-import Changelog, { useChangelogData, hasRecentChanges } from "components/Changelog/Changelog";
+import Changelog, { useChangelogData, hasRecentChanges, markChangelogAsViewed } from "components/Changelog/Changelog";
 import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
@@ -33,6 +33,7 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "achievements" | "discord" | "excerise" | "chat" | "changelog"
   >("logs");
+  const [hasNewChangelog, setHasNewChangelog] = useState(false);
 
   const {
     unreadCount: unreadChats,
@@ -47,7 +48,12 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
   } = useUnreadMessages("logs");
 
   const { changelog } = useChangelogData("2026-05");
-  const hasNewChangelog = changelog?.entries ? hasRecentChanges(changelog.entries) : false;
+
+  useEffect(() => {
+    if (changelog?.entries) {
+      setHasNewChangelog(hasRecentChanges(changelog.entries));
+    }
+  }, [changelog?.entries]);
 
   const { t } = useTranslation("common");
 
@@ -56,6 +62,9 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
       markChatsAsRead();
     } else if (category === "logs") {
       markLogsAsRead();
+    } else if (category === "changelog" && changelog?.entries) {
+      markChangelogAsViewed(changelog.entries);
+      setHasNewChangelog(false);
     }
     setShowedCategory(category);
   };

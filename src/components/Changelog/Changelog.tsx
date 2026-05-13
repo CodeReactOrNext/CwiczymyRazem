@@ -52,8 +52,13 @@ const parseChangelog = (markdown: string): ParsedChangelog => {
 
 export const hasRecentChanges = (entries: ChangelogEntry[]): boolean => {
   if (!entries || entries.length === 0) return false;
+
   const latestDate = entries[0]?.date;
   if (!latestDate) return false;
+
+  const lastViewed = localStorage.getItem('changelog_last_viewed');
+
+  if (lastViewed === latestDate) return false;
 
   try {
     const [day, month, year] = latestDate.split(".").map(Number);
@@ -63,6 +68,13 @@ export const hasRecentChanges = (entries: ChangelogEntry[]): boolean => {
     return daysDiff < 3;
   } catch {
     return false;
+  }
+};
+
+export const markChangelogAsViewed = (entries: ChangelogEntry[]) => {
+  const latestDate = entries[0]?.date;
+  if (latestDate) {
+    localStorage.setItem('changelog_last_viewed', latestDate);
   }
 };
 
@@ -92,6 +104,12 @@ export const useChangelogData = (month: string = "2026-05") => {
 
 const Changelog = ({ month = "2026-05" }: { month?: string }) => {
   const { changelog, isLoading } = useChangelogData(month);
+
+  useEffect(() => {
+    if (changelog?.entries && changelog.entries.length > 0) {
+      markChangelogAsViewed(changelog.entries);
+    }
+  }, [changelog?.entries]);
 
   if (isLoading) {
     return (
