@@ -65,12 +65,11 @@ export const NotificationsBell = () => {
         <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors group">
           <Bell
             className={cn(
-              "h-5 w-5 text-zinc-400 group-hover:text-white transition-colors",
-              unreadCount > 0 && "text-cyan-400"
+              "h-5 w-5 text-zinc-400 group-hover:text-white transition-colors"
             )}
           />
           {unreadCount > 0 && (
-            <span className="absolute top-0.5 right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cyan-500 px-1 text-[10px] font-bold text-white ring-2 ring-zinc-900">
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-[20px] items-center justify-center rounded-[8px] bg-red-600 px-1 text-[12px] font-extrabold text-white ring-2 ring-zinc-900 shadow-xl select-none">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -96,7 +95,7 @@ export const NotificationsBell = () => {
                 e.preventDefault();
                 markAllAsRead();
               }}
-              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-cyan-500/10">
+              className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-500/10">
               Mark all as read
             </button>
           )}
@@ -142,7 +141,7 @@ export const NotificationsBell = () => {
                       "w-full flex gap-4 items-start px-5 py-4 text-left transition-colors border-b border-white/5 last:border-0",
                       n.isRead
                         ? "hover:bg-white/5"
-                        : "bg-cyan-500/5 hover:bg-cyan-500/8"
+                        : "bg-red-500/5 hover:bg-red-500/8"
                     )}
                     onClick={() => markAsRead(n.id)}>
                     {/* Avatar or system icon + type badge */}
@@ -207,7 +206,7 @@ export const NotificationsBell = () => {
 
                     {/* Unread indicator */}
                     {!n.isRead && (
-                      <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0 mt-2" />
+                      <div className="h-2 w-2 rounded-full bg-red-600 shrink-0 mt-2" />
                     )}
                   </button>
                 );

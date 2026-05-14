@@ -306,7 +306,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white">Rifff Quest</h2>
+              <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
             </div>
             <div className="ml-auto">
               <NotificationsBell />
@@ -342,7 +342,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
                     <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-white">Rifff Quest</h2>
+                    <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
