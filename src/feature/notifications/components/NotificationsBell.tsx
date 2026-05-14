@@ -62,14 +62,14 @@ export const NotificationsBell = () => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors group">
+        <button className="flex items-center gap-2 px-2.5 py-2 rounded-[8px] bg-white/5 hover:bg-white/10 transition-colors group">
           <Bell
             className={cn(
-              "h-5 w-5 text-zinc-400 group-hover:text-white transition-colors"
+              "h-4 w-4 text-zinc-400 group-hover:text-white transition-colors"
             )}
           />
           {unreadCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-[20px] items-center justify-center rounded-[8px] bg-red-600 px-1 text-[12px] font-extrabold text-white ring-2 ring-zinc-900 shadow-xl select-none">
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-[4px] bg-red-500/20 px-1.5 text-[12px] font-bold text-red-400 select-none">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
