@@ -59,7 +59,8 @@ export const addSong = async (
       artist,
       "added",
       avatarUrl,
-      difficulty_rate
+      difficulty_rate,
+      docRef.id
     );
     return docRef.id;
   } catch (error) {

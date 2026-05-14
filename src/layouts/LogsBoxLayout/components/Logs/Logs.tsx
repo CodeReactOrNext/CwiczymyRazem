@@ -25,7 +25,7 @@ import type {
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useTranslation } from "hooks/useTranslation";
-import { Video } from "lucide-react"; 
+import { Video, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
@@ -319,7 +319,7 @@ const FirebaseLogsSongItem = ({
   currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, status, uid, avatarUrl, userAvatarFrame } = log;
+  const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status, t);
 
@@ -333,13 +333,20 @@ const FirebaseLogsSongItem = ({
           </span>
           <p className='text-secondText text-sm'>
             {message}{" "}
-            <span className='text-white'>
-              {songArtist} {songTitle}
-            </span>
+            {songId ? (
+              <Link href={`/songs?view=management&songId=${songId}`} className='inline-flex items-center gap-1 text-white hover:text-cyan-400 hover:underline transition-colors'>
+                {songArtist} {songTitle}
+                <ExternalLink className='h-3 w-3 opacity-60' />
+              </Link>
+            ) : (
+              <span className='text-white'>
+                {songArtist} {songTitle}
+              </span>
+            )}
             {status !== "difficulty_rate" && "."}
           </p>
         </div>
-        
+
         <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
           {log.id && (
             <LogReaction

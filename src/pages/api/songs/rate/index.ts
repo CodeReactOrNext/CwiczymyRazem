@@ -123,7 +123,8 @@ export default async function handler(
       artist,
       "difficulty_rate",
       avatarUrl,
-      rating
+      rating,
+      songId
     );
 
     return res.status(200).json({
