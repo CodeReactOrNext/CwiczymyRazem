@@ -9,10 +9,11 @@ import { withAuth } from "utils/auth/serverAuth";
 const SongsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const view = (router.query.view as string) || "explore";
+  const songId = (router.query.songId as string) || "";
 
   return (
     <MainContainer noBorder>
-      <SongsView view={view} />
+      <SongsView view={view} initialSongId={songId} />
     </MainContainer>
   );
 };

@@ -14,6 +14,7 @@ export interface FirebaseLogsSongsInterface {
   userName: string;
   songTitle: string;
   songArtist: string;
+  songId?: string;
   difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
   avatarUrl: string | undefined;

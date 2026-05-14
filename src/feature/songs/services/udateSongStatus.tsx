@@ -66,7 +66,8 @@ export const updateSongStatus = async (
       artist,
       status,
       avatarUrl,
-      undefined
+      undefined,
+      songId
     );
     return { success: true, pointsAdded };
   } catch (error) {

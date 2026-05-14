@@ -69,9 +69,10 @@ import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 
 interface SongsViewProps {
   view?: "explore" | "management" | string;
+  initialSongId?: string;
 }
 
-const SongsView = ({ view = "explore" }: SongsViewProps) => {
+const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => {
   const { t } = useTranslation("songs");
   const isManagementView = view === "management";
 
@@ -154,6 +155,16 @@ const SongsView = ({ view = "explore" }: SongsViewProps) => {
     mediaQuery.addEventListener("change", handler);
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
+
+  useEffect(() => {
+    if (initialSongId) {
+      const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
+      const song = allSongs.find(s => s.id === initialSongId);
+      if (song) {
+        setDetailsTarget(song);
+      }
+    }
+  }, [initialSongId, userSongs]);
 
   const disableDnd = isMobile;
 
