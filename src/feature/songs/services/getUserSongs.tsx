@@ -43,7 +43,9 @@ export const getUserSongs = async (userId: string) => {
 
     if (userSongs.length === 0) return songLists;
 
-    const songIds = userSongs.map((us) => us.id);
+    const songIds = userSongs.map((us) => us.id).filter((id) => id !== undefined);
+    if (songIds.length === 0) return songLists;
+
     const CHUNK_SIZE = 10;
     const songChunks = [];
     for (let i = 0; i < songIds.length; i += CHUNK_SIZE) {
