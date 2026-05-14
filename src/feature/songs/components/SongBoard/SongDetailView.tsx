@@ -270,14 +270,20 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          <div className="relative px-6 md:px-8 pb-8 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
             <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-10 w-full lg:w-auto">
                {/* Primary Action Button */}
-               <Button 
-                 onClick={() => onPractice(song)}
+               <Button
+                 onClick={() => {
+                   if (!status) {
+                     onStatusChange(song.id, "wantToLearn", song.title, song.artist);
+                   } else {
+                     onPractice(song);
+                   }
+                 }}
                  className="h-14 w-full sm:w-auto px-8 rounded-lg bg-white hover:bg-zinc-200 text-black font-black tracking-widest flex items-center justify-center gap-6 transition-all active:scale-95 shadow-xl border-none group"
                >
                  <div className="mr-4 p-2 rounded-md transition-colors">
-                    <Play className="h-5 w-5 fill-current" />
+                    {status ? <Play className="h-5 w-5 fill-current" /> : <Music className="h-5 w-5" />}
                  </div>
-                 <span className="text-sm">Start practice</span>
+                 <span className="text-sm">{status ? "Start practice" : "Add to library"}</span>
                </Button>
 
                {/* Steam-style Info Boxes */}

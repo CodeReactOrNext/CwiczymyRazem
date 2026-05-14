@@ -162,6 +162,15 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
       const song = allSongs.find(s => s.id === initialSongId);
       if (song) {
         setDetailsTarget(song);
+      } else {
+        const fetchSong = async () => {
+          const { getSongById } = await import("feature/songs/services/getSongs");
+          const fetchedSong = await getSongById(initialSongId);
+          if (fetchedSong) {
+            setDetailsTarget(fetchedSong);
+          }
+        };
+        fetchSong();
       }
     }
   }, [initialSongId, userSongs]);

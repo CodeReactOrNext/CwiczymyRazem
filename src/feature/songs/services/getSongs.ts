@@ -186,3 +186,24 @@ export const getSongs = async (
 const invalidateSongsCache = () => {
   memoryCache.clear('songs');
 };
+
+export const getSongById = async (songId: string): Promise<Song | null> => {
+  try {
+    const { doc, getDoc } = await import("firebase/firestore");
+    const songRef = doc(db, "songs", songId);
+    const { trackedGetDoc } = await import("utils/firebase/client/firestoreTracking");
+    const docSnap = await trackedGetDoc(songRef);
+
+    if (!docSnap.exists()) {
+      return null;
+    }
+
+    return {
+      id: docSnap.id,
+      ...docSnap.data()
+    } as Song;
+  } catch (error) {
+    console.error("Error getting song by ID:", error);
+    return null;
+  }
+};
