@@ -28,13 +28,13 @@ const LogsBoxButton = ({
         <Icon className='mx-1 text-base xs:text-2xl sm:text-base' />
         <span className='hidden font-normal sm:block'> {title}</span>
         {hasNewMessages && (
-          <span className="ml-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm">
+          <span className="ml-1 flex min-w-[20px] h-5 items-center justify-center rounded-[8px] bg-red-600 px-1 text-[11px] font-extrabold text-white shadow-sm">
             {notificationCount || "!"}
           </span>
         )}
       </button>
       {hasNewDot && !hasNewMessages && (
-        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full shadow-md" />
+        <div className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full shadow-md" />
       )}
     </div>
   );
