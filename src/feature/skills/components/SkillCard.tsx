@@ -10,26 +10,26 @@ interface SkillCardProps {
   onSkillClick: () => void;
 }
 
-const COLOR_CLASSES: Record<string, { iconBg: string; iconText: string; ring: string }> = {
+const COLOR_CLASSES: Record<string, { iconBg: string; iconBorder: string; iconText: string; }> = {
   technique: {
-    iconBg: "bg-red-500/20",
-    iconText: "text-red-400",
-    ring: "hover:ring-red-500/40",
+    iconBg: "bg-gradient-to-br from-rose-500/20 to-rose-500/5",
+    iconBorder: "border border-white/5 border-t-rose-500/40 border-l-rose-500/20",
+    iconText: "text-rose-400",
   },
   theory: {
-    iconBg: "bg-main/20",
-    iconText: "text-main-300",
-    ring: "hover:ring-main/40",
+    iconBg: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
+    iconBorder: "border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20",
+    iconText: "text-indigo-400",
   },
   hearing: {
-    iconBg: "bg-emerald-500/20",
+    iconBg: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5",
+    iconBorder: "border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20",
     iconText: "text-emerald-400",
-    ring: "hover:ring-emerald-500/40",
   },
   creativity: {
-    iconBg: "bg-amber-500/20",
+    iconBg: "bg-gradient-to-br from-amber-500/20 to-amber-500/5",
+    iconBorder: "border border-white/5 border-t-amber-500/40 border-l-amber-500/20",
     iconText: "text-amber-400",
-    ring: "hover:ring-amber-500/40",
   },
 };
 
@@ -39,7 +39,6 @@ export const SkillCard = ({
   onSkillClick,
 }: SkillCardProps) => {
   const { t } = useTranslation("skills");
-  const theme = getSkillTheme(skill.category);
   const colors = COLOR_CLASSES[skill.category] || COLOR_CLASSES.technique;
   const Icon = skill.icon;
 
@@ -47,40 +46,30 @@ export const SkillCard = ({
     <div
       onClick={onSkillClick}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl cursor-pointer",
-        "border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600",
-        "p-4 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 active:scale-95",
-        colors.ring
+        "group relative flex items-center gap-3 rounded-lg bg-white/[0.02] p-3.5 backdrop-blur-sm transition-all duration-300",
+        "border border-white/[0.02] cursor-pointer hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-black/20"
       )}
     >
-      <div className="relative z-10 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1">
-           <div className={cn(
-             "rounded-xl p-3 shadow-2xl transition-all duration-500 group-hover:scale-110",
-             colors.iconBg,
-             colors.iconText
-           )}>
-             {Icon && <Icon className="w-6 h-6" strokeWidth={1.5} />}
-           </div>
+      <div className={cn(
+        "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-105 shadow-lg",
+        colors.iconBg,
+        colors.iconBorder,
+        colors.iconText
+      )}>
+        {Icon && <Icon className="w-6 h-6" strokeWidth={2} />}
+      </div>
 
-           <div className="flex flex-col flex-1 min-w-0">
-             <h3 className="text-base font-bold tracking-tight text-white truncate mb-1">
-               {skill.name || t(`skills.${skill.id}.name` as any)}
-             </h3>
-              <div className="flex items-baseline gap-1.5">
-                 <span className={cn("text-2xl font-black tabular-nums leading-none tracking-tight", colors.iconText)}>
-                     {currentPoints}
-                 </span>
-              </div>
-           </div>
-        </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="truncate text-[14px] font-bold text-zinc-100 group-hover:text-white transition-colors mb-0.5">
+          {skill.name || t(`skills.${skill.id}.name` as any)}
+        </h3>
+        <p className={cn("truncate text-[12px] font-semibold transition-colors", colors.iconText)}>
+          {currentPoints} <span className="opacity-70 font-medium">XP</span>
+        </p>
+      </div>
 
-        <div className={cn(
-          "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
-          "bg-white/5 group-hover:bg-white/10 text-zinc-500 group-hover:text-white"
-        )}>
-          <ChevronRight size={16} />
-        </div>
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300">
+        <ChevronRight className="h-4 w-4 text-zinc-700 transition-all group-hover:translate-x-1 group-hover:text-zinc-200" />
       </div>
     </div>
   );
