@@ -133,7 +133,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
     <DashboardSection compact>
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">Changelog</h3>
-        <div className="space-y-4 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-800">
+        <div className="space-y-4">
           {changelog.entries.map((entry, idx) => (
             <div key={idx} className="border-l-2 border-cyan-500/50 pl-4 pb-4">
               <p className="text-sm font-medium text-cyan-400">{entry.date}</p>
