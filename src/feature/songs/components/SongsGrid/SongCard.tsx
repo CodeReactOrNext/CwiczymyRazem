@@ -58,7 +58,7 @@ export const SongCard = ({
     <div 
       onClick={onOpenDetails}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-[8px] glass-card p-5 transition-all duration-500 click-behavior cursor-pointer border border-white/5",
+        "group relative flex flex-col justify-between overflow-hidden rounded-lg glass-card p-5 transition-all duration-500 click-behavior cursor-pointer border border-white/5",
         "hover:glass-card-hover hover:shadow-2xl hover:shadow-black/60",
         userStatus && "border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.1)]"
       )}
@@ -89,7 +89,7 @@ export const SongCard = ({
       {userStatus && (
         <div className="absolute top-0 right-0 z-30">
              <div className={cn(
-               "flex items-center gap-1.5 px-3 py-1.5 rounded-bl-xl text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-lg border-b border-l",
+               "flex items-center gap-1.5 px-3 py-1.5 rounded-bl text-[10px] font-black capitalize tracking-wider backdrop-blur-md shadow-lg border-b border-l",
                userStatus === "wantToLearn" && "bg-amber-500/20 text-amber-400 border-amber-500/20",
                userStatus === "learning" && "bg-cyan-500/20 text-cyan-400 border-cyan-500/20",
                userStatus === "learned" && "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
@@ -152,7 +152,7 @@ export const SongCard = ({
               {song.genres && song.genres.length > 0 && (
                 <div className="flex gap-1">
                   {song.genres.slice(0, 1).map(g => (
-                    <span key={g} className="px-2.5 py-0.5 capitalize rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 transition-colors">
+                    <span key={g} className="px-2.5 py-0.5 capitalize rounded bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 transition-colors">
                       {g}
                     </span>
                   ))}
@@ -168,9 +168,9 @@ export const SongCard = ({
                <span>Difficulty</span>
                <span className="text-sm font-bold" style={{ color: tier.color }}>{avgDifficulty.toFixed(1)}</span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40 p-0.5 ring-1 ring-white/5">
+            <div className="h-1.5 w-full overflow-hidden rounded bg-black/40 p-0.5 ring-1 ring-white/5">
               <div
-                className="h-full rounded-full transition-all duration-1000 ease-out"
+                className="h-full rounded transition-all duration-1000 ease-out"
                 style={{
                   width: `${Math.min(avgDifficulty * 10, 100)}%`,
                   backgroundColor: tier.color,
@@ -180,7 +180,7 @@ export const SongCard = ({
             </div>
         </div>
 
-        <div className="relative z-10 mt-auto flex items-center gap-2 p-1 rounded-[8px] bg-black/20 border border-white/5 backdrop-blur-sm">
+        <div className="relative z-10 mt-auto flex items-center gap-2 p-1 rounded-lg bg-black/20 border border-white/5 backdrop-blur-sm">
           <Button
             onClick={(e) => {
               e.stopPropagation();

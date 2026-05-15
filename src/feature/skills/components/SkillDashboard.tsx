@@ -215,16 +215,16 @@ export const SkillDashboard = ({
         className="w-full"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
-          <TabsList className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1 w-fit h-auto">
+          <TabsList className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded p-1 w-fit h-auto">
             <TabsTrigger
               value="skill-tree"
-              className="px-4 py-1.5 rounded-md text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+              className="px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
             >
               Skill Tree
             </TabsTrigger>
             <TabsTrigger
               value="browse"
-              className="px-4 py-1.5 rounded-md text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+              className="px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
             >
               Browse Exercises
             </TabsTrigger>
@@ -279,7 +279,7 @@ export const SkillDashboard = ({
               <>
                 {/* Difficulty tab buttons */}
                 <div className="flex-shrink-0 px-6 pt-4 pb-0">
-                  <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+                  <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded p-1">
                     {uniqueDifficulties.map((d) => {
                       const isActive = currentDifficulty === d;
                       const label = d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
@@ -294,7 +294,7 @@ export const SkillDashboard = ({
                           key={d}
                           onClick={() => setActiveDifficulty(d)}
                           className={cn(
-                            "flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors",
+                            "flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded text-sm font-semibold transition-colors",
                             isActive ? activeClass : "text-zinc-400 hover:text-zinc-200"
                           )}
                         >
@@ -341,9 +341,9 @@ export const SkillDashboard = ({
                           <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5">
                             <div className="flex items-start justify-between gap-3">
                               <p className="text-[15px] font-bold text-zinc-500 group-hover:text-zinc-400 leading-snug flex-1 transition-colors">{challenge.title}</p>
-                              <div className="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
+                              <div className="flex items-center gap-1.5 rounded bg-amber-500/10 px-2.5 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
                                 <Lock className="h-3 w-3 text-amber-500" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+                                <span className="text-[10px] font-bold capitalize tracking-wider text-amber-500">Pro</span>
                               </div>
                             </div>
                             {challenge.description && (
@@ -406,7 +406,7 @@ export const SkillDashboard = ({
                               {micHighScore != null && micHighScore > 0 && (
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-amber-400">
                                   <Mic className="h-4 w-4 text-amber-500/80" />
-                                  <span>{micHighScore.toLocaleString()} PTS</span>
+                                  <span>{micHighScore.toLocaleString()} Pts</span>
                                   {micAccuracy != null && <span className="text-amber-500/60 font-medium">({micAccuracy}%)</span>}
                                 </div>
                               )}
@@ -414,7 +414,7 @@ export const SkillDashboard = ({
                               {earTrainingHighScore != null && earTrainingHighScore > 0 && (
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-cyan-400">
                                   <Ear className="h-4 w-4 text-cyan-400/80" />
-                                  <span>{earTrainingHighScore} PTS</span>
+                                  <span>{earTrainingHighScore} Pts</span>
                                 </div>
                               )}
 
@@ -422,7 +422,7 @@ export const SkillDashboard = ({
                                 <div className="flex-1 flex justify-end">
                                   <button
                                     onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
-                                    className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-all shadow-sm"
+                                    className="inline-flex items-center gap-2 text-[11px] font-bold capitalize tracking-wider px-3 py-1.5 rounded border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-all shadow-sm"
                                   >
                                     <Trophy className="h-4 w-4" />
                                     <span className={cn(hasBeenAttempted ? "" : "opacity-0 invisible w-0")}>Leaderboard</span>

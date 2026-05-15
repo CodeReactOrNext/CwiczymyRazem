@@ -129,7 +129,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-black uppercase tracking-[0.3em] text-zinc-300 drop-shadow-lg"
+              className="text-2xl font-black capitalize tracking-[0.3em] text-zinc-300 drop-shadow-lg"
             >
               {caseDef?.name ?? "Opening Case"}
             </motion.h2>
@@ -137,7 +137,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             {/* Roulette */}
             <div
               ref={containerRef}
-              className="relative w-full overflow-hidden rounded-xl border-2 border-zinc-700/80 bg-zinc-950/90 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]"
+              className="relative w-full overflow-hidden rounded border-2 border-zinc-700/80 bg-zinc-950/90 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]"
               style={{ height: 220 }}
             >
               <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[4px] bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)]" />
@@ -162,7 +162,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     >
                       <div
                         className={cn(
-                          "relative flex items-center justify-center rounded-xl w-[160px] h-[120px] border-b-[5px] transition-all duration-500 overflow-hidden",
+                          "relative flex items-center justify-center rounded w-[160px] h-[120px] border-b-[5px] transition-all duration-500 overflow-hidden",
                           isWinner ? "bg-zinc-800 scale-110" : "bg-zinc-900/80"
                         )}
                         style={{
@@ -188,10 +188,10 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                         )}
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5" style={{ color: rs.baseColor }}>
+                        <span className="text-[8px] font-black capitalize tracking-[0.2em] opacity-60 mb-0.5" style={{ color: rs.baseColor }}>
                           {item.kind === "guitar" ? item.def.brand : item.def.type}
                         </span>
-                        <span className="text-[11px] font-black uppercase tracking-wider text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
+                        <span className="text-[11px] font-black capitalize tracking-wider text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
                           {item.def.name}
                         </span>
                       </div>
@@ -220,7 +220,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     />
                     <motion.div
                       className={cn(
-                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded-3xl bg-zinc-950/90 border-b-8",
+                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded bg-zinc-950/90 border-b-8",
                         RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{ borderBottomColor: rarityStyles.baseColor }}
@@ -233,7 +233,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <div className="absolute inset-0 rounded-3xl opacity-30" style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)` }} />
+                      <div className="absolute inset-0 rounded opacity-30" style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)` }} />
                       {winDef.kind === "guitar" ? (
                         <img
                           src={`/static/images/rank/${winDef.def.imageId}.png`}
@@ -258,17 +258,17 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                   >
                     <RarityBadge rarity={winDef.def.rarity} size="lg" />
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-sm font-bold text-zinc-400 uppercase tracking-[0.3em] leading-none">
+                      <span className="text-sm font-bold text-zinc-400 capitalize tracking-[0.3em] leading-none">
                         {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
                       </span>
-                      <h3 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-white drop-shadow-lg text-center leading-tight">
+                      <h3 className="text-2xl sm:text-4xl md:text-5xl font-black capitalize tracking-wider text-white drop-shadow-lg text-center leading-tight">
                         {winDef.def.name}
                       </h3>
                       {winDef.kind === "guitar" && result?.newItem?.year && result?.newItem?.country && (
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{result.newItem.year}</span>
+                          <span className="text-xs font-bold text-zinc-500 capitalize tracking-widest">{result.newItem.year}</span>
                           <span className="text-zinc-600 text-xs">·</span>
-                          <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{result.newItem.country}</span>
+                          <span className="text-xs font-bold text-zinc-500 capitalize tracking-widest">{result.newItem.country}</span>
                         </div>
                       )}
                     </div>
@@ -289,7 +289,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     <Button
                       onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
                       disabled={isEquipping}
-                      className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black uppercase tracking-widest h-12 text-sm"
+                      className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black capitalize tracking-widest h-12 text-sm"
                     >
                       Equip Now
                     </Button>
@@ -297,7 +297,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                   <Button
                     variant="outline"
                     onClick={onClose}
-                    className="w-full border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white font-bold uppercase tracking-widest h-12 text-sm"
+                    className="w-full border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white font-bold capitalize tracking-widest h-12 text-sm"
                   >
                     {winDef.kind === "guitar" ? "Keep in Arsenal" : "Add to Collection"}
                   </Button>

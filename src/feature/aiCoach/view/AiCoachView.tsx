@@ -49,7 +49,7 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
       </div>
 
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-cyan-500/70">
+        <p className="text-[11px] font-semibold capitalize tracking-widest text-cyan-500/70">
           Roadmap is building your plan
         </p>
         <p
@@ -208,7 +208,7 @@ const AiCoachView = () => {
           rightContent={
             <button
               onClick={() => setSelectedId(null)}
-              className="flex w-fit items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
+              className="flex w-fit items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -252,7 +252,7 @@ const AiCoachView = () => {
               <Plus className="h-4 w-4" />
               New Roadmap
             </Button>
-            <p className="text-[12px] mt-2 font-semibold md:font-normal text-zinc-300 uppercase md:normal-case tracking-wider md:tracking-normal">
+            <p className="text-[12px] mt-2 font-semibold md:font-normal text-zinc-300 capitalize md:normal-case tracking-wider md:tracking-normal">
               {roadmaps.length}/{MAX_ROADMAPS} plans · {generatedToday}/{MAX_DAILY_GENERATIONS} today
             </p>
           </div>
@@ -262,7 +262,7 @@ const AiCoachView = () => {
 
       {/* Generate form */}
       {showForm && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
           {generating ? (
             <PlanGeneratingOverlay goal={goal} />
           ) : (
@@ -270,7 +270,7 @@ const AiCoachView = () => {
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-zinc-300">Your guitar goal</label>
                 <textarea
-                  className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                  className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                   rows={3}
                   maxLength={500}
                   placeholder="E.g. I want to learn blues improvisation, play solos like SRV..."
@@ -290,7 +290,7 @@ const AiCoachView = () => {
                     <div key={l} className="group relative">
                       <button
                         onClick={() => setLevel(l)}
-                        className={`rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
+                        className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                           level === l
                             ? "border-cyan-500 bg-cyan-500/10 text-cyan-400"
                             : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
@@ -310,13 +310,13 @@ const AiCoachView = () => {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => { setShowForm(false); setGoal(""); }}
-                  className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-400 transition hover:border-zinc-600 hover:text-zinc-200"
+                  className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm text-zinc-400 transition hover:border-zinc-600 hover:text-zinc-200"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleGenerate}
-                  className="flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-500"
+                  className="flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-500"
                 >
                   <Sparkles className="h-4 w-4" />
                   Generate plan
@@ -349,7 +349,7 @@ const AiCoachView = () => {
           <span className="text-sm">No plans yet.</span>
           <button
             onClick={() => setShowForm(true)}
-            className="mt-1 flex items-center gap-2 rounded-xl border border-zinc-800 px-4 py-2 text-sm text-zinc-500 transition hover:border-zinc-700 hover:text-zinc-300"
+            className="mt-1 flex items-center gap-2 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-500 transition hover:border-zinc-700 hover:text-zinc-300"
           >
             <Plus className="h-4 w-4" />
             Create your first plan

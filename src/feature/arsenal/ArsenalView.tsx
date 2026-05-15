@@ -43,7 +43,7 @@ export const ArsenalView = () => {
         eyebrow="Collect & equip"
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         rightContent={
-          <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
+          <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
             <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
             <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
             <span className="text-xs text-zinc-400">Fame Points</span>
@@ -57,14 +57,14 @@ export const ArsenalView = () => {
             <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit border border-white/5 h-auto">
               <TabsTrigger 
                 value="cases" 
-                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <PackageOpen size={16} />
                 Cases
               </TabsTrigger>
               <TabsTrigger 
                 value="collection" 
-                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Swords size={16} />
                 Collection
@@ -74,7 +74,7 @@ export const ArsenalView = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="rig" 
-                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Guitar size={16} />
                 Rig
@@ -94,7 +94,7 @@ export const ArsenalView = () => {
               {isLoading ? (
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {Array.from({ length: 10 }).map((_, i) => (
-                    <Skeleton key={i} className="h-36 rounded-xl bg-zinc-800/50" />
+                    <Skeleton key={i} className="h-36 rounded-lg bg-zinc-800/50" />
                   ))}
                 </div>
               ) : data ? (

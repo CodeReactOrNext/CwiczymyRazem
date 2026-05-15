@@ -317,7 +317,7 @@ const GpTabsPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <HeroBanner
         title="GP Tabs"
         subtitle="Your Guitar Pro file library"
@@ -340,7 +340,7 @@ const GpTabsPage: NextPageWithLayout = () => {
       <div className="px-4 md:px-8 pb-8 space-y-4">
         {/* Upload progress */}
         {isUploading && (
-          <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+          <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4">
             <div className="flex items-center gap-3 mb-2">
               <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
               <span className="text-sm font-bold text-cyan-400">
@@ -360,15 +360,15 @@ const GpTabsPage: NextPageWithLayout = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center gap-3 py-24 text-zinc-600">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="text-xs font-bold uppercase tracking-widest">
+            <span className="text-xs font-bold capitalize tracking-widest">
               Loading your files...
             </span>
           </div>
         ) : files.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-2xl border border-white/5 bg-white/[0.02]">
+          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg border border-white/5 bg-white/[0.02]">
             <FolderOpen className="h-12 w-12 text-zinc-600 opacity-40" />
             <div className="text-center space-y-1">
-              <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">
+              <p className="text-sm font-bold capitalize tracking-widest text-zinc-500">
                 No GP files yet
               </p>
               <p className="text-xs text-zinc-600">
@@ -377,7 +377,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             </div>
             <Button
               onClick={() => fileInputRef.current?.click()}
-              className="mt-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-xl text-xs font-bold uppercase tracking-widest"
+              className="mt-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
             >
               <Upload className="h-3.5 w-3.5 mr-2" />
               Upload GP file
@@ -395,11 +395,11 @@ const GpTabsPage: NextPageWithLayout = () => {
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col gap-3 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                  className="flex flex-col gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     {/* Icon */}
-                    <div className="flex-shrink-0 h-11 w-11 rounded-xl overflow-hidden">
+                    <div className="flex-shrink-0 h-11 w-11 rounded-lg overflow-hidden">
                       {linked[0]?.coverUrl ? (
                         <img
                           src={linked[0].coverUrl}
@@ -407,7 +407,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-full w-full rounded-xl border border-cyan-500/20 bg-cyan-500/10 flex items-center justify-center">
+                        <div className="h-full w-full rounded-lg border border-cyan-500/20 bg-cyan-500/10 flex items-center justify-center">
                           <FileMusic className="h-5 w-5 text-cyan-400" />
                         </div>
                       )}
@@ -418,8 +418,8 @@ const GpTabsPage: NextPageWithLayout = () => {
                       <p className="text-sm font-bold text-white truncate">
                         {file.name}
                       </p>
-                      <p className="text-[10px] text-zinc-600 uppercase tracking-wider">
-                        {ext.toUpperCase().slice(1)} · {formatSize(file.size)} ·{" "}
+                      <p className="text-[10px] text-zinc-600 capitalize tracking-wider">
+                        {ext.replace(".", "").toUpperCase()} · {formatSize(file.size)} ·{" "}
                         {formatDate(file.uploadedAt)}
                       </p>
                     </div>
@@ -430,7 +430,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                         onClick={() => handleLoadForPractice(file)}
                         loading={isThisLoading}
                         disabled={!!loadingFileId}
-                        className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-wider border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 transition-all"
+                        className="h-9 px-4 rounded-lg text-[10px] font-bold capitalize tracking-wider border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 transition-all"
                       >
                         <Play className="h-3.5 w-3.5 mr-1.5 fill-current" />
                         <span>Practice</span>
@@ -458,7 +458,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                         <Link
                           key={song.songId}
                           href={`/songs/practice/${song.songId}`}
-                          className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider hover:bg-orange-500/20 transition-colors"
+                          className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold capitalize tracking-wider hover:bg-orange-500/20 transition-colors"
                         >
                           {song.coverUrl ? (
                             <img
@@ -494,11 +494,11 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
 
           {/* Card */}
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="relative z-10 w-full max-w-md rounded-lg border border-white/10 bg-zinc-900 shadow-2xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                   Session Setup
                 </p>
                 <h2 className="text-lg font-bold text-white leading-tight truncate max-w-[280px]">
@@ -519,7 +519,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {/* Track selector */}
             {staged.parsed.tracks.length > 1 && (
               <div className="space-y-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                   Track
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -528,7 +528,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={idx}
                       onClick={() => handleTrackSelect(idx)}
                       className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold capitalize tracking-wider transition-all",
                         staged.selectedTrackIndex === idx
                           ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
                           : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
@@ -544,14 +544,14 @@ const GpTabsPage: NextPageWithLayout = () => {
 
             {/* Time mode toggle */}
             <div className="space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                 Time mode
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setConfigFreeMode(false)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
                     !configFreeMode
                       ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
                       : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
@@ -563,7 +563,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => setConfigFreeMode(true)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
                     configFreeMode
                       ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
                       : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
@@ -578,7 +578,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {/* Time presets — only when time limit mode */}
             {!configFreeMode && (
               <div className="space-y-3 animate-in fade-in duration-200">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                   Duration
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -587,7 +587,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={min}
                       onClick={() => setConfigTimeMinutes(min)}
                       className={cn(
-                        "px-4 py-2 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all",
+                        "px-4 py-2 rounded-lg border text-xs font-bold capitalize tracking-wider transition-all",
                         configTimeMinutes === min
                           ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
                           : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
@@ -606,7 +606,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
               loading={isStarting}
-              className="w-full h-12 rounded-xl bg-cyan-500 text-black font-bold hover:bg-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.3)] transition-all group"
+              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.3)] transition-all group"
             >
               <span>Start Practice</span>
               <Zap className={cn("h-4 w-4 ml-2 fill-current group-hover:scale-125 transition-transform", isStarting && "hidden")} />

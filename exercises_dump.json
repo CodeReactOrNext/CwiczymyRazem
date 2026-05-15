@@ -10,7 +10,7 @@
     "id": "spider_stairs_hard",
     "title": "Advanced Spider Stairs Exercise",
     "description": "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
-    "difficulty": "medium",
+    "difficulty": "hard",
     "category": "technique"
   },
   {
@@ -94,6 +94,20 @@
     "id": "hammer_on_sequence_5_7_9",
     "title": "Hammer-ons – 5-7-9 Sequence",
     "description": "Hammer-on focused exercise using a 5-7-9 sequence across strings, designed to build left-hand strength, finger independence, and legato clarity.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "hammer_on_pentatonic_run",
+    "title": "Hammer-on Pentatonic Run – 3 Strings",
+    "description": "Legato hammer-on exercise using the A minor pentatonic scale across 3 strings (G→B→e→B). One bar of 8th notes: pick the first note on each string, hammer-on the second, then reverse back to B — building left-hand strength and smooth cross-string transitions.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "pull_off_pentatonic_run",
+    "title": "Dark Pull-off Pentatonic Run",
+    "description": "Legato pull-off exercise using the A minor pentatonic scale across the middle strings (G→D→A→D). This avoids the bright upper strings for a darker, heavier sound, eliminating the 'happy' feel. One bar of 8th notes: pick the 7th fret, pull-off to the 5th.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -394,6 +408,20 @@
     "category": "technique"
   },
   {
+    "id": "alternate_picking_pentatonic_a_positions",
+    "title": "A Pentatonic Alternate Picking — Position Drill",
+    "description": "Classic alternate picking drill on A minor pentatonic at 5th position. Each fret position is played 4 times before moving to the next — ascending all 6 strings, then descending back. Builds picking consistency and string-change timing.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "finger_independence_1a",
+    "title": "Finger Independence Exercise 1a",
+    "description": "Cross-string isolation exercise developing independence between all four fretting fingers. Outer fingers pick on the higher string while inner fingers press silently on the adjacent lower string — then all four fingers move to the same string. Works every adjacent string pair ascending from A/E to e/B.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
     "id": "muting_discipline_drill",
     "title": "Muting Discipline Drill",
     "description": "String-skipping patterns on E minor that force clean muting of unused strings. Progresses from small skips to maximum skips (string 6 to string 1), building right and left hand muting technique.",
@@ -450,10 +478,38 @@
     "category": "hearing"
   },
   {
+    "id": "first_bend",
+    "title": "First Bend – Whole Step",
+    "description": "Introduction to whole-step bends across two strings in Am pentatonic position 1. Play the target pitch first so your ear knows where to aim, then bend from the lower fret up to match it. Half-note pacing gives you time to really listen.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "first_bend_half_step",
+    "title": "First Bend – Half Step",
+    "description": "Introduction to half-step bends across two strings in Am pentatonic position 1. A subtler, more controlled bend than a whole step — used constantly in blues and rock for that slight push of tension. Play the reference pitch first, then bend from below to match it.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "bend_and_release",
+    "title": "Bend & Release",
+    "description": "Whole-step bend followed by a slow, controlled release — on both G and B strings in Am pentatonic position 1. The release is the harder skill: the string must drift back smoothly while still ringing. Half-note values give you time to feel every stage of the movement.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "high_register_bends",
+    "title": "High Register Bends – 15th Fret",
+    "description": "Whole-step bends on the B and high e strings at the 15th fret — the same Am pentatonic shape as position 1, shifted two octaves up. High frets require less physical force to bend but demand better pitch control: the strings are short and tight, so overshooting is easy.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
     "id": "precision_bending_drill",
-    "title": "Precision Bend Targeting",
-    "description": "Half-step and whole-step bends on strings 2-3 at 5th and 7th positions. Play the target note first, then bend up to match its pitch. Progresses from single bends to bend-release sequences.",
-    "difficulty": "medium",
+    "title": "First Bend – Whole Step",
+    "description": "Your first whole-step bend. String 2 (B), fret 7 — push up to match fret 9. Every bend is preceded by the target pitch so your ear always has a reference.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
@@ -478,6 +534,27 @@
     "category": "technique"
   },
   {
+    "id": "tapping_single_string",
+    "title": "Tapping – Simple Melody",
+    "description": "An Am pentatonic melody on the high e string where both the tapped note and the pull-off target move independently. Every two notes form a melodic interval — a descending third, a fifth, a step. Quarter note pace so every note has room to breathe.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "tapping_pull_hammer",
+    "title": "Tapping – Two-Voice Phrase",
+    "description": "A two-string tapping phrase where both voices move independently — no note stays the same twice in a row. String 1 carries the upper melody, string 2 echoes a third below. Both the tap note and the pull-off target vary each half bar, so the hands are always doing something different.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "tapping_descending_target",
+    "title": "Tapping – Descending Target Drill",
+    "description": "Each measure the tapping hand drops one fret lower (from 17 down to 12), then climbs back up. The left hand stays frozen at fret 5. You cannot slide your way to the target — every tap must land accurately on a new fret from above. Trains right-hand spatial awareness and fret targeting.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
     "id": "tapping_triadic_cascade",
     "title": "Tapping Triadic Cascades",
     "description": "Two-handed tapping triads on strings 1-2. Tap the high note with your picking hand, then pull-off and hammer-on with the fretting hand. Builds clean articulation and muting control.",
@@ -496,6 +573,27 @@
     "title": "3-String Sweep Synchronization",
     "description": "Clean 3-string sweep picking arpeggios focusing on right-left hand coordination. Am, C, and Dm triad shapes ascending and descending with one note per string.",
     "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "sweep_picking_motion_drill",
+    "title": "Sweep Picking Motion Drill – 3 Strings",
+    "description": "Pure right-hand motion drill across G, B, and high e strings. All notes are muted — the goal is to train the sweeping wrist movement and pick-landing technique before adding fretting. Down sweep follows the natural gravity of the pick through the strings; up sweep uses a controlled return stroke.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "sweep_picking_motion_drill_6_string",
+    "title": "Sweep Picking Motion Drill – 6 Strings",
+    "description": "Full six-string sweep motion drill. All notes are muted — the entire focus is on training the pick to flow continuously from the low E string to the high e and back in one uninterrupted stroke. The wider range exposes weaknesses in the turn-around and in maintaining even volume across all strings.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "mini_arpeggio",
+    "title": "Mini Arpeggio – Em7",
+    "description": "A compact three-string Em7 arpeggio sweep: down from the A string through D and G, hammer-on at the top, pull-off, then sweep back up. One clean cycle per bar — the foundation of sweep picking phrasing.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
@@ -678,6 +776,104 @@
     "title": "Phrygian Assault — Thrash Tremolo Picking",
     "description": "Pure tremolo picking on the low E string using the E Phrygian scale (E F G A B C D). 16th notes, palm mute, no chords — pure mechanical aggression. The b2 interval (E→F, one half-step) is the sound of danger in thrash and death metal. Each measure is a loop. Inspired by Slayer, Kreator, Sepultura.",
     "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "down_picking_doom_pulse",
+    "title": "Doom Pulse — Slow Down Picking Control",
+    "description": "A single-string doom groove on the low E string — all down picks, palm muted, slow and deliberate. Four measures that progressively add tension: starts with a basic E minor pentatonic move, introduces a tritone hit, stretches into half notes, and resolves back down. Inspired by Black Sabbath and early Metallica. The goal is not speed — it's a perfectly even, controlled down stroke every single time.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "naked_tone_melody",
+    "title": "Naked Tone — Half Note Melody",
+    "description": "A simple 8-note melody in G major — all half notes, clean tone, zero articulation. No bends, no vibrato, no hammer-ons, no slides. Nothing. Just you, the fret, the string, and the pick. This exercise sounds trivially easy but exposes every flaw: buzzing, uneven attack, poor fretting pressure, and intonation drift. The goal is absolute perfection on every single note.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "muting_spotlight_drill",
+    "title": "Muting Spotlight — Pick One, Kill the Rest",
+    "description": "A 3-note motif (G → A → B on the G string) played clean once as a reference, then repeated four times — each time with a different single note ringing out and the other two killed as dead (X) muted hits. The exercise sounds deceptively simple but demands precise, deliberate muting control: you must strike dead notes with full confidence while surgically letting only the target note sustain.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "chord_spotlight_drill",
+    "title": "Chord Spotlight — D Major, 2 Dead",
+    "description": "A D major triad (strings 3-2-1: fret 2-3-2, notes A-D-F#) struck as a chord on every beat. In measures 2–4, only one note rings — the other two are dead muted hits. All three strings are attacked with the same pick stroke every time. Because all notes are fretted, both hands can be used for muting — but you must decide which technique fits each case.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "vibrato_sustain_drill",
+    "title": "Vibrato Sustain — Hold It for the Whole Bar",
+    "description": "Two notes (B on string 2, D on string 3) played as sustained whole notes with vibrato, then repeated with a deliberate quarter-note rest on beat 2. The rest is the point — you must start vibrato, pause completely, then re-enter clean vibrato without resetting your technique. Slow, wide, controlled. No rushing, no wobble.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "vibrato_low_position",
+    "title": "Vibrato — Low Position (Frets 1–5)",
+    "description": "Vibrato practice in the low position (frets 1–5) where fret spacing is widest and string tension is highest. Each measure is a single sustained note with continuous vibrato. Low position is the hardest place to do vibrato — the string fights back more, the frets are far apart, and most players produce an uneven, stiff result here. Four notes across measures, each on a different string.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "vibrato_high_position",
+    "title": "Vibrato — High Position (Frets 12–17)",
+    "description": "Vibrato practice in the high position (frets 12–17) where fret spacing is narrowest and string tension is lowest. The string moves easily here — which means control becomes the challenge, not force. Four sustained whole notes across different strings. High position is where most players first develop a good-sounding vibrato, but it is easy to overdo it and produce a wide, uncontrolled wobble.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "vibrato_finger_isolation",
+    "title": "Vibrato — One Finger at a Time",
+    "description": "Four measures, one finger per measure: index (1), middle (2), ring (3), pinky (4). Each finger frets the same string (string 2, B) at its natural comfortable position and sustains vibrato for a full whole note. Most players have a strong ring finger vibrato and a nearly dead index or pinky — this exercise forces you to confront and train each finger individually.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "string_skipping_two_notes",
+    "title": "String Skipping — 2 Notes Per String",
+    "description": "The simplest possible string skipping pattern: 2 notes on string 6, skip string 5, 2 notes on string 4, skip string 3, 2 notes on string 2 — then reverse back down. All notes are from the A minor pentatonic box 1 (frets 5 and 7). One measure up, one measure down. The skipped string is always in between — your pick must arc cleanly over it every single time.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "first_melody",
+    "title": "First Melody — One String",
+    "description": "Your very first melody: 'Mary Had a Little Lamb' played entirely on the B string using only three fret positions (1, 3, 5). No string changes, no chords — just a real tune from day one.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "quarter_notes_drill",
+    "title": "Quarter Notes Drill",
+    "description": "One downstroke per beat on the A string — open A and one fretted note (B), with rests scattered through the pattern. The rests are not a break; they are the exercise: count through the silence and land the next note exactly on the click.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "pentatonic_string_crossing_3",
+    "title": "Pentatonic String Crossing — 3 Strings",
+    "description": "Am pentatonic box 1 on strings 4, 3, and 2 only — 2 notes per string. The focus is the moment the pick crosses from one string to the next: keep the motion small, the volume even, and the timing locked.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "rhythm_triole",
+    "title": "Triplets Drill",
+    "description": "Three notes per beat on the G string — C, D, E ascending and descending. Feel the even 3-against-1 pulse while playing a real melodic shape.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "pentatonic_box1_up_down",
+    "title": "Pentatonic Box 1 — Up and Down",
+    "description": "Am pentatonic box 1 at 5th position played ascending all 6 strings, then descending back. The foundation of every pentatonic solo. Slow and even — every note rings clean.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {

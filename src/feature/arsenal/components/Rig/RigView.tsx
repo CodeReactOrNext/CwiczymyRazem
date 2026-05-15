@@ -54,8 +54,8 @@ export const RigView = ({ data }: RigViewProps) => {
       {/* Pedalboard */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500">Effects</p>
-          <p className="text-base font-black text-white uppercase tracking-wide">Pedalboard</p>
+          <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
+          <p className="text-base font-black text-white capitalize tracking-wide">Pedalboard</p>
         </div>
         <PedalboardView data={data} onUpdateItems={savePedalboard} />
       </div>

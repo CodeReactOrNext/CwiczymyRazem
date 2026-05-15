@@ -25,8 +25,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   return (
     <div className="flex flex-col gap-3 mt-8">
       <div className="flex flex-col gap-0.5">
-        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500">Effects</p>
-        <p className="text-base font-black text-white uppercase tracking-wide">Pedals</p>
+        <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
+        <p className="text-base font-black text-white capitalize tracking-wide">Pedals</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {items.map(({ item, count }) => {
@@ -39,7 +39,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
               key={item.id}
               className="relative flex flex-col overflow-hidden cursor-default"
               style={{
-                borderRadius: 6,
+                borderRadius: 4,
                 background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
                 border: `1px solid ${rs.baseColor}28`,
                 borderBottom: `3px solid ${rs.baseColor}`,
@@ -51,13 +51,13 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
               {/* Header */}
               <div className="px-3 pt-2 pb-1">
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] leading-none truncate" style={{ color: rs.baseColor }}>
+                <p className="text-[9px] font-black capitalize tracking-[0.25em] leading-none truncate" style={{ color: rs.baseColor }}>
                   {effect.brand}
                 </p>
-                <p className="text-[12px] font-black text-white uppercase tracking-wide leading-tight truncate mt-0.5">
+                <p className="text-[12px] font-black text-white capitalize tracking-wide leading-tight truncate mt-0.5">
                   {effect.name}
                 </p>
-                <p className="text-[8px] font-bold uppercase tracking-[0.2em] mt-0.5" style={{ color: `${rs.baseColor}80` }}>
+                <p className="text-[8px] font-bold capitalize tracking-[0.2em] mt-0.5" style={{ color: `${rs.baseColor}80` }}>
                   {effect.rarity} · {effect.type}
                 </p>
               </div>
@@ -91,16 +91,16 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
                 {/* NEW badge */}
                 {item.isNew && (
                   <div
-                    className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
-                    style={{ backgroundColor: rs.baseColor, borderRadius: 3, boxShadow: `0 0 12px ${rs.baseColor}90` }}
+                    className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black capitalize tracking-widest text-black"
+                    style={{ backgroundColor: rs.baseColor, borderRadius: 4, boxShadow: `0 0 12px ${rs.baseColor}90` }}
                   >
-                    NEW
+                    New
                   </div>
                 )}
 
                 {/* Count */}
                 {count > 1 && (
-                  <div className="absolute top-2 left-2 z-20 px-1.5 py-0.5 text-[9px] font-black text-zinc-300 bg-black/70 border border-zinc-700/60" style={{ borderRadius: 3 }}>
+                  <div className="absolute top-2 left-2 z-20 px-1.5 py-0.5 text-[9px] font-black text-zinc-300 bg-black/70 border border-zinc-700/60" style={{ borderRadius: 4 }}>
                     ×{count}
                   </div>
                 )}

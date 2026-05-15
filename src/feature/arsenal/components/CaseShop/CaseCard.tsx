@@ -38,10 +38,10 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
   const probs = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
 
   return (
-    <div className={cn("flex flex-col gap-6 rounded-xl border p-6", accent.cardBg)}>
+    <div className={cn("flex flex-col gap-6 rounded-lg border p-6", accent.cardBg)}>
       {/* Header */}
       <div className="flex flex-col gap-1 items-center text-center">
-        <h3 className={cn("text-base font-bold tracking-widest uppercase", accent.header)}>
+        <h3 className={cn("text-base font-bold tracking-widest capitalize", accent.header)}>
           {caseDef.name}
         </h3>
       </div>
@@ -62,15 +62,15 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
           return (
             <div key={rarity} className="flex items-center justify-between text-xs">
               <span
-                className="font-semibold uppercase tracking-wider"
+                className="font-semibold capitalize tracking-wider"
                 style={{ color: rs.baseColor }}
               >
                 {rarity}
               </span>
               <div className="flex items-center gap-3">
-                <div className="h-1 w-24 rounded-full bg-black/40 overflow-hidden">
+                <div className="h-1 w-24 rounded bg-black/40 overflow-hidden">
                   <div
-                    className="h-full rounded-full"
+                    className="h-full rounded"
                     style={{
                       width: `${Math.min(prob * 100, 100)}%`,
                       backgroundColor: rs.baseColor,
@@ -105,7 +105,7 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
           onClick={() => onOpen(caseDef.id)}
           disabled={!canAfford || isOpening}
           className={cn(
-            "w-full rounded-lg py-3 text-xs font-bold uppercase tracking-widest transition-colors",
+            "w-full rounded-lg py-3 text-xs font-bold capitalize tracking-widest transition-colors",
             !canAfford ? "opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500" : accent.button,
             isOpening && "opacity-70 cursor-wait"
           )}

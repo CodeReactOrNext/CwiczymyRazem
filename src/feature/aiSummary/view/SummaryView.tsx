@@ -141,7 +141,7 @@ function DayActivityStrip({
   });
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+    <div className="overflow-x-auto rounded-lg border-none bg-zinc-900/50 px-4 py-4">
       <div className="flex items-end gap-2 min-w-0">
         {days.map((day, i) => {
           const isSelected = isSameDay(day, selectedDate);
@@ -164,7 +164,7 @@ function DayActivityStrip({
               className={cn("flex flex-col items-center gap-1.5 flex-1 min-w-[48px] cursor-pointer group/dot")}
               onClick={() => onSelectDay(day)}
             >
-              <span className={cn("text-[10px] font-semibold uppercase tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
+              <span className={cn("text-[10px] font-semibold capitalize tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
                 {shortName}
               </span>
 
@@ -260,7 +260,7 @@ function ActivityHeatmap({
   });
 
   return (
-    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+    <div className="rounded-lg border-none bg-zinc-900/50 px-4 py-4">
       <div className="flex gap-2">
         {/* Day labels */}
         <div className="flex flex-col gap-1 shrink-0">
@@ -317,14 +317,14 @@ function WeekDayGrid({ weekDays }: { weekDays: { date: Date; dayName: string; to
   const DAY_ABBR = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
   return (
-    <div className="grid grid-cols-7 gap-2 rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+    <div className="grid grid-cols-7 gap-2 rounded-lg border-none bg-zinc-900/50 px-4 py-4">
       {weekDays.map((d, i) => {
         const barH = Math.max(Math.round((d.totalMinutes / maxMin) * 64), d.totalMinutes > 0 ? 6 : 2);
         const dotCls = dayDotClass(d.totalMinutes).split(" ").find(c => c.startsWith("bg-")) ?? "bg-zinc-700";
 
         return (
           <div key={i} className="flex flex-col items-center gap-1">
-            <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">{DAY_ABBR[i]}</span>
+            <span className="text-[10px] font-medium text-zinc-500 capitalize tracking-wide">{DAY_ABBR[i]}</span>
             <div className="flex items-end w-full justify-center h-16">
               <div
                 className={cn("w-full rounded-lg transition-all", dotCls)}
@@ -352,10 +352,10 @@ function StatStrip({ stats }: {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {stats.map((s, i) => (
-        <div key={i} className="flex flex-col gap-3 rounded-2xl bg-zinc-900 border border-zinc-800/60 p-5">
+        <div key={i} className="flex flex-col gap-3 rounded-lg bg-zinc-900 border-none p-5">
           <div className="flex items-center gap-2 text-zinc-500">
             {s.icon}
-            <span className="text-xs font-medium uppercase tracking-wide">{s.label}</span>
+            <span className="text-xs font-medium capitalize tracking-wide">{s.label}</span>
           </div>
           <p className="text-3xl font-bold text-zinc-100 tabular-nums leading-none">{s.value}</p>
           {s.trend && (
@@ -388,7 +388,7 @@ function SectionHeading({ children, count, icon }: { children: React.ReactNode; 
         {children}
       </h2>
       {count !== undefined && (
-        <span className="text-xs font-medium text-zinc-400 bg-zinc-800/50 px-2 py-0.5 rounded-md tabular-nums mt-0.5">{count}</span>
+        <span className="text-xs font-medium text-zinc-400 bg-zinc-800/50 px-2 py-0.5 rounded tabular-nums mt-0.5">{count}</span>
       )}
     </div>
   );
@@ -419,8 +419,8 @@ function CategoryBars({ rows }: {
               {r.icon}
               <span className="text-xs font-medium">{r.label}</span>
             </div>
-            <div className="flex-1 h-1 rounded-full bg-zinc-800 overflow-hidden">
-              <div className={cn("h-full rounded-full transition-all duration-700", c.bar)} style={{ width:`${pct}%` }} />
+            <div className="flex-1 h-1 rounded bg-zinc-800 overflow-hidden">
+              <div className={cn("h-full rounded transition-all duration-700", c.bar)} style={{ width:`${pct}%` }} />
             </div>
             <span className="text-xs font-semibold text-zinc-400 w-12 text-right tabular-nums">{fmtMs(r.value)}</span>
             <span className="text-[10px] text-zinc-600 w-7 text-right tabular-nums">{pct}%</span>
@@ -484,7 +484,7 @@ function DayTimeline({ logs }: { logs: FirebaseUserExceriseLog[] }) {
   );
 
   return (
-    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 overflow-hidden">
+    <div className="rounded-lg border-none bg-zinc-900/50 overflow-hidden">
       {/* SVG chart */}
       <div className="px-5 pt-6 pb-3">
         <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full overflow-visible" style={{ height: VH }}>
@@ -601,8 +601,8 @@ function SessionRow({ log }: { log: FirebaseUserExceriseLog }) {
   ].filter(Boolean) as { label:string; val:number; cls:string }[];
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-zinc-800/60 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-800 transition-all duration-150">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
+    <div className="flex items-center gap-3 px-4 py-3.5 rounded-lg border-none bg-zinc-900/50 hover:bg-zinc-800 transition-all duration-150">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-zinc-800">
         {log.songTitle
           ? <Guitar size={13} className="text-zinc-500" />
           : <Zap size={13} className="text-zinc-500" />}
@@ -620,7 +620,7 @@ function SessionRow({ log }: { log: FirebaseUserExceriseLog }) {
         {chips.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {chips.map(c => (
-              <span key={c.label} className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md", c.cls)}>
+              <span key={c.label} className={cn("text-[10px] font-medium px-2 py-0.5 rounded", c.cls)}>
                 {c.label} · {fmtMs(c.val)}
               </span>
             ))}
@@ -668,7 +668,7 @@ function PointsChart({ logs, today }: { logs: FirebaseUserExceriseLog[]; today: 
   const totalPts   = data.reduce((s, d) => s + d.pts, 0);
 
   return (
-    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-5 pt-5 pb-4 relative">
+    <div className="rounded-lg border-none bg-zinc-900/50 px-5 pt-5 pb-4 relative">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
           <TrendingUp size={14} className="text-zinc-500"/>
@@ -725,7 +725,7 @@ type Mode = "daily" | "weekly";
 
 function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
   return (
-    <div className="inline-flex gap-0.5 p-1 rounded-xl bg-zinc-900 border border-zinc-800">
+    <div className="inline-flex gap-0.5 p-1 rounded-lg bg-zinc-900 border border-zinc-800">
       {(["daily","weekly"] as Mode[]).map(m => (
         <button
           key={m}
@@ -751,7 +751,7 @@ function CoachSection({ icon, label, color, children }: {
   icon: React.ReactNode; label: string; color: string; children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/50 p-5 space-y-3">
+    <div className="rounded-lg border-none bg-zinc-900/50 p-5 space-y-3">
       <div className="flex items-center gap-2">
         <div className={cn("flex h-7 w-7 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800/60", color)}>
           {icon}
@@ -772,12 +772,12 @@ function BestSessionCard({ logs }: { logs: FirebaseUserExceriseLog[] }) {
   if (!total) return null;
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+    <div className="flex items-center gap-4 rounded-lg border-none bg-amber-500/5 px-5 py-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-amber-500/10 border border-amber-500/20">
         <Trophy size={18} className="text-amber-400" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold text-amber-400/70 uppercase tracking-widest mb-0.5">Best session this week</p>
+        <p className="text-[10px] font-semibold text-amber-400/70 capitalize tracking-widest mb-0.5">Best session this week</p>
         <p className="text-sm font-semibold text-zinc-200 truncate">{best.exceriseTitle || "Practice session"}</p>
         {best.songTitle && (
           <p className="text-xs text-zinc-600 truncate mt-0.5">
@@ -1066,10 +1066,10 @@ export const SummaryView = () => {
               aria-label="AI Coach settings"
               aria-expanded={showConfig}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
+                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border-none transition-all",
                 showConfig
-                  ? "bg-link/20 border-link/40 text-link"
-                  : "bg-zinc-800/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/10"
+                  ? "bg-link/20 text-link"
+                  : "bg-zinc-800/60 text-zinc-400 hover:text-zinc-200"
               )}
             >
               <Settings size={13} />
@@ -1084,9 +1084,9 @@ export const SummaryView = () => {
         {!promptConfig.goal.trim() && (
           <div 
             onClick={() => setShowConfig(true)}
-            className="group flex cursor-pointer items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-5 py-4 transition-colors hover:bg-amber-500/20"
+            className="group flex cursor-pointer items-center gap-4 rounded-lg border-none bg-amber-500/10 px-5 py-4 transition-colors hover:bg-amber-500/20"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 group-hover:border-amber-500/50 transition-colors">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 border-none group-hover:border-amber-500/50 transition-colors">
               <Target size={18} className="text-amber-400" />
             </div>
             <div className="flex-1 min-w-0">
@@ -1098,7 +1098,7 @@ export const SummaryView = () => {
 
       {/* ── AI Coach config panel ──────────────────────────── */}
       {showConfig && (
-        <div className="rounded-2xl border border-link/20 bg-zinc-900/80 p-5 flex flex-col gap-4">
+        <div className="rounded-lg border-none bg-zinc-900/80 p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-zinc-200">AI Coach Settings</span>
             <button
@@ -1112,15 +1112,15 @@ export const SummaryView = () => {
 
           {/* Practice style */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Practice style</span>
+            <span className="text-xs font-bold capitalize tracking-widest text-zinc-500">Practice style</span>
             <div className="flex gap-2">
               <button
                 onClick={() => setPromptConfig(c => ({ ...c, practiceStyle: "hobby" }))}
                 className={cn(
-                  "flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all",
+                  "flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold border-none transition-all",
                   promptConfig.practiceStyle === "hobby"
-                    ? "bg-link/15 border-link/40 text-link"
-                    : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+                    ? "bg-link/15 text-link"
+                    : "bg-zinc-800/40 text-zinc-500 hover:text-zinc-300"
                 )}
               >
                 Hobby
@@ -1128,10 +1128,10 @@ export const SummaryView = () => {
               <button
                 onClick={() => setPromptConfig(c => ({ ...c, practiceStyle: "professional" }))}
                 className={cn(
-                  "flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all",
+                  "flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold border-none transition-all",
                   promptConfig.practiceStyle === "professional"
-                    ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
-                    : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+                    ? "bg-amber-500/15 text-amber-300"
+                    : "bg-zinc-800/40 text-zinc-500 hover:text-zinc-300"
                 )}
               >
                 Professional
@@ -1146,12 +1146,12 @@ export const SummaryView = () => {
 
           {/* Goal */}
           <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Your goal</span>
+            <span className="text-xs font-bold capitalize tracking-widest text-zinc-500">Your goal</span>
             <textarea
               value={promptConfig.goal}
               onChange={(e) => setPromptConfig(c => ({ ...c, goal: e.target.value.slice(0, GOAL_MAX_LENGTH) }))}
               placeholder="e.g. I want to learn fingerpicking and play folk songs"
-              className="w-full bg-zinc-800/60 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-link/40 transition-colors"
+              className="w-full bg-zinc-800/60 border-none rounded-lg px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-link/40 transition-colors"
               rows={2}
             />
             <div className="flex justify-between">
@@ -1170,7 +1170,7 @@ export const SummaryView = () => {
                 if (mode === "weekly") { setWeekly(null); generateAi(true); }
                 else { setDaily(null); generateDailyAi(true); }
               }}
-              className="px-6 py-2.5 rounded-xl text-sm font-bold bg-link/20 border border-link/30 text-link hover:bg-link/30 transition-colors"
+              className="px-6 py-2.5 rounded-lg text-sm font-bold bg-link/20 border-none text-link hover:bg-link/30 transition-colors"
             >
               Save settings
             </button>
@@ -1203,8 +1203,8 @@ export const SummaryView = () => {
 
           {/* Today — summary not available yet */}
           {isSameDay(selectedDate, today) ? (
-            <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-zinc-800 py-16 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-link/10 ring-1 ring-link/20">
+            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-800 py-16 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-link/10 ring-1 ring-link/20">
                 <Sparkles className="h-6 w-6 text-link opacity-60" />
               </div>
               <div className="flex flex-col gap-1">
@@ -1249,7 +1249,7 @@ export const SummaryView = () => {
                   />
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
+                <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-zinc-800 py-16 text-zinc-700">
                   <Guitar className="h-10 w-10 opacity-30"/>
                   <p className="text-sm font-medium text-zinc-500">No practice logged on this day</p>
                   <p className="text-xs text-zinc-600">Start a session to track your progress</p>
@@ -1306,33 +1306,33 @@ export const SummaryView = () => {
             </SectionHeading>
 
             {aiLoading && (
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 p-8 flex flex-col items-center justify-center min-h-[400px]">
+              <div className="rounded-lg border-none bg-zinc-900/50 p-8 flex flex-col items-center justify-center min-h-[400px]">
                 <RatingSkeleton messages={WEEKLY_LOADING_MESSAGES} />
               </div>
             )}
 
             {!aiLoading && weekly && weekCfg && (
-              <div className={cn("rounded-2xl border border-zinc-800/60 bg-zinc-900/50 border-l-[3px] overflow-hidden", weekCfg.accent)}>
+              <div className={cn("rounded-lg border-none bg-zinc-900/50 border-l-[3px] overflow-hidden", weekCfg.accent)}>
                 {/* header */}
-                <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-zinc-800/60 flex-wrap bg-zinc-900/40">
+                <div className="flex items-center justify-between gap-3 px-5 py-4 border-none flex-wrap bg-zinc-900/40">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-zinc-500 font-medium">
                       {last7[0].toLocaleDateString("en-US",{month:"short",day:"numeric"})} – {last7[6].toLocaleDateString("en-US",{month:"short",day:"numeric"})}
                     </span>
                   </div>
                   {weekly.bestDay && (
-                    <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
+                    <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded">
                       <Star size={13}/> Best: {weekly.bestDay}
                     </span>
                   )}
                 </div>
 
                 {/* score & overview merger */}
-                <div className="p-5 flex flex-col sm:flex-row gap-6 border-b border-zinc-800/60">
+                <div className="p-5 flex flex-col sm:flex-row gap-6 border-none">
                    {weekly.grade && (
                      <div className="flex flex-col items-center gap-4">
                         <ScoreRing score={weekly.score ?? 0} grade={weekly.grade} animated={!aiLoading} />
-                        <span className={cn("text-xs font-bold uppercase tracking-widest text-center", GRADE_COLOR[weekly.grade]?.text)}>
+                        <span className={cn("text-xs font-bold capitalize tracking-widest text-center", GRADE_COLOR[weekly.grade]?.text)}>
                           {weekly.verdict}
                         </span>
                      </div>
@@ -1340,7 +1340,7 @@ export const SummaryView = () => {
                    <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-2">
                          <Brain size={14} className="text-main" />
-                         <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Week Overview</h4>
+                         <h4 className="text-xs font-bold capitalize tracking-widest text-zinc-500">Week Overview</h4>
                       </div>
                       <p className="text-sm leading-relaxed text-zinc-300">
                         {weekly.overview}
@@ -1350,8 +1350,8 @@ export const SummaryView = () => {
 
                 {/* key insight */}
                 {weekly.highlight && (
-                  <div className="px-5 py-4 border-b border-zinc-800/60">
-                    <div className="flex items-start gap-3 rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3">
+                  <div className="px-5 py-4 border-none">
+                    <div className="flex items-start gap-3 rounded-lg border-none bg-amber-500/5 px-4 py-3">
                       <Lightbulb size={16} className="text-amber-400 mt-0.5 shrink-0"/>
                       <p className="text-sm font-medium text-zinc-200">{weekly.highlight}</p>
                     </div>
@@ -1378,14 +1378,14 @@ export const SummaryView = () => {
             )}
 
             {!aiLoading && !weekly && !logsLoading && (
-              <div className="rounded-2xl border border-dashed border-zinc-800 py-10 text-center">
+              <div className="rounded-lg border border-dashed border-zinc-800 py-10 text-center">
                 <p className="text-sm text-zinc-600">No weekly report available</p>
               </div>
             )}
           </div>
 
           {weekActive === 0 && !logsLoading && (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-zinc-800 py-16 text-zinc-700">
               <CalendarDays className="h-10 w-10 opacity-30"/>
               <p className="text-sm font-medium text-zinc-500">No practice last week</p>
               <p className="text-xs text-zinc-600">Start a session to build your streak</p>

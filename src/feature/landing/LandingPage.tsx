@@ -9,6 +9,7 @@ import type { BlogFrontmatter } from "lib/blog";
 
 const WhySection = dynamic(() => import("feature/landing/components/WhySection").then(m => m.WhySection));
 const InteractiveExercisesSection = dynamic(() => import("feature/landing/components/InteractiveExercisesSection").then(m => m.InteractiveExercisesSection));
+const ExerciseCatalogPreview = dynamic(() => import("feature/landing/components/ExerciseCatalogPreview").then(m => m.ExerciseCatalogPreview));
 const StatisticsSection = dynamic(() => import("feature/landing/components/StatisticsSection").then(m => m.StatisticsSection));
 const SongsLibrarySection = dynamic(() => import("feature/landing/components/SongsLibrarySection").then(m => m.SongsLibrarySection));
 const PracticePlansSection = dynamic(() => import("feature/landing/components/PracticePlansSection").then(m => m.PracticePlansSection));
@@ -22,9 +23,17 @@ const CookieBanner = dynamic(() => import("feature/landing/components/CookieBann
 
 interface LandingPageProps {
   blogs: BlogFrontmatter[];
+  spotlightExercises?: Array<{
+    id: string;
+    title: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+    category: string;
+    description: string;
+    timeInMinutes: number;
+  }>;
 }
 
-const LandingPage = ({ blogs }: LandingPageProps) => {
+const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
   
     {
@@ -73,6 +82,7 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
         <ProductDemo />
         <WhySection />
         <InteractiveExercisesSection />
+        {spotlightExercises.length > 0 && <ExerciseCatalogPreview exercises={spotlightExercises} />}
         <StatisticsSection />
         <SongsLibrarySection />
         <PracticePlansSection />
