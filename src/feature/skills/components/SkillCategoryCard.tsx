@@ -48,15 +48,15 @@ export const SkillCategoryCard = ({
       initial={{ y: 10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.1 }}
-      className="relative rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-sm transition-all duration-300 hover:border-white/10 hover:bg-zinc-900/60"
+      className="relative rounded-lg border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-sm transition-all duration-300 hover:border-white/10 hover:bg-zinc-900/60"
     >
       <div className="flex flex-col h-full gap-6">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-white/5 pb-5">
-          <div className={cn("rounded-xl p-2.5 flex items-center justify-center", getCategoryColors())}>
+          <div className={cn("rounded-lg p-2.5 flex items-center justify-center", getCategoryColors())}>
             <CategoryIcon className="h-5 w-5" />
           </div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-100">
+          <h3 className="text-xs font-bold capitalize tracking-widest text-zinc-100">
             {t(`skills:categories.${category}` as any)}
           </h3>
         </div>
@@ -74,7 +74,7 @@ export const SkillCategoryCard = ({
                   >
                     <div className="flex items-center gap-2">
                       {skill.icon && <skill.icon className="h-3.5 w-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
-                      <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                      <span className="text-[11px] capitalize tracking-wider font-semibold text-zinc-400 group-hover:text-zinc-300 transition-colors">
                         {t(`skills:skills.${skill.id}.name` as any)}
                       </span>
                     </div>

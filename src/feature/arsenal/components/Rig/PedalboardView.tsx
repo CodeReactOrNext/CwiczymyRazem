@@ -174,7 +174,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
         className="relative w-full select-none"
         style={{
           background: "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
-          borderRadius: 12,
+          borderRadius: 4,
           padding: "10px 14px 14px",
           boxShadow: "0 20px 60px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
           border: "2px solid #383838",
@@ -184,13 +184,13 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex gap-2">
             {[0,1].map(i => (
-              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
+              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 4, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
             ))}
           </div>
-          <span className="text-[8px] font-black uppercase tracking-[0.35em] text-zinc-600">Pedalboard</span>
+          <span className="text-[8px] font-black capitalize tracking-[0.35em] text-zinc-600">Pedalboard</span>
           <div className="flex gap-2">
             {[0,1].map(i => (
-              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
+              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 4, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
             ))}
           </div>
         </div>
@@ -201,7 +201,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           className="relative w-full overflow-hidden"
           style={{
             aspectRatio: "16 / 7",
-            borderRadius: 6,
+            borderRadius: 4,
             backgroundImage: "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
             backgroundSize: "9px 9px",
             backgroundColor: "#141414",
@@ -214,12 +214,12 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
             </div>
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Amp</span>
+            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Amp</span>
           </div>
 
           {/* Instr jack — bottom right */}
           <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Instr</span>
+            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Instr</span>
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
             </div>
@@ -270,7 +270,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                 <button
                   onMouseDown={e => e.stopPropagation()}
                   onClick={e => handleRemove(placement.itemId, e)}
-                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/90 border border-zinc-500 flex items-center justify-center text-zinc-300 opacity-0 group-hover:opacity-100 hover:text-white hover:border-zinc-300 transition-opacity z-10"
+                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded bg-black/90 border border-zinc-500 flex items-center justify-center text-zinc-300 opacity-0 group-hover:opacity-100 hover:text-white hover:border-zinc-300 transition-opacity z-10"
                 >
                   <X size={8} />
                 </button>
@@ -281,11 +281,11 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           {/* Add pedal button */}
           <button
             onClick={() => setShowPicker(true)}
-            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-sm border border-zinc-500 bg-zinc-800/80 text-zinc-300 hover:text-white hover:border-zinc-300 hover:bg-zinc-700/80 transition-all duration-150 z-10"
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded border border-zinc-500 bg-zinc-800/80 text-zinc-300 hover:text-white hover:border-zinc-300 hover:bg-zinc-700/80 transition-all duration-150 z-10"
             style={{ fontSize: 9, boxShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
           >
             <Plus size={10} strokeWidth={2.5} />
-            <span className="font-black uppercase tracking-[0.2em]">Add Pedal</span>
+            <span className="font-black capitalize tracking-[0.2em]">Add Pedal</span>
           </button>
         </div>
 
@@ -294,7 +294,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           <div style={{ width: 52, height: 9, background: "linear-gradient(180deg,#555,#2a2a2a)", borderRadius: 4, boxShadow: "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)" }} />
           <div className="flex gap-6">
             {[0,1,2,3].map(i => (
-              <div key={i} style={{ width: 11, height: 11, borderRadius: "50%", background: "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)", boxShadow: "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)" }} />
+              <div key={i} style={{ width: 11, height: 11, borderRadius: 4, background: "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)", boxShadow: "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)" }} />
             ))}
           </div>
           <div style={{ width: 52, height: 9, background: "linear-gradient(180deg,#555,#2a2a2a)", borderRadius: 4, boxShadow: "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)" }} />

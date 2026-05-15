@@ -76,7 +76,7 @@ export const GuitarStartDate = () => {
         </Select>
         
         {date && (
-            <div className="bg-muted/50 border border-muted p-3 rounded-md text-sm text-foreground">
+            <div className="bg-muted/50 border border-muted p-3 rounded-lg text-sm text-foreground">
                 <span role="img" aria-label="guitar" className="mr-2">🎸</span>
                 {t("guitarStartDate.duration_years", { years: durationYears })}
             </div>

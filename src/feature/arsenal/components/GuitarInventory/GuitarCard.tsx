@@ -25,7 +25,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
         isEquipped && "ring-2 ring-amber-400/60"
       )}
       style={{
-        borderRadius: 6,
+        borderRadius: 8,
         background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
         border: `1px solid ${rs.baseColor}28`,
         borderBottom: `3px solid ${rs.baseColor}`,
@@ -45,7 +45,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
         <p className="text-[15px] font-bold text-white leading-tight truncate mt-0.5">
           {guitar.name}
         </p>
-        <p className="text-[8px] font-medium tracking-[0.2em] mt-0.5 uppercase" style={{ color: `${rs.baseColor}80` }}>
+        <p className="text-[8px] font-medium tracking-[0.2em] mt-0.5 capitalize" style={{ color: `${rs.baseColor}80` }}>
           {guitar.rarity}
         </p>
       </div>
@@ -79,16 +79,16 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
         {/* Badges */}
         {item.isNew && (
           <div
-            className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
-            style={{ backgroundColor: rs.baseColor, borderRadius: 3, boxShadow: `0 0 12px ${rs.baseColor}90` }}
+            className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black capitalize tracking-widest text-black"
+            style={{ backgroundColor: rs.baseColor, borderRadius: 4, boxShadow: `0 0 12px ${rs.baseColor}90` }}
           >
-            NEW
+            New
           </div>
         )}
         {/* Equip indicator dot */}
         {isEquipped && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }} />
+            <div className="w-1.5 h-1.5 rounded bg-amber-400" style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }} />
           </div>
         )}
       </div>
@@ -97,12 +97,12 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
       <div className="flex items-stretch border-t" style={{ borderColor: `${rs.baseColor}20` }}>
         {item.year && (
           <div className="flex-1 flex items-center justify-center py-1.5 border-r" style={{ borderColor: `${rs.baseColor}20` }}>
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{item.year}</span>
+            <span className="text-[9px] font-black text-zinc-500 capitalize tracking-widest">{item.year}</span>
           </div>
         )}
         {item.country && (
           <div className="flex-1 flex items-center justify-center py-1.5">
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest truncate px-1">{item.country}</span>
+            <span className="text-[9px] font-black text-zinc-500 capitalize tracking-widest truncate px-1">{item.country}</span>
           </div>
         )}
       </div>
@@ -112,7 +112,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
         onClick={() => onEquip(guitar.id, item.year, item.country)}
         disabled={isEquipped || isEquipping}
         className={cn(
-          "w-full py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",
+          "w-full py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",
           isEquipped
             ? "text-amber-400 cursor-default"
             : "text-zinc-600 hover:text-white disabled:opacity-40"

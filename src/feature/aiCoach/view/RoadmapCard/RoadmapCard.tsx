@@ -46,7 +46,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen, onDelete }) 
 
   return (
     <div
-      className="group relative flex cursor-pointer flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900"
+      className="group relative flex cursor-pointer flex-col gap-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900"
       onClick={onOpen}
     >
       {/* Header */}
@@ -81,9 +81,9 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen, onDelete }) 
             {progress}%
           </span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+        <div className="h-1.5 w-full overflow-hidden rounded bg-zinc-800">
           <div
-            className={`h-full rounded-full transition-all duration-700 ${
+            className={`h-full rounded transition-all duration-700 ${
               progress === 100 ? "bg-emerald-500" : progress > 0 ? "bg-amber-500" : "bg-zinc-700"
             }`}
             style={{ width: `${progress}%` }}
@@ -116,7 +116,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen, onDelete }) 
       <div className="flex items-center justify-between border-t border-zinc-800/60 pt-3">
         <div className="flex items-center gap-2">
           <span
-            className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${levelCls}`}
+            className={`rounded border px-2.5 py-0.5 text-[11px] font-medium ${levelCls}`}
           >
             {roadmap.level}
           </span>

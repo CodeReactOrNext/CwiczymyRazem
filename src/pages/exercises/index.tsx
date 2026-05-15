@@ -1,4 +1,8 @@
 import { Footer } from "feature/landing/components/Footer";
+import { ExerciseCard } from "feature/exercises/components/ExerciseCard/ExerciseCard";
+import { idToSlug, slugToId } from "feature/exercises/lib/slugUtils";
+import { serializeExercises } from "feature/exercises/lib/serializeExercise";
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import AppLayout from "layouts/AppLayout";
 import {
   ArrowRight,
@@ -10,12 +14,25 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
+import type { GetStaticProps } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+
+interface ExercisesLandingPageProps {
+  exercisesData: Array<{
+    id: string;
+    title: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+    category: string;
+    description: string;
+    timeInMinutes: number;
+    premium?: boolean;
+  }>;
+}
 
 const CATEGORIES = [
   {
@@ -152,7 +169,7 @@ const difficultyBadge: Record<string, string> = {
   Beginner: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
 };
 
-const ExercisesLandingPage: NextPageWithLayout = () => {
+const ExercisesLandingPage: NextPageWithLayout<ExercisesLandingPageProps> = ({ exercisesData }) => {
   const { status } = useSession();
   const isLogged = status === "authenticated";
 
@@ -247,6 +264,42 @@ const ExercisesLandingPage: NextPageWithLayout = () => {
                   <div className="text-3xl font-black text-white">{s.n}</div>
                   <div className="text-xs font-semibold uppercase tracking-widest text-zinc-600 mt-0.5">{s.label}</div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── BROWSE BY CATEGORY ───────────────────────────────── */}
+        <section className="relative py-16 bg-black border-y border-white/5">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold text-white mb-2">Browse by Category</h2>
+              <p className="text-zinc-400">Explore exercises organized by skill area</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { id: "technique", label: "Technique", icon: "🎸", count: Math.floor(exercisesData.filter(e => e.category === "technique").length) },
+                { id: "theory", label: "Theory", icon: "📚", count: Math.floor(exercisesData.filter(e => e.category === "theory").length) },
+                { id: "hearing", label: "Ear Training", icon: "👂", count: Math.floor(exercisesData.filter(e => e.category === "hearing").length) },
+                { id: "creativity", label: "Creativity", icon: "✨", count: Math.floor(exercisesData.filter(e => e.category === "creativity").length) },
+              ].map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/exercises/category/${cat.id}`}
+                  className="group rounded-2xl border border-white/5 bg-zinc-900/40 hover:bg-zinc-900/70 transition-all duration-200 p-6 cursor-pointer"
+                >
+                  <div className="text-4xl mb-4">{cat.icon}</div>
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                    {cat.label}
+                  </h3>
+                  <p className="text-sm text-zinc-500 mb-4">
+                    {cat.count} exercise{cat.count !== 1 ? "s" : ""}
+                  </p>
+                  <div className="flex items-center gap-1 text-cyan-400 text-sm font-semibold group-hover:gap-2 transition-all">
+                    Browse <ArrowRight className="w-4 h-4" />
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -378,9 +431,45 @@ const ExercisesLandingPage: NextPageWithLayout = () => {
                 href="/signup"
                 className="inline-flex items-center gap-2 rounded-2xl border border-white/10 px-8 py-4 text-sm font-bold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
               >
-                See all 144 exercises after sign-up <ArrowRight className="w-4 h-4" />
+                See all {exercisesData.length} exercises after sign-up <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* ─── FULL EXERCISE CATALOG ────────────────────────────── */}
+        <section className="py-28 bg-black border-t border-white/5">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mb-16 text-center max-w-2xl mx-auto">
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-cyan-400 mb-4">Browse All</p>
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-white leading-tight">
+                Complete Exercise Catalog
+              </h2>
+              <p className="text-zinc-400 text-lg mt-4">
+                Explore all {exercisesData.length} exercises across 4 categories. Free exercises available immediately, premium exercises unlock with a subscription.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {exercisesData.slice(0, 30).map((exercise) => (
+                <ExerciseCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  href={`/exercises/${idToSlug(exercise.id)}`}
+                />
+              ))}
+            </div>
+
+            {exercisesData.length > 30 && (
+              <div className="mt-12 text-center">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-cyan-500 px-8 py-4 text-sm font-bold text-black hover:bg-cyan-400 transition-colors"
+                >
+                  Sign up to explore all {exercisesData.length} exercises <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
@@ -421,6 +510,22 @@ ExercisesLandingPage.getLayout = function getLayout(page: ReactElement) {
       {page}
     </AppLayout>
   );
+};
+
+export const getStaticProps: GetStaticProps<ExercisesLandingPageProps> = async () => {
+  const exercisesData = serializeExercises(exercisesAgregat).map((ex) => ({
+    id: ex.id,
+    title: ex.title,
+    difficulty: ex.difficulty,
+    category: ex.category,
+    description: ex.description,
+    timeInMinutes: ex.timeInMinutes,
+    premium: ex.premium,
+  }));
+
+  return {
+    props: { exercisesData },
+  };
 };
 
 export default ExercisesLandingPage;

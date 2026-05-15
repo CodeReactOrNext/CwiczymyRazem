@@ -37,13 +37,13 @@ export const EffectPickerModal = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-xl max-h-[80vh] overflow-y-auto rounded-sm bg-zinc-950 border border-zinc-800 p-5 shadow-2xl"
+        className="relative w-full max-w-xl max-h-[80vh] overflow-y-auto rounded bg-zinc-950 border border-zinc-800 p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Pedalboard · Slot {slotIndex + 1}</p>
-            <p className="text-base font-black text-white uppercase tracking-wide">Choose an effect</p>
+            <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">Pedalboard · Slot {slotIndex + 1}</p>
+            <p className="text-base font-black text-white capitalize tracking-wide">Choose an effect</p>
           </div>
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
             <X size={20} />
@@ -53,7 +53,7 @@ export const EffectPickerModal = ({
         {currentItemId && (
           <button
             onClick={() => { onSelect(null); onClose(); }}
-            className="mb-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-zinc-500 rounded-sm transition-colors"
+            className="mb-4 w-full py-2 text-[10px] font-black capitalize tracking-widest border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-zinc-500 rounded transition-colors"
           >
             Remove from slot
           </button>
@@ -90,8 +90,8 @@ export const EffectPickerModal = ({
                   style={{ height: 120 }}
                 />
                 <div className="px-2 pb-2 w-full text-left">
-                  <p className="text-[8px] font-bold uppercase truncate" style={{ color: rs.baseColor }}>{effect.type}</p>
-                  <p className="text-[10px] font-black text-white uppercase truncate leading-snug">{effect.name}</p>
+                  <p className="text-[8px] font-bold capitalize truncate" style={{ color: rs.baseColor }}>{effect.type}</p>
+                  <p className="text-[10px] font-black text-white capitalize truncate leading-snug">{effect.name}</p>
                 </div>
               </button>
             );

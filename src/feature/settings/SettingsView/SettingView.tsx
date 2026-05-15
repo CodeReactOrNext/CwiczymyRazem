@@ -46,27 +46,27 @@ const SettingsView = () => {
              <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1.5">
                 <TabsTrigger 
                   value="profile" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
                     <User className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Profile</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="socials" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-blue-500/10 group-data-[state=active]:text-blue-500 transition-colors">
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-blue-500/10 group-data-[state=active]:text-blue-500 transition-colors">
                     <Share2 className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Social Media</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="security" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
                     <Lock className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Security</span>
@@ -74,9 +74,9 @@ const SettingsView = () => {
                 
                 <TabsTrigger
                   value="subscription"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-emerald-500/10 group-data-[state=active]:text-emerald-500 transition-colors">
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-emerald-500/10 group-data-[state=active]:text-emerald-500 transition-colors">
                     <CreditCard className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Subscription</span>
@@ -88,9 +88,9 @@ const SettingsView = () => {
 
                 <TabsTrigger
                   value="danger" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:text-red-500 data-[state=active]:bg-red-500/10 hover:bg-red-500/5 border border-transparent group text-muted-foreground font-bold"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:text-red-500 data-[state=active]:bg-red-500/10 hover:bg-red-500/5 border border-transparent group text-muted-foreground font-bold"
                 >
-                  <div className="p-2 rounded-xl bg-red-500/5 group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white transition-colors">
+                  <div className="p-2 rounded bg-red-500/5 group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white transition-colors">
                     <ShieldAlert className="h-4 w-4" />
                   </div>
                   <span>Danger Zone</span>
@@ -112,7 +112,7 @@ const SettingsView = () => {
 
             <TabsContent value="security" className="mt-0 space-y-6">
                {isViaGoogle ? (
-                  <div className="rounded-xl bg-cyan-50 border border-cyan-100 p-6 flex items-center gap-4">
+                  <div className="rounded-lg bg-cyan-50 border border-cyan-100 p-6 flex items-center gap-4">
                     <div className="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600">
                        <Lock className="h-5 w-5" />
                     </div>

@@ -21,7 +21,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
     return (
       <button
         onClick={() => onOpenPicker(slotIndex)}
-        className="relative flex flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-zinc-700/50 bg-zinc-900/20 min-h-[260px] w-full transition-all duration-200 hover:border-zinc-500/70 hover:bg-zinc-900/50 group overflow-hidden"
+        className="relative flex flex-col items-center justify-center gap-3 rounded border border-dashed border-zinc-700/50 bg-zinc-900/20 min-h-[260px] w-full transition-all duration-200 hover:border-zinc-500/70 hover:bg-zinc-900/50 group overflow-hidden"
       >
         {/* Guitar icon with glow on hover */}
         <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-zinc-800/40 border border-zinc-700/40 group-hover:border-zinc-600/60 group-hover:bg-zinc-800/70 transition-all duration-200">
@@ -31,12 +31,12 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
 
         {/* Label */}
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-zinc-300 transition-colors duration-200">
+          <span className="text-[10px] font-black capitalize tracking-widest text-zinc-500 group-hover:text-zinc-300 transition-colors duration-200">
             Add Guitar
           </span>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <Plus size={10} className="text-zinc-400" />
-            <span className="text-[8px] font-semibold uppercase tracking-widest text-zinc-400">Choose from collection</span>
+            <span className="text-[8px] font-semibold capitalize tracking-widest text-zinc-400">Choose from collection</span>
           </div>
         </div>
       </button>
@@ -45,7 +45,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
 
   return (
     <div
-      className="relative flex flex-col rounded-sm overflow-hidden"
+      className="relative flex flex-col rounded overflow-hidden"
       style={{
         background: `linear-gradient(160deg, ${rs.baseColor}22 0%, #0f0f12 40%, #0f0f12 100%)`,
         border: `1px solid ${rs.baseColor}30`,
@@ -54,7 +54,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
     >
       {/* Slot number badge */}
       <div
-        className="absolute top-2 left-2 z-20 w-5 h-5 flex items-center justify-center text-[9px] font-black rounded-sm"
+        className="absolute top-2 left-2 z-20 w-5 h-5 flex items-center justify-center text-[9px] font-black rounded"
         style={{ backgroundColor: `${rs.baseColor}20`, color: rs.baseColor, border: `1px solid ${rs.baseColor}40` }}
       >
         {slotIndex + 1}
@@ -63,7 +63,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       {/* Remove button */}
       <button
         onClick={() => onRemove(slotIndex)}
-        className="absolute top-2 right-2 z-20 rounded-sm bg-zinc-900/80 border border-zinc-700 p-1 text-zinc-500 hover:text-white hover:border-zinc-500 transition-colors"
+        className="absolute top-2 right-2 z-20 rounded bg-zinc-900/80 border border-zinc-700 p-1 text-zinc-500 hover:text-white hover:border-zinc-500 transition-colors"
       >
         <X size={12} />
       </button>
@@ -76,7 +76,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
         <p className="text-[15px] font-bold text-white leading-snug truncate">
           {guitar.name}
         </p>
-        <p className="text-[8px] font-medium uppercase tracking-widest mt-0.5" style={{ color: `${rs.baseColor}bb` }}>
+        <p className="text-[8px] font-medium capitalize tracking-widest mt-0.5" style={{ color: `${rs.baseColor}bb` }}>
           {guitar.rarity}
         </p>
       </div>
@@ -101,12 +101,12 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       <div className="flex items-center border-t border-zinc-800/60 min-h-[26px]">
         {item.year && (
           <div className="flex-1 flex items-center justify-center py-1 border-r border-zinc-800/60">
-            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">{item.year}</span>
+            <span className="text-[8px] font-black text-zinc-500 capitalize tracking-widest">{item.year}</span>
           </div>
         )}
         {item.country && (
           <div className="flex-1 flex items-center justify-center py-1">
-            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest truncate px-1">{item.country}</span>
+            <span className="text-[8px] font-black text-zinc-500 capitalize tracking-widest truncate px-1">{item.country}</span>
           </div>
         )}
       </div>
@@ -114,7 +114,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       {/* Edit button */}
       <button
         onClick={() => onOpenPicker(slotIndex)}
-        className="w-full py-1.5 text-[9px] font-black uppercase tracking-widest border-t border-zinc-800/60 text-zinc-600 hover:text-white hover:bg-zinc-800/40 transition-colors"
+        className="w-full py-1.5 text-[9px] font-black capitalize tracking-widest border-t border-zinc-800/60 text-zinc-600 hover:text-white hover:bg-zinc-800/40 transition-colors"
       >
         Change
       </button>

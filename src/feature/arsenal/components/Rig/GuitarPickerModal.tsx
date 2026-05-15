@@ -34,13 +34,13 @@ export const GuitarPickerModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-sm bg-zinc-950 border border-zinc-800 p-5 shadow-2xl"
+        className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded bg-zinc-950 border border-zinc-800 p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Guitar Slot {slotIndex + 1}</p>
-            <p className="text-base font-black text-white uppercase tracking-wide">Choose a guitar</p>
+            <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">Guitar Slot {slotIndex + 1}</p>
+            <p className="text-base font-black text-white capitalize tracking-wide">Choose a guitar</p>
           </div>
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
             <X size={20} />
@@ -50,7 +50,7 @@ export const GuitarPickerModal = ({
         {currentItemId && (
           <button
             onClick={() => { onSelect(null); onClose(); }}
-            className="mb-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-zinc-500 rounded-sm transition-colors"
+            className="mb-4 w-full py-2 text-[10px] font-black capitalize tracking-widest border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-zinc-500 rounded transition-colors"
           >
             Remove from slot
           </button>
@@ -69,7 +69,7 @@ export const GuitarPickerModal = ({
                 key={item.id}
                 disabled={isOccupied}
                 onClick={() => { onSelect(item.id); onClose(); }}
-                className="relative flex flex-col items-center rounded-sm overflow-hidden text-left transition-all duration-200 disabled:opacity-30"
+                className="relative flex flex-col items-center rounded overflow-hidden text-left transition-all duration-200 disabled:opacity-30"
                 style={{
                   background: `linear-gradient(160deg, ${rs.baseColor}20 0%, #0f0f12 50%)`,
                   borderBottom: `2px solid ${rs.baseColor}`,
@@ -85,8 +85,8 @@ export const GuitarPickerModal = ({
                   />
                 </div>
                 <div className="px-2 pb-2 w-full">
-                  <p className="text-[8px] font-bold uppercase truncate" style={{ color: rs.baseColor }}>{guitar.brand}</p>
-                  <p className="text-[10px] font-black text-white uppercase truncate leading-snug">{guitar.name}</p>
+                  <p className="text-[8px] font-bold capitalize truncate" style={{ color: rs.baseColor }}>{guitar.brand}</p>
+                  <p className="text-[10px] font-black text-white capitalize truncate leading-snug">{guitar.name}</p>
                 </div>
               </button>
             );

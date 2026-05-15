@@ -47,7 +47,7 @@ export const RarityBadge = ({ rarity, size = "sm" }: RarityBadgeProps) => {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-sm font-black uppercase tracking-widest relative overflow-hidden",
+        "inline-flex items-center rounded font-black capitalize tracking-widest relative overflow-hidden",
         size === "sm" ? "px-2.5 py-0.5 text-[9px]" : size === "md" ? "px-4 py-1.5 text-xs" : "px-6 py-2 text-sm",
         size === "sm" ? styles.text : "text-white"
       )}

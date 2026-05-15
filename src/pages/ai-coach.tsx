@@ -48,7 +48,7 @@ const AiCoachPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <PremiumGate feature="ai-coach" requiredPlan="master">
         <AiCoachView />
       </PremiumGate>
