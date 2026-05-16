@@ -49,7 +49,7 @@ export const TablatureSection = memo(function TablatureSection({
   const { hitNotes, missedNotes } = useNoteMatchingContext();
 
   return (
-    <div className="relative w-full my-8 bg-[#0a0a0a] rounded-xl">
+    <div className="relative w-full my-8 bg-[#0a0a0a] rounded-lg">
       {rawGpFile && (
         <button
           onClick={onToggleAlphaTabScore}

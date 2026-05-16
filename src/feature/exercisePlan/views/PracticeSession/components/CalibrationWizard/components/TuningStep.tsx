@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
@@ -35,6 +36,8 @@ export const TuningStep = React.memo(function TuningStep({
   const isWrongString = hasNote && abs > 200;
   const captureProgress = sampleCount / 8; // MIN_SAMPLES
 
+
+
   const statusText = isWrongString ? "Wrong string?"
     : !hasNote    ? `Play the open ${str.name} string`
     : isInTune    ? "In tune — keep holding…"
@@ -51,7 +54,7 @@ export const TuningStep = React.memo(function TuningStep({
       <div className="flex items-start justify-between mb-3">
         <div>
           <h2 className="text-base font-bold tracking-tight">Tune Your Guitar</h2>
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mt-0.5">
+          <p className="text-[10px] text-zinc-600 font-bold tracking-widest mt-0.5">
             String {currentIndex + 1} of {STRINGS.length}
           </p>
         </div>
@@ -60,10 +63,7 @@ export const TuningStep = React.memo(function TuningStep({
         </button>
       </div>
 
-      <div className="w-full h-20 shrink-0 rounded-xl overflow-hidden mb-4 relative border border-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.05)]">
-        <img src="/images/calibration/tuning.png" alt="Tuning" className="w-full h-full object-cover object-center opacity-70" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-zinc-950/90" />
-      </div>
+
 
       <div className="h-0.5 w-full rounded-full bg-zinc-800 overflow-hidden mb-4">
         <motion.div className="h-full bg-cyan-500"
@@ -87,8 +87,8 @@ export const TuningStep = React.memo(function TuningStep({
         <div className="w-full max-w-xs flex flex-col items-center">
           <ArcTuner cents={cents} hasNote={hasNote} />
           <div className="flex justify-between w-full px-3 -mt-1 mb-2">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-700">← Flat</span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-700">Sharp →</span>
+            <span className="text-[9px] font-bold tracking-widest text-zinc-700">← Flat</span>
+            <span className="text-[9px] font-bold tracking-widest text-zinc-700">Sharp →</span>
           </div>
 
           <div className="text-center space-y-0.5 mb-3">
@@ -109,39 +109,16 @@ export const TuningStep = React.memo(function TuningStep({
           </div>
 
           <AnimatePresence mode="wait">
-            {stringState === "done" && currentOffset !== null ? (
-              <motion.div key="done" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                className="flex flex-col items-center gap-3 w-full"
-              >
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-                  <FaCheck className="h-3 w-3 text-emerald-400" />
-                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Offset Captured</span>
-                </div>
 
-                <div className="w-full space-y-2 mt-1">
-                  <button
-                    onClick={onAdvance}
-                    className="w-full bg-emerald-500 text-black font-bold py-3 rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"
-                  >
-                    {currentIndex < STRINGS.length - 1 ? "Next String" : "Finish Calibration"}
-                  </button>
-                  <button onClick={onRetry}
-                    className="w-full text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-widest font-bold transition-colors py-1"
-                  >
-                    Redo this string
-                  </button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div key="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+              <div key="status" className="w-full">
                 <p className={cn("text-sm font-medium text-center min-h-[1.25rem] transition-colors duration-200", statusColor)}>
                   {statusText}
                 </p>
                 <div className="w-full mt-6 space-y-2">
-                  <div className="h-3 w-full rounded-full bg-zinc-950 overflow-hidden border border-white/5 shadow-inner">
+                  <div className="h-3 w-full rounded-lg bg-zinc-950 overflow-hidden shadow-inner">
                     <motion.div
                       className={cn(
-                        "h-full rounded-full relative",
+                        "h-full rounded-lg relative",
                         isInTune ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.6)]" : "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]"
                       )}
                       animate={{ width: `${captureProgress * 100}%` }}
@@ -152,29 +129,49 @@ export const TuningStep = React.memo(function TuningStep({
                       )}
                     </motion.div>
                   </div>
-                  <div className="flex justify-between items-center px-1">
-                    <span className={cn(
-                      "text-[9px] font-bold uppercase tracking-widest transition-colors duration-300",
-                      isInTune ? "text-emerald-400" : "text-zinc-500"
-                    )}>
-                      {isInTune ? "Capturing data..." : "Stabilize your pitch"}
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-600">{Math.round(captureProgress * 100)}%</span>
-                  </div>
+
                 </div>
-              </motion.div>
-            )}
+              </div>
           </AnimatePresence>
         </div>
       </div>
 
-      {stringState === "listening" && (
-        <div className="flex justify-center mt-3">
-          <button onClick={onAdvance} className="text-xs text-zinc-700 hover:text-zinc-500 uppercase tracking-widest font-bold transition-colors py-1">
-            Skip this string
-          </button>
+        <div className="w-full mt-8 space-y-3">
+          <motion.div
+            animate={stringState === "done" ? {
+              x: [0, -1, 1, -1, 1, 0],
+              transition: {
+                duration: 0.4,
+                repeat: Infinity,
+                repeatDelay: 2
+              }
+            } : {}}
+          >
+            <Button
+              onClick={onAdvance}
+              variant={stringState === "done" ? "default" : "secondary"}
+              className={cn(
+                "w-full h-12 transition-all duration-300",
+                stringState === "done" && "ring-2 ring-emerald-500/50 ring-offset-2 ring-offset-zinc-950 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+              )}
+            >
+              {stringState === "done" 
+                ? (currentIndex < STRINGS.length - 1 ? "Next String" : "Finish Calibration")
+                : "Skip String"
+              }
+            </Button>
+          </motion.div>
+          
+          {stringState === "done" && (
+            <Button 
+              variant="ghost"
+              onClick={onRetry}
+              className="w-full h-8 text-zinc-500 hover:text-zinc-300"
+            >
+              Redo this string
+            </Button>
+          )}
         </div>
-      )}
     </div>
   );
 });

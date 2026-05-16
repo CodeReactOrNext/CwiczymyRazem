@@ -38,7 +38,7 @@ export const SessionSidebar = memo(function SessionSidebar({
         <div className="rounded-lg bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <GiGuitar className="text-cyan-400" />
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Audio Mixer</h4>
+            <h4 className="text-[10px] font-bold tracking-widest text-zinc-500">Audio Mixer</h4>
           </div>
           <div className="space-y-6">
             {audioTracks.map((track) => (

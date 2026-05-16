@@ -71,7 +71,7 @@ const ImageModal = ({
           <Button
             variant='secondary'
             size='sm'
-            className='rounded-full bg-background/40 backdrop-blur-sm'
+            className='rounded-lg bg-background/40 backdrop-blur-sm'
             onClick={onClose}>
             <FaCompress className='h-4 w-4' />
           </Button>
@@ -114,7 +114,7 @@ const ImageModal = ({
             size='sm'
             onClick={handleZoomOut}
             disabled={imageScale <= 0.5}
-            className='h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm'>
+            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
             <Minus className='h-5 w-5' />
           </Button>
           <Button
@@ -122,7 +122,7 @@ const ImageModal = ({
             size='sm'
             onClick={handleZoomIn}
             disabled={imageScale >= 8}
-            className='h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm'>
+            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
             <Plus className='h-5 w-5' />
           </Button>
           <Button
@@ -132,7 +132,7 @@ const ImageModal = ({
               resetImagePosition();
               setPosition({ x: 0, y: 0 });
             }}
-            className='h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm'>
+            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
             <FaCompress className='h-5 w-5' />
           </Button>
         </div>

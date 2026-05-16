@@ -154,7 +154,7 @@ export function LandscapeSessionModal({
             <motion.div
               animate={{ width: isPanelExpanded ? 240 : 56 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative flex shrink-0 flex-row border-l border-white/10 bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
+              className="relative flex shrink-0 flex-row bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
             >
               {/* Scrollable details — visible only when expanded */}
               <AnimatePresence>
@@ -165,10 +165,10 @@ export function LandscapeSessionModal({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
-                    className="flex w-[184px] shrink-0 flex-col overflow-y-auto overscroll-contain scrollbar-hide border-r border-white/5"
+                    className="flex w-[184px] shrink-0 flex-col overflow-y-auto overscroll-contain scrollbar-hide"
                   >
                     {/* Title + counter */}
-                    <div className="flex items-center gap-1 border-b border-white/5 px-2 py-2">
+                    <div className="flex items-center gap-1 px-2 py-2">
                       <span className='flex-1 truncate text-[10px] font-bold text-foreground'>{currentExercise.title}</span>
                       <Badge variant='outline' className='shrink-0 text-[8px]'>{currentExerciseIndex + 1}/{totalExercises}</Badge>
                     </div>
@@ -185,17 +185,17 @@ export function LandscapeSessionModal({
 
                     {/* Mic stats */}
                     {isMicEnabled && (
-                      <div className="px-2 py-1 space-y-1 border-b border-white/5">
+                      <div className="px-2 py-1 space-y-1">
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Score</span>
+                          <span className="text-zinc-600 tracking-widest">Score</span>
                           <span className="font-black text-white tabular-nums">{gameState.score.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Acc</span>
+                          <span className="text-zinc-600 tracking-widest">Acc</span>
                           <span className="font-black text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
                         </div>
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Streak</span>
+                          <span className="text-zinc-600 tracking-widest">Streak</span>
                           <span className="font-black text-cyan-400 tabular-nums">{gameState.combo}×{gameState.multiplier}</span>
                         </div>
                       </div>
@@ -255,13 +255,13 @@ export function LandscapeSessionModal({
 
                 {currentExerciseIndex > 0 && (
                   <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white">
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
                     <FaStepBackward className="h-3 w-3" />
                   </Button>
                 )}
                 {activeTablature && activeTablature.length > 0 && (
                   <Button onClick={handleRestart} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-amber-400 hover:text-amber-300">
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
                     <FaUndo className="h-3 w-3" />
                   </Button>
                 )}
@@ -270,7 +270,7 @@ export function LandscapeSessionModal({
                   onClick={handleToggleTimer}
                   size="icon"
                   className={cn(
-                    "h-11 w-11 shrink-0 rounded-2xl transition-all click-behavior",
+                    "h-11 w-11 shrink-0 rounded-lg transition-all click-behavior",
                     isPlaying ? "bg-white text-black shadow-lg" : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
                   )}
                 >
@@ -282,10 +282,10 @@ export function LandscapeSessionModal({
                     onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                     disabled={isFinishing || isSubmittingReport }
                     variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white"
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
                   >
                     {isFinishing || isSubmittingReport
-                      ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
+                      ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-lg" />
                       : isLastExercise ? <FaCheck className="h-4 w-4" /> : <FaStepForward className="h-4 w-4" />
                     }
                   </Button>

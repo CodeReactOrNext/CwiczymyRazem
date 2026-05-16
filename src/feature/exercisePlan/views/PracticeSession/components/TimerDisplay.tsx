@@ -39,7 +39,7 @@ export const TimerDisplay = ({
     <div className='relative'>
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[20px] transition-all duration-700",
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg blur-[20px] transition-all duration-700",
           sizeClasses[size]
         )}
         style={{
@@ -50,16 +50,16 @@ export const TimerDisplay = ({
 
       <div
         className={cn(
-          "relative rounded-full bg-zinc-900/50",
+          "relative rounded-lg bg-zinc-900/50",
           sizeClasses[size]
         )}>
         <AnimatePresence>
           {isPlaying && (
-            <div className='absolute inset-0 overflow-hidden rounded-full'>
+            <div className='absolute inset-0 overflow-hidden rounded-lg'>
               {[...Array(12)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className='absolute h-1 w-1 rounded-full bg-white'
+                  className='absolute h-1 w-1 rounded-lg bg-white'
                   initial={{
                     x: "50%",
                     y: "50%",
@@ -85,7 +85,7 @@ export const TimerDisplay = ({
         </AnimatePresence>
 
         <motion.div
-          className='absolute inset-[-2px] rounded-full'
+          className='absolute inset-[-2px] rounded-lg'
           style={{
             background: `conic-gradient(
               from ${isPlaying ? 0 : 180}deg, 
@@ -125,8 +125,8 @@ export const TimerDisplay = ({
 
         {isPlaying && (
           <motion.div
-            className='absolute inset-0 rounded-full border-2'
-            style={{ borderColor: progressColor }}
+            className='absolute inset-0 rounded-lg'
+            style={{ backgroundColor: progressColor + "20" }}
             animate={{
               scale: [1, 1.03, 1],
               opacity: [0.2, 0.4, 0.2],

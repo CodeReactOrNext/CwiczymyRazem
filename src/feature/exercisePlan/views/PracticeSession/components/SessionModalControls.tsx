@@ -40,7 +40,7 @@ export const SessionModalControls = ({
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className='border-t border-white/5 bg-zinc-950/80 shadow-2xl backdrop-blur-xl pb-safe'>
+      className='bg-zinc-950/80 shadow-2xl backdrop-blur-xl pb-safe'>
       <div className='flex items-center justify-between p-4 gap-3'>
         <Button
           variant='ghost'
@@ -55,7 +55,7 @@ export const SessionModalControls = ({
               onClick={handleBackExercise}
               variant="ghost"
               size="icon"
-              className="h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all"
+              className="h-12 w-12 rounded-lg bg-white/5 text-zinc-400 hover:text-white transition-all"
             >
               <FaStepBackward className="h-4 w-4" />
             </Button>
@@ -66,7 +66,7 @@ export const SessionModalControls = ({
               onClick={onRestart}
               variant="ghost"
               size="icon"
-              className="h-12 w-12 rounded-full border border-white/5 bg-white/5 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all"
+              className="h-12 w-12 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all"
             >
               <FaUndo className="h-4 w-4" />
             </Button>
@@ -75,7 +75,7 @@ export const SessionModalControls = ({
           <Button
             onClick={toggleTimer}
             className={cn(
-              "h-12 px-8 rounded-2xl font-black text-[10px] tracking-[0.2em] transition-all uppercase click-behavior",
+              "h-12 px-8 rounded-lg font-black text-[10px] tracking-[0.2em] transition-all click-behavior",
               isPlaying 
                 ? "bg-white text-black shadow-lg shadow-white/10" 
                 : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
@@ -94,11 +94,11 @@ export const SessionModalControls = ({
               variant="ghost"
               size="icon"
                className={cn(
-                "h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all",
+                "h-12 w-12 rounded-lg bg-white/5 text-zinc-400 hover:text-white transition-all",
               )}
             >
               {isFinishing || isSubmittingReport ? (
-                <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
+                <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-lg" />
               ) : isLastExercise ? (
                 <FaCheck className="h-5 w-5" />
               ) : (
