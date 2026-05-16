@@ -5,40 +5,45 @@ export const SongCardSkeleton = () => {
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between overflow-hidden rounded-[8px] border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-md",
+        "relative flex flex-col justify-between overflow-hidden rounded-lg bg-zinc-900/40 p-5 backdrop-blur-md",
         "w-full h-[236px]"
       )}
     >
-      {/* Header Section */}
-      <div className="flex items-start gap-4">
-        {/* Cover Image Skeleton */}
-        <Skeleton className="h-20 w-20 rounded-[8px] shrink-0" />
+      {/* Header Section with Bleed Cover */}
+      <div className="relative flex items-start">
+        {/* Corner-Bleed Cover Image Skeleton */}
+        <div className="relative -ml-5 -mt-5 shrink-0">
+          <Skeleton className="h-28 w-28 rounded-br-lg" />
+        </div>
         
-        <div className="min-w-0 flex-1 pt-1 space-y-2">
+        <div className="min-w-0 flex-1 pl-4 -mt-0.5 space-y-2">
             {/* Title Skeleton */}
-            <Skeleton className="h-5 w-3/4 rounded-md" />
+            <Skeleton className="h-5 w-3/4 rounded-[4px]" />
             {/* Artist Skeleton */}
-            <Skeleton className="h-4 w-1/2 rounded-md" />
+            <Skeleton className="h-4 w-1/2 rounded-[4px]" />
             
-            <div className="mt-4 flex items-center gap-3">
-               <Skeleton className="h-3 w-8 rounded-full" />
-               <Skeleton className="h-3 w-12 rounded-full" />
+            <div className="mt-4 flex items-center gap-2">
+               <Skeleton className="h-3 w-8 rounded-[4px]" />
+               <Skeleton className="h-1 w-1 rounded-[4px]" />
+               <Skeleton className="h-3 w-12 rounded-[4px]" />
             </div>
         </div>
       </div>
 
-      {/* Difficulty Section */}
-      <div className="mt-6 space-y-2">
+      {/* Stats Section: Difficulty Meter */}
+      <div className="relative mb-6 space-y-2">
          <div className="flex justify-between items-center">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-3 w-8" />
+            <Skeleton className="h-3 w-16 rounded-[4px]" />
+            <Skeleton className="h-4 w-8 rounded-[4px]" />
          </div>
-         <Skeleton className="h-1.5 w-full rounded-full" />
+         <div className="h-1 w-full overflow-hidden rounded-[4px] bg-black/20">
+            <Skeleton className="h-full w-2/3 rounded-[4px]" />
+         </div>
       </div>
 
       {/* Footer Section */}
-      <div className="mt-auto pt-4">
-        <Skeleton className="h-8 w-full rounded-[8px]" />
+      <div className="relative mt-auto flex items-center gap-2">
+        <Skeleton className="h-9 w-full rounded-lg" />
       </div>
     </div>
   );

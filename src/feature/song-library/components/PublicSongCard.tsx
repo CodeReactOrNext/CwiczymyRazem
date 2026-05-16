@@ -3,7 +3,7 @@
 import { cn } from "assets/lib/utils";
 import type { LibrarySong } from "feature/song-library/services/getSongsForStaticProps";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ArrowRight, Music, Users } from "lucide-react";
+import { ChevronRight, Music, Users } from "lucide-react";
 import Link from "next/link";
 
 interface PublicSongCardProps {
@@ -41,7 +41,7 @@ export const PublicSongCard = ({ song }: PublicSongCardProps) => {
         {/* Cover image */}
         <div className="relative shrink-0">
           {song.coverUrl ? (
-            <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+            <div className="relative h-20 w-20 overflow-hidden rounded-2xl shadow-2xl">
               <img
                 src={song.coverUrl}
                 alt={`${song.title} cover`}
@@ -90,7 +90,7 @@ export const PublicSongCard = ({ song }: PublicSongCardProps) => {
               </div>
             )}
             {song.genres.length > 0 && (
-              <span className="px-2.5 py-0.5 capitalize rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400">
+              <span className="px-2.5 py-0.5 capitalize rounded-md bg-zinc-800 border border-white/5 text-[10px] font-bold text-zinc-400">
                 {song.genres[0]}
               </span>
             )}
@@ -122,10 +122,10 @@ export const PublicSongCard = ({ song }: PublicSongCardProps) => {
       <div className="relative z-10 mt-auto">
         <Link
           href="/signup"
-          className="flex h-8 w-full items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-all hover:bg-white/10 hover:text-white"
+          className="flex h-8 w-full items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-all hover:bg-white/10 hover:text-white gap-2"
         >
           <span>Start Learning</span>
-          <ArrowRight className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+          <ChevronRight className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-transform group-hover:translate-x-1 ml-2" />
         </Link>
       </div>
     </div>

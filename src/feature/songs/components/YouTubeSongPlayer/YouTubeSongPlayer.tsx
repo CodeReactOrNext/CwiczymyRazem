@@ -131,7 +131,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
 
     if (!videoId || isEditing) {
       return (
-        <div className="rounded-xl bg-white/[0.02] border border-white/10 p-5 flex flex-col gap-3">
+        <div className="rounded-lg bg-white/[0.02] p-5 flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Video className="h-4 w-4 text-zinc-500" />
             <span className="text-sm font-medium text-zinc-500">
@@ -146,8 +146,8 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
           <div className="flex gap-2">
             <input
               className={cn(
-                "flex-1 h-10 bg-white/5 border rounded-xl px-4 text-sm text-white placeholder-zinc-600 outline-none focus:border-cyan-500/50 transition-colors",
-                inputError ? "border-red-500/60" : "border-white/10"
+                "flex-1 h-10 bg-white/5 rounded-lg px-4 text-sm text-white placeholder-zinc-600 outline-none transition-colors",
+                inputError ? "bg-red-500/10" : ""
               )}
               placeholder="Paste YouTube link…"
               value={urlInput}
@@ -159,7 +159,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
             />
             <Button
               onClick={handleSaveUrl}
-              className="h-10 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-xl px-5 font-bold text-sm transition-colors"
+              className="h-10 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 rounded-lg px-5 font-bold text-sm transition-colors border-none"
             >
               Save
             </Button>
@@ -171,7 +171,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
                   setUrlInput("");
                   setInputError(false);
                 }}
-                className="h-10 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 border border-white/5"
+                className="h-10 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5"
               >
                 Cancel
               </Button>
@@ -194,14 +194,14 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
               setUrlInput(youtubeUrl ?? "");
               setIsEditing(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs font-medium text-zinc-500 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] text-xs font-medium text-zinc-500 hover:text-white hover:bg-white/10 transition-all"
           >
             <Pencil className="h-3.5 w-3.5" />
             Change video
           </button>
         </div>
 
-        <div className="aspect-video w-full rounded-xl overflow-hidden bg-white/5 border border-white/5">
+        <div className="aspect-video w-full rounded-lg overflow-hidden bg-white/5">
           <YouTube
             videoId={videoId}
             opts={opts}
@@ -222,10 +222,10 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
               type="button"
               onClick={() => handleSpeedChange(rate)}
               className={cn(
-                "px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors",
+                "px-3 py-1.5 rounded-lg text-xs font-bold transition-colors",
                 speed === rate
-                  ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
-                  : "bg-white/[0.03] border-white/10 text-zinc-500 hover:bg-white/5 hover:text-white hover:border-white/20"
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "bg-white/[0.03] text-zinc-500 hover:bg-white/5 hover:text-white"
               )}
             >
               {rate === 1 ? "1×" : `${rate}×`}
@@ -240,10 +240,10 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
                     type="button"
                     onClick={onLockToggle}
                     className={cn(
-                      "h-8 px-3 rounded-lg flex items-center gap-2 border transition-all",
+                      "h-8 px-3 rounded-lg flex items-center gap-2 transition-all",
                       isLocked
-                        ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                        : "bg-white/[0.03] border-white/10 text-zinc-500 hover:text-white hover:bg-white/5"
+                        ? "bg-amber-500/10 text-amber-400"
+                        : "bg-white/[0.03] text-zinc-500 hover:text-white hover:bg-white/5"
                     )}
                   >
                     {isLocked ? (
@@ -251,7 +251,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
                     ) : (
                       <LockKeyholeOpen className="h-3.5 w-3.5" />
                     )}
-                    <span className="text-[10px] font-bold uppercase tracking-wider">
+                    <span className="text-[10px] font-bold">
                       {isLocked ? "Locked" : "Lock"}
                     </span>
                   </button>

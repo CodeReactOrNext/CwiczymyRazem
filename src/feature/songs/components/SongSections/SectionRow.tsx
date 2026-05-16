@@ -78,12 +78,12 @@ export const SectionRow = ({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:px-4 sm:py-3 rounded-lg border transition-all",
+        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:px-4 sm:py-3 rounded-lg transition-all",
         isLooping
-          ? "bg-cyan-500/5 border-cyan-500/20"
+          ? "bg-cyan-500/5"
           : section.mastery === 3
-          ? "bg-green-500/5 border-green-500/20"
-          : "bg-white/[0.02] border-white/5 hover:bg-white/5"
+          ? "bg-green-500/5"
+          : "bg-white/[0.02] hover:bg-white/5"
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -107,7 +107,7 @@ export const SectionRow = ({
                 setEditingTime(false);
               }
             }}
-            className="w-12 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[13px] text-white font-mono text-center outline-none focus:border-cyan-500/50 transition-colors"
+            className="w-12 bg-white/5 rounded-lg px-2 py-1 text-[13px] text-white font-mono text-center outline-none transition-colors"
           />
         ) : (
           <button
@@ -141,7 +141,7 @@ export const SectionRow = ({
                   setEditingName(false);
                 }
               }}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white outline-none focus:border-cyan-500/50 transition-colors"
+              className="w-full bg-white/5 rounded-lg px-3 py-1.5 text-sm text-white outline-none transition-colors"
             />
             <div
               className="flex flex-wrap gap-1"
@@ -157,10 +157,10 @@ export const SectionRow = ({
                     setEditingName(false);
                   }}
                   className={cn(
-                    "px-2.5 py-1 rounded-md border text-[10px] font-medium transition-colors",
+                    "px-2.5 py-1 rounded-[4px] text-[10px] font-medium transition-colors",
                     nameValue === name
-                      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
-                      : "bg-white/[0.03] border-white/10 text-zinc-500 hover:bg-cyan-500/10 hover:border-cyan-500/30 hover:text-cyan-400"
+                      ? "bg-cyan-500/10 text-cyan-400"
+                      : "bg-white/[0.03] text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400"
                   )}
                 >
                   {name}

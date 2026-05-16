@@ -314,7 +314,7 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
               href={`/practice/exercise/${exercise.id}`}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-cyan-500 text-zinc-950 font-bold hover:bg-cyan-400 transition-colors"
             >
-              Ćwicz teraz →
+              Start Practice →
             </Link>
           </div>
         </section>

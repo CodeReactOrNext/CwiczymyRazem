@@ -245,8 +245,8 @@ export const SongTimerLayout = ({
         <div className="w-full max-w-4xl mx-auto space-y-8 px-4">
 
           {/* Compact timer bar */}
-          <div className="flex items-center gap-2 sm:gap-4 bg-white/[0.02] border border-white/5 rounded-2xl p-2.5 sm:px-5 sm:py-3.5">
-            <div className="h-11 w-11 rounded-xl overflow-hidden shrink-0 border border-white/10">
+          <div className="flex items-center gap-2 sm:gap-4 bg-white/[0.02] rounded-lg p-2.5 sm:px-5 sm:py-3.5">
+            <div className="h-11 w-11 rounded-lg overflow-hidden shrink-0">
               {song.coverUrl ? (
                 <img src={song.coverUrl} className="h-full w-full object-cover" alt={song.title} />
               ) : (
@@ -273,10 +273,10 @@ export const SongTimerLayout = ({
             <button
               onClick={toggleTimer}
               className={cn(
-                "h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0",
+                "h-10 w-10 rounded-full flex items-center justify-center transition-all shrink-0",
                 timerEnabled
-                  ? "border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700"
-                  : "border-white bg-white text-black hover:bg-zinc-100"
+                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                  : "bg-white text-black hover:bg-zinc-100"
               )}
             >
               {timerEnabled ? (
@@ -302,7 +302,7 @@ export const SongTimerLayout = ({
                   timerSubmitHandler();
                 }
               }}
-              className="sm:ml-2 gap-2 px-3 sm:px-4"
+              className="sm:ml-2 gap-2 px-3 sm:px-4 rounded-lg"
             >
               <span className="hidden sm:inline">{t("finish")}</span>
               <CheckCircle2 className="h-4 w-4" />
@@ -357,26 +357,26 @@ export const SongTimerLayout = ({
 
           {/* Shortcuts Legend - only show when YouTube URL exists */}
           {youtubeUrl && (
-            <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+            <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] rounded-lg">
               <div className="flex items-center gap-2 text-zinc-500">
                 <Keyboard className="h-4 w-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">Shortcuts</span>
+                <span className="text-xs font-bold text-zinc-500">Shortcuts</span>
               </div>
               <div className="flex flex-wrap gap-x-6 gap-y-2">
                 <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">Space</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">Space</kbd>
                   <span className="text-xs text-zinc-500">Play/Pause</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">M</kbd>
-                  <span className="text-xs text-zinc-500">Mark Section</span>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">M</kbd>
+                  <span className="text-xs text-zinc-500">Mark section</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">L</kbd>
-                  <span className="text-xs text-zinc-500">Toggle Loop</span>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">L</kbd>
+                  <span className="text-xs text-zinc-500">Toggle loop</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">← →</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">← →</kbd>
                   <span className="text-xs text-zinc-500">Seek 5s</span>
                 </div>
               </div>
@@ -385,21 +385,21 @@ export const SongTimerLayout = ({
 
           {/* CTA for YouTube link - show when no URL */}
           {!youtubeUrl && (
-            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6 text-center">
+            <div className="bg-cyan-500/10 rounded-lg p-6 text-center">
               <h3 className="text-base font-bold text-white mb-2">Link a YouTube video to unlock features</h3>
               <p className="text-sm text-zinc-400 mb-4">Add a YouTube link above to use sections, mark passages, loop sections, and keyboard shortcuts for an enhanced practice experience.</p>
-              <div className="inline-block px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-lg text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                ↑ Paste a YouTube link in the player above
+              <div className="inline-block px-4 py-2 bg-cyan-500/20 rounded-[4px] text-xs font-bold text-cyan-400">
+                Paste a YouTube link in the player above
               </div>
             </div>
           )}
 
           {/* Notes Section */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.01]">
+          <div className="bg-white/[0.02] rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3 bg-white/[0.01]">
               <div className="flex items-center gap-2 text-zinc-400">
                 <FileText className="h-4 w-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">Practice Notes</span>
+                <span className="text-xs font-bold text-zinc-500">Practice notes</span>
               </div>
               <div className="flex items-center gap-2">
                 {isSaving && (

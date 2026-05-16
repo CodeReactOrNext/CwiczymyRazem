@@ -102,7 +102,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const mainNavigation = [
     { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
     { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={18} /> },
-    { id: "songs", name: "Songs", href: "/songs?view=management", icon: <Music size={18} /> },
+    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={18} /> },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     { id: "seasons", name: "Seasons", href: "/seasons", icon: <Calendar size={18} /> },
     { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={18} /> },
