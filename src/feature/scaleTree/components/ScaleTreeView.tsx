@@ -2,6 +2,7 @@ import { Stage, Layer } from 'react-konva';
 import type Konva from 'konva';
 import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
+
 import {
   useCallback,
   useEffect,
@@ -85,11 +86,6 @@ export function ScaleTreeView() {
 
       // Within same scale - always show
       if (sourceScale && targetScale && sourceScale === targetScale) {
-        return true;
-      }
-
-      // Between different scales - only if both are single_string nodes
-      if (sourceId.includes("single_string") && targetId.includes("single_string")) {
         return true;
       }
 
@@ -279,35 +275,21 @@ export function ScaleTreeView() {
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden rounded-xl bg-zinc-950"
+      className="relative h-full w-full overflow-hidden rounded-xl bg-[#141414]"
     >
-      {/* Background */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-zinc-950"
-        style={{
-          background:
-            'linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%)',
-        }}
-      >
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `linear-gradient(rgba(34,211,238,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.5) 1px, transparent 1px)`,
-            backgroundSize: '80px 80px',
-          }}
-        />
-      </div>
+      {/* Clean Flat Background */}
+      <div className='absolute inset-0 pointer-events-none z-0 bg-[#141414]' />
 
       {/* Title header */}
       <div className="absolute left-4 top-4 z-10 pointer-events-none">
         <h1
           style={{
-            fontSize: 18,
-            fontWeight: 700,
-            color: '#f0f4ff',
-            letterSpacing: '0.04em',
-            lineHeight: 1.2,
-            textShadow: '0 0 30px rgba(34,211,238,0.35)',
+            fontSize: 20,
+            fontWeight: 800,
+            color: '#ffffff',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            textShadow: 'none',
             margin: 0,
           }}
         >
@@ -331,10 +313,9 @@ export function ScaleTreeView() {
       <div
         className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5"
         style={{
-          border: '1px solid rgba(34,211,238,0.18)',
-          background: 'rgba(2,2,16,0.75)',
-          boxShadow:
-            '0 0 24px rgba(34,211,238,0.06), inset 0 0 16px rgba(34,211,238,0.03)',
+          border: '1px solid rgba(255,255,255,0.05)',
+          background: '#0b0b0d',
+          boxShadow: 'none',
         }}
       >
         <span className="text-xs font-light tracking-widest text-zinc-300">

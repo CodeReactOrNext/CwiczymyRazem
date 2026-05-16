@@ -13,7 +13,7 @@ const ScaleTreeView = dynamic(
 const ScaleTreePage: NextPageWithLayout = () => {
   return (
     <div className="absolute inset-0 z-0 h-[calc(100vh-4rem)]">
-      <div className="h-full w-full bg-zinc-950">
+      <div className="h-full w-full bg-[#141414]">
         <ScaleTreeView />
       </div>
     </div>
