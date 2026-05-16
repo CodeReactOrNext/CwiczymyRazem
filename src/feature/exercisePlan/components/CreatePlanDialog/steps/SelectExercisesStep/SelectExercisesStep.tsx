@@ -258,8 +258,6 @@ export const SelectExercisesStep = ({
 
       <ExercisePreviewDialog
         exercise={previewingExercise ?? null}
-        isSelected={selectedExercises.some(e => e.id === previewingExercise?.id)}
-        onToggleExercise={handleExerciseToggleWithTimeModal}
         onClose={() => setPreviewingExercise(undefined)}
       />
 
