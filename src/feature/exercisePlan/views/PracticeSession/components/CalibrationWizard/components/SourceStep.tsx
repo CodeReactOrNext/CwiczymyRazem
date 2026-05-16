@@ -22,7 +22,7 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
         </button>
       </div>
       
-      <div className="w-full h-32 rounded-xl overflow-hidden mb-6 relative border border-white/10 shadow-2xl">
+      <div className="w-full h-32 rounded-lg overflow-hidden mb-6 relative shadow-2xl">
         <img src="/images/calibration/source.png" alt="Connection types" className="w-full h-full object-cover object-center opacity-80" />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
       </div>
@@ -34,7 +34,7 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
           icon={<FaPlug className="text-4xl" />}
           title="Audio Interface"
           description={<>USB or Thunderbolt<br />audio interface</>}
-          accentClass="hover:border-cyan-500/40 hover:bg-cyan-500/5 group-hover:border-cyan-500/20 group-hover:text-cyan-400"
+          accentClass="hover:bg-cyan-500/5 group-hover:text-cyan-400"
           iconIdleClass="text-zinc-500"
           iconActiveClass="group-hover:text-cyan-400"
           onClick={() => onSelect("interface")}
@@ -43,7 +43,7 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
           icon={<FaMicrophone className="text-4xl" />}
           title="Microphone"
           description={<>Built-in laptop mic<br />or external USB mic</>}
-          accentClass="hover:border-emerald-500/40 hover:bg-emerald-500/5 group-hover:border-emerald-500/20"
+          accentClass="hover:bg-emerald-500/5"
           iconIdleClass="text-zinc-500"
           iconActiveClass="group-hover:text-emerald-400"
           onClick={() => onSelect("microphone")}
@@ -75,12 +75,12 @@ function SourceCard({
     <button
       onClick={onClick}
       className={cn(
-        "group flex flex-col items-center justify-center gap-5 p-6 rounded-2xl border border-white/8 bg-zinc-900/40 transition-all",
+        "group flex flex-col items-center justify-center gap-5 p-6 rounded-lg bg-zinc-900/40 transition-all",
         accentClass
       )}
     >
       <div className={cn(
-        "w-20 h-20 rounded-2xl bg-zinc-800/80 border border-white/8 flex items-center justify-center transition-all",
+        "w-20 h-20 rounded-lg bg-zinc-800/80 flex items-center justify-center transition-all",
         accentClass
       )}>
         <span className={cn("transition-colors", iconIdleClass, iconActiveClass)}>

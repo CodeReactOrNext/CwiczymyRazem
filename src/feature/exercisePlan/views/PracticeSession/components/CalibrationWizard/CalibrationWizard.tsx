@@ -60,7 +60,7 @@ export const CalibrationWizard = ({
 
   return createPortal(
     <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/70 backdrop-blur-sm font-openSans">
-      <div className="relative w-full max-w-lg mx-4 bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-y-auto max-h-[90dvh]">
+      <div className="relative w-full max-w-lg mx-4 bg-zinc-950 rounded-lg shadow-2xl overflow-y-auto max-h-[90dvh]">
         {micError ? (
           <MicErrorScreen onRetry={() => { setMicError(false); handleGrant(); }} onCancel={handleCancel} />
         ) : (

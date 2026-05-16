@@ -26,7 +26,7 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-        <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] border border-emerald-500/20">
+        <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)]">
           <img src="/images/calibration/perm.png" alt="Microphone Permission" className="w-full h-full object-cover" />
         </div>
 
@@ -42,11 +42,11 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
           <Button
             onClick={onGrant}
             disabled={isLoading}
-            className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold h-12 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+            className="w-full h-12"
           >
             {isLoading ? "Allowing..." : "Allow Microphone Access"}
           </Button>
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+          <p className="text-[10px] text-zinc-600 font-bold tracking-widest">
             A browser prompt will appear
           </p>
         </div>

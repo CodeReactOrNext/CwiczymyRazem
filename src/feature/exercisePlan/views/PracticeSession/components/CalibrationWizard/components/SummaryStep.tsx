@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { CheckCircle2, Music } from "lucide-react";
 import React from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
@@ -29,8 +30,9 @@ export const SummaryStep = React.memo(function SummaryStep({
           transition={{ type: "spring", stiffness: 220, damping: 18 }}
           className="flex justify-center"
         >
-          <div className="relative w-32 h-32 rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.2)] border border-emerald-500/20">
-            <img src="/images/calibration/summary.png" alt="Calibration Complete" className="w-full h-full object-cover" />
+          <div className="relative w-32 h-32 rounded-full flex items-center justify-center bg-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.15)] border border-emerald-500/20">
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-transparent rounded-full" />
+            <CheckCircle2 className="w-16 h-16 text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]" />
           </div>
         </motion.div>
 
@@ -40,13 +42,13 @@ export const SummaryStep = React.memo(function SummaryStep({
             Your calibration is complete. If you feel the detection is still slightly off,
             consider re-tuning your guitar or adjusting the input sensitivity.
           </p>
-          <p className="text-emerald-400 font-bold uppercase tracking-[0.2em] text-[10px]">
+          <p className="text-emerald-400 font-bold tracking-[0.2em] text-[10px]">
             Good luck!
           </p>
         </div>
 
-        <div className="flex gap-3 pt-1 pb-2">
-          <Button onClick={onConfirm} className="flex-1 bg-emerald-500 text-black hover:bg-emerald-400 font-bold h-11">
+        <div className="flex w-full gap-3 pt-1 pb-2">
+          <Button onClick={onConfirm} className="flex-1 h-11">
             <FaCheck className="mr-2 h-3.5 w-3.5" /> Save & Close
           </Button>
           <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">Discard</Button>

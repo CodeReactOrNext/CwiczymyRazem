@@ -188,8 +188,8 @@ const SessionModal = ({
               className="flex flex-col items-center gap-3"
             >
               <div className="relative group">
-                <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-                <div className="relative w-24 h-24 rounded-2xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
+                <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-lg opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
+                <div className="relative w-24 h-24 rounded-lg bg-zinc-900/80 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
                   <span className="text-5xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                     {currentExercise.customGoal}
@@ -197,7 +197,7 @@ const SessionModal = ({
                 </div>
               </div>
               {currentExercise.customGoalDescription && (
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                <p className="text-[10px] text-zinc-500 font-bold tracking-widest">
                   {currentExercise.customGoalDescription}
                 </p>
               )}
@@ -240,14 +240,14 @@ const SessionModal = ({
           />
 
           {currentExercise.links && currentExercise.links.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 space-y-4 mb-20">
-              <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
+            <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4 mb-20">
+              <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-widest">
                 <span>Support Author</span>
               </div>
               <div className="flex flex-col gap-2">
                 {currentExercise.links.map((link: any, idx: number) => (
                   <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-between group px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm"
+                    className="flex items-center justify-between group px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-sm"
                   >
                     <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
                   </a>

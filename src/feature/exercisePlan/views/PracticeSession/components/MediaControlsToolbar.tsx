@@ -62,7 +62,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
       <div className="flex flex-col gap-1.5">
         {hasMetronome && (
           <div className={cn(
-            "flex items-center rounded-[6px] overflow-hidden transition-all",
+            "flex items-center rounded-lg overflow-hidden transition-all",
             isSlowed ? "bg-cyan-500/5" : "bg-white/5"
           )}>
             <div className={cn(
@@ -101,7 +101,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               disabled={isRiddleMode}
               title={isAudioMuted ? "Backing track off" : "Backing track on"}
               className={cn(
-                "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all",
+                "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
                 isAudioMuted
                   ? "bg-white/5 text-zinc-400 hover:text-white"
                   : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
@@ -118,7 +118,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onMicToggle}
                 title={isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
                 className={cn(
-                  "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all",
+                  "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
                   isMicEnabled
                     ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                     : "bg-white/5 text-zinc-400 hover:text-white"
@@ -131,7 +131,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={onRecalibrate}
                   title="Recalibrate"
-                  className="flex items-center justify-center h-8 w-8 rounded-[6px] transition-all bg-white/5 text-zinc-400 hover:text-white"
+                  className="flex items-center justify-center h-8 w-8 rounded-lg transition-all bg-white/5 text-zinc-400 hover:text-white"
                 >
                   <FaSync className="h-3 w-3" />
                 </button>
@@ -142,7 +142,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   onClick={() => setIsTunerOpen(true)}
                   title="Tuner"
                   className={cn(
-                    "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all",
+                    "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
                     isTunerOpen
                       ? "bg-violet-500/10 text-violet-400"
                       : "bg-white/5 text-zinc-400 hover:text-white"
@@ -174,7 +174,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
         <Tooltip>
           <TooltipTrigger asChild>
             <div className={cn(
-              "flex items-center rounded-[8px] overflow-hidden transition-all",
+              "flex items-center rounded-lg overflow-hidden transition-all",
               h,
               isSlowed ? "bg-cyan-500/5" : "bg-white/5"
             )}>
@@ -220,7 +220,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               onClick={onAudioToggle}
               disabled={isRiddleMode}
               className={cn(
-                "flex items-center justify-center w-12 rounded-[8px] transition-all",
+                "flex items-center justify-center w-12 rounded-lg transition-all",
                 h,
                 isAudioMuted
                   ? "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
@@ -244,7 +244,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               <button
                 onClick={onMicToggle}
                 className={cn(
-                  "flex items-center gap-2 px-4 rounded-[8px] transition-all font-semibold",
+                  "flex items-center gap-2 px-4 rounded-lg transition-all font-semibold",
                   h,
                   isMicEnabled
                     ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
@@ -268,7 +268,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={onRecalibrate}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-[8px] transition-all bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5",
                     h
                   )}
                 >
@@ -286,7 +286,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={() => setIsTunerOpen(true)}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-[8px] transition-all",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all",
                     h,
                     isTunerOpen
                       ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
@@ -350,7 +350,7 @@ function TunerDialog({
       onClick={onClose}
     >
       <div
-        className="relative bg-zinc-900 border border-white/10 rounded-[8px] shadow-2xl p-8 w-72"
+        className="relative bg-zinc-900 rounded-lg shadow-2xl p-8 w-72"
         onClick={e => e.stopPropagation()}
       >
         <button
