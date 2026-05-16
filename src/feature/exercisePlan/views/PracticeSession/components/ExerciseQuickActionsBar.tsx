@@ -54,11 +54,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           <button
             onClick={() => toggle("instructions")}
             className={cn(
-              "flex items-center gap-2 px-4 rounded-[8px] transition-all border",
+              "flex items-center gap-2 px-4 rounded-[8px] transition-all",
               h,
               openModal === "instructions"
-                ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
-                : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
             )}
           >
             <FaInfoCircle className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
@@ -68,16 +68,16 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
 
         {hasMetronome && (
           <div className={cn(
-            "flex items-center rounded-[8px] border overflow-hidden transition-all",
+            "flex items-center rounded-[8px] overflow-hidden transition-all",
             h,
             openModal === "metronome"
-              ? "border-white/15 bg-zinc-800/60"
-              : "border-white/5 bg-white/5"
+              ? "bg-zinc-800/60"
+              : "bg-white/5"
           )}>
             <button
               onClick={() => toggle("metronome")}
               className={cn(
-                "flex items-center gap-1.5 border-r border-white/5 h-full text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors",
+                "flex items-center gap-1.5 h-full text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors",
                 compact ? "px-2" : "px-3"
               )}
             >
@@ -88,7 +88,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             <button
               onClick={() => toggle("metronome")}
               className={cn(
-                "flex items-center justify-center h-full border-r border-white/5 transition-colors hover:bg-white/5",
+                "flex items-center justify-center h-full transition-colors hover:bg-white/5",
                 compact ? "px-2" : "px-4",
                 tempoColor(bpm)
               )}
@@ -119,11 +119,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           <button
             onClick={() => toggle("bpm")}
             className={cn(
-              "flex items-center gap-2 px-4 rounded-[8px] transition-all border font-bold",
+              "flex items-center gap-2 px-4 rounded-[8px] transition-all font-bold",
               h,
               openModal === "bpm"
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
             )}
           >
             <FaCheck className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />

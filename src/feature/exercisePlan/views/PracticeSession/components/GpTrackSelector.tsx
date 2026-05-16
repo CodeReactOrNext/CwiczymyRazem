@@ -20,10 +20,10 @@ export const GpTrackSelector = memo(function GpTrackSelector({ tracks, selectedI
           key={track.id}
           onClick={() => onChange(idx)}
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
+            "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
             selectedIdx === idx
-              ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-              : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+              ? "bg-cyan-500/10 text-cyan-400"
+              : "bg-white/5 text-zinc-500 hover:text-zinc-300"
           )}
         >
           {track.trackType === "drums" ? <Drum className="h-3 w-3" /> : <Music className="h-3 w-3" />}

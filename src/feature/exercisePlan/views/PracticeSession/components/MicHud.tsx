@@ -20,26 +20,6 @@ export const MicHud = () => {
           <span className="block text-[10px] font-semibold tracking-wide text-zinc-500 mb-1">Accuracy</span>
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
-            <AnimatePresence mode="wait">
-              {(() => {
-                const grade = getPerformanceGrade(sessionAccuracy);
-                return (
-                  <motion.span
-                    key={grade.letter}
-                    initial={{ scale: 1.4, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    className={cn(
-                      "inline-flex items-center justify-center w-8 h-8 rounded-lg border text-sm font-bold",
-                      grade.color, grade.bg, grade.border, grade.glow
-                    )}
-                  >
-                    {grade.letter}
-                  </motion.span>
-                );
-              })()}
-            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -57,11 +37,6 @@ export const MicHud = () => {
           >
             {gameState.score.toLocaleString()}
           </motion.span>
-          {maxPossibleScore > 0 && (
-            <span className="text-sm font-bold text-zinc-600 tabular-nums">
-              / {maxPossibleScore.toLocaleString()}
-            </span>
-          )}
         </div>
       </div>
 
