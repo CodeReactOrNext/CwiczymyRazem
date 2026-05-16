@@ -20,7 +20,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ exercise, a
         exercise.isPlayalong ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
       )}>
         {exercise.isPlayalong && (
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10">
             <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
             <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
           </div>
@@ -37,7 +37,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ exercise, a
         >
           <div className="relative group">
             <div className="absolute -inset-8 bg-cyan-500/20 blur-[40px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-            <div className="relative w-32 h-32 rounded-3xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl overflow-hidden">
+            <div className="relative w-32 h-32 rounded-3xl bg-zinc-900 flex items-center justify-center shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
               <span className="text-6xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
                 {exercise.customGoal}
@@ -56,7 +56,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ exercise, a
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10 w-full max-w-2xl px-6 py-4 rounded-xl bg-main/10 border border-main/20 flex items-center justify-between"
+          className="mb-10 w-full max-w-2xl px-6 py-4 rounded-xl bg-main/10 flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg bg-main text-white"><Timer size={20} /></div>
@@ -72,7 +72,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ exercise, a
           </div>
           <div className="flex gap-1.5">
             {Array.from({ length: streakPlan.streakDays }).map((_: unknown, i: number) => (
-              <div key={i} className="h-1.5 w-6 rounded-full bg-main/20 border border-main/10" />
+              <div key={i} className="h-1.5 w-6 rounded-full bg-main/20" />
             ))}
           </div>
         </motion.div>

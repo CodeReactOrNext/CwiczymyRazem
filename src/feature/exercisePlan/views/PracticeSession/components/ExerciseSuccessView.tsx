@@ -35,12 +35,12 @@ interface ExerciseSuccessViewProps {
 
 type TierKey = 'S' | 'A' | 'B' | 'C' | 'D';
 
-const TIERS: Record<TierKey, { color: string; bg: string; border: string }> = {
-  S: { color: 'text-red-300',    bg: 'bg-red-500/10',    border: 'border-red-400/20'    },
-  A: { color: 'text-orange-300', bg: 'bg-orange-500/10', border: 'border-orange-400/20' },
-  B: { color: 'text-yellow-300', bg: 'bg-yellow-500/10', border: 'border-yellow-400/20' },
-  C: { color: 'text-green-300',  bg: 'bg-green-500/10',  border: 'border-green-400/20'  },
-  D: { color: 'text-cyan-300',   bg: 'bg-cyan-500/10',   border: 'border-cyan-400/20'   },
+const TIERS: Record<TierKey, { color: string; bg: string }> = {
+  S: { color: 'text-red-300',    bg: 'bg-red-500/10'    },
+  A: { color: 'text-orange-300', bg: 'bg-orange-500/10' },
+  B: { color: 'text-yellow-300', bg: 'bg-yellow-500/10' },
+  C: { color: 'text-green-300',  bg: 'bg-green-500/10'  },
+  D: { color: 'text-cyan-300',   bg: 'bg-cyan-500/10'   },
 };
 
 const getTierFromAccuracy = (accuracy: number): TierKey => {
@@ -159,10 +159,10 @@ export const ExerciseSuccessView = ({
         className="relative w-full max-w-lg my-auto">
 
         {/* Main card */}
-        <div className="bg-zinc-900 border border-white/5 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden">
 
           {/* Header */}
-          <div className="px-7 pt-7 pb-5 border-b border-white/5">
+          <div className="px-7 pt-7 pb-5">
             {isExam ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 {/* Stars */}
@@ -174,10 +174,10 @@ export const ExerciseSuccessView = ({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.3 + i * 0.12, type: 'spring', stiffness: 200, damping: 14 }}
                       className={cn(
-                        'h-12 w-12 flex items-center justify-center rounded-full border',
+                        'h-12 w-12 flex items-center justify-center rounded-full',
                         i <= stars
-                          ? 'bg-amber-500/15 border-amber-400/25 text-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.35)]'
-                          : 'bg-zinc-800 border-white/5 text-zinc-600'
+                          ? 'bg-amber-500/15 text-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.35)]'
+                          : 'bg-zinc-800 text-zinc-600'
                       )}>
                       <FaStar className="h-5 w-5" />
                     </motion.div>
@@ -216,7 +216,7 @@ export const ExerciseSuccessView = ({
               <motion.div
                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-4">
-                <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/15 shrink-0">
+                <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-cyan-500/10 shrink-0">
                   <FaTrophy className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
@@ -231,7 +231,7 @@ export const ExerciseSuccessView = ({
           {(isExam || stats) && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="px-7 py-5 border-b border-white/5">
+              className="px-7 py-5">
 
               {/* Score — exam only */}
               {isExam && (
@@ -241,17 +241,26 @@ export const ExerciseSuccessView = ({
                     <div className="text-5xl font-bold text-white tabular-nums tracking-tight">{displayScore.toLocaleString()}</div>
                   </div>
                   {/* Tier badge */}
-                  <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl border', tier.bg, tier.border)}>
+                  <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl', tier.bg)}>
                     <span className={cn('text-3xl font-black leading-none', tier.color)}>{tierKey}</span>
                     <span className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Grade</span>
                   </div>
                 </div>
               )}
 
-              {/* Accuracy + Combo */}
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/15 flex items-center justify-center shrink-0">
+              {/* Accuracy + Combo + Score */}
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
+                    <FaStar className="text-yellow-400 h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <div className="text-white font-bold text-base leading-none">{(score ?? 0).toLocaleString()}</div>
+                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Score</div>
+                  </div>
+                </div>
+                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0">
                     <FaBullseye className="text-cyan-400 h-3.5 w-3.5" />
                   </div>
                   <div>
@@ -259,8 +268,8 @@ export const ExerciseSuccessView = ({
                     <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Accuracy</div>
                   </div>
                 </div>
-                <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0">
+                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
                     <FaFire className="text-orange-400 h-3.5 w-3.5" />
                   </div>
                   <div>
@@ -276,7 +285,7 @@ export const ExerciseSuccessView = ({
           {hasTimeline && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-              className="px-7 py-5 border-b border-white/5">
+              className="px-7 py-5">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">Performance</p>
                 <span className="text-[10px] text-zinc-600">{timeline!.length} notes</span>
@@ -309,7 +318,7 @@ export const ExerciseSuccessView = ({
                       const { active, payload } = props;
                       if (active && payload?.length) {
                         return (
-                          <div className="rounded-lg bg-zinc-950/90 px-3 py-2 border border-white/5 text-xs">
+                          <div className="rounded-lg bg-zinc-950/90 px-3 py-2 text-xs">
                             <span className="text-zinc-400">Accuracy </span>
                             <span className="text-white font-bold">{payload[0].value}%</span>
                           </div>
@@ -336,9 +345,9 @@ export const ExerciseSuccessView = ({
           {(unlockedContent?.length || (isExam && isPassed)) && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
-              className="px-7 py-4 border-b border-white/5">
+              className="px-7 py-4">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/15 flex items-center justify-center shrink-0">
+                <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
                   <FaUnlock className="text-purple-400 h-3.5 w-3.5" />
                 </div>
                 <div>
@@ -357,7 +366,7 @@ export const ExerciseSuccessView = ({
               <Button
                 onClick={onRestart}
                 disabled={isLoading}
-                className="flex-1 h-10 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium border border-white/8 transition-all">
+                className="flex-1 h-10 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium transition-all">
                 Try Again
               </Button>
             )}
@@ -367,7 +376,7 @@ export const ExerciseSuccessView = ({
               className={cn(
                 'flex-1 h-10 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2',
                 isExam && !isPassed
-                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white border border-white/8'
+                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white'
                   : 'bg-white hover:bg-zinc-200 text-zinc-950 font-semibold'
               )}>
               {isLoading ? (

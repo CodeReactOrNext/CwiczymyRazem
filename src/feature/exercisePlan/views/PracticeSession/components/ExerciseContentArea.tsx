@@ -100,13 +100,12 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl",
-      currentExercise.isPlayalong ? "" : "border border-white/10"
+      "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl"
     )}>
 
       {/* Ear Training */}
       {currentExercise.riddleConfig?.mode === "sequenceRepeat" && (
-        <div className="p-4 border-b border-white/5">
+        <div className="p-4">
           <EarTrainingView
             difficulty={currentExercise.riddleConfig.difficulty}
             isRevealed={isRiddleRevealed}

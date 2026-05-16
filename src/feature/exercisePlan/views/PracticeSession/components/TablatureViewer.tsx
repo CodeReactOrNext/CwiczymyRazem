@@ -117,7 +117,7 @@ const TablatureViewerInner = ({
 
       {showRestWarning && countInRemaining === 0 && (
         <div className="absolute top-2 right-3 pointer-events-none z-10">
-          <div className="flex items-center gap-1.5 bg-white/8 border border-white/15 text-white/50 text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+          <div className="flex items-center gap-1.5 bg-white/8 text-white/50 text-xs px-3 py-1 rounded-full backdrop-blur-sm">
             <span className="leading-none">𝄽</span>
             <span className="tracking-wider">pauza</span>
           </div>

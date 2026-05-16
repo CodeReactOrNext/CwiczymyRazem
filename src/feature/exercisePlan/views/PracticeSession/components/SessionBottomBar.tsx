@@ -59,7 +59,7 @@ export const SessionBottomBar = memo(({
 
   return (
     <>
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-zinc-950">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
@@ -141,7 +141,7 @@ export const SessionBottomBar = memo(({
     </div>
 
     <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-      <DialogContent className="max-w-md bg-zinc-900 border border-white/10 text-white">
+      <DialogContent className="max-w-md bg-zinc-900 text-white">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
@@ -151,7 +151,7 @@ export const SessionBottomBar = memo(({
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
           <Button
             variant="ghost"
-            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 border border-white/10 hover:border-red-500/30 font-semibold text-sm"
+            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-semibold text-sm"
             onClick={() => { setShowExitDialog(false); onClose?.(); }}
           >
             <FaSignOutAlt className="mr-2" />
