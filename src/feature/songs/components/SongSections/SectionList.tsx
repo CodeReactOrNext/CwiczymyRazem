@@ -58,10 +58,10 @@ export const SectionList = ({
         <button
           type="button"
           onClick={onAdd}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-dashed border-white/20 text-xs font-medium text-white hover:border-white/40 hover:bg-white/5 transition-all mt-1"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-white/[0.03] text-xs font-medium text-white hover:bg-white/5 transition-all mt-1"
         >
           <Plus className="h-4 w-4" />
-          Add Section
+          Add section
         </button>
       )}
     </div>

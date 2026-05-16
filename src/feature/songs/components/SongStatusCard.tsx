@@ -79,7 +79,7 @@ export const SongStatusCard = ({
       {(!isMobile || !hideHeaderOnMobile) && (
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-2 px-3 py-1.5 text-zinc-500 group/header cursor-pointer select-none w-full bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors rounded-md mb-1"
+          className="flex items-center gap-2 px-3 py-1.5 text-zinc-500 group/header cursor-pointer select-none w-full bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors rounded-lg mb-1"
         >
             <ChevronDown 
               size={10} 
@@ -88,7 +88,7 @@ export const SongStatusCard = ({
                 isCollapsed ? "-rotate-90" : "rotate-0"
               )} 
             />
-            <h3 className="text-xs font-bold uppercase tracking-wider transition-colors group-hover/header:text-zinc-300">{title}</h3>
+            <h3 className="text-xs font-bold transition-colors group-hover/header:text-zinc-300">{title}</h3>
             <span className="text-xs font-medium opacity-60">
               ({songs?.length || 0})
             </span>
@@ -108,9 +108,9 @@ export const SongStatusCard = ({
             <div 
               ref={setNodeRef}
               className={cn(
-                "group relative flex flex-col overflow-hidden rounded-2xl bg-zinc-900/10 transition-all duration-300",
-                isLibraryDropTarget && "ring-2 ring-cyan-500/50 bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.15)]",
-                isDropTarget && "scale-[1.02] border-cyan-500/30 bg-cyan-500/5"
+                "group relative flex flex-col overflow-hidden rounded-lg bg-zinc-900/10 transition-all duration-300",
+                isLibraryDropTarget && "bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.15)]",
+                isDropTarget && "scale-[1.02] bg-cyan-500/5"
               )}
             >
               {/* Premium Gradient Background for Drop Highlight */}

@@ -259,6 +259,7 @@ export const SkillDashboard = ({
             isPremium={isPremium}
             onStartExercise={handleStartChallenge}
             onShowUpgrade={() => setShowUpgradeModal(true)}
+            onShowLeaderboard={(id, title) => setLeaderboardExercise({ id, title })}
           />
         </TabsContent>
       </Tabs>

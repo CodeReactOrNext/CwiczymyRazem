@@ -61,7 +61,7 @@ interface SongLearningSectionProps {
   isPremium?: boolean;
   onPracticeWithGp?: (song: Song) => void;
   onOpenDetails?: (song: Song) => void;
-  onExploreLibrary?: () => void;
+  onExploreLibrary?: (view: 'board' | 'explore') => void;
   isLibraryActive?: boolean;
   activeId?: string | null;
   disableDnd?: boolean;
@@ -198,37 +198,37 @@ export const SongLearningSection = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-3 space-y-1">
-        <button
-          onClick={onExploreLibrary}
-          className={cn(
-            "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 border",
-            isLibraryActive 
-              ? "bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.1)] border-cyan-500/30" 
-              : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border-white/5"
-          )}
-        >
-          <div className={cn(
-            "h-8 w-8 rounded-lg flex items-center justify-center transition-colors",
-            isLibraryActive ? "bg-cyan-500/20" : "bg-zinc-800/50"
-          )}>
-            <Search size={16} />
-          </div>
-          <div className="flex-1 flex items-center justify-between">
-            <div className="flex flex-col items-start leading-none">
-              <span className="text-sm font-bold">Explore Library</span>
-              <span className="text-[10px] opacity-60 mt-1">Discover new songs</span>
-            </div>
-            <ChevronRight size={14} className={cn(
-              "transition-all duration-300",
-              isLibraryActive ? "translate-x-0.5 opacity-100 text-cyan-400" : "opacity-20 text-zinc-500"
-            )} />
-          </div>
-        </button>
+      <div className="p-3">
+        <div className="flex p-1 rounded-xl bg-zinc-900/50 border border-white/5">
+          <button
+            onClick={() => onExploreLibrary?.('board')}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
+              !isLibraryActive 
+                ? "bg-zinc-800 text-white shadow-lg border border-white/5" 
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Music size={14} className={!isLibraryActive ? "text-cyan-500" : ""} />
+            My Board
+          </button>
+          <button
+            onClick={() => onExploreLibrary?.('explore')}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
+              isLibraryActive 
+                ? "bg-zinc-800 text-white shadow-lg border border-white/5" 
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Search size={14} className={isLibraryActive ? "text-cyan-500" : ""} />
+            Library
+          </button>
+        </div>
       </div>
 
       <div className="px-5 py-4">
-         <h2 className="text-xs font-black text-zinc-600 uppercase tracking-[0.2em]">Your collection</h2>
+         <h2 className="text-xs font-bold text-zinc-500">Your collection</h2>
       </div>
       <FilterBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} t={t} />
 

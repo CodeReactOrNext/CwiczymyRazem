@@ -12,6 +12,7 @@ import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
 import { SongBoard } from "feature/songs/components/SongBoard/SongBoard";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
@@ -73,6 +74,7 @@ interface SongsViewProps {
 }
 
 const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => {
+  const router = useRouter();
   const { t } = useTranslation("songs");
   const isManagementView = view === "management";
 
@@ -362,8 +364,11 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onOpenDetails={(song) => {
                     setDetailsTarget(song);
                   }}
-                  onExploreLibrary={() => setDetailsTarget(null)}
-                  isLibraryActive={!detailsTarget}
+                  onExploreLibrary={(v) => {
+                    router.push({ query: { ...router.query, view: v } }, undefined, { shallow: true });
+                    setDetailsTarget(null);
+                  }}
+                  isLibraryActive={view === 'explore' && !detailsTarget}
                   activeId={activeId}
                   disableDnd={disableDnd}
                   isMobile={isMobile}
@@ -373,7 +378,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
           <main className={cn(
             "flex-1 overflow-y-auto no-scrollbar relative bg-black/20",
-            !detailsTarget && mobileTab === 'explore' ? "p-4 sm:p-6 md:p-10" : ""
+            !detailsTarget ? "p-4 sm:p-6 md:p-10" : ""
           )}>
             {detailsTarget ? (
               <div className="h-full flex flex-col">
@@ -390,6 +395,87 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onBack={() => setDetailsTarget(null)}
                 />
               </div>
+            ) : view === 'board' ? (
+              <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
+                <SkillPowerHero 
+                  skillPower={skillPower}
+                  playerTier={playerTier}
+                  learnedCount={learnedCount}
+                  totalCount={totalSongsCount}
+                />
+                
+                <div className="space-y-12">
+                  {userSongs.wantToLearn.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-zinc-500/10 flex items-center justify-center text-zinc-400">
+                           <Music size={16} />
+                        </div>
+                        <h2 className="text-xl font-bold text-white">Want to learn</h2>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {userSongs.wantToLearn.map((song) => (
+                          <SongCard 
+                            key={song.id} 
+                            song={song} 
+                            onOpenDetails={() => setDetailsTarget(song)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.learning.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                           <Play size={16} className="fill-current" />
+                        </div>
+                        <h2 className="text-xl font-bold text-white">Currently learning</h2>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {userSongs.learning.map((song) => (
+                          <SongCard 
+                            key={song.id} 
+                            song={song} 
+                            onOpenDetails={() => setDetailsTarget(song)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.learned.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                           <Trophy size={16} />
+                        </div>
+                        <h2 className="text-xl font-bold text-white">Mastered songs</h2>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {userSongs.learned.map((song) => (
+                          <SongCard 
+                            key={song.id} 
+                            song={song} 
+                            onOpenDetails={() => setDetailsTarget(song)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.learned.length === 0 && userSongs.learning.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
+                      <div className="h-20 w-20 rounded-full bg-zinc-800 flex items-center justify-center mb-6">
+                        <Music size={32} className="text-zinc-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">No songs in your board yet</h3>
+                      <p className="text-sm max-w-xs">Start exploring the library and add songs to your collection to track your progress.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : mobileTab === 'collection' ? (
               <div className="xl:hidden h-full overflow-y-auto p-4 bg-zinc-900/20 overscroll-none scroll-smooth">
                  <SongLearningSection
@@ -403,8 +489,12 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onOpenDetails={(song) => {
                     setDetailsTarget(song);
                   }}
-                  onExploreLibrary={() => setMobileTab('explore')}
-                  isLibraryActive={false}
+                  onExploreLibrary={(v) => {
+                    router.push({ query: { ...router.query, view: v } }, undefined, { shallow: true });
+                    setDetailsTarget(null);
+                    if (v === 'explore') setMobileTab('explore');
+                  }}
+                  isLibraryActive={view === 'explore' && !detailsTarget}
                   activeId={activeId}
                   disableDnd={disableDnd}
                   isMobile={isMobile}
@@ -415,8 +505,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 {/* Tier Selection Grid */}
                 <div className="space-y-4">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
-                    <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
+                    <p className="text-xs font-bold text-zinc-500">Filter by Tier</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {getAllTiers().map((tier) => {
@@ -433,16 +522,14 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                             }
                           }}
                           className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-[8px] border-2 font-bold transition-all active:scale-90",
+                            "flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
                             isActive 
-                              ? "shadow-lg" 
-                              : "border-white/5 bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
+                              ? "opacity-100 shadow-lg shadow-black/20" 
+                              : "bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
                           )}
                           style={{
-                            borderColor: isActive ? tier.color : "transparent",
-                            backgroundColor: isActive ? `${tier.color}15` : "",
+                            backgroundColor: isActive ? `${tier.color}25` : "",
                             color: isActive ? tier.color : "inherit",
-                            boxShadow: isActive ? `0 0 15px ${tier.color}30` : ""
                           }}
                         >
                           {tier.tier}
@@ -463,7 +550,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         placeholder={t("artist", "Artist...") as string}
                         value={artistQuery}
                         onChange={(e) => setArtistQuery(e.target.value)}
-                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                     </div>
 
@@ -475,7 +562,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         placeholder={t("title", "Title...") as string}
                         value={titleQuery}
                         onChange={(e) => setTitleQuery(e.target.value)}
-                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                     </div>
 
@@ -484,7 +571,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         variant="outline"
                         onClick={() => setIsFilterSheetOpen(true)}
                         className={cn(
-                          "relative h-12 flex-1 border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 shadow-lg hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          "relative h-12 flex-1 border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
                           hasFilters && "border-cyan-500/30 bg-cyan-500/5 text-cyan-400"
                         )}
                       >

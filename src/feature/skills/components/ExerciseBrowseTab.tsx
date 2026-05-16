@@ -8,9 +8,14 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, ChevronRight, Ear, Info, Mic, Search, Lock } from "lucide-react";
+import { Trophy, ChevronLeft, ChevronRight, Ear, Info, Mic, Search, Lock } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
+
+import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
+
 import type { DashboardExercise } from "./SkillDashboard";
 
 interface ExerciseBrowseTabProps {
@@ -18,6 +23,7 @@ interface ExerciseBrowseTabProps {
   isPremium: boolean;
   onStartExercise: (challenge: DashboardExercise) => void;
   onShowUpgrade: () => void;
+  onShowLeaderboard: (id: string, title: string) => void;
 }
 
 const PAGE_SIZE = 15;
@@ -52,6 +58,7 @@ export const ExerciseBrowseTab = ({
   isPremium,
   onStartExercise,
   onShowUpgrade,
+  onShowLeaderboard,
 }: ExerciseBrowseTabProps) => {
   const { t } = useTranslation(["common", "skills"]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,6 +67,8 @@ export const ExerciseBrowseTab = ({
   const [selectedSkill, setSelectedSkill] = useState("all");
   const [page, setPage] = useState(1);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+  const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
+  const [isLoadingRanks, setIsLoadingRanks] = useState(false);
 
   const availableSkills = useMemo(() => {
     const skillSet = new Set<GuitarSkillId>();
@@ -102,6 +111,39 @@ export const ExerciseBrowseTab = ({
 
   // reset to page 1 whenever filters change
   useEffect(() => { setPage(1); }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill]);
+
+  const userAuth = useAppSelector(selectUserAuth);
+
+  useEffect(() => {
+    if (!userAuth || pageExercises.length === 0) return;
+
+    const fetchRanks = async () => {
+      setIsLoadingRanks(true);
+      const rankPromises = pageExercises.map(async (ex) => {
+        const progress = progressMap.get(ex.id);
+        const score = progress?.micHighScore || progress?.earTrainingHighScore;
+        if (score && score > 0) {
+          const rank = await getExerciseUserRank(ex.id, score);
+          if (rank !== null) {
+            return { id: ex.id, rank };
+          }
+        }
+        return null;
+      });
+
+      const results = await Promise.all(rankPromises);
+      const newRanks: Record<string, number> = {};
+      results.forEach(res => {
+        if (res) newRanks[res.id] = res.rank;
+      });
+      setLeaderboardRanks(prev => ({ ...prev, ...newRanks }));
+      setIsLoadingRanks(false);
+    };
+
+    if (pageExercises.length > 0) {
+      fetchRanks();
+    }
+  }, [pageExercises, progressMap]);
 
   const buildChallenge = (exercise: typeof exercisesAgregat[0]): DashboardExercise => {
     const skillId = exercise.relatedSkills[0] || "general";
@@ -218,6 +260,7 @@ export const ExerciseBrowseTab = ({
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Bpm</th>
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Min</th>
+                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Rank</th>
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500 min-w-[160px]">Progress</th>
                 <th className="px-3 py-3 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
               </tr>
@@ -325,6 +368,39 @@ export const ExerciseBrowseTab = ({
                       {exercise.timeInMinutes}
                     </td>
 
+                    {/* Rank */}
+                    <td className="px-3 py-3.5">
+                      {isLoadingRanks && hasBeenAttempted && !leaderboardRanks[exercise.id] ? (
+                        <div className="h-6 w-6 rounded bg-zinc-800 animate-pulse ml-0.5" />
+                      ) : leaderboardRanks[exercise.id] ? (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
+                          className="flex items-center gap-2 group/rank cursor-pointer hover:opacity-80 transition-opacity"
+                          title="View Leaderboard"
+                        >
+                          <div className={cn(
+                            "flex items-center justify-center w-6 h-6 rounded border font-bold text-[11px] shadow-sm transition-all group-hover/rank:scale-110 group-hover/rank:border-white/30",
+                            leaderboardRanks[exercise.id] === 1 ? "bg-amber-500/20 border-amber-500/40 text-amber-500 shadow-amber-500/10" :
+                            leaderboardRanks[exercise.id] === 2 ? "bg-zinc-300/20 border-zinc-300/40 text-zinc-300 shadow-zinc-300/10" :
+                            leaderboardRanks[exercise.id] === 3 ? "bg-amber-700/20 border-amber-700/40 text-amber-600 shadow-amber-700/10" :
+                            "bg-zinc-800/40 border-zinc-700/50 text-zinc-400"
+                          )}>
+                            {leaderboardRanks[exercise.id]}
+                          </div>
+                          {leaderboardRanks[exercise.id] <= 3 && (
+                            <Trophy className={cn(
+                              "h-3.5 w-3.5 drop-shadow-md",
+                              leaderboardRanks[exercise.id] === 1 ? "text-amber-400" :
+                              leaderboardRanks[exercise.id] === 2 ? "text-zinc-400" :
+                              "text-amber-700"
+                            )} />
+                          )}
+                        </button>
+                      ) : (
+                        <span className="text-zinc-800 text-[10px] ml-2">—</span>
+                      )}
+                    </td>
+
                     {/* Progress */}
                     <td className="px-3 py-3.5">
                       {!hasBeenAttempted ? (
@@ -334,14 +410,14 @@ export const ExerciseBrowseTab = ({
                           {hasBpmProgress && (
                             <div className="flex flex-col gap-0.5">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[11px] font-bold text-main-400 tabular-nums">
+                                <span className="text-[11px] font-bold text-zinc-300 tabular-nums">
                                   {completedBpms.length}/{bpmStages.length} BPM
                                 </span>
                                 <span className="text-[10px] text-zinc-600">({bpmPct}%)</span>
                               </div>
                               <div className="h-1 w-24 rounded-full bg-zinc-800 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-main-500 transition-all"
+                                  className="h-full rounded-full bg-zinc-600 transition-all"
                                   style={{ width: `${bpmPct}%` }}
                                 />
                               </div>
@@ -349,25 +425,25 @@ export const ExerciseBrowseTab = ({
                           )}
                           {micScore != null && micScore > 0 && (
                             <div className="flex items-center gap-1.5">
-                              <Mic className="h-3 w-3 text-amber-500/80 shrink-0" />
-                              <span className="text-[11px] font-semibold text-amber-400 tabular-nums">
+                              <Mic className="h-3 w-3 text-zinc-500 shrink-0" />
+                              <span className="text-[11px] font-semibold text-zinc-200 tabular-nums">
                                 {micScore.toLocaleString()} pts
                               </span>
                               {micAccuracy != null && (
-                                <span className="text-[10px] text-amber-600">({micAccuracy}%)</span>
+                                <span className="text-[10px] text-zinc-500">({micAccuracy}%)</span>
                               )}
                             </div>
                           )}
                           {earScore != null && earScore > 0 && (
                             <div className="flex items-center gap-1.5">
-                              <Ear className="h-3 w-3 text-cyan-400/80 shrink-0" />
-                              <span className="text-[11px] font-semibold text-cyan-400 tabular-nums">
+                              <Ear className="h-3 w-3 text-zinc-500 shrink-0" />
+                              <span className="text-[11px] font-semibold text-zinc-200 tabular-nums">
                                 {earScore.toLocaleString()} pts
                               </span>
                             </div>
                           )}
                           {!hasBpmProgress && micScore == null && earScore == null && (
-                            <span className="text-[11px] text-emerald-400 font-semibold">Done</span>
+                            <span className="text-[11px] text-zinc-400 font-semibold">Done</span>
                           )}
                         </div>
                       )}

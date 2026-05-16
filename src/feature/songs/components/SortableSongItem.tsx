@@ -151,7 +151,7 @@ const SongMasteryProgress = ({ progress, totalSections }: { progress: number; to
   
   return (
     <div className="mt-2.5 space-y-1">
-      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.15em]">
+      <div className="flex items-center justify-between text-[10px] font-bold">
         <span className="text-zinc-500">Mastery</span>
         <span className="text-cyan-400 font-black">{progress}%</span>
       </div>
@@ -211,7 +211,7 @@ export const SortableSongItem = ({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex items-center gap-2 px-3 py-1.5 transition-colors select-none",
+        "group relative flex items-center gap-3 px-3 py-2.5 transition-colors select-none",
         isMobile ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         (!disableDnd && !isMobile) && "touch-none",
         isDragging ? "opacity-0" : "hover:bg-zinc-800/60 active:bg-zinc-800",
@@ -219,7 +219,7 @@ export const SortableSongItem = ({
     >
       {/* Tiny Cover Icon */}
       <div 
-        className="relative h-5 w-5 shrink-0 overflow-hidden rounded-sm bg-zinc-800 cursor-pointer border border-white/5"
+        className="relative h-6 w-6 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800 cursor-pointer"
         onClick={(e) => { e.stopPropagation(); onOpenDetails?.(song); }}
       >
         {song.coverUrl ? (
@@ -250,10 +250,9 @@ export const SortableSongItem = ({
       {/* Tier & Actions (Subtle) */}
       <div className="flex items-center gap-2 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
         <div 
-          className="flex h-5 w-5 items-center justify-center rounded-[4px] border text-[11px] font-black shadow-sm"
+          className="flex h-6 w-6 items-center justify-center rounded-[4px] text-[11px] font-black shadow-sm leading-none"
           style={{ 
-            borderColor: `${getSongTier(song.tier || 0).color}40`,
-            backgroundColor: `${getSongTier(song.tier || 0).color}10`,
+            backgroundColor: `${getSongTier(song.tier || 0).color}15`,
             color: getSongTier(song.tier || 0).color 
           }}
         >
@@ -269,7 +268,7 @@ export const SortableSongItem = ({
               <MoreVertical className="h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-zinc-950 border-white/5 backdrop-blur-xl p-1.5 shadow-2xl text-zinc-400 rounded-xl">
+          <DropdownMenuContent align="end" className="w-56 bg-zinc-950 backdrop-blur-xl p-1.5 shadow-2xl text-zinc-400 rounded-lg">
              <DropdownMenuItem
                     onClick={() => onPracticeWithGp ? onPracticeWithGp(song) : router.push(`/timer/song/${song.id}`)}
                     className="flex items-center gap-3 px-3 py-2 text-sm font-medium hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
