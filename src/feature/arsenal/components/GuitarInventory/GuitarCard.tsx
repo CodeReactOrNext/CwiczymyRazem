@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { Check } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
@@ -10,9 +10,11 @@ interface GuitarCardProps {
   isEquipped: boolean;
   onEquip: (guitarId: number | string, year?: number, country?: string) => void;
   isEquipping: boolean;
+  onSellClick: (inventoryItemId: string, guitarId: number | string) => void;
+  isSelling: boolean;
 }
 
-export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick, isSelling }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -27,8 +29,6 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
       style={{
         borderRadius: 8,
         background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
-        border: `1px solid ${rs.baseColor}28`,
-        borderBottom: `3px solid ${rs.baseColor}`,
         boxShadow: isEquipped
           ? `0 0 24px rgba(251,191,36,0.25), inset 0 0 0 1px rgba(251,191,36,0.1)`
           : `0 8px 32px rgba(0,0,0,0.6), 0 0 0 0 transparent`,
@@ -107,30 +107,46 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
         )}
       </div>
 
-      {/* Equip button */}
-      <button
-        onClick={() => onEquip(guitar.id, item.year, item.country)}
-        disabled={isEquipped || isEquipping}
-        className={cn(
-          "w-full py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",
-          isEquipped
-            ? "text-amber-400 cursor-default"
-            : "text-zinc-600 hover:text-white disabled:opacity-40"
-        )}
-        style={{
-          borderColor: isEquipped ? `rgba(251,191,36,0.25)` : `${rs.baseColor}18`,
-          background: isEquipped ? `rgba(251,191,36,0.08)` : "transparent",
-        }}
-      >
-        {isEquipped ? (
-          <>
-            <Check size={10} strokeWidth={3} />
-            Equipped
-          </>
-        ) : (
-          "Equip"
-        )}
-      </button>
+      {/* Buttons */}
+      <div className="flex gap-1 border-t" style={{ borderColor: `${rs.baseColor}20` }}>
+        {/* Equip button */}
+        <button
+          onClick={() => onEquip(guitar.id, item.year, item.country)}
+          disabled={isEquipped || isEquipping}
+          className={cn(
+            "flex-1 py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 flex items-center justify-center gap-1.5",
+            isEquipped
+              ? "text-amber-400 cursor-default"
+              : "text-zinc-600 hover:text-white disabled:opacity-40"
+          )}
+          style={{
+            background: isEquipped ? `rgba(251,191,36,0.08)` : "transparent",
+          }}
+        >
+          {isEquipped ? (
+            <>
+              <Check size={10} strokeWidth={3} />
+              Equipped
+            </>
+          ) : (
+            "Equip"
+          )}
+        </button>
+
+        {/* Sell button */}
+        <button
+          onClick={() => onSellClick(item.id, guitar.id)}
+          disabled={isSelling || isEquipped}
+          className="flex-1 py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 text-red-600/70 hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+          style={{
+            background: "transparent",
+          }}
+          title={isEquipped ? "Cannot sell equipped guitar" : undefined}
+        >
+          <Trash2 size={10} strokeWidth={3} />
+          Sell
+        </button>
+      </div>
     </div>
   );
 };

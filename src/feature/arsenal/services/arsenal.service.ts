@@ -51,3 +51,21 @@ export const updatePedalboard = async (items: PedalboardPlacement[]): Promise<vo
   const idToken = await getIdToken();
   await axios.post("/api/arsenal/update-pedalboard", { idToken, items });
 };
+
+export const sellGuitar = async (inventoryItemId: string): Promise<{ fameReward: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number }>("/api/arsenal/sell-guitar", {
+    idToken,
+    inventoryItemId,
+  });
+  return data;
+};
+
+export const sellEffect = async (inventoryItemId: string): Promise<{ fameReward: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number }>("/api/arsenal/sell-effect", {
+    idToken,
+    inventoryItemId,
+  });
+  return data;
+};

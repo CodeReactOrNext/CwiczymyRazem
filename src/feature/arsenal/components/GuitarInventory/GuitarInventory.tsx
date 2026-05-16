@@ -1,11 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
+import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { PackageOpen } from "lucide-react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import type { ArsenalUserData } from "../../types/arsenal.types";
+import { SellConfirmDialog } from "./SellConfirmDialog";
 import { GuitarCard } from "./GuitarCard";
 
 interface GuitarInventoryProps {
@@ -14,7 +16,12 @@ interface GuitarInventoryProps {
 
 export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
+  const { mutate: sell, isPending: isSelling } = useSellGuitar();
   const queryClient = useQueryClient();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedGuitarId, setSelectedGuitarId] = useState<number | string | null>(null);
 
   // Clear "new" flags when user opens collection tab
   useEffect(() => {
@@ -37,17 +44,51 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   const sorted = [...data.inventory].sort((a, b) => b.acquiredAt - a.acquiredAt);
 
+  const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {
+    setSelectedItemId(inventoryItemId);
+    setSelectedGuitarId(guitarId);
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmSell = () => {
+    if (selectedItemId) {
+      sell(selectedItemId, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          setSelectedItemId(null);
+          setSelectedGuitarId(null);
+        },
+      });
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {sorted.map((item) => (
-        <GuitarCard
-          key={item.id}
-          item={item}
-          isEquipped={data.equippedGuitarId === item.guitarId}
-          onEquip={(guitarId, year, country) => equip({ guitarId, year, country })}
-          isEquipping={isEquipping}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {sorted.map((item) => (
+          <GuitarCard
+            key={item.id}
+            item={item}
+            isEquipped={data.equippedGuitarId === item.guitarId}
+            onEquip={(guitarId, year, country) => equip({ guitarId, year, country })}
+            isEquipping={isEquipping}
+            onSellClick={handleSellClick}
+            isSelling={isSelling}
+          />
+        ))}
+      </div>
+
+      <SellConfirmDialog
+        isOpen={isDialogOpen}
+        guitarId={selectedGuitarId || 0}
+        onConfirm={handleConfirmSell}
+        onCancel={() => {
+          setIsDialogOpen(false);
+          setSelectedItemId(null);
+          setSelectedGuitarId(null);
+        }}
+        isLoading={isSelling}
+      />
+    </>
   );
 };

@@ -211,11 +211,11 @@
   },
   {
     "id": "random_note_hunt",
-    "title": "Random Note Hunt: A#",
+    "title": "Random Note Hunt: C",
     "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
     "difficulty": "easy",
     "category": "theory",
-    "customGoal": "A#",
+    "customGoal": "C",
     "customGoalDescription": "Find this note everywhere on the neck"
   },
   {

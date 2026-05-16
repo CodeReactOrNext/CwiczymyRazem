@@ -136,6 +136,11 @@ const userSlice = createSlice({
         );
       }
     },
+    addFame: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.fame = (state.currentUserStats.fame || 0) + payload;
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
@@ -457,6 +462,7 @@ export const {
   setActivity,
   setUserRole,
   deductFame,
+  addFame,
   setSelectedGuitar,
 } = userSlice.actions;
 
