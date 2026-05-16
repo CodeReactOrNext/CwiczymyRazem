@@ -33,6 +33,7 @@ import {
   Library as LibraryIcon,
   LoaderCircle,
   Music,
+  Play,
   Plus,
   Search,
   SlidersHorizontal,
