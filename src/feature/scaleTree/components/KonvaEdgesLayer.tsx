@@ -1,4 +1,4 @@
-import { Line } from 'react-konva';
+import { Line, Group } from 'react-konva';
 
 interface KonvaEdgesLayerProps {
   edges: Array<{ id: string; source: string; target: string }>;
@@ -41,6 +41,12 @@ export function KonvaEdgesLayer({
         const targetPos = positionMap[edge.target];
         if (!sourcePos || !targetPos) return null;
 
+        // Filter out extremely long horizontal lines that suggest non-existent connections
+        // (e.g. connections between distant scales that span the entire width)
+        const dx = Math.abs(sourcePos.x - targetPos.x);
+        const dy = Math.abs(sourcePos.y - targetPos.y);
+        if (dy < 1 && dx > 500) return null;
+
         // Lines between single_string nodes are more transparent
         const isSingleStringEdge =
           edge.source.includes('single_string') &&
@@ -50,13 +56,25 @@ export function KonvaEdgesLayer({
           : isCompleted ? 0.9 : 0.15;
 
         return (
-          <Line
-            key={edge.id}
-            points={[sourcePos.x, sourcePos.y, targetPos.x, targetPos.y]}
-            stroke={`rgba(${colorRGB}, ${opacity})`}
-            strokeWidth={isCompleted ? 3 : 2.5}
-            perfectDrawEnabled={false}
-          />
+          <Group key={edge.id}>
+            {/* 1. The Border - same color and style as node border */}
+            {!isCompleted && (
+              <Line
+                points={[sourcePos.x, sourcePos.y, targetPos.x, targetPos.y]}
+                stroke="rgba(255,255,255,0.02)"
+                strokeWidth={9}
+                perfectDrawEnabled={false}
+              />
+            )}
+
+            {/* 2. The Ditch core (darker than background) */}
+            <Line
+              points={[sourcePos.x, sourcePos.y, targetPos.x, targetPos.y]}
+              stroke={isCompleted ? `rgba(${colorRGB}, ${opacity})` : 'rgba(0,0,0,0.6)'}
+              strokeWidth={isCompleted ? 7 : 5}
+              perfectDrawEnabled={false}
+            />
+          </Group>
         );
       })}
     </>
