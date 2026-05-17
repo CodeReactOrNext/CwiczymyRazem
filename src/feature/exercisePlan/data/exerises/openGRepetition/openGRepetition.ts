@@ -17,6 +17,7 @@ export const openGRepetitionExercise: Exercise = {
     "Listen carefully to the metronome.",
     "Try to sync your picks perfectly with the beats."
   ],
+  whyItMatters: "This exercise improves timing consistency and alternate picking control by training you to play evenly with the metronome. It helps build the precision and stability needed for clean rhythm guitar playing.",
   metronomeSpeed: {
     min: 40,
     max: 120,

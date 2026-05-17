@@ -8,6 +8,7 @@ import { ImprovPromptView } from "./ImprovPromptView";
 import { StrummingSection } from "./StrummingSection";
 import { TablatureSection } from "./TablatureSection";
 import { VideoSection } from "./VideoSection";
+import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 
 interface ExerciseContentAreaProps {
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -54,6 +55,8 @@ interface ExerciseContentAreaProps {
   setTimerTime: (t: number) => void;
   onVideoEnd: () => void;
   isPlaying: boolean;
+  rewardSkillId?: string;
+  rewardAmount?: number;
 }
 
 export const ExerciseContentArea = memo(function ExerciseContentArea({
@@ -92,6 +95,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isPlaying,
   isMicEnabled,
   volumeRef,
+  rewardSkillId,
+  rewardAmount,
 }: ExerciseContentAreaProps) {
   const hasTablature =
     activeTablature &&
@@ -182,6 +187,13 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMobileView={false}
         />
       )}
+      
+      <ExerciseInstructionsInline 
+        exercise={activeExercise} 
+        isPlaying={isPlaying} 
+        rewardSkillId={rewardSkillId}
+        rewardAmount={rewardAmount}
+      />
     </div>
   );
 });

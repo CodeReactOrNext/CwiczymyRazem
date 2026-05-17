@@ -56,7 +56,7 @@ export function MobileMicGameHud() {
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     className={cn(
                       "inline-flex items-center justify-center w-6 h-6 rounded-md border text-[10px] font-black",
-                      grade.color, grade.bg, grade.border, grade.glow
+                      grade.color, grade.bg, grade.glow
                     )}
                   >
                     {grade.letter}

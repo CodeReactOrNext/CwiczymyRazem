@@ -17,6 +17,7 @@ export const spiderChromaticsExercise: Exercise = {
     "Keep fingers close to the fretboard when not playing.",
     "Focus on synchronous movement between both hands."
   ],
+  whyItMatters: "This exercise develops finger independence and hand synchronization through controlled chromatic movement. It helps improve fretting accuracy and overall coordination across the fretboard.",
   metronomeSpeed: {
     min: 40,
     max: 200,

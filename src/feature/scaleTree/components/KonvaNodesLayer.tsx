@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Group, RegularPolygon, Shape, Text } from 'react-konva';
 import type Konva from 'konva';
 
