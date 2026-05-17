@@ -3,24 +3,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const jazzChordMelodyExercise: Exercise = {
   id: "jazz_chord_melody",
   title: "Bass and Chords",
-  description: "Play bass notes with pick while comping chords with fingers.",
+  description: "Coordinate hybrid picking to execute clean bass lines while plucking simultaneous chord harmony.",
+  whyItMatters: "This exercise develops highly independent control between your pick and fingers. By separating low-frequency bass lines from high-frequency harmony voicings, you build the essential hand coordination needed to play solo arrangements, manage polyrhythms, and achieve precise chord comping.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
-    "Use the pick to play bass notes on beats 1 and 3.",
-    "Use fingers (i, m, a) to pluck chord voicings on beats 2 and 4.",
-    "Create a walking bass line with the pick while comping chords above.",
-    "Practice simple II-V-I progression first (Dm7-G7-Cmaj7).",
-    "Focus on smooth voice leading between chord voicings.",
-    "Keep bass notes steady while adding chord punctuations."
+    "Strike the low-register bass notes cleanly on the beat using your pick or fingers.",
+    "Use your middle, ring, and pinky fingers to pluck the higher chord voicings on alternate beats.",
+    "Coordinate the volume balance so the bass line and chords sound distinct but cohesive.",
   ],
   tips: [
-    "Think of your picking hand as two separate instruments - bass and piano.",
-    "The pick plays the role of a bass player - steady and grounded.",
-    "Fingers add harmonic color like piano comping in a jazz trio.",
-    "Listen to Joe Pass, Wes Montgomery, or Ted Greene for examples.",
-    "Start with simple two-note voicings before attempting full chords."
+    "Keep the pick steady and low to remain in position for the bass strokes.",
+    "Allow your fingers to pluck upward slightly rather than clawing at the strings.",
+    "Start with simple two-note voicings to master the hybrid hand coordination first.",
   ],
   metronomeSpeed: { min: 70, max: 110, recommended: 90 },
   relatedSkills: ["hybrid_picking"],

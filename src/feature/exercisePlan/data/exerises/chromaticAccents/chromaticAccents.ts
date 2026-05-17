@@ -6,24 +6,19 @@ import chromaticAccentsImage from "./image.png";
 export const chromaticAccentsExercise: Exercise = {
   id: "chromatic_accents",
   title: "Chromatic Accent Dynamics",
-  description: "Exercise developing dynamic control through playing chromatic sequences with shifting accents.",
-  difficulty: "easy",
+  description: "Master your dynamic control by playing a chromatic sequence with shifting accents. You will learn to control your pick attack to make accented notes significantly louder and non-accented notes noticeably quieter.",
+  whyItMatters: "This exercise develops precise dynamic control over your pick attack. It teaches you to differentiate accented and normal notes, which is essential for groove, phrasing, and expressive playing.",
+  difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Follow the chromatic sequence (frets 1-4) moving across the strings as shown in the tablature.",
-    "The exercise focuses on shifting the dynamic accent through each 16th note in a group of four.",
-    "Measures 1-2: Begin by accenting the 1st note of each group, then shift to the 2nd note mid-measure 2.",
-    "Measure 3: Maintain the 2nd note accent, then shift to the 3rd note mid-measure 3.",
-    "Measure 4: Continue accenting the 3rd note of each group across all strings.",
-    "Measure 5: Complete the pattern by shifting the accent to the 4th note of each group."
+    "Play the chromatic sequence across the strings, strictly following the accent markers (>).",
+    "Make accented notes significantly louder and non-accented notes whisper-soft.",
   ],
   tips: [
-    "The difference between accented and non-accented notes should be clearly audible.",
-    "Control your pick attack - stronger for accents, lighter for other notes.",
-    "Work with a metronome to maintain even timing despite dynamic changes.",
-    "Initially practice slowly, increasing tempo only when you have full control over dynamics.",
-
+    "Exaggerate the volume difference — strike accents hard and brush normal notes gently.",
+    "Keep your metronome slow and focus entirely on dynamic control.",
+    "Ensure your timing remains perfectly even; do not rush the loud notes.",
   ],
   metronomeSpeed: {
     min: 60,

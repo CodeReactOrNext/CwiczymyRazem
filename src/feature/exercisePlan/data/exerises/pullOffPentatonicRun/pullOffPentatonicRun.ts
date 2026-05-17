@@ -3,24 +3,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const pullOffPentatonicRunExercise: Exercise = {
   id: "pull_off_pentatonic_run",
   title: "Dark Pull-off Pentatonic Run",
-  description:
-    "Legato pull-off exercise using the A minor pentatonic scale across the middle strings (G→D→A→D). This avoids the bright upper strings for a darker, heavier sound, eliminating the 'happy' feel. One bar of 8th notes: pick the 7th fret, pull-off to the 5th.",
+  description: "Develop seamless legato technique using A minor pentatonic pull-offs across the middle strings. Focus on dynamic equality between picked and pulled notes for a smooth, heavy flow.",
+  whyItMatters: "This exercise builds fretting hand finger independence and strength. Legato runs are fundamental to fluid phrasing, speed, and clean transitions between strings.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 1.07,
   instructions: [
-    "Hold both fingers down before picking — the pull-off finger must already be in place.",
-    "Follow the string order: G (7→5), D (7→5), A (7→5), then back to D (7→5).",
-    "Pull the fretting finger sideways (toward the floor) to sound the lower note clearly.",
-    "Keep both notes equal in volume — the pulled note should ring as loud as the picked one.",
-    "Repeat the pattern continuously without stopping between cycles."
+    "Pre-plant both fingers before picking — the pull-off receiving finger must already be in place.",
+    "Pull your fretting finger slightly sideways (toward the floor) rather than straight off, snap-sounding the lower note clearly.",
+    "Keep both notes equal in volume: the pulled note must ring as loudly as the picked note.",
   ],
   tips: [
-    "Pre-plant both fingers before picking — don't place the pull-off finger after the pick.",
-    "Pull sideways, not straight off the string — this gives the lower note its volume.",
-    "Keep fingers close to the fretboard to minimise movement between strings.",
-    "The direction change at the bottom (A→D) is the trickiest part — isolate it if needed.",
-    "Once comfortable, combine with the Hammer-on Pentatonic Run for a full legato loop."
+    "Exaggerate the sideways pull to match the volume of picked notes.",
+    "Keep idle fingers hovering close to the fretboard to minimize unnecessary movement.",
+    "Isolate and slow down the direction change at the bottom string (A→D) to keep timing even.",
   ],
   metronomeSpeed: { min: 60, max: 160, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pull-off.mp3", sourceBpm: 50 },

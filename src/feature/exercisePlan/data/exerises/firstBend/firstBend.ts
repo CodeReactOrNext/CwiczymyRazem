@@ -7,24 +7,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const firstBendExercise: Exercise = {
   id: "first_bend",
   title: "First Bend – Whole Step",
-  description:
-    "Introduction to whole-step bends across two strings in Am pentatonic position 1. Play the target pitch first so your ear knows where to aim, then bend from the lower fret up to match it. Half-note pacing gives you time to really listen.",
+  description: "Learn accurate whole-step string bending. Compare your bent pitch against reference notes to train both muscle memory and your ear.",
+  whyItMatters: "This exercise teaches you to target bent pitches by ear rather than guessing. It trains your muscle memory to hit the exact whole-step pitch perfectly every time, preventing flat or out-of-tune bends.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 1.49,
   instructions: [
-    "Play the reference note first (fret 9 or 10) — that's the pitch your bend must reach.",
-    "Place your ring finger on the bend fret, with middle and index fingers supporting behind it.",
-    "Push the string upward until the pitch matches the reference, then hold for a full half note.",
-    "Measures 1–2: G string (fret 7 → bend to E). Measures 3–4: B string (fret 8 → bend to A).",
-    "Measures 5–8 repeat the same pattern — use them to refine accuracy."
+    "Play the reference note first to lock the target pitch in your ear.",
+    "Use your ring finger to bend, supported by your middle and index fingers behind it for strength.",
+    "Push the string upward from your wrist until the pitch matches the reference note perfectly.",
   ],
   tips: [
-    "Rotate your wrist to push the string — finger strength alone isn't enough.",
-    "Keep your thumb anchored on the back of the neck for maximum leverage.",
-    "The half-note pace is intentional: use the extra time to check the pitch before moving on.",
-    "If the bent pitch drifts flat while you hold it, push slightly harder mid-note.",
-    "Don't rush to the next note — a clean, sustained bend beats a fast, sloppy one."
+    "Rotate your wrist to push the string — do not rely on finger strength alone.",
+    "Never bend with a single finger — always support the bending finger with other fingers behind it.",
+    "Listen carefully to the sustained pitch; push slightly harder if it starts to drift flat.",
   ],
   metronomeSpeed: { min: 40, max: 72, recommended: 52 },
   relatedSkills: ["bending"],

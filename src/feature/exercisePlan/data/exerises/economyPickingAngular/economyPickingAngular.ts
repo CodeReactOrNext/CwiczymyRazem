@@ -5,24 +5,20 @@ import economyPickingImage from "./image.png";
 export const economyPickingAngularExercise: Exercise = {
   id: "economy_picking_angular",
   title: "Angular / Economy Picking",
-  description:
-    "Angular (economy) picking exercise focused on efficient string crossing, smooth sweep motions, and right-hand economy.",
+  description: "Practice angular economy picking to minimize picking hand movement and transition fluidly across adjacent strings.",
+  whyItMatters: "This exercise develops picking hand efficiency through directional economy picking. By allowing the pick to continue its path through adjacent strings rather than forcing strict alternate strokes, you minimize wasted physical movement, increase potential playing speed, and build a smooth, sweeping cross-string motion.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 6,
   instructions: [
-    "Play the exercise slowly, following the natural direction of the pick when changing strings.",
-    "When moving to a higher string, allow the pick to continue in the same direction (economy picking).",
-    "Use small sweep motions when two notes fall on adjacent strings in the same pick direction.",
-    "After completing the pattern, move it across all strings.",
-    "Maintain consistent tone and volume for every note."
+    "Let the pick continue in the same direction when crossing onto an adjacent string.",
+    "Use a tiny sweeping motion for sequential notes falling on adjacent strings.",
+    "Maintain uniform tone, volume, and metronomic timing on every note.",
   ],
   tips: [
-    "Do not force alternate picking — let the string changes dictate the pick direction.",
-    "Keep the pick close to the strings to minimize motion.",
-    "Focus on synchronization between both hands.",
-    "Start at a slow tempo and increase speed only when the exercise feels relaxed.",
-    "Stop if excessive tension appears in the picking hand."
+    "Do not force alternate picking — allow the string changes to dictate your stroke direction.",
+    "Keep your picking stroke compact and close to the strings to maximize efficiency.",
+    "Practice slowly to coordinate the exact moment of pick crossing with your fretting hand.",
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
   relatedSkills: ["hybrid_picking"],

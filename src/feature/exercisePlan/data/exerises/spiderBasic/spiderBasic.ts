@@ -6,21 +6,20 @@ import spiderBasicImage from "./image.png";
 export const spiderBasicExercise: Exercise = {
   id: "spider_basic",
   title: "Horizontal Spider Exercise",
-  description: "Exercise developing left hand precision and synchronization with right hand.",
+  description: "Master left-hand finger independence and sync it perfectly with your picking hand using this foundational horizontal shifting pattern.",
+  whyItMatters: "This exercise develops solid finger autonomy. It prevents fingers from 'flying away' from the fretboard, vastly improves economy of motion, and synchronizes both hands for clean, fast lead playing.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 4,
   instructions: [
-    "Perform the 'spider' exercise on the guitar, playing 4 notes per beat (i.e. sixteenths). Maintain the pattern shown on the tablature, shifting it every fret after completing a repetition.",
-
+    "Play 4 even notes per beat using strict alternate picking (down-up-down-up).",
+    "Shift your entire hand up by one fret each time you complete a full pattern cycle.",
+    "Ensure every note sounds completely clear before moving to the next fret.",
   ],
   tips: [
-    "Focus on even pressure and smooth movements.",
-    "Try not to lift fingers unnecessarily to maintain stability and economy of movement.",
-    "Practice intonation, ensuring each note sounds clean and clear.",
-    "Control hand tension, don't squeeze the neck too hard but maintain stability.",
-    "Adjust tempo to your abilities, gradually increasing it.",
-    "You can freely change position on the fretboard to practice different hand arrangements.",
+    "Keep unused fingers hovering extremely close to the strings to minimize movement.",
+    "Relax your grip — use minimum pressure required to fret each note cleanly.",
+    "Use a metronome and slow down if your timing between hand shifts becomes uneven.",
   ],
   metronomeSpeed: {
     min: 40,

@@ -2,6 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const firstMelodyExercise: Exercise = {
   id: "first_melody",
+  isHiddenFromLibrary: true,
   title: "First Melody — One String",
   description:
     "Your very first melody: 'Mary Had a Little Lamb' played entirely on the B string using only three fret positions (1, 3, 5). No string changes, no chords — just a real tune from day one.",

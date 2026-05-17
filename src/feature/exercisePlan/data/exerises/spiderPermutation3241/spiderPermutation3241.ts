@@ -4,21 +4,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const spiderPermutation3241Exercise: Exercise = {
   id: "spider_permutation_3241",
   title: "Spider Exercise - 3-2-4-1 Permutation",
-  description: "Chromatic exercise using finger permutation 3-2-4-1, developing finger independence and coordination.",
-  difficulty: "medium",
+  description: "Fret notes on a single string using finger permutation 3-2-4-1 to isolate specific finger movements and develop deep coordination control.",
+  whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 3-2-4-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
+  difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Place your left hand fingers on four consecutive frets of one string.",
-    "Start playing according to the permutation 3-2-4-1, which means: finger 3, finger 2, finger 4, finger 1.",
-
+    "Place your fretting hand fingers over four consecutive frets on a single string.",
+    "Play the notes strictly following the 3-2-4-1 finger sequence.",
+    "Shift your hand up by one fret each time you complete a full pattern loop.",
   ],
   tips: [
-    "This permutation ends with a challenging 4-1 transition, requiring a large jump.",
-    "Maintain even tempo and spacing between notes - use a metronome.",
-    "Use minimal pressure on the frets - only as much as needed for a clean sound.",
-    "Try to keep other fingers close to the strings, ready to use.",
-
+    "Use strict alternate picking (down-up-down-up) throughout the exercise.",
+    "Keep unused fingers hovering extremely close to the strings to minimize wasted motion.",
+    "Ensure each note rings out completely clean and free of fret-buzz.",
   ],
   metronomeSpeed: {
     min: 60,
