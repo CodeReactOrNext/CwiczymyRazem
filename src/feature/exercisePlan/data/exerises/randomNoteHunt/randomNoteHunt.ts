@@ -41,6 +41,10 @@ export const randomNoteHuntExercise: Exercise = {
     "Don't worry about rhythm; focus on accuracy and speed of location.",
     "Try to visualize the note on the fretboard before you play it."
   ],
+  whyItMatters: "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck.",
   metronomeSpeed: null,
   relatedSkills: ["music_theory"],
+  disableMic: true,
+  disableBackingTrack: true,
+  disableTuner: true,
 };

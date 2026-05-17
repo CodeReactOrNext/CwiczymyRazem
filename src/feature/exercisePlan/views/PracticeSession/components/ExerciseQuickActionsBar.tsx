@@ -19,7 +19,7 @@ interface ExerciseQuickActionsBarProps {
   compact?: boolean;
 }
 
-type ModalType = "instructions" | "metronome" | "bpm" | null;
+type ModalType = "metronome" | "bpm" | null;
 
 const tempoColor = (bpm: number) =>
   bpm < 80 ? "text-emerald-400" : bpm < 120 ? "text-amber-400" : "text-red-400";
@@ -35,11 +35,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   const [openModal, setOpenModal] = useState<ModalType>(null);
   const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
 
-  const hasInstructions = !!(exercise.instructions?.length || exercise.tips?.length);
   const hasMetronome = !!exercise.metronomeSpeed && !examMode;
   const hasBpmProgress = !!exercise.metronomeSpeed && bpmStages.length > 0 && !exercise.gpFileUrl && !examMode;
 
-  if (!hasInstructions && !hasMetronome) return null;
+  if (!hasMetronome) return null;
 
   const bpm: number = metronome.bpm;
   const h = compact ? "h-8" : "h-12";
@@ -50,21 +49,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   return (
     <>
       <div className={cn("flex items-center justify-center gap-1.5 flex-wrap", compact ? "" : "gap-3 mb-4")}>
-        {hasInstructions && (
-          <button
-            onClick={() => toggle("instructions")}
-            className={cn(
-              "flex items-center gap-2 px-4 rounded-[8px] transition-all",
-              h,
-              openModal === "instructions"
-                ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
-                : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
-            )}
-          >
-            <FaInfoCircle className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-            {!compact && <span className="text-[10px] font-semibold tracking-wide hidden sm:block">About Exercise</span>}
-          </button>
-        )}
+
 
         {hasMetronome && (
           <div className={cn(
@@ -155,40 +140,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               <X size={18} />
             </button>
 
-            {openModal === "instructions" && (
-              <div className="p-8 max-h-[75vh] overflow-y-auto">
-                {exercise.instructions && exercise.instructions.length > 0 && (
-                  <div className={cn(exercise.tips?.length ? "mb-8" : "")}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 rounded-[8px] bg-cyan-500/10 text-cyan-400">
-                        <FaInfoCircle />
-                      </div>
-                      <h3 className="font-bold text-white tracking-wide">Instructions</h3>
-                    </div>
-                    <div className="space-y-3 text-zinc-300 leading-relaxed text-left">
-                      {exercise.instructions.map((instruction, idx) => (
-                        <p key={idx}>{instruction}</p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {exercise.tips && exercise.tips.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 rounded-[8px] bg-amber-500/10 text-amber-400">
-                        <FaLightbulb />
-                      </div>
-                      <h3 className="font-bold text-white tracking-wide">Tips</h3>
-                    </div>
-                    <ul className="space-y-2 list-disc list-inside text-zinc-300 text-left">
-                      {exercise.tips.map((tip, idx) => (
-                        <li key={idx} className="marker:text-amber-500/50">{tip}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
+
 
             {openModal === "metronome" && (
               <div className="p-6">

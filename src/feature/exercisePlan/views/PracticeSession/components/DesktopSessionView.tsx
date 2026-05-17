@@ -95,6 +95,8 @@ interface DesktopSessionViewProps {
   planHasTablature:         boolean;
   planHasGpFile:            boolean;
   planHasStrumming:         boolean;
+  skillRewardSkillId?:      string;
+  skillRewardAmount?:       number;
 }
 
 export const DesktopSessionView = React.memo(function DesktopSessionView(p: DesktopSessionViewProps) {
@@ -140,7 +142,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                 </div>
 
                 <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-8")}>
-                  <ExerciseHeroHeader exercise={p.currentExercise} activeExercise={p.activeExercise} plan={p.plan} />
+                  <ExerciseHeroHeader 
+                    exercise={p.currentExercise} 
+                    activeExercise={p.activeExercise} 
+                    plan={p.plan} 
+                    rewardSkillId={p.skillRewardSkillId}
+                    rewardAmount={p.skillRewardAmount}
+                  />
                   {p.isMicEnabled && <MicHud />}
                   {p.allGpTracks && !p.showAlphaTabScore && (
                     <GpTrackSelector tracks={p.allGpTracks} selectedIdx={p.selectedGpTrackIdx} onChange={p.setSelectedGpTrackIdx} />
@@ -182,6 +190,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     setVideoDuration={p.setVideoDuration} setTimerTime={p.setTimerTime}
                     onVideoEnd={p.handleNextExerciseClick} isPlaying={p.isPlaying}
                     isMicEnabled={p.isMicEnabled} volumeRef={p.volumeRef}
+                    rewardSkillId={p.skillRewardSkillId}
+                    rewardAmount={p.skillRewardAmount}
                   />
                 </div>
 

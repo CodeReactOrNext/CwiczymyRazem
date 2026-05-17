@@ -9,10 +9,15 @@ interface ExerciseHeroHeaderProps {
   exercise: Exercise;
   activeExercise: Exercise;
   plan: ExercisePlan;
+  rewardSkillId?: string;
+  rewardAmount?: number;
 }
 
-export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ exercise, activeExercise, plan }: ExerciseHeroHeaderProps) {
+export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ 
+  exercise, activeExercise, plan, rewardSkillId, rewardAmount 
+}: ExerciseHeroHeaderProps) {
   const streakPlan = plan as any;
+
   return (
     <>
       <h2 className={cn(

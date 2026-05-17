@@ -401,6 +401,7 @@ export const PracticeSession = ({
         onFinishSession={async () => { metronome.stopMetronome(); await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
         onClose={onClose} skipExitDialog={skipExitDialog}
         planHasTablature={planHasTablature} planHasGpFile={planHasGpFile} planHasStrumming={planHasStrumming}
+        skillRewardSkillId={skillRewardSkillId} skillRewardAmount={skillRewardAmount}
       />
 
       <SessionDialogs

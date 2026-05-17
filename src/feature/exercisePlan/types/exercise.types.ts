@@ -132,6 +132,7 @@ export interface Exercise {
   timeInMinutes: number;
   instructions: LocalizedContent[];
   tips: LocalizedContent[];
+  whyItMatters?: string;
   metronomeSpeed: {
     min: number;
     max: number;
@@ -159,6 +160,9 @@ export interface Exercise {
   _generatorConfig?: any;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */
   examBacking?: { url: string; sourceBpm: number };
+  disableMic?: boolean;
+  disableBackingTrack?: boolean;
+  disableTuner?: boolean;
 }
 
 export interface ExercisePlan {

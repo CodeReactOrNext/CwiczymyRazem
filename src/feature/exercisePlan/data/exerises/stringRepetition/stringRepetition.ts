@@ -17,6 +17,7 @@ export const stringRepetitionExercise: Exercise = {
     "Mute adjacent strings to avoid unwanted noise.",
     "Pay attention to a consistent eighth-note rhythm."
   ],
+  whyItMatters: "This exercise trains clean string switching while keeping a steady rhythm. It helps improve picking accuracy and control between strings.",
   metronomeSpeed: {
     min: 40,
     max: 140,
