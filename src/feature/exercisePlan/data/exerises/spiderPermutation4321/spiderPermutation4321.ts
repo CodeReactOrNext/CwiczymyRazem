@@ -5,22 +5,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const spiderPermutation4321Exercise: Exercise = {
   id: "spider_permutation_4321",
   title: "Spider Exercise - 4-3-2-1 Permutation",
-  description: "Chromatic exercise using finger permutation 4-3-2-1, developing finger independence and coordination.",
-  difficulty: "medium",
+  description: "Fret notes on a single string using finger permutation 4-3-2-1 to isolate specific finger movements and develop deep coordination control.",
+  whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 4-3-2-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
+  difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Place your left hand fingers on four consecutive frets of one string.",
-    "Start playing according to the permutation 4-3-2-1, which means: finger 4, finger 3, finger 2, finger 1.",
-
-
+    "Place your fretting hand fingers over four consecutive frets on a single string.",
+    "Play the notes strictly following the 4-3-2-1 finger sequence.",
+    "Shift your hand up by one fret each time you complete a full pattern loop.",
   ],
   tips: [
-    "This permutation is completely backward - requires special control over each finger.",
-    "Maintain even tempo and spacing between notes - use a metronome.",
-    "Use minimal pressure on the frets - only as much as needed for a clean sound.",
-
-
+    "Use strict alternate picking (down-up-down-up) throughout the exercise.",
+    "Keep unused fingers hovering extremely close to the strings to minimize wasted motion.",
+    "Ensure each note rings out completely clean and free of fret-buzz.",
   ],
   metronomeSpeed: {
     min: 60,

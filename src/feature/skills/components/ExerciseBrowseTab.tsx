@@ -72,7 +72,10 @@ export const ExerciseBrowseTab = ({
 
   const availableSkills = useMemo(() => {
     const skillSet = new Set<GuitarSkillId>();
-    exercisesAgregat.forEach(ex => ex.relatedSkills.forEach(s => skillSet.add(s as GuitarSkillId)));
+    exercisesAgregat.forEach(ex => {
+      if (ex.isHiddenFromLibrary) return;
+      ex.relatedSkills.forEach(s => skillSet.add(s as GuitarSkillId));
+    });
     return Array.from(skillSet).sort((a, b) => {
       const na = guitarSkills.find(s => s.id === a)?.id ?? a;
       const nb = guitarSkills.find(s => s.id === b)?.id ?? b;
@@ -84,6 +87,7 @@ export const ExerciseBrowseTab = ({
     const q = searchQuery.toLowerCase();
     return exercisesAgregat
       .filter(ex => {
+        if (ex.isHiddenFromLibrary) return false;
         if (ex.isPlayalong) return false;
         if (selectedCategory !== "all" && ex.category !== selectedCategory) return false;
         if (selectedDifficulty !== "all" && ex.difficulty !== selectedDifficulty) return false;

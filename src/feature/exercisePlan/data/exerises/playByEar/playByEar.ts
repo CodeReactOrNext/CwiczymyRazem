@@ -4,22 +4,21 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const playByEarExercise: Exercise = {
   id: "play_by_ear",
   title: "Playing By Ear",
-  description: "Exercise developing the ability to listen and reproduce music without sheet music.",
+  description: "Listen to an external audio fragment and reproduce it on the guitar without visual aids or tabs.",
+  whyItMatters: "Transcribing audio directly to the fretboard connects your auditory processing to your physical playing. This eliminates reliance on sheet music and tabs, developing the crucial ability to play the melodies you hear in your head or in a live band setting.",
   difficulty: "medium",
   category: "hearing",
   timeInMinutes: 15,
   instructions: [
-    "Choose a simple riff or song fragment, preferably from a genre you're familiar with.",
-    "Listen to the fragment several times, focusing first on rhythm and structure.",
-    "Slowly reproduce the fragment on guitar, correcting mistakes and adjusting your playing.",
-    "Repeat until you're satisfied with the result or until the end of the exercise time."
+    "Select a short, simple riff or melody from a recording.",
+    "Listen to the fragment multiple times, internalizing the rhythm and pitch contour before touching the guitar.",
+    "Identify the root note or key center by trial and error on the fretboard.",
+    "Reconstruct the phrase note-by-note on the guitar, making corrections until it matches the recording exactly.",
   ],
   tips: [
-    "Start with simple, single-line riffs - avoid complicated pieces at the beginning.",
-    "Use technology - apps allowing song slowdown or isolating fragments can be helpful.",
-    "Sing the notes you hear before playing them on guitar - this helps internalize the sounds.",
-    "Don't be afraid to experiment on different strings and positions to find the right notes.",
-
+    "Sing the pitches out loud before attempting to find them on the fretboard.",
+    "If you get stuck, use software to isolate the fragment or slow down the playback speed without changing the pitch.",
+    "Test different fretboard positions for the same notes to find the most efficient fingering for the phrase.",
   ],
   metronomeSpeed: null,
   relatedSkills: ["ear_training"],

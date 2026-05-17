@@ -513,15 +513,17 @@ ExercisesLandingPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getStaticProps: GetStaticProps<ExercisesLandingPageProps> = async () => {
-  const exercisesData = serializeExercises(exercisesAgregat).map((ex) => ({
-    id: ex.id,
-    title: ex.title,
-    difficulty: ex.difficulty,
-    category: ex.category,
-    description: ex.description,
-    timeInMinutes: ex.timeInMinutes,
-    premium: ex.premium,
-  }));
+  const exercisesData = serializeExercises(exercisesAgregat)
+    .filter((ex) => !ex.isHiddenFromLibrary)
+    .map((ex) => ({
+      id: ex.id,
+      title: ex.title,
+      difficulty: ex.difficulty,
+      category: ex.category,
+      description: ex.description,
+      timeInMinutes: ex.timeInMinutes,
+      premium: ex.premium,
+    }));
 
   return {
     props: { exercisesData },

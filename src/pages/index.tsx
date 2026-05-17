@@ -27,7 +27,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 
   // Select 3 free exercises (unmarked as premium) with tablature for landing preview
   const spotlightExercises = serializeExercises(exercisesAgregat)
-    .filter((ex) => !ex.premium && ex.tablature?.length)
+    .filter((ex) => !ex.premium && ex.tablature?.length && !ex.isHiddenFromLibrary)
     .slice(0, 3)
     .map((ex) => ({
       id: ex.id,

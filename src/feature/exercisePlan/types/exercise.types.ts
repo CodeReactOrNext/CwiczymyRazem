@@ -163,6 +163,8 @@ export interface Exercise {
   disableMic?: boolean;
   disableBackingTrack?: boolean;
   disableTuner?: boolean;
+  isHiddenFromLibrary?: boolean;
+  requiresBackingTrack?: boolean;
 }
 
 export interface ExercisePlan {

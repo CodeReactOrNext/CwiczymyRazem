@@ -9,6 +9,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const quarterNotesDrillExercise: Exercise = {
   id: "quarter_notes_drill",
+  isHiddenFromLibrary: true,
   title: "Quarter Notes Drill",
   description:
     "One downstroke per beat on the A string — open A and one fretted note (B), with rests scattered through the pattern. The rests are not a break; they are the exercise: count through the silence and land the next note exactly on the click.",

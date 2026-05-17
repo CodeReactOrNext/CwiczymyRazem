@@ -40,7 +40,11 @@ export const ExerciseInstructionsInline = ({
     exercise.difficulty === "hard" ? 3 : 0
   );
 
-  const displaySkillId = rewardSkillId || (exercise.relatedSkills && exercise.relatedSkills[0]) || exercise.category;
+  const displaySkillIds = rewardSkillId 
+    ? [rewardSkillId] 
+    : (exercise.relatedSkills && exercise.relatedSkills.length > 0)
+      ? exercise.relatedSkills 
+      : [exercise.category];
 
   const getTranslatedSkill = (id?: string) => {
     if (!id) return "";
@@ -121,20 +125,34 @@ export const ExerciseInstructionsInline = ({
                   )}
                 </div>
 
-                {exercise.tips && exercise.tips.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2.5 text-zinc-400 mb-2">
-                      <FaLightbulb size={14} />
-                      <h4 className="text-xs font-bold">Pro Tips</h4>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                      {exercise.tips.map((tip, idx) => (
-                        <div key={idx} className="flex gap-3 text-zinc-400 text-sm leading-relaxed font-medium">
-                          <span className="text-amber-500/50 font-bold shrink-0">#{idx + 1}</span>
-                          <p>{tip}</p>
+                {(exercise.requiresBackingTrack || (exercise.tips && exercise.tips.length > 0)) && (
+                  <div className="space-y-6">
+                    {exercise.requiresBackingTrack && (
+                      <div className="p-3.5 bg-amber-500/10 rounded-lg flex items-start gap-3 text-amber-400 text-sm leading-relaxed font-semibold">
+                        <FaInfoCircle size={16} className="shrink-0 text-amber-500 mt-0.5" />
+                        <div>
+                          <div className="text-[11px] font-bold text-amber-500/80 mb-1">Backing track recommended</div>
+                          You should use a backing track for this exercise!
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+
+                    {exercise.tips && exercise.tips.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2.5 text-zinc-400 mb-2">
+                          <FaLightbulb size={14} />
+                          <h4 className="text-xs font-bold">Pro Tips</h4>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          {exercise.tips.map((tip, idx) => (
+                            <div key={idx} className="flex gap-3 text-zinc-400 text-sm leading-relaxed font-medium">
+                              <span className="text-amber-500/50 font-bold shrink-0">#{idx + 1}</span>
+                              <p>{tip}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -158,25 +176,25 @@ export const ExerciseInstructionsInline = ({
                       </p>
                     </div>
 
-                    {/* Potential Reward Section */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-zinc-400">
-                        <span className="text-emerald-500/80 shrink-0">
-                          {(() => {
-                            const specificSkill = guitarSkills.find(s => s.id === displaySkillId);
-                            if (specificSkill && specificSkill.icon) {
-                              const SpecificIcon = specificSkill.icon;
-                              return <SpecificIcon size={14} />;
-                            }
-                            const CategoryIcon = SKILL_CATEGORY_ICONS[displaySkillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck;
-                            return <CategoryIcon size={'small'} />;
-                          })()}
-                        </span>
+                        <FaCheck size={14} className="text-emerald-500/80" />
                         <h4 className="text-xs font-bold">Potential Reward</h4>
                       </div>
-                      <p className="text-zinc-400 text-sm leading-relaxed font-medium pl-6">
-                        Earn <strong className="text-emerald-400">+{displayAmount}</strong> in <strong className="text-emerald-400">{getTranslatedSkill(displaySkillId as string)}</strong>
-                      </p>
+                      <div className="space-y-1.5 pl-6">
+                        {displaySkillIds.map(skillId => {
+                          const specificSkill = guitarSkills.find(s => s.id === skillId);
+                          const Icon = (specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck;
+                          return (
+                            <div key={skillId} className="flex items-center gap-2 text-zinc-400 text-sm font-medium">
+                              <Icon size={12} className="text-emerald-500/70 shrink-0" />
+                              <span>
+                                Earn <strong className="text-emerald-400">+{displayAmount}</strong> in <strong className="text-emerald-400">{getTranslatedSkill(skillId)}</strong>
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 )}

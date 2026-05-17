@@ -7,24 +7,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const bendAndReleaseExercise: Exercise = {
   id: "bend_and_release",
   title: "Bend & Release",
-  description:
-    "Whole-step bend followed by a slow, controlled release — on both G and B strings in Am pentatonic position 1. The release is the harder skill: the string must drift back smoothly while still ringing. Half-note values give you time to feel every stage of the movement.",
+  description: "Perform clean whole-step string bends followed by slow, controlled releases to develop precise pitch control and finger strength.",
+  whyItMatters: "This exercise develops accurate pitch control and micro-intonation. The slow, controlled release trains your fingers to guide the string back to its starting position without losing fret pressure, eliminating pitch wobbles and ensuring a smooth, expressive vocal-like quality to your bends.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Pick fret 7 (G string) or fret 8 (B string) and push up to a full whole-step bend — hold for a half note.",
-    "Without re-picking, slowly lower the string back to its original position over the next half note.",
-    "Play the unbent note straight for one beat to confirm you're back in tune, then rest one beat.",
-    "Measures 1–2: G string bend and release. Measures 3–4: B string bend and release.",
-    "Measures 5–8 repeat — focus on making the release as smooth and even as the bend."
+    "Push the string up cleanly to a full whole-step bend using three fingers (ring finger on the target fret supported by middle and index). Do not attempt to bend with a single finger.",
+    "Hold the peak of the bend briefly, then slowly release the string back to its starting pitch without re-picking.",
+    "Listen to ensure the string rings continuously and decays smoothly throughout the entire release.",
   ],
   tips: [
-    "Maintain fretting pressure throughout the release — never let go of the string.",
-    "Un-rotate your wrist at the same speed you rotated it going up.",
-    "The released note must ring cleanly: if it dies, you're losing contact with the fret.",
-    "A wobbly or jerky release sounds like a mistake; a smooth one sounds like expression.",
-    "Once the release is clean, try doing it in silence (with a pick-hand mute) to focus on feel."
+    "Use your index and middle fingers behind your bending finger to support the string tension and ensure precise pitch control.",
+    "Keep steady downward fret pressure on the string during the release so the note does not choke out.",
+    "Rotate your wrist from the forearm to drive the bend, rather than pushing from the finger joints.",
   ],
   metronomeSpeed: { min: 40, max: 65, recommended: 48 },
   relatedSkills: ["bending"],

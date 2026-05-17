@@ -2,6 +2,7 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import React, { useEffect } from "react";
 import { FaSync } from "react-icons/fa";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;
@@ -25,10 +26,22 @@ export const SuccessRewardCard = ({
   skillRewardSkillId,
   skillRewardAmount,
   skillPointsGained,
-  onRestart,
   onContinue
 }: SuccessRewardCardProps) => {
-  const skillName = skillRewardSkillId ? skillRewardSkillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "";
+  const { t } = useTranslation("skills");
+
+  const getTranslatedSkill = (id?: string) => {
+    if (!id) return "";
+    if (["technique", "theory", "hearing", "creativity"].includes(id)) {
+      const categoryTranslated = t(`categories.${id}`);
+      if (categoryTranslated !== `categories.${id}`) return categoryTranslated;
+    }
+    const skillTranslated = t(`skills.${id}.name`);
+    if (skillTranslated !== `skills.${id}.name`) return skillTranslated;
+    return id.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const skillName = getTranslatedSkill(skillRewardSkillId);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -112,7 +125,7 @@ export const SuccessRewardCard = ({
                {skillPointsGained && Object.keys(skillPointsGained).length > 0 && (
                  <div className="flex flex-wrap justify-center gap-2 mt-2">
                     {Object.entries(skillPointsGained).map(([skillId, points], index) => {
-                      const name = skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                      const name = getTranslatedSkill(skillId);
                       return (
                         <motion.div
                           key={skillId}

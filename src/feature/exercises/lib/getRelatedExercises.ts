@@ -21,7 +21,7 @@ export function getRelatedExercises(
   limit = 4
 ): RelatedExerciseCard[] {
   const scored = all
-    .filter((ex) => ex.id !== current.id)
+    .filter((ex) => ex.id !== current.id && !ex.isHiddenFromLibrary)
     .map((ex) => {
       let score = 0;
 

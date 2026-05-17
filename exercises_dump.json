@@ -2,14 +2,14 @@
   {
     "id": "spider_one_string",
     "title": "Single String Spider Exercise",
-    "description": "Chromatic exercise on a single string developing finger independence and left hand precision.",
+    "description": "Fret notes chromatic sequence on a single string to develop basic finger coordination and clean fretting hand accuracy.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_stairs_hard",
     "title": "Advanced Spider Stairs Exercise",
-    "description": "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
+    "description": "Fret non-adjacent string skipping patterns with wide interval leaps to build absolute finger independence and fingerboard stretch control.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -37,7 +37,7 @@
   {
     "id": "spider_basic",
     "title": "Horizontal Spider Exercise",
-    "description": "Exercise developing left hand precision and synchronization with right hand.",
+    "description": "Master left-hand finger independence and sync it perfectly with your picking hand using this foundational horizontal shifting pattern.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -72,8 +72,8 @@
   {
     "id": "chromatic_accents",
     "title": "Chromatic Accent Dynamics",
-    "description": "Exercise developing dynamic control through playing chromatic sequences with shifting accents.",
-    "difficulty": "easy",
+    "description": "Master your dynamic control by playing a chromatic sequence with shifting accents. You will learn to control your pick attack to make accented notes significantly louder and non-accented notes noticeably quieter.",
+    "difficulty": "medium",
     "category": "technique"
   },
   {
@@ -86,7 +86,7 @@
   {
     "id": "economy_picking_angular",
     "title": "Angular / Economy Picking",
-    "description": "Angular (economy) picking exercise focused on efficient string crossing, smooth sweep motions, and right-hand economy.",
+    "description": "Practice angular economy picking to minimize picking hand movement and transition fluidly across adjacent strings.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -100,14 +100,14 @@
   {
     "id": "hammer_on_pentatonic_run",
     "title": "Hammer-on Pentatonic Run – 3 Strings",
-    "description": "Legato hammer-on exercise using the A minor pentatonic scale across 3 strings (G→B→e→B). One bar of 8th notes: pick the first note on each string, hammer-on the second, then reverse back to B — building left-hand strength and smooth cross-string transitions.",
+    "description": "Develop strong legato hammer-on technique and smooth cross-string transition fluidity across three strings.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "pull_off_pentatonic_run",
     "title": "Dark Pull-off Pentatonic Run",
-    "description": "Legato pull-off exercise using the A minor pentatonic scale across the middle strings (G→D→A→D). This avoids the bright upper strings for a darker, heavier sound, eliminating the 'happy' feel. One bar of 8th notes: pick the 7th fret, pull-off to the 5th.",
+    "description": "Develop seamless legato technique using A minor pentatonic pull-offs across the middle strings. Focus on dynamic equality between picked and pulled notes for a smooth, heavy flow.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -142,7 +142,7 @@
   {
     "id": "call_and_response_phrasing",
     "title": "Call and Response Phrasing",
-    "description": "Exercise developing musical phrasing through a call-and-response approach, teaching how to create tension and resolution by treating phrases as questions and answers.",
+    "description": "Improvise contrasting pairs of musical phrases to structure guitar solos into clear questions and answers.",
     "difficulty": "medium",
     "category": "creativity"
   },
@@ -211,179 +211,179 @@
   },
   {
     "id": "random_note_hunt",
-    "title": "Random Note Hunt: G",
+    "title": "Random Note Hunt: D#",
     "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
     "difficulty": "easy",
     "category": "theory",
-    "customGoal": "G",
+    "customGoal": "D#",
     "customGoalDescription": "Find this note everywhere on the neck"
   },
   {
     "id": "spider_permutation_1234",
     "title": "Spider Exercise - 1-2-3-4 Permutation",
-    "description": "Basic chromatic exercise using finger permutation 1-2-3-4, developing finger independence and coordination.",
+    "description": "Fret notes on a single string using finger permutation 1-2-3-4 to isolate specific finger movements and develop deep coordination control.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_1243",
     "title": "Spider Exercise - 1-2-4-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 1-2-4-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 1-2-4-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_1324",
     "title": "Spider Exercise - 1-3-2-4 Permutation",
-    "description": "Chromatic exercise using finger permutation 1-3-2-4, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 1-3-2-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_1342",
     "title": "Spider Exercise - 1-3-4-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 1-3-4-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 1-3-4-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_1423",
     "title": "Spider Exercise - 1-4-2-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 1-4-2-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 1-4-2-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_1432",
     "title": "Spider Exercise - 1-4-3-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 1-4-3-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 1-4-3-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2134",
     "title": "Spider Exercise - 2-1-3-4 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-1-3-4, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-1-3-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2143",
     "title": "Spider Exercise - 2-1-4-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-1-4-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-1-4-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2314",
     "title": "Spider Exercise - 2-3-1-4 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-3-1-4, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-3-1-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2341",
     "title": "Spider Exercise - 2-3-4-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-3-4-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-3-4-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2413",
     "title": "Spider Exercise - 2-4-1-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-4-1-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-4-1-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_2431",
     "title": "Spider Exercise - 2-4-3-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 2-4-3-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 2-4-3-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3124",
     "title": "Spider Exercise - 3-1-2-4 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-1-2-4, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-1-2-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3142",
     "title": "Spider Exercise - 3-1-4-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-1-4-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-1-4-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3214",
     "title": "Spider Exercise - 3-2-1-4 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-2-1-4, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-2-1-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3241",
     "title": "Spider Exercise - 3-2-4-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-2-4-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-2-4-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3412",
     "title": "Spider Exercise - 3-4-1-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-4-1-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-4-1-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_3421",
     "title": "Spider Exercise - 3-4-2-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 3-4-2-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 3-4-2-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4123",
     "title": "Spider Exercise - 4-1-2-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-1-2-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-1-2-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4132",
     "title": "Spider Exercise - 4-1-3-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-1-3-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-1-3-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4213",
     "title": "Spider Exercise - 4-2-1-3 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-2-1-3, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-2-1-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4231",
     "title": "Spider Exercise - 4-2-3-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-2-3-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-2-3-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4312",
     "title": "Spider Exercise - 4-3-1-2 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-3-1-2, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-3-1-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "spider_permutation_4321",
     "title": "Spider Exercise - 4-3-2-1 Permutation",
-    "description": "Chromatic exercise using finger permutation 4-3-2-1, developing finger independence and coordination.",
-    "difficulty": "medium",
+    "description": "Fret notes on a single string using finger permutation 4-3-2-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
     "category": "technique"
   },
   {
@@ -410,7 +410,7 @@
   {
     "id": "alternate_picking_pentatonic_a_positions",
     "title": "A Pentatonic Alternate Picking — Position Drill",
-    "description": "Classic alternate picking drill on A minor pentatonic at 5th position. Each fret position is played 4 times before moving to the next — ascending all 6 strings, then descending back. Builds picking consistency and string-change timing.",
+    "description": "Practice pentatonic alternate picking using repeated notes per string to lock in hand synchronization and metronome timing.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -431,7 +431,7 @@
   {
     "id": "speed_burst_chromatic_blitz",
     "title": "Speed Burst Chromatic Blitz",
-    "description": "Short explosive chromatic bursts followed by rests. Train your hands to fire fast and reset cleanly.",
+    "description": "Execute brief, rapid chromatic note groups interspersed with quick rests to build fast twitch muscle response and control hand tension.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -480,7 +480,7 @@
   {
     "id": "first_bend",
     "title": "First Bend – Whole Step",
-    "description": "Introduction to whole-step bends across two strings in Am pentatonic position 1. Play the target pitch first so your ear knows where to aim, then bend from the lower fret up to match it. Half-note pacing gives you time to really listen.",
+    "description": "Learn accurate whole-step string bending. Compare your bent pitch against reference notes to train both muscle memory and your ear.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -494,7 +494,7 @@
   {
     "id": "bend_and_release",
     "title": "Bend & Release",
-    "description": "Whole-step bend followed by a slow, controlled release — on both G and B strings in Am pentatonic position 1. The release is the harder skill: the string must drift back smoothly while still ringing. Half-note values give you time to feel every stage of the movement.",
+    "description": "Perform clean whole-step string bends followed by slow, controlled releases to develop precise pitch control and finger strength.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -508,7 +508,7 @@
   {
     "id": "precision_bending_drill",
     "title": "First Bend – Whole Step",
-    "description": "Your first whole-step bend. String 2 (B), fret 7 — push up to match fret 9. Every bend is preceded by the target pitch so your ear always has a reference.",
+    "description": "Develop precise whole-step bending and control. Follow the reference notes to train your ears, and master slow, controlled releases back to the starting pitch.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -571,7 +571,7 @@
   {
     "id": "sweep_picking_3_string",
     "title": "3-String Sweep Synchronization",
-    "description": "Clean 3-string sweep picking arpeggios focusing on right-left hand coordination. Am, C, and Dm triad shapes ascending and descending with one note per string.",
+    "description": "Practice clean 3-string sweep picking arpeggios to coordinate your pick stroke with sequential finger lifts.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -599,7 +599,7 @@
   {
     "id": "sweep_5_string_cascade",
     "title": "5-String Sweep Cascades",
-    "description": "Extended 5-string arpeggio sweep patterns. Am and Dm shapes across strings 5-1 with hammer-on turnaround at the top. Builds endurance and cross-string muting discipline.",
+    "description": "Execute extended 5-string sweep arpeggios to build deep fretting hand muting control and fluid sweep motion.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -633,8 +633,8 @@
   },
   {
     "id": "jazz_chord_melody",
-    "title": "Bass and Chords",
-    "description": "Play bass notes with pick while comping chords with fingers.",
+    "title": "D Major - String Muting Control",
+    "description": "Master selective muting technique while playing D Major chord shapes. Learn to deadmute unwanted strings while keeping others resonant and clean.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -683,7 +683,7 @@
   {
     "id": "dynamic_crescendo",
     "title": "Dynamic Range Control",
-    "description": "Master the full spectrum from whisper-quiet to aggressive attack. The volume bars below the tab show exactly how loud each note should be.",
+    "description": "Master the full dynamic spectrum of the guitar, from whisper-quiet to an aggressive attack. Control your picking depth and attack speed to match the required volume curves.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -773,8 +773,8 @@
   },
   {
     "id": "metal_tremolo_picking",
-    "title": "Phrygian Assault — Thrash Tremolo Picking",
-    "description": "Pure tremolo picking on the low E string using the E Phrygian scale (E F G A B C D). 16th notes, palm mute, no chords — pure mechanical aggression. The b2 interval (E→F, one half-step) is the sound of danger in thrash and death metal. Each measure is a loop. Inspired by Slayer, Kreator, Sepultura.",
+    "title": "Phrygian Assault Thrash Tremolo Picking",
+    "description": "Develop high-speed tremolo picking endurance and precise low-end palm muting using the aggressive, minor-second Phrygian scale structure.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -837,7 +837,7 @@
   {
     "id": "string_skipping_two_notes",
     "title": "String Skipping — 2 Notes Per String",
-    "description": "The simplest possible string skipping pattern: 2 notes on string 6, skip string 5, 2 notes on string 4, skip string 3, 2 notes on string 2 — then reverse back down. All notes are from the A minor pentatonic box 1 (frets 5 and 7). One measure up, one measure down. The skipped string is always in between — your pick must arc cleanly over it every single time.",
+    "description": "Fret two notes per string and skip adjacent strings to develop precise picking hand spatial awareness.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -858,14 +858,14 @@
   {
     "id": "pentatonic_string_crossing_3",
     "title": "Pentatonic String Crossing — 3 Strings",
-    "description": "Am pentatonic box 1 on strings 4, 3, and 2 only — 2 notes per string. The focus is the moment the pick crosses from one string to the next: keep the motion small, the volume even, and the timing locked.",
+    "description": "Master the transitions between strings inside the pentatonic box. Focus on minimal pick travel to eliminate speed bottlenecks.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "rhythm_triole",
     "title": "Triplets Drill",
-    "description": "Three notes per beat on the G string — C, D, E ascending and descending. Feel the even 3-against-1 pulse while playing a real melodic shape.",
+    "description": "Play three even notes per beat on a single string to master the feel and timing of triplet subdivisions.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -879,7 +879,7 @@
   {
     "id": "strumming_basic",
     "title": "Basic Down Strumming",
-    "description": "Foundation of rhythm guitar — steady down strums on every beat.",
+    "description": "Execute steady downward strumming strokes on every beat to build fundamental rhythm and timing control.",
     "difficulty": "easy",
     "category": "technique"
   },
