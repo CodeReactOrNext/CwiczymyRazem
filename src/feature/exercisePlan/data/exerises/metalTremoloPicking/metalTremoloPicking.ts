@@ -9,14 +9,14 @@ export const metalTremoloPickingExercise: Exercise = {
   category: "technique",
   timeInMinutes: 4,
   instructions: [
-    "Pick at a constant, high-speed tremolo rate using strict alternate picking (down-up-down-up).",
-    "Apply a solid palm mute near the bridge to keep the tone punchy and tight.",
-    "Fret each scale note cleanly while maintaining the relentless alternate picking cycle.",
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Generate the picking motion entirely from your wrist, keeping your forearm and shoulder relaxed.",
-    "Keep your pick strokes extremely small and shallow to conserve energy and gain speed.",
-    "Practice at a slower tempo first to ensure your hand synchronization is perfectly locked.",
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: { min: 90, max: 200, recommended: 130 },
   relatedSkills: ["alternate_picking"],

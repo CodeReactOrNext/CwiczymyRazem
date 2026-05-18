@@ -71,7 +71,8 @@ const compositionChallengeConfig: ImprovPromptRiddleConfig = {
 export const compositionChallengeExercise: Exercise = {
   id: "composition_challenge",
   title: "Composition Challenge",
-  description: "Compose a piece in 40 minutes guided by 5 random constraints — style, form, harmony, melody, and rhythm. Every session generates a unique creative brief.",
+  description: "Create short, structured musical phrases within defined parameters to develop phrasing.",
+  whyItMatters: "Limiting your creative options to specific notes, rhythms, or shapes forces you to think about phrasing and structure rather than relying on speed or automatic licks. This fosters deep musical thinking and distinct artistic voice.",
   difficulty: "hard",
   category: "creativity",
   timeInMinutes: 40,

@@ -111,7 +111,8 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
   };
 
   // Build meta description
-  const metaDescription = `${exercise.description} ${difficultyInfo.label} guitar exercise. ${exercise.timeInMinutes} min. BPM ${bpmMin}–${bpmMax}.`.slice(
+  const durationStr = exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`;
+  const metaDescription = `${exercise.description} ${difficultyInfo.label} guitar exercise. ${durationStr}. BPM ${bpmMin}–${bpmMax}.`.slice(
     0,
     155
   );
@@ -227,7 +228,7 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
             <div className="flex flex-wrap gap-6 text-sm text-zinc-400 pt-4 border-t border-white/5">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-cyan-400" />
-                {exercise.timeInMinutes} minutes
+                {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)} seconds` : `${exercise.timeInMinutes} minutes`}
               </div>
               <div className="flex items-center gap-2">
                 <Music className="w-4 h-4 text-cyan-400" />

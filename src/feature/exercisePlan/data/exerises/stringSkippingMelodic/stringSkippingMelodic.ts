@@ -3,25 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const stringSkippingMelodicExercise: Exercise = {
   id: "string_skipping_melodic",
   title: "Melodic Skip Sequences",
-  description: "Transform scale patterns into dramatic melodic lines using string skipping.",
+  description: "Navigate melodic lines that utilize constant, wide-interval string skips.",
+  whyItMatters: "Melodic string skips add dramatic pitch changes to your solos. This exercise trains your picking hand to find strings instantly without looking, building excellent spatial accuracy.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
-    "Play the G major scale using string skipping to create wide intervallic leaps.",
-    "Pattern: Play a note, skip a string, play the next scale degree.",
-    "Use groups of 4 notes (16th notes) to create a cascading sequence effect.",
-    "Maintain strict alternate picking even across the string skips.",
-    "Start the pattern on different strings to explore all positions.",
-    "Focus on creating a smooth, connected sound despite the large jumps."
+    "Maintain strict pick control, keeping your hand relaxed during wide jumps.",
+    "Ensure notes do not bleed together during string-skipping transitions."
   ],
   tips: [
-    "The wider the skip, the more dramatic and 'outside' the melody sounds.",
-    "This technique creates intervallic patterns impossible with linear playing.",
-    "Great for breaking out of scale box patterns and pentatonic ruts.",
-    "Listen to Frank Gambale, Paul Gilbert, or John Petrucci for advanced examples.",
-    "Try applying this to modal scales for even more exotic sounds.",
-    "Combine with legato or tapping for hybrid technique vocabulary."
+    "Keep your picking wrist loose and flexible to navigate wide intervals smoothly.",
+    "Use the exact tip of your fretting fingers to avoid accidental string muting."
   ],
   metronomeSpeed: { min: 70, max: 130, recommended: 90 },
   relatedSkills: ["string_skipping"],

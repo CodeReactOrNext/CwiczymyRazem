@@ -96,7 +96,6 @@ import {
 import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 // Exercises available for free — all others require Pro
@@ -266,7 +265,6 @@ const rawExercises: Exercise[] = [
   naturalNotesMapExercise,
   fretboardMasteryExercise,
   smoothChordTransitionsExercise,
-  vibratoMasteryExercise,
   metronomeGapTestExercise,
   singWhatYouPlayExercise,
   openGRepetitionExercise,

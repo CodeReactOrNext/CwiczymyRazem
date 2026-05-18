@@ -184,7 +184,7 @@ export const ExerciseInstructionsInline = ({
                       <div className="space-y-1.5 pl-6">
                         {displaySkillIds.map(skillId => {
                           const specificSkill = guitarSkills.find(s => s.id === skillId);
-                          const Icon = (specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck;
+                          const Icon = ((specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck) as any;
                           return (
                             <div key={skillId} className="flex items-center gap-2 text-zinc-400 text-sm font-medium">
                               <Icon size={12} className="text-emerald-500/70 shrink-0" />

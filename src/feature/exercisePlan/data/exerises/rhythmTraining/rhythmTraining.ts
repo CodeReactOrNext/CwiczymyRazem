@@ -14,14 +14,14 @@ export const rhythmTrainingEasy: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Mute a single string with your fretting hand to produce a percussive click.",
-    "Strike the string strictly in time with the indicated rhythmic values.",
-    "Ensure rests are completely silent by stopping the pick motion or resting it on the string.",
+    "Maintain a relaxed, pendulum-like strumming motion of the wrist and forearm.",
+    "Execute even, fluid down and up strokes, keeping pick depth shallow.",
+    "Use light fretting-hand pressure releases to mute the strings cleanly on rhythmic rests."
   ],
   tips: [
-    "Tap your foot consistently on every downbeat to physically anchor your internal clock.",
-    "Count the quarter notes aloud ('1 2 3 4') as you play.",
-    "Maintain a relaxed grip on the pick to prevent timing fluctuations caused by physical tension.",
+    "Angle the pick slightly so it glides smoothly across the strings rather than catching.",
+    "Focus on the dynamic contrast between accented strums and quiet ghost strokes.",
+    "Keep your arm moving continuously, even during silent rests, to internalize the groove."
   ],
   metronomeSpeed: { min: 50, max: 85, recommended: 65 },
   relatedSkills: ["rhythm"],

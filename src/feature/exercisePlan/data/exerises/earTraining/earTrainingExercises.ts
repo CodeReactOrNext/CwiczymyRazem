@@ -3,19 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const earTrainingEasy: Exercise = {
   id: "earTrainingEasy",
   title: "Ear Training Level 1",
-  description: "Listen to 2 notes and repeat them correctly.",
+  description: "Recognize intervals and simple melodic movements to bridge ear-to-fretboard connection.",
+  whyItMatters: "A well-trained ear allows you to translate the melodies in your head directly onto the guitar, transcribe songs quickly, and react dynamically to other musicians during a performance.",
   difficulty: "easy",
   category: "hearing",
   timeInMinutes: 5,
   instructions: [
-    "Press PLAY to hear a sequence of 2 notes.",
-    "Try to find them on your guitar by ear.",
-    "When you think you have it, play them.",
-    "If you are stuck, click REVEAL to see the answer."
+    "Listen closely to the reference pitches and sing or hum them internally before playing.",
+    "Focus on recognizing the spatial distance between the two notes."
   ],
   tips: [
-    "Listen to the interval distance.",
-    "Is the second note higher or lower?"
+    "Relate common intervals to the opening notes of familiar songs to memorize their sounds.",
+    "Practice daily in short, focused bursts rather than long, fatiguing sessions."
   ],
   metronomeSpeed: {
     min: 60,

@@ -6,21 +6,18 @@ import spiderBasicImage from "./image.png";
 export const spiderXExercise: Exercise = {
   id: "spider_x",
   title: "Spider X Pattern Exercise",
-  description: "Exercise using X-pattern to develop finger independence and hand coordination.",
+  description: "Play a diagonal, cross-string spider pattern that forms an 'X' shape.",
+  whyItMatters: "Diagonal fretboard movement is highly common in real solos but rarely practiced. The Spider X drill breaks up linear muscle memory, training your brain and fingers to navigate the fretboard dynamically.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 8,
   instructions: [
-    "Position fingers in an X shape on two adjacent strings.",
-    "Play alternating notes from both strings, maintaining the X pattern.",
-    "Move the pattern one fret higher after each cycle.",
-    "Repeat the exercise on all adjacent string pairs."
+    "Sync diagonal string changes with precise alternate pick strokes.",
+    "Move smoothly between positions without disrupting the rhythmic grid."
   ],
   tips: [
-    "Pay attention to note clarity when crossing fingers.",
-    "Maintain minimal hand tension despite unusual pattern.",
-    "Practice slowly, focusing on movement accuracy.",
-    "Experiment with different rhythms within the pattern."
+    "Keep your thumb positioned behind the neck to support diagonal hand movement.",
+    "Mute adjacent strings with both hands to ensure maximum clarity."
   ],
   metronomeSpeed: {
     min: 60,

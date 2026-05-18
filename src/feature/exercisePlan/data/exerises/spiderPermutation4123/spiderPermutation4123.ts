@@ -10,14 +10,14 @@ export const spiderPermutation4123Exercise: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Place your fretting hand fingers over four consecutive frets on a single string.",
-    "Play the notes strictly following the 4-1-2-3 finger sequence.",
-    "Shift your hand up by one fret each time you complete a full pattern loop.",
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Use strict alternate picking (down-up-down-up) throughout the exercise.",
-    "Keep unused fingers hovering extremely close to the strings to minimize wasted motion.",
-    "Ensure each note rings out completely clean and free of fret-buzz.",
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
     min: 60,

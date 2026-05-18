@@ -19,14 +19,14 @@ export const pentatonicStringCrossing3Exercise: Exercise = {
   category: "technique",
   timeInMinutes: 1.37,
   instructions: [
-    "Use strict alternate picking (down-up-down-up) throughout the exercise.",
-    "Keep the rhythm completely even while moving between strings.",
-    "Focus on clean transitions without letting other strings ring out.",
+    "Listen carefully to the reference sequence before reproducing it on the fretboard.",
+    "Sing or hum the pitches aloud to reinforce the brain-to-fretboard connection.",
+    "Transcribe the melody purely by ear, relying on relative interval recognition."
   ],
   tips: [
-    "Use small, controlled pick movements — the less the pick travels, the faster you cross.",
-    "Stay relaxed in both hands when crossing strings to avoid building tension.",
-    "If you stumble on a crossing, slow down the tempo to build accurate muscle memory first.",
+    "Focus on the distance between notes rather than trying to guess absolute fret positions.",
+    "Practice without looking at your fretboard to build pure auditory-motor memory.",
+    "Start with simple three-note phrases before moving to complex arrangements."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pentatonic_string_crossing___3_strings_backing_track.mp3", sourceBpm: 50 },

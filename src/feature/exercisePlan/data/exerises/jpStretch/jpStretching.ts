@@ -6,21 +6,18 @@ import jpStretchingImage from "./image.png";
 export const jpStretching: Exercise = {
   id: "jp_stretching",
   title: "Petrucci Stretching Exercise",
-  description: "John Petrucci's stretching exercise from Rock Discipline - helps improve finger flexibility and reach.",
+  description: "Expand your finger reach and hand flexibility with a wide-interval linear stretch.",
+  whyItMatters: "Developing wide fretboard reach requires careful conditioning of the hand muscles. This exercise helps build structural reach, making complex jazz chords and wide-span metal/shred runs feel effortless and comfortable.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 4,
   instructions: [
-    "Position your hand at the 12th fret. Place your fingers on frets 12, 13, 14, and 15 of the 6th string.",
-    "After completing the sequence, move one fret lower and repeat.",
-    "Continue moving down the fretboard until you reach the first fret.",
-    "Repeat the exercise on all strings."
+    "Position your thumb low behind the middle of the neck to maximize finger span.",
+    "Execute each note cleanly, ensuring all fingers remain curved and relaxed."
   ],
   tips: [
-    "Focus on stretching your fingers, not on speed.",
-    "Keep your wrist in a neutral position to avoid tension.",
-    "If you feel pain (not discomfort), stop the exercise.",
-    "Remember to relax your hand between repetitions."
+    "Stop immediately if you feel sharp pain—stretch slowly and build reach over time.",
+    "Keep your shoulder and elbow relaxed to allow your hand to rotate naturally."
   ],
   metronomeSpeed: null,
   relatedSkills: ["finger_independence"],

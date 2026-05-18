@@ -44,14 +44,14 @@
   {
     "id": "play_by_ear",
     "title": "Playing By Ear",
-    "description": "Exercise developing the ability to listen and reproduce music without sheet music.",
+    "description": "Listen to an external audio fragment and reproduce it on the guitar without visual aids or tabs.",
     "difficulty": "medium",
     "category": "hearing"
   },
   {
     "id": "one_string_backing",
     "title": "Single String Phrasing",
-    "description": "Exercise developing phrasing skills and musical expression by restricting playing to a single string.",
+    "description": "Improvise over a backing track while physically restricting your playing to a single string.",
     "difficulty": "medium",
     "category": "creativity"
   },
@@ -184,14 +184,14 @@
   {
     "id": "metronome_gap_test",
     "title": "Metronome Gap Test",
-    "description": "Advanced timing exercise: maintain a steady pulse when the metronome stops/silences.",
+    "description": "Maintain a steady rhythmic pulse while the metronome is muted for several measures.",
     "difficulty": "medium",
     "category": "theory"
   },
   {
     "id": "sing_what_you_play",
     "title": "Sing What You Play",
-    "description": "Advanced ear-training and phrasing drill: connect your voice to your fingers.",
+    "description": "Sing pitches out loud simultaneously as you play them on the guitar.",
     "difficulty": "hard",
     "category": "hearing"
   },
@@ -211,11 +211,11 @@
   },
   {
     "id": "random_note_hunt",
-    "title": "Random Note Hunt: D#",
+    "title": "Random Note Hunt: F#",
     "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
     "difficulty": "easy",
     "category": "theory",
-    "customGoal": "D#",
+    "customGoal": "F#",
     "customGoalDescription": "Find this note everywhere on the neck"
   },
   {
@@ -633,8 +633,8 @@
   },
   {
     "id": "jazz_chord_melody",
-    "title": "D Major - String Muting Control",
-    "description": "Master selective muting technique while playing D Major chord shapes. Learn to deadmute unwanted strings while keeping others resonant and clean.",
+    "title": "Bass and Chords",
+    "description": "Coordinate hybrid picking to execute clean bass lines while plucking simultaneous chord harmony.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -711,42 +711,42 @@
   {
     "id": "improv_prompt_easy",
     "title": "Improv Prompts — Easy",
-    "description": "Follow rotating creative constraints while improvising. Simple, single rules that focus your playing.",
+    "description": "Improvise over a backing track while adhering to a single, rotating creative constraint.",
     "difficulty": "easy",
     "category": "creativity"
   },
   {
     "id": "improv_prompt_medium",
     "title": "Improv Prompts — Medium",
-    "description": "Musical concept prompts that push your vocabulary. Faster rotation keeps you on your toes.",
+    "description": "Improvise over a backing track while rapidly adapting to rotating musical and theoretical constraints.",
     "difficulty": "medium",
     "category": "creativity"
   },
   {
     "id": "improv_prompt_hard",
     "title": "Improv Prompts — Hard",
-    "description": "Two simultaneous advanced constraints. Demands real-time creative problem-solving.",
+    "description": "Improvise over a backing track while simultaneously adhering to multiple advanced creative constraints.",
     "difficulty": "hard",
     "category": "creativity"
   },
   {
     "id": "rhythm_training_easy",
     "title": "Rhythm Training — Easy",
-    "description": "Build a solid sense of pulse with simple note values. Play on a muted string along with the metronome.",
+    "description": "Execute fundamental quarter and half-note rhythms on a muted string to establish a solid internal pulse.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "rhythm_training_medium",
     "title": "Rhythm Training — Medium",
-    "description": "Eighth-note subdivisions and syncopation. Develop an internal clock that holds up under rhythmic variety.",
+    "description": "Perform eighth-note subdivisions and basic syncopated patterns on a muted string.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "rhythm_training_hard",
     "title": "Rhythm Training — Hard",
-    "description": "Sixteenth-note subdivisions, triplets, and polyrhythmic patterns. Push your internal clock to its limits.",
+    "description": "Execute complex sixteenth-note subdivisions, triplets, and polyrhythmic groupings on a muted string.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -801,8 +801,8 @@
   },
   {
     "id": "chord_spotlight_drill",
-    "title": "Chord Spotlight — D Major, 2 Dead",
-    "description": "A D major triad (strings 3-2-1: fret 2-3-2, notes A-D-F#) struck as a chord on every beat. In measures 2–4, only one note rings — the other two are dead muted hits. All three strings are attacked with the same pick stroke every time. Because all notes are fretted, both hands can be used for muting — but you must decide which technique fits each case.",
+    "title": "Chord Spotlight — D Major Muting Drill",
+    "description": "Strike a three-string D major triad while selectively muting specific strings with your fretting hand.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -907,210 +907,210 @@
   {
     "id": "strumming_pattern_2",
     "title": "Strumming Pattern 2 — Quarter Downs + Final Up",
-    "description": "Four steady downstrokes with a single upstroke on the final '&'. The easiest entry to strumming with rhythm.",
+    "description": "Execute four steady downstrokes with a single upstroke on the final subdivision.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_3",
     "title": "Strumming Pattern 3 — All Eighth Notes",
-    "description": "Constant down-up strumming on every 8th note subdivision. The foundation of all strumming.",
+    "description": "Execute continuous alternate strumming on every 8th-note subdivision.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_4",
     "title": "Strumming Pattern 4 — Down-Skip-Down-Up",
-    "description": "Down on 1, skip the '&', Down-Up on 2, repeat. One of the most common pop/rock patterns.",
+    "description": "Perform an alternating pattern with a missed upstroke on the first subdivision.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_5",
     "title": "Strumming Pattern 5 — Down-Up Skip",
-    "description": "Down-Up on beats 1 and 3, skip the '&' before beats 2 and 4. Creates a forward-moving feel.",
+    "description": "Perform a pattern that omits the upstrokes before beats 2 and 4.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_6",
     "title": "Strumming Pattern 6 — Syncopated Upstroke",
-    "description": "Classic syncopated pattern: the '&' of beat 2 continues into beat 3 with two upstrokes.",
+    "description": "Execute a syncopated pattern featuring two consecutive sounding upstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_7",
     "title": "Strumming Pattern 7 — Inside Upstrokes",
-    "description": "Downstrokes on 1 and 3, surrounded by upstrokes on all the '&' positions. Flowing and continuous.",
+    "description": "Perform a pattern centered around upstrokes on the subdivisions.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_8",
     "title": "Strumming Pattern 8 — Two Downs then Down-Up",
-    "description": "Steady quarter-note feel on beats 1-2, then eighth-note feel on beats 3-4.",
+    "description": "Combine quarter-note and eighth-note feels within a single measure.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_9",
     "title": "Strumming Pattern 9 — Skip First &",
-    "description": "Skips only the first '&', then runs all eighth notes for the rest of the bar.",
+    "description": "Execute an eighth-note run that omits only the first upstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_10",
     "title": "Strumming Pattern 10 — Syncopated Upstroke Run",
-    "description": "Heavy syncopation: three upstrokes in a row after beat 1. Creates a choppy, modern feel.",
+    "description": "Execute a highly syncopated pattern dominated by consecutive upstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_11",
     "title": "Strumming Pattern 11 — Syncopated Mid-Bar Down",
-    "description": "Starts with down-up, then a series of upstrokes with a surprise downstroke in the middle.",
+    "description": "Perform a syncopated pattern that interrupts an upstroke run with a mid-measure downstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_12",
     "title": "Strumming Pattern 12 — Starts on Upstroke",
-    "description": "Begins with an upstroke on the '&' of beat 1. Unusual feel that trains coordination.",
+    "description": "Begin a strumming sequence on the first subdivision upstroke rather than the downbeat.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_13",
     "title": "Strumming Pattern 13 — Soft Landing",
-    "description": "Down on all 4 beats, with a single upstroke on '&' of beat 2. Gentle and versatile.",
+    "description": "Perform a steady downstroke sequence featuring a single isolated upstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_14",
     "title": "Strumming Pattern 14 — All Upstrokes",
-    "description": "Only upstrokes on every '&'. No downstrokes at all. Develops upstroke technique and tone.",
+    "description": "Execute a pattern composed entirely of upstrokes on the subdivisions.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_15",
     "title": "Strumming Pattern 15 — Upstrokes + One Down",
-    "description": "Upstrokes on '&' positions with a single downstroke sneaked in. Trains rhythmic variety.",
+    "description": "Perform an upstroke-heavy pattern punctuated by a single downstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_16",
     "title": "Strumming Pattern 16 — Double Down-Up",
-    "description": "Two down-up pairs buried inside upstroke-only positions. Tricky syncopation challenge.",
+    "description": "Execute two alternating pairs embedded within syncopated upstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_18",
     "title": "Strumming Pattern 18 — Half-Time Feel",
-    "description": "Only downstrokes on beats 1 and 3. Creates a slow, open, spacious feel.",
+    "description": "Perform a sparse pattern with downstrokes on beats 1 and 3.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_19",
     "title": "Strumming Pattern 19 — Down-Up on Beat 1",
-    "description": "Opens with a down-up pair, then straight downstrokes. Creates an energetic opening feel.",
+    "description": "Begin with an alternating pair followed by strict downstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_20",
     "title": "Strumming Pattern 20 — Mixed Syncopation",
-    "description": "A balanced mix of down-up pairings and single downstrokes creating a flowing rhythm.",
+    "description": "Perform a flowing pattern that mixes alternating pairs with isolated downstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_21",
     "title": "Strumming Pattern 21 — Upstroke Ending",
-    "description": "Single downstroke to open, then an upstroke-down-up figure at the end of the bar.",
+    "description": "Execute a sparse opening leading into a dense, syncopated ending.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_22",
     "title": "Strumming Pattern 22 — Mid-Bar Upstroke",
-    "description": "Down, then upstroke-down on beat 2, followed by a lone down on beat 3.",
+    "description": "Perform a pattern featuring an alternating pair displaced to the middle of the measure.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_23",
     "title": "Strumming Pattern 23 — Full 1-2, Quarter 3-4",
-    "description": "Eighth notes on beats 1-2, quarter notes on beats 3-4. Contrast between sections.",
+    "description": "Contrast dense eighth notes in the first half with sparse quarter notes in the second.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_24",
     "title": "Strumming Pattern 24 — Opens on Upstroke",
-    "description": "Starts on an '&1' upstroke, then quarter-note downs. Advanced feel with delayed entry.",
+    "description": "Begin on the first subdivision upstroke followed by steady quarter-note downstrokes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_25",
     "title": "Strumming Pattern 25 — Late Upstroke",
-    "description": "Four beats of down-up but skips the '&' of beats 3 and 4, ending with a final upstroke.",
+    "description": "Execute alternating pairs with a syncopated, delayed final upstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_26",
     "title": "Strumming Pattern 26 — Two Down-Up Groups",
-    "description": "Two isolated down-up pairs, one on beat 1 and one on beat 3. Big open gaps between them.",
+    "description": "Perform two isolated alternating pairs separated by rests.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_27",
     "title": "Strumming Pattern 27 — Upstroke Lead-In",
-    "description": "Upstroke on '&1' followed by constant eighth notes. Creates a forward, driving feel.",
+    "description": "Begin with an upstroke leading directly into a continuous eighth-note run.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_28",
     "title": "Strumming Pattern 28 — Upstroke into Downs",
-    "description": "Upstroke on '&1', then downstrokes on beats 2 and 3, finishing with down-up.",
+    "description": "Perform an upstroke entry followed by quarter notes and an alternating finish.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_29",
     "title": "Strumming Pattern 29 — Skip the & of 3",
-    "description": "Constant eighth notes but with a skip on '&' of beat 3. Creates a characteristic 'hiccup'.",
+    "description": "Execute continuous subdivisions with a single omission on the upstroke of beat 3.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_30",
     "title": "Strumming Pattern 30 — Opens Slow, Ends Fast",
-    "description": "Two quiet quarter-note downs, then a syncopated upstroke and down-up ending.",
+    "description": "Transition from sparse quarter notes to a dense, syncopated ending phrase.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_31",
     "title": "Strumming Pattern 31 — All Eighths, Skip Last",
-    "description": "Continuous eighth notes but the very last '&' is skipped. Almost full but not quite.",
+    "description": "Perform continuous eighth notes, omitting only the final upstroke.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_pattern_32",
     "title": "Strumming Pattern 32 — Double Upstroke Gaps",
-    "description": "Two up-down pairs on '&' positions, with everything else silent. Very syncopated.",
+    "description": "Execute isolated up-down pairs positioned exclusively on subdivisions.",
     "difficulty": "easy",
     "category": "technique"
   }

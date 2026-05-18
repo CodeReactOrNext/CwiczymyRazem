@@ -4,24 +4,18 @@ export const nakedToneMelodyExercise: Exercise = {
   id: "naked_tone_melody",
   title: "Naked Tone — Half Note Melody",
   description:
-    "A simple 8-note melody in G major — all half notes, clean tone, zero articulation. No bends, no vibrato, no hammer-ons, no slides. Nothing. Just you, the fret, the string, and the pick. This exercise sounds trivially easy but exposes every flaw: buzzing, uneven attack, poor fretting pressure, and intonation drift. The goal is absolute perfection on every single note.",
+    "Play slow, long melodies with zero effects to improve fundamental touch.",
+  whyItMatters: "Effects like delay, reverb, and distortion can hide dynamic inconsistencies and weak fret connection. Playing with a 'naked' clean tone forces you to focus on the exact moment of finger contact, note duration, and articulation.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Measure 1: G (string 3, fret 0) → A (string 3, fret 2). Two half notes. Each lasts exactly two beats. Let each note fully sustain — no early lift.",
-    "Measure 2: B (string 3, fret 4) → D (string 2, fret 3). A string cross. Make sure the pick angle and attack stay identical on both strings.",
-    "Measure 3: E (string 2, fret 5) → D (string 2, fret 3). Step back down. Listen: does the D sound exactly the same as in M2? It should.",
-    "Measure 4: B (string 3, fret 4) → G (string 3, fret 0). Return to root. The open G should ring as cleanly as any fretted note.",
-    "Repeat. Each loop should sound more pure, more even, more intentional than the last.",
+    "Connect your guitar directly to a clean amp with absolutely no reverb, delay, or gain.",
+    "Let each half note ring for its exact duration, connecting them smoothly without gaps."
   ],
   tips: [
-    "No articulation means no articulation. Resist every instinct to add vibrato or bend to make the note sound 'better'. That is exactly the point — can you make it sound good without those tools?",
-    "Fretting hand: press the string down firmly, directly behind the fret, with the very tip of your finger. Any buzzing means your finger placement is off.",
-    "Picking hand: use the same pick depth, the same angle, and the same wrist speed on every single note. Inconsistency in attack is the most common issue here.",
-    "Let each half note ring for its full two beats before you lift your finger. Do not mute early — that is an articulation too.",
-    "Record yourself. Play it back without looking at your hands. Does every note sound identical in tone and volume? That is the standard.",
-    "If a note buzzes — stop. Fix the fretting position. Do not move on until that note is clean. This is a precision exercise, not a flow exercise.",
+    "Listen for fret buzz, uneven volume, or weak finger pressure—fix these mechanical issues instantly.",
+    "Control your pick attack to ensure every note sounds warm and balanced."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 55 },
   relatedSkills: ["articulation"],

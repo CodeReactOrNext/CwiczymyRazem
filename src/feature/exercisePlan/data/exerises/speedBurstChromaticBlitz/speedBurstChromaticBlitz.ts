@@ -9,14 +9,14 @@ export const speedBurstChromaticBlitzExercise: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Play the short note groups rapidly and cleanly, treating them as a single rhythmic gesture.",
-    "Use the silence of each rest to completely relax both hands.",
-    "Maintain strict alternate picking (down-up-down-up) during each sprint.",
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Do not try to force high speeds — focus on the quick release of hand tension during the rests.",
-    "Keep your finger movements tiny and pick strokes shallow to conserve energy.",
-    "Slow down the overall tempo if the transition between strings feels uneven.",
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
     min: 100,

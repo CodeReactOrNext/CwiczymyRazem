@@ -3,20 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const metalPlayalongExercise: Exercise = {
   id: "metal_playalong_basic",
   title: "Metal Guitar Playalong",
-  description: "Practice along with video - metal guitar exercises. Play synchronously with the instructor and develop your technique.",
+  description: "Apply rhythm and lead metal techniques along an energetic backing track.",
+  whyItMatters: "Practicing in a musical context trains your timing, stamina, and ability to stay locked with a rhythm section. It integrates individual mechanical skills into a cohesive, expressive performance.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Play the video and follow along with the instructor",
-    "Synchronize your tempo with the video",
-    "Focus on clean sound and precision",
-    "Repeat harder sections using pause"
+    "Lock in with the drum and bass rhythm section, maintaining a solid, aggressive pocket.",
+    "Control your dynamics during transitions between heavy rhythm and soaring leads."
   ],
   tips: [
-    "You can pause the video at any time to practice harder sections",
-    "Start with slower tempo if the video is too fast",
-    "Pay attention to the instructor's right and left hand technique"
+    "Keep your picking wrist loose to sustain fast rhythm parts without tensing up.",
+    "Use precise palm muting to keep the overall performance clear and defined."
   ],
   metronomeSpeed: null,
   relatedSkills: [],

@@ -8,23 +8,18 @@ export const highRegisterBendsExercise: Exercise = {
   id: "high_register_bends",
   title: "High Register Bends – 15th Fret",
   description:
-    "Whole-step bends on the B and high e strings at the 15th fret — the same Am pentatonic shape as position 1, shifted two octaves up. High frets require less physical force to bend but demand better pitch control: the strings are short and tight, so overshooting is easy.",
+    "Control string tension and achieve precise intonation when bending in the higher register.",
+  whyItMatters: "String tension feels significantly different in the high register compared to the middle of the neck. Practicing bends at the 15th fret and above builds the mechanical strength and fine motor skills necessary for soaring, pitch-perfect solos.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Play the reference note first: fret 17 on the B string (E), then fret 17 on the e string (A).",
-    "Bend from fret 15 — push upward (toward the ceiling) two semitones to match the reference.",
-    "Hold the bent note for a full half note, listening carefully for pitch accuracy.",
-    "Measures 1–2: B string. Measures 3–4: e string. Measures 5–8 repeat both.",
-    "Use your ring finger on fret 15, middle on 14, index on 13 for full support."
+    "Brace your bending finger with your middle and index fingers for maximum leverage.",
+    "Push the string upward, keeping your knuckles curved to prevent the string from slipping."
   ],
   tips: [
-    "High frets feel easier but pitch accuracy suffers more — even a tiny overshoot is noticeable.",
-    "The string tension is lower up here, so use less wrist force than you would at the 7th fret.",
-    "Keep your elbow pulled into your body slightly — it gives more wrist rotation range.",
-    "On the high e string, bend toward the floor (downward) instead of toward the ceiling.",
-    "Compare the bent pitch to an open string or a familiar note to double-check your ear."
+    "Be mindful of the narrow fret spacing in this register; keep your fingers tightly grouped.",
+    "Ensure your picking hand mutes the lower strings to prevent high-gain feedback."
   ],
   metronomeSpeed: { min: 40, max: 72, recommended: 52 },
   relatedSkills: ["bending"],

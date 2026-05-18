@@ -4,11 +4,12 @@ export const guideToneVoiceLeadingExercise: Exercise = {
   id: "guide_tone_voice_leading",
   title: "Guide Tone Voice-Leading Drill",
   description:
-    "Exercise focused on voice leading and harmonic awareness by using only guide tones (3rds and 7ths) to outline chord progressions with minimal melodic movement.",
+    "Connect chord progressions smoothly by resolving third and seventh intervals.",
+  whyItMatters: "Guide tones are the most harmonically defining notes of any chord. Resolving thirds to sevenths (and vice versa) during chord transitions creates incredibly smooth voice leading, which is a staple of jazz, fusion, and professional chord arranging.",
   difficulty: "hard",
   category: "theory",
   timeInMinutes: 10,
-  instructions: [
+instructions: [
     "Choose a looping chord progression or any backing track with clear chord changes (e.g., ii–V–I in a major key: Dm7 – G7 – Cmaj7).",
     "Set a slow tempo (around 60–80 BPM) and use a clean guitar tone.",
     "For each chord, identify its 3rd and 7th and locate them on the fretboard in a single position.",

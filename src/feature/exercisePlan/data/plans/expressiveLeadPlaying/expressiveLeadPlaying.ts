@@ -1,6 +1,6 @@
 import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
 import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -11,7 +11,7 @@ export const expressiveLeadPlayingPlan: ExercisePlan = {
   difficulty: "medium",
   category: "technique",
   exercises: [
-    vibratoMasteryExercise,
+    vibratoSustainDrillExercise,
     expressiveBendPhrasingExercise,
     dynamicCrescendoExercise,
   ],

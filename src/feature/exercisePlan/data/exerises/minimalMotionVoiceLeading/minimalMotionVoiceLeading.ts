@@ -4,7 +4,8 @@ export const minimalMotionVoiceLeadingExercise: Exercise = {
   id: "minimal_motion_voice_leading",
   title: "Minimal-Motion Voice Leading",
   description:
-    "Advanced voice-leading drill: connect chord changes with the smallest possible melodic movement to create smooth, harmonically aware lines.",
+    "Arrange chord voicings to minimize finger movement between transitions.",
+  whyItMatters: "Minimal-motion voice leading makes chord progressions sound cohesive, elegant, and highly polished. It reduces large jumps across the fretboard, making your rhythm parts easier to play and much more satisfying to listen to.",
   difficulty: "hard",
   category: "theory",
   timeInMinutes: 10,

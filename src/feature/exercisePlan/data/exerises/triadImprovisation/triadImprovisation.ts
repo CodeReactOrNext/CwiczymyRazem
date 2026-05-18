@@ -3,23 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const triadImprovisationExercise: Exercise = {
   id: "triad_improvisation",
   title: "Triad Improvisation",
-  description: "Exercise developing improvisation skills using chord triads, strengthening harmonic awareness and melodic fluency.",
+  description: "Improvise solos purely using three-note triad shapes.",
+  whyItMatters: "Limiting yourself to triads forces you to learn chord shapes inside out and connect them melodically across the neck. It prevents you from playing mindless scale runs and makes your solos sound highly structured.",
   difficulty: "hard",
   category: "creativity",
   timeInMinutes: 12,
   instructions: [
-    "Choose a backing track with a clear chord progression (e.g., blues, jazz standard, pop song).",
-    "Identify the chord sequence in the backing track and list their corresponding triads.",
-    "While playing, use only notes from the triad of the currently sounding chord (root, third, fifth).",
-    "Change triads as the chords change in the backing track, building melodies from these three notes.",
-    "Experiment with different triad inversions to achieve smoother melodic transitions."
+    "Construct melodic phrases using only the notes of the active triad shapes.",
+    "Connect adjacent triad shapes smoothly as you improvise."
   ],
   tips: [
-    "Know the shapes of triads in all inversions on different string sets.",
-    "Less is more - instead of playing many notes, focus on melodiousness and rhythmic variety.",
-    "Try connecting triads from the closest positions - look for common tones between chords.",
-    "Use arpeggios (broken chords) and vertical triads in various combinations.",
-    "Pay attention to the tonal character of each triad - major, minor, diminished or augmented."
+    "Focus on rhythmic phrasing and dynamics to make the limited note selection interesting.",
+    "Use slides and bends to connect triad shapes across the neck."
   ],
   metronomeSpeed: null,
   relatedSkills: ["harmony", "improvisation", "chords", ],

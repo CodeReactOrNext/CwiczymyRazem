@@ -57,7 +57,7 @@ export const ExerciseCard = ({
           <div className='flex flex-wrap items-center gap-2'>
             <span className='whitespace-nowrap text-xs text-muted-foreground sm:text-sm'>
               <FaClock className='mr-1 inline h-3 w-3' />
-              {exercise.timeInMinutes} min
+              {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`}
             </span>
             <span
               className={`rounded-full px-2 py-0.5 text-xs ${

@@ -6,23 +6,18 @@ export const hammerOnSequence579Exercise: Exercise = {
   id: "hammer_on_sequence_5_7_9",
   title: "Hammer-ons – 5-7-9 Sequence",
   description:
-    "Hammer-on focused exercise using a 5-7-9 sequence across strings, designed to build left-hand strength, finger independence, and legato clarity.",
+    "Build finger strength and legato fluidity using wide-span hammer-ons.",
+  whyItMatters: "Hammer-ons allow you to play fluid, rapid lines with a soft, vocal-like attack. The 5-7-9 sequence requires stretching the fingers, which helps build both reach and independent hammer strength in the ring and pinky fingers.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Pick only the first note on each string, then perform hammer-ons for the remaining notes (5–7–9).",
-    "Use consistent fingerings and keep all hammer-ons strong and clear.",
-    "Repeat the written pattern three times before moving on.",
-    "Move the sequence across all indicated strings.",
-    "Let each note ring clearly without relying on the picking hand."
+    "Strike the first note with the pick, then execute the subsequent notes purely with hammer-ons.",
+    "Bring each finger down sharply and vertically onto the target fret."
   ],
   tips: [
-    "Hammer with confidence — aim for volume equal to the picked note.",
-    "Keep fingers close to the fretboard to minimize motion.",
-    "Avoid squeezing the neck; use finger strength, not tension.",
-    "Maintain steady timing even though most notes are legato.",
-    "Mute unused strings with both hands to keep the exercise clean."
+    "Keep your thumb anchored low behind the neck to support the wide finger stretch.",
+    "Use the exact tip of your fingers to avoid accidentally muting adjacent strings."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
   relatedSkills: ["legato"],

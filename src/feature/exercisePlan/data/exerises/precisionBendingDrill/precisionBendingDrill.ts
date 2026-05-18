@@ -9,14 +9,14 @@ export const precisionBendingDrillExercise: Exercise = {
   category: "technique",
   timeInMinutes: 3,
   instructions: [
-    "Listen to the target reference note before every bend to program your ear.",
-    "Use your ring finger to bend, supported by your middle and index fingers behind it.",
-    "Bend and release notes slowly and with full control, guiding the string back down smoothly.",
+    "Bend the string smoothly to reach the exact target pitch with perfect intonation.",
+    "Maintain steady finger pressure and hand stability at the peak of the bend.",
+    "Listen carefully to match the pitch perfectly with the underlying harmony."
   ],
   tips: [
-    "Overshooting is worse than undershooting — come up slowly and stop exactly when it matches the target.",
-    "Never bend with a single finger — always support the bending finger with other fingers behind it.",
-    "Do not drop the string abruptly on releases; guide it down in a fluid motion.",
+    "Support the bending finger with adjacent fingers on the same string for maximum strength.",
+    "Rotate your wrist and forearm upward to execute the bend rather than pushing with fingers alone.",
+    "Keep idle strings muted with your picking hand palm to prevent unwanted noise."
   ],
   metronomeSpeed: {
     min: 50,

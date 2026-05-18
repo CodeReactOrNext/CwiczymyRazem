@@ -3,16 +3,19 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const pentatonicPlayalongExercise: Exercise = {
   id: "pentatonic_playalong_best_of",
   title: "Pentatonic Best Of - Guitar Playalongs",
-  description: "Practice pentatonic scales along with the video. The best pentatonic exercises in one place.",
+  description: "Integrate pentatonic shapes and phrasing over classic blues and rock backing tracks.",
+  whyItMatters: "Applying scale shapes to actual songs teaches you how to phrase notes in context, resolve lines musically, and control your dynamics in response to a real band arrangement.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 13,
   instructions: [
-    "Play the video and follow along with the instructor",
-    "Pay attention to fingering and clarity of sound",
-    "Try to keep up with the tempo in the video"
+    "Lock your phrasing into the groove of the backing track, using call-and-response timing.",
+    "Incorporate sliding and bending to connect pentatonic shapes fluidly."
   ],
-  tips: [],
+  tips: [
+    "Listen to the rhythm section and leave space in your solos to let the music breathe.",
+    "Accent the strong beats to make your pentatonic lines sound punchy and deliberate."
+  ],
   metronomeSpeed: null,
   relatedSkills: [],
   youtubeVideoId: "nMV64UCrtFw",

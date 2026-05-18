@@ -4,18 +4,14 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const chordPracticeExercise: Exercise = {
   id: "chord_practice_configurable",
   title: "Chord Practice (Configurable)",
-  description: "Choose your chords and timing to practice transitions with a metronome.",
+  description: "Practice clean transitions and finger placement across a customizable selection of chords.",
+  whyItMatters: "Mastering transitions between diverse chord families is essential for smooth rhythm playing. This exercise builds muscle memory and hand independence, ensuring all strings ring clearly without unintended muting.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "This is a configurable chord practice exercise.",
-    "When you start, you'll be able to choose:",
-    "• Chords to include in the loop",
-    "• How often to change chords",
-    "• Whether to show notes (frets) in the tablature",
-    "• Target tempo",
-    "The system will generate a custom practice session for you."
+    "Position your thumb behind the middle of the neck to support a curved fretting arch.",
+    "Arpeggiate each chord slowly to verify that every string rings out clearly."
   ],
   tips: [
     "Focus on smooth transitions — don't stop the rhythm between chords.",
