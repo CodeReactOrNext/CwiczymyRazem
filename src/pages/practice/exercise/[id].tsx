@@ -20,6 +20,11 @@ export default function PracticeExercisePage() {
   const examBpm = bpm ? parseInt(bpm as string, 10) : undefined;
 
   useEffect(() => {
+    if (!router.isReady) return;
+    if (!userAuth) {
+      router.push('/login');
+      return;
+    }
     if (!id) return;
 
     const exerciseId = (id as string).replace(/-/g, "_");
@@ -35,7 +40,7 @@ export default function PracticeExercisePage() {
         exercises: [exercise],
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: userAuth || "anonymous",
+        userId: userAuth,
         image: (exercise.imageUrl || "") as any,
       };
       setPlan(dummyPlan);

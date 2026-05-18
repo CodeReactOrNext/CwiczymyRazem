@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
+import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
+import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 
 import type { ArsenalUserData } from "../../types/arsenal.types";
 import { EffectCard } from "./EffectCard";
@@ -11,9 +14,20 @@ interface EffectCollectionProps {
 
 export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const { mutate: sellEffect, isPending: isSelling } = useSellEffect();
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedEffectId, setSelectedEffectId] = useState<number | string | null>(null);
+
+  // Clear "new" flags when user opens collection tab
+  useEffect(() => {
+    const hasNew = data.effectInventory.some((item) => item.isNew);
+    if (hasNew) {
+      clearNewFlags().then(() => {
+        queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+      });
+    }
+  }, []);
 
   if (!data.effectInventory || data.effectInventory.length === 0) return null;
 

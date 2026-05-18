@@ -89,21 +89,19 @@ export const EffectCard = ({ item, count, isOnPedalboard, onSellClick, isSelling
       </div>
 
       {/* Sell button */}
-      {count === 1 && (
-        <button
-          onClick={() => onSellClick(item.id, item.effectId)}
-          disabled={isSelling || isOnPedalboard}
-          className="w-full py-2 text-[9px] font-black capitalize tracking-widest transition-all duration-200 text-red-600/70 hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-          style={{
-            background: "transparent",
-            borderTop: `1px solid ${rs.baseColor}20`,
-          }}
-          title={isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined}
-        >
-          <Trash2 size={10} strokeWidth={3} />
-          Sell
-        </button>
-      )}
+      <button
+        onClick={() => onSellClick(item.id, item.effectId)}
+        disabled={isSelling || (count === 1 && isOnPedalboard)}
+        className="w-full py-2 text-[9px] font-black capitalize tracking-widest transition-all duration-200 text-red-600/70 hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+        style={{
+          background: "transparent",
+          borderTop: `1px solid ${rs.baseColor}20`,
+        }}
+        title={count === 1 && isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined}
+      >
+        <Trash2 size={10} strokeWidth={3} />
+        Sell
+      </button>
     </div>
   );
 };
