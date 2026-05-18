@@ -242,8 +242,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               if (mobile) handleLinkClick();
               setIsFeedbackOpen(true);
             }}
-            className="flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300">
-            <span className="text-cyan-500">
+            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            <span className="text-zinc-500">
               <MessageSquarePlus size={16} />
             </span>
             <span>Send Feedback</span>

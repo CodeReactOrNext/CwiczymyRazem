@@ -8,7 +8,7 @@ import { serializeExercise, serializeExercises } from 'feature/exercises/lib/ser
 import { idToSlug, slugToId } from 'feature/exercises/lib/slugUtils';
 import type { SerializedExercise } from 'feature/exercises/lib/serializeExercise';
 import type { RelatedExerciseCard } from 'feature/exercises/lib/getRelatedExercises';
-import { ChevronRight, Clock, Music, Lock } from 'lucide-react';
+import { ChevronRight, Clock, Music, Lock, BarChart3, Zap, Activity } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -240,9 +240,9 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
 
         {/* Tablature / Strumming pattern */}
         {(exercise.tablature || exercise.strummingPatterns) && (
-          <section className="px-6 mx-auto max-w-6xl pb-12 border-t border-white/5 pt-12">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-1">
+          <section className="border-t border-white/5 pt-12">
+            <div className="px-6 mx-auto max-w-6xl mb-8">
+              <h2 className="text-2xl font-bold text-white mb-2">
                 {exercise.tablature ? 'Tablature' : 'Strumming Pattern'}
               </h2>
               <p className="text-sm text-zinc-500">
@@ -253,19 +253,37 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
             </div>
 
             {exercise.tablature && (
-              <TablatureViewer
-                measures={exercise.tablature}
-                bpm={exercise.metronomeSpeed?.recommended || 120}
-                isPlaying={false}
-                startTime={null}
-                countInRemaining={0}
-                hideNotes={exercise.hideTablatureNotes}
-                hideDynamicsLane={true}
-                className="w-full"
-              />
+              <div className="px-6 mx-auto max-w-6xl pb-12">
+                <TablatureViewer
+                  measures={exercise.tablature}
+                  bpm={exercise.metronomeSpeed?.recommended || 120}
+                  isPlaying={false}
+                  startTime={null}
+                  countInRemaining={0}
+                  hideNotes={exercise.hideTablatureNotes}
+                  hideDynamicsLane={true}
+                  className="w-full"
+                />
+              </div>
             )}
             {exercise.strummingPatterns && (
-              <StaticStrumPattern patterns={exercise.strummingPatterns} />
+              <div className="px-6 mx-auto max-w-6xl pb-12">
+                <StaticStrumPattern patterns={exercise.strummingPatterns} />
+              </div>
+            )}
+
+            {exercise.tablature && exercise.whyItMatters && (
+              <div className="px-6 mx-auto max-w-6xl pb-12">
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6">
+                  <h3 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
+                    <span className="inline-block w-1 h-1 bg-cyan-400 rounded-full"></span>
+                    Why It Matters
+                  </h3>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {exercise.whyItMatters}
+                  </p>
+                </div>
+              </div>
             )}
           </section>
         )}
@@ -303,20 +321,83 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
         )}
 
         {/* CTA Section */}
-        <section className="px-6 mx-auto max-w-6xl py-12 border-t border-white/5">
-          <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-950 p-8 md:p-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to Practice?</h2>
-            <p className="text-zinc-400 mb-8 max-w-md">
-              {exercise.premium
-                ? 'Upgrade to Premium to unlock this exercise and master it with our guided practice tools.'
-                : 'Start practicing this exercise right now with our interactive tablature and real-time feedback.'}
-            </p>
-            <Link
-              href={`/practice/exercise/${exercise.id}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-cyan-500 text-zinc-950 font-bold hover:bg-cyan-400 transition-colors"
-            >
-              Start Practice →
-            </Link>
+        <section className="px-6 mx-auto max-w-6xl py-12 border-t border-white/5 relative">
+          <div className="relative rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-950 p-8 md:p-12">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-white mb-4">Ready to Practice?</h2>
+                <p className="text-zinc-400 mb-8">
+                  {exercise.premium
+                    ? 'Upgrade to Premium to unlock this exercise and master it with our guided practice tools.'
+                    : 'Start practicing this exercise right now with our interactive tablature and real-time feedback.'}
+                </p>
+
+                {/* Features List */}
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-cyan-500/20">
+                      <Music className="h-5 w-5 text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Sound Recognition</p>
+                      <p className="text-xs text-zinc-500">Real-time audio recognition</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-500/20">
+                      <BarChart3 className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Analytics</p>
+                      <p className="text-xs text-zinc-500">Track your progress</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-emerald-500/20">
+                      <Activity className="h-5 w-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Activity Heatmap</p>
+                      <p className="text-xs text-zinc-500">Visualize your streak</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-purple-500/20">
+                      <Zap className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Real-time Feedback</p>
+                      <p className="text-xs text-zinc-500">Instant corrections</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-cyan-500 text-zinc-950 font-bold hover:bg-cyan-400 transition-colors"
+                >
+                  Start Practice →
+                </Link>
+              </div>
+              <div className="hidden lg:block w-[450px] pointer-events-none flex-shrink-0">
+                <Image
+                  src="/images/how-it-works/step-3.png"
+                  alt="Ready to practice"
+                  width={450}
+                  height={450}
+                  className="w-full h-auto object-cover rounded-lg shadow-2xl"
+                />
+              </div>
+              <div className="lg:hidden w-full h-56 mt-4">
+                <Image
+                  src="/images/how-it-works/step-3.png"
+                  alt="Ready to practice"
+                  width={300}
+                  height={300}
+                  className="w-full h-full object-cover rounded-lg shadow-2xl"
+                />
+              </div>
+            </div>
           </div>
         </section>
 

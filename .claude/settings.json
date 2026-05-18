@@ -11,7 +11,8 @@
       "Bash(xargs grep -l \"collection\\(\"\"users\"\"\\)\")",
       "Bash(git checkout *)",
       "Bash(git add *)",
-      "Bash(git commit -m 'style: capitalize '\\\\''Your Position'\\\\'' label in leaderboard header *)"
+      "Bash(git commit -m 'style: capitalize '\\\\''Your Position'\\\\'' label in leaderboard header *)",
+      "WebFetch(domain:riff.quest)"
     ]
   }
 }
