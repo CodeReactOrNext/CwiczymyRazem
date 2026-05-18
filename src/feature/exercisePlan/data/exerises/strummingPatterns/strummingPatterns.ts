@@ -26,8 +26,9 @@ export const strummingPattern2: Exercise = {
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   instructions: [
-    "Strum downward on every quarter-note beat (1, 2, 3, 4).",
-    "Add a single upstroke on the final '&' of beat 4.",
+    "Maintain a relaxed, pendulum-like strumming motion of the wrist and forearm.",
+    "Execute even, fluid down and up strokes, keeping pick depth shallow.",
+    "Use light fretting-hand pressure releases to mute the strings cleanly on rhythmic rests."
   ],
   tips: BASE_TIPS,
   strummingPatterns: [{ timeSignature: TS, subdivisions: 2, strums: [D,M,D,M,D,M,D,U] }],

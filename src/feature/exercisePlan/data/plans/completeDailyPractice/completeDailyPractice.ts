@@ -3,7 +3,7 @@ import { improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPro
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -18,7 +18,7 @@ export const completeDailyPracticePlan: ExercisePlan = {
     spiderBasicExercise,
     rhythmicPocketMasteryExercise,
     earTrainingMedium,
-    vibratoMasteryExercise,
+    vibratoSustainDrillExercise,
     improvPromptMedium,
   ],
   userId: "system",

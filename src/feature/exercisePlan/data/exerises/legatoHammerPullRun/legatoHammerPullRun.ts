@@ -3,22 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const legatoHammerPullRunExercise: Exercise = {
   id: "legato_hammer_pull_run",
   title: "Legato Hammer-Pull Scale Run",
-  description: "4-note hammer-on / pull-off groups across A natural minor 3nps positions. Pick only the first note of each group, then hammer up and pull back. Builds left-hand strength and legato clarity.",
+  description: "Incorporate legato runs across multiple strings with precise rhythmic timing.",
+  whyItMatters: "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Each group is 4 sixteenth notes: pick the first note, hammer-on to the next two, then pull-off back. Pattern per string: root → hammer → hammer → pull.",
-    "Measures 1-3: Ascending then descending across all 6 strings at 5th position (A natural minor).",
-    "Measures 4-6: Same pattern shifted to 7th position. Your hand has to re-settle cleanly at the new frets.",
-    "Focus on making hammer-ons and pull-offs as loud as the picked note — no volume dips.",
+    "Pick only the first note on each string, executing all other notes with legato.",
+    "Coordinate string transitions quickly to prevent gaps in the rhythmic flow."
   ],
   tips: [
-    "Keep your thumb behind the neck center for maximum finger reach and pressing power.",
-    "Fingers stay close to the fretboard at all times — economy of motion is key.",
-    "The pull-off should snap sideways off the string, not lift straight up.",
-    "If your hand tenses up, slow down. Legato is about relaxed strength, not brute force.",
-    "Try playing without any distortion to honestly hear which notes are weak.",
+    "Use your fretting-hand index finger to mute the string you just exited.",
+    "Keep your pick strokes minimal and synchronized with the initial notes."
   ],
   metronomeSpeed: {
     min: 60,

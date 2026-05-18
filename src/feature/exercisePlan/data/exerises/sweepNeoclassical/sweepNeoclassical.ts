@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const sweepNeoclassicalExercise: Exercise = {
   id: "sweep_neoclassical",
   title: "Neoclassical Sweep Master",
-  description: "Complex sweep picking figures inspired by neoclassical shred. Diminished and minor arpeggio shapes across 5 strings with position shifts and legato turnarounds.",
+  description: "Execute multi-octave sweep arpeggios with perfect synchronization.",
+  whyItMatters: "Sweeping is the ultimate high-speed arpeggio technique. This neoclassical drill focuses on the sync between the picking hand 'sweep' and fretting hand 'rolls', ensuring every note is perfectly separated and articulate.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
-    "Measures 1-2: Am arpeggio in 12th position with extended turnaround — sweep down, hammer-pull at top, sweep back, shift position on the way back.",
-    "Measures 3-4: Diminished 7th arpeggio (Bdim7) — symmetrical shape repeating every 3 frets. Sweep through str 5-1, shift up 3 frets, repeat.",
-    "Measures 5-6: Sequence combining Am → Bdim7 → C → Am arpeggios. Quick shape and position changes.",
-    "Hand synchronization is key — every note must be perfectly clean.",
+    "Drag the pick across the strings in a single, continuous, sweeping motion.",
+    "Roll your fretting fingers to isolate each note and prevent chord bleeding."
   ],
   tips: [
-    "Hand synchronization is key — both hands must move as one unit.",
-    "For diminished shapes, the symmetrical fingering makes position shifts easier.",
-    "Practice each arpeggio shape isolated before stringing them into sequences.",
-    "Record and listen critically — any overlapping notes mean your muting needs work.",
+    "Use your picking-hand palm to follow the pick, muting lower strings instantly.",
+    "Coordinate the sweep speed perfectly with your fretting finger movements."
   ],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   relatedSkills: ["sweep_picking"],

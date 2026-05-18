@@ -6,22 +6,18 @@ export const legatoSextuplets457Exercise: Exercise = {
   id: "legato_sextuplets_4_5_7",
   title: "Legato Sextuplets – 4-5-7",
   description:
-    "Legato exercise based on 4-5-7 fingerings played in sextuplets, combining hammer-ons and pull-offs to develop left-hand strength, control, and rhythmic precision.",
+    "Execute fast, even six-note patterns using legato phrasing.",
+  whyItMatters: "Sextuplets are a standard rhythmic subdivision for high-speed runs. Practicing them with legato techniques on frets 4, 5, and 7 improves pinky strength and teaches you to divide beats evenly without relying on the metronome click for every note.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 4,
   instructions: [
-    "Use hammer-ons for ascending notes (4–5–7).",
-    "Use pull-offs for descending notes (7–5).",
-    "Play each group as an even sextuplet subdivision.",
-    "Repeat the written pattern three times before moving on."
+    "Focus on equal spacing between all six notes, keeping the subdivisions perfectly even.",
+    "Drive the hammers and pulls with equal force to maintain uniform volume."
   ],
   tips: [
-    "Make hammer-ons and pull-offs as loud and clear as the picked note.",
-    "Keep fingers close to the fretboard to maintain legato smoothness.",
-    "Avoid tension in the thumb and wrist of the fretting hand.",
-    "Use minimal picking motion — the right hand should stay relaxed.",
-    "Count the sextuplets internally to keep timing stable."
+    "Condition your pinky finger to hammer down with the same authority as your index.",
+    "Keep your fretting wrist straight to ensure optimal tendon alignment."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
   relatedSkills: ["legato"],

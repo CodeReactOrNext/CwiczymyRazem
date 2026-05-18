@@ -14,23 +14,18 @@ export const miniArpeggioExercise: Exercise = {
   id: "mini_arpeggio",
   title: "Mini Arpeggio – Em7",
   description:
-    "A compact three-string Em7 arpeggio sweep: down from the A string through D and G, hammer-on at the top, pull-off, then sweep back up. One clean cycle per bar — the foundation of sweep picking phrasing.",
+    "Practice clean sweeping and rolling mechanics across three-string shapes.",
+  whyItMatters: "Mini arpeggios are the building blocks of sweep picking. Learning to roll your fretting fingers across the same fret on adjacent strings prevents notes from bleeding together, ensuring a clean, articulated arpeggio line.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Sweep down through strings 5→4→3 in one continuous pick motion — not three separate strokes.",
-    "At the G string (fret 9) immediately hammer onto fret 12, then pull-off back to fret 9.",
-    "Reverse the pick direction and sweep up through strings 3→4→5 to complete the cycle.",
-    "Lift each fretting finger right after it sounds so notes do not bleed into each other.",
-    "Start slow — the aim is one smooth, even-volume cycle before adding speed."
+    "Use a single, continuous downward pick stroke to sweep across the strings.",
+    "Roll your fretting fingers across the frets to prevent notes from ringing together."
   ],
   tips: [
-    "The pick should feel like it's falling through the strings on the way down, not hitting each one individually.",
-    "Pre-plant the hammer-on finger before you reach the G string so there's no hesitation at the top.",
-    "The up sweep is usually weaker than the down — give it extra attention at slow tempos.",
-    "If any note is noticeably louder, adjust pick angle or depth on that string.",
-    "Once the cycle is clean, try chaining it: two cycles per bar at half the BPM."
+    "Lift each fretting finger slightly as soon as the pick leaves the corresponding string.",
+    "Coordinate the sweep speed perfectly with your fretting finger movements."
   ],
   metronomeSpeed: { min: 30, max: 200, recommended: 45 },
   relatedSkills: ["sweep_picking"],

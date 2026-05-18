@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const strummingFunkExercise: Exercise = {
   id: "strumming_funk",
   title: "Funk Rhythm Guitar",
-  description: "16th-note funk strumming with heavy use of muted chucks and syncopation.",
+  description: "Master 16th-note scratching, clean accents, and tight left-hand muting.",
+  whyItMatters: "Funk rhythm relies heavily on percussive 'scratching' and precise accents. This exercise trains your fretting hand to squeeze the neck only on accented notes and relax to mute the strings on others, building elite hand sync.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Funk strumming uses 16th-note subdivisions: 1 e & a 2 e & a 3 e & a 4 e & a.",
-    "Your arm moves in a constant 16th-note pendulum. Most strums are muted chucks (×) — only accent notes ring out.",
-    "Pattern A: the classic James Brown / Nile Rodgers approach — tight, clean, and relentless.",
-    "Keep your fretting hand slightly relaxed so muted strums give a clean 'chk' — don't fully fret them.",
-    "Gradually speed up. Funk grooves best between 90–110 BPM.",
+    "Maintain a constant, rapid 16th-note strumming motion in your right hand.",
+    "Squeeze the neck only on accented beats, relaxing instantly to create percussive scratches."
   ],
   tips: [
-    "The secret of funk: what you DON'T play is as important as what you do. Embrace the gaps.",
-    "Your fretting hand does most of the work — muting and releasing strings creates the percussive texture.",
-    "Record yourself and listen back. Funk rhythm is unforgiving — you'll hear if you're rushing.",
+    "Ensure your fretting hand completely dampens the strings during scratches.",
+    "Focus on making the accented chords pop out clearly against the muted scratches."
   ],
   metronomeSpeed: { min: 70, max: 115, recommended: 90 },
   relatedSkills: ["rhythm"],

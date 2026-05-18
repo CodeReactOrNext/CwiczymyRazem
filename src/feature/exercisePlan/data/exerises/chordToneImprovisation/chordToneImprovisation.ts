@@ -4,7 +4,8 @@ export const chordToneImprovisationExercise: Exercise = {
   id: "chord_tone_improvisation",
   title: "Chord Tone Improvisation",
   description:
-    "Advanced harmonic awareness exercise focused on strict chord-tone improvisation over faster chord changes and increased cognitive load.",
+    "Target chord tones systematically over shifting backing tracks to build melodic intent.",
+  whyItMatters: "Improvising by targeting chord tones (root, third, fifth, seventh) anchors your solos directly to the underlying harmony. This technique prevents random note selection, producing structured, harmonically rich solos that sound musical and professional.",
   difficulty: "hard",
   category: "theory",
   timeInMinutes: 10,
@@ -16,7 +17,6 @@ export const chordToneImprovisationExercise: Exercise = {
     "Avoid repeating the same chord tone twice in a row within the same chord.",
     "At each chord change, aim for the smallest possible movement to a chord tone of the next chord.",
     "Perform the exercise from memory — actively track chord changes and their tones without visual aids.",
-    "If a wrong note is played, stop immediately and restart the progression."
   ],
   tips: [
     "Mentally name the chord tones ahead of the chord change to avoid hesitation.",

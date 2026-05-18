@@ -6,19 +6,18 @@ import spiderBasicImage from "./image.png";
 export const spiderLegatoBasicExercise: Exercise = {
   id: "spider_legato_basic",
   title: "Spider Legato - Basic",
-  description: "Exercise developing left hand strength and legato technique (hammer-ons and pull-offs).",
+  description: "Execute the spider walk pattern purely with hammer-ons and pull-offs.",
+  whyItMatters: "Removing the pick forces your fretting hand to do all the work. This builds massive strength, finger independence, and timing control, leading to incredibly fluid legato runs.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Perform the spider exercise using only legato technique.",
-    "Ascending: Play 1-2-3-4 with hammer-ons across strings 6 to 1 at the same position. Shift up one fret only when moving back up the strings.",
-    "Descending: After reaching the top, play 8-7-6-5 with pull-offs across strings 6 to 1 at the same position. Shift down one fret only when moving back up the strings.",
+    "Strike only the first note of each string, executing the rest with pure legato.",
+    "Ensure hammer-ons are strong and pull-offs are clean and snapped."
   ],
   tips: [
-    "Ensure each hammer-on and pull-off is clear and has consistent volume.",
-    "Keep your fingers close to the fretboard to minimize movement.",
-    "Maintain a steady rhythm.",
+    "Keep unused fingers hovered close to the strings to prevent sympathetic ring.",
+    "Flick the string slightly downward during pull-offs to maintain volume."
   ],
   metronomeSpeed: {
     min: 40,

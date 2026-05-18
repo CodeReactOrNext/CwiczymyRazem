@@ -8,24 +8,18 @@ export const sweepPickingMotionDrillExercise: Exercise = {
   id: "sweep_picking_motion_drill",
   title: "Sweep Picking Motion Drill – 3 Strings",
   description:
-    "Pure right-hand motion drill across G, B, and high e strings. All notes are muted — the goal is to train the sweeping wrist movement and pick-landing technique before adding fretting. Down sweep follows the natural gravity of the pick through the strings; up sweep uses a controlled return stroke.",
+    "Develop basic sweeping mechanics using simple three-string triad shapes.",
+  whyItMatters: "Three-string sweeps are the perfect entry point to mastering the sweeping motion. Focusing on a continuous, fluid pick stroke across a small number of strings builds excellent muscle memory for larger sweeps.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Mute all three strings lightly with the palm of your fretting hand.",
-    "Downstroke the G string and let the pick fall through onto the B string — don't lift between notes.",
-    "Continue the same downward motion through B onto the high e string.",
-    "At the high e, reverse direction: upstroke e, land on B, then upstroke B back to G.",
-    "The whole six-note sweep should feel like one smooth wrist movement in each direction.",
-    "Do not stop at any string — the pick should be in continuous motion throughout the cycle."
+    "Sweep the pick smoothly across three strings, avoiding separate individual pick strokes.",
+    "Coordinate fretting finger rolls to ensure only one note rings at a time."
   ],
   tips: [
-    "Think of the down sweep as letting gravity pull the pick through the strings, not forcing it.",
-    "The turning point at the high e is where most beginners stall — keep the motion fluid.",
-    "Use the minimum pick depth: just enough to catch the string, no deeper.",
-    "Slow down until every hit is equal in volume — only then increase tempo.",
-    "Once the motion feels natural, add fretting to turn this into real arpeggios."
+    "Focus on a relaxed picking wrist—let gravity pull the pick through the strings.",
+    "Practice slowly to master the synchronization between both hands."
   ],
   metronomeSpeed: { min: 50, max: 130, recommended: 70 },
   relatedSkills: ["sweep_picking"],

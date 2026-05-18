@@ -9,15 +9,14 @@ export const metronomeGapTestExercise: Exercise = {
   category: "theory",
   timeInMinutes: 5,
   instructions: [
-    "Select a basic strumming pattern or scale sequence.",
-    "Configure a metronome to mute itself for specific intervals (e.g., 2 measures audible, 2 measures silent).",
-    "Play continuously through both sections without altering your physical motion.",
-    "Assess your timing accuracy at the exact moment the metronome click returns.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "Mentally subdivide the beat (e.g., counting '1 & 2 & 3 & 4 &') during the silent gaps to prevent tempo drift.",
-    "Close your eyes or look away from the metronome so you do not rely on visual flashing cues.",
-    "If you fail to align with the returning click, actively note whether you arrived early (rushing) or late (dragging) to correct your natural tendency.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: {
     min: 40,

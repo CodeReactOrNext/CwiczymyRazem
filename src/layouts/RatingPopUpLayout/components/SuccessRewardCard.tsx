@@ -26,6 +26,7 @@ export const SuccessRewardCard = ({
   skillRewardSkillId,
   skillRewardAmount,
   skillPointsGained,
+  onRestart,
   onContinue
 }: SuccessRewardCardProps) => {
   const { t } = useTranslation("skills");

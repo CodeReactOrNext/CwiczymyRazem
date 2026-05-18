@@ -29,6 +29,9 @@ export interface SerializedExercise {
   customGoal?: string;
   customGoalDescription?: string;
   strummingPatterns?: StrumPattern[];
+  whyItMatters?: string;
+  isHiddenFromLibrary?: boolean;
+  requiresBackingTrack?: boolean;
   examBacking?: { url: string; sourceBpm: number };
 }
 

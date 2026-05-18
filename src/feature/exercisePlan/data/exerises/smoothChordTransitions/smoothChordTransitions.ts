@@ -4,11 +4,12 @@ export const smoothChordTransitionsExercise: Exercise = {
   id: "smooth_chord_transitions",
   title: "Smooth Chord Transitions",
   description:
-    "Exercise focused on practical voice leading by connecting chord shapes with minimal finger movement and preserving common tones between chords.",
+    "Minimize finger movement and eliminate pauses during common chord changes.",
+  whyItMatters: "Choppy chord changes ruin the groove of a song. Training your fingers to move as a single, coordinated unit and using anchor fingers where possible ensures a continuous, professional rhythm sound.",
   difficulty: "hard",
   category: "theory",
   timeInMinutes: 10,
-  instructions: [
+ instructions: [
     "Choose a simple looping chord progression with at least three chords (e.g. I–IV–V in any key).",
     "Decide on one fixed string set to use for all chords (e.g. strings 5–4–3 for triads or 4–3–2–1 for seventh chords).",
     "Find chord shapes on those strings only — do not switch string sets even if a chord feels uncomfortable.",

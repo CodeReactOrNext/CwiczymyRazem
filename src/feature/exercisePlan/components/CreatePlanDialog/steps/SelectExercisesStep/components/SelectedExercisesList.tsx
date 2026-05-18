@@ -97,8 +97,17 @@ const SortableItem = ({
             title="Click to change time"
           >
             <Clock className="h-3 w-3 text-cyan-500/70 group-hover/time:text-cyan-400 transition-colors" />
-            <span className="text-[12px] font-bold">{exercise.timeInMinutes}</span>
-            <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">min</span>
+            {exercise.timeInMinutes < 1 ? (
+              <>
+                <span className="text-[12px] font-bold">{Math.round(exercise.timeInMinutes * 60)}</span>
+                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">s</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[12px] font-bold">{exercise.timeInMinutes}</span>
+                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">min</span>
+              </>
+            )}
             <Edit2 className="h-3 w-3 text-zinc-600 group-hover/time:text-cyan-400 transition-colors ml-0.5" />
           </button>
           
@@ -203,7 +212,9 @@ export const SelectedExercisesList = ({
         <div className="flex items-center gap-2 rounded-[8px] bg-white/[0.03] backdrop-blur-md px-3.5 py-1.5 border border-white/5 shadow-sm transition-colors">
           <Clock className="h-3.5 w-3.5 text-cyan-400" />
           <span className="text-[13px] font-bold text-zinc-200">
-            {totalDuration} <span className="text-zinc-500 font-medium">min</span>
+            {totalDuration < 1 
+              ? `${Math.round(totalDuration * 60)}s` 
+              : `${Math.round(totalDuration * 10) / 10} min`}
           </span>
         </div>
       </div>

@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const tappingMelodicLinesExercise: Exercise = {
   id: "tapping_melodic_lines",
   title: "Melodic Tapping Compositions",
-  description: "Flowing melodic lines using tapping as the primary technique. Move beyond patterns into actual musical phrases across multiple strings.",
+  description: "Incorporate two-handed tapping to play expressive, melodic phrases.",
+  whyItMatters: "Two-handed tapping turns the guitar into a piano-like instrument. Learning to tap melodic lines rather than just fast arpeggios adds a highly lyrical, unique texture to your solos.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
-    "Measures 1-2: A minor melody across strings 1-2 using tap-pulloff-hammer sequences. The melody should sing, not just sound like exercises.",
-    "Measures 3-4: Wider string jumps — tapping on string 1 combined with bass notes on string 3. Think like a pianist.",
-    "Measures 5-6: Full composition piece — melody moves across strings 1-2-3, combining taps, hammers, and pull-offs into a complete musical phrase.",
-    "Focus on musicality: dynamics, phrasing, and making every note intentional.",
+    "Tap melodic lines cleanly, balancing the volume of both hands.",
+    "Sync string changes smoothly between tapped and fretted notes."
   ],
   tips: [
-    "Think like a pianist — your hands work independently but create one musical statement.",
-    "Let notes ring into each other where possible for a legato, flowing sound.",
-    "Vary your tap attack strength to create dynamics — not every note needs the same volume.",
-    "Record yourself and listen back — does it sound musical or mechanical?",
+    "Keep your tapping hand relaxed to sustain long melodic phrases.",
+    "Use a light fretting hand touch to avoid unwanted fret noise."
   ],
   metronomeSpeed: { min: 60, max: 100, recommended: 75 },
   relatedSkills: ["tapping"],

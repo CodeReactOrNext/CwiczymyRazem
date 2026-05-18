@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const expressiveBendPhrasingExercise: Exercise = {
   id: "expressive_bend_phrasing",
   title: "Expressive Bend Phrasing",
-  description: "Pre-bends, release bends, bend-release-bend sequences, and compound phrases. Bluesy phrasing on Am pentatonic at 5th and 8th position.",
+  description: "Integrate whole-step and half-step bends into melodic phrases with precise pitch control.",
+  whyItMatters: "Bending is one of the most expressive techniques on the guitar, mimicking the human voice. Proper bending technique involves using the strength of multiple fingers and rotating the wrist to achieve perfect intonation and prevent string slippage.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Measures 1-2: Pre-bend + release patterns. Start at the bent pitch (PB) and release down to the fret pitch.",
-    "Measures 3-4: Bend → vibrato → release sequences. Bend up, hold with vibrato, then release.",
-    "Measures 5-6: Full expressive phrases combining bends, releases, vibrato, and hammer-ons in Am pentatonic.",
-    "Focus on smooth transitions between techniques — the phrase should flow like a vocal line.",
+    "Support the bending finger with your adjacent fingers to maximize control and stability.",
+    "Rotate your wrist and forearm rather than pushing with fingers alone to drive the bend."
   ],
   tips: [
-    "For pre-bends, silently bend the string before picking so the note starts at the target pitch.",
-    "When combining bend + vibrato, establish the bend first, then add vibrato.",
-    "Listen to blues guitarists like B.B. King and David Gilmour for phrasing inspiration.",
-    "Release bends should be controlled and gradual, not abrupt.",
+    "Listen closely to match the target pitch perfectly—do not under-bend or over-bend.",
+    "Keep pressure constant throughout the bend so the note does not die prematurely."
   ],
   metronomeSpeed: {
     min: 40,

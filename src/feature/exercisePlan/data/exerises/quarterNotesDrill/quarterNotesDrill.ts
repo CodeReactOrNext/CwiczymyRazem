@@ -12,24 +12,18 @@ export const quarterNotesDrillExercise: Exercise = {
   isHiddenFromLibrary: true,
   title: "Quarter Notes Drill",
   description:
-    "One downstroke per beat on the A string — open A and one fretted note (B), with rests scattered through the pattern. The rests are not a break; they are the exercise: count through the silence and land the next note exactly on the click.",
+    "Develop strict timing and pick attack consistency using quarter-note pulses.",
+  whyItMatters: "Perfect rhythmic timing is the separation between amateur and professional guitarists. This drill builds a solid internal clock, ensuring you land exactly on the beat without rushing or lagging behind.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 1.68,
   instructions: [
-    "All notes are on string 5 (A string). Open string = A, fret 2 = B.",
-    "Use only downstrokes — one per beat, no upstrokes yet.",
-    "Phase 1 (bars 1–2): open A only. Count through the rests — don't speed up when silence hits.",
-    "Phase 2 (bars 3–4): fret 2 (B) only. Left hand enters, but the pulse stays the same.",
-    "Phase 3 (bars 5–6): A and B together. Don't rush the note that comes after a rest.",
-    "Phase 4 (bars 7–8): accented beat 1 — the last bar is mostly silence, count all 4 beats.",
-    "Start at 50 BPM. Tap your foot on every beat, including rests.",
+    "Strike exactly on the metronome click with zero rushed or lagged notes.",
+    "Maintain identical pick velocity and attack angle on every beat."
   ],
   tips: [
-    "Rests are not waiting — keep counting '1 2 3 4' out loud even when you're not picking.",
-    "The note that comes after a rest is where most players rush — slow down mentally before that beat.",
-    "Keep the pick hand moving down on every beat, even on rests — just don't touch the string.",
-    "Tap your foot on the floor: foot down = beat, whether you play or not.",
+    "Tap your foot or nod your head to internalize the pulse of the metronome.",
+    "Keep your picking movement small and highly controlled to ensure timing accuracy."
   ],
   metronomeSpeed: { min: 40, max: 90, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/quarter_notes_drill_backing_track.mp3", sourceBpm: 50 },

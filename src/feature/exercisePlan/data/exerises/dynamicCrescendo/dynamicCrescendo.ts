@@ -9,14 +9,14 @@ export const dynamicCrescendoExercise: Exercise = {
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Follow the volume curves shown below the tablature exactly.",
-    "Perform smooth crescendos (getting louder) and decrescendos (getting quieter).",
-    "Exaggerate subito dynamics — make sudden, instant jumps between extreme loud and extreme quiet.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "Control volume by changing pick depth and wrist speed — keep your grip pressure constant.",
-    "Soft playing requires much more control than loud playing; do not rush the quiet notes.",
-    "Make the contrast in subito dynamics (instant jumps) as extreme and immediate as possible.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: { min: 50, max: 100, recommended: 70 },
   examBacking: { url: "/static/sounds/exercise/dynamic-control.mp3", sourceBpm: 70 },

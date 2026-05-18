@@ -10,15 +10,14 @@ export const playByEarExercise: Exercise = {
   category: "hearing",
   timeInMinutes: 15,
   instructions: [
-    "Select a short, simple riff or melody from a recording.",
-    "Listen to the fragment multiple times, internalizing the rhythm and pitch contour before touching the guitar.",
-    "Identify the root note or key center by trial and error on the fretboard.",
-    "Reconstruct the phrase note-by-note on the guitar, making corrections until it matches the recording exactly.",
+    "Listen carefully to the reference sequence before reproducing it on the fretboard.",
+    "Sing or hum the pitches aloud to reinforce the brain-to-fretboard connection.",
+    "Transcribe the melody purely by ear, relying on relative interval recognition."
   ],
   tips: [
-    "Sing the pitches out loud before attempting to find them on the fretboard.",
-    "If you get stuck, use software to isolate the fragment or slow down the playback speed without changing the pitch.",
-    "Test different fretboard positions for the same notes to find the most efficient fingering for the phrase.",
+    "Focus on the distance between notes rather than trying to guess absolute fret positions.",
+    "Practice without looking at your fretboard to build pure auditory-motor memory.",
+    "Start with simple three-note phrases before moving to complex arrangements."
   ],
   metronomeSpeed: null,
   relatedSkills: ["ear_training"],

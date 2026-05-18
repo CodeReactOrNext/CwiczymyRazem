@@ -11,14 +11,14 @@ export const spiderStairsHardExercise: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Play the staircase shapes crossing over non-adjacent strings as shown in the tab.",
-    "Keep unused fingers hovering extremely close to the strings to minimize movement.",
-    "Use strict alternate picking (down-up-down-up) throughout all string changes.",
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Keep your thumb positioned low on the back of the neck to support wide stretches cleanly.",
-    "Release all fretting hand tension immediately as you transition between shapes.",
-    "Focus on absolute precision — slow down if you get any fret buzz or muffled notes.",
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   tablature: [
     {

@@ -9,23 +9,18 @@ export const tappingPullHammerExercise: Exercise = {
   id: "tapping_pull_hammer",
   title: "Tapping – Two-Voice Phrase",
   description:
-    "A two-string tapping phrase where both voices move independently — no note stays the same twice in a row. String 1 carries the upper melody, string 2 echoes a third below. Both the tap note and the pull-off target vary each half bar, so the hands are always doing something different.",
+    "Develop counterpoint and independent phrasing by playing a two-voice tapped melody.",
+  whyItMatters: "Playing independent voices with both hands builds incredible brain-to-finger coordination. This advanced technique lets you play both basslines/chords and melodies simultaneously on a single guitar.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Each half bar: tap a note on one string, then pull off to a different fret on the same string.",
-    "Measures 1–4: the two strings take turns — listen for the alternating voice effect.",
-    "Measures 5–8: both strings play in the same half bar — tap str1 then immediately str2.",
-    "Neither the tap fret nor the pull-off target repeat consecutively — follow the notation.",
-    "Half notes only: one tap + one pull-off per half bar. Do not rush."
+    "Play the bass/rhythm line with your fretting hand and the melody with your tapping hand.",
+    "Maintain strict independence, ensuring both voices sound distinct and balanced."
   ],
   tips: [
-    "Pre-plant the pull-off finger before the tap — it must already be on the string.",
-    "When alternating strings (M5–8), mute the idle string with your right-hand palm.",
-    "Listen for the interval each pair makes — third, fourth, fifth — name it as you play.",
-    "The lower string (B) pull-offs sound darker and warmer — let that colour show.",
-    "If one voice is louder than the other, adjust tap pressure until they balance."
+    "Use a fret wrap or picking-hand palm to mute idle strings.",
+    "Start slowly to coordinate the different rhythms of each hand."
   ],
   metronomeSpeed: { min: 40, max: 65, recommended: 48 },
   relatedSkills: ["tapping"],

@@ -369,7 +369,10 @@ export const ExerciseBrowseTab = ({
 
                     {/* Min */}
                     <td className="px-3 py-3.5 text-zinc-500 text-xs">
-                      {exercise.timeInMinutes}
+                      {exercise.timeInMinutes < 1
+                        ? `${Math.round(exercise.timeInMinutes * 60)}s`
+                        : `${exercise.timeInMinutes}`
+                      }
                     </td>
 
                     {/* Rank */}

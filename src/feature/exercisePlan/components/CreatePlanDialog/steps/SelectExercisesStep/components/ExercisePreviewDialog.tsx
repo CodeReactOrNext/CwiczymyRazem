@@ -52,7 +52,7 @@ export function ExercisePreviewDialog({
             <div className="hidden sm:flex flex-wrap items-center gap-2 mt-5">
               <Badge variant="outline" className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-zinc-900/80 border-white/10 text-white flex items-center gap-1.5">
                 <Clock className="w-3 h-3 text-cyan-400" />
-                {exercise.timeInMinutes} min
+                {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`}
               </Badge>
               
               <Badge variant="outline" className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-emerald-500/10 border-emerald-500/20 text-emerald-400">

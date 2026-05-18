@@ -9,14 +9,14 @@ export const strummingBasicExercise: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Hold a basic chord of your choice (such as Em or G major) and strum down cleanly on every beat.",
-    "Keep your strumming elbow relaxed and allow the forearm to move like a steady pendulum.",
-    "Ensure every string rings out cleanly with consistent volume across each strum.",
+    "Maintain a relaxed, pendulum-like strumming motion of the wrist and forearm.",
+    "Execute even, fluid down and up strokes, keeping pick depth shallow.",
+    "Use light fretting-hand pressure releases to mute the strings cleanly on rhythmic rests."
   ],
   tips: [
-    "Maintain the continuous pendulum swing of your arm, even on silent or missed beats.",
-    "Use a light grip on the pick to prevent harsh contact with the strings.",
-    "Focus on perfect rhythmic alignment with the metronome click.",
+    "Angle the pick slightly so it glides smoothly across the strings rather than catching.",
+    "Focus on the dynamic contrast between accented strums and quiet ghost strokes.",
+    "Keep your arm moving continuously, even during silent rests, to internalize the groove."
   ],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   relatedSkills: ["rhythm"],

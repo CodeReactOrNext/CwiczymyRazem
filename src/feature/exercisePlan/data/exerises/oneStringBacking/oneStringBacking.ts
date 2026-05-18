@@ -10,15 +10,14 @@ export const oneStringBackingExercise: Exercise = {
   category: "creativity",
   timeInMinutes: 10,
   instructions: [
-    "Select a backing track in a key you are comfortable with.",
-    "Choose exactly one string (e.g., the G or B string) and do not play any notes on other strings.",
-    "Locate the root notes and scale degrees of the key horizontally along your chosen string.",
-    "Improvise freely, using only horizontal movement to build melodies.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "Since your note choices are limited, focus heavily on phrasing: utilize slides, bends, vibrato, and dynamic picking.",
-    "Use the space between notes intentionally—rests are crucial when horizontal movement takes longer than vertical string skipping.",
-    "Vary your register by sliding between the lowest and highest frets on the string to create contour in your solos.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: null,
   relatedSkills: ["phrasing", "improvisation"],

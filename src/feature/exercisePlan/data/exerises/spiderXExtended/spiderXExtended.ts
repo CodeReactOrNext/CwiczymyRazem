@@ -6,22 +6,18 @@ import spiderBasicImage from "./image.png";
 export const spiderXExtendedExercise: Exercise = {
   id: "spider_x_extended",
   title: "Extended Spider X Exercise",
-  description: "Advanced version of X exercise with wider stretches and complex patterns.",
+  description: "Challenge coordination with a wider, multi-position version of the diagonal Spider X.",
+  whyItMatters: "The extended version introduces shifting positions along with diagonal string changes. This builds outstanding spatial awareness, finger dexterity, and high-level picking synchronization.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
-    "Start with basic X pattern, then extend the layout by an additional fret.",
-    "Perform the sequence on three adjacent strings.",
-    "Add direction changes within the pattern.",
-    "Combine different variants of the extended X pattern."
+    "Execute horizontal position shifts seamlessly while maintaining diagonal picking.",
+    "Keep pick strokes minimal and synchronized with fretting finger contacts."
   ],
   tips: [
-    "Pay special attention to ergonomics with wider stretches.",
-    "Adjust wrist position for the extended layout.",
-    "Take breaks at first signs of fatigue.",
-    "Gradually increase pattern complexity.",
-    "Regularly return to basic version for comparison."
+    "Maintain a relaxed wrist and shoulder during wide shifts.",
+    "Focus on equal note duration and volume across all strings."
   ],
   metronomeSpeed: {
     min: 60,

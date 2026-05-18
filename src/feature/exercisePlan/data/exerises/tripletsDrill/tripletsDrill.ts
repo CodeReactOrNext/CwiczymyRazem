@@ -62,14 +62,14 @@ export const tripletsDrillExercise: Exercise = {
   category: "technique",
   timeInMinutes: 1.520,
   instructions: [
-    "Play exactly three notes per beat on the G string, keeping each note perfectly equal in length.",
-    "Use a metronome and tap your foot on every beat, landing note 1 on the click.",
-    "Maintain strict alternate picking (down-up-down) inside each triplet group.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "Accent the first note of each triplet group slightly to anchor your rhythmic timing.",
-    "Keep your fretting hand fingers hovering close to the fretboard to maintain fluid motion.",
-    "Ensure the transition between ascending and descending shapes remains perfectly even.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 45 },
   examBacking: { url: "/static/sounds/exercise/triplets_drill_backing_track.mp3", sourceBpm: 50 },

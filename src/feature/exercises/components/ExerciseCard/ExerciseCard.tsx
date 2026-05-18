@@ -64,7 +64,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, href }) =>
         {/* Metadata */}
         <div className="flex items-center justify-between pt-4 border-t border-white/5">
           <div className="text-xs text-zinc-500">
-            ⏱ {exercise.timeInMinutes} min
+            ⏱ {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`}
           </div>
           <div className="flex items-center gap-1 text-xs font-semibold text-cyan-400 group-hover:translate-x-1 transition-transform">
             Explore <ArrowRight className="w-3 h-3" />

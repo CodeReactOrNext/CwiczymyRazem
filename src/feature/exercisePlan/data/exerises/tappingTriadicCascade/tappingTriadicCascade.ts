@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const tappingTriadicCascadeExercise: Exercise = {
   id: "tapping_triadic_cascade",
   title: "Tapping Triadic Cascades",
-  description: "Two-handed tapping triads on strings 1-2. Tap the high note with your picking hand, then pull-off and hammer-on with the fretting hand. Builds clean articulation and muting control.",
+  description: "Execute fast, flowing tapped arpeggios that cascade diagonally.",
+  whyItMatters: "Tapped arpeggios that cascade diagonally across the fretboard sound modern and complex. Combining tapping with slides and string changes creates a fluid, harp-like effect that elevates your lead guitar vocabulary.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Measures 1-2: Am triad tapping pattern — tap fret 12, pull-off to 8, hammer-on to 5, repeat. Strings 1 and 2.",
-    "Measures 3-4: C major triad — tap fret 12, pull-off to 8, hammer-on to 5 on string 2; tap 13, pull-off to 8, hammer-on to 5 on string 1.",
-    "Measures 5-6: Move through Am → C → G → Em triads, one per beat. Practice smooth position shifts.",
-    "Mute unused strings with the palm of your tapping hand resting lightly across lower strings.",
+    "Combine taps, slides, and string changes into a single, continuous flow.",
+    "Execute diagonal slides cleanly, maintaining constant string contact."
   ],
   tips: [
-    "The tapped note should be a firm, quick strike directly onto the fret — like a hammer-on from above.",
-    "Pull-offs from the tap should snap sideways to keep volume consistent.",
-    "Mute unused strings with the palm of your right hand to avoid noise.",
-    "Start very slowly — tapping clarity comes from precision, not speed.",
+    "Mute higher strings with the side of your fretting-hand index finger.",
+    "Focus on rhythmic evenness—do not let the slides interrupt the flow."
   ],
   metronomeSpeed: {
     min: 60,
