@@ -66,6 +66,10 @@ export const useMobileMetronome = ({
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    setBpm(initialBpm);
+  }, [initialBpm]);
+
   // When the external context changes, adopt it (replacing the internal one if any).
   useEffect(() => {
     if (!externalAudioContext || !enabled) return;

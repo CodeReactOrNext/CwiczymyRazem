@@ -124,7 +124,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
     <div className="flex flex-col items-center gap-4 py-2">
       {/* Countdown bar */}
       <div className="w-full max-w-md flex items-center gap-3">
-        <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+        <div className="flex-1 h-1.5 bg-zinc-800 rounded-lg overflow-hidden border border-white/5">
           <motion.div
             className="h-full bg-gradient-to-r from-cyan-400 to-purple-400"
             initial={false}
@@ -154,7 +154,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25, delay: i * 0.05 }}
                 className={cn(
-                  "relative rounded-2xl border backdrop-blur-sm overflow-hidden",
+                  "relative rounded-lg border backdrop-blur-sm overflow-hidden",
                   "bg-zinc-900/80",
                   colors.border,
                   colors.glow,
@@ -177,7 +177,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
                 )}>
                   {/* Category badge */}
                   <span className={cn(
-                    "inline-flex items-center shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] border",
+                    "inline-flex items-center shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-black border capitalize",
                     colors.bg,
                     colors.text,
                     colors.border
@@ -200,7 +200,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
       </div>
 
       {!isRunning && (
-        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+        <p className="text-[10px] font-bold text-zinc-600 capitalize">
           Paused — press play to start prompts
         </p>
       )}

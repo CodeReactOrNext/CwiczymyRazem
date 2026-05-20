@@ -187,7 +187,7 @@ export const PracticeModeSelector = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("journey",  Route,      "Learning Path", "Step-by-step progress",   "/journey",       "rose")}
                 {listItem("roadmap", Map, "Roadmaps", "AI-powered learning paths", "/ai-coach", "rose", !isMaster, "Master")}
-                {listItem("scales", PiTreeView, "Scale Map", "Coming Soon", "#", "rose", true, "Soon")}
+                {listItem("scales", PiTreeView, "Scale Map", "Interactive scale fretboard tree", "/scale-tree", "rose")}
               </div>
             </div>
 

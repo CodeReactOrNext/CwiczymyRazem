@@ -85,6 +85,10 @@ export const useMetronome = ({
     isMutedRef.current = isMuted;
   }, [isMuted]);
 
+  useEffect(() => {
+    setBpm(initialBpm);
+  }, [initialBpm]);
+
   // ── AudioContext + AudioWorklet setup ───────────────────────────────────────
   // When externalAudioContext is provided (e.g. AlphaTab's context for GP files),
   // we skip creating our own and add the worklet module to the shared context instead.

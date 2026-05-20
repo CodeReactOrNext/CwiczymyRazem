@@ -205,8 +205,8 @@ export function LandscapeSessionModal({
                     <div className="px-1 py-2 space-y-1">
                       <MediaControlsToolbar
                         hasMetronome={!!currentExercise.metronomeSpeed}
-                        hasAudioTrack={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
-                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
+                        hasAudioTrack={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack}
+                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableMic}
                         speedMultiplier={speedMultiplier ?? 1}
                         onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
                         isAudioMuted={isAudioMuted}
@@ -217,6 +217,7 @@ export function LandscapeSessionModal({
                         onRecalibrate={onRecalibrate ?? (() => {})}
                         frequencyRef={frequencyRef}
                         volumeRef={volumeRef}
+                        disableTuner={currentExercise.disableTuner}
                         compact
                       />
                       <ExerciseQuickActionsBar

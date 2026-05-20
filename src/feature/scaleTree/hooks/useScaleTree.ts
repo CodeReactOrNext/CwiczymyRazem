@@ -8,12 +8,36 @@ import { getClaimedRewards } from "../services/rewardService";
 import type { BpmProgressMap, ScaleTreeNodeData, RewardNodeDef } from "../types/scaleTree.types";
 import type { Edge } from "@xyflow/react";
 
+const progressCache: Record<string, BpmProgressMap> = {};
+const rewardsCache: Record<string, string[]> = {};
+
 export function useScaleTree() {
   const userId = useAppSelector(selectUserAuth);
-  const [progressMap, setProgressMap] = useState<BpmProgressMap>(new Map());
-  const [claimedRewards, setClaimedRewards] = useState<string[]>([]);
+  const [progressMap, setProgressMap] = useState<BpmProgressMap>(() => {
+    if (userId && progressCache[userId]) {
+      return progressCache[userId];
+    }
+    return new Map();
+  });
+  const [claimedRewards, setClaimedRewards] = useState<string[]>(() => {
+    if (userId && rewardsCache[userId]) {
+      return rewardsCache[userId];
+    }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userId) {
+      if (progressCache[userId]) {
+        setProgressMap(progressCache[userId]);
+      }
+      if (rewardsCache[userId]) {
+        setClaimedRewards(rewardsCache[userId]);
+      }
+    }
+  }, [userId]);
 
   const loadProgress = useCallback(async () => {
     if (!userId) return;
@@ -23,6 +47,8 @@ export function useScaleTree() {
         fetchAllBpmProgress(userId),
         getClaimedRewards(userId),
       ]);
+      progressCache[userId] = map;
+      rewardsCache[userId] = rewards;
       setProgressMap(map);
       setClaimedRewards(rewards);
     } finally {
@@ -110,6 +136,7 @@ export function useScaleTree() {
     if (!userId) return;
     try {
       const rewards = await getClaimedRewards(userId);
+      rewardsCache[userId] = rewards;
       setClaimedRewards(rewards);
     } catch (error) {
       console.error("Failed to refresh claimed rewards:", error);

@@ -155,13 +155,14 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                   )}
                   <MediaControlsToolbar
                     hasMetronome={!!p.currentExercise.metronomeSpeed}
-                    hasAudioTrack={!!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming)}
-                    hasMicControls={p.planHasTablature || p.planHasGpFile || p.planHasStrumming}
+                    hasAudioTrack={!!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableBackingTrack}
+                    hasMicControls={(p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableMic}
                     speedMultiplier={p.speedMultiplier} onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
                     isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
                     onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
                     onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
                     frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
+                    disableTuner={p.currentExercise.disableTuner}
                   />
                   <ExerciseQuickActionsBar
                     exercise={p.currentExercise}

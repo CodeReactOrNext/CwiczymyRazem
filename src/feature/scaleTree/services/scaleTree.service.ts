@@ -30,7 +30,8 @@ export function computeNodeStatuses(progressMap: BpmProgressMap): Record<string,
     changed = false;
 
     for (const node of SCALE_TREE_NODES) {
-      const prerequisitesMet = node.prerequisites.every((id) => completedIds.has(id));
+      const isSingleString = node.id.includes('single_string');
+      const prerequisitesMet = isSingleString || node.prerequisites.every((id) => completedIds.has(id));
 
       if (!prerequisitesMet) {
         if (statuses[node.id] !== "locked") {
