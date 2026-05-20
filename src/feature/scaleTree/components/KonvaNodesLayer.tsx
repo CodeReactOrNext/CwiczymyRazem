@@ -7,6 +7,7 @@ interface NodeData {
   scaleFamily: 'pentatonic' | 'diatonic' | 'mode';
   label: string;
   subtitle?: string;
+  scaleType?: string;
   requiredExercises?: Array<{
     position?: number;
     stringNum?: number;
