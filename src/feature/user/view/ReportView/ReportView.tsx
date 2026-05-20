@@ -22,6 +22,7 @@ import {
   AcceptExceedingPopUp,
   ErrorBox,
   HealthHabbitsBox,
+  LongPracticeConfirmPopUp,
   TimeInputBox,
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
@@ -57,6 +58,8 @@ const ReportView = () => {
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
+  const [longTimePopUpVisible, setLongTimePopUpVisible] = useState(false);
+  const [acceptLongTime, setAcceptLongTime] = useState(false);
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -215,6 +218,11 @@ const ReportView = () => {
       toast.error(t("toast.24h_error"), {
         duration: 3000,
       });
+      return;
+    }
+
+    if (sumTime > 6 * 60 * 60 * 1000 && !acceptLongTime) {
+      setLongTimePopUpVisible(true);
       return;
     }
 
@@ -685,6 +693,23 @@ const ReportView = () => {
                         isFetching={isFetching}
                         setAcceptExceedingTime={setAcceptExceedingTime}
                         setAcceptPopUpVisible={setAcceptPopUpVisible}
+                      />
+                    </div>
+                  </Backdrop>
+                )}
+
+                {longTimePopUpVisible && (
+                  <Backdrop selector='overlays'>
+                    <div>
+                      <LongPracticeConfirmPopUp
+                        totalTime={getSumTime(values)}
+                        onAccept={() => {
+                          setLongTimePopUpVisible(false);
+                          reportOnSubmit(values);
+                        }}
+                        isFetching={isFetching}
+                        setAcceptLongTime={setAcceptLongTime}
+                        setLongTimePopUpVisible={setLongTimePopUpVisible}
                       />
                     </div>
                   </Backdrop>
