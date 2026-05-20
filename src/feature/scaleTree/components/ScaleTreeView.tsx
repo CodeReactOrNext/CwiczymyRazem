@@ -437,33 +437,7 @@ export function ScaleTreeView() {
     >
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#141414]" />
 
-      <div className="absolute left-4 top-4 z-10 pointer-events-none">
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 800,
-            color: '#ffffff',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-            textShadow: 'none',
-            margin: 0,
-          }}
-        >
-          Ścieżka Mistrzostwa Gitary
-        </h1>
-        <p
-          style={{
-            fontSize: 11,
-            fontWeight: 300,
-            color: 'rgba(160,170,200,0.65)',
-            letterSpacing: '0.12em',
-            marginTop: 3,
-            textTransform: 'uppercase',
-          }}
-        >
-          Wybierz swoją ścieżkę rozwoju
-        </p>
-      </div>
+
 
       <div
         className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5"
@@ -723,16 +697,7 @@ export function ScaleTreeView() {
         </div>
       )}
 
-      {!selectedNodeId && (
-        <motion.p
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-5 right-4 z-10 text-[9px] font-light tracking-widest uppercase text-zinc-700 select-none"
-        >
-          Click a node to practice
-        </motion.p>
-      )}
+
     </div>
   );
 }
