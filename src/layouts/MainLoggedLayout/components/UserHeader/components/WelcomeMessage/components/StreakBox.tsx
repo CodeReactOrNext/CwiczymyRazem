@@ -21,7 +21,7 @@ export const StreakBox = () => {
     userLastReportDate,
     didPracticeToday
   );
-  
+
   const dayWithoutBreak = isStreak === 1 && !didPracticeToday ? 0 : actualDayWithoutBreak;
 
   return (
@@ -29,8 +29,8 @@ export const StreakBox = () => {
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <FaFire className={cn(
           "text-xl transition-all duration-500",
-          dayWithoutBreak > 0 
-            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
+          dayWithoutBreak > 0
+            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
             : "text-zinc-700 opacity-50"
         )} />
         {dayWithoutBreak > 0 && (

@@ -1,7 +1,7 @@
 import { Stage, Layer, Group, Text, Circle, Rect } from 'react-konva';
 import type Konva from 'konva';
 import { motion } from 'framer-motion';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Plus, Minus, Maximize2 } from 'lucide-react';
 
 import {
   useCallback,
@@ -44,7 +44,6 @@ export function ScaleTreeView() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
-  const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
   const lastPinchDistRef = useRef<number | null>(null);
 
   const [size, setSize] = useState({ w: 800, h: 600 });
@@ -243,60 +242,91 @@ export function ScaleTreeView() {
     []
   );
 
-  const handleTouchStart = useCallback((e: Konva.KonvaEventObject<TouchEvent>) => {
-    e.evt.preventDefault();
-    const touches = e.evt.touches;
-    if (touches.length === 1) {
-      lastTouchRef.current = { x: touches[0].clientX, y: touches[0].clientY };
-      lastPinchDistRef.current = null;
-    } else if (touches.length === 2) {
-      const dx = touches[1].clientX - touches[0].clientX;
-      const dy = touches[1].clientY - touches[0].clientY;
-      lastPinchDistRef.current = Math.hypot(dx, dy);
-      lastTouchRef.current = null;
-    }
+  // Zoom around a specific pixel point in the stage container.
+  const zoomAt = useCallback((pointerX: number, pointerY: number, newScale: number) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const oldScale = stage.scaleX();
+    const clamped = Math.max(0.05, Math.min(2, newScale));
+    const pointTo = {
+      x: (pointerX - stage.x()) / oldScale,
+      y: (pointerY - stage.y()) / oldScale,
+    };
+    stage.scale({ x: clamped, y: clamped });
+    stage.position({
+      x: pointerX - pointTo.x * clamped,
+      y: pointerY - pointTo.y * clamped,
+    });
+    stage.batchDraw();
   }, []);
 
+  // Two-finger pinch only. Single-finger pan is handled by Konva's `draggable`.
   const handleTouchMove = useCallback((e: Konva.KonvaEventObject<TouchEvent>) => {
-    e.evt.preventDefault();
     const stage = stageRef.current;
     if (!stage) return;
     const touches = e.evt.touches;
+    if (touches.length < 2) return;
 
-    if (touches.length === 1 && lastTouchRef.current) {
-      const dx = touches[0].clientX - lastTouchRef.current.x;
-      const dy = touches[0].clientY - lastTouchRef.current.y;
-      stage.position({ x: stage.x() + dx, y: stage.y() + dy });
-      lastTouchRef.current = { x: touches[0].clientX, y: touches[0].clientY };
-    } else if (touches.length === 2 && lastPinchDistRef.current !== null) {
-      const dx = touches[1].clientX - touches[0].clientX;
-      const dy = touches[1].clientY - touches[0].clientY;
-      const newDist = Math.hypot(dx, dy);
-      const scaleBy = newDist / lastPinchDistRef.current;
-      const oldScale = stage.scaleX();
-      const newScale = Math.max(0.05, Math.min(2, oldScale * scaleBy));
+    e.evt.preventDefault();
+    // Stop Konva's draggable behavior while pinching so it doesn't fight us.
+    if (stage.isDragging()) stage.stopDrag();
 
-      const midX = (touches[0].clientX + touches[1].clientX) / 2;
-      const midY = (touches[0].clientY + touches[1].clientY) / 2;
-      const rect = stage.container().getBoundingClientRect();
-      const pointer = { x: midX - rect.left, y: midY - rect.top };
-      const midPointTo = {
-        x: (pointer.x - stage.x()) / oldScale,
-        y: (pointer.y - stage.y()) / oldScale,
-      };
-      stage.scale({ x: newScale, y: newScale });
-      stage.position({
-        x: pointer.x - midPointTo.x * newScale,
-        y: pointer.y - midPointTo.y * newScale,
-      });
+    const t0 = touches[0];
+    const t1 = touches[1];
+    const dx = t1.clientX - t0.clientX;
+    const dy = t1.clientY - t0.clientY;
+    const newDist = Math.hypot(dx, dy);
+
+    if (lastPinchDistRef.current === null) {
       lastPinchDistRef.current = newDist;
+      return;
     }
-  }, []);
+
+    const scaleBy = newDist / lastPinchDistRef.current;
+    const midX = (t0.clientX + t1.clientX) / 2;
+    const midY = (t0.clientY + t1.clientY) / 2;
+    const rect = stage.container().getBoundingClientRect();
+    zoomAt(midX - rect.left, midY - rect.top, stage.scaleX() * scaleBy);
+    lastPinchDistRef.current = newDist;
+  }, [zoomAt]);
 
   const handleTouchEnd = useCallback(() => {
-    lastTouchRef.current = null;
     lastPinchDistRef.current = null;
   }, []);
+
+  // Zoom from the center of the viewport (used by +/- buttons).
+  const zoomByButton = useCallback((direction: 1 | -1) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const factor = 1.3;
+    const newScale = stage.scaleX() * Math.pow(factor, direction);
+    zoomAt(size.w / 2, size.h / 2, newScale);
+  }, [size, zoomAt]);
+
+  const recenterView = useCallback(() => {
+    if (layoutNodes.length === 0 || size.w === 0) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    layoutNodes.forEach((n: any) => {
+      minX = Math.min(minX, n.position.x);
+      maxX = Math.max(maxX, n.position.x);
+      minY = Math.min(minY, n.position.y);
+      maxY = Math.max(maxY, n.position.y);
+    });
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const targetScale = 0.12;
+    stage.to({
+      x: size.w / 2 - centerX * targetScale,
+      y: size.h / 2 - centerY * targetScale,
+      scaleX: targetScale,
+      scaleY: targetScale,
+      duration: 0.4,
+      easing: 'ease-in-out',
+    });
+  }, [layoutNodes, size]);
 
 
 
@@ -515,6 +545,33 @@ export function ScaleTreeView() {
         </button>
       </div>
 
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2">
+        <button
+          onClick={() => zoomByButton(1)}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-[#0b0b0d]/90 text-zinc-300 backdrop-blur-md transition-colors hover:text-cyan-400 active:bg-[#1a1a1d]"
+          title="Zoom in"
+          aria-label="Zoom in"
+        >
+          <Plus className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => zoomByButton(-1)}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-[#0b0b0d]/90 text-zinc-300 backdrop-blur-md transition-colors hover:text-cyan-400 active:bg-[#1a1a1d]"
+          title="Zoom out"
+          aria-label="Zoom out"
+        >
+          <Minus className="h-5 w-5" />
+        </button>
+        <button
+          onClick={recenterView}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-[#0b0b0d]/90 text-zinc-300 backdrop-blur-md transition-colors hover:text-cyan-400 active:bg-[#1a1a1d]"
+          title="Center view"
+          aria-label="Center view"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </button>
+      </div>
+
       {size.w > 0 && (
         <Stage
           ref={stageRef}
@@ -522,7 +579,6 @@ export function ScaleTreeView() {
           height={size.h}
           draggable
           onWheel={handleWheel}
-          onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
