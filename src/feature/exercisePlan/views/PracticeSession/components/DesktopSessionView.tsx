@@ -116,8 +116,6 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
       {p.examMode && (
         <ExamModeBanner
           examMode={p.examMode}
-          exerciseId={p.activeExercise.id}
-          exerciseTitle={p.currentExercise.title}
         />
       )}
       <TooltipProvider>
