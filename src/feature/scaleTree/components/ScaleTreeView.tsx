@@ -44,6 +44,8 @@ export function ScaleTreeView() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
+  const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
+  const lastPinchDistRef = useRef<number | null>(null);
 
   const [size, setSize] = useState({ w: 800, h: 600 });
   const [particles, setParticles] = useState<Array<{
@@ -241,6 +243,61 @@ export function ScaleTreeView() {
     []
   );
 
+  const handleTouchStart = useCallback((e: Konva.KonvaEventObject<TouchEvent>) => {
+    e.evt.preventDefault();
+    const touches = e.evt.touches;
+    if (touches.length === 1) {
+      lastTouchRef.current = { x: touches[0].clientX, y: touches[0].clientY };
+      lastPinchDistRef.current = null;
+    } else if (touches.length === 2) {
+      const dx = touches[1].clientX - touches[0].clientX;
+      const dy = touches[1].clientY - touches[0].clientY;
+      lastPinchDistRef.current = Math.hypot(dx, dy);
+      lastTouchRef.current = null;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: Konva.KonvaEventObject<TouchEvent>) => {
+    e.evt.preventDefault();
+    const stage = stageRef.current;
+    if (!stage) return;
+    const touches = e.evt.touches;
+
+    if (touches.length === 1 && lastTouchRef.current) {
+      const dx = touches[0].clientX - lastTouchRef.current.x;
+      const dy = touches[0].clientY - lastTouchRef.current.y;
+      stage.position({ x: stage.x() + dx, y: stage.y() + dy });
+      lastTouchRef.current = { x: touches[0].clientX, y: touches[0].clientY };
+    } else if (touches.length === 2 && lastPinchDistRef.current !== null) {
+      const dx = touches[1].clientX - touches[0].clientX;
+      const dy = touches[1].clientY - touches[0].clientY;
+      const newDist = Math.hypot(dx, dy);
+      const scaleBy = newDist / lastPinchDistRef.current;
+      const oldScale = stage.scaleX();
+      const newScale = Math.max(0.05, Math.min(2, oldScale * scaleBy));
+
+      const midX = (touches[0].clientX + touches[1].clientX) / 2;
+      const midY = (touches[0].clientY + touches[1].clientY) / 2;
+      const rect = stage.container().getBoundingClientRect();
+      const pointer = { x: midX - rect.left, y: midY - rect.top };
+      const midPointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+      };
+      stage.scale({ x: newScale, y: newScale });
+      stage.position({
+        x: pointer.x - midPointTo.x * newScale,
+        y: pointer.y - midPointTo.y * newScale,
+      });
+      lastPinchDistRef.current = newDist;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    lastTouchRef.current = null;
+    lastPinchDistRef.current = null;
+  }, []);
+
 
 
   useEffect(() => {
@@ -429,6 +486,7 @@ export function ScaleTreeView() {
     <div
       ref={containerRef}
       className="relative h-full w-full overflow-hidden rounded-xl bg-[#141414]"
+      style={{ touchAction: 'none' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#141414]" />
 
@@ -464,6 +522,9 @@ export function ScaleTreeView() {
           height={size.h}
           draggable
           onWheel={handleWheel}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           <Layer listening={false}>
             <KonvaEdgesLayer
