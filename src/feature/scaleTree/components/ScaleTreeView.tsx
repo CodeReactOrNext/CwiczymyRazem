@@ -241,13 +241,7 @@ export function ScaleTreeView() {
     []
   );
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMouseCoord({ x, y });
-  }, []);
+
 
   useEffect(() => {
     if (particles.length === 0) return;
@@ -281,7 +275,7 @@ export function ScaleTreeView() {
       scaleX: targetScale,
       scaleY: targetScale,
       duration: 0.55,
-      easing: Konva.Easings.EaseInOut,
+      easing: 'ease-in-out',
     });
   }, [size]);
 
@@ -290,7 +284,7 @@ export function ScaleTreeView() {
       const targetId = router.query.nodeId as string;
       const node = layoutNodes.find((n: any) => n.id === targetId);
       if (node) {
-        const family = node.data?.scaleFamily || 'diatonic';
+        const family = (node.data?.scaleFamily as string) || 'diatonic';
         const color = FAMILY_COLORS[family] || '#22d3ee';
         const newParticles: Array<{
           id: number;
@@ -347,7 +341,8 @@ export function ScaleTreeView() {
     if (!req) return [];
 
     const rootMidi = 60;
-    const scaleDef = scaleDefinitions[req.scaleType || hoveredNode.data.scaleType];
+    const scaleKey = (req.scaleType || hoveredNode.data.scaleType) as any;
+    const scaleDef = scaleDefinitions[scaleKey as keyof typeof scaleDefinitions];
     if (!scaleDef) return [];
 
     if (req.stringNum != null) {
