@@ -78,7 +78,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute left-1/2 top-1/2 z-30 w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-md"
+            className="absolute left-1/2 top-1/2 z-30 w-[90vw] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-md"
           >
             {/* Header */}
             <div className="flex items-start justify-between p-4 pb-2">
