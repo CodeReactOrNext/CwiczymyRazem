@@ -31,6 +31,7 @@ interface MediaControlsToolbarProps {
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
+  disableTuner?: boolean;
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -48,13 +49,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   frequencyRef,
   volumeRef,
   compact = false,
+  disableTuner = false,
 }: MediaControlsToolbarProps) {
   const [isTunerOpen, setIsTunerOpen] = useState(false);
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
   const isSlowed = speedMultiplier < 1;
-  const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef;
+  const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
   const h = compact ? "h-8" : "h-12";
 
   if (compact) {

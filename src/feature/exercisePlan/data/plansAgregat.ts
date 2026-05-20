@@ -9,7 +9,7 @@ import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboar
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
 import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
 import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
-import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
+import { beginnerDailyExercisesPlan, megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
 import { musicianFitnessLvl1S1Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S1";
 import { musicianFitnessLvl1S2Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S2";
 import { musicianFitnessLvl1S3Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S3";
@@ -51,6 +51,7 @@ const difficultyOrder: Record<string, number> = {
 // Plans available for free — all others require Pro
 const FREE_PLAN_IDS = new Set([
   "mega_beginner_first_steps",
+  "beginner_daily_exercises",
   "ear_rhythm_fundamentals",
   "daily_dexterity_starter",
   "warm_up_15_minutes",
@@ -96,6 +97,7 @@ export const defaultPlans: ExercisePlan[] = [
   rhythmicPrecisionPlan,
   theIntervalMapPlan,
   megaBeginnerFirstStepsPlan,
+  beginnerDailyExercisesPlan,
   earRhythmFundamentalsPlan,
   handHealthStrengthPlan,
   dailyDexterityStarterPlan,

@@ -40,14 +40,14 @@ export const EarTrainingView = ({
       
       {/* Score Display */}
       <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 z-10">
-          <div className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md">
+          <div className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg backdrop-blur-md">
               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
               <span className="text-lg sm:text-xl font-black text-emerald-400">{score}</span>
           </div>
           {highScore != null && highScore > 0 && (
             <div className={cn(
-              "bg-purple-950/60 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border backdrop-blur-md flex items-center gap-1.5",
-              score > highScore ? "border-amber-500/30 bg-amber-950/60" : "border-purple-500/20"
+              "bg-purple-950/60 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg backdrop-blur-md flex items-center gap-1.5",
+              score > highScore ? "bg-amber-950/60" : ""
             )}>
               <Trophy className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", score > highScore ? "text-amber-400" : "text-purple-400")} />
               <span className={cn("text-[10px] sm:text-xs font-bold uppercase tracking-widest mr-1", score > highScore ? "text-amber-400" : "text-purple-400")}>
@@ -55,14 +55,6 @@ export const EarTrainingView = ({
               </span>
               <span className={cn("text-lg sm:text-xl font-black", score > highScore ? "text-amber-400" : "text-purple-300")}>{highScore}</span>
             </div>
-          )}
-          {(onRecordsClick) && (
-            <button
-              onClick={onRecordsClick}
-              className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
-            >
-              Records
-            </button>
           )}
       </div>
 
@@ -76,7 +68,7 @@ export const EarTrainingView = ({
              isPlaying && "opacity-40 scale-105"
           )} />
           
-          <div className="relative h-full w-full bg-zinc-900/90 border border-white/10 rounded-3xl backdrop-blur-xl flex flex-col items-center justify-center overflow-hidden shadow-2xl">
+          <div className="relative h-full w-full bg-zinc-900/90 rounded-3xl backdrop-blur-xl flex flex-col items-center justify-center overflow-hidden shadow-2xl">
               
               <AnimatePresence mode="wait">
                   {!isRevealed ? (

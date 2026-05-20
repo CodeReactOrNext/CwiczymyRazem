@@ -108,8 +108,8 @@ const SessionModal = ({
   const category = currentExercise.category || "mixed";
   const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
 
-  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl);
-  const hasAudioTrack  = hasMicControls;
+  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableMic;
+  const hasAudioTrack  = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
 
   if (isLandscape) {
@@ -229,6 +229,7 @@ const SessionModal = ({
             onRecalibrate={onRecalibrate ?? (() => {})}
             frequencyRef={frequencyRef}
             volumeRef={volumeRef}
+            disableTuner={currentExercise.disableTuner}
           />
 
           <ExerciseQuickActionsBar

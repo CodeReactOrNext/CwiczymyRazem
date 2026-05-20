@@ -80,7 +80,7 @@ export const ExerciseSuccessView = ({
   const [displayScore, setDisplayScore] = useState(0);
 
   const isExam = examMode && typeof score !== 'undefined' && typeof maxScore !== 'undefined';
-  const passThreshold = isExam ? Math.ceil(maxScore! * 0.8) : 0;
+  const passThreshold = isExam ? Math.ceil(maxScore! * 0.85) : 0;
   const isPassed = isExam ? score! >= passThreshold : true;
   const nextStarDist = isExam ? Math.max(0, passThreshold - score!) : 0;
 

@@ -1,4 +1,4 @@
-import { Stage, Layer } from 'react-konva';
+import { Stage, Layer, Group, Text, Circle, Rect } from 'react-konva';
 import type Konva from 'konva';
 import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
@@ -18,6 +18,15 @@ import { KonvaEdgesLayer } from './KonvaEdgesLayer';
 import { KonvaNodesLayer } from './KonvaNodesLayer';
 import { useScaleTree } from '../hooks/useScaleTree';
 import { organizeByGridSimple } from '../data/scaleTreeLayouts';
+import { getScalePatternForPosition, getScaleOnString } from 'feature/exercisePlan/scales/fretboardMapper';
+import { scaleDefinitions } from 'feature/exercisePlan/scales/scaleDefinitions';
+import { CLUSTER_LABELS } from '../data/scaleTreeNodes';
+
+const FAMILY_COLORS: Record<string, string> = {
+  pentatonic: '#fbbf24',
+  diatonic: '#22d3ee',
+  mode: '#a78bfa',
+};
 
 export function ScaleTreeView() {
   const router = useRouter();
@@ -37,6 +46,20 @@ export function ScaleTreeView() {
   const stageRef = useRef<Konva.Stage>(null);
 
   const [size, setSize] = useState({ w: 800, h: 600 });
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+    color: string;
+    alpha: number;
+    life: number;
+  }>>([]);
+  const [hoveredNode, setHoveredNode] = useState<any | null>(null);
+  const [hoveredCoords, setHoveredCoords] = useState<{ x: number; y: number } | null>(null);
+  const [flashNodeId, setFlashNodeId] = useState<string | null>(null);
 
   // ResizeObserver to track container size
   useEffect(() => {
@@ -218,12 +241,166 @@ export function ScaleTreeView() {
     []
   );
 
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMouseCoord({ x, y });
+  }, []);
+
+  useEffect(() => {
+    if (particles.length === 0) return;
+    let animId: number;
+    const tick = () => {
+      setParticles((prev) =>
+        prev
+          .map((p) => ({
+            ...p,
+            x: p.x + p.vx,
+            y: p.y + p.vy,
+            alpha: p.alpha - 0.02,
+            life: p.life - 1,
+          }))
+          .filter((p) => p.life > 0 && p.alpha > 0)
+      );
+      animId = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => cancelAnimationFrame(animId);
+  }, [particles.length]);
+
+  const animateStageTo = useCallback((targetX: number, targetY: number, targetScale: number = 0.85) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const newX = size.w / 2 - targetX * targetScale;
+    const newY = size.h / 2 - targetY * targetScale;
+    stage.to({
+      x: newX,
+      y: newY,
+      scaleX: targetScale,
+      scaleY: targetScale,
+      duration: 0.55,
+      easing: Konva.Easings.EaseInOut,
+    });
+  }, [size]);
+
+  useEffect(() => {
+    if (router.query.fromExam === 'true' && router.query.nodeId && layoutNodes.length > 0) {
+      const targetId = router.query.nodeId as string;
+      const node = layoutNodes.find((n: any) => n.id === targetId);
+      if (node) {
+        const family = node.data?.scaleFamily || 'diatonic';
+        const color = FAMILY_COLORS[family] || '#22d3ee';
+        const newParticles: Array<{
+          id: number;
+          x: number;
+          y: number;
+          vx: number;
+          vy: number;
+          radius: number;
+          color: string;
+          alpha: number;
+          life: number;
+        }> = [];
+        for (let i = 0; i < 50; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1.5 + Math.random() * 5.5;
+          newParticles.push({
+            id: Math.random(),
+            x: node.position.x,
+            y: node.position.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 1.5 + Math.random() * 3.5,
+            color,
+            alpha: 1.0,
+            life: 50 + Math.random() * 20,
+          });
+        }
+        setParticles(newParticles);
+        animateStageTo(node.position.x, node.position.y, 0.85);
+        setFlashNodeId(targetId);
+        router.replace('/scale-tree', undefined, { shallow: true });
+      }
+    }
+  }, [router.query, layoutNodes, animateStageTo]);
+
+  const handleNodeMouseEnter = useCallback((node: any) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const scale = stage.scaleX();
+    const x = node.position.x * scale + stage.x();
+    const y = node.position.y * scale + stage.y();
+    setHoveredNode(node);
+    setHoveredCoords({ x, y });
+  }, []);
+
+  const handleNodeMouseLeave = useCallback(() => {
+    setHoveredNode(null);
+    setHoveredCoords(null);
+  }, []);
+
+  const hoveredFretPositions = useMemo(() => {
+    if (!hoveredNode) return [];
+    const req = hoveredNode.data?.requiredExercises?.[0];
+    if (!req) return [];
+
+    const rootMidi = 60;
+    const scaleDef = scaleDefinitions[req.scaleType || hoveredNode.data.scaleType];
+    if (!scaleDef) return [];
+
+    if (req.stringNum != null) {
+      return getScaleOnString(rootMidi, scaleDef.intervals, req.stringNum, 0, 15);
+    } else if (req.position != null) {
+      return getScalePatternForPosition(rootMidi, scaleDef.intervals, req.position);
+    }
+    return [];
+  }, [hoveredNode]);
+
+  const activeFretRange = useMemo(() => {
+    if (hoveredFretPositions.length === 0) return { min: 0, max: 4 };
+    let min = Infinity;
+    let max = -Infinity;
+    hoveredFretPositions.forEach((pos) => {
+      min = Math.min(min, pos.fret);
+      max = Math.max(max, pos.fret);
+    });
+    if (max - min > 5) {
+      min = 0;
+      max = 12;
+    } else if (max - min < 4) {
+      max = min + 4;
+    }
+    return { min, max };
+  }, [hoveredFretPositions]);
+
+  const clusterProgress = useMemo(() => {
+    const stats: Record<string, { completed: number; total: number }> = {};
+    initialNodes.forEach((n: any) => {
+      if (n.type === 'rewardNode' || !n.data?.scaleType) return;
+      const type = n.data.scaleType;
+      if (!stats[type]) {
+        stats[type] = { completed: 0, total: 0 };
+      }
+      stats[type].total += 1;
+      if (n.data.status === 'completed') {
+        stats[type].completed += 1;
+      }
+    });
+    return stats;
+  }, [initialNodes]);
+
   const handleNodeClick = useCallback(
     (nodeId: string) => {
       console.log('Clicked node ID:', nodeId);
       setSelectedNodeId(nodeId);
+      const clickedNode = layoutNodes.find((n: any) => n.id === nodeId);
+      if (clickedNode) {
+        animateStageTo(clickedNode.position.x, clickedNode.position.y, 0.85);
+      }
     },
-    [setSelectedNodeId]
+    [setSelectedNodeId, layoutNodes, animateStageTo]
   );
 
   const handlePractice = useCallback(() => {
@@ -240,25 +417,6 @@ export function ScaleTreeView() {
       );
     }
   }, [selectedNode, router]);
-
-  const handleMarkComplete = useCallback(async () => {
-    if (!selectedNode || !userId) return;
-    try {
-      const req = selectedNode.requiredExercises[0];
-      if (req) {
-        await toggleBpmStage(
-          userId,
-          req.exerciseId,
-          req.requiredBpm,
-          req.label,
-          'theory'
-        );
-        refreshProgress();
-      }
-    } catch (e) {
-      console.error('Failed to mark complete:', e);
-    }
-  }, [selectedNode, userId, refreshProgress]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedNodeId(null);
@@ -277,10 +435,8 @@ export function ScaleTreeView() {
       ref={containerRef}
       className="relative h-full w-full overflow-hidden rounded-xl bg-[#141414]"
     >
-      {/* Clean Flat Background */}
-      <div className='absolute inset-0 pointer-events-none z-0 bg-[#141414]' />
+      <div className="absolute inset-0 pointer-events-none z-0 bg-[#141414]" />
 
-      {/* Title header */}
       <div className="absolute left-4 top-4 z-10 pointer-events-none">
         <h1
           style={{
@@ -309,7 +465,6 @@ export function ScaleTreeView() {
         </p>
       </div>
 
-      {/* Progress + refresh */}
       <div
         className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5"
         style={{
@@ -333,7 +488,6 @@ export function ScaleTreeView() {
         </button>
       </div>
 
-      {/* Konva canvas */}
       {size.w > 0 && (
         <Stage
           ref={stageRef}
@@ -342,36 +496,233 @@ export function ScaleTreeView() {
           draggable
           onWheel={handleWheel}
         >
-          {/* Edges layer (behind) */}
           <Layer listening={false}>
             <KonvaEdgesLayer
               edges={filteredEdges}
               nodeDataMap={nodeDataMap}
               positionMap={positionMap}
+              flashSourceNodeId={flashNodeId}
             />
           </Layer>
 
-          {/* Nodes layer */}
           <Layer>
+            {CLUSTER_LABELS.map((lbl) => {
+              const ssNodeIdMap: Record<string, string> = {
+                lbl_min_pent: 'min_pent_single_string',
+                lbl_maj_pent: 'maj_pent_single_string',
+                lbl_nat_minor: 'nat_minor_single_string',
+                lbl_major: 'major_single_string',
+                lbl_dorian: 'dorian_single_string',
+                lbl_phrygian: 'phrygian_single_string',
+                lbl_mixolydian: 'mixolydian_single_string',
+                lbl_lydian: 'lydian_single_string',
+                lbl_locrian: 'locrian_single_string',
+              };
+              const ssNodeId = ssNodeIdMap[lbl.id];
+              const ssNode = layoutNodes.find((n: any) => n.id === ssNodeId);
+              const x = ssNode ? ssNode.position.x : lbl.x;
+              const y = ssNode ? ssNode.position.y : lbl.y;
+
+              const labelYOffset = -340;
+              const color = FAMILY_COLORS[lbl.family] || '#ffffff';
+              const familyLabelMap: Record<string, string> = {
+                pentatonic: 'PENTATONIC',
+                diatonic: 'DIATONIC SCALE',
+                mode: 'MODAL MODE',
+              };
+
+              const scaleTypeMap: Record<string, string> = {
+                lbl_min_pent: 'minor_pentatonic',
+                lbl_maj_pent: 'major_pentatonic',
+                lbl_nat_minor: 'minor',
+                lbl_major: 'major',
+                lbl_dorian: 'dorian',
+                lbl_phrygian: 'phrygian',
+                lbl_mixolydian: 'mixolydian',
+                lbl_lydian: 'lydian',
+                lbl_locrian: 'locrian',
+              };
+              const scaleType = scaleTypeMap[lbl.id];
+              const stats = clusterProgress[scaleType] || { completed: 0, total: 0 };
+              const percent = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+
+              return (
+                <Group key={lbl.id} x={x} y={y + labelYOffset} listening={false}>
+                  <Text
+                    text={familyLabelMap[lbl.family] || lbl.family.toUpperCase()}
+                    fontSize={20}
+                    fontFamily="sans-serif"
+                    fill={color}
+                    opacity={0.4}
+                    align="center"
+                    x={-500}
+                    y={-40}
+                    width={1000}
+                    fontStyle="bold"
+                    letterSpacing={8}
+                  />
+                  <Text
+                    text={lbl.label}
+                    fontSize={76}
+                    fontFamily="serif"
+                    fill="#d4d4d8"
+                    opacity={0.85}
+                    align="center"
+                    x={-600}
+                    y={0}
+                    width={1200}
+                    fontStyle="bold"
+                    letterSpacing={3}
+                  />
+                  <Rect
+                    x={-150}
+                    y={88}
+                    width={300}
+                    height={4}
+                    fill="rgba(255, 255, 255, 0.06)"
+                    cornerRadius={2}
+                  />
+                  {percent > 0 && (
+                    <Rect
+                      x={-150}
+                      y={88}
+                      width={300 * (percent / 100)}
+                      height={4}
+                      fill={color}
+                      cornerRadius={2}
+                    />
+                  )}
+                  <Text
+                    text={stats.completed === stats.total ? "COMPLETED" : `${stats.completed} / ${stats.total} COMPLETED (${percent}%)`}
+                    fontSize={14}
+                    fontFamily="sans-serif"
+                    fill={stats.completed === stats.total ? color : '#a1a1aa'}
+                    opacity={stats.completed === stats.total ? 0.7 : 0.5}
+                    align="center"
+                    x={-300}
+                    y={104}
+                    width={600}
+                    fontStyle="bold"
+                    letterSpacing={2}
+                  />
+                </Group>
+              );
+            })}
+
             <KonvaNodesLayer
               nodes={layoutNodes as any}
               selectedNodeId={selectedNodeId}
               onNodeClick={handleNodeClick}
+              onNodeMouseEnter={handleNodeMouseEnter}
+              onNodeMouseLeave={handleNodeMouseLeave}
             />
           </Layer>
+
+          {particles.length > 0 && (
+            <Layer listening={false}>
+              {particles.map((p) => (
+                <Circle
+                  key={p.id}
+                  x={p.x}
+                  y={p.y}
+                  radius={p.radius}
+                  fill={p.color}
+                  opacity={p.alpha}
+                  perfectDrawEnabled={false}
+                />
+              ))}
+            </Layer>
+          )}
         </Stage>
       )}
 
-      {/* Modal */}
       <ScaleNodeModal
         node={selectedNode}
         status={selectedNodeStatus}
         onClose={handleCloseModal}
         onPractice={handlePractice}
-        onMarkComplete={handleMarkComplete}
       />
 
-      {/* Hint */}
+      {hoveredNode && hoveredCoords && hoveredFretPositions.length > 0 && (
+        <div
+          className="absolute z-20 pointer-events-none rounded-xl border border-white/10 bg-[#0e0e11]/90 p-4 shadow-2xl backdrop-blur-md transition-opacity duration-200"
+          style={{
+            left: hoveredCoords.x,
+            top: hoveredCoords.y - 40,
+            transform: 'translate(-50%, -100%)',
+            width: 260,
+          }}
+        >
+          <div className="mb-2 text-center">
+            <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+              {hoveredNode.data.scaleFamily}
+            </p>
+            <p className="text-xs font-semibold text-zinc-200">
+              {hoveredNode.data.label}
+            </p>
+            <p className="text-[9px] text-zinc-400">
+              {hoveredNode.data.subtitle || ''}
+            </p>
+          </div>
+
+          <div className="relative mt-3 flex flex-col gap-1.5 rounded-lg bg-black/40 p-2">
+            {[1, 2, 3, 4, 5, 6].map((stringNum) => {
+              const frets = [];
+              for (let f = activeFretRange.min; f <= activeFretRange.max; f++) {
+                frets.push(f);
+              }
+              return (
+                <div key={stringNum} className="relative flex items-center justify-between h-4">
+                  <div className="absolute inset-x-0 top-1/2 h-[1px] bg-zinc-700/50" />
+                  
+                  {frets.map((fret) => {
+                    const isHighlighted = hoveredFretPositions.some(
+                      (p) => p.string === stringNum && p.fret === fret
+                    );
+                    const family = hoveredNode.data.scaleFamily || 'diatonic';
+                    const color = FAMILY_COLORS[family] || '#22d3ee';
+
+                    return (
+                      <div
+                        key={fret}
+                        className="relative flex-1 flex items-center justify-center h-full"
+                        style={{
+                          borderRight: '1px solid rgba(255,255,255,0.15)',
+                        }}
+                      >
+                        {isHighlighted && (
+                          <div
+                            className="z-10 h-2 w-2 rounded-full"
+                            style={{
+                              backgroundColor: color,
+                              boxShadow: `0 0 6px ${color}`,
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+
+            <div className="mt-1 flex justify-between px-1 text-[8px] font-mono text-zinc-500">
+              {(() => {
+                const labels = [];
+                for (let f = activeFretRange.min; f <= activeFretRange.max; f++) {
+                  labels.push(
+                    <span key={f} className="flex-1 text-center">
+                      {f}
+                    </span>
+                  );
+                }
+                return labels;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
       {!selectedNodeId && (
         <motion.p
           initial={{ opacity: 0, y: 4 }}
