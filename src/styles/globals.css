@@ -263,6 +263,7 @@ a {
   100% { transform: translateX(100%); }
 }
 
+
 @layer utilities {
   .animate-shimmer {
     animation: shimmer-slide 2s infinite linear;

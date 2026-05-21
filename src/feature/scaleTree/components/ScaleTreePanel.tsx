@@ -116,7 +116,7 @@ export function ScaleTreePanel({
         <div className="flex items-start justify-between border-b border-white/10 p-4">
           <div className="flex-1 min-w-0">
             <div className="mb-0.5 flex items-center gap-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              <span className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                 {FAMILY_LABELS[node.scaleFamily]}
               </span>
             </div>
@@ -164,7 +164,7 @@ export function ScaleTreePanel({
             <>
               {/* Required exercises */}
               <div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <p className="mb-2 text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                   Required exercises
                 </p>
                 <div className="space-y-2">

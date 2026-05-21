@@ -83,7 +83,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
             {/* Header */}
             <div className="flex items-start justify-between p-4 pb-2">
               <div className="min-w-0">
-                <p className={`text-[10px] font-semibold uppercase tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
+                <p className={`text-[10px] font-semibold capitalize tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
                   {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
                 </p>
                 <h2 className="mt-0.5 text-base font-bold leading-tight text-white">{node.label}</h2>
