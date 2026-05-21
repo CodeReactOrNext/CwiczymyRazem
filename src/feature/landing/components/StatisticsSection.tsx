@@ -186,7 +186,7 @@ export const StatisticsSection = () => {
             <ul className="space-y-5">
               {features.map((f, i) => (
                 <li key={i} className="flex items-start gap-4 group">
-                  <div className="mt-0.5 w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 transition-colors group-hover:bg-amber-500/20">
+                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 shadow-lg transition-all duration-300 group-hover:scale-105">
                     {f.icon}
                   </div>
                   <div>
