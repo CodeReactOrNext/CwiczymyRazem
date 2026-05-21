@@ -62,7 +62,7 @@ export const SongsLibrarySection = () => {
             <ul className="space-y-5">
               {features.map((f, i) => (
                 <li key={i} className="flex items-start gap-4 group">
-                  <div className="mt-0.5 w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 transition-colors group-hover:bg-cyan-500/20">
+                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 shadow-lg transition-all duration-300 group-hover:scale-105">
                     {f.icon}
                   </div>
                   <div>
