@@ -1,4 +1,10 @@
-import { sendStreakReminderEmail } from "lib/email/send";
+import {
+  sendSeasonEndingSoonEmail,
+  sendSeasonResultsEmail,
+  sendSeasonStartEmail,
+  sendStreakReminderEmail,
+} from "lib/email/send";
+import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore, messaging } from "utils/firebase/api/firebase.config";
 
@@ -132,11 +138,123 @@ export default async function handler(
 
     await Promise.all(emailJobs);
 
+    // Season emails
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const currentSeasonId = `${year}-${month}`;
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const daysLeftInSeason = Math.round(
+      (lastDayOfMonth.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const seasonJobs: Promise<unknown>[] = [];
+
+    // Helper: fetch participants of a season with their emails
+    async function getSeasonParticipants(seasonId: string) {
+      const usersSnap = await firestore
+        .collection("seasons")
+        .doc(seasonId)
+        .collection("users")
+        .orderBy("points", "desc")
+        .get();
+
+      if (usersSnap.empty) return [];
+
+      type RankedParticipant = { uid: string; place: number; points: number; displayName: string };
+
+      const ranked: RankedParticipant[] = usersSnap.docs.map((doc: any, idx: number) => ({
+        uid: doc.id as string,
+        place: idx + 1,
+        points: (doc.data().points as number) || 0,
+        displayName: (doc.data().displayName as string) || "",
+      }));
+
+      const userRefs = ranked.map((p: RankedParticipant) => firestore.collection("users").doc(p.uid));
+      const userDocs = await firestore.getAll(...userRefs);
+
+      return ranked
+        .map((p: RankedParticipant, idx: number) => ({
+          ...p,
+          email: (userDocs[idx].data()?.email as string) ?? null,
+        }))
+        .filter((p: RankedParticipant & { email: string | null }) => p.email !== null) as (RankedParticipant & { email: string })[];
+    }
+
+    // Day 1: season results for previous season + start email for new season
+    if (today.getDate() === 1) {
+      const prevDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      const prevSeasonId = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+      const prevSeasonName = `Season ${prevSeasonId}`;
+      const currentSeasonName = `Season ${currentSeasonId}`;
+      const daysInCurrentSeason = lastDayOfMonth.getDate();
+
+      const prevParticipants = await getSeasonParticipants(prevSeasonId);
+      const top3 = prevParticipants.slice(0, 3).map((p) => ({
+        displayName: p.displayName,
+        points: p.points,
+      }));
+
+      for (const participant of prevParticipants) {
+        const isTopFive = participant.place <= 5;
+        const fameEarned = isTopFive ? SEASON_FAME_REWARDS[participant.place - 1] : null;
+
+        seasonJobs.push(
+          sendSeasonResultsEmail({
+            to: participant.email,
+            userName: participant.displayName,
+            seasonName: prevSeasonName,
+            userPlace: participant.place,
+            userPoints: participant.points,
+            fameEarned,
+            top3,
+          }).catch((err) =>
+            console.error("[email] season results failed", { email: participant.email, err })
+          )
+        );
+
+        seasonJobs.push(
+          sendSeasonStartEmail({
+            to: participant.email,
+            userName: participant.displayName,
+            seasonName: currentSeasonName,
+            daysInSeason: daysInCurrentSeason,
+          }).catch((err) =>
+            console.error("[email] season start failed", { email: participant.email, err })
+          )
+        );
+      }
+    }
+
+    // 7 days before end of season: ending soon email
+    if (daysLeftInSeason === 7) {
+      const currentParticipants = await getSeasonParticipants(currentSeasonId);
+      const top3 = currentParticipants.slice(0, 3).map((p) => ({
+        displayName: p.displayName,
+        points: p.points,
+      }));
+      const seasonName = `Season ${currentSeasonId}`;
+
+      for (const participant of currentParticipants) {
+        seasonJobs.push(
+          sendSeasonEndingSoonEmail({
+            to: participant.email,
+            userName: participant.displayName,
+            seasonName,
+            top3,
+          }).catch((err) =>
+            console.error("[email] season ending soon failed", { email: participant.email, err })
+          )
+        );
+      }
+    }
+
+    await Promise.all(seasonJobs);
+
     return res.status(200).json({
       message: "Notifications processed",
       pushSent: successCount,
       pushFailed: failureCount,
-      emailsSent: emailJobs.length,
+      streakEmailsSent: emailJobs.length,
+      seasonEmailsSent: seasonJobs.length,
     });
 
   } catch (error) {
