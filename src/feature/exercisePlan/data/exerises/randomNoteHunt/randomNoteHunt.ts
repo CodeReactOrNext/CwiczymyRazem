@@ -19,6 +19,7 @@ const getStableRandomNote = () => {
 
 export const randomNoteHuntExercise: Exercise = {
   id: "random_note_hunt",
+  isHiddenFromLanding: true,
   get title() {
     return `Random Note Hunt: ${getStableRandomNote()}`;
   },

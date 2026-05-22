@@ -233,7 +233,7 @@ export const getStaticProps: GetStaticProps<ExerciseCategoryPageProps> = async (
   }
 
   const exercises = serializeExercises(exercisesAgregat)
-    .filter((ex) => ex.category === category && !ex.isHiddenFromLibrary)
+    .filter((ex) => ex.category === category && !ex.isHiddenFromLibrary && !ex.isHiddenFromLanding && !ex.isPlayalong)
     .map((ex) => ({
       id: ex.id,
       title: ex.title,

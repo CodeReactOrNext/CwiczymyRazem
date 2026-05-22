@@ -16,21 +16,21 @@
   {
     "id": "spider_string_skipping",
     "title": "String Skipping Spider Exercise",
-    "description": "Exercise developing coordination in string skipping and right hand precision.",
+    "description": "Integrate wide string jumps into the spider walk pattern.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "spider_x",
     "title": "Spider X Pattern Exercise",
-    "description": "Exercise using X-pattern to develop finger independence and hand coordination.",
+    "description": "Play a diagonal, cross-string spider pattern that forms an 'X' shape.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "spider_x_extended",
     "title": "Extended Spider X Exercise",
-    "description": "Advanced version of X exercise with wider stretches and complex patterns.",
+    "description": "Challenge coordination with a wider, multi-position version of the diagonal Spider X.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -58,14 +58,14 @@
   {
     "id": "one_chord_improv",
     "title": "Single Chord Improvisation",
-    "description": "Exercise developing creativity and harmonic understanding through improvisation over a single, unchanging chord.",
+    "description": "Explore the full expressive and modal potential of a static chord.",
     "difficulty": "medium",
     "category": "creativity"
   },
   {
     "id": "triad_improvisation",
     "title": "Triad Improvisation",
-    "description": "Exercise developing improvisation skills using chord triads, strengthening harmonic awareness and melodic fluency.",
+    "description": "Improvise solos purely using three-note triad shapes over a backing track.",
     "difficulty": "hard",
     "category": "creativity"
   },
@@ -79,7 +79,7 @@
   {
     "id": "spider_legato_basic",
     "title": "Spider Legato - Basic",
-    "description": "Exercise developing left hand strength and legato technique (hammer-ons and pull-offs).",
+    "description": "Execute the spider walk pattern purely with hammer-ons and pull-offs.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -93,7 +93,7 @@
   {
     "id": "hammer_on_sequence_5_7_9",
     "title": "Hammer-ons – 5-7-9 Sequence",
-    "description": "Hammer-on focused exercise using a 5-7-9 sequence across strings, designed to build left-hand strength, finger independence, and legato clarity.",
+    "description": "Build finger strength and legato fluidity using wide-span hammer-ons.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -114,28 +114,28 @@
   {
     "id": "legato_sextuplets_4_5_7",
     "title": "Legato Sextuplets – 4-5-7",
-    "description": "Legato exercise based on 4-5-7 fingerings played in sextuplets, combining hammer-ons and pull-offs to develop left-hand strength, control, and rhythmic precision.",
+    "description": "Execute fast, even six-note patterns using legato phrasing.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "guide_tone_voice_leading",
     "title": "Guide Tone Voice-Leading Drill",
-    "description": "Exercise focused on voice leading and harmonic awareness by using only guide tones (3rds and 7ths) to outline chord progressions with minimal melodic movement.",
+    "description": "Connect chord progressions smoothly by resolving third and seventh intervals.",
     "difficulty": "hard",
     "category": "theory"
   },
   {
     "id": "two_notes_per_bar_phrasing",
     "title": "Two-Notes-Per-Bar Phrasing",
-    "description": "Exercise developing phrasing, space, and musical decision-making by strictly limiting you to a maximum of two notes per bar.",
+    "description": "Create expressive phrases restricted to exactly two notes per measure.",
     "difficulty": "easy",
     "category": "creativity"
   },
   {
     "id": "chord_tone_improvisation",
     "title": "Chord Tone Improvisation",
-    "description": "Advanced harmonic awareness exercise focused on strict chord-tone improvisation over faster chord changes and increased cognitive load.",
+    "description": "Target chord tones systematically over shifting backing tracks to build melodic intent.",
     "difficulty": "hard",
     "category": "theory"
   },
@@ -149,37 +149,30 @@
   {
     "id": "minimal_motion_voice_leading",
     "title": "Minimal-Motion Voice Leading",
-    "description": "Advanced voice-leading drill: connect chord changes with the smallest possible melodic movement to create smooth, harmonically aware lines.",
+    "description": "Arrange chord voicings to minimize finger movement between transitions.",
     "difficulty": "hard",
     "category": "theory"
   },
   {
     "id": "natural_notes_map",
     "title": "Natural Notes Map",
-    "description": "Exercise for fretboard mapping: systematically find and play only natural notes (A–G) across the entire guitar neck to build fast note-location awareness.",
+    "description": "Visualize and map all natural notes across the entire fretboard.",
     "difficulty": "medium",
     "category": "theory"
   },
   {
     "id": "fretboard_mastery",
     "title": "Fretboard Mastery",
-    "description": "Exercise developing full fretboard awareness by playing the same melodic phrase in multiple positions, forcing note-based thinking instead of relying on shapes.",
+    "description": "Instantly locate and memorize natural and accidental notes across all strings.",
     "difficulty": "hard",
     "category": "theory"
   },
   {
     "id": "smooth_chord_transitions",
     "title": "Smooth Chord Transitions",
-    "description": "Exercise focused on practical voice leading by connecting chord shapes with minimal finger movement and preserving common tones between chords.",
+    "description": "Minimize finger movement and eliminate pauses during common chord changes.",
     "difficulty": "hard",
     "category": "theory"
-  },
-  {
-    "id": "vibrato_mastery",
-    "title": "Vibrato Mastery",
-    "description": "Exercise focusing on control of width and speed of your vibrato for maximum expression.",
-    "difficulty": "medium",
-    "category": "technique"
   },
   {
     "id": "metronome_gap_test",
@@ -396,7 +389,7 @@
   {
     "id": "jp_stretching",
     "title": "Petrucci Stretching Exercise",
-    "description": "John Petrucci's stretching exercise from Rock Discipline - helps improve finger flexibility and reach.",
+    "description": "Expand your finger reach and hand flexibility with a wide-interval linear stretch.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -417,14 +410,14 @@
   {
     "id": "finger_independence_1a",
     "title": "Finger Independence Exercise 1a",
-    "description": "Cross-string isolation exercise developing independence between all four fretting fingers. Outer fingers pick on the higher string while inner fingers press silently on the adjacent lower string — then all four fingers move to the same string. Works every adjacent string pair ascending from A/E to e/B.",
+    "description": "Isolate individual fingers of the fretting hand while keeping the others anchored.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "muting_discipline_drill",
     "title": "Muting Discipline Drill",
-    "description": "String-skipping patterns on E minor that force clean muting of unused strings. Progresses from small skips to maximum skips (string 6 to string 1), building right and left hand muting technique.",
+    "description": "Eliminate unwanted string noise using systematic dual-hand muting.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -438,28 +431,28 @@
   {
     "id": "legato_hammer_pull_run",
     "title": "Legato Hammer-Pull Scale Run",
-    "description": "4-note hammer-on / pull-off groups across A natural minor 3nps positions. Pick only the first note of each group, then hammer up and pull back. Builds left-hand strength and legato clarity.",
+    "description": "Incorporate legato runs across multiple strings with precise rhythmic timing.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "legato_trill_sprint",
     "title": "Legato Trill Sprints",
-    "description": "Sextuplet trill patterns across strings for building legato speed and endurance. Single-string trills progressing to cross-string 3nps sextuplet runs.",
+    "description": "Develop muscular endurance and rapid finger coordination with trill bursts.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "legato_continuous_flow",
     "title": "Continuous Legato Flow",
-    "description": "Non-stop 3nps legato runs across the full fretboard. Pick only the first note of each string — everything else is hammer-ons and pull-offs. Builds extreme left-hand endurance and seamless string transitions.",
+    "description": "Maintain a continuous, unbroken stream of notes using pure legato technique.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "earTrainingEasy",
     "title": "Ear Training Level 1",
-    "description": "Listen to 2 notes and repeat them correctly.",
+    "description": "Recognize intervals and simple melodic movements to bridge ear-to-fretboard connection.",
     "difficulty": "easy",
     "category": "hearing"
   },
@@ -487,7 +480,7 @@
   {
     "id": "first_bend_half_step",
     "title": "First Bend – Half Step",
-    "description": "Introduction to half-step bends across two strings in Am pentatonic position 1. A subtler, more controlled bend than a whole step — used constantly in blues and rock for that slight push of tension. Play the reference pitch first, then bend from below to match it.",
+    "description": "Master the mechanics of half-step string bending with a focus on pitch accuracy.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -501,7 +494,7 @@
   {
     "id": "high_register_bends",
     "title": "High Register Bends – 15th Fret",
-    "description": "Whole-step bends on the B and high e strings at the 15th fret — the same Am pentatonic shape as position 1, shifted two octaves up. High frets require less physical force to bend but demand better pitch control: the strings are short and tight, so overshooting is easy.",
+    "description": "Control string tension and achieve precise intonation when bending in the higher register.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -515,56 +508,56 @@
   {
     "id": "vibrato_control_drill",
     "title": "Vibrato Control",
-    "description": "Long sustained notes with vibrato on different strings and frets. Practice slow wide vibrato and fast narrow vibrato. Builds expressive control and consistency.",
+    "description": "Control the speed, width, and depth of your pitch modulation by sustaining notes and bent pitches across multiple strings.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "expressive_bend_phrasing",
     "title": "Expressive Bend Phrasing",
-    "description": "Pre-bends, release bends, bend-release-bend sequences, and compound phrases. Bluesy phrasing on Am pentatonic at 5th and 8th position.",
+    "description": "Integrate whole-step and half-step bends into melodic phrases with precise pitch control.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "unison_bend_drill",
     "title": "Unison Bending",
-    "description": "Unison bends — play a note on one string while bending the adjacent string to match its pitch. Two-note simultaneous hits that create a dramatic unison effect. Progresses across string pairs.",
+    "description": "Master pitch matching and microtonal adjustments in unison bends.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "tapping_single_string",
     "title": "Tapping – Simple Melody",
-    "description": "An Am pentatonic melody on the high e string where both the tapped note and the pull-off target move independently. Every two notes form a melodic interval — a descending third, a fifth, a step. Quarter note pace so every note has room to breathe.",
+    "description": "Learn basic tapping mechanics by playing a simple melody along a single string.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "tapping_pull_hammer",
     "title": "Tapping – Two-Voice Phrase",
-    "description": "A two-string tapping phrase where both voices move independently — no note stays the same twice in a row. String 1 carries the upper melody, string 2 echoes a third below. Both the tap note and the pull-off target vary each half bar, so the hands are always doing something different.",
+    "description": "Develop counterpoint and independent phrasing by playing a two-voice tapped melody.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "tapping_descending_target",
     "title": "Tapping – Descending Target Drill",
-    "description": "Each measure the tapping hand drops one fret lower (from 17 down to 12), then climbs back up. The left hand stays frozen at fret 5. You cannot slide your way to the target — every tap must land accurately on a new fret from above. Trains right-hand spatial awareness and fret targeting.",
+    "description": "Practice precise, descending tapped arpeggios with clean pull-offs.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "tapping_triadic_cascade",
     "title": "Tapping Triadic Cascades",
-    "description": "Two-handed tapping triads on strings 1-2. Tap the high note with your picking hand, then pull-off and hammer-on with the fretting hand. Builds clean articulation and muting control.",
+    "description": "Execute fast, flowing tapped arpeggios that cascade diagonally.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "tapping_melodic_lines",
     "title": "Melodic Tapping Compositions",
-    "description": "Flowing melodic lines using tapping as the primary technique. Move beyond patterns into actual musical phrases across multiple strings.",
+    "description": "Incorporate two-handed tapping to play expressive, melodic phrases.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -578,21 +571,21 @@
   {
     "id": "sweep_picking_motion_drill",
     "title": "Sweep Picking Motion Drill – 3 Strings",
-    "description": "Pure right-hand motion drill across G, B, and high e strings. All notes are muted — the goal is to train the sweeping wrist movement and pick-landing technique before adding fretting. Down sweep follows the natural gravity of the pick through the strings; up sweep uses a controlled return stroke.",
+    "description": "Develop basic sweeping mechanics using simple three-string triad shapes.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "sweep_picking_motion_drill_6_string",
     "title": "Sweep Picking Motion Drill – 6 Strings",
-    "description": "Full six-string sweep motion drill. All notes are muted — the entire focus is on training the pick to flow continuously from the low E string to the high e and back in one uninterrupted stroke. The wider range exposes weaknesses in the turn-around and in maintaining even volume across all strings.",
+    "description": "Master full-span, six-string sweep arpeggios with intense focus on fretting rolls.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "mini_arpeggio",
     "title": "Mini Arpeggio – Em7",
-    "description": "A compact three-string Em7 arpeggio sweep: down from the A string through D and G, hammer-on at the top, pull-off, then sweep back up. One clean cycle per bar — the foundation of sweep picking phrasing.",
+    "description": "Practice clean sweeping and rolling mechanics across three-string shapes.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -606,28 +599,28 @@
   {
     "id": "sweep_neoclassical",
     "title": "Neoclassical Sweep Master",
-    "description": "Complex sweep picking figures inspired by neoclassical shred. Diminished and minor arpeggio shapes across 5 strings with position shifts and legato turnarounds.",
+    "description": "Execute multi-octave sweep arpeggios with perfect synchronization.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "rhythmic_pocket_mastery",
     "title": "Subdivision Control",
-    "description": "Switch between triplets, eighths, and sixteenths without delays.",
+    "description": "Transition smoothly between different rhythmic subdivisions at a constant tempo.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "hybrid_picking_independence",
     "title": "String Skipping",
-    "description": "Use the pick on bass strings and fingers (m, a) on treble strings.",
+    "description": "Combine your pick and fingers to play wide-interval string-skipping lines.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "chicken_pickin",
     "title": "Snap and Pop",
-    "description": "Practice snapping strings with fingers for that classic country 'pop' sound.",
+    "description": "Develop hybrid picking coordination and percussive snapping dynamics.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -641,42 +634,42 @@
   {
     "id": "string_skipping_basic",
     "title": "Pentatonic String Skips",
-    "description": "Master the fundamental string skipping motion with pentatonic patterns.",
+    "description": "Practice jumping over strings while playing pentatonic scale shapes.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "string_skipping_arpeggios",
     "title": "Spread Triad Arpeggios",
-    "description": "Create wide intervallic sounds by playing triads across non-adjacent strings.",
+    "description": "Play wide-interval arpeggios using clean string-skipping mechanics.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "string_skipping_melodic",
     "title": "Melodic Skip Sequences",
-    "description": "Transform scale patterns into dramatic melodic lines using string skipping.",
+    "description": "Navigate melodic lines that utilize constant, wide-interval string skips.",
     "difficulty": "hard",
     "category": "technique"
   },
   {
     "id": "chromatic_spider_walk",
     "title": "Chromatic Spider Drill",
-    "description": "Build finger independence with chromatic permutation patterns.",
+    "description": "Improve finger synchronization, independent muscle control, and clean cross-string coordination.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "pinky_power_drill",
     "title": "Pinky-Led Patterns",
-    "description": "Strengthen your weakest finger by making it lead every phrase.",
+    "description": "Strengthen your weakest finger by playing linear patterns that initiate with the pinky.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "fret_stretch_drill",
     "title": "Wide Fret Span Sequences",
-    "description": "Gradually expand your fret reach with controlled stretching patterns.",
+    "description": "Develop finger flexibility and fretboard reach by practicing controlled, wide-interval fretting sequences.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -690,21 +683,21 @@
   {
     "id": "tone_color_exploration",
     "title": "Tonal Palette Discovery",
-    "description": "Explore the full spectrum of tones available from picking position and technique.",
+    "description": "Explore the different sounds you can produce by varying pick location and angle.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "tone_matching_challenge",
     "title": "Tone Matching Challenge",
-    "description": "Select any song and copy the sound of a selected fragment. This exercise focuses on recreating the timbre and nuance of a specific guitar part.",
+    "description": "Listen to reference tones and adjust your attack and pickup selection to match them.",
     "difficulty": "medium",
     "category": "hearing"
   },
   {
     "id": "scale_practice_configurable",
     "title": "Scale Practice (Configurable)",
-    "description": "Choose your scale, pattern, and position for customized scale practice.",
+    "description": "Practice scale patterns, fingerings, and alternate picking across customizable scales.",
     "difficulty": "medium",
     "category": "theory"
   },
@@ -753,21 +746,21 @@
   {
     "id": "chord_practice_configurable",
     "title": "Chord Practice (Configurable)",
-    "description": "Choose your chords and timing to practice transitions with a metronome.",
+    "description": "Practice clean transitions and finger placement across a customizable selection of chords.",
     "difficulty": "medium",
     "category": "technique"
   },
   {
     "id": "composition_challenge",
     "title": "Composition Challenge",
-    "description": "Compose a piece in 40 minutes guided by 5 random constraints — style, form, harmony, melody, and rhythm. Every session generates a unique creative brief.",
+    "description": "Create short, structured musical phrases within defined parameters to develop phrasing.",
     "difficulty": "hard",
     "category": "creativity"
   },
   {
     "id": "metal_gallop",
     "title": "Iron Gallop — Thrash Rhythm Drill",
-    "description": "Pure gallop rhythm (16th–16th–8th) on the low E string with palm mute. Each measure is a looping single-note pattern with fret shifts — E, A, G. Clean, mechanical picking with no chords. Think Metallica 'Battery', Iron Maiden 'The Trooper'.",
+    "description": "Master precise, high-speed rhythmic galloping patterns.",
     "difficulty": "medium",
     "category": "technique"
   },
@@ -781,21 +774,21 @@
   {
     "id": "down_picking_doom_pulse",
     "title": "Doom Pulse — Slow Down Picking Control",
-    "description": "A single-string doom groove on the low E string — all down picks, palm muted, slow and deliberate. Four measures that progressively add tension: starts with a basic E minor pentatonic move, introduces a tritone hit, stretches into half notes, and resolves back down. Inspired by Black Sabbath and early Metallica. The goal is not speed — it's a perfectly even, controlled down stroke every single time.",
+    "description": "Build wrist stamina and heavy, percussive down-picking control.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "naked_tone_melody",
     "title": "Naked Tone — Half Note Melody",
-    "description": "A simple 8-note melody in G major — all half notes, clean tone, zero articulation. No bends, no vibrato, no hammer-ons, no slides. Nothing. Just you, the fret, the string, and the pick. This exercise sounds trivially easy but exposes every flaw: buzzing, uneven attack, poor fretting pressure, and intonation drift. The goal is absolute perfection on every single note.",
+    "description": "Play slow, long melodies with zero effects to improve fundamental touch.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "muting_spotlight_drill",
     "title": "Muting Spotlight — Pick One, Kill the Rest",
-    "description": "A 3-note motif (G → A → B on the G string) played clean once as a reference, then repeated four times — each time with a different single note ringing out and the other two killed as dead (X) muted hits. The exercise sounds deceptively simple but demands precise, deliberate muting control: you must strike dead notes with full confidence while surgically letting only the target note sustain.",
+    "description": "Isolate single notes while aggressively muting all adjacent strings under gain.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -809,28 +802,28 @@
   {
     "id": "vibrato_sustain_drill",
     "title": "Vibrato Sustain — Hold It for the Whole Bar",
-    "description": "Two notes (B on string 2, D on string 3) played as sustained whole notes with vibrato, then repeated with a deliberate quarter-note rest on beat 2. The rest is the point — you must start vibrato, pause completely, then re-enter clean vibrato without resetting your technique. Slow, wide, controlled. No rushing, no wobble.",
+    "description": "Sustain notes with continuous, even vibrato while executing precise rests to test control over pitch modulation.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "vibrato_low_position",
     "title": "Vibrato — Low Position (Frets 1–5)",
-    "description": "Vibrato practice in the low position (frets 1–5) where fret spacing is widest and string tension is highest. Each measure is a single sustained note with continuous vibrato. Low position is the hardest place to do vibrato — the string fights back more, the frets are far apart, and most players produce an uneven, stiff result here. Four notes across measures, each on a different string.",
+    "description": "Develop controlled, wide vibrato in the lower frets with high string tension.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "vibrato_high_position",
     "title": "Vibrato — High Position (Frets 12–17)",
-    "description": "Vibrato practice in the high position (frets 12–17) where fret spacing is narrowest and string tension is lowest. The string moves easily here — which means control becomes the challenge, not force. Four sustained whole notes across different strings. High position is where most players first develop a good-sounding vibrato, but it is easy to overdo it and produce a wide, uncontrolled wobble.",
+    "description": "Adapt your vibrato technique to the narrow frets of the upper register.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "vibrato_finger_isolation",
     "title": "Vibrato — One Finger at a Time",
-    "description": "Four measures, one finger per measure: index (1), middle (2), ring (3), pinky (4). Each finger frets the same string (string 2, B) at its natural comfortable position and sustains vibrato for a full whole note. Most players have a strong ring finger vibrato and a nearly dead index or pinky — this exercise forces you to confront and train each finger individually.",
+    "description": "Isolate and develop controlled vibrato for each individual finger.",
     "difficulty": "hard",
     "category": "technique"
   },
@@ -844,14 +837,14 @@
   {
     "id": "first_melody",
     "title": "First Melody — One String",
-    "description": "Your very first melody: 'Mary Had a Little Lamb' played entirely on the B string using only three fret positions (1, 3, 5). No string changes, no chords — just a real tune from day one.",
+    "description": "Play a simple, expressive melody along a single string to develop horizontal movement.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "quarter_notes_drill",
     "title": "Quarter Notes Drill",
-    "description": "One downstroke per beat on the A string — open A and one fretted note (B), with rests scattered through the pattern. The rests are not a break; they are the exercise: count through the silence and land the next note exactly on the click.",
+    "description": "Develop strict timing and pick attack consistency using quarter-note pulses.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -872,7 +865,7 @@
   {
     "id": "pentatonic_box1_up_down",
     "title": "Pentatonic Box 1 — Up and Down",
-    "description": "Am pentatonic box 1 at 5th position played ascending all 6 strings, then descending back. The foundation of every pentatonic solo. Slow and even — every note rings clean.",
+    "description": "Build basic scale navigation, alternate picking, and muscle memory.",
     "difficulty": "easy",
     "category": "technique"
   },
@@ -886,21 +879,21 @@
   {
     "id": "strumming_down_up",
     "title": "Down-Up Strumming",
-    "description": "Introduces alternating down-up strumming — the foundation of most rhythm guitar patterns.",
+    "description": "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_rock",
     "title": "Rock Strumming Patterns",
-    "description": "Classic rock rhythm patterns with skips, accents and muted chucks.",
+    "description": "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
     "difficulty": "easy",
     "category": "technique"
   },
   {
     "id": "strumming_funk",
     "title": "Funk Rhythm Guitar",
-    "description": "16th-note funk strumming with heavy use of muted chucks and syncopation.",
+    "description": "Master 16th-note scratching, clean accents, and tight left-hand muting.",
     "difficulty": "easy",
     "category": "technique"
   },

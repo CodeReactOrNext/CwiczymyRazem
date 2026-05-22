@@ -7,6 +7,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
  */
 export const scalePracticeExercise: Exercise = {
   id: "scale_practice_configurable",
+  isHiddenFromLanding: true,
   title: "Scale Practice (Configurable)",
   description: "Practice scale patterns, fingerings, and alternate picking across customizable scales.",
   whyItMatters: "Scales are the foundation of melody and harmony. Developing speed, accuracy, and muscle memory across a wide range of scales is critical for advanced lead playing and composing.",

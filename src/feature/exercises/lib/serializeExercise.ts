@@ -33,6 +33,8 @@ export interface SerializedExercise {
   isHiddenFromLibrary?: boolean;
   requiresBackingTrack?: boolean;
   examBacking?: { url: string; sourceBpm: number };
+  additionalText?: string;
+  isHiddenFromLanding?: boolean;
 }
 
 /**
