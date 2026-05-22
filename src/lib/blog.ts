@@ -44,6 +44,7 @@ export interface BlogFrontmatter {
   title: string;
   description: string;
   date: string;
+  updatedAt?: string;
   image: string;
   slug: string;
   author?: string;
