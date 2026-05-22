@@ -165,6 +165,8 @@ export interface Exercise {
   disableTuner?: boolean;
   isHiddenFromLibrary?: boolean;
   requiresBackingTrack?: boolean;
+  additionalText?: string;
+  isHiddenFromLanding?: boolean;
 }
 
 export interface ExercisePlan {

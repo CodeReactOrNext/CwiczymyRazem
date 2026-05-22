@@ -8,7 +8,7 @@ import { serializeExercise, serializeExercises } from 'feature/exercises/lib/ser
 import { idToSlug, slugToId } from 'feature/exercises/lib/slugUtils';
 import type { SerializedExercise } from 'feature/exercises/lib/serializeExercise';
 import type { RelatedExerciseCard } from 'feature/exercises/lib/getRelatedExercises';
-import { ChevronRight, Clock, Music, Lock, BarChart3, Zap, Activity } from 'lucide-react';
+import { ChevronRight, Clock, Music, Lock, BarChart3, Zap, Activity, Headphones } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -33,17 +33,17 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryColors: Record<string, string> = {
-  technique: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
-  theory: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
-  creativity: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
-  hearing: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  mixed: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
+  technique: 'bg-rose-500/10 text-rose-300',
+  theory: 'bg-indigo-500/10 text-indigo-300',
+  creativity: 'bg-amber-500/10 text-amber-300',
+  hearing: 'bg-emerald-500/10 text-emerald-300',
+  mixed: 'bg-cyan-500/10 text-cyan-300',
 };
 
 const difficultyColors: Record<string, { label: string; color: string }> = {
-  easy: { label: 'Easy', color: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' },
-  medium: { label: 'Medium', color: 'bg-amber-500/10 text-amber-300 border-amber-500/20' },
-  hard: { label: 'Hard', color: 'bg-rose-500/10 text-rose-300 border-rose-500/20' },
+  easy: { label: 'Easy', color: 'bg-emerald-500/10 text-emerald-300' },
+  medium: { label: 'Medium', color: 'bg-amber-500/10 text-amber-300' },
+  hard: { label: 'Hard', color: 'bg-rose-500/10 text-rose-300' },
 };
 
 const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, related }) => {
@@ -112,7 +112,8 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
 
   // Build meta description
   const durationStr = exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`;
-  const metaDescription = `${exercise.description} ${difficultyInfo.label} guitar exercise. ${durationStr}. BPM ${bpmMin}–${bpmMax}.`.slice(
+  const whySuffix = exercise.whyItMatters ? ` ${exercise.whyItMatters}` : '';
+  const metaDescription = `${exercise.description}${whySuffix} ${difficultyInfo.label} guitar exercise. ${durationStr}. BPM ${bpmMin}–${bpmMax}.`.slice(
     0,
     155
   );
@@ -200,14 +201,14 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
           <div className="flex flex-col gap-4 mb-8">
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-semibold border ${categoryColor}`}>
+              <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-semibold ${categoryColor}`}>
                 {categoryLabel}
               </span>
-              <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-semibold border capitalize ${difficultyInfo.color}`}>
+              <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-semibold capitalize ${difficultyInfo.color}`}>
                 {difficultyInfo.label}
               </span>
               {exercise.premium && (
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-yellow-500/20 bg-yellow-500/10 text-yellow-300">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-500/10 text-yellow-300">
                   <Lock className="w-3.5 h-3.5" />
                   Premium
                 </span>
@@ -225,7 +226,7 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
             </p>
 
             {/* Metadata */}
-            <div className="flex flex-wrap gap-6 text-sm text-zinc-400 pt-4 border-t border-white/5">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 pt-4 border-t border-white/5">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-cyan-400" />
                 {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)} seconds` : `${exercise.timeInMinutes} minutes`}
@@ -234,22 +235,53 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
                 <Music className="w-4 h-4 text-cyan-400" />
                 BPM {bpmMin}–{bpmMax}
               </div>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-500 text-zinc-950 text-xs font-bold hover:bg-cyan-400 transition-colors"
+              >
+                Start Practice →
+              </Link>
             </div>
           </div>
         </section>
+
+        {/* Backing track alert */}
+        {exercise.requiresBackingTrack && (
+          <section className="px-6 mx-auto max-w-6xl pb-8">
+            <div className="flex items-start gap-4 p-5 rounded-lg bg-amber-500/10">
+              <div className="p-2 rounded-lg bg-amber-500/20 shrink-0">
+                <Headphones className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-amber-400 mb-1">Backing track required</p>
+                <p className="text-sm text-amber-300/70 leading-relaxed">
+                  This exercise is designed to be practiced over a backing track or drone. Without one, you lose the harmonic context that makes the exercise effective — pick any backing track in the key of your choice and keep it looping throughout the session.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Tablature / Strumming pattern */}
         {(exercise.tablature || exercise.strummingPatterns) && (
           <section className="border-t border-white/5 pt-12">
             <div className="px-6 mx-auto max-w-6xl mb-8">
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-2xl font-bold text-white mb-3">
                 {exercise.tablature ? 'Tablature' : 'Strumming Pattern'}
               </h2>
-              <p className="text-sm text-zinc-500">
-                {exercise.tablature
-                  ? 'First few measures of the exercise.'
-                  : 'Strum direction pattern to practice.'}
-              </p>
+              {exercise.tablature ? (
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-zinc-900">
+                  <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <p className="text-sm text-zinc-300">
+                    <span className="font-semibold text-white">Preview only.</span> Log in to access the fully interactive version with playback, tempo control, and real-time feedback.{' '}
+                    <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                      Sign in →
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-zinc-500">Strum direction pattern to practice.</p>
+              )}
             </div>
 
             {exercise.tablature && (
@@ -274,7 +306,7 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
 
             {exercise.tablature && exercise.whyItMatters && (
               <div className="px-6 mx-auto max-w-6xl pb-12">
-                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6">
+                <div className="bg-zinc-900/50 rounded-lg p-6">
                   <h3 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
                     <span className="inline-block w-1 h-1 bg-cyan-400 rounded-full"></span>
                     Why It Matters
@@ -285,6 +317,15 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
                 </div>
               </div>
             )}
+
+          </section>
+        )}
+
+        {/* Why it matters — always shown when no tablature */}
+        {!exercise.tablature && exercise.whyItMatters && (
+          <section className="px-6 mx-auto max-w-6xl pb-12 border-t border-white/5 pt-12">
+            <h2 className="text-2xl font-bold text-white mb-6">Why This Exercise Matters</h2>
+            <p className="text-zinc-400 leading-relaxed max-w-3xl">{exercise.whyItMatters}</p>
           </section>
         )}
 
@@ -295,7 +336,7 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
             <ol className="space-y-4">
               {exercise.instructions.map((instruction, idx) => (
                 <li key={idx} className="flex gap-4">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-xs font-bold text-cyan-400">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center text-xs font-bold text-cyan-400">
                     {idx + 1}
                   </span>
                   <span className="text-zinc-300 leading-relaxed pt-0.5">{instruction}</span>
@@ -320,9 +361,36 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
           </section>
         )}
 
+        {/* Additional text — SEO-oriented long-form content, supplied per-exercise */}
+        {exercise.additionalText && (
+          <section className="px-6 mx-auto max-w-6xl pb-12 border-t border-white/5 pt-12">
+            <h2 className="text-2xl font-bold text-white mb-6">About This Exercise</h2>
+            <div className="prose prose-zinc prose-invert max-w-3xl text-zinc-400 leading-relaxed whitespace-pre-line">
+              {exercise.additionalText}
+            </div>
+          </section>
+        )}
+
+        {/* Related skills */}
+        {exercise.relatedSkills && exercise.relatedSkills.length > 0 && (
+          <section className="px-6 mx-auto max-w-6xl pb-12 border-t border-white/5 pt-12">
+            <h2 className="text-2xl font-bold text-white mb-6">Skills You'll Develop</h2>
+            <div className="flex flex-wrap gap-2">
+              {exercise.relatedSkills.map((skill) => (
+                <span
+                  key={skill}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-300 capitalize"
+                >
+                  {skill.replace(/_|-/g, ' ')}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* CTA Section */}
         <section className="px-6 mx-auto max-w-6xl py-12 border-t border-white/5 relative">
-          <div className="relative rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-950 p-8 md:p-12">
+          <div className="relative rounded-lg bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-950 p-8 md:p-12">
             <div className="flex flex-col lg:flex-row items-center gap-12">
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-white mb-4">Ready to Practice?</h2>

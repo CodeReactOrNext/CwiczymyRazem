@@ -28,7 +28,8 @@
       "Bash(sed 's/collection\\(db, //')",
       "Bash(tr ';' '\\\\n')",
       "Bash(/tmp/pause_button_analysis.txt:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "WebFetch(domain:localhost)"
     ]
   }
 }

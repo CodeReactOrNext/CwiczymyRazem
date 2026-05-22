@@ -514,7 +514,7 @@ ExercisesLandingPage.getLayout = function getLayout(page: ReactElement) {
 
 export const getStaticProps: GetStaticProps<ExercisesLandingPageProps> = async () => {
   const exercisesData = serializeExercises(exercisesAgregat)
-    .filter((ex) => !ex.isHiddenFromLibrary)
+    .filter((ex) => !ex.isHiddenFromLibrary && !ex.isHiddenFromLanding && !ex.isPlayalong)
     .map((ex) => ({
       id: ex.id,
       title: ex.title,

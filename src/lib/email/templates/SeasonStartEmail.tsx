@@ -182,7 +182,7 @@ export default function SeasonStartEmail({
     <Html lang="en">
       <Head />
       <Preview>
-        {seasonName} has started — {daysInSeason} days to climb the leaderboard
+        {`${seasonName} has started — ${daysInSeason} days to climb the leaderboard`}
       </Preview>
       <Body style={main}>
         <Container style={container}>
