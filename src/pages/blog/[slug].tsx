@@ -82,8 +82,9 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         "description": frontmatter.description,
         "image": `https://riff.quest${frontmatter.image}`,
         "author": {
-          "@type": "Organization",
-          "name": "Riff Quest"
+          "@type": "Person",
+          "name": frontmatter.author || "Riff Quest",
+          "url": "https://riff.quest"
         },
         "publisher": {
           "@type": "Organization",
@@ -94,6 +95,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
           }
         },
         "datePublished": frontmatter.date,
+        "dateModified": frontmatter.updatedAt || frontmatter.date,
         "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": `https://riff.quest/blog/${frontmatter.slug}`
@@ -143,8 +145,12 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         <meta name="description" content={frontmatter.description} />
         <meta property="og:title" content={frontmatter.title} />
         <meta property="og:description" content={frontmatter.description} />
-        <meta property="og:image" content={frontmatter.image} />
+        <meta property="og:image" content={`https://riff.quest${frontmatter.image}`} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://riff.quest/blog/${frontmatter.slug}`} />
+        <meta property="article:published_time" content={frontmatter.date} />
+        <meta property="article:modified_time" content={frontmatter.updatedAt || frontmatter.date} />
+        <meta property="article:author" content={frontmatter.author || "Riff Quest"} />
         <link rel='canonical' href={`https://riff.quest/blog/${frontmatter.slug}`} />
         <script
           type="application/ld+json"
