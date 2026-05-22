@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { sendWelcomeEmail } from "lib/email/send";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 const statisticsInitial = {
@@ -44,6 +45,15 @@ export default async function handler(
           createdAt: new Date(),
           statistics: statisticsInitial,
         });
+
+        if (user.email) {
+          sendWelcomeEmail({
+            to: user.email,
+            userName: user.displayName,
+          }).catch((err) =>
+            console.error("[welcome-email] failed for", user.email, err)
+          );
+        }
       }
 
       const userData = (await userDocRef.get()).data();
