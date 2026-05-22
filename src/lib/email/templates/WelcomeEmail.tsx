@@ -15,7 +15,6 @@ interface WelcomeEmailProps {
   userName: string;
   dashboardUrl: string;
   logoUrl: string;
-  discordUrl: string;
 }
 
 const colors = {
@@ -145,39 +144,6 @@ const tipText = {
   margin: 0,
 };
 
-const discordBox = {
-  backgroundColor: colors.cardElevated,
-  borderRadius: "8px",
-  padding: "20px",
-  margin: "20px 0 0",
-  textAlign: "center" as const,
-};
-
-const discordTitle = {
-  fontSize: "15px",
-  fontWeight: 600,
-  color: colors.text,
-  margin: "0 0 6px",
-};
-
-const discordText = {
-  fontSize: "13px",
-  lineHeight: "20px",
-  color: colors.textMuted,
-  margin: "0 0 14px",
-};
-
-const discordButton = {
-  backgroundColor: colors.cyan,
-  color: "#09090b",
-  padding: "10px 22px",
-  borderRadius: "8px",
-  fontWeight: 700,
-  fontSize: "13px",
-  textDecoration: "none",
-  display: "inline-block",
-};
-
 const footer = {
   fontSize: "12px",
   color: colors.textDim,
@@ -209,7 +175,6 @@ export default function WelcomeEmail({
   userName,
   dashboardUrl,
   logoUrl,
-  discordUrl,
 }: WelcomeEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
 
@@ -263,17 +228,6 @@ export default function WelcomeEmail({
                 Short, consistent practice beats marathon sessions. Aim for 15
                 minutes a day to start, your streak will thank you.
               </Text>
-            </Section>
-
-            <Section style={discordBox}>
-              <Text style={discordTitle}>Join Our Community</Text>
-              <Text style={discordText}>
-                Connect with other guitarists, share riffs, and get tips from
-                fellow players on our Discord.
-              </Text>
-              <Button href={discordUrl} style={discordButton}>
-                Join Discord
-              </Button>
             </Section>
           </Section>
 

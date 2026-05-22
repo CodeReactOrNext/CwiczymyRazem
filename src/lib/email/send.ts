@@ -14,9 +14,6 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
     process.env.EMAIL_LOGO_URL ??
     "https://riff.quest/images/longlightlogo.png";
 
-  const discordUrl =
-    process.env.NEXT_PUBLIC_DISCORD_URL ?? "https://discord.gg/6yJmsZW2Ne";
-
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
@@ -25,7 +22,6 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
       userName: userName ?? "",
       dashboardUrl: `${baseUrl}/dashboard`,
       logoUrl,
-      discordUrl,
     }),
   });
 
