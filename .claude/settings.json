@@ -12,7 +12,10 @@
       "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(git commit -m 'style: capitalize '\\\\''Your Position'\\\\'' label in leaderboard header *)",
-      "WebFetch(domain:riff.quest)"
+      "WebFetch(domain:riff.quest)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Read(//c/Users/Krokon/.claude/**)"
     ]
   }
 }
