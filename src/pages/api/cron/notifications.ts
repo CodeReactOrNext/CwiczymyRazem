@@ -1,3 +1,4 @@
+import { sendStreakReminderEmail } from "lib/email/send";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore, messaging } from "utils/firebase/api/firebase.config";
 
@@ -93,10 +94,49 @@ export default async function handler(
     const successCount = results.reduce((acc, curr) => acc + curr.successCount, 0);
     const failureCount = results.reduce((acc, curr) => acc + curr.failureCount, 0);
 
+    // Streak reminder emails — independent of push notification opt-in
+    const emailUsersSnapshot = await firestore
+      .collection("users")
+      .where("email", "!=", null)
+      .get();
+
+    const emailJobs: Promise<unknown>[] = [];
+
+    emailUsersSnapshot.docs.forEach((doc: any) => {
+      const data = doc.data();
+      const email: string | null = data.email ?? null;
+      if (!email) return;
+
+      const lastReportDateStr = data.statistics?.lastReportDate;
+      if (!lastReportDateStr) return;
+
+      const lastReportDate = new Date(lastReportDateStr);
+      lastReportDate.setHours(0, 0, 0, 0);
+
+      const diffDays = Math.ceil(
+        Math.abs(today.getTime() - lastReportDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diffDays !== 1 && diffDays !== 3) return;
+
+      const streakDays: number = data.statistics?.actualDayWithoutBreak ?? 0;
+      const userName: string = data.displayName ?? "";
+      const variant = diffDays === 1 ? "d1" : "d3";
+
+      emailJobs.push(
+        sendStreakReminderEmail({ to: email, userName, streakDays, variant }).catch(
+          (err) => console.error("[email] streak reminder failed", { email, variant, err })
+        )
+      );
+    });
+
+    await Promise.all(emailJobs);
+
     return res.status(200).json({
       message: "Notifications processed",
-      sent: successCount,
-      failed: failureCount
+      pushSent: successCount,
+      pushFailed: failureCount,
+      emailsSent: emailJobs.length,
     });
 
   } catch (error) {

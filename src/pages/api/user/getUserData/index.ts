@@ -43,6 +43,7 @@ export default async function handler(
           displayName: user.displayName ?? null,
           avatar: user.photoURL ?? null,
           createdAt: new Date(),
+          email: user.email ?? null,
           statistics: statisticsInitial,
         });
 
@@ -56,7 +57,12 @@ export default async function handler(
         }
       }
 
-      const userData = (await userDocRef.get()).data();
+      const userSnapshotFresh = await userDocRef.get();
+      const userData = userSnapshotFresh.data();
+
+      if (userData && !userData.email && user.email) {
+        await userDocRef.update({ email: user.email });
+      }
 
       return res.status(200).json({
         userInfo: {
