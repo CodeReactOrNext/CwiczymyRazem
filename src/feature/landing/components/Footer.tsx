@@ -62,6 +62,22 @@ export const Footer = () => {
                                 </div>
                             </div>
                         </Link>
+
+                        <Link href='https://buymeacoffee.com/riffquest' target='_blank'>
+                            <div className="relative p-[1px] overflow-hidden rounded-lg group">
+                                <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#FFDD00_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div className='relative flex items-center gap-3 px-5 py-2.5 rounded-[7px] bg-zinc-900 border border-white/5 group-hover:bg-zinc-950 transition-all font-black uppercase tracking-widest text-xs text-amber-400 group-hover:text-amber-300'>
+                                    <svg className='h-5 w-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                                        <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+                                        <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+                                        <line x1="6" x2="6" y1="2" y2="4"/>
+                                        <line x1="10" x2="10" y1="2" y2="4"/>
+                                        <line x1="14" x2="14" y1="2" y2="4"/>
+                                    </svg>
+                                    Buy me a coffee
+                                </div>
+                            </div>
+                        </Link>
                     </div>
                   </div>
 
@@ -81,6 +97,7 @@ export const Footer = () => {
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Social</h4>
                         <ul className="space-y-4">
                             <li><Link href="https://discord.gg/6yJmsZW2Ne" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Discord</Link></li>
+                            <li><Link href="https://buymeacoffee.com/riffquest" target="_blank" className="text-sm font-bold text-amber-600/70 hover:text-amber-400 transition-colors flex items-center group">Buy me a coffee <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/contact" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Contact <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Privacy Policy <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/terms-of-service" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Terms of Service <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
