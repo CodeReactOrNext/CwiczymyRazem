@@ -3,7 +3,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Lock } from "lucide-react";
+import { Globe, Lock } from "lucide-react";
 import Image from "next/image";
 import {
   FaBrain,
@@ -27,6 +27,7 @@ interface PlanCardProps {
   onDelete?: () => void;
   onEdit?: () => void;
   onUpgrade?: () => void;
+  onTogglePublic?: () => void;
   startButtonText?: string;
   isLoading?: boolean;
   isLocked?: boolean;
@@ -84,6 +85,7 @@ export const PlanCard = ({
   onDelete,
   onEdit,
   onUpgrade,
+  onTogglePublic,
   startButtonText,
   isLoading,
   isLocked = false,
@@ -157,8 +159,19 @@ export const PlanCard = ({
             )}
         </div>
         <div className="flex items-center gap-2">
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || onTogglePublic) && (
                 <div className="flex items-center gap-1 mr-2">
+                    {onTogglePublic && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-7 w-7 transition-colors", plan.isPublic ? "text-cyan-400 hover:text-cyan-300" : "text-zinc-500 hover:text-zinc-300")}
+                            title={plan.isPublic ? "Published — click to unpublish" : "Unpublished — click to publish"}
+                            onClick={(e) => { e.stopPropagation(); onTogglePublic(); }}
+                        >
+                            <Globe className="h-3.5 w-3.5" />
+                        </Button>
+                    )}
                     {onEdit && (
                         <Button
                             variant="ghost"
@@ -210,12 +223,12 @@ export const PlanCard = ({
             </div>
         )}
         <div className="flex-1 space-y-1">
-            {plan.author && (
+            {(plan.author || plan.authorUsername) && (
                 <span className={cn(
                   "text-[11px] font-medium leading-none",
                   isLocked ? "text-zinc-400" : "text-primary/80"
                 )}>
-                    {plan.author.name}
+                    {plan.author?.name ?? plan.authorUsername}
                 </span>
             )}
             <h3 className={cn(

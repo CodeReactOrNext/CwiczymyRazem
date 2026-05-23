@@ -20,6 +20,7 @@ import { useCallback, useEffect,useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
+import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
@@ -228,6 +229,12 @@ export const SkillDashboard = ({
             >
               Browse Exercises
             </TabsTrigger>
+            <TabsTrigger
+              value="community"
+              className="px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+            >
+              Community
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -261,6 +268,10 @@ export const SkillDashboard = ({
             onShowUpgrade={() => setShowUpgradeModal(true)}
             onShowLeaderboard={(id, title) => setLeaderboardExercise({ id, title })}
           />
+        </TabsContent>
+
+        <TabsContent value="community" className="mt-0">
+          <CommunityExercisesTab onStartExercise={handleStartChallenge} />
         </TabsContent>
       </Tabs>
 

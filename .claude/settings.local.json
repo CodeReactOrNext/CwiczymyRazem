@@ -29,7 +29,13 @@
       "Bash(tr ';' '\\\\n')",
       "Bash(/tmp/pause_button_analysis.txt:*)",
       "Read(//tmp/**)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(Get-ChildItem -Path \"g:\\\\cw\\\\sss\\\\CwiczymyRazem\" -Recurse -Force)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-List FullName)",
+      "Bash(Get-ChildItem -Path \"g:/cw/sss/CwiczymyRazem/src/layouts\" -Recurse -Filter \"*.tsx\")",
+      "Bash(Select-Object FullName)",
+      "Bash(npx firebase *)"
     ]
   }
 }

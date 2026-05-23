@@ -185,4 +185,6 @@ export interface ExercisePlan {
     name: string;
     avatar: StaticImageData;
   };
+  isPublic?: boolean;
+  authorUsername?: string;
 }

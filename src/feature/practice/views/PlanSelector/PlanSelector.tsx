@@ -6,13 +6,14 @@ import {
 } from "assets/components/ui/tabs";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft,Flame, Music, Zap } from "lucide-react";
+import { ArrowLeft, Flame, Globe, Music, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -30,33 +31,38 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
+  const [communityPlans, setCommunityPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadCustomPlans = async () => {
+    const loadPlans = async () => {
       if (!userAuth) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const plans = await getUserExercisePlans(userAuth);
-        setCustomPlans(plans);
+        const [userPlans, publicPlans] = await Promise.all([
+          getUserExercisePlans(userAuth),
+          getPublicExercisePlans(),
+        ]);
+        setCustomPlans(userPlans);
+        setCommunityPlans(publicPlans);
       } catch (error) {
-        console.error("Failed to load custom plans:", error);
+        console.error("Failed to load plans:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadCustomPlans();
+    loadPlans();
   }, [userAuth]);
 
   const playalongPlans = defaultPlans.filter(p => p.exercises.some(e => e.isPlayalong));
   const routinePlans = defaultPlans.filter(p => !p.exercises.some(e => e.isPlayalong));
 
   const handleStartPlan = (planId: string) => {
-    const plan = [...defaultPlans, ...customPlans].find((p) => p.id === planId);
+    const plan = [...defaultPlans, ...customPlans, ...communityPlans].find((p) => p.id === planId);
     if (plan && onSelectPlan) {
       onSelectPlan(planId);
     }
@@ -156,6 +162,13 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                   <Flame size={16} />
                   <span>My Plans</span>
                 </TabsTrigger>
+                <TabsTrigger
+                  value="community"
+                  className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                >
+                  <Globe size={16} />
+                  <span>Community</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-12">
@@ -163,12 +176,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               </TabsContent>
 
               <TabsContent value="playalongs" className="mt-6 focus-visible:outline-none space-y-12">
-            
                 {renderDifficultyGroups(playalongPlans)}
               </TabsContent>
 
               <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-12">
-
                 {customPlans.length === 0 ? (
                   <div className='rounded-2xl border border-dashed border-white/5 p-12 text-center bg-zinc-900/10'>
                     <p className='text-zinc-500 text-sm'>
@@ -196,6 +207,32 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                         />
                       );
                     })}
+                  </motion.div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-12">
+                {communityPlans.length === 0 ? (
+                  <div className='rounded-2xl border border-dashed border-white/5 p-12 text-center bg-zinc-900/10'>
+                    <p className='text-zinc-500 text-sm'>No community plans published yet.</p>
+                    <p className='text-zinc-600 text-xs mt-2'>Go to My Plans and publish one of your plans to share it here.</p>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
+                  >
+                    {communityPlans.map((plan) => (
+                      <PlanCard
+                        key={plan.id}
+                        plan={plan}
+                        onSelect={() => handleStartPlan(plan.id)}
+                        onStart={() => handleStartPlan(plan.id)}
+                        startButtonText={t("common:start")}
+                        isLoading={loadingPlanId === plan.id}
+                      />
+                    ))}
                   </motion.div>
                 )}
               </TabsContent>

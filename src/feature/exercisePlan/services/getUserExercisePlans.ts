@@ -26,6 +26,8 @@ export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan
         exercises: data.exercises,
         totalDuration: data.totalDuration,
         isPrivate: data.isPrivate,
+        isPublic: data.isPublic ?? false,
+        authorUsername: data.authorUsername,
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
         userId: data.userId,

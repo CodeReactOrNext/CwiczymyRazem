@@ -24,4 +24,5 @@ export type NavPagesTypes =
   | "practice-finder"
   | "journey"
   | "scale-tree"
+  | "my-exercises"
   | null;
