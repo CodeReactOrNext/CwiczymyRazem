@@ -1,11 +1,13 @@
 import { Button } from "assets/components/ui/button";
+import { getCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
+import type { CommunityExercise } from "feature/communityExercises/types";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
 import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, BookOpen, Globe } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
 import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
@@ -36,6 +38,40 @@ export const SelectExercisesStep = ({
   const [pendingExercise, setPendingExercise] = useState<Exercise | undefined>(undefined);
   const [editingBuiltinExercise, setEditingBuiltinExercise] = useState<Exercise | undefined>(undefined);
   const [previewingExercise, setPreviewingExercise] = useState<Exercise | undefined>(undefined);
+  const [sourceTab, setSourceTab] = useState<"library" | "community">("library");
+  const [communityExercises, setCommunityExercises] = useState<Exercise[]>([]);
+  const [communitySearch, setCommunitySearch] = useState("");
+  const [communityLoading, setCommunityLoading] = useState(false);
+  const communityFetched = useRef(false);
+
+  const communityToExercise = (ce: CommunityExercise): Exercise => ({
+    id: `community-${ce.id}`,
+    title: ce.title,
+    description: ce.description,
+    category: ce.category,
+    difficulty: ce.difficulty,
+    timeInMinutes: ce.timeInMinutes,
+    instructions: ce.instructions,
+    tips: ce.tips,
+    metronomeSpeed: ce.metronomeSpeed,
+    relatedSkills: ce.relatedSkills,
+    tablature: ce.tablature,
+  });
+
+  useEffect(() => {
+    if (sourceTab !== "community" || communityFetched.current) return;
+    communityFetched.current = true;
+    setCommunityLoading(true);
+    getCommunityExercises()
+      .then(data => setCommunityExercises(data.map(communityToExercise)))
+      .finally(() => setCommunityLoading(false));
+  }, [sourceTab]);
+
+  const filteredCommunityExercises = communityExercises.filter(e =>
+    communitySearch === "" ||
+    e.title.toLowerCase().includes(communitySearch.toLowerCase()) ||
+    e.description?.toLowerCase().includes(communitySearch.toLowerCase())
+  );
 
   const {
     searchQuery,
@@ -201,44 +237,103 @@ export const SelectExercisesStep = ({
         </div>
 
         <div className="lg:col-span-7 space-y-6 min-w-0">
-          <ExerciseFilters
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            selectedDifficulty={selectedDifficulty}
-            onDifficultyChange={setSelectedDifficulty}
-            selectedSkill={selectedSkill}
-            onSkillChange={setSelectedSkill}
-            availableSkills={availableSkills}
-            groupedExercises={groupedExercises}
-          />
-
-          <div className="flex lg:hidden flex-wrap gap-2">
-            {[
-              { label: "Create Scale Exercise",  onClick: handleCreateScaleOpen,  cls: "border-indigo-500/30 bg-indigo-950/40 text-indigo-300 hover:border-indigo-400/60 hover:bg-indigo-950/60 hover:text-indigo-200" },
-              { label: "Create Chord Exercise",  onClick: handleCreateChordOpen,  cls: "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400/60 hover:bg-emerald-950/60 hover:text-emerald-200" },
-              { label: "Create Custom Exercise", onClick: handleCreateCustomOpen,             cls: "border-zinc-600/40 bg-zinc-900/40 text-zinc-400 hover:border-zinc-500/60 hover:bg-zinc-800/50 hover:text-zinc-200" },
-            ].map(({ label, onClick, cls }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={onClick}
-                className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border text-xs font-bold tracking-tight transition-all ${cls}`}
-              >
-                <FaPlus className="h-2.5 w-2.5 shrink-0" />
-                {label}
-              </button>
-            ))}
+          {/* Source tabs */}
+          <div className="flex items-center gap-1 bg-zinc-900 border border-white/5 rounded-lg p-1 w-fit">
+            <button
+              type="button"
+              onClick={() => setSourceTab("library")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
+                sourceTab === "library"
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              <BookOpen size={14} />
+              Library
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceTab("community")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
+                sourceTab === "community"
+                  ? "bg-zinc-800 text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              <Globe size={14} />
+              Community
+            </button>
           </div>
 
-          <ExerciseGrid
-            exercises={filteredExercises}
-            selectedExercises={selectedExercises}
-            onToggleExercise={handleExerciseToggleWithTimeModal}
-            onPreviewExercise={setPreviewingExercise}
-          />
+          {sourceTab === "library" ? (
+            <>
+              <ExerciseFilters
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                selectedDifficulty={selectedDifficulty}
+                onDifficultyChange={setSelectedDifficulty}
+                selectedSkill={selectedSkill}
+                onSkillChange={setSelectedSkill}
+                availableSkills={availableSkills}
+                groupedExercises={groupedExercises}
+              />
 
+              <div className="flex lg:hidden flex-wrap gap-2">
+                {[
+                  { label: "Create Scale Exercise",  onClick: handleCreateScaleOpen,  cls: "border-indigo-500/30 bg-indigo-950/40 text-indigo-300 hover:border-indigo-400/60 hover:bg-indigo-950/60 hover:text-indigo-200" },
+                  { label: "Create Chord Exercise",  onClick: handleCreateChordOpen,  cls: "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400/60 hover:bg-emerald-950/60 hover:text-emerald-200" },
+                  { label: "Create Custom Exercise", onClick: handleCreateCustomOpen, cls: "border-zinc-600/40 bg-zinc-900/40 text-zinc-400 hover:border-zinc-500/60 hover:bg-zinc-800/50 hover:text-zinc-200" },
+                ].map(({ label, onClick, cls }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={onClick}
+                    className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border text-xs font-bold tracking-tight transition-all ${cls}`}
+                  >
+                    <FaPlus className="h-2.5 w-2.5 shrink-0" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <ExerciseGrid
+                exercises={filteredExercises}
+                selectedExercises={selectedExercises}
+                onToggleExercise={handleExerciseToggleWithTimeModal}
+                onPreviewExercise={setPreviewingExercise}
+              />
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                value={communitySearch}
+                onChange={e => setCommunitySearch(e.target.value)}
+                placeholder="Search community exercises…"
+                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50"
+              />
+              {communityLoading ? (
+                <div className="flex h-40 items-center justify-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
+                </div>
+              ) : filteredCommunityExercises.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-white/5 p-12 text-center">
+                  <p className="text-zinc-500 text-sm">
+                    {communitySearch ? "No exercises match your search." : "No community exercises published yet."}
+                  </p>
+                </div>
+              ) : (
+                <ExerciseGrid
+                  exercises={filteredCommunityExercises}
+                  selectedExercises={selectedExercises}
+                  onToggleExercise={handleExerciseToggleWithTimeModal}
+                  onPreviewExercise={setPreviewingExercise}
+                />
+              )}
+            </>
+          )}
         </div>
       </div>
 

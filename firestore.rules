@@ -23,7 +23,9 @@ service cloud.firestore {
 
     // ─── Exercise plans ───────────────────────────────────────────────────────
     match /exercisePlans/{planId} {
-      allow read:   if request.auth != null && resource.data.userId == request.auth.uid;
+      // Owner can always read; any auth'd user can read public plans
+      allow read:   if request.auth != null
+        && (resource.data.userId == request.auth.uid || resource.data.isPublic == true);
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update: if request.auth != null && resource.data.userId == request.auth.uid;
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
@@ -43,6 +45,30 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update: if request.auth != null && resource.data.userId == request.auth.uid;
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Community exercises ──────────────────────────────────────────────────
+    match /communityExercises/{exerciseId} {
+      // Anyone logged in can read
+      allow read: if request.auth != null;
+
+      // Only the author can create; authorId must match uid
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid;
+
+      // Author can update their own exercise (but cannot change authorId)
+      allow update: if request.auth != null
+        && resource.data.authorId == request.auth.uid
+        && !("authorId" in request.resource.data.diff(resource.data).affectedKeys());
+
+      allow delete: if request.auth != null
+        && resource.data.authorId == request.auth.uid;
+
+      // Ratings subcollection — each user writes only their own rating
+      match /ratings/{userId} {
+        allow read:  if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // ─── Default: deny everything else ────────────────────────────────────────

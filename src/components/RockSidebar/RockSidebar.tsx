@@ -24,6 +24,7 @@ import {
   LogOut,
   MessageSquarePlus,
   Music,
+  Music2,
   Settings,
   Swords,
   Timer,
@@ -83,6 +84,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/plans")) return "plans";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/recordings")) return "recordings";
+    if (pathname.startsWith("/my-exercises")) return "my-exercises";
+    if (pathname.startsWith("/tab-editor")) return "my-exercises";
     return null;
   };
 
@@ -110,6 +113,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const toolsNavigation = [
     { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
+    { id: "my-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
     { id: "arsenal", name: "Guitar Arsenal", href: "/arsenal", icon: <Swords size={16} /> },
     { id: "summary", name: "Summary", href: "/summary", icon: <BarChart2 size={16} /> },
   ];
