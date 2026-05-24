@@ -6,7 +6,7 @@ import { exercisesAgregat } from '../src/feature/exercisePlan/data/exercisesAgre
 describe('Export Exercises', () => {
   it('should export exercises to JSON', () => {
     const simplifiedExercises = exercisesAgregat
-      .filter(ex => !ex.isPlayalong)
+      .filter(ex => !ex.isPlayalong && !ex.isHiddenFromLibrary)
       .map(ex => ({
         id: ex.id,
         title: ex.title,
@@ -15,7 +15,7 @@ describe('Export Exercises', () => {
         category: ex.category,
         youtubeVideoId: ex.youtubeVideoId,
         customGoal: ex.customGoal,
-        customGoalDescription: ex.customGoalDescription
+        whyItMatters: ex.whyItMatters
       }));
 
     const outputPath = path.resolve(__dirname, '../exercises_dump.json');

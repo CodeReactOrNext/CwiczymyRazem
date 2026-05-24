@@ -23,6 +23,13 @@ SKILL TYPE — adjust length accordingly:
 - Conceptual/musical skill (theory, harmony, ear training, structure): 2–3 sections with [square bracket titles], 2–4 sentences each.
 SECTION TITLES (conceptual only):
 Choose 2–3 titles that fit the specific skill, e.g. [Why it matters], [How to practice], [Common trap]. One title per line in square brackets.
+
+NON-REPETITION RULE — critical:
+- Every skill listed as "already mastered" is FULLY understood by the student. Never explain it, never summarize it, never re-introduce it. Treat it as invisible background knowledge.
+- If this step naturally follows from a previous step, one brief clause like "building on your vibrato control" is the maximum reference allowed — then move on immediately.
+- Each description must read as if the previous steps don't exist. A student reading only this description should get zero information about how to perform any other step.
+- Violating this rule produces redundant content that wastes the student's time.
+
 AVOID — never include:
 - Specific BPM or tempo numbers → use "start slow, increase gradually"
 - Specific fret or string numbers → use "any comfortable position on the neck"
@@ -64,6 +71,11 @@ const buildUserPrompt = (req: StepDetailRequest): string => {
     .filter(Boolean)
     .join("\n");
 
+  const masteredSkills = [
+    ...allPhases.slice(0, phaseIndex).flatMap((p) => p.steps),
+    ...prevSteps,
+  ];
+
   return `Student's goal: "${goal}"
 Skill level: ${level}
 
@@ -71,9 +83,8 @@ ${prevPhasesText ? `PREVIOUS PHASES (completed):\n${prevPhasesText}\n\n` : ""}CU
 ${currentPhaseContext}
 ${nextPhasesText ? `\nUPCOMING PHASES:\n${nextPhasesText}` : ""}
 
-Write a detailed description for the concept/skill "${stepTitle}".
-Remember: the title is a SKILL NAME — explain what it is, why it matters, and how to develop it conceptually. Do NOT include specific BPM, fret numbers, or note names.
-Consider the context — what the student already knows (don't repeat it), what they will practice next (prepare the ground).`;
+${masteredSkills.length > 0 ? `ALREADY MASTERED — do NOT explain, mention, or summarize any of these:\n${masteredSkills.map((s) => `- ${s}`).join("\n")}\n\n` : ""}Write a description EXCLUSIVELY for "${stepTitle}". Assume everything above is fully mastered.
+The title is a SKILL NAME — explain what it is, why it matters, and how to develop it. Do NOT include specific BPM, fret numbers, or note names.`;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -24,6 +24,9 @@
       "assets/*": [
         "./src/assets/*"
       ],
+      "data/*": [
+        "./src/data/*"
+      ],
       "components/*": [
         "src/components/*"
       ],

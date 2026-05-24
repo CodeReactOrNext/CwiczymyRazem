@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Circle, Clock, Trash2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import React from "react";
 
 import type { Roadmap } from "../../types/roadmap.types";
@@ -13,120 +13,118 @@ function getRoadmapStats(roadmap: Roadmap) {
   const allSteps = roadmap.phases.flatMap((p) => p.steps);
   const total = allSteps.length;
   const done = allSteps.filter((s) => s.sessionsCompleted >= s.sessionsRequired).length;
-  const inProgress = allSteps.filter(
-    (s) => s.sessionsCompleted > 0 && s.sessionsCompleted < s.sessionsRequired
-  ).length;
   const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-  return { total, done, inProgress, progress };
+  return { total, done, progress };
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("pl-PL", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-const LEVEL_COLOR: Record<string, string> = {
-  "Absolute Beginner": "text-sky-400 bg-sky-500/10 border-sky-500/20",
-  "Beginner": "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  "Intermediate": "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  "Advanced": "text-rose-400 bg-rose-500/10 border-rose-500/20",
+const LEVEL_THEME: Record<string, { accentRgb: string }> = {
+  "Absolute Beginner": { accentRgb: "6,182,212"  },
+  "Beginner":          { accentRgb: "16,185,129" },
+  "Intermediate":      { accentRgb: "245,158,11" },
+  "Advanced":          { accentRgb: "139,92,246" },
 };
 
-const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen, onDelete }) => {
-  const { total, done, inProgress, progress } = getRoadmapStats(roadmap);
-  const levelCls = LEVEL_COLOR[roadmap.level] ?? "text-zinc-400 bg-zinc-800 border-zinc-700";
+const DEFAULT_THEME = LEVEL_THEME["Intermediate"];
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete();
-  };
+const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
+  const { total, done, progress } = getRoadmapStats(roadmap);
+  const theme = LEVEL_THEME[roadmap.level] ?? DEFAULT_THEME;
+  const { accentRgb } = theme;
+
+  const tag = roadmap.level;
+  const ctaLabel = done > 0 ? "Continue Learning" : "Start Roadmap";
+  const progressLabel =
+    done === total && total > 0
+      ? "✓ Roadmap complete!"
+      : done > 0
+      ? `${progress}% done — keep going`
+      : "Ready to start — 0% complete";
 
   return (
     <div
-      className="group relative flex cursor-pointer flex-col gap-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl transition-all hover:brightness-110"
       onClick={onOpen}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <h3 className="truncate text-base font-bold text-zinc-100">{roadmap.title}</h3>
-          <p className="line-clamp-2 text-sm leading-relaxed text-zinc-500">{roadmap.goal}</p>
-        </div>
+      <div className="flex flex-col md:flex-row">
+        {/* ── Image panel ── */}
+        <div className="relative h-60 shrink-0 overflow-hidden bg-zinc-800 md:h-auto md:w-80">
+          {/* Mobile bottom fade */}
+          <div className="absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-zinc-900 to-transparent md:hidden" />
+          {/* Desktop right fade */}
+          <div className="absolute inset-y-0 right-0 z-10 hidden w-16 bg-gradient-to-l from-zinc-900 to-transparent md:block" />
 
-        <button
-          onClick={handleDelete}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-700 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-950/40 hover:text-red-500"
-          title="Delete roadmap"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      </div>
+          {roadmap.image ? (
+            <>
+              <img
+                src={roadmap.image}
+                alt={roadmap.title}
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ filter: "grayscale(55%) saturate(0.7)" }}
+              />
+              {/* subtle accent tint over grayscale */}
+              <div
+                className="absolute inset-0 z-[1]"
+                style={{ background: `linear-gradient(160deg, rgba(${accentRgb},0.12) 0%, transparent 55%)` }}
+              />
+            </>
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{ background: `radial-gradient(ellipse at 50% 60%, rgba(${accentRgb},0.12) 0%, transparent 70%)` }}
+            />
+          )}
 
-      {/* Progress bar */}
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-zinc-400">Progress</span>
-          <span
-            className={`font-bold tabular-nums ${
-              progress === 100
-                ? "text-emerald-400"
-                : progress > 0
-                  ? "text-amber-400"
-                  : "text-zinc-600"
-            }`}
-          >
-            {progress}%
-          </span>
-        </div>
-        <div className="h-1.5 w-full overflow-hidden rounded bg-zinc-800">
+          {/* Tag badge */}
           <div
-            className={`h-full rounded transition-all duration-700 ${
-              progress === 100 ? "bg-emerald-500" : progress > 0 ? "bg-amber-500" : "bg-zinc-700"
-            }`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Stats row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
-        <span className="flex items-center gap-1.5">
-          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-          {done}/{total} steps done
-        </span>
-        {inProgress > 0 && (
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-amber-400" />
-            {inProgress} in progress
-          </span>
-        )}
-        {done === 0 && inProgress === 0 && (
-          <span className="flex items-center gap-1.5">
-            <Circle className="h-3.5 w-3.5 text-zinc-700" />
-            Not started
-          </span>
-        )}
-        <span className="ml-auto text-zinc-700">{roadmap.phases.length} phases</span>
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between border-t border-zinc-800/60 pt-3">
-        <div className="flex items-center gap-2">
-          <span
-            className={`rounded border px-2.5 py-0.5 text-[11px] font-medium ${levelCls}`}
+            className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-lg border bg-black/60 px-3 py-1 text-[10px] font-bold tracking-widest backdrop-blur-sm"
+            style={{ borderColor: `rgba(${accentRgb},0.35)`, color: `rgb(${accentRgb})` }}
           >
-            {roadmap.level}
-          </span>
-          <span className="text-[11px] text-zinc-700">{formatDate(roadmap.createdAt)}</span>
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: `rgb(${accentRgb})`, boxShadow: `0 0 6px 2px rgba(${accentRgb},0.6)` }}
+            />
+            {tag}
+          </div>
         </div>
 
-        <span className="flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors group-hover:text-emerald-400">
-          Open
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </span>
+        {/* ── Info panel ── */}
+        <div className="flex flex-1 flex-col justify-between p-7">
+          <div>
+            <div className="mb-3">
+              <span className="text-xs font-semibold tracking-widest text-zinc-500">
+                {roadmap.level} · {roadmap.phases.length} phases
+              </span>
+            </div>
+            <h2 className="text-2xl font-black text-white md:text-3xl">{roadmap.title}</h2>
+            {roadmap.goal && roadmap.goal !== roadmap.title && (
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-400">{roadmap.goal}</p>
+            )}
+          </div>
+
+          {/* Progress + CTA */}
+          <div className="mt-8 space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium tracking-wide text-zinc-400">Progress</span>
+                <span className="text-xs font-bold text-zinc-200">{done}/{total} steps</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ background: `rgb(${accentRgb})`, width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-[11px] font-medium text-zinc-500">{progressLabel}</p>
+            </div>
+
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3.5 text-sm font-semibold text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-700"
+            >
+              {ctaLabel}
+              <ChevronRight size={18} strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

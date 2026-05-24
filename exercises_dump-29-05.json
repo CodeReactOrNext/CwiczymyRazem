@@ -1,0 +1,1249 @@
+[
+  {
+    "id": "spider_one_string",
+    "title": "Single String Spider Exercise",
+    "description": "Fret notes chromatic sequence on a single string to develop basic finger coordination and clean fretting hand accuracy.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise establishes precise finger coordination on a single string. It helps build initial finger strength, ensures clear note separation, and trains your fingers to find frets without looking."
+  },
+  {
+    "id": "spider_stairs_hard",
+    "title": "Advanced Spider Stairs Exercise",
+    "description": "Fret non-adjacent string skipping patterns with wide interval leaps to build absolute finger independence and fingerboard stretch control.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise develops extreme finger independence and wide stretching capacity. By crossing multiple strings non-sequentially while maintaining a wide fret stretch, it trains your hand to stay relaxed under technical strain and prevents your fingers from tensing up during large interval leaps."
+  },
+  {
+    "id": "spider_string_skipping",
+    "title": "String Skipping Spider Exercise",
+    "description": "Integrate wide string jumps into the spider walk pattern.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "String skipping can easily cause missed notes or accidental string noise. Combining it with the spider walk forces both hands to sync perfectly, building elite-level coordinate agility."
+  },
+  {
+    "id": "spider_x",
+    "title": "Spider X Pattern Exercise",
+    "description": "Play a diagonal, cross-string spider pattern that forms an 'X' shape.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Diagonal fretboard movement is highly common in real solos but rarely practiced. The Spider X drill breaks up linear muscle memory, training your brain and fingers to navigate the fretboard dynamically."
+  },
+  {
+    "id": "spider_x_extended",
+    "title": "Extended Spider X Exercise",
+    "description": "Challenge coordination with a wider, multi-position version of the diagonal Spider X.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "The extended version introduces shifting positions along with diagonal string changes. This builds outstanding spatial awareness, finger dexterity, and high-level picking synchronization."
+  },
+  {
+    "id": "spider_basic",
+    "title": "Horizontal Spider Exercise",
+    "description": "Master left-hand finger independence and sync it perfectly with your picking hand using this foundational horizontal shifting pattern.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise develops solid finger autonomy. It prevents fingers from 'flying away' from the fretboard, vastly improves economy of motion, and synchronizes both hands for clean, fast lead playing."
+  },
+  {
+    "id": "play_by_ear",
+    "title": "Playing By Ear",
+    "description": "Listen to an external audio fragment and reproduce it on the guitar without visual aids or tabs.",
+    "difficulty": "medium",
+    "category": "hearing",
+    "whyItMatters": "Transcribing audio directly to the fretboard connects your auditory processing to your physical playing. This eliminates reliance on sheet music and tabs, developing the crucial ability to play the melodies you hear in your head or in a live band setting."
+  },
+  {
+    "id": "one_string_backing",
+    "title": "Single String Phrasing",
+    "description": "Improvise over a backing track while physically restricting your playing to a single string.",
+    "difficulty": "medium",
+    "category": "creativity",
+    "whyItMatters": "Removing the ability to play across strings eliminates reliance on familiar vertical box shapes. This forces you to navigate the fretboard horizontally, significantly improving your ability to connect distant positions and demanding a heavy reliance on expressive techniques (slides, bends) to keep the phrasing interesting."
+  },
+  {
+    "id": "one_chord_improv",
+    "title": "Single Chord Improvisation",
+    "description": "Explore the full expressive and modal potential of a static chord.",
+    "difficulty": "medium",
+    "category": "creativity",
+    "whyItMatters": "When the harmony doesn't change, you cannot rely on chord changes to create interest. This exercise forces you to focus on rhythm, dynamics, interval selection, and phrasing to build tension and resolution."
+  },
+  {
+    "id": "triad_improvisation",
+    "title": "Triad Improvisation",
+    "description": "Improvise solos purely using three-note triad shapes over a backing track.",
+    "difficulty": "hard",
+    "category": "creativity",
+    "whyItMatters": "Limiting yourself to triads forces you to learn chord shapes inside out and connect them melodically across the neck. It prevents you from playing mindless scale runs and makes your solos sound highly structured."
+  },
+  {
+    "id": "chromatic_accents",
+    "title": "Chromatic Accent Dynamics",
+    "description": "Master your dynamic control by playing a chromatic sequence with shifting accents. You will learn to control your pick attack to make accented notes significantly louder and non-accented notes noticeably quieter.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise develops precise dynamic control over your pick attack. It teaches you to differentiate accented and normal notes, which is essential for groove, phrasing, and expressive playing."
+  },
+  {
+    "id": "spider_legato_basic",
+    "title": "Spider Legato - Basic",
+    "description": "Execute the spider walk pattern purely with hammer-ons and pull-offs.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Removing the pick forces your fretting hand to do all the work. This builds massive strength, finger independence, and timing control, leading to incredibly fluid legato runs."
+  },
+  {
+    "id": "economy_picking_angular",
+    "title": "Angular / Economy Picking",
+    "description": "Practice angular economy picking to minimize picking hand movement and transition fluidly across adjacent strings.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise develops picking hand efficiency through directional economy picking. By allowing the pick to continue its path through adjacent strings rather than forcing strict alternate strokes, you minimize wasted physical movement, increase potential playing speed, and build a smooth, sweeping cross-string motion."
+  },
+  {
+    "id": "hammer_on_sequence_5_7_9",
+    "title": "Hammer-ons – 5-7-9 Sequence",
+    "description": "Build finger strength and legato fluidity using wide-span hammer-ons.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Hammer-ons allow you to play fluid, rapid lines with a soft, vocal-like attack. The 5-7-9 sequence requires stretching the fingers, which helps build both reach and independent hammer strength in the ring and pinky fingers."
+  },
+  {
+    "id": "hammer_on_pentatonic_run",
+    "title": "Hammer-on Pentatonic Run – 3 Strings",
+    "description": "Develop strong legato hammer-on technique and smooth cross-string transition fluidity across three strings.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise builds finger independence and hammer-on power. It gives you the strength and speed needed for fluid legato lines without relying constantly on the pick."
+  },
+  {
+    "id": "pull_off_pentatonic_run",
+    "title": "Dark Pull-off Pentatonic Run",
+    "description": "Develop seamless legato technique using A minor pentatonic pull-offs across the middle strings. Focus on dynamic equality between picked and pulled notes for a smooth, heavy flow.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise builds fretting hand finger independence and strength. Legato runs are fundamental to fluid phrasing, speed, and clean transitions between strings."
+  },
+  {
+    "id": "legato_sextuplets_4_5_7",
+    "title": "Legato Sextuplets – 4-5-7",
+    "description": "Execute fast, even six-note patterns using legato phrasing.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Sextuplets are a standard rhythmic subdivision for high-speed runs. Practicing them with legato techniques on frets 4, 5, and 7 improves pinky strength and teaches you to divide beats evenly without relying on the metronome click for every note."
+  },
+  {
+    "id": "guide_tone_voice_leading",
+    "title": "Guide Tone Voice-Leading Drill",
+    "description": "Connect chord progressions smoothly by resolving third and seventh intervals.",
+    "difficulty": "hard",
+    "category": "theory",
+    "whyItMatters": "Guide tones are the most harmonically defining notes of any chord. Resolving thirds to sevenths (and vice versa) during chord transitions creates incredibly smooth voice leading, which is a staple of jazz, fusion, and professional chord arranging."
+  },
+  {
+    "id": "two_notes_per_bar_phrasing",
+    "title": "Two-Notes-Per-Bar Phrasing",
+    "description": "Create expressive phrases restricted to exactly two notes per measure.",
+    "difficulty": "easy",
+    "category": "creativity",
+    "whyItMatters": "When notes are extremely limited, you must focus entirely on timing, tone, vibrato, and silence. This drill builds incredible phrasing discipline, making every note you choose count."
+  },
+  {
+    "id": "chord_tone_improvisation",
+    "title": "Chord Tone Improvisation",
+    "description": "Target chord tones systematically over shifting backing tracks to build melodic intent.",
+    "difficulty": "hard",
+    "category": "theory",
+    "whyItMatters": "Improvising by targeting chord tones (root, third, fifth, seventh) anchors your solos directly to the underlying harmony. This technique prevents random note selection, producing structured, harmonically rich solos that sound musical and professional."
+  },
+  {
+    "id": "call_and_response_phrasing",
+    "title": "Call and Response Phrasing",
+    "description": "Improvise contrasting pairs of musical phrases to structure guitar solos into clear questions and answers.",
+    "difficulty": "medium",
+    "category": "creativity",
+    "whyItMatters": "This exercise develops structural phrasing and melodic storytelling during improvisation. By forcing you to separate solos into distinct pairs of 'questions' (tense/unresolved) and 'responses' (resolved), you learn to use pauses effectively, build and release tension logically, and keep your listeners engaged."
+  },
+  {
+    "id": "minimal_motion_voice_leading",
+    "title": "Minimal-Motion Voice Leading",
+    "description": "Arrange chord voicings to minimize finger movement between transitions.",
+    "difficulty": "hard",
+    "category": "theory",
+    "whyItMatters": "Minimal-motion voice leading makes chord progressions sound cohesive, elegant, and highly polished. It reduces large jumps across the fretboard, making your rhythm parts easier to play and much more satisfying to listen to."
+  },
+  {
+    "id": "natural_notes_map",
+    "title": "Natural Notes Map",
+    "description": "Visualize and map all natural notes across the entire fretboard.",
+    "difficulty": "medium",
+    "category": "theory",
+    "whyItMatters": "Learning natural note positions provides a reliable grid for the entire fretboard. Once natural notes are memorized, locating sharps and flats becomes a simple, immediate adjustment."
+  },
+  {
+    "id": "fretboard_mastery",
+    "title": "Fretboard Mastery",
+    "description": "Instantly locate and memorize natural and accidental notes across all strings.",
+    "difficulty": "hard",
+    "category": "theory",
+    "whyItMatters": "Complete fretboard visualization removes the guesswork from your playing. Knowing note names instantly allows you to transpose keys, construct chords, and find scale shapes on the fly without relying on fixed geometric patterns."
+  },
+  {
+    "id": "smooth_chord_transitions",
+    "title": "Smooth Chord Transitions",
+    "description": "Minimize finger movement and eliminate pauses during common chord changes.",
+    "difficulty": "hard",
+    "category": "theory",
+    "whyItMatters": "Choppy chord changes ruin the groove of a song. Training your fingers to move as a single, coordinated unit and using anchor fingers where possible ensures a continuous, professional rhythm sound."
+  },
+  {
+    "id": "metronome_gap_test",
+    "title": "Metronome Gap Test",
+    "description": "Maintain a steady rhythmic pulse while the metronome is muted for several measures.",
+    "difficulty": "medium",
+    "category": "theory",
+    "whyItMatters": "This exercise exposes whether you are genuinely internalizing the tempo or just blindly following an external click. By forcing you to maintain the grid during silence, it develops the deep internal timing required to lead a band, lock in with a drummer, and prevent rushing or dragging."
+  },
+  {
+    "id": "sing_what_you_play",
+    "title": "Sing What You Play",
+    "description": "Sing pitches out loud simultaneously as you play them on the guitar.",
+    "difficulty": "hard",
+    "category": "hearing",
+    "whyItMatters": "This exercise bridges the gap between your physical muscle memory and your internal ear. By forcing your vocal cords to match the notes your fingers are playing, you eliminate the delay between musical thought and execution, ensuring you play what you hear rather than just running visual patterns on the fretboard."
+  },
+  {
+    "id": "open_g_repetition",
+    "title": "Open G String Repetition",
+    "description": "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise improves timing consistency and alternate picking control by training you to play evenly with the metronome. It helps build the precision and stability needed for clean rhythm guitar playing."
+  },
+  {
+    "id": "all_strings_open_repetition",
+    "title": "All Strings Open Repetition",
+    "description": "Advanced rhythm exercise moving across all strings using open notes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise trains clean string switching while keeping a steady rhythm. It helps improve picking accuracy and control between strings."
+  },
+  {
+    "id": "random_note_hunt",
+    "title": "Random Note Hunt: D",
+    "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
+    "difficulty": "easy",
+    "category": "theory",
+    "customGoal": "D",
+    "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
+  },
+  {
+    "id": "spider_permutation_1234",
+    "title": "Spider Exercise - 1-2-3-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-2-3-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-2-3-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_1243",
+    "title": "Spider Exercise - 1-2-4-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-2-4-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-2-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_1324",
+    "title": "Spider Exercise - 1-3-2-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-3-2-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-3-2-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_1342",
+    "title": "Spider Exercise - 1-3-4-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-3-4-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-3-4-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_1423",
+    "title": "Spider Exercise - 1-4-2-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-4-2-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-4-2-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_1432",
+    "title": "Spider Exercise - 1-4-3-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 1-4-3-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-4-3-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2134",
+    "title": "Spider Exercise - 2-1-3-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-1-3-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-1-3-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2143",
+    "title": "Spider Exercise - 2-1-4-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-1-4-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-1-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2314",
+    "title": "Spider Exercise - 2-3-1-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-3-1-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-3-1-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2341",
+    "title": "Spider Exercise - 2-3-4-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-3-4-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-3-4-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2413",
+    "title": "Spider Exercise - 2-4-1-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-4-1-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-4-1-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_2431",
+    "title": "Spider Exercise - 2-4-3-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 2-4-3-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-4-3-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3124",
+    "title": "Spider Exercise - 3-1-2-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-1-2-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-1-2-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3142",
+    "title": "Spider Exercise - 3-1-4-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-1-4-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-1-4-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3214",
+    "title": "Spider Exercise - 3-2-1-4 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-2-1-4 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-2-1-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3241",
+    "title": "Spider Exercise - 3-2-4-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-2-4-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-2-4-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3412",
+    "title": "Spider Exercise - 3-4-1-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-4-1-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-4-1-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_3421",
+    "title": "Spider Exercise - 3-4-2-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 3-4-2-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-4-2-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4123",
+    "title": "Spider Exercise - 4-1-2-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-1-2-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-1-2-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4132",
+    "title": "Spider Exercise - 4-1-3-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-1-3-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-1-3-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4213",
+    "title": "Spider Exercise - 4-2-1-3 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-2-1-3 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-2-1-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4231",
+    "title": "Spider Exercise - 4-2-3-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-2-3-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-2-3-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4312",
+    "title": "Spider Exercise - 4-3-1-2 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-3-1-2 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-3-1-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_permutation_4321",
+    "title": "Spider Exercise - 4-3-2-1 Permutation",
+    "description": "Fret notes on a single string using finger permutation 4-3-2-1 to isolate specific finger movements and develop deep coordination control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-3-2-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
+  },
+  {
+    "id": "spider_chromatics",
+    "title": "Spider Chromatics - 1-2-3-4",
+    "description": "Classic chromatic spider exercise involving fingers 1-2-3-4 moving across all strings.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise develops finger independence and hand synchronization through controlled chromatic movement. It helps improve fretting accuracy and overall coordination across the fretboard."
+  },
+  {
+    "id": "jp_stretching",
+    "title": "Petrucci Stretching Exercise",
+    "description": "Expand your finger reach and hand flexibility with a wide-interval linear stretch.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Developing wide fretboard reach requires careful conditioning of the hand muscles. This exercise helps build structural reach, making complex jazz chords and wide-span metal/shred runs feel effortless and comfortable."
+  },
+  {
+    "id": "alternate_picking_cross_string",
+    "title": "Alternate Picking Cross-String",
+    "description": "A minor scale-based alternate picking exercise across all 6 strings. Progresses from 2-note-per-string pentatonic patterns to 3-note-per-string natural minor, training inside and outside picking.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise develops clean alternate picking across string changes. It improves picking consistency, string transition control, and synchronization between both hands."
+  },
+  {
+    "id": "alternate_picking_pentatonic_a_positions",
+    "title": "A Pentatonic Alternate Picking — Position Drill",
+    "description": "Practice pentatonic alternate picking using repeated notes per string to lock in hand synchronization and metronome timing.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise anchors your picking hand synchronization by isolating the moment of string crossing. Playing each note four times allows your brain to settle into the alternate picking pulse before navigating the physical change of string plane, resulting in extremely clean and stable picking runs."
+  },
+  {
+    "id": "finger_independence_1a",
+    "title": "Finger Independence Exercise 1a",
+    "description": "Isolate individual fingers of the fretting hand while keeping the others anchored.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Finger independence prevents secondary muscle tension and sympathetic finger movement. Developing isolated control over each finger ensures clean note execution, smoother transitions, and superior economy of motion during complex playing."
+  },
+  {
+    "id": "muting_discipline_drill",
+    "title": "Muting Discipline Drill",
+    "description": "Eliminate unwanted string noise using systematic dual-hand muting.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in professional, clear, and professional-grade performances."
+  },
+  {
+    "id": "speed_burst_chromatic_blitz",
+    "title": "Speed Burst Chromatic Blitz",
+    "description": "Execute brief, rapid chromatic note groups interspersed with quick rests to build fast twitch muscle response and control hand tension.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise develops fast-twitch muscle response in both hands. It trains your fingers to fire quickly in sync, and teaches you how to release tension instantly during rests, preventing hand fatigue."
+  },
+  {
+    "id": "legato_hammer_pull_run",
+    "title": "Legato Hammer-Pull Scale Run",
+    "description": "Incorporate legato runs across multiple strings with precise rhythmic timing.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination."
+  },
+  {
+    "id": "legato_trill_sprint",
+    "title": "Legato Trill Sprints",
+    "description": "Develop muscular endurance and rapid finger coordination with trill bursts.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Trills require rapid, continuous hammer-ons and pull-offs between two notes. Sprints build fast-twitch muscle response in individual finger pairs, which dramatically improves overall legato speed and control."
+  },
+  {
+    "id": "legato_continuous_flow",
+    "title": "Continuous Legato Flow",
+    "description": "Maintain a continuous, unbroken stream of notes using pure legato technique.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Legato playing minimizes picking hand involvement to create a smooth, flowing sound. Developing continuous flow trains your fretting hand to generate consistent note volume and tone purely through finger strength and coordination."
+  },
+  {
+    "id": "earTrainingEasy",
+    "title": "Ear Training Level 1",
+    "description": "Recognize intervals and simple melodic movements to bridge ear-to-fretboard connection.",
+    "difficulty": "easy",
+    "category": "hearing",
+    "whyItMatters": "A well-trained ear allows you to translate the melodies in your head directly onto the guitar, transcribe songs quickly, and react dynamically to other musicians during a performance."
+  },
+  {
+    "id": "earTrainingMedium",
+    "title": "Ear Training Level 2",
+    "description": "Listen to a short melody and repeat it.",
+    "difficulty": "medium",
+    "category": "hearing"
+  },
+  {
+    "id": "earTrainingHard",
+    "title": "Ear Training Level 3",
+    "description": "Complex intervals and wider range.",
+    "difficulty": "hard",
+    "category": "hearing"
+  },
+  {
+    "id": "first_bend",
+    "title": "First Bend – Whole Step",
+    "description": "Learn accurate whole-step string bending. Compare your bent pitch against reference notes to train both muscle memory and your ear.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise teaches you to target bent pitches by ear rather than guessing. It trains your muscle memory to hit the exact whole-step pitch perfectly every time, preventing flat or out-of-tune bends."
+  },
+  {
+    "id": "first_bend_half_step",
+    "title": "First Bend – Half Step",
+    "description": "Master the mechanics of half-step string bending with a focus on pitch accuracy.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Developing accurate bending mechanics early prevents the development of weak finger-only bending habits. Precise half-step bends are critical for smooth blues and rock phrasing, helping you hit the target pitch perfectly every time."
+  },
+  {
+    "id": "bend_and_release",
+    "title": "Bend & Release",
+    "description": "Perform clean whole-step string bends followed by slow, controlled releases to develop precise pitch control and finger strength.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise develops accurate pitch control and micro-intonation. The slow, controlled release trains your fingers to guide the string back to its starting position without losing fret pressure, eliminating pitch wobbles and ensuring a smooth, expressive vocal-like quality to your bends."
+  },
+  {
+    "id": "high_register_bends",
+    "title": "High Register Bends – 15th Fret",
+    "description": "Control string tension and achieve precise intonation when bending in the higher register.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "String tension feels significantly different in the high register compared to the middle of the neck. Practicing bends at the 15th fret and above builds the mechanical strength and fine motor skills necessary for soaring, pitch-perfect solos."
+  },
+  {
+    "id": "precision_bending_drill",
+    "title": "First Bend – Whole Step",
+    "description": "Develop precise whole-step bending and control. Follow the reference notes to train your ears, and master slow, controlled releases back to the starting pitch.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise gives you total control over string tension during sustained bends and releases. You will learn to hold bent notes perfectly in tune and guide them back down smoothly without any abrupt noise."
+  },
+  {
+    "id": "vibrato_control_drill",
+    "title": "Vibrato Control",
+    "description": "Control the speed, width, and depth of your pitch modulation by sustaining notes and bent pitches across multiple strings.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Sustaining clean vibrato requires maintaining uniform oscillation width and speed across different fretboard locations. Practicing vibrato on regular notes, during string changes, and on bent pitches develops the finger strength and forearm rotational control needed for high-level expression and pitch consistency."
+  },
+  {
+    "id": "expressive_bend_phrasing",
+    "title": "Expressive Bend Phrasing",
+    "description": "Integrate whole-step and half-step bends into melodic phrases with precise pitch control.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Bending is one of the most expressive techniques on the guitar, mimicking the human voice. Proper bending technique involves using the strength of multiple fingers and rotating the wrist to achieve perfect intonation and prevent string slippage."
+  },
+  {
+    "id": "unison_bend_drill",
+    "title": "Unison Bending",
+    "description": "Master pitch matching and microtonal adjustments in unison bends.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Unison bends (holding one note while bending an adjacent string to match its pitch) sound powerful and aggressive. Achieving perfect pitch unison eliminates beat frequencies, creating a massive, focused rock sound."
+  },
+  {
+    "id": "tapping_single_string",
+    "title": "Tapping – Simple Melody",
+    "description": "Learn basic tapping mechanics by playing a simple melody along a single string.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Starting with a simple melody lets you focus entirely on the physical mechanics of tapping: landing exactly in the middle of the fret and executing a clean pull-off without string noise."
+  },
+  {
+    "id": "tapping_pull_hammer",
+    "title": "Tapping – Two-Voice Phrase",
+    "description": "Develop counterpoint and independent phrasing by playing a two-voice tapped melody.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Playing independent voices with both hands builds incredible brain-to-finger coordination. This advanced technique lets you play both basslines/chords and melodies simultaneously on a single guitar."
+  },
+  {
+    "id": "tapping_descending_target",
+    "title": "Tapping – Descending Target Drill",
+    "description": "Practice precise, descending tapped arpeggios with clean pull-offs.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Descending tapping sequences can easily become muddy if the tapped finger doesn't pull off cleanly. This drill trains your tapping finger to pull slightly downward, ensuring a crisp, high-volume note trigger."
+  },
+  {
+    "id": "tapping_triadic_cascade",
+    "title": "Tapping Triadic Cascades",
+    "description": "Execute fast, flowing tapped arpeggios that cascade diagonally.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Tapped arpeggios that cascade diagonally across the fretboard sound modern and complex. Combining tapping with slides and string changes creates a fluid, harp-like effect that elevates your lead guitar vocabulary."
+  },
+  {
+    "id": "tapping_melodic_lines",
+    "title": "Melodic Tapping Compositions",
+    "description": "Incorporate two-handed tapping to play expressive, melodic phrases.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Two-handed tapping turns the guitar into a piano-like instrument. Learning to tap melodic lines rather than just fast arpeggios adds a highly lyrical, unique texture to your solos."
+  },
+  {
+    "id": "sweep_picking_3_string",
+    "title": "3-String Sweep Synchronization",
+    "description": "Practice clean 3-string sweep picking arpeggios to coordinate your pick stroke with sequential finger lifts.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise coordinates the exact micro-timing between your hands required for clean sweep picking. It eliminates note bleeding by training your fretting hand to lift fingers sequentially, and teaches your picking hand to execute a single, continuous fluid sweep stroke rather than individual picking motions."
+  },
+  {
+    "id": "sweep_picking_motion_drill",
+    "title": "Sweep Picking Motion Drill – 3 Strings",
+    "description": "Develop basic sweeping mechanics using simple three-string triad shapes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Three-string sweeps are the perfect entry point to mastering the sweeping motion. Focusing on a continuous, fluid pick stroke across a small number of strings builds excellent muscle memory for larger sweeps."
+  },
+  {
+    "id": "sweep_picking_motion_drill_6_string",
+    "title": "Sweep Picking Motion Drill – 6 Strings",
+    "description": "Master full-span, six-string sweep arpeggios with intense focus on fretting rolls.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Six-string sweeps require exceptional coordination and palm muting. This drill teaches you to roll across multiple strings to prevent note bleeding while using your palm to keep the low strings completely quiet."
+  },
+  {
+    "id": "mini_arpeggio",
+    "title": "Mini Arpeggio – Em7",
+    "description": "Practice clean sweeping and rolling mechanics across three-string shapes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Mini arpeggios are the building blocks of sweep picking. Learning to roll your fretting fingers across the same fret on adjacent strings prevents notes from bleeding together, ensuring a clean, articulated arpeggio line."
+  },
+  {
+    "id": "sweep_5_string_cascade",
+    "title": "5-String Sweep Cascades",
+    "description": "Execute extended 5-string sweep arpeggios to build deep fretting hand muting control and fluid sweep motion.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise develops muting discipline and fluid motion across almost the entire fretboard width. It trains your picking hand to execute a broad, uniform sweep stroke, and builds the string-to-string muting control required to play clean, note-separated arpeggios at any speed."
+  },
+  {
+    "id": "sweep_neoclassical",
+    "title": "Neoclassical Sweep Master",
+    "description": "Execute multi-octave sweep arpeggios with perfect synchronization.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Sweeping is the ultimate high-speed arpeggio technique. This neoclassical drill focuses on the sync between the picking hand 'sweep' and fretting hand 'rolls', ensuring every note is perfectly separated and articulate."
+  },
+  {
+    "id": "rhythmic_pocket_mastery",
+    "title": "Subdivision Control",
+    "description": "Transition smoothly between different rhythmic subdivisions at a constant tempo.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Rhythmic flexibility allows you to vary the speed of your solos and rhythm parts without changing the song's BPM. Mastering subdivision control keeps you locked in 'the pocket' during complex rhythm shifts."
+  },
+  {
+    "id": "hybrid_picking_independence",
+    "title": "String Skipping",
+    "description": "Combine your pick and fingers to play wide-interval string-skipping lines.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Hybrid picking bridges the gap between pick control and fingerstyle agility. Using the pick for low strings and fingers for high strings allows you to cross wide string gaps effortlessly, which is essential for modern rock, country, and jazz fusion styles."
+  },
+  {
+    "id": "chicken_pickin",
+    "title": "Snap and Pop",
+    "description": "Develop hybrid picking coordination and percussive snapping dynamics.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Chicken picking is a cornerstone of country and blues lead styles. Snapping the string with your fingers while muting it with your picking hand creates a percussive, high-attack note definition that adds rhythmic energy and dynamic contrast to your playing."
+  },
+  {
+    "id": "jazz_chord_melody",
+    "title": "Bass and Chords",
+    "description": "Coordinate hybrid picking to execute clean bass lines while plucking simultaneous chord harmony.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise develops highly independent control between your pick and fingers. By separating low-frequency bass lines from high-frequency harmony voicings, you build the essential hand coordination needed to play solo arrangements, manage polyrhythms, and achieve precise chord comping."
+  },
+  {
+    "id": "string_skipping_basic",
+    "title": "Pentatonic String Skips",
+    "description": "Practice jumping over strings while playing pentatonic scale shapes.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Pentatonic scales can sound repetitive if played sequentially. Adding string skips opens up the scale, creating larger interval jumps that sound highly expressive and modern."
+  },
+  {
+    "id": "string_skipping_arpeggios",
+    "title": "Spread Triad Arpeggios",
+    "description": "Play wide-interval arpeggios using clean string-skipping mechanics.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Spread triads sound open, majestic, and less predictable than standard block chords. Practicing them with string skipping builds great picking hand control and introduces highly modern melodic textures."
+  },
+  {
+    "id": "string_skipping_melodic",
+    "title": "Melodic Skip Sequences",
+    "description": "Navigate melodic lines that utilize constant, wide-interval string skips.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Melodic string skips add dramatic pitch changes to your solos. This exercise trains your picking hand to find strings instantly without looking, building excellent spatial accuracy."
+  },
+  {
+    "id": "chromatic_spider_walk",
+    "title": "Chromatic Spider Drill",
+    "description": "Improve finger synchronization, independent muscle control, and clean cross-string coordination.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "The spider walk is a fundamental warm-up that isolates each finger of the fretting hand. By coordinating finger movement with alternate picking, you build rhythmic accuracy, reduce excess tension, and lay a solid foundation for advanced speed and endurance."
+  },
+  {
+    "id": "pinky_power_drill",
+    "title": "Pinky-Led Patterns",
+    "description": "Strengthen your weakest finger by playing linear patterns that initiate with the pinky.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Most guitarists suffer from an under-developed pinky finger, leading to uneven speed and restricted fretboard patterns. Isolating the pinky improves hand balance, dexterity, and overall fretting agility."
+  },
+  {
+    "id": "fret_stretch_drill",
+    "title": "Wide Fret Span Sequences",
+    "description": "Develop finger flexibility and fretboard reach by practicing controlled, wide-interval fretting sequences.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Flexibility in the fretting hand enables you to play complex chord shapes, sweeping arpeggios, and legato lines that span multiple frets. Building proper reach mechanics—rather than just applying force—prevents hand fatigue, minimizes muscle tension, and lowers the risk of tendon strain."
+  },
+  {
+    "id": "dynamic_crescendo",
+    "title": "Dynamic Range Control",
+    "description": "Master the full dynamic spectrum of the guitar, from whisper-quiet to an aggressive attack. Control your picking depth and attack speed to match the required volume curves.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise trains exact physical control over pick depth and attack velocity. Differentiating volume levels smoothly (crescendo and decrescendo) separates expressive, professional guitarists from mechanical ones."
+  },
+  {
+    "id": "tone_color_exploration",
+    "title": "Tonal Palette Discovery",
+    "description": "Explore the different sounds you can produce by varying pick location and angle.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Your hands are the ultimate tone control. Picking near the bridge produces a bright, biting tone, while picking near the neck creates a warm, round sound. Developing control over these tone 'colors' adds massive expression to your playing."
+  },
+  {
+    "id": "tone_matching_challenge",
+    "title": "Tone Matching Challenge",
+    "description": "Listen to reference tones and adjust your attack and pickup selection to match them.",
+    "difficulty": "medium",
+    "category": "hearing",
+    "whyItMatters": "Matching reference tones trains your ear to recognize subtle changes in dynamics, timbre, and equalization, helping you dial in the perfect sound on any gear."
+  },
+  {
+    "id": "scale_practice_configurable",
+    "title": "Scale Practice (Configurable)",
+    "description": "Practice scale patterns, fingerings, and alternate picking across customizable scales.",
+    "difficulty": "medium",
+    "category": "theory",
+    "whyItMatters": "Scales are the foundation of melody and harmony. Developing speed, accuracy, and muscle memory across a wide range of scales is critical for advanced lead playing and composing."
+  },
+  {
+    "id": "improv_prompt_easy",
+    "title": "Improv Prompts — Easy",
+    "description": "Improvise over a backing track while adhering to a single, rotating creative constraint.",
+    "difficulty": "easy",
+    "category": "creativity",
+    "whyItMatters": "Random constraints force you to break out of habitual playing patterns. By imposing artificial limitations (like playing only on two strings or avoiding certain rhythms), you are forced to discover new pathways and creative solutions on the spot."
+  },
+  {
+    "id": "improv_prompt_medium",
+    "title": "Improv Prompts — Medium",
+    "description": "Improvise over a backing track while rapidly adapting to rotating musical and theoretical constraints.",
+    "difficulty": "medium",
+    "category": "creativity",
+    "whyItMatters": "Faster rotations and more complex constraints test your ability to instantly recall and apply musical vocabulary. It trains your brain to quickly formulate musical ideas that fit specific structural requirements in real-time."
+  },
+  {
+    "id": "improv_prompt_hard",
+    "title": "Improv Prompts — Hard",
+    "description": "Improvise over a backing track while simultaneously adhering to multiple advanced creative constraints.",
+    "difficulty": "hard",
+    "category": "creativity",
+    "whyItMatters": "Balancing multiple, sometimes conflicting constraints demands extreme cognitive flexibility and advanced fretboard mastery. This workout pushes your improvisational bandwidth to its absolute limit, turning moments of struggle into spontaneous creative breakthroughs."
+  },
+  {
+    "id": "rhythm_training_easy",
+    "title": "Rhythm Training — Easy",
+    "description": "Execute fundamental quarter and half-note rhythms on a muted string to establish a solid internal pulse.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise strips away all melodic and harmonic distractions, forcing you to focus entirely on rhythmic precision. Developing a strong quarter-note pulse is the foundational prerequisite for all complex strumming and lead playing."
+  },
+  {
+    "id": "rhythm_training_medium",
+    "title": "Rhythm Training — Medium",
+    "description": "Perform eighth-note subdivisions and basic syncopated patterns on a muted string.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "This exercise develops your ability to accurately divide the beat and execute off-beat rhythms. Mastering eighth-note syncopation provides the rhythmic vocabulary necessary for standard pop, rock, and funk guitar parts."
+  },
+  {
+    "id": "rhythm_training_hard",
+    "title": "Rhythm Training — Hard",
+    "description": "Execute complex sixteenth-note subdivisions, triplets, and polyrhythmic groupings on a muted string.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise challenges your fine motor control and deep rhythmic grid. Navigating rapid sixteenths, shifting to triplet feels, and executing 3-over-4 polyrhythms trains ultimate rhythmic independence and strict metronomic alignment."
+  },
+  {
+    "id": "chord_practice_configurable",
+    "title": "Chord Practice (Configurable)",
+    "description": "Practice clean transitions and finger placement across a customizable selection of chords.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "Mastering transitions between diverse chord families is essential for smooth rhythm playing. This exercise builds muscle memory and hand independence, ensuring all strings ring clearly without unintended muting."
+  },
+  {
+    "id": "composition_challenge",
+    "title": "Composition Challenge",
+    "description": "Create short, structured musical phrases within defined parameters to develop phrasing.",
+    "difficulty": "hard",
+    "category": "creativity",
+    "whyItMatters": "Limiting your creative options to specific notes, rhythms, or shapes forces you to think about phrasing and structure rather than relying on speed or automatic licks. This fosters deep musical thinking and distinct artistic voice."
+  },
+  {
+    "id": "metal_gallop",
+    "title": "Iron Gallop — Thrash Rhythm Drill",
+    "description": "Master precise, high-speed rhythmic galloping patterns.",
+    "difficulty": "medium",
+    "category": "technique",
+    "whyItMatters": "The gallop (one eighth note followed by two sixteenth notes) is the rhythmic heartbeat of heavy metal and hard rock. Achieving a tight, aggressive gallop requires strict pick stroke direction and palm-muting discipline."
+  },
+  {
+    "id": "metal_tremolo_picking",
+    "title": "Phrygian Assault Thrash Tremolo Picking",
+    "description": "Develop high-speed tremolo picking endurance and precise low-end palm muting using the aggressive, minor-second Phrygian scale structure.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "This exercise builds speed and endurance for your picking hand. It tightens your alternate picking accuracy, locks in palm-mute consistency, and trains your hand to stay completely relaxed during high-intensity metal riffing."
+  },
+  {
+    "id": "down_picking_doom_pulse",
+    "title": "Doom Pulse — Slow Down Picking Control",
+    "description": "Build wrist stamina and heavy, percussive down-picking control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Consistent, heavy down-picking is crucial for genres like metal, rock, and punk. This exercise trains the wrist and forearm muscles to maintain a constant dynamic attack and timing precision at solid tempos, preventing fatigue during long rhythm parts."
+  },
+  {
+    "id": "naked_tone_melody",
+    "title": "Naked Tone — Half Note Melody",
+    "description": "Play slow, long melodies with zero effects to improve fundamental touch.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Effects like delay, reverb, and distortion can hide dynamic inconsistencies and weak fret connection. Playing with a 'naked' clean tone forces you to focus on the exact moment of finger contact, note duration, and articulation."
+  },
+  {
+    "id": "muting_spotlight_drill",
+    "title": "Muting Spotlight — Pick One, Kill the Rest",
+    "description": "Isolate single notes while aggressively muting all adjacent strings under gain.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "High gain amplifies every minor vibration on the guitar. Isolating a single note while resting your picking hand palm on lower strings and fretting index finger on higher strings creates a dead-silent background for your leads."
+  },
+  {
+    "id": "chord_spotlight_drill",
+    "title": "Chord Spotlight — D Major Muting Drill",
+    "description": "Strike a three-string D major triad while selectively muting specific strings with your fretting hand.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise develops independent fretting hand tension control. By holding a full chord shape and selectively releasing pressure on specific fingers, you learn to mute unwanted strings without breaking your structural hand position—an essential skill for clean rhythm playing and funky percussive strumming."
+  },
+  {
+    "id": "vibrato_sustain_drill",
+    "title": "Vibrato Sustain — Hold It for the Whole Bar",
+    "description": "Sustain notes with continuous, even vibrato while executing precise rests to test control over pitch modulation.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Developing clean vibrato requires complete physical control over finger and wrist movement. By introducing intentional rests, this exercise trains you to immediately activate and deactivate the vibrato technique at precise times without resetting your hand placement or drifting in pitch and tempo."
+  },
+  {
+    "id": "vibrato_low_position",
+    "title": "Vibrato — Low Position (Frets 1–5)",
+    "description": "Develop controlled, wide vibrato in the lower frets with high string tension.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Fretting near the nut requires more physical force to modulate the string's pitch. This drill builds the foundational hand strength and wrist mechanics needed to execute clean, wide vibrato on low frets."
+  },
+  {
+    "id": "vibrato_high_position",
+    "title": "Vibrato — High Position (Frets 12–17)",
+    "description": "Adapt your vibrato technique to the narrow frets of the upper register.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "The mechanical leverage of the fingers is lower in the high register. Practicing vibrato above the 12th fret trains you to use precise wrist rotation and forearm push/pull to achieve even, expressive pitch modulation."
+  },
+  {
+    "id": "vibrato_finger_isolation",
+    "title": "Vibrato — One Finger at a Time",
+    "description": "Isolate and develop controlled vibrato for each individual finger.",
+    "difficulty": "hard",
+    "category": "technique",
+    "whyItMatters": "Most guitarists can only vibrate with their index or middle finger. Isolating each finger builds uniform strength and wrist rotation, allowing you to add expression to any note regardless of the fingering."
+  },
+  {
+    "id": "string_skipping_two_notes",
+    "title": "String Skipping — 2 Notes Per String",
+    "description": "Fret two notes per string and skip adjacent strings to develop precise picking hand spatial awareness.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise programs accurate spatial awareness into your picking hand. By jumping over intermediate strings, you train your hand to find strings instantly by feel, vastly improving your control, speed, and accuracy."
+  },
+  {
+    "id": "pentatonic_string_crossing_3",
+    "title": "Pentatonic String Crossing — 3 Strings",
+    "description": "Master the transitions between strings inside the pentatonic box. Focus on minimal pick travel to eliminate speed bottlenecks.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise develops clean alternate picking across string changes. It improves your picking consistency, string transition control, and synchronization between both hands."
+  },
+  {
+    "id": "rhythm_triole",
+    "title": "Triplets Drill",
+    "description": "Play three even notes per beat on a single string to master the feel and timing of triplet subdivisions.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise programs the feel of three-note subdivisions (triplets) directly into your internal rhythm. It develops an even picking pulse, prevents rushing the third note, and establishes the essential hand coordination needed for odd-numbered divisions."
+  },
+  {
+    "id": "pentatonic_box1_up_down",
+    "title": "Pentatonic Box 1 — Up and Down",
+    "description": "Build basic scale navigation, alternate picking, and muscle memory.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Pentatonic Box 1 is the most widely used scale shape in rock, blues, and pop. Developing a highly reliable up-and-down flow through this box is the first step toward fast, fluid improvisation and soloing."
+  },
+  {
+    "id": "strumming_basic",
+    "title": "Basic Down Strumming",
+    "description": "Execute steady downward strumming strokes on every beat to build fundamental rhythm and timing control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise establishes the basic pendulum arm movement necessary for all rhythm guitar playing. Strumming steady downbeats locks your internal timing with the metronome, trains your wrist to remain relaxed, and ensures even string contact across the entire chord shape."
+  },
+  {
+    "id": "strumming_down_up",
+    "title": "Down-Up Strumming",
+    "description": "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly."
+  },
+  {
+    "id": "strumming_rock",
+    "title": "Rock Strumming Patterns",
+    "description": "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence."
+  },
+  {
+    "id": "strumming_funk",
+    "title": "Funk Rhythm Guitar",
+    "description": "Master 16th-note scratching, clean accents, and tight left-hand muting.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Funk rhythm relies heavily on percussive 'scratching' and precise accents. This exercise trains your fretting hand to squeeze the neck only on accented notes and relax to mute the strings on others, building elite hand sync."
+  },
+  {
+    "id": "strumming_pattern_2",
+    "title": "Strumming Pattern 2 — Quarter Downs + Final Up",
+    "description": "Execute four steady downstrokes with a single upstroke on the final subdivision.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This pattern introduces basic subdivision control, allowing you to insert an upstroke without disrupting the primary downbeat pulse."
+  },
+  {
+    "id": "strumming_pattern_3",
+    "title": "Strumming Pattern 3 — All Eighth Notes",
+    "description": "Execute continuous alternate strumming on every 8th-note subdivision.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This pattern establishes the core mechanics of alternate strumming, ensuring equal weight and timing between downstrokes and upstrokes."
+  },
+  {
+    "id": "strumming_pattern_4",
+    "title": "Strumming Pattern 4 — Down-Skip-Down-Up",
+    "description": "Perform an alternating pattern with a missed upstroke on the first subdivision.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This introduces syncopation by omitting a subdivision, training your arm to maintain the pendulum motion even when skipping the strings."
+  },
+  {
+    "id": "strumming_pattern_5",
+    "title": "Strumming Pattern 5 — Down-Up Skip",
+    "description": "Perform a pattern that omits the upstrokes before beats 2 and 4.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Omitting specific upstrokes develops selective targeting, allowing you to create breathing room within a rhythm without losing momentum."
+  },
+  {
+    "id": "strumming_pattern_6",
+    "title": "Strumming Pattern 6 — Syncopated Upstroke",
+    "description": "Execute a syncopated pattern featuring two consecutive sounding upstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Consecutive upstrokes force you to rely entirely on the internal pendulum pulse, developing advanced syncopation and timing independence."
+  },
+  {
+    "id": "strumming_pattern_7",
+    "title": "Strumming Pattern 7 — Inside Upstrokes",
+    "description": "Perform a pattern centered around upstrokes on the subdivisions.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "By isolating the upstrokes, this exercise balances your strumming attack and ensures your upward motions are as authoritative as your downward motions."
+  },
+  {
+    "id": "strumming_pattern_8",
+    "title": "Strumming Pattern 8 — Two Downs then Down-Up",
+    "description": "Combine quarter-note and eighth-note feels within a single measure.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Mixing rhythmic densities trains your hand to transition smoothly between sparse and busy strumming without altering your core tempo."
+  },
+  {
+    "id": "strumming_pattern_9",
+    "title": "Strumming Pattern 9 — Skip First &",
+    "description": "Execute an eighth-note run that omits only the first upstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This pattern builds stamina and consistency in continuous eighth-note strumming, using a single rest to reset the phrasing loop."
+  },
+  {
+    "id": "strumming_pattern_10",
+    "title": "Strumming Pattern 10 — Syncopated Upstroke Run",
+    "description": "Execute a highly syncopated pattern dominated by consecutive upstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Extended runs of upstrokes test your timing accuracy and arm control, ensuring your silent downswings remain perfectly anchored to the beat."
+  },
+  {
+    "id": "strumming_pattern_11",
+    "title": "Strumming Pattern 11 — Syncopated Mid-Bar Down",
+    "description": "Perform a syncopated pattern that interrupts an upstroke run with a mid-measure downstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Inserting a surprise downstroke into a syncopated run trains rapid motor switching and breaks predictability in your rhythm playing."
+  },
+  {
+    "id": "strumming_pattern_12",
+    "title": "Strumming Pattern 12 — Starts on Upstroke",
+    "description": "Begin a strumming sequence on the first subdivision upstroke rather than the downbeat.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Starting on an upbeat forces you to internalize the downbeat silently, dramatically improving your internal pulse and metronome alignment."
+  },
+  {
+    "id": "strumming_pattern_13",
+    "title": "Strumming Pattern 13 — Soft Landing",
+    "description": "Perform a steady downstroke sequence featuring a single isolated upstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This exercise isolates the upstroke motion within a downstroke-heavy context, refining your dynamic control and subtle accenting."
+  },
+  {
+    "id": "strumming_pattern_14",
+    "title": "Strumming Pattern 14 — All Upstrokes",
+    "description": "Execute a pattern composed entirely of upstrokes on the subdivisions.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Isolating upstrokes builds tone consistency and precise pick depth control, as upward strums are naturally weaker and require focused mechanics."
+  },
+  {
+    "id": "strumming_pattern_15",
+    "title": "Strumming Pattern 15 — Upstrokes + One Down",
+    "description": "Perform an upstroke-heavy pattern punctuated by a single downstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This inversion of standard strumming conventions sharpens your coordination and forces you to treat upstrokes as the primary rhythmic driver."
+  },
+  {
+    "id": "strumming_pattern_16",
+    "title": "Strumming Pattern 16 — Double Down-Up",
+    "description": "Execute two alternating pairs embedded within syncopated upstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Navigating dense alternating pairs surrounded by silence and syncopation challenges your rhythmic stability and strict pendulum mechanics."
+  },
+  {
+    "id": "strumming_pattern_18",
+    "title": "Strumming Pattern 18 — Half-Time Feel",
+    "description": "Perform a sparse pattern with downstrokes on beats 1 and 3.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Sparse patterns require intense internal counting to prevent rushing. This exercise builds patience and sustained tempo control."
+  },
+  {
+    "id": "strumming_pattern_19",
+    "title": "Strumming Pattern 19 — Down-Up on Beat 1",
+    "description": "Begin with an alternating pair followed by strict downstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Transitioning immediately from subdivisions to quarter notes stabilizes your tempo and prevents rushing after busy rhythmic figures."
+  },
+  {
+    "id": "strumming_pattern_20",
+    "title": "Strumming Pattern 20 — Mixed Syncopation",
+    "description": "Perform a flowing pattern that mixes alternating pairs with isolated downstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This develops rhythmic vocabulary by combining common structural building blocks into a cohesive, musical phrase."
+  },
+  {
+    "id": "strumming_pattern_21",
+    "title": "Strumming Pattern 21 — Upstroke Ending",
+    "description": "Execute a sparse opening leading into a dense, syncopated ending.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Managing long silences followed by rapid subdivisions builds dynamic pacing and prevents tempo drag during rests."
+  },
+  {
+    "id": "strumming_pattern_22",
+    "title": "Strumming Pattern 22 — Mid-Bar Upstroke",
+    "description": "Perform a pattern featuring an alternating pair displaced to the middle of the measure.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Displacing standard rhythmic figures to unexpected beats trains your concentration and disrupts automatic muscle memory patterns."
+  },
+  {
+    "id": "strumming_pattern_23",
+    "title": "Strumming Pattern 23 — Full 1-2, Quarter 3-4",
+    "description": "Contrast dense eighth notes in the first half with sparse quarter notes in the second.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This structural contrast requires you to rapidly shift rhythmic gears without losing the underlying quarter-note pulse."
+  },
+  {
+    "id": "strumming_pattern_24",
+    "title": "Strumming Pattern 24 — Opens on Upstroke",
+    "description": "Begin on the first subdivision upstroke followed by steady quarter-note downstrokes.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Starting off-beat before settling into a strong downbeat groove trains recovery mechanics and subdivision awareness."
+  },
+  {
+    "id": "strumming_pattern_25",
+    "title": "Strumming Pattern 25 — Late Upstroke",
+    "description": "Execute alternating pairs with a syncopated, delayed final upstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Delayed accents build tension and release in your rhythm playing, requiring strict adherence to the silent pendulum swings."
+  },
+  {
+    "id": "strumming_pattern_26",
+    "title": "Strumming Pattern 26 — Two Down-Up Groups",
+    "description": "Perform two isolated alternating pairs separated by rests.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Isolating short rhythmic bursts trains explosive control and immediate muting awareness between active strumming phrases."
+  },
+  {
+    "id": "strumming_pattern_27",
+    "title": "Strumming Pattern 27 — Upstroke Lead-In",
+    "description": "Begin with an upstroke leading directly into a continuous eighth-note run.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Entering a busy pattern on an upstroke requires excellent pick depth control to prevent the pick from digging in and disrupting the flow."
+  },
+  {
+    "id": "strumming_pattern_28",
+    "title": "Strumming Pattern 28 — Upstroke into Downs",
+    "description": "Perform an upstroke entry followed by quarter notes and an alternating finish.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This pattern demands precise switching between off-beats, on-beats, and continuous subdivisions, challenging overall rhythmic agility."
+  },
+  {
+    "id": "strumming_pattern_29",
+    "title": "Strumming Pattern 29 — Skip the & of 3",
+    "description": "Execute continuous subdivisions with a single omission on the upstroke of beat 3.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Omitting a single subdivision within a continuous flow develops selective string avoidance and subtle syncopation mechanics."
+  },
+  {
+    "id": "strumming_pattern_30",
+    "title": "Strumming Pattern 30 — Opens Slow, Ends Fast",
+    "description": "Transition from sparse quarter notes to a dense, syncopated ending phrase.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Accelerating the rhythmic density builds momentum and phrasing awareness, essential for creating dynamic rhythm guitar parts."
+  },
+  {
+    "id": "strumming_pattern_31",
+    "title": "Strumming Pattern 31 — All Eighths, Skip Last",
+    "description": "Perform continuous eighth notes, omitting only the final upstroke.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "Dropping the final subdivision creates a brief resting window, useful for executing complex chord transitions on the subsequent downbeat."
+  },
+  {
+    "id": "strumming_pattern_32",
+    "title": "Strumming Pattern 32 — Double Upstroke Gaps",
+    "description": "Execute isolated up-down pairs positioned exclusively on subdivisions.",
+    "difficulty": "easy",
+    "category": "technique",
+    "whyItMatters": "This highly syncopated pattern entirely avoids the strong downbeats, forcing complete reliance on internal timing and subdivision accuracy."
+  }
+]

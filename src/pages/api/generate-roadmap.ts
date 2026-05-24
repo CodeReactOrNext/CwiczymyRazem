@@ -59,11 +59,12 @@ OUTPUT — return ONLY valid JSON:
 }
 
 REQUIREMENTS:
-- 4–6 phases covering 3–6 months of learning
-- 4–6 steps per phase, 15–30 steps total
+- 6–8 phases covering 6–12 months of learning
+- 6–9 steps per phase, 40–60 steps total
 - Phases build logically: physical techniques before music theory, single-string skills before chord-based skills
 - Phase titles: concise top-level themes
-- Step titles: concept names only — no exercise numbers, no BPM`;
+- Step titles: concept names only — no exercise numbers, no BPM
+- Do NOT pad with generic filler steps — every step must be a distinct, meaningful skill the student needs to practice`;
 
 const buildUserPrompt = (goal: string, level: string) =>
   `Goal: "${goal}"

@@ -176,7 +176,7 @@ export const PracticeModeSelector = () => {
               <h2 className="text-lg font-bold text-indigo-400 mb-4">Practice</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {hasLastSession && heroListItem("resume", History, "Resume Last", "Continue playing where you left off", "/timer/practice", "indigo")}
-                {heroListItem("routine",  ListChecks,    "Daily Routine", "Follow your personalized daily guided routine",   "/timer/plans",   "indigo")}
+                {heroListItem("routine",  ListChecks,    "Daily Routine", "Follow daily guided routine",   "/timer/plans",   "indigo")}
                 {heroListItem("song",      PiCassetteTapeLight,    "Songs",      "Track practice time for your repertoire", "/timer/song-select",  "indigo")}
                 {heroListItem("log",     ClipboardList, "Log Practice", "Manually log a custom practice session",  "/report",         "indigo")}
               </div>
@@ -186,7 +186,7 @@ export const PracticeModeSelector = () => {
               <h2 className="text-lg font-bold text-rose-400 mb-4">Learn</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("journey",  Route,      "Learning Path", "Step-by-step progress",   "/journey",       "rose")}
-                {listItem("roadmap", Map, "Roadmaps", "AI-powered learning paths", "/ai-coach", "rose", !isMaster, "Master")}
+                {listItem("roadmap", Map, "Roadmaps", "Structured learning paths", "/ai-coach", "rose", !isMaster, "Master")}
                 {listItem("scales", PiTreeView, "Scale Map", "Interactive scale fretboard tree", "/scale-tree", "rose")}
               </div>
             </div>
