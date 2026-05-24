@@ -1,9 +1,10 @@
+import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { motion } from "framer-motion";
 import { ChevronRight,
-Drum,   Guitar, Mic2,
+Drum,   Guitar, Lightbulb, Mic2,
 Music2, } from "lucide-react";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import type { JourneyModuleWithStatus, LockedModulePlaceholder } from "../../types/journey.types";
 
@@ -135,6 +136,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
   placeholders,
   onSelectModule,
 }) => {
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const cfg = MODULE_CFG[activeModule.id] ?? MODULE_CFG.fundamentals;
 
   const pct       = activeModule.totalCount > 0
@@ -322,7 +324,21 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
             </div>
           )}
 
+          {/* ─── Suggest a path ─── */}
+          <button
+            onClick={() => setSuggestOpen(true)}
+            className="mt-2 flex w-full items-center gap-4 rounded-2xl bg-zinc-900/40 px-5 py-4 text-left transition hover:bg-zinc-900/70"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-800">
+              <Lightbulb className="h-4 w-4 text-zinc-400" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-300">Suggest a learning path</p>
+              <p className="text-xs text-zinc-600">Missing a topic? Let us know what you'd like to see next.</p>
+            </div>
+          </button>
 
+          <FeedbackModal isOpen={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
         </div>
       </div>
