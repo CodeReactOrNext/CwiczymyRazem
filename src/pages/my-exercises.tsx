@@ -1,13 +1,16 @@
 import { cn } from "assets/lib/utils";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
+import { deleteCommunityExercise, getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { Music2, Plus, Star } from "lucide-react";
+import { ChevronLeft, Globe, Lock, Music2, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
@@ -25,11 +28,43 @@ const CATEGORY_COLORS: Record<string, string> = {
   mixed: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
 };
 
+const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
+  id: ex.id,
+  title: ex.title,
+  description: ex.description,
+  category: ex.category as any,
+  requiredSkillId: ex.relatedSkills[0] || "general",
+  requiredLevel: ex.difficulty === "easy" ? 0 : ex.difficulty === "medium" ? 1 : 2,
+  rewardDescription: "Practice complete",
+  exercises: [{
+    id: ex.id,
+    title: ex.title,
+    description: ex.description,
+    difficulty: ex.difficulty,
+    category: ex.category,
+    timeInMinutes: ex.timeInMinutes,
+    instructions: ex.instructions,
+    tips: ex.tips,
+    metronomeSpeed: ex.metronomeSpeed,
+    relatedSkills: ex.relatedSkills,
+    tablature: ex.tablature,
+  }],
+  unlockDescription: "",
+  streakDays: 0,
+  intensity: "medium",
+  shortGoal: "",
+  accentColor: "#ffffff",
+  difficulty: ex.difficulty,
+  tablature: ex.tablature,
+});
+
 const MyExercisesPage: NextPageWithLayout = () => {
   const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const [exercises, setExercises] = useState<CommunityExercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeExercise, setActiveExercise] = useState<DashboardExercise | null>(null);
 
   useEffect(() => {
     if (!userAuth) return;
@@ -42,6 +77,42 @@ const MyExercisesPage: NextPageWithLayout = () => {
   const handleCreate = () => {
     router.push("/tab-editor");
   };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    const ok = await deleteCommunityExercise(id);
+    if (ok) {
+      setExercises(prev => prev.filter(e => e.id !== id));
+      toast.success("Exercise deleted.");
+    } else {
+      toast.error("Failed to delete. Try again.");
+    }
+    setDeletingId(null);
+  };
+
+  if (activeExercise) {
+    return (
+      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+        <div className="px-4 pt-6 pb-2">
+          <button
+            onClick={() => setActiveExercise(null)}
+            className="flex items-center gap-1.5 text-zinc-500 hover:text-white text-sm font-semibold transition-colors"
+          >
+            <ChevronLeft size={16} />
+            Back to My Exercises
+          </button>
+        </div>
+        <div className="flex-1 overflow-hidden rounded-2xl mx-4 mb-4 border border-zinc-900 shadow-2xl">
+          <PracticeSession
+            plan={activeExercise as any}
+            onFinish={() => setActiveExercise(null)}
+            onClose={() => setActiveExercise(null)}
+            forceFullDuration={true}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
@@ -89,7 +160,20 @@ const MyExercisesPage: NextPageWithLayout = () => {
               >
                 {/* Title + meta */}
                 <div className="flex-1 min-w-0 space-y-1.5">
-                  <p className="font-semibold text-white truncate">{ex.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-white truncate">{ex.title}</p>
+                    {ex.isPublic ? (
+                      <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                        <Globe size={9} />
+                        Public
+                      </span>
+                    ) : (
+                      <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
+                        <Lock size={9} />
+                        Private
+                      </span>
+                    )}
+                  </div>
                   {ex.description && (
                     <p className="text-xs text-zinc-500 truncate">{ex.description}</p>
                   )}
@@ -110,7 +194,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
                 {/* Rating */}
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  {ex.ratingCount > 0 ? (
+                  {ex.isPublic && ex.ratingCount > 0 ? (
                     <>
                       <div className="flex items-center gap-1">
                         <Star size={12} className="text-amber-400" fill="currentColor" />
@@ -118,17 +202,38 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       </div>
                       <span className="text-[10px] text-zinc-600">{ex.ratingCount} rating{ex.ratingCount !== 1 ? "s" : ""}</span>
                     </>
-                  ) : (
+                  ) : ex.isPublic ? (
                     <span className="text-[10px] text-zinc-700">No ratings yet</span>
-                  )}
+                  ) : null}
                 </div>
 
-                {/* View in community */}
+                {/* Play */}
                 <button
-                  onClick={() => router.push("/profile/skills?tab=community")}
-                  className="shrink-0 px-3 py-1.5 rounded border border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 text-xs font-semibold transition-all"
+                  onClick={() => setActiveExercise(buildChallenge(ex))}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-700 bg-zinc-800/40 text-zinc-300 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 text-xs font-semibold transition-all"
                 >
-                  View
+                  <Play size={12} fill="currentColor" />
+                  Practice
+                </button>
+
+                {/* View in community — only for public */}
+                {ex.isPublic && (
+                  <button
+                    onClick={() => router.push("/profile/skills?tab=community")}
+                    className="shrink-0 px-3 py-1.5 rounded border border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 text-xs font-semibold transition-all"
+                  >
+                    View
+                  </button>
+                )}
+
+                {/* Delete */}
+                <button
+                  onClick={() => handleDelete(ex.id)}
+                  disabled={deletingId === ex.id}
+                  className="shrink-0 p-2 rounded border border-zinc-800 bg-zinc-900/40 text-zinc-600 hover:text-rose-400 hover:border-rose-500/40 hover:bg-rose-500/5 disabled:opacity-40 transition-all"
+                  title="Delete exercise"
+                >
+                  <Trash2 size={14} />
                 </button>
               </div>
             ))}

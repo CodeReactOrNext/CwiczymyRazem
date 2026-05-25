@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 export interface PlanDetailsFormData {
   title: string;
   description: string;
+  isPublic: boolean;
 }
 
 interface UsePlanDetailsFormProps {
@@ -28,10 +29,11 @@ export const usePlanDetailsForm = ({
     return typeof val === "string" ? val : (val.pl || val.en || "");
   };
 
-  const { register, handleSubmit, formState } = useForm<PlanDetailsFormData>({
+  const { register, handleSubmit, formState, control } = useForm<PlanDetailsFormData>({
     defaultValues: {
       title: getInitialValue(initialData?.title),
       description: getInitialValue(initialData?.description),
+      isPublic: initialData?.isPublic ?? false,
     }
   });
 
@@ -39,6 +41,7 @@ export const usePlanDetailsForm = ({
     onSubmit({
       title: data.title,
       description: data.description,
+      isPublic: data.isPublic,
       image: initialData?.image ?? null,
       createdAt: initialData?.createdAt ?? new Date(),
       updatedAt: new Date(),
@@ -52,6 +55,7 @@ export const usePlanDetailsForm = ({
   return {
     register,
     formState,
+    control,
     handleSubmit: handleSubmit(handleFormSubmit),
   };
 }; 

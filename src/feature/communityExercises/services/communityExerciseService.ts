@@ -2,6 +2,7 @@ import { logger } from "feature/logger/Logger";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -41,7 +42,11 @@ export const createCommunityExercise = async (
 
 export const getCommunityExercises = async (): Promise<CommunityExercise[]> => {
   try {
-    const q = query(collection(db, COLLECTION), orderBy("averageRating", "desc"));
+    const q = query(
+      collection(db, COLLECTION),
+      where("isPublic", "==", true),
+      orderBy("averageRating", "desc")
+    );
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() } as CommunityExercise));
   } catch (error) {
@@ -62,6 +67,16 @@ export const getUserCommunityExercises = async (userId: string): Promise<Communi
   } catch (error) {
     logger.error(error, { context: "getUserCommunityExercises" });
     return [];
+  }
+};
+
+export const deleteCommunityExercise = async (exerciseId: string): Promise<boolean> => {
+  try {
+    await deleteDoc(doc(db, COLLECTION, exerciseId));
+    return true;
+  } catch (error) {
+    logger.error(error, { context: "deleteCommunityExercise" });
+    return false;
   }
 };
 

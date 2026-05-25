@@ -101,7 +101,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const handleCreatePlan = async (
     title: string,
     description: string,
-    exercises: Exercise[]
+    exercises: Exercise[],
+    isPublic: boolean
   ): Promise<void> => {
     try {
       if (!userAuth) {
@@ -115,6 +116,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       const formattedPlanData = {
         title,
         description,
+        isPublic,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,
