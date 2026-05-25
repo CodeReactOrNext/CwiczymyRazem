@@ -19,6 +19,7 @@ export interface CommunityExercise {
   createdAt: Timestamp;
   averageRating: number;
   ratingCount: number;
+  isPublic: boolean;
 }
 
 export interface CommunityExerciseRating {
@@ -37,4 +38,5 @@ export interface CreateCommunityExerciseInput {
   instructions: string[];
   tips: string[];
   tablature: TablatureMeasure[];
+  isPublic: boolean;
 }

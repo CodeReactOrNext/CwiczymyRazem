@@ -23,7 +23,8 @@ const CreatePlanPage: NextPageWithLayout = () => {
   const handleCreatePlan = async (
     title: string,
     description: string,
-    exercises: Exercise[]
+    exercises: Exercise[],
+    isPublic: boolean
   ): Promise<void> => {
     try {
       if (!userAuth) return;
@@ -31,6 +32,7 @@ const CreatePlanPage: NextPageWithLayout = () => {
       await createExercisePlan(userAuth, {
         title,
         description,
+        isPublic,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,

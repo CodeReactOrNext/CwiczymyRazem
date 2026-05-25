@@ -7,7 +7,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { AlertCircle, ArrowLeft, Check, ChevronDown, Plus, Trash2, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Check, ChevronDown, Globe, Lock, Plus, Trash2, X } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
@@ -46,7 +46,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const [bpmRecommended, setBpmRecommended] = useState(80);
   const [instructions, setInstructions] = useState<string[]>([""]);
   const [tips, setTips] = useState<string[]>([""]);
-  const [agreedToPublic, setAgreedToPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -67,7 +67,6 @@ const PublishExercisePage: NextPageWithLayout = () => {
     if (instructions.filter(i => i.trim()).length === 0) newErrors.instructions = "At least one instruction is required.";
     if (bpmMin < 20 || bpmMax > 300 || bpmMin >= bpmMax) newErrors.bpm = "BPM range is invalid. Min must be lower than Max.";
     if (bpmRecommended < bpmMin || bpmRecommended > bpmMax) newErrors.bpm = "Recommended BPM must be between Min and Max.";
-    if (!agreedToPublic) newErrors.consent = "You must agree to publish publicly.";
     if (tablature.length === 0) newErrors.tablature = "No tablature data found. Go back to the Tab Editor and click Publish from there.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,6 +92,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
       instructions: instructions.filter(i => i.trim()),
       tips: tips.filter(t => t.trim()),
       tablature,
+      isPublic,
     };
 
     const id = await createCommunityExercise(
@@ -136,21 +136,35 @@ const PublishExercisePage: NextPageWithLayout = () => {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center p-8">
         <div className="max-w-md w-full text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-lg flex items-center justify-center mx-auto">
-            <Check className="text-emerald-400" size={32} />
+          <div className={cn(
+            "w-16 h-16 rounded-lg flex items-center justify-center mx-auto border",
+            isPublic
+              ? "bg-emerald-500/20 border-emerald-500/30"
+              : "bg-cyan-500/20 border-cyan-500/30"
+          )}>
+            {isPublic ? <Check className="text-emerald-400" size={32} /> : <Lock className="text-cyan-400" size={32} />}
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-white tracking-tight">Exercise Published!</h2>
+            <h2 className="text-2xl font-black text-white tracking-tight">
+              {isPublic ? "Exercise Published!" : "Exercise Saved Privately!"}
+            </h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Your exercise is now live in the Community library. Other users can discover, practice, and rate it.
+              {isPublic
+                ? "Your exercise is now live in the Community library. Other users can discover, practice, and rate it."
+                : "Your exercise is saved privately. Only you can see and practice it. You can make it public at any time."}
             </p>
           </div>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => router.push("/profile/skills?tab=community")}
-              className="px-5 py-2.5 bg-emerald-500 text-black text-sm font-bold rounded-lg hover:bg-emerald-400 transition-all"
+              className={cn(
+                "px-5 py-2.5 text-sm font-bold rounded-lg transition-all",
+                isPublic
+                  ? "bg-emerald-500 text-black hover:bg-emerald-400"
+                  : "bg-cyan-500 text-black hover:bg-cyan-400"
+              )}
             >
-              View in Library
+              {isPublic ? "View in Library" : "View My Exercises"}
             </button>
             <button
               onClick={() => router.push("/tab-editor")}
@@ -426,29 +440,56 @@ const PublishExercisePage: NextPageWithLayout = () => {
             </button>
           </div>
 
-          {/* Public consent */}
-          <div className={cn(
-            "border rounded-lg p-5 space-y-3",
-            errors.consent ? "border-rose-500/40 bg-rose-500/5" : "border-zinc-800 bg-zinc-900/40"
-          )}>
-            <h3 className="text-sm font-bold text-white">Publishing Agreement</h3>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              By publishing this exercise, you agree that it will be <strong className="text-white">publicly visible</strong> to all users under your username <strong className="text-cyan-400">{userInfo?.displayName || "your account"}</strong>.
-              The community may rate and comment on your exercise. Moderators may edit or remove exercises that violate community guidelines.
-              You retain credit for your contribution.
-            </p>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreedToPublic}
-                onChange={e => setAgreedToPublic(e.target.checked)}
-                className="mt-0.5 w-4 h-4 accent-cyan-500"
-              />
-              <span className="text-sm text-zinc-300">
-                I understand and agree to publish this exercise publicly.
-              </span>
-            </label>
-            {errors.consent && <p className="text-xs text-rose-400">{errors.consent}</p>}
+          {/* Visibility picker */}
+          <div className="space-y-3">
+            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Visibility</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setIsPublic(true)}
+                className={cn(
+                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
+                  isPublic
+                    ? "border-emerald-500/50 bg-emerald-500/10"
+                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Globe size={16} className={isPublic ? "text-emerald-400" : "text-zinc-500"} />
+                  <span className={cn("text-sm font-bold", isPublic ? "text-white" : "text-zinc-400")}>Public</span>
+                  {isPublic && <Check size={12} className="text-emerald-400 ml-auto" />}
+                </div>
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Visible to all users in the Community library. Others can practice and rate it.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPublic(false)}
+                className={cn(
+                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
+                  !isPublic
+                    ? "border-cyan-500/50 bg-cyan-500/10"
+                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Lock size={16} className={!isPublic ? "text-cyan-400" : "text-zinc-500"} />
+                  <span className={cn("text-sm font-bold", !isPublic ? "text-white" : "text-zinc-400")}>Private</span>
+                  {!isPublic && <Check size={12} className="text-cyan-400 ml-auto" />}
+                </div>
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Only visible to you. Saved to your personal library. You can make it public later.
+                </p>
+              </button>
+            </div>
+            {isPublic && (
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                By publishing publicly, you agree that this exercise will be visible to all users under your username{" "}
+                <span className="text-cyan-400 font-semibold">{userInfo?.displayName || "your account"}</span>.
+                The community may rate it. Moderators may remove exercises that violate community guidelines.
+              </p>
+            )}
           </div>
 
           {/* Auth error */}
@@ -477,9 +518,14 @@ const PublishExercisePage: NextPageWithLayout = () => {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-black text-sm font-bold rounded-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+              className={cn(
+                "flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed text-black text-sm font-bold rounded-lg transition-all",
+                isPublic
+                  ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                  : "bg-cyan-500 hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+              )}
             >
-              {isSubmitting ? "Publishing…" : "Publish Exercise"}
+              {isSubmitting ? (isPublic ? "Publishing…" : "Saving…") : (isPublic ? "Publish Exercise" : "Save Privately")}
             </button>
           </div>
         </div>

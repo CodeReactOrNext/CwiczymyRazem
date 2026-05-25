@@ -49,8 +49,9 @@ service cloud.firestore {
 
     // ─── Community exercises ──────────────────────────────────────────────────
     match /communityExercises/{exerciseId} {
-      // Anyone logged in can read
-      allow read: if request.auth != null;
+      // Public exercises are readable by anyone logged in; private only by their author
+      allow read: if request.auth != null
+        && (resource.data.isPublic == true || resource.data.authorId == request.auth.uid);
 
       // Only the author can create; authorId must match uid
       allow create: if request.auth != null

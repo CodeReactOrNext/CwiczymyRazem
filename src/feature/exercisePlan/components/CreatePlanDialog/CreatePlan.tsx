@@ -17,7 +17,8 @@ interface CreatePlanProps {
   onSubmit: (
     title: string | LocalizedContent,
     description: string | LocalizedContent,
-    exercises: Exercise[]
+    exercises: Exercise[],
+    isPublic: boolean
   ) => Promise<void>;
   onUpdate?: (plan: ExercisePlan) => Promise<void>;
 }
@@ -32,7 +33,7 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
     if (initialPlan && onUpdate) {
         onUpdate({ ...planData, id: initialPlan.id } as ExercisePlan);
     } else {
-        onSubmit(planData.title, planData.description, selectedExercises);
+        onSubmit(planData.title, planData.description, selectedExercises, planData.isPublic ?? false);
     }
   };
 
