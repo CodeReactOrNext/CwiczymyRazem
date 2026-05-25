@@ -78,6 +78,7 @@ export const CreateCustomExerciseDialog = ({
   const [gpBackingTracks, setGpBackingTracks] = useState<BackingTrack[] | null>(null);
   const [gpFileName, setGpFileName] = useState<string | null>(null);
   const [gpRawFile, setGpRawFile] = useState<File | null>(null);
+  const [gpFileCleared, setGpFileCleared] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   // Effect to reset/initialize when open status changes
@@ -103,12 +104,19 @@ export const CreateCustomExerciseDialog = ({
           setUseMetronome(false);
         }
 
+        setGpFileCleared(false);
         if (initialData.gpFileUrl) {
           setGpFileName("(uploaded GP file)");
+          setGpTablature(null);
+          setGpBackingTracks(null);
         } else if (initialData.tablature && initialData.tablature.length > 0) {
           setGpTablature(initialData.tablature);
           setGpBackingTracks(initialData.backingTracks ?? null);
           setGpFileName("(existing GP data)");
+        } else {
+          setGpFileName(null);
+          setGpTablature(null);
+          setGpBackingTracks(null);
         }
       } else if (mode === "create") {
           resetForm();
@@ -148,6 +156,7 @@ export const CreateCustomExerciseDialog = ({
     setGpBackingTracks(null);
     setGpFileName(null);
     setGpRawFile(null);
+    setGpFileCleared(true);
   };
 
   const handleAddInstruction = () => {
@@ -180,8 +189,19 @@ export const CreateCustomExerciseDialog = ({
         return;
     }
 
+    const finalInstructions = currentInstruction.trim()
+      ? [...instructions, currentInstruction.trim()]
+      : instructions;
+    const finalTips = currentTip.trim()
+      ? [...tips, currentTip.trim()]
+      : tips;
+
     let gpFileUrl: string | undefined;
-    if (gpRawFile && userId) {
+    if (gpRawFile) {
+      if (!userId) {
+        toast.error("You must be logged in to upload a GP file");
+        return;
+      }
       setIsUploading(true);
       try {
         const uploaded = await uploadUserGpFile(userId, gpRawFile);
@@ -194,8 +214,8 @@ export const CreateCustomExerciseDialog = ({
       setIsUploading(false);
     }
 
-    // Preserve existing gpFileUrl in edit mode when no new file was uploaded
-    const effectiveGpFileUrl = gpFileUrl ?? (mode === "edit" ? initialData?.gpFileUrl : undefined);
+    // Preserve existing gpFileUrl in edit mode when no new file was uploaded (unless user explicitly cleared it)
+    const effectiveGpFileUrl = gpFileUrl ?? (mode === "edit" && !gpFileCleared ? initialData?.gpFileUrl : undefined);
     const hasGpFile = !!effectiveGpFileUrl;
 
     const newExercise: Exercise = {
@@ -205,8 +225,8 @@ export const CreateCustomExerciseDialog = ({
       difficulty,
       category,
       timeInMinutes: parseInt(duration) || 5,
-      instructions: instructions,
-      tips: tips,
+      instructions: finalInstructions,
+      tips: finalTips,
       metronomeSpeed: useMetronome ? {
         min: parseInt(minBpm) || 60,
         max: parseInt(maxBpm) || 180,
@@ -256,6 +276,7 @@ export const CreateCustomExerciseDialog = ({
       setGpBackingTracks(null);
       setGpFileName(null);
       setGpRawFile(null);
+      setGpFileCleared(false);
   };
 
   return (
