@@ -1,0 +1,632 @@
+{
+  "id": "46f35fb5-be6a-494e-970c-78227135660d",
+  "title": "I want to play in the style of Marty Friedman",
+  "goal": "I want to play in the style of Marty Friedman",
+  "level": "Advanced",
+  "image": "/images/roadmap/friedman.png",
+  "phases": [
+    {
+      "id": "62fdd3ff-b781-4b3b-8644-5765c3351ebb",
+      "title": "Advanced Right-hand Control",
+      "order": 0,
+      "steps": [
+        {
+          "id": "e5ea092c-25d6-401f-8292-ee20e17efd93",
+          "title": "Alternate picking precision",
+          "description": "Alternate picking precision is the disciplined down-up picking that produces even tone, consistent attack, and clean articulation across both tight scalar lines and wide intervallic leaps. Aim for a compact, wrist-led motion with a slight pick angle so each stroke slices the string cleanly while minimizing wasted travel; let forearm involvement be brief and purposeful for larger shifts. Develop it with focused drills that force strict alternation through clean string crossings and interval changes, pausing to correct any uneven accents or inconsistent contact before gradually increasing fluidity.",
+          "successCriteria": "Strokes are evenly balanced so consecutive notes match in volume and tone, up- and down-strokes sound identical in attack, string crossings and interval skips remain clear and free of unintended accents, and you can raise speed while preserving the same articulation and minimal hand motion.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "alternate_picking_cross_string",
+          "suggestedLessonIds": [
+            "6kZJm6k1b0g",
+            "VQjsYPIXI2Q",
+            "1nVE0mx_7WE",
+            "vhHpWANKqGg",
+            "UyftYGc4mxY"
+          ]
+        },
+        {
+          "id": "53311260-4664-49a0-94ed-abd580ab0527",
+          "title": "String-skipping accuracy",
+          "description": "[What it is]\nString-skipping accuracy is the ability to pick and articulate notes on non-adjacent strings so each intended note rings clearly while unwanted strings stay silent. It requires precise pick trajectory, targeted attack, and coordinated left-hand damping so wide leaps sound deliberate rather than sloppy. At an advanced level it also means integrating those leaps into melodic lines and arpeggios without losing tone or timing.\n\n[Why it matters]\nClean string skips preserve the intervallic shape and expressive tension in lines characteristic of Marty Friedman–style playing, where wide leaps and unconventional voice-leading are common. Accurate skips let you control dynamics and timbral contrast on each note, making phrases sound intentional instead of noisy or muddy. When skips are reliable, you can focus on expression and phrasing rather than constant cleanup.\n\n[How to practice]\nIsolate target-string drills: mute surrounding strings and practice landing on a single intended string from various starting points, start slow and increase gradually while minimizing extraneous motion. Emphasize small wrist pivots and lateral pick motion, coordinate light left-hand damping, and use ghost notes to reveal leakage; reduce arm movement until the motion is efficient. Then embed those skips into short musical phrases and arpeggio shapes so accuracy becomes automatic within real musical contexts.",
+          "successCriteria": "Skips land cleanly with no audible sympathetic ringing or buzz; each target note has consistent tone and dynamic control. Wide-interval leaps preserve the intended melodic shape and sit naturally inside phrases. You can execute string-skipping passages reliably under expressive playing without extra audible cleanup.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "muting_spotlight_drill"
+        },
+        {
+          "id": "4ede00f9-70c9-4b5a-b503-147ce200c801",
+          "title": "Cross-string articulation",
+          "description": "[What it is]\nCross-string articulation is the deliberate shaping of attack, sustain, decay and accent when a melodic line moves from one string to another. It’s about making those crossings sound intentional and musical so the line reads as a continuous phrase instead of disconnected notes.\n\n[Why it matters]\nConsistent articulation across strings preserves tone and phrasing when you use wide intervals, arpeggiated passages, or scalar runs; it’s what turns technical passages into expressive statements. Controlling how each note speaks at a string boundary lets you place accents, control tension, and maintain a unified tonal color through varied timbres.\n\n[How to practice]\nWork with short cross-string fragments and alter only one articulation variable at a time—accent placement, note length, or dynamic—listening for a smooth, consistent result; record and compare takes to hear subtle differences. Practice combining clean, muted separations and seamless legato links so you can choose whether a crossing should be crisp or blended, and then apply those chosen articulations into longer lines until they become intentional musical choices rather than reactions.",
+          "successCriteria": "Transitions between strings sound deliberate and cohesive: accents land predictably, sustained notes maintain consistent tone, and unwanted string noise is controlled. Phrases feel and sound like single, expressive lines whether you aim for crisp separation or smooth blending, and you can reliably reproduce those articulation choices in performance.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "string_skipping_melodic"
+        },
+        {
+          "id": "214ddf51-55ad-4268-9ebc-1a65f01eead7",
+          "title": "Pick attack shading",
+          "description": "Pick attack shading is the deliberate, small adjustments to how the pick meets the string—angle, edge versus face contact, depth and lateral motion—to shape attack, harmonic content and perceived loudness. It matters because these micro-variations let you sculpt tone and phrasing so a single line can sound glassy, nasal, biting or vocal without changing notes. Develop it with focused, low-amplitude motions: practice switching between more perpendicular and more angled contact, feathering the pick to soften attack, and deliberately digging for brighter tones; practice long tones and isolated accents, start slow and increase gradually while listening and recording to compare subtle tonal changes.",
+          "successCriteria": "You can produce repeatable shifts in brightness and bite on command while keeping left-hand fingering constant; accents land precisely and softer passages remain clear. Phrases sound intentionally shaded and expressive—you can highlight target notes, smooth transitions, and make single-line playing convey different colors and dynamics.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "tone_color_exploration",
+          "suggestedLessonIds": [
+            "6o7p3ZAwLrE",
+            "Yu9HJA4NS7c",
+            "1nVE0mx_7WE"
+          ]
+        },
+        {
+          "id": "c4262761-a911-4937-8931-3b4b7a70220e",
+          "title": "Palm mute dynamics",
+          "description": "Palm mute dynamics is the subtle control of the picking-hand palm against the strings near the bridge to vary damping from fully open to tightly choked. It matters because those small changes shape note length, harmonic content and rhythmic weight—allowing you to move between singing sustain, gritty chokes and percussive ghost notes for expressive phrasing. Develop it by sliding the palm closer to and away from the bridge while holding tones and while playing lines, using micro-adjustments of pressure (wrist, not big arm moves), and practising clean, repeatable transitions between open, half-muted and fully muted sounds and rhythmic ghost patterns.",
+          "successCriteria": "You can change sustain and tonal brightness mid-phrase with precise, repeatable palm placement and pressure; half-muted tones keep their pitch clarity while full mutes cut resonance cleanly. Muted and unmuted attacks sit consistently in the groove and respond predictably as you vary hand position and pressure.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "muting_spotlight_drill",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "6fm2VihcB54",
+            "d41GHKVrzCI",
+            "iIHx-lU0j6E",
+            "76ZOPqcjK8c"
+          ]
+        },
+        {
+          "id": "c72748c3-82f2-4221-8e59-16ded64c387e",
+          "title": "Tremolo bar control",
+          "description": "Tremolo bar control is the deliberate, proportional use of the whammy bar to shape pitch—from tiny vibrato-like flutter to precise dives and squeals—while keeping return-to-pitch and timing consistent. It matters because those vocal, crying and harmonic effects are a central expressive device in the Marty Friedman sound: they let single notes and phrases breathe, scream or settle with intention. Develop it by isolating small wrist motions and larger arm pivots, practicing controlled micro-oscillations up to full-range movements, coordinating release timing with the fretting hand to avoid pitch wobble, and increasing range and speed only after the motion is repeatable and musically placed.",
+          "successCriteria": "You can execute repeatable micro-warble and wide dive effects that reliably return to pitch; squeals and expressive dives sound intentional and sit cleanly in a phrase rather than slipping or flubbing; timing and dynamic placement of bar moves enhance the musical line rather than distract.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "vibrato_finger_isolation",
+          "suggestedLessonIds": [
+            "Z5ini0uUg7s",
+            "loX-zYQJZ3Y"
+          ]
+        },
+        {
+          "id": "97fa9561-fedf-4425-8f66-92d1415615ec",
+          "title": "Rhythmic picking displacement",
+          "description": "Rhythmic picking displacement is the deliberate shifting of where your pick-strokes land relative to the underlying beat so a repeated phrase begins on different subdivisions or off‑beats, creating syncopation and rhythmic tension. It matters because those small timing shifts make single-note lines sound more expressive and unpredictable, helping melodic ideas breathe and push against the groove in the way heard in Marty Friedman’s phrasing. To develop it, isolate a short lick and repeat it while moving the pick‑stroke start one subdivision forward or back each repetition, using small, economy pick motions and consistent accents so the timing shift, not uneven tone, defines the effect; start slow and increase gradually until the displacement feels effortless within your groove.",
+          "successCriteria": "You can slide a short phrase ahead of or behind the beat without losing evenness of tone, articulation, or dynamic control; displaced versions lock into the groove so they sound intentionally syncopated rather than sloppy. Accents and pick motion remain consistent across displacements, and you can apply the same displacement habit to different melodic shapes and string sets while keeping the line musical.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "rhythmic_pocket_mastery",
+          "suggestedLessonIds": [
+            "1nVE0mx_7WE",
+            "QDT7dgBF6Fc"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bfa2afd0-5e36-469e-ae98-6cb4aafe2ceb",
+      "title": "Left-hand Expression Techniques",
+      "order": 1,
+      "steps": [
+        {
+          "id": "fb0f2c26-712a-4cd8-9eb1-de7d08bec465",
+          "title": "Wide vibrato control",
+          "description": "Wide vibrato control is the deliberate, large pitch oscillation created by pivoting the fretting finger and rotating the wrist/forearm so the note swings broadly while staying centered and musical. It matters because those big, vocal-sounding arcs are a core part of expressive lead phrasing — they give sustained notes drama, character, and a distinctly emotive tone associated with Marty Friedman’s style. Develop it by holding a single pitch and practicing controlled outward-and-back motions using fingertip pivot and forearm rotation; start slow and increase width gradually, focus on returning exactly to the target pitch, vary the width inside phrases, and use repeated sustained holds to build control and strength.",
+          "successCriteria": "You can produce a wide, even vibrato that sounds intentional and vocal: each cycle reliably returns to the target pitch, width and emphasis are adjustable within a phrase, and the note remains clear and sustained rather than choked or unstable.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "vibrato_control_drill",
+          "suggestedLessonIds": [
+            "MQrn-xCi7to",
+            "39mhhYpaFS0",
+            "FgP9Qy9BBks",
+            "89jbZsZ9avA",
+            "CZZTZWNlqxY"
+          ]
+        },
+        {
+          "id": "2e015995-9e97-43a1-846c-17193b23b134",
+          "title": "Microtonal bending",
+          "description": "[What it is] Microtonal bending is the precise adjustment of pitch by fractions of a semitone — tiny, controlled string deflections and slight pre- or release motions that place a note between the usual fixed pitches. It’s about shaping pitch in very small steps so a single note can convey shades of tension, color, or 'outside' flavor.\n\n[Why it matters] These micro-inflections give solos a vocal, expressive quality and allow you to suggest non-Western or bluesy intervals without changing scale fingerings. They create subtle tension and release inside a phrase, making melodic lines sound more nuanced and emotionally specific.\n\n[How to practice] Isolate small target pitch shifts and train your ear to recognize and reproduce them; use a cent-capable tuner as feedback while you also rely on listening to the interval in musical context. Practice very slow, tiny bends and controlled releases, then place those motions into short motifs and small licks until you can execute them consistently and musically; favor fingertip control and minimal, repeatable motion over brute force.",
+          "successCriteria": "You can reliably place a bend to the intended microtone by ear (and verify it on a tuner), use those bends within short phrases so they read as deliberate expression, and perform them consistently without overshooting or sounding accidental.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "unison_bend_drill"
+        },
+        {
+          "id": "003b0def-9da8-4785-b31d-486991aad70d",
+          "title": "Controlled legato runs",
+          "description": "Controlled legato runs are smooth, connected lines produced mainly with hammer-ons and pull-offs where each note matches the previous in volume, timing and clarity without relying on continuous picking. They matter because they let you shape long, singing phrases and rapid passages with nuanced dynamics and articulation—key to an expressive lead voice in the Marty Friedman idiom. Develop them by practicing short, repeatable patterns with minimal finger motion, focusing on even attack and clean release, starting slow and increasing speed gradually while removing tension and adding small dynamic accents so runs sound musical rather than mechanical.",
+          "successCriteria": "Runs sound even and seamless from note to note, with consistent volume and clean articulation; transitions between hammer-ons and pull-offs are indistinguishable from picked notes, without unwanted string noise or loss of pitch. Phrases feel relaxed and under control, allowing you to add expressive accents and slight timing/volume variations that make the legato lines feel like a vocal, not a mechanical exercise.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "legato_continuous_flow",
+          "suggestedLessonIds": [
+            "DlqPITGLr2s",
+            "sstArwUX2AQ",
+            "6hBh1RRDUas",
+            "tVKAbx3KLXY",
+            "pkcb9Wcnkxo"
+          ]
+        },
+        {
+          "id": "90608b17-2121-4cd6-9c18-fa39dc3e6928",
+          "title": "Pre-bend release accuracy",
+          "description": "[What it is]\nPre-bend release accuracy is the ability to pre-bend a string up to a precise target pitch before you pick and then release it back down so the returning pitch, timing and tonal character are exactly as intended. It combines pitch precision, controlled hand motion and consistent tone during the release portion of the gesture. On the instrument it reads like a deliberate vocal inflection rather than a loose or ambiguous bend.\n\n[Why it matters]\nIn the style you're aiming for, precise pre-bend releases create dramatic tension and release — they make short phrases sing and give solos a vocal, expressive quality. If the pre-bent pitch or the released pitch is off or the timing is sloppy, the phrase sounds out of tune or accidental instead of emotionally intentional. Clean releases let you shape dynamics and rhythmic placement so small melodic gestures carry weight.\n\n[How to practice]\nIsolate single pre-bend operations: hold the pre-bent target until you can clearly hear and match the pitch, then practice releasing slowly and steadily until the return pitch is consistent every time; use a tuner or attentive ear for feedback. Vary release speed and attack dynamic, then chain the motion into short melodic fragments so the release becomes a deliberate part of the phrase rather than an isolated trick. Record and compare takes, focus on matching pitch and tone on each repetition, and transfer the motion to different neck positions and string gauges until the feel and intonation are uniform.",
+          "successCriteria": "You reliably reach the intended pre-bent pitch before the pick and return to the intended pitch on release with consistent tone and timing; the gesture sounds intentional and expressive within a phrase rather than sloppy or out of tune. You can reproduce clean pre-bend releases across different positions and musical fragments and shape them dynamically to support melodic phrasing.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "bend_and_release"
+        },
+        {
+          "id": "c23ce15b-458b-4267-b25a-a09fb6f6fd80",
+          "title": "Double-stop fingering",
+          "description": "[What it is]\nDouble-stop fingering is the left-hand technique of fretting two notes simultaneously and choosing fingerings that preserve intonation, hand shape, and voice-leading as you move. It involves deciding which two fingers to use, whether to pivot or bar, and how to manage adjacent-string muting so both voices speak cleanly. The goal is to make two-note textures sound as musical and controlled as single-note lines.\n\n[Why it matters]\nDouble-stops are a core expressive tool in the Marty Friedman palette—small harmonies, unusual interval choices, and tight dissonance/resolution give solos a distinctive color and emotional bite. Well-executed double-stops let you harmonize lines, punctuate phrases, and create tension without breaking the solo’s flow. On the instrument they add density and a vocal quality that single notes alone can’t provide.\n\n[How to practice]\nIsolate common two-note pairings and practice switching finger combinations slowly so each note rings with equal clarity and steady pressure; vary which two fingers you use to find the most economical shapes. Work sliding and small position shifts while keeping both notes in tune, and practice anchoring one finger as a pivot while the other moves to preserve smooth voice-leading. Include muting drills for adjacent strings and transpose the same finger patterns across different neck positions to build consistency and fretting-hand economy. Always start slow, listen for beating or imbalance between the two tones, then increase speed and integrate the shapes into short phrases and harmonized licks.",
+          "successCriteria": "Both notes of any double-stop ring clearly and in tune with no string buzzing or unwanted ringing; finger-pair changes and small position shifts are smooth and efficient. You can choose and execute fingerings that preserve voice-leading and mood, and you can drop double-stops into melodic phrases to create the characteristic harmonic color used in Marty Friedman–style soloing.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "d8301ab3-148a-4cf7-847d-9c927b430a86",
+          "title": "Left-hand muting precision",
+          "description": "Left-hand muting precision is the controlled use of fretting‑hand contact to silence unwanted string vibrations while allowing intended notes to sound; it depends on accurate fingertip and palm placement and tiny pressure adjustments. It matters because tight, deliberate muting removes sympathetic ringing and sharpens phrasing so fast or exposed lines read as intentional rather than noisy. Develop it by practicing slow, focused motions: rest non‑playing finger pads lightly on adjacent strings, use small lateral shifts and lift‑release micro‑motions to stop or free a string, and repeat common phrase shapes until the mute becomes an automatic, minimal movement.",
+          "successCriteria": "Clean single notes and runs with no audible sympathetic ringing; muted ghost notes are even in volume and timing; you can selectively mute during bends, slides, and rapid passages without choking desired sustain or altering tone.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "muting_discipline_drill",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "d41GHKVrzCI",
+            "6fm2VihcB54",
+            "97_u9KqulKQ",
+            "iIHx-lU0j6E"
+          ]
+        },
+        {
+          "id": "271d1492-5ad7-4da7-86ca-4a987fb76d5d",
+          "title": "Slide and smear control",
+          "description": "[What it is]\nSlide and smear control is the left‑hand skill of moving a fretted finger laterally to connect pitches (slides) or to partially blur a pitch by dragging or shifting pressure (smears). It’s less about raw motion and more about shaping the pitch trajectory, transient noise and sustain with precise pressure, contact point and lateral speed. The goal is to make the motion sound intentional — either a clean glissando into a new note or a tasteful vocal‑like smear that colors the tone.\n\n[Why it matters]\nSlides and smears give single‑note lines a singing, vocal quality that heightens expressiveness and makes melodic phrases feel organic rather than mechanical. They’re essential for phrasing choices that emphasize exotic intervals and microtonal inflection, allowing you to connect disparate pitches smoothly or to flirt with pitch without committing to a full bend. Controlled slides/smears let you place emotion and nuance at the exact moment you want it, which is a signature of expressive lead playing.\n\n[How to practice]\nWork slowly in any comfortable position on the neck: practice cleanly arriving on a target note with a deliberate slide and then practice arriving with a partial smear that intentionally under‑ or over‑centers the pitch. Vary lateral speed, finger pressure and contact point to hear how each parameter changes the tone and noise; practice single‑finger slides, short micro‑slides and multi‑finger shifts, then apply the gestures to intervals and short melodic fragments. Isolate the transient (start/stop of the motion), control the release, and repeat each variant until you can reproduce the exact amount of smear or the exact clean landing on demand.",
+          "successCriteria": "Slides land on target pitches with repeatable intonation and the amount of smear is a deliberate, controllable choice; smears add vocal inflection without uncontrolled string noise or loss of pitch reference. You can vary speed and pressure to produce clear glissandi, subtle blurs or aggressive slides at will, and apply these gestures musically inside short phrases so they enhance — not obscure — the melody.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "one_string_backing"
+        }
+      ]
+    },
+    {
+      "id": "8b8207af-d9a6-4426-9ef6-150b39e5261c",
+      "title": "String-skipping & Intervals",
+      "order": 2,
+      "steps": [
+        {
+          "id": "b94ed132-194b-4007-a4e1-b968ee00d5c6",
+          "title": "Wide interval leaps",
+          "description": "[What it is]\nWide interval leaps are melodic jumps that move the line across large pitch distances rather than stepwise motion. They prioritize intervallic choices and spatial navigation on the neck so single notes or dyads land far apart and create an angular melodic contour.\n\n[Why it matters]\nLarge leaps give solos an instantly memorable, vocal quality — they inject surprise, widen your tonal palette, and let you outline exotic interval relationships that stand out against scalar runs. In the stylistic context you’re targeting, well-placed wide leaps become signature moments that emphasize exotic color and emotional punctuation in a phrase.\n\n[How to practice]\nIsolate one leap at a time: pick a source note and a distant target, then practice aiming and landing cleanly with a steady pulse; start slow, increase gradually only after landing reliably. Repeat short two-note and three-note motifs that incorporate approach tones, then chain those motifs into longer lines so the leaps sit inside musical phrases rather than sounding like isolated exercises. Focus on minimizing unnecessary motion, rehearsing the movement mentally before you play, and adding tasteful shading immediately after the landing to make each jump feel like an expressive choice rather than a technical trick.",
+          "successCriteria": "Leaps consistently land cleanly and in time, sounding like intentional melodic statements; you can connect wide intervals into fluid phrases with clear pitches and expressive emphasis rather than hesitancy or noise.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "string_skipping_melodic"
+        },
+        {
+          "id": "c1d71f03-c894-4a8f-8900-2c0f6c75b104",
+          "title": "String-skipping legato",
+          "description": "String-skipping legato is the ability to connect notes on non-adjacent strings using left‑hand hammer‑ons and pull‑offs so the melody sounds continuous despite wide string gaps. It matters because it creates large-interval, singing lines and exotic intervallic colors without choppy articulation or accidental string noise. Develop it by isolating small two- and three-note patterns that jump across unused strings, keeping fretting fingers tight to the fretwire, using economical pivots and diagonal fingering, and coordinating right‑hand ghosting or selective articulation so only intended notes sustain. Work slowly, lock in clean skips and muting for each pattern, then broaden the shapes and add expressive elements once the mechanics are steady.",
+          "successCriteria": "Lines across skipped strings sound smooth and connected with consistent tone and volume, no audible gaps or sympathetic ringing on intervening strings, accurate pitch on each skip, and the fingering and muting choices feel automatic when played musically.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "string_skipping_melodic",
+          "suggestedLessonIds": [
+            "sstArwUX2AQ",
+            "xfFNn3dkhSc",
+            "DlqPITGLr2s",
+            "gbJP2nr1aZY"
+          ]
+        },
+        {
+          "id": "061b151f-aa2a-438c-b529-e55d4cc87db0",
+          "title": "Octave displacement phrasing",
+          "description": "[What it is]\nOctave displacement phrasing is the deliberate choice to move parts of a melodic line up or down an octave inside a single phrase so the motif appears in different registers rather than staying at one pitch level. It’s not simply playing octave pairs; it’s about shifting the listener’s reference point mid-phrase so a single voice can imply counterpoint, widen the sonic space, or highlight a note by changing its register. These shifts can be sudden or gradual, and they become a structural device for shaping a melodic sentence.\n\n[Why it matters]\nDisplacing octaves gives melodies dramatic contrast and a vocal, conversational quality—one line can sound like two interacting voices without adding harmony. It’s a powerful tool for creating surprise, emphasizing target notes, and carving out a unique timbral signature within solos. In the stylistic context you’re aiming for, octave displacement helps produce exotic, singing lines that feel both angular and lyrical.\n\n[How to practice]\nPick a short melodic motif and repeatedly play it, then experiment by moving one or two notes of that motif an octave up or down while keeping the phrase intact; listen for which placements create tension or clarity. Work on smooth, in-time transitions between registers, varying where you place the displacement inside the phrase and how long you hold the new register. Practice applying the same idea to longer lines and short improvisations, making deliberate choices about when an octave jump serves the musical shape versus when it distracts, and focus each session on consistent tone and accurate intonation across registers.",
+          "successCriteria": "Lines that incorporate octave jumps sound intentional and musical rather than random: the octave shifts highlight or contrast target notes, maintain rhythmic placement, and preserve tonal consistency. You can move a motif between registers without losing clarity or pitch accuracy, and you can deploy octave displacement as a compositional choice during improvisation to create tension, release, and a distinct melodic voice.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "random_note_hunt"
+        },
+        {
+          "id": "3af65cf5-256e-44ae-8520-f32410849690",
+          "title": "Thirds and sixths lines",
+          "description": "[What it is] Thirds and sixths lines are melodic phrases made from two-note intervals that move together, either in parallel or with small voice-leading shifts. They function as compact harmonies that turn a single melodic idea into a harmonized statement without full chordal movement. Played as connected lines or as successive dyads, they create a distinct two-voice texture within a lead line.\n\n[Why it matters] These interval choices give a singing, vocal quality to solos while adding harmonic richness and color—qualities central to the phrasing you want to emulate. Using thirds and sixths lets you outline chord motion and modal flavor at the same time, producing memorable motifs that stand out in a solo. They also provide a compact way to introduce exotic-sounding counterpoint and distinctive melodic contours.\n\n[How to practice] Map a few scale areas and play simple stepwise and skipwise progressions in both third and sixth shapes, starting slow and increasing speed while keeping the two notes balanced. Work different articulations—smoothly connected lines, clipped accents, and tasteful pitch shifts—so each dyad reads as one expressive unit rather than two separate notes. Improvise short motifs that alternate between thirds and sixths, record them, and listen specifically for even volume, clean intonation between the voices, and how naturally the harmonized line can become part of a larger phrase.",
+          "successCriteria": "Lines sound like unified, harmonized melodies: both notes are in tune and balanced, shifts between interval shapes are smooth, and the phrasing reads as intentional harmony rather than incidental doubling. You can drop into thirds or sixths within improvisation and use them to shape memorable, voice-led phrases that fit the intended stylistic color.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "tapping_pull_hammer",
+          "suggestedLessonIds": [
+            "QbXNL4XXmIk"
+          ]
+        },
+        {
+          "id": "30dab544-49f8-4eb8-b5bd-5afff36bd4c2",
+          "title": "Diagonal string patterns",
+          "description": "[What it is]\nDiagonal string patterns are melodic shapes that move across the strings while shifting up or down the neck, creating a slanted contour instead of purely linear or vertical motion. They combine scalar steps and intervallic leaps so notes travel obliquely across string groups, producing voice-leading that feels both angular and continuous.\n\n[Why it matters]\nDiagonal motion gives solos a vocal, exotic quality by connecting distant pitch areas without sounding like a straight run; the slanted lines create surprising interval relationships and memorable motifs. Mastering them lets you craft phrases that move organically across the fingerboard and open new pathways for expressive bends, slides, and articulations.\n\n[How to practice]\nStart with a small diagonal shape and loop it slowly, then shift the same shape up and down the neck so your fingers internalize the slanted displacement; expand the span and reverse direction as it becomes comfortable. Isolate the micro-transitions where a finger must change string plane and drill those until crossings are seamless, keeping tone and articulation consistent; finally, vary rhythmic placement and endings so the shape becomes a usable melodic idea, not just a mechanical pattern.",
+          "successCriteria": "You can play diagonal lines that cross strings smoothly with even tone and clean articulation, transpose the shapes across the neck, and deploy them as singable motifs in improvisation so they sound intentional rather than mechanical.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "spider_x_extended"
+        },
+        {
+          "id": "96feb7db-0bbf-43b6-bd57-2614b9fff0f2",
+          "title": "Intervallic arpeggio shapes",
+          "description": "[What it is]\nIntervallic arpeggio shapes are compact, repeatable fingering patterns that outline a chord by emphasizing specific intervals between successive notes rather than running up or down scalar lines. They treat an arpeggio as a collection of interval relationships (thirds, fourths, sevenths, etc.) that can be reshaped and moved to create distinctive melodic contours. The focus is on how those interval relationships map under the hand so you can use them as melodic building blocks across the fretboard.\n\n[Why it matters]\nUsing intervallic shapes makes solos sound more horizontal and voice-led, because each shape implies harmonic movement rather than just scalar motion. These shapes help you highlight chord tones, create angular or exotic-sounding lines, and produce memorable motifs that cut through a band texture. For an advanced stylistic target, they also let you blend chordal clarity with single-note phrasing for a more compositionally aware solo approach.\n\n[How to practice]\nChoose a handful of intervallic shapes and isolate them: play them slowly across different positions and listen for each interval's character, then connect shapes using shared tones or small voice-leading moves. Improvise using only those shapes at first, vary rhythmic placement and articulation, and insert them as motifs inside longer lines to hear how they imply harmony. Gradually expand your vocabulary by transposing shapes to different chord qualities and chaining inversions so the shapes become automatic tools for outlining changes and creating signature melodic textures.",
+          "successCriteria": "You can call up multiple intervallic arpeggio shapes instantly and place them musically so each note clearly outlines the underlying harmony; lines feel composed rather than purely scalar. Transitions between shapes are smooth and motivically coherent, producing angular yet singable phrases that sit well in a band context. You can improvise for several bars using only these shapes and still convey strong harmonic direction and distinct melodic identity.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "string_skipping_arpeggios",
+          "suggestedLessonIds": [
+            "1rkRIoffK7I",
+            "GYwdxHH9Y_k"
+          ]
+        },
+        {
+          "id": "cc0b01a1-7f5f-4cbd-8011-65a9547b8e88",
+          "title": "Chromatic enclosures",
+          "description": "[What it is]\nChromatic enclosures are short melodic devices that surround a chosen target pitch with one or more chromatic approach tones before resolving to that target. They can be simple — a lower and upper neighbor — or extended, weaving chromatic passing tones around the note to create a brief tension-and-release gesture. Used sparingly, they imply deliberate voice-leading and make single-line phrases sound more vocal and unpredictable.\n\n[Why it matters]\nEnclosures add chromatic color and forward motion to scale and arpeggio-based lines, turning predictable runs into memorable motifs. They create small, expressive dissonances that resolve quickly, which helps you articulate phrases that sound both sophisticated and emotionally charged. For a style that favors exotic intervallic choices and expressive nuance, chromatic enclosures are a compact way to link disparate melodic cells and highlight target tones.\n\n[How to practice]\nIsolate a target pitch anywhere on the neck and practice approaching it first from below then from above, then both before resolving, aiming for even timing and clean articulation of the approach tones. Expand by inserting enclosures into scale fragments, arpeggio outlines, and short intervallic leaps so they become a natural part of phrase construction rather than a separate exercise. Vary the length (one-note, two-note, or longer) and rhythmic placement, and record short phrases to judge whether the enclosure sounds intentional versus ornamental.",
+          "successCriteria": "You can insert chromatic enclosures so they resolve cleanly and rhythmically, sounding like purposeful voice-leading rather than random fills; they should heighten tension and resolution without breaking the line's flow.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "chromatic_accents"
+        }
+      ]
+    },
+    {
+      "id": "2b1b37c0-9cdd-4314-a9c6-d1def7f4cdb6",
+      "title": "Exotic Scales & Modes",
+      "order": 3,
+      "steps": [
+        {
+          "id": "8478250b-3ad5-4258-bc34-addf1e2957d2",
+          "title": "Harmonic minor fluency",
+          "description": "[What it is]\nHarmonic minor fluency means knowing the harmonic minor collection as a tonal resource — its intervalic fingerprint, characteristic raised seventh, and the melodic colors that result when you place those intervals over minor harmonies. It’s not just running the scale: it’s being able to phrase with its exotic leaps, target its structural chord tones, and shift smoothly between scalar, arpeggiated, and linear melodic uses. Fluency implies you can summon that specific mood quickly and reliably in any register.\n\n[Why it matters]\nThis scale supplies the dramatic, Eastern-tinged tension and unmistakable leading-tone resolution that underpin the style you’re aiming for. Mastering it opens up distinct melodic shapes and arpeggio choices that give solos a lyrical-yet-unpredictable quality, letting you blend exotic color with strong harmonic direction. It also links naturally to diminished and augmented sonorities, so it becomes a bridge to more advanced modal and chromatic material.\n\n[How to practice]\nMap the scale across the neck and build short motifs that emphasize the scale’s unique interval leaps and their resolutions; sequence those motifs through different tonal centers until they feel idiomatic. Practice moving between scalar lines and small arpeggio outlines that highlight the raised seventh, then create call-and-response phrases where one phrase outlines harmony and the next uses harmonic minor color to answer. Train your ear by singing or imagining the pull of the raised seventh resolving, and vary articulation and rhythmic placement so the scale becomes a musical vocabulary, not a technical exercise.",
+          "successCriteria": "You can weave harmonic minor lines into solos so the raised seventh and augmented-second feel intentional, not accidental; motifs based on harmonic minor move naturally across the neck and resolve cleanly to chord tones; arpeggio and scalar material derived from harmonic minor cohere with surrounding harmony and add the expected exotic/directional flavor to phrases.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "scale_practice_configurable",
+          "suggestedLessonIds": [
+            "rToM-6U8I-k",
+            "Ya-CIsLt_2E"
+          ]
+        },
+        {
+          "id": "6cb440bb-bb0f-4a60-b9fc-75feb271d4b0",
+          "title": "Phrygian dominant mastery",
+          "description": "[What it is]\nPhrygian dominant is a modal scale with a flattened second and a major third above the root, producing an immediately exotic, tense-yet-resolving color. Its intervals create a sound that blends Phrygian darkness with a dominant, almost Eastern flavor, useful for melodic lines that want to sound both exotic and harmonically pointed. Think of it as a toolkit of characteristic tones and intervallic relationships you can use to color phrases.\n\n[Why it matters]\nThis scale is a core ingredient for the Middle‑Eastern-tinged, dramatic lead lines heard in many virtuosic rock and fusion solos; it gives single-note lines a distinct identity that stands out against more common minor or major material. Mastering it lets you command that edgy tension on approach notes, targets, and resolutions so your phrases register as intentionally flavored rather than incidental. For your goal of playing in the style of Marty Friedman, it supplies many of the exotic melodic choices and dramatic turns that define that sound.\n\n[How to practice]\nIsolate the scale’s characteristic intervals (the flattened second and the major third) and make short melodic motifs that center on those tones as targets and resolutions, then vary their rhythm and articulation. Practice outlining implied harmony with arpeggio fragments and sequence the scale in different interval patterns so the shape becomes a vocabulary rather than just a run. Add chromatic approach notes, wide interval leaps, and expressive articulations to turn scalar material into musical phrases; record short vamps and improvise focused ideas that emphasize the scale’s tension and release. Finally, analyze and transcribe short phrases you like, then rework them with your own phrasing and ornamentation until the sound feels natural in your playing.",
+          "successCriteria": "Your solos consistently convey the Phrygian dominant character: the flattened second is used as a clear dissonant target and the major third provides decisive resolution; listeners immediately recognize the exotic quality even amid chromatic passing tones. You can create compact motifs that outline the scale’s harmonic implications, convert scalar runs into musical statements with expressive articulation, and comfortably improvise short, varied ideas over a static vamp so the scale becomes a deliberate expressive choice.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "scale_practice_configurable",
+          "suggestedLessonIds": [
+            "ZnoKgWnMEq8",
+            "aCZezZf9bi0"
+          ]
+        },
+        {
+          "id": "cb0eb390-7c2e-467a-89b3-e0d2fa9add4a",
+          "title": "Diminished scale fluency",
+          "description": "[What it is]\nThe diminished scale is a symmetrical eight-note collection built from alternating step sizes; its repeating pattern creates identical pitch arrangements every small interval, so shapes and motifs can be shifted predictably across the neck. It yields a tense, chromatic sound ideal for passing motion, diminished sonorities, and altered dominant colors. Understanding its symmetry is more about pattern recognition than memorizing isolated positions.\n\n[Why it matters]\nThis scale is a primary source of angular, exotic-sounding lines and compact diminished sonorities that cut through mixes and create surprising resolutions. It functions as a tool for tension — supplying voice-leading options and pivot notes that make phrase endings and dominant substitutions more compelling. For a stylistic approach that favors wide intervals and unusual scalar colors, the diminished scale expands melodic vocabulary and strategic chromaticism.\n\n[How to practice]\nLearn both alternating orderings (the pattern that begins with the smaller step and the one that begins with the larger step), then map their repeating shapes across the neck so you can shift any motif by the scale's repeating interval without recalculation. Drill short motifs and sequences, sing them aloud, and practice resolving diminished lines to clear chord tones so your ear recognizes their tension-to-release behavior. Work on creating short improvised phrases that use diminished passages as pass-throughs or pivots, and vary articulation and dynamics while you repeat them; start slow and increase gradually, then apply the patterns in musical contexts until they feel instinctive.\n",
+          "successCriteria": "You can hear and sing the scale's repeating pattern, shift diminished motifs fluently every repeating interval, and use diminished lines to create clear, intentional tension that resolves to chord tones without hesitation.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "scale_practice_configurable",
+          "suggestedLessonIds": [
+            "wv4sBVxx2ZU"
+          ]
+        },
+        {
+          "id": "d9d15410-7a01-4dc4-93f0-c46df48fd8e2",
+          "title": "Japanese pentatonic variants",
+          "description": "[What it is]\nJapanese pentatonic variants are a family of five-note scale shapes derived from traditional Japanese music; each variant alters one or two scale degrees from a basic pentatonic core to produce distinct melodic colors and intervallic gaps. On guitar they create a sound world different from Western pentatonics: spare, often plaintive or exotic, with characteristic nagging semitone or minor-second flavors and open-string-friendly contours.\n\n[Why it matters]\nThese variants give you melodic material that immediately reads as \"Japanese\" without resorting to overt exoticism, and they provide fresh target notes and intervallic leaps that cut through dense harmonic contexts. For a player working toward Marty Friedman’s voice, they supply the specific tonal flavors and unexpected stepwise shifts he often uses to make lines feel both lyrical and otherworldly.\n\n[How to practice]\nLearn one variant at a time: sing or hum its melodic shape, then map a couple of compact motifs across the neck in any comfortable position so the ear associates the sound with fingerings. Improvise short two-phrase statements that emphasize the variant’s unique intervals and rest points, then link different variants by moving between their characteristic notes; focus on short, memorable motifs rather than endless scale runs. Gradually increase musical speed and variety, and practice extracting small melodic fragments that you can reuse in solos for recognizably Japanese coloration.",
+          "successCriteria": "Your improvised lines consistently evoke the Japanese pentatonic color—you can choose and move between variants smoothly, create short memorable motifs that highlight their characteristic intervals, and drop those motifs into solos so they sound idiomatic and expressive in the target style.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "string_skipping_basic",
+          "suggestedLessonIds": [
+            "sk36Tv6US6E",
+            "BgRzzvVWBrU"
+          ]
+        },
+        {
+          "id": "4f398559-86d1-40bb-a247-1d5e318c0936",
+          "title": "Chromatic approach notes",
+          "description": "[What it is]\nChromatic approach notes are brief non-diatonic tones that lead directly into a chosen target note, functioning as concise melodic ornaments and voice‑leading devices. They usually arrive from immediately above or below the target or as a short enclosure that circles the target before resolving. Used sparingly, they act as directional punctuation rather than sustained scale tones.\n\n[Why it matters]\nChromatic approaches generate immediate tension-and-release and give lines a vocal, purposeful push toward important chord or scale tones. They make solos sound more sophisticated and intentional by emphasizing resolution and enhancing melodic contour. When integrated well they bridge different modal colors and highlight harmonic destinations without muddying the underlying harmony.\n\n[How to practice]\nIsolate a target tone in any comfortable neck position and practice approaching it from a chromatic neighbor above, below, and with two-note enclosures; focus on clean articulation and precise timing so the approach reads as deliberate. Vary the attack (accented, ghosted, or tied into the rhythm), place approaches on different subdivisions, and move the same patterns across string sets and positions to build consistency. Start slow and only increase speed once each approach reliably lands with the intended tone and phrasing; record and listen for whether the chromaticism enhances the melody rather than sounding accidental.",
+          "successCriteria": "Approach notes consistently resolve cleanly and intentionally to target tones, sounding like deliberate ornaments rather than random passing tones. You can execute approaches from above, below, and as enclosures across positions with steady articulation and tonal clarity, and they make your lines feel more directed and melodic.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "chord_tone_improvisation",
+          "suggestedLessonIds": [
+            "4NSz8Rfggdo",
+            "jByqIuGbNRQ"
+          ]
+        },
+        {
+          "id": "f1b2753f-afef-4393-ba2c-b5c7f1cb9023",
+          "title": "Modal mixture application",
+          "description": "[What it is]\nModal mixture application is the deliberate borrowing of notes, motifs, or chord colors from parallel modes to tint a single tonal center. Rather than changing keys, you layer contrasting modal intervals over the same root so phrases shift emotional character without losing their anchor. In practice this is used on single-note lines, double-stops and brief harmonic inflections to create surprising but coherent color changes.\n\n[Why it matters]\nUsed tastefully, modal mixture is a primary source of the exotic, theatrical quality heard in advanced rock and metal lead work: it lets you inject Eastern or chromatic flavors as punctuation rather than wholesale modulation. It expands your vocabulary for tension and release, enabling short, memorable turns of phrase that stand out without breaking the line. For a stylistic objective like Marty Friedman’s, mixture gives you the ability to blend lyricism with uncanny intervallic color in compact statements.\n\n[How to practice]\nPick a tonal center and craft short motifs that state it clearly, then make variations that replace one or two scale degrees with notes from a parallel mode — focus on the smallest meaningful swap that changes color. Practice pivoting on common tones and smooth voice-leading so the ear still recognizes the center while hearing the new color; record and compare the original motif to its mixed variant to ensure the change reads as intentional. Work both melodically (single-line motifs) and harmonically (brief chordal or double-stop inflections), isolating two-bar windows where you insert the mixture as punctuation; refine until the borrowed material feels like a natural expressive choice rather than an accidental dissonance. Start slow and increase gradually, then apply the technique to longer phrases so the mixture becomes a deliberate tool for storytelling.",
+          "successCriteria": "You can slip a borrowed modal color into a phrase mid-lick and have it sound like a purposeful expressive turn rather than a mistake; the tonal center remains clear while the color change is obvious and musically satisfying. Motifs retain melodic continuity across the shift, resolving or pivoting by shared tones or smooth voice-leading. On both single-note lines and brief harmonic punctuations, the mixture reads as an idiomatic, repeatable device that enhances drama and exoticism in your solos.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "one_chord_improv",
+          "suggestedLessonIds": [
+            "y-Wnt-dmNnA",
+            "FStNDshxYvE",
+            "RyR98UEtt18",
+            "FbWVO9e84Uc",
+            "_7hMEfWTWpM"
+          ]
+        },
+        {
+          "id": "bb5f24e0-0473-453b-9faa-2376f3a0a486",
+          "title": "Scale sequencing craft",
+          "description": "[What it is]\nScale sequencing craft is the conscious design and repetition of short melodic patterns derived from a scale—ordered permutations, intervallic leaps, and transpositions used as building blocks. Rather than running scales straight, you create small, repeatable motifs that can be moved, inverted, and varied to produce coherent phrases.\n\n[Why it matters]\nWell-constructed sequences turn abstract scale knowledge into identifiable musical statements: they give solos recognizable motifs, create predictable tension and release, and make navigation of the neck feel intentional. For an advanced player, sequences let you balance exotic color with melodic logic so lines sound composed rather than random.\n\n[How to practice]\nWrite or choose a handful of short patterns (three- to five-note shapes, intervallic outlines, or step-skip permutations) and systematically transpose them through different harmonic contexts; focus on smooth voice-leading as you move the pattern. Drill each pattern with varied rhythms, accents, and articulations, then connect two different patterns into a longer phrase and practice moving that phrase across positions. Record sessions, pick one sequence per practice block and impose constraints (limit intervals, invert shapes, or only use legato) to force creative solutions and make the sequences musical rather than mechanical.",
+          "successCriteria": "You can take a small motif and transpose or invert it through a progression so it sounds like a deliberate idea, not a scale run; sequences link smoothly across positions and target chord tones, and you can alter rhythm and articulation on the fly to suit the phrase. Played in context, your sequences become recognizable motifs that outline harmony and retain melodic interest when repeated or developed.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "string_skipping_melodic"
+        }
+      ]
+    },
+    {
+      "id": "afdb5910-4e02-4ddc-b0fd-eef3e8cf163d",
+      "title": "Advanced Arpeggios & Picking",
+      "order": 4,
+      "steps": [
+        {
+          "id": "88a6383b-edad-45c7-a7d5-15ff7a8d5a2d",
+          "title": "Sweep arpeggio clarity",
+          "description": "[What it is]\nSweep arpeggio clarity means executing sweep-picked arpeggios so each pitch sounds distinct and intentional: no blurring between notes, no unintended ringing, and an even attack across the sweep. It’s the combination of economy in the picking motion, precise left‑hand fretting and release timing, and controlled muting so the harmonic content reads clearly.\n\n[Why it matters]\nClear sweeps let the underlying chord tones and exotic intervals speak, turning a technical run into a melodic statement rather than noise. In the stylistic context you’re targeting, clean arpeggios highlight voicing and phrasing choices, making complex shapes musical and intelligible to the listener.\n\n[How to practice]\nWork small: isolate the smallest arpeggio cell, play it slowly and deliberately, and only increase speed when every note is even in volume and separated cleanly. Focus on synchronized timing between pick motion and finger release, and practice explicit muting of adjacent strings so unwanted resonance is eliminated. Vary dynamics and articulation within the same shape (e.g., light accents, softer repeats) to train consistent control under musical demands; start slow and increase gradually until clarity holds at performance tempo.",
+          "successCriteria": "Sweeps sound articulate and musical: each note is clearly heard with even volume, no sympathetic or adjacent-string ringing, and clean starts/stops. You can move through full arpeggio runs without accidental overlaps or buzz, sustain intended chord tones, and shape the line dynamically so it reads as melodic content rather than technical display.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "sweep_picking_3_string",
+          "suggestedLessonIds": [
+            "6tw_COZ5GGc",
+            "2FRTPuf3dMk",
+            "gChLdrC57hw"
+          ]
+        },
+        {
+          "id": "c5e6570f-6875-46f5-9355-bb6833b5c741",
+          "title": "String-skipping arpeggios",
+          "description": "[What it is]\nString-skipping arpeggios are arpeggio outlines executed with deliberate leaps across non-adjacent strings, so each chord tone is presented as a distinct, wide-interval statement rather than a scalar run. The result is angular, vocal-like phrasing and clear voice-leading that highlights inner notes and large interval moves.\n\n[Why it matters]\nThese arpeggios give your solos an orchestral, unpredictable quality—they cut through mixes and create dramatic tension by emphasizing distant chord tones and register shifts. For a stylistic target like Marty Friedman, they help produce the exotic, expressive leaps and haunting melodic gestures that make phrases memorable.\n\n[How to practice]\nIsolate small arpeggio shapes and drill the leap until the target note rings cleanly without sympathetic noise; make clarity the first priority. Connect shapes by varying interval size and rhythmic accent placement so the jumps become musical transitions rather than technical flashes. Increase complexity gradually by introducing different picking strokes and accent displacements while keeping each arpeggio phrase singable and intentional.",
+          "successCriteria": "You can play wide-leap arpeggio patterns so every target note rings clean and intentional, with no unwanted string noise or missed notes. Lines feel melodic across registers, with accents and dynamics that expose chord tones and produce the dramatic, voice-leading phrasing characteristic of Marty Friedman's leads.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "string_skipping_arpeggios",
+          "suggestedLessonIds": [
+            "7fc8sT0gQ0o",
+            "kYcRmAA_RVQ",
+            "fxpn2pf0zf8",
+            "GYwdxHH9Y_k"
+          ]
+        },
+        {
+          "id": "6f94933b-d709-4519-bb09-48b36119a35d",
+          "title": "Alternate-economy transitions",
+          "description": "Building on your alternate picking precision, alternate-economy transitions is the micro-coordination of when and how to switch between strictly alternating strokes and economy (directional) strokes so string crossings happen with minimal motion and uncompromised articulation. It matters because choosing the appropriate stroke at each crossing preserves rhythmic subdivision and tone while reducing wasted motion on wide arpeggio and intervallic passages, letting fast lines sound both effortless and musical. Develop it by isolating individual string changes and practicing the exact pick-direction change for each one: exaggerate the pick motion to feel the switch, repeat short targeted phrases until the swap is smooth, then relax the movement so the transition is automatic and quiet.",
+          "successCriteria": "Transitions are unconscious and repeatable: pick motion is minimal and relaxed, attack and tone remain even across direction changes, there are no audible hiccups or extra string noise, and you can sustain clean, rhythmically secure arpeggio/interval lines that cross multiple strings without thinking about which stroke to use.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "economy_picking_angular",
+          "suggestedLessonIds": [
+            "-SzJ147UNcE",
+            "MAoZNSellrU",
+            "qBRYZE2k0U8",
+            "MWzbeD2tRj0",
+            "VQjsYPIXI2Q"
+          ]
+        },
+        {
+          "id": "48de6d1b-0a0b-4a38-84ed-1a06f339ef8a",
+          "title": "Inverted arpeggio shapes",
+          "description": "[What it is]\nInverted arpeggio shapes are fingerings and melodic outlines that present a chord's notes in a different order so a chord tone other than the root is heard or placed first. On the fretboard this yields distinct shapes and interval relationships compared with the 'root-first' version, changing which notes sit on top or in the bass. That re-ordering creates new melodic contours and phrasing possibilities.\n\n[Why it matters]\nInversions let you emphasize different chord tones as the melodic focal point, producing varied colors and emotional emphasis from the same harmony. They enable smoother connections between harmonies by lining up closer pitches and offering alternative resolution points, so your lines can move more singingly or more angularly as required. Using inversions intentionally makes your phrasing sound more deliberate and harmonically informed.\n\n[How to practice]\nPick a chord and work through every inversion in several neck regions until each shape and its sound are familiar; then link them by moving one voice at a time and using small connecting notes. Build short motifs that you repeat on different inversions so you learn to hear each chord tone as a lead note, and practice resolving those lead notes to different chord tones to feel their functions. Start slow, increase gradually, and vary articulation and dynamic emphasis so you can choose the inversion that best supports a given melodic idea.",
+          "successCriteria": "You can shift between inversions smoothly so a chosen chord tone becomes the clear melodic focus, and your lines connect without awkward jumps. Phrases using inversions sound intentional and varied in color — you can pick an inversion to shade a phrase darker, brighter, or more tense and resolve it where you want. In use, inversions feel like available, natural choices when crafting short improvisations or composed lines.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "triad_improvisation",
+          "suggestedLessonIds": [
+            "OdbcisEH95Q",
+            "xIwjyUOpiHE",
+            "1rkRIoffK7I",
+            "fxpn2pf0zf8",
+            "GYwdxHH9Y_k"
+          ]
+        },
+        {
+          "id": "6ffd4ba8-5646-48ee-8cec-9aa5f328e6b3",
+          "title": "Diminished arpeggio sequences",
+          "description": "[What it is]\nDiminished arpeggio sequences are lines built from the notes of diminished seventh sonorities, moved and reordered to form repeating, symmetrical patterns. Because the diminished sonority is cyclic, these sequences create rotating shapes and predictable transpositions that can be used as compact, intense melodic units. They can be played as contiguous arpeggios, broken fragments, or woven into scalar passages to produce angular, tension-heavy runs.\n\n[Why it matters]\nThese sequences are a powerful device for producing ambiguity and forward motion: they create tension that begs resolution and let you pivot between tonal centers with small, memorable gestures. Their symmetry gives you tools for dramatic voice-leading and surprise cadences, making solos sound more adventurous and composed rather than purely scalar. In an advanced stylistic context they help craft lines that are both exotic and harmonically decisive, useful for carving memorable phrases.\n\n[How to practice]\nIsolate a compact diminished arpeggio shape and cycle it through all inversions and neighboring string sets, listening for smooth voice-leading and consistent attack. Practice linking each sequence into nearby diatonic or chromatic material, try different rhythmic placements and displaced accents, and vary fingering so the line stays musical rather than mechanical. Start slow, increase gradually, and record short phrases to judge whether your sequences reliably create the intended tension and resolve cleanly.",
+          "successCriteria": "You can move a diminished arpeggio shape fluidly through multiple inversions and positions so lines sound intentional rather than accidental; phrases should produce clear tension and resolve to a target chord or pitch, with even articulation and audible voice-leading between notes.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "sweep_neoclassical",
+          "suggestedLessonIds": [
+            "u_9X4rZ6pFA",
+            "wv4sBVxx2ZU"
+          ]
+        },
+        {
+          "id": "5ee86374-e58c-4c70-a292-02cd8ea092f0",
+          "title": "Legato arpeggio linking",
+          "description": "[Why it matters]\nLegato arpeggio linking is the craft of connecting arpeggio outlines into single, flowing melodic statements so the harmony reads clearly even when the line is played with minimal pick attack. For a Marty Friedman–inspired voice, this lets you produce singing, violin-like runs that move through complex chord colors without sounding fragmented.\n\n[How to practice]\nWork on short linking exercises that force a clear target note at the junction between two arpeggio shapes, then chain those links into longer phrases; focus on economy of fretting motion and the timing of fingered connections. Add expressive devices—subtle slides, slight micro‑inflections, and dynamic shading—so the linked line breathes as one musical phrase rather than a series of licks. Apply the links over changing harmonies and in different neck regions so the technique becomes musical, not just mechanical.\n\n[Common trap]\nA frequent mistake is making the legato material so dense that the chord tones that define the arpeggio disappear, leaving only indistinct runs. Also avoid relying exclusively on continuous legato—preserve occasional chosen attacks or separations so phrase direction and rhythmic pulse remain audible. Keep each link purposeful: if a connector doesn't highlight the harmony or shape the phrase, simplify it.",
+          "successCriteria": "You can move between arpeggio shapes without audible gaps while the defining chord tones remain clear; phrases feel like single, vocal lines with intentional breathing and shape; listeners perceive the harmonic motion even when most notes are fingered rather than picked.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "legato_continuous_flow",
+          "suggestedLessonIds": [
+            "sstArwUX2AQ",
+            "nnAFVTNxW6Y"
+          ]
+        },
+        {
+          "id": "66aa8050-514c-4729-b6f5-01b8d2b21379",
+          "title": "Arpeggio phrasing dynamics",
+          "description": "[What it is]\nArpeggio phrasing dynamics is the conscious shaping of loudness, emphasis and sustain inside arpeggiated lines so they read as musical sentences rather than a run of equal notes. It means choosing which chord tones to bring forward, where to compress or breathe, and how to use contrasts (soft→loud, short→long, accented→ghosted) to create forward motion and tension-release.\n\n[Why it matters]\nGood dynamic phrasing turns technical arpeggios into expressive statements that highlight voice-leading and emotional peaks; it makes single-note groups convey harmony and intent. For stylistic players, these choices are what separate flashy technique from memorable melody — listeners remember the shape and contour more than exact notes.\n\n[How to practice]\nPractice a single arpeggio shape repeatedly with different dynamic contours: push towards a peak on different chord tones, perform a gradual swell then a quick drop, or play alternating notes louder and softer to audition different accent patterns. Record short phrases, exaggerate contrasts while slow, then smooth them back toward musical subtlety as control improves; focus on consistent control of sustain and release so dynamics feel deliberate. Finally, create tiny motifs that place the dynamic high point on unexpected chord tones and practice linking those motifs into longer lines so the phrasing becomes second nature when improvising.",
+          "successCriteria": "Mastery feels like every arpeggio telling a clear musical idea: intentional peaks, audible emphasis on chosen chord tones, natural breath points, and controlled sustain so phrases sing and create tension–release. Dynamics are repeatable and adaptable — you can make the same shape sound soft and mysterious or bold and declarative on demand.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "chord_tone_improvisation"
+        }
+      ]
+    },
+    {
+      "id": "0c257b07-d828-4d91-bb39-e6a11a28b949",
+      "title": "Phrase Craft & Tone",
+      "order": 5,
+      "steps": [
+        {
+          "id": "c0f9ab76-933f-47ed-a662-681946734be7",
+          "title": "Motivic development",
+          "description": "[What it is]\nMotivic development is the craft of taking a tiny melodic or rhythmic cell and transforming it so the listener recognises a through-line even as the music changes. Transformations include rhythmic reshaping, intervallic alteration, fragmentation, sequencing, inversion and timbral or articulative variation. The goal is a coherent thread that can be stretched, repeated, and disguised to create forward motion and narrative within a solo.\n\n[Why it matters]\nStrong motivic work makes a solo feel like a single conversation rather than a string of unrelated licks; it gives personality, recall, and emotional logic to longer lines. For a stylistic approach that blends exotic colors and dramatic gestures, motivic development lets you suggest themes and then elaborate them so every phrase contributes to a larger statement. It also makes improvisation sound composed, intentional, and memorable.\n\n[How to practice]\nChoose a very short motif (a two-to-four event cell) and explore systematic variations: displace its rhythm, stretch or compress its durations, flip intervals, break it into fragments and recombine those pieces, and sequence it through different registers. Emphasize changes of articulation, dynamics and small ornamental moves to alter character without losing identity; use silence and staggered repetition to create call-and-response between statements. Work by deliberate constraints — repeat only one transformation for a pass, then another — so the relationship between motif and variation becomes explicit and immediately usable in soloing.",
+          "successCriteria": "You can state a clear motif and then produce several recognisable but varied restatements within a run; listeners can hear the motif recur even as you alter its rhythm, intervals, register and articulation. Phrases feel connected, transitions sound inevitable, and short cells reliably generate longer, expressive lines.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "composition_challenge"
+        },
+        {
+          "id": "b366a5a2-f1ed-45ba-8f64-cfd67f510503",
+          "title": "Silence and space",
+          "description": "[What it is]\nSilence and space is the deliberate use of rests, pauses, and the natural decay of notes as an active part of phrasing rather than as gaps to be filled. It treats absence of sound as a compositional ingredient that shapes timing, tension, and listener expectation. On guitar this includes intentional timing of note endings, leaving strings to ring or be cut, and designing phrases that rely on what isn't played as much as what is.\n\n[Why it matters]\nThoughtful use of silence makes lines more vocal and memorable by giving motifs room to breathe and by heightening contrast between ideas. It controls momentum and creates moments of anticipation and release, which are crucial in a style that values expressive, emotive solos. Listeners perceive purpose in pauses when they follow clear melodic intent; silence turns technique into statement.\n\n[How to practice]\nCraft short motifs and force a rest after each one — resist the urge to fill the space; listen to how the pause changes the motif's meaning and adjust note choices to benefit the silence. Practice varying the length and placement of rests inside longer phrases so silence becomes a rhythmic device: try leaving gaps inside runs, ending phrases early, or letting a single sustained note decay fully. Record and evaluate whether pauses feel intentional or uncertain, then refine dynamics and note endings so the space reads as punctuation. Finally, experiment with implied continuation — suggest a phrase through partial material and let the listener's expectation complete it in the silence.",
+          "successCriteria": "Your solos breathe: pauses feel intentional and create clear tension/release, motifs become more memorable because of the gaps, and overall phrasing uses silence to shape direction and emotional impact rather than simply filling time.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "229f3159-17ad-428d-b750-42d629dc2ed2",
+          "title": "Dynamic microphrasing",
+          "description": "[What it is]\nBuilding on your motivic development and use of space, dynamic microphrasing is the deliberate control of very small-scale dynamic shapes inside short melodic fragments—tiny crescendos, instant decays, micro-accents and subtle touch changes that make a line breathe like a voice. It operates at the level of individual notes and the transitions between them, altering emotional contour without changing pitch or rhythm.\n\n[Why it matters]\nThese micro-choices are what turn technical runs into expressive statements: they highlight fragments, create tension and release within a single phrase, and give a personal, vocal quality to lines. In performance, well-placed microphrasing keeps listener attention and makes repeated motifs feel fresh and communicative.\n\n[How to practice]\nWork with very short motifs (two to four notes) and deliberately explore variations of entrance, sustain and release for each note: soft-to-swell, abrupt cut-off, or a barely audible accent on a subdivision. Practice isolating one variable at a time—attack firmness, sustain level, or decay timing—so you can hear how each affects the phrase's character, then combine them. Always start slow and aim for repeatable control; record short takes and compare them to train your ear to recognize useful micro-differences. Gradually apply those controlled micro-choices inside longer lines until they become second nature.",
+          "successCriteria": "You can alter the emotional direction of a short phrase using only subtle changes in attack, sustain or release, and listeners notice the difference even when notes and rhythm remain the same. Your micro-dynamic shapes are repeatable under performance conditions and integrate smoothly into longer lines without disrupting timing.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "chromatic_accents"
+        },
+        {
+          "id": "75d6634b-0b45-4060-83b9-4ad4c952ab65",
+          "title": "Vibrato placement choices",
+          "description": "[What it is] Building on your vibrato control, vibrato placement choices are the artistic decisions about which notes receive vibrato, when that vibrato begins, and how long it continues. This skill treats vibrato as a phrasing tool — placing it on arrival tones, phrase endings, or unexpected beats changes the sentence-level meaning of a line. Think in terms of onset (immediate vs delayed), duration (brief accent vs sustained), and selectivity (isolated highlight vs continuous color).\n\n[Why it matters] Placement shapes emotional contour and melodic clarity: the same lick can feel plaintive, aggressive, or singing simply by where you put vibrato. In idiomatic soloing, well-chosen vibrato emphasizes target tones, reinforces tension–release, and prevents everything from sounding uniformly 'vibrato-heavy.' Thoughtful placement also helps your lines read as intentional statements rather than technical demonstrations.\n\n[How to practice] Choose short phrases and make deliberate variants: no vibrato, immediate-onset, delayed-onset, and sustained-onset; listen back and note which placement best serves the harmony and mood. Practice shifting the vibrato start later by small increments until the arrival feels natural, then vary duration and sparseness across a run so vibrato becomes a punctuation mark rather than a default. Improvise with a rule: only apply vibrato to destination tones or to an intentionally colored non-destination, and judge each choice by whether it clarifies or muddies the line.",
+          "successCriteria": "You can place vibrato so phrases sound vocal and purposeful: vibrato highlights target tones, creates clear tension–release, and varies enough to avoid predictability while always serving the musical context.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing",
+          "suggestedLessonIds": [
+            "MQrn-xCi7to",
+            "FgP9Qy9BBks",
+            "x1o9VZ250G0",
+            "Nlj5X3o0R-0",
+            "89jbZsZ9avA"
+          ]
+        },
+        {
+          "id": "34c4b831-168c-4f41-85fa-a8b056dedfa0",
+          "title": "Tone shaping for sustain",
+          "description": "[What it is]\nTone shaping for sustain is the deliberate control of a note’s amplitude envelope and harmonic content so the sound holds musically over time instead of collapsing or ringing uncontrolled. It integrates touch and gear choices to sculpt how harmonics bloom and how the loudness decays, creating a singing, vocal quality.\n\n[Why it matters]\nSustain becomes an expressive tool: well-shaped sustain lets single notes and long lines sit above accompaniment, connects ornamentation into phrases, and makes melodic statements feel intentional rather than accidental. In lead playing, it determines whether a held note supports the line or distracts from it.\n\n[How to practice]\nIsolate one variable at a time—pick attack, guitar volume, pickup selection, drive/saturation, compression, and amp EQ—and record short sustained notes and simple intervallic phrases while changing that variable to hear its effect on the decay and harmonic balance. Practice holding notes and overlapping phrases while deliberately adjusting attack and volume to keep the fundamental present and the desired overtones audible; then try to reproduce the same sustain with reduced reliance on pedals so the motion and touch internalize the result. Use critical listening (A/B recordings), small incremental adjustments, and repetition until you can dial a sustaining tone quickly to match the musical context.",
+          "successCriteria": "Sustained notes consistently 'sing' with an even decay and musically balanced harmonics, sit clearly in a mix without obscuring articulation, and can be reproduced reliably by adjusting touch and basic gear settings. You can shape sustain to support different phrase types (long, singing lines vs. short accented notes) and achieve similar results with or without effect assistance.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "vibrato_finger_isolation"
+        },
+        {
+          "id": "1cc22cf4-1da4-4477-8b63-f8117f15a123",
+          "title": "Tremolo bar ornamentation",
+          "description": "[What it is]\nTremolo bar ornamentation means using the tremolo (whammy) arm as an expressive device — small pitch inflections, scoops, fluttering micro-oscillations, or occasional dramatic dives — applied like a voice-shaped embellishment to single notes, double-stops, or phrase endpoints. The focus is on depth, timing, and the exact return point so the motion becomes a deliberate color rather than a mechanical effect.\n\n[Why it matters]\nThese ornaments turn technical lines into singing, vocal-like statements: they add emotional shading, highlight motifs, and create surprise or tension-release within a phrase. Tasteful use makes lines feel less mechanical and more personal, widening your palette without changing the underlying harmony.\n\n[How to practice]\nWork in stages: first isolate very small, repeatable motions that reliably return to pitch, then apply those motions to accented notes and phrase endings, and finally expand to larger gestures and combined articulations until they feel musical. Record short phrases and listen for consistent return, clean timing, and whether the ornament supports the phrase; refine by reducing excess motion and tightening the endpoint. Vary placement and intensity so the tremolo-arm choice becomes a deliberate expressive decision rather than a reflex.",
+          "successCriteria": "Ornaments sound intentional and vocal-like, with consistent depth and timing; each motion reliably returns to the original pitch without unwanted drift. The effect enhances phrasing and emotional contour rather than distracting, and you can execute both subtle inflections and larger gestures with controlled, repeatable results.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "vibrato_control_drill",
+          "suggestedLessonIds": [
+            "K0ODw9QhILQ"
+          ]
+        },
+        {
+          "id": "84ce8b60-26b1-4fb4-8259-ffb2e53eebe5",
+          "title": "Delay-based phrasing",
+          "description": "[What it is]\nDelay-based phrasing treats a delay effect as an active musical partner: your played notes produce timed repeats that can shadow, answer, or contrapuntally interact with the original line. By adjusting delay time, feedback and mix, those repeats become a second voice that shapes rhythm, space and implied harmony around each phrase. The technique is about composing with echoes — intentionally placing notes so the repeats create melodic and rhythmic dialogue.\n\n[Why it matters]\nUsing delay musically expands what a single guitar line can do, making sparse playing sound fuller and conversational without extra picking. Well-managed repeats let you imply counterpoint, emphasize exotic intervallic choices, and create rhythmic displacement that adds tension and release. When the effect is under control it enhances expression; when uncontrolled it muddies the line, so deliberate use is essential for clarity and impact.\n\n[How to practice]\nWork with short melodic phrases: play one fragment, listen to how the repeats fall, then alter your timing and attack to force different interactions with the echoes. Systematically change the delay mix and feedback so you can hear when repeats sit behind your dry signal versus when they become a dominant second voice; practice stopping the dry sound cleanly to let repeats finish the idea. Train call-and-response patterns where you play, pause and let the delay answer, then progressively overlap your next phrase into the repeats to build controlled counterlines and rhythmic tension.",
+          "successCriteria": "Your repeats consistently function as a musical partner: they sit at an intentional level in the mix, fill or punctuate space without causing clutter, and create audible counterlines or rhythmic displacement that enhance phrasing. You can start a phrase and rely on the delay to answer, or play through repeats to create layered textures, and you can adjust settings live so the echo behaves predictably as part of the arrangement. The overall effect sounds deliberate and conversational rather than accidental or muddy.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        }
+      ]
+    },
+    {
+      "id": "43f40c2d-c868-4b3f-9654-7ed7fc7f1554",
+      "title": "Marty Friedman Integration",
+      "order": 6,
+      "steps": [
+        {
+          "id": "a0f70325-46b2-40e6-9fd7-4c421e41314a",
+          "title": "Tornado of Souls integration",
+          "description": "[What it is]\nIntegrating the \"Tornado of Souls\" solo means internalizing its melodic gestures, idiosyncratic rhythmic phrasing, and signature tonal character so you can reproduce and adapt them musically. It's about understanding how short motifs connect into a coherent solo narrative that breathes and resolves, rather than parroting isolated licks. When integrated, those motifs become flexible vocabulary you can use in both faithful renditions and original improvisation.\n\n[Why it matters]\nThis integration converts memorized phrases into a working stylistic language you can deploy in performance or composition. It trains you to place and shape lines so they serve the song’s drama and interact with the band, rather than simply showcasing technique. Mastering this balance is what makes a performance feel convincingly Friedmanesque while still sounding personal.\n\n[How to practice]\nTranscribe the solo in short chunks and sing or hum each phrase until its contour and timing are fixed in your ear. Practice each chunk slowly to match its timing, timbral nuances, and expressive inflections, then connect chunks until transitions are seamless. Reapply the motifs in different harmonic contexts and against a backing mix so they become adaptable tools, and record yourself to compare tonal and phrasing choices against the original. Finally, take isolated motifs and improvise variations that retain the solo’s voice while reflecting your own musical decisions.",
+          "successCriteria": "You can perform the solo or convincingly Friedmanesque improvisations where phrases flow naturally and convey the original’s expressive intent. Motifs are adaptable across harmonic settings, transitions between ideas are seamless, and your recorded performances show consistent tonal and rhythmic character that sits well with a band. You can both reproduce the solo with musicality and use its vocabulary creatively without sounding like a note-for-note copy.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "sing_what_you_play",
+          "suggestedLessonIds": [
+            "E5WoxqThfwU"
+          ]
+        },
+        {
+          "id": "6cd6c707-97e2-4bdc-968c-8ff252eeb4ba",
+          "title": "Hangar 18 solo study",
+          "description": "[What it is]\nA concentrated, phrase-by-phrase study of the Hangar 18 solo to internalize Marty Friedman’s melodic language: the small motifs, unusual note relationships, accent placement, and expressive micro-timing that give the solo its identity. Rather than rote copying, it’s an analytical replication—you learn why each phrase moves the way it does and how those choices create tension and release.\n\n[Why it matters]\nWorking this solo teaches the listener-centered decisions that define Friedman's voice: how isolated motifs are shaped, how contrast between lines creates drama, and how small timing and ornament choices make a phrase memorable. Mastering it accelerates your ability to write and improvise convincing Friedmanesque lines and to reproduce that expressive character in a full-band context.\n\n[How to practice]\nTranscribe the solo in short segments, notating exact rhythmic placement and any ornamental marks, then sing or hum each segment until its contour is internalized. Work slowly on each excerpt until you can play it cleanly from memory, then recombine and reorder motifs to test true understanding; record comparisons to the original and practice performing the phrases over backing material so you can reliably reproduce both the notes and the expressive intent.",
+          "successCriteria": "You can play the Hangar 18 solo from memory with accurate note choices, convincing expressive timing, and the same overall melodic arc; you can sing or hum each motif and recreate it spontaneously. You can rearrange its motifs into new lines and incorporate those ideas into improvisation and band performance while preserving the solo’s characteristic voice.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "sing_what_you_play"
+        },
+        {
+          "id": "c48e460c-bae8-49e0-97df-ecebd0fc7f36",
+          "title": "Dragon's Kiss assimilation",
+          "description": "[What it is]\nDragon's Kiss assimilation is the process of internalizing the piece's distinctive melodic vocabulary, rhythmic quirks, and tonal gestures so they become usable language in your own playing. Rather than rote memorization, it means hearing and feeling the phrasing, ornamentation, and timbral choices so you can reproduce and adapt them spontaneously. The goal is idiomatic fluency: the piece's character should come out naturally when you play, not as a checklist of licks.\n\n[Why it matters]\nMastering this assimilation gives you direct access to the specific emotional and stylistic fingerprints that define the piece—its tension bends, unexpected turns, and expressive contours—so your improvisation and composition genuinely reflect that style. It trains your ear for subtle rhythmic displacement and the small articulations that make phrases sound personal rather than mechanical. That fluency lets you weave recognizable Friedmanesque color into new musical contexts without sounding like a photocopy.\n\n[How to practice]\nWork phrase-by-phrase: isolate short motifs, loop them, and match the exact timing, attack, and tiny ornamental moves by ear before copying them on the instrument. Remove the scaffolding by transposing each motif into other harmonic contexts and creating variations that preserve the original character while changing intervals or rhythmic placement. Record yourself, compare tone and phrasing against the reference, then use the assimilated motifs in call-and-response exercises and free improvisation so they become automatic building blocks. Keep focus on subtlety—small changes in attack, duration, or harmonic placement are the difference between sounding studied and sounding lived-in.",
+          "successCriteria": "You can reproduce the piece's idiomatic turns and micro-gestures from memory with convincing tone and timing, then adapt those motifs into original lines that retain the same expressive weight. Phrases sit naturally over changing harmonies and feel like part of your vocabulary rather than copied licks.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "sing_what_you_play"
+        },
+        {
+          "id": "2f2651c4-0ce0-4abc-bf33-e3ab1463e2b7",
+          "title": "Friedmanesque improvisation",
+          "description": "[What it is]\nFriedmanesque improvisation is a personal vocabulary that marries exotic scalar color, large intervallic leaps, and vocal-like, ornamented phrasing into coherent melodic statements. It emphasizes surprising melodic turns and expressive nuance rather than constant speed — lines feel both exotic and singable, often resolving in unexpected but logical ways. The result is an improvisational voice that sounds deliberate, theatrical, and emotionally specific.\n\n[Why it matters]\nAdopting this approach gives your solos a distinct personality and emotional weight that listeners immediately recognize: it’s less about showing chops and more about shaping memorable melodic narratives. It also trains you to use dissonance and release deliberately, so tension feels earned rather than gratuitous. For band contexts, it helps craft leads that cut through the mix while still serving the song.\n\n[How to practice]\nDevelop short, repeatable motifs and transform them using intervallic leaps, chromatic approaches, and timbral changes so each statement evolves logically into the next. Practice improvising over a static harmony or simple vamp, focusing on target-note resolution, varied rhythmic placement, and controlled use of ornament (bends, slides, small micro-inflections) to make phrases vocal. Record short improvisations, pick 1–2 favorite motifs per take, and refine them into 8–16 bar solos that balance exotic color with singable lines; iterate until the motifs feel inevitable rather than forced.",
+          "successCriteria": "Solos consistently sound identifiable as ‘Friedmanesque’: motifs are memorable, intervals and exotic colors are used tastefully, phrases resolve with convincing logic, and ornamentation reads as expressive rather than mechanical. You can create coherent 8–16 bar improvised solos on the fly that combine surprise and singability, and others can recognize the stylistic flavor in your playing.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "one_string_backing"
+        },
+        {
+          "id": "3ed1ea35-a86b-4bc3-9111-67bad3bc4a78",
+          "title": "Arrangement for band context",
+          "description": "[What it is]\nArrangement for band context is the craft of assigning and shaping guitar parts so they serve the whole ensemble: deciding when the guitar leads, supports, doubles, or creates counter-melodies, and how its tone and phrasing fit with drums, bass, keys, and vocals. It includes voicing choices, harmonic placement, textural layering, and planning transitions and dynamics so guitar parts enhance the song rather than compete with other instruments. Effective arrangements also consider live practicality — what can be reproduced or simplified onstage without losing character.\n\n[Why it matters]\nA well-considered arrangement makes signature guitar gestures audible and meaningful in a dense mix, preserves clarity across frequency ranges, and gives the band room to breathe so riffs and solos land with impact. It prevents clutter by choosing the right role for the guitar at each moment — lead focus, harmonic pad, rhythmic engine, or color — and ensures that the emotional contour of a piece (builds, drops, climaxes) is supported by complementary guitar choices. In performance settings, good arrangements make demanding parts repeatable and cohesive with the rest of the ensemble.\n\n[How to practice]\nWork on short-section sketches: write or transcribe a verse, chorus, and solo section and arrange several alternative guitar roles for each (single-line lead, harmony, doubled riff, sparse comping) to hear what best serves the band. Make simple charts, test each option with full-band or backing-track rehearsal, record the mix, and adjust voicings and dynamics to avoid masking with bass or keys. Practice communicating and notating parts clearly, create streamlined live versions of complex studio lines, and iterate based on how the guitar sits in recordings and in rehearsal spaces.",
+          "successCriteria": "Arrangements consistently allow the guitar to be heard with presence and definition in ensemble mixes, solos and riffs sit gracefully without masking other instruments, transitions and dynamics feel natural and deliberate, and the parts are practical and repeatable in live performance while retaining the stylistic character.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "guide_tone_voice_leading"
+        },
+        {
+          "id": "cf731353-a95e-45d6-9f5b-4288142a3fda",
+          "title": "Live phrasing reproduction",
+          "description": "[What it is]\nLive phrasing reproduction is the ability to deliver a studio-level, stylistically authentic guitar phrase onstage over and over—including subtle timing nudges, micro-dynamics, attack variations, and small ornamentation—so it reads as both precise and alive. It’s not rote copying; it’s reproducing the expressive decisions that make a phrase unmistakably characteristic while keeping it responsive to the moment.\n\n[Why it matters]\nAudiences and bandmates recognize signature phrasing more than exact notes. Consistent live reproduction preserves the emotional intent and identity of a line, anchors arrangements, and lets you interact musically with the band without losing the stylistic fingerprint.\n\n[How to practice]\nIsolate short target phrases and loop them: listen, sing or hum the nuance, then play and compare, tightening discrepancies until the phrase feels natural to repeat. Practice under realistic performance conditions (standing, full rig, with backing parts and distractions), and train to reproduce the phrase multiple times in a row with the same expressive details; vary dynamics and context so you can deliver the phrase faithfully whether soloing, trading with the band, or comping.\n",
+          "successCriteria": "You can consistently reproduce chosen phrases in performance settings so they retain the same timing quirks, dynamic shading, and ornamentation as the reference, while remaining responsive to band interaction; listeners familiar with the style identify the phrasing as authentic and intentional.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "sing_what_you_play"
+        },
+        {
+          "id": "3b2f80d6-a43e-44ad-9c22-251e902647c6",
+          "title": "Original composition in style",
+          "description": "[What it is]\nOriginal composition in this style means writing full pieces—motifs, progressions, solos and arrangements—that capture the artist's characteristic voice without copying existing music. It emphasizes memorable melodic contours, distinctive intervallic choices, and deliberate timbral and dynamic decisions so the result feels stylistically authentic yet original. The objective is a complete, performable piece that communicates a clear musical statement in that aesthetic.\n\n[Why it matters]\nComposing transforms passive imitation into active authorship: you internalize stylistic grammar by choosing which elements to adopt, adapt, or discard. Originals give you material tailored to your strengths for recording and performance, and they help develop a personal voice that listeners can recognize as inspired by the style rather than derivative. The process also highlights musical weaknesses to address and creates a portfolio of playable works.\n\n[How to develop it]\nBegin with short motifs and expand them into contrasting sections—statement, development, return—making sure each phrase has a role in the larger form. Play with unexpected intervallic moves and nonstandard scalar/color choices for melodic interest, then shape dynamics, tone and arrangement so the melody remains central rather than being buried by virtuosity. Iterate by recording rough demos, editing for clarity and purpose, seeking outside feedback, and refining orchestration and pacing until the piece stands on its own musically.",
+          "successCriteria": "You can produce original pieces that clearly evoke the artist's aesthetic without sounding like copies: motifs are memorable, melodic leaps feel intentional, harmonic color feels surprising yet resolved, solos serve the song, and the full arrangement is performable and stylistically coherent.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "composition_challenge"
+        }
+      ]
+    }
+  ]
+}
