@@ -29,5 +29,8 @@ export const saveUserSongMeta = async (
   data: UserSongMeta
 ): Promise<void> => {
   const ref = doc(db, "users", userId, "userSongs", songId);
-  await setDoc(ref, data, { merge: true });
+  const clean = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined)
+  );
+  await setDoc(ref, clean, { merge: true });
 };
