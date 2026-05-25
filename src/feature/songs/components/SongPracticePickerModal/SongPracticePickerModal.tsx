@@ -18,10 +18,10 @@ import {
   Link2Off,
   Loader2,
   Lock,
-  Timer,
   Upload,
-  Zap,
 } from "lucide-react";
+import { PiCassetteTapeLight } from "react-icons/pi";
+import { SiGuitarpro } from "react-icons/si";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -105,7 +105,7 @@ export function SongPracticePickerModal({
           )}
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
-              {phase === "pick" ? "Choose practice mode" : "Attach GP5 file"}
+              {phase === "pick" ? "Choose practice mode" : "Attach GP file"}
             </p>
             <p className="truncate text-sm font-bold text-white">
               {song.title}
@@ -122,12 +122,12 @@ export function SongPracticePickerModal({
               onClick={handleFreePractice}
               className="group flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-zinc-900">
-                <Timer className="h-5 w-5 text-zinc-300" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
+                <PiCassetteTapeLight className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">Free Practice</p>
-                <p className="text-[11px] text-zinc-500">Timer and metronome, no tablature</p>
+                <p className="text-sm font-bold text-white">Practice Session</p>
+                <p className="text-[11px] text-zinc-500">Timer, YouTube player and section mapping</p>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
             </button>
@@ -138,18 +138,18 @@ export function SongPracticePickerModal({
                 onClick={handleGp5Practice}
                 className="group flex w-full items-center gap-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-left transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 active:scale-[0.99]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/10">
-                  <Zap className="h-5 w-5 text-cyan-400" />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
+                  <SiGuitarpro className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">GP5 Practice</p>
+                  <p className="text-sm font-bold text-white">GP File Practice</p>
                   {hasGpFile ? (
                     <div className="mt-0.5 flex items-center gap-1.5">
                       <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
                       <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-zinc-500">Attach your own GP5 file for interactive tablature</p>
+                    <p className="text-[11px] text-zinc-500">Attach a GP file for interactive tablature</p>
                   )}
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition-colors group-hover:text-cyan-400" />
@@ -158,12 +158,12 @@ export function SongPracticePickerModal({
               <div className="relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] p-4 opacity-70">
                 {/* Locked overlay */}
                 <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-700/50 bg-zinc-900">
-                    <Lock className="h-5 w-5 text-zinc-500" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border border-white/5 border-t-cyan-500/20 border-l-cyan-500/10 shadow-lg">
+                    <SiGuitarpro className="h-5 w-5 text-zinc-600" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-zinc-400">GP5 Practice</p>
+                      <p className="text-sm font-bold text-zinc-400">GP File Practice</p>
                       <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-400">
                         <Crown className="h-2.5 w-2.5" />
                         Premium

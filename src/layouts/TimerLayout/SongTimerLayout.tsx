@@ -111,7 +111,7 @@ export const SongTimerLayout = ({
         case "KeyM":
           if (!isLocked) {
              e.preventDefault();
-             handleAddSection();
+             handleAddSection(undefined);
           }
           break;
         case "KeyL":
@@ -181,10 +181,10 @@ export const SongTimerLayout = ({
     }
   };
 
-  const handleAddSection = () => {
+  const handleAddSection = (name?: string) => {
     const newSection: SongSection = {
       id: uuidv4(),
-      name: `Section ${sections.length + 1}`,
+      name: name ?? `Section ${sections.length + 1}`,
       startTime: Math.floor(currentTime),
       color: nextSectionColor(sections),
       mastery: 0,
@@ -324,6 +324,8 @@ export const SongTimerLayout = ({
               onPlay={startTimer}
               isLocked={isLocked}
               onLockToggle={() => setIsLocked(!isLocked)}
+              songTitle={song.title}
+              songArtist={song.artist}
             />
 
             {youtubeUrl && (
@@ -342,6 +344,7 @@ export const SongTimerLayout = ({
                   sections={sections}
                   loopSectionId={loopSectionId}
                   currentTime={currentTime}
+                  duration={duration}
                   onPlay={handleSectionPlay}
                   onLoop={handleSectionLoop}
                   onMasteryChange={handleMasteryChange}
@@ -349,6 +352,7 @@ export const SongTimerLayout = ({
                   onTimeChange={handleTimeChange}
                   onDelete={handleDelete}
                   onAdd={handleAddSection}
+                  onAddNamed={(name) => handleAddSection(name)}
                   isLocked={isLocked}
                 />
               </div>
@@ -383,16 +387,6 @@ export const SongTimerLayout = ({
             </div>
           )}
 
-          {/* CTA for YouTube link - show when no URL */}
-          {!youtubeUrl && (
-            <div className="bg-cyan-500/10 rounded-lg p-6 text-center">
-              <h3 className="text-base font-bold text-white mb-2">Link a YouTube video to unlock features</h3>
-              <p className="text-sm text-zinc-400 mb-4">Add a YouTube link above to use sections, mark passages, loop sections, and keyboard shortcuts for an enhanced practice experience.</p>
-              <div className="inline-block px-4 py-2 bg-cyan-500/20 rounded-[4px] text-xs font-bold text-cyan-400">
-                Paste a YouTube link in the player above
-              </div>
-            </div>
-          )}
 
           {/* Notes Section */}
           <div className="bg-white/[0.02] rounded-lg overflow-hidden">
