@@ -36,9 +36,9 @@ export const EarTrainingLeaderboardDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-xl shadow-2xl">
-        <div className="p-6">
-          <DialogHeader className="mb-6 text-left">
+      <DialogContent className="max-w-md bg-[#0a0a0a] border-0 p-0 sm:rounded-xl shadow-2xl max-h-[85vh] flex flex-col">
+        <div className="p-6 pb-4 shrink-0">
+          <DialogHeader className="mb-0 text-left">
             <div className="flex items-center gap-3 mb-2">
               <Trophy className="w-5 h-5 text-amber-400" />
               <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">Leaderboard</span>
@@ -47,7 +47,9 @@ export const EarTrainingLeaderboardDialog = ({
               {exerciseTitle}
             </DialogTitle>
           </DialogHeader>
+        </div>
 
+        <div className="overflow-y-auto flex-1 px-6 pb-6 min-h-0 custom-scrollbar">
           {isLoading ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -75,10 +77,10 @@ export const EarTrainingLeaderboardDialog = ({
                   <div
                     key={entry.userId}
                     className={cn(
-                      "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                      "flex items-center gap-3 p-3 rounded-xl transition-all",
                       isCurrentUser
-                        ? "bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 border-cyan-500/20"
-                        : "bg-zinc-900/40 border-zinc-800/50"
+                        ? "bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
+                        : "bg-zinc-900/40"
                     )}
                   >
                     {/* Rank Badge */}

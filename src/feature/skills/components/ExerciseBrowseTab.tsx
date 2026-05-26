@@ -29,17 +29,17 @@ interface ExerciseBrowseTabProps {
 const PAGE_SIZE = 15;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  technique: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-  theory: "bg-violet-500/15 text-violet-400 border-violet-500/20",
-  hearing: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
-  creativity: "bg-green-500/15 text-green-400 border-green-500/20",
-  mixed: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
+  technique: "bg-blue-500/[0.12] text-blue-400 border-blue-500/30",
+  theory: "bg-violet-500/[0.12] text-violet-400 border-violet-500/30",
+  hearing: "bg-cyan-500/[0.12] text-cyan-400 border-cyan-500/30",
+  creativity: "bg-green-500/[0.12] text-green-400 border-green-500/30",
+  mixed: "bg-zinc-500/[0.12] text-zinc-400 border-zinc-500/30",
 };
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  easy: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-  medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  hard: "bg-rose-500/15 text-rose-400 border-rose-500/20",
+  easy: "bg-emerald-500/[0.12] text-emerald-400 border-emerald-500/30",
+  medium: "bg-amber-500/[0.12] text-amber-400 border-amber-500/30",
+  hard: "bg-rose-500/[0.12] text-rose-400 border-rose-500/30",
 };
 
 const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
@@ -394,14 +394,6 @@ export const ExerciseBrowseTab = ({
                           )}>
                             {leaderboardRanks[exercise.id]}
                           </div>
-                          {leaderboardRanks[exercise.id] <= 3 && (
-                            <Trophy className={cn(
-                              "h-3.5 w-3.5 drop-shadow-md",
-                              leaderboardRanks[exercise.id] === 1 ? "text-amber-400" :
-                              leaderboardRanks[exercise.id] === 2 ? "text-zinc-400" :
-                              "text-amber-700"
-                            )} />
-                          )}
                         </button>
                       ) : (
                         <span className="text-zinc-800 text-[10px] ml-2">—</span>
