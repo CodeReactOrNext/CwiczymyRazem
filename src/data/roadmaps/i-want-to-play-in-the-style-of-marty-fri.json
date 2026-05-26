@@ -75,25 +75,12 @@
           ]
         },
         {
-          "id": "c72748c3-82f2-4221-8e59-16ded64c387e",
-          "title": "Tremolo bar control",
-          "description": "Tremolo bar control is the deliberate, proportional use of the whammy bar to shape pitch—from tiny vibrato-like flutter to precise dives and squeals—while keeping return-to-pitch and timing consistent. It matters because those vocal, crying and harmonic effects are a central expressive device in the Marty Friedman sound: they let single notes and phrases breathe, scream or settle with intention. Develop it by isolating small wrist motions and larger arm pivots, practicing controlled micro-oscillations up to full-range movements, coordinating release timing with the fretting hand to avoid pitch wobble, and increasing range and speed only after the motion is repeatable and musically placed.",
-          "successCriteria": "You can execute repeatable micro-warble and wide dive effects that reliably return to pitch; squeals and expressive dives sound intentional and sit cleanly in a phrase rather than slipping or flubbing; timing and dynamic placement of bar moves enhance the musical line rather than distract.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "vibrato_finger_isolation",
-          "suggestedLessonIds": [
-            "Z5ini0uUg7s",
-            "loX-zYQJZ3Y"
-          ]
-        },
-        {
           "id": "97fa9561-fedf-4425-8f66-92d1415615ec",
           "title": "Rhythmic picking displacement",
           "description": "Rhythmic picking displacement is the deliberate shifting of where your pick-strokes land relative to the underlying beat so a repeated phrase begins on different subdivisions or off‑beats, creating syncopation and rhythmic tension. It matters because those small timing shifts make single-note lines sound more expressive and unpredictable, helping melodic ideas breathe and push against the groove in the way heard in Marty Friedman’s phrasing. To develop it, isolate a short lick and repeat it while moving the pick‑stroke start one subdivision forward or back each repetition, using small, economy pick motions and consistent accents so the timing shift, not uneven tone, defines the effect; start slow and increase gradually until the displacement feels effortless within your groove.",
           "successCriteria": "You can slide a short phrase ahead of or behind the beat without losing evenness of tone, articulation, or dynamic control; displaced versions lock into the groove so they sound intentionally syncopated rather than sloppy. Accents and pick motion remain consistent across displacements, and you can apply the same displacement habit to different melodic shapes and string sets while keeping the line musical.",
           "sessionsRequired": 8,
-          "order": 6,
+          "order": 5,
           "suggestedExerciseId": "rhythmic_pocket_mastery",
           "suggestedLessonIds": [
             "1nVE0mx_7WE",
@@ -533,24 +520,12 @@
           "suggestedExerciseId": "vibrato_finger_isolation"
         },
         {
-          "id": "1cc22cf4-1da4-4477-8b63-f8117f15a123",
-          "title": "Tremolo bar ornamentation",
-          "description": "[What it is]\nTremolo bar ornamentation means using the tremolo (whammy) arm as an expressive device — small pitch inflections, scoops, fluttering micro-oscillations, or occasional dramatic dives — applied like a voice-shaped embellishment to single notes, double-stops, or phrase endpoints. The focus is on depth, timing, and the exact return point so the motion becomes a deliberate color rather than a mechanical effect.\n\n[Why it matters]\nThese ornaments turn technical lines into singing, vocal-like statements: they add emotional shading, highlight motifs, and create surprise or tension-release within a phrase. Tasteful use makes lines feel less mechanical and more personal, widening your palette without changing the underlying harmony.\n\n[How to practice]\nWork in stages: first isolate very small, repeatable motions that reliably return to pitch, then apply those motions to accented notes and phrase endings, and finally expand to larger gestures and combined articulations until they feel musical. Record short phrases and listen for consistent return, clean timing, and whether the ornament supports the phrase; refine by reducing excess motion and tightening the endpoint. Vary placement and intensity so the tremolo-arm choice becomes a deliberate expressive decision rather than a reflex.",
-          "successCriteria": "Ornaments sound intentional and vocal-like, with consistent depth and timing; each motion reliably returns to the original pitch without unwanted drift. The effect enhances phrasing and emotional contour rather than distracting, and you can execute both subtle inflections and larger gestures with controlled, repeatable results.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "vibrato_control_drill",
-          "suggestedLessonIds": [
-            "K0ODw9QhILQ"
-          ]
-        },
-        {
           "id": "84ce8b60-26b1-4fb4-8259-ffb2e53eebe5",
           "title": "Delay-based phrasing",
           "description": "[What it is]\nDelay-based phrasing treats a delay effect as an active musical partner: your played notes produce timed repeats that can shadow, answer, or contrapuntally interact with the original line. By adjusting delay time, feedback and mix, those repeats become a second voice that shapes rhythm, space and implied harmony around each phrase. The technique is about composing with echoes — intentionally placing notes so the repeats create melodic and rhythmic dialogue.\n\n[Why it matters]\nUsing delay musically expands what a single guitar line can do, making sparse playing sound fuller and conversational without extra picking. Well-managed repeats let you imply counterpoint, emphasize exotic intervallic choices, and create rhythmic displacement that adds tension and release. When the effect is under control it enhances expression; when uncontrolled it muddies the line, so deliberate use is essential for clarity and impact.\n\n[How to practice]\nWork with short melodic phrases: play one fragment, listen to how the repeats fall, then alter your timing and attack to force different interactions with the echoes. Systematically change the delay mix and feedback so you can hear when repeats sit behind your dry signal versus when they become a dominant second voice; practice stopping the dry sound cleanly to let repeats finish the idea. Train call-and-response patterns where you play, pause and let the delay answer, then progressively overlap your next phrase into the repeats to build controlled counterlines and rhythmic tension.",
           "successCriteria": "Your repeats consistently function as a musical partner: they sit at an intentional level in the mix, fill or punctuate space without causing clutter, and create audible counterlines or rhythmic displacement that enhance phrasing. You can start a phrase and rely on the delay to answer, or play through repeats to create layered textures, and you can adjust settings live so the echo behaves predictably as part of the arrangement. The overall effect sounds deliberate and conversational rather than accidental or muddy.",
           "sessionsRequired": 8,
-          "order": 6,
+          "order": 5,
           "suggestedExerciseId": "call_and_response_phrasing"
         }
       ]

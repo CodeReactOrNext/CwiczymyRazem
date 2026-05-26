@@ -249,9 +249,9 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                   filter: showCollision
                     ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
                     : isDragging
-                    ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                    : `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
-                  transform: isDragging ? "scale(1.07) translateY(-5px)" : "scale(1)",
+                    ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
+                    : `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))`,
+                  transform: isDragging ? "scale(1.07) translateY(-6px)" : "scale(1)",
                   transition: isDragging ? "none" : "filter 0.15s, transform 0.15s",
                 }}
               >
