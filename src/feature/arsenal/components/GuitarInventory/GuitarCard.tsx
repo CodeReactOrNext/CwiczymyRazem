@@ -31,7 +31,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
       )}
       style={{
         borderRadius: 10,
-        background: `linear-gradient(160deg, ${rs.baseColor}35 0%, #0a0a0e 55%)`,
+        background: `linear-gradient(160deg, ${rs.baseColor}35 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
         boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
         contain: "layout style paint",
@@ -73,12 +73,6 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         className="relative flex items-center justify-center flex-1 overflow-hidden py-4"
         style={{ minHeight: 200 }}
       >
-
-        {/* Rarity glow behind guitar */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${rs.baseColor}02 0%, transparent 100%)` }}
-        />
 
         {item.isNew && (
           <div
@@ -148,7 +142,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           style={{
             height: 260,
             width: 260,
-            filter: `drop-shadow(0 0 12px ${rs.baseColor}28)`,
+            filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))",
           }}
         />
 
