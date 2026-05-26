@@ -2,6 +2,9 @@ import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { Check, Trash2 } from "lucide-react";
 
+// SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
+const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
 import type { InventoryItem } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 
@@ -23,109 +26,166 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
   return (
     <div
       className={cn(
-        "group relative flex flex-col h-full overflow-hidden cursor-default",
-        isEquipped && "ring-2 ring-amber-400/60"
+        "group relative flex flex-col h-full overflow-hidden",
+        isEquipped && "ring-1 ring-amber-400/40"
       )}
       style={{
-        borderRadius: 8,
-        background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
-        boxShadow: isEquipped
-          ? `0 0 24px rgba(251,191,36,0.25), inset 0 0 0 1px rgba(251,191,36,0.1)`
-          : `0 8px 32px rgba(0,0,0,0.6), 0 0 0 0 transparent`,
+        borderRadius: 10,
+        background: `linear-gradient(160deg, ${rs.baseColor}35 0%, #0a0a0e 55%)`,
+        border: `1px solid ${rs.baseColor}28`,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
+        contain: "layout style paint",
       }}
     >
-      {/* Rarity stripe top */}
-      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}90, transparent)` }} />
+      {/* Grain overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{ backgroundImage: NOISE_BG, backgroundSize: "180px 180px", opacity: 0.035, mixBlendMode: "overlay" }}
+      />
 
-      {/* Header */}
-      <div className="px-3 pt-2 pb-1.5 flex flex-col gap-0">
-        <p className="text-[9px] font-semibold tracking-wide leading-none truncate" style={{ color: rs.baseColor }}>
+      {/* Rarity top stripe */}
+      <div
+        className="h-[2px] w-full flex-shrink-0"
+        style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}, transparent)` }}
+      />
+
+      {/* Brand + Name + Rarity */}
+      <div className="px-3 pt-3 pb-1.5 flex-shrink-0">
+        <p
+          className="text-[10px] font-semibold tracking-wider uppercase leading-none"
+          style={{ color: rs.baseColor }}
+        >
           {guitar.brand}
         </p>
-        <p className="text-[15px] font-bold text-white leading-tight truncate mt-0.5">
+        <p className="text-[16px] font-extrabold text-white leading-tight truncate mt-1">
           {guitar.name}
         </p>
-        <p className="text-[8px] font-medium tracking-[0.2em] mt-0.5 capitalize" style={{ color: `${rs.baseColor}80` }}>
+        <p
+          className="text-[9px] font-medium tracking-[0.15em] mt-0.5 capitalize"
+          style={{ color: rs.baseColor, opacity: 0.7 }}
+        >
           {guitar.rarity}
         </p>
       </div>
 
-      {/* Image */}
+      {/* Guitar image */}
       <div
-        className="relative flex items-center justify-center overflow-hidden flex-1"
-        style={{
-          minHeight: 220,
-          background: `radial-gradient(ellipse at 50% 60%, ${rs.baseColor}28 0%, ${rs.baseColor}06 50%, transparent 75%)`,
-        }}
+        className="relative flex items-center justify-center flex-1 overflow-hidden py-4"
+        style={{ minHeight: 200 }}
       >
-        {/* Scan line */}
+
+        {/* Rarity glow behind guitar */}
         <div
-          className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
-          style={{ background: `linear-gradient(to top, ${rs.baseColor}14, transparent)` }}
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${rs.baseColor}02 0%, transparent 100%)` }}
         />
+
+        {item.isNew && (
+          <div
+            className="absolute top-2 left-2 z-20 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
+            style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}
+          >
+            New
+          </div>
+        )}
+
+        {/* Tags on the right */}
+        {(item.year || item.country) && (
+          <>
+            <div className="absolute top-3 right-2 z-20 flex flex-col gap-1.5">
+              {item.year && (
+                <div className="relative flex items-center">
+                  <div
+                    className="absolute left-[3px] w-[5px] h-[5px] rounded-full z-10"
+                    style={{ background: "#0f0f12", border: "1px solid rgba(255,255,255,0.12)" }}
+                  />
+                  <div
+                    className="text-[9px] font-semibold text-zinc-300 tracking-wide"
+                    style={{
+                      background: "linear-gradient(135deg, #28282e, #1b1b21)",
+                      borderRadius: "2px 3px 3px 2px",
+                      clipPath: "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
+                      paddingLeft: "14px",
+                      paddingRight: "8px",
+                      paddingTop: "3px",
+                      paddingBottom: "3px",
+                    }}
+                  >
+                    {item.year}
+                  </div>
+                </div>
+              )}
+              {item.country && (
+                <div className="relative flex items-center">
+                  <div
+                    className="absolute left-[3px] w-[5px] h-[5px] rounded-full z-10"
+                    style={{ background: "#0f0f12", border: "1px solid rgba(255,255,255,0.12)" }}
+                  />
+                  <div
+                    className="text-[9px] font-semibold text-zinc-300 tracking-wide"
+                    style={{
+                      background: "linear-gradient(135deg, #28282e, #1b1b21)",
+                      borderRadius: "2px 3px 3px 2px",
+                      clipPath: "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
+                      paddingLeft: "14px",
+                      paddingRight: "8px",
+                      paddingTop: "3px",
+                      paddingBottom: "3px",
+                    }}
+                  >
+                    {item.country}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
         <img
           src={`/static/images/rank/${guitar.imageId}.png`}
           alt={guitar.name}
           className="relative z-10 object-contain -rotate-90"
           style={{
-            height: 240,
-            width: 240,
-            WebkitMaskImage: "radial-gradient(ellipse 55% 88% at 50% 50%, black 55%, transparent 100%)",
-            maskImage: "radial-gradient(ellipse 55% 88% at 50% 50%, black 55%, transparent 100%)",
+            height: 260,
+            width: 260,
+            filter: `drop-shadow(0 0 12px ${rs.baseColor}28)`,
           }}
         />
 
-        {/* Badges */}
-        {item.isNew && (
-          <div
-            className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black capitalize tracking-widest text-black"
-            style={{ backgroundColor: rs.baseColor, borderRadius: 4, boxShadow: `0 0 12px ${rs.baseColor}90` }}
-          >
-            New
-          </div>
-        )}
-        {/* Equip indicator dot */}
         {isEquipped && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded bg-amber-400" style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }} />
+          <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1.5">
+            <div
+              className="w-1.5 h-1.5 rounded-full bg-amber-400"
+              style={{ boxShadow: "0 0 8px rgba(251,191,36,1)" }}
+            />
+            <span className="text-[8px] text-amber-400/70 font-medium tracking-wide">equipped</span>
           </div>
         )}
       </div>
 
-      {/* Meta row */}
-      <div className="flex items-stretch border-t" style={{ borderColor: `${rs.baseColor}20` }}>
-        {item.year && (
-          <div className="flex-1 flex items-center justify-center py-1.5 border-r" style={{ borderColor: `${rs.baseColor}20` }}>
-            <span className="text-[9px] font-black text-zinc-500 capitalize tracking-widest">{item.year}</span>
-          </div>
-        )}
-        {item.country && (
-          <div className="flex-1 flex items-center justify-center py-1.5">
-            <span className="text-[9px] font-black text-zinc-500 capitalize tracking-widest truncate px-1">{item.country}</span>
-          </div>
-        )}
-      </div>
 
-      {/* Buttons */}
-      <div className="flex gap-1 border-t" style={{ borderColor: `${rs.baseColor}20` }}>
-        {/* Equip button */}
+      {/* Equip / Sell */}
+      <div
+        className="flex border-t flex-shrink-0"
+        style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
+      >
         <button
           onClick={() => onEquip(guitar.id, item.year, item.country)}
           disabled={isEquipped || isEquipping}
           className={cn(
-            "flex-1 py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 flex items-center justify-center gap-1.5",
+            "flex-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
             isEquipped
-              ? "text-amber-400 cursor-default"
-              : "text-zinc-600 hover:text-white disabled:opacity-40"
+              ? "cursor-default text-amber-400"
+              : "text-zinc-500 hover:text-white disabled:opacity-30"
           )}
           style={{
-            background: isEquipped ? `rgba(251,191,36,0.08)` : "transparent",
+            borderColor: `${rs.baseColor}15`,
+            background: isEquipped ? "rgba(251,191,36,0.06)" : undefined,
           }}
         >
           {isEquipped ? (
             <>
-              <Check size={10} strokeWidth={3} />
+              <Check size={9} strokeWidth={3} />
               Equipped
             </>
           ) : (
@@ -133,17 +193,13 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           )}
         </button>
 
-        {/* Sell button */}
         <button
           onClick={() => onSellClick(item.id, guitar.id)}
           disabled={isSelling || isEquipped}
-          className="flex-1 py-2 text-[10px] font-black capitalize tracking-widest transition-all duration-200 text-red-600/70 hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-          style={{
-            background: "transparent",
-          }}
+          className="flex-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
           title={isEquipped ? "Cannot sell equipped guitar" : undefined}
         >
-          <Trash2 size={10} strokeWidth={3} />
+          <Trash2 size={9} strokeWidth={2.5} />
           Sell
         </button>
       </div>
