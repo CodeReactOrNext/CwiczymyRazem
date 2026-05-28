@@ -1,0 +1,581 @@
+{
+  "id": "f078b316-705e-416d-b831-a842fdff7a24",
+  "title": "I want to play like Adam Jones",
+  "goal": "I want to play like Adam Jones",
+  "level": "Intermediate",
+  "phases": [
+    {
+      "id": "b06643ee-7ddb-4c63-ac11-4ea3e2ffa5df",
+      "title": "Single-Note Expression",
+      "order": 0,
+      "steps": [
+        {
+          "id": "2c3bb54b-9267-492f-8b75-0feadd6cc6b6",
+          "title": "String bend control",
+          "description": "String bend control is the precise, repeatable management of how far and how smoothly you raise or lower a note by bending the string, using coordinated finger pressure and wrist motion to hit exact pitch targets and expressive microtonal shades. It matters because controlled bends are a core part of the vocal-like, emotive lead phrasing heard in Adam Jones's playing—they make single notes cry, resolve, or hover without sounding sloppy or out of tune. Develop it by practicing slow, focused bends to clear pitch targets, using multiple fingers for leverage and a wrist pivot for power, training releases and pre-bends, and constantly checking pitch by ear as you increase speed and range gradually.",
+          "successCriteria": "Bends consistently land precisely where intended and hold stable tone; releases and micro-adjustments are controlled and musical rather than ragged, and bends integrate smoothly into your lines so they sound like intentional expressive choices.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "expressive_bend_phrasing",
+          "suggestedLessonIds": [
+            "v7hTZgHtI9Q",
+            "ShULWDbl8Uc",
+            "3rACLmS4roU",
+            "NG9Pq5kSFqg",
+            "2eRwGUN1Kas"
+          ]
+        },
+        {
+          "id": "64f43faf-4085-4c0c-afe3-7976e45f0ab9",
+          "title": "Wide vibrato control",
+          "description": "[What it is] Wide vibrato control is the ability to produce large, intentional pitch oscillations on a sustained note so the pitch moves noticeably above and below the center pitch while remaining musical. It requires a consistent return to the target pitch and even, controlled motion so the note sings rather than sounding loose. The motion typically comes from a coordinated wrist/forearm gesture while the fretting fingers maintain secure contact.\n\n[Why it matters] Wide vibrato gives single notes a powerful, vocal quality and is a defining expressive tool in the emotive, sustain-forward style you hear from Adam Jones. Used tastefully, it can make a held note feel like a phrase, build tension, and convey intensity without adding extra notes. Mastery keeps the vibrato dramatic without sounding out of tune or uncontrolled.\n\n[How to practice] Sustain a single note in any comfortable neck position and exaggerate the pitch sweep, focusing first on evenness of the ups and downs and a clear return to the center; then refine the gesture until it sounds intentional. Isolate width first, then practice varying width while keeping the motion steady, and later vary cycle speed independently; record and listen to choose the most musical setting. Keep the fretting hand stable so the vibrato motion is reliable, and apply the gesture to different notes and melodic phrases until it becomes a fluent expressive choice.",
+          "successCriteria": "Wide vibrato sounds vocal and deliberate: pitch swings are large but controlled, consistently return to the target pitch, and enhance the note rather than obscuring it. You can produce different widths at will, maintain intonation and timing while applying it in melodic lines, and choose a vibrato that serves the phrase’s emotion.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "vibrato_control_drill",
+          "suggestedLessonIds": [
+            "MQrn-xCi7to"
+          ]
+        },
+        {
+          "id": "527b02d7-94fb-4a25-8346-32e3a4a12bb5",
+          "title": "Sustain and feedback",
+          "description": "[What it is]\nSustain is the ability to keep a note ringing with steady tone and length; controlled feedback is the intentional use of the guitar-amplifier interaction to produce pitched, musical overtones that you can summon and tame. Together they let single notes sing past their initial attack and add harmonic color and atmosphere to a phrase.\n\n[Why it matters]\nSustain and feedback turn short lines into vocal, emotive statements and give you an extra sound source to color a solo without adding more notes. When used musically, they create tension, release, and a signature ambience that helps make single-note playing feel larger and more expressive.\n\n[How to practice]\nFind any comfortable position on the neck and learn the amp/guitar sweet spot where a fretted note will ring and the instrument will respond without wild squeal; practice holding notes with minimal re‑picking to hear consistent decay. Work on calling up feedback predictably by making small body and hand movements, adjusting your volume and tone controls, and using light palm muting to start and stop resonance cleanly. Gradually add moderate saturation and experiment with pick attack, hand damping, and distance/orientation to shape the harmonic content so feedback sounds musical rather than noisy.",
+          "successCriteria": "Notes sustain with even timbre and decay, and you can reliably start and stop musical feedback on command. The feedback produces harmonics that complement the pitch being played and can be shaped with small movements and control changes. Sustained tones support phrase continuity and add expressive color without sounding uncontrolled.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "muting_spotlight_drill",
+          "suggestedLessonIds": [
+            "ie0u-IZl3mA",
+            "zBIQYGavvPI"
+          ]
+        },
+        {
+          "id": "f1b9932d-59bb-4841-a650-7f0582465a0e",
+          "title": "Legato phrasing fluency",
+          "description": "[What it is]\nLegato phrasing fluency is the ability to play connected single-note lines so they sound like a single, singing phrase rather than a series of separate attacks. It relies on efficient finger-based techniques (hammer-ons, pull-offs, slides and minimal picking) plus precise timing and micro-dynamics to shape each phrase. The goal is seamless note-to-note connection with intentional articulation choices.\n\n[Why it matters]\nFluent legato makes melodies feel vocal and expressive, letting long lines breathe and evolve without mechanical interruptions. It thickens texture and gives you control over forward motion and tension inside a run, so your phrases can contrast cleanly with more percussive or chordal moments. For an expressive electric-guitar voice, legato is a primary tool for phrasing and contour.\n\n[How to practice]\nWork small: isolate short melodic fragments and link them until each connection is clean, then expand outward, always starting slow and increasing speed gradually. Focus on economy of motion — keep fretting fingers close to the string, coordinate left-hand releases so notes articulate clearly, and practice hybrid patterns with and without picking to develop consistent tone. Add rhythmic and dynamic variations once the mechanics are steady so the legato becomes a musical choice rather than a technical artifact.",
+          "successCriteria": "Phrases are audible as continuous, singing lines with no audible gaps between notes; hammer-ons, pull-offs and slides produce even volume and clear pitch transitions. You can sustain a melodic idea across position changes and string crossings without hesitations, and use subtle dynamic or rhythmic changes to make legato passages feel intentional and expressive.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "spider_legato_basic",
+          "suggestedLessonIds": [
+            "nnAFVTNxW6Y"
+          ]
+        },
+        {
+          "id": "155d1cfd-e808-4ce3-981b-da5e7bc44f3a",
+          "title": "Slide ornamentation",
+          "description": "[What it is]\nSlide ornamentation is the deliberate use of finger slides to decorate single-note lines: smooth glides into or away from a target pitch, quick scoots that imply a microtonal motion, or longer glissando-like moves used as punctuation. It’s not just moving from one fret to another — it’s shaping the approach and release so the slide becomes a musical gesture rather than a mechanical shift.\n\n[Why it matters]\nSlides give phrases a vocal, conversational quality and can turn a simple melody into something with character and attitude; they are a big part of the phrasing that defines many expressive electric guitar players. Used tastefully they add tension, emphasize target notes, and create signatures in your tone and timing that a listener can recognize even without heavy effects.\n\n[How to practice]\nStart by isolating short melodic fragments and practice sliding into the target note from varying distances and speeds, focusing on hitting the pitch cleanly and controlling the transition noise. Explore different end behaviors: landing precisely and holding, sliding through and releasing, and barely nicking the pitch as a subtle inflection; vary finger choice and pressure to find smooth motion. Gradually integrate slides into longer phrases, deliberately choosing when a slide should be obvious and when it should be a whisper, and record/listen to judge whether each slide serves the musical statement.",
+          "successCriteria": "Slides consistently land on the intended pitch with minimal unwanted string noise, and they sound like intentional musical inflections rather than mechanical movements. You can vary slide length and speed to produce either a bold glissando or a subtle ornament, and you place slides so they enhance the phrase’s shape and emotional contour.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "one_string_backing"
+        },
+        {
+          "id": "0579f3c5-fbb7-4527-a9b8-6898a4eb6ef2",
+          "title": "Picking dynamics control",
+          "description": "[What it is]\nPicking dynamics control is the deliberate use of your picking hand to vary attack, volume and articulation on single-note lines. It includes whisper-soft touches, firm accented strikes and controlled transitions between those levels. This skill sculpts the emotional contour of a phrase independent of fingering or timing.\n\n[Why it matters]\nDynamics turn identical notes into conversational phrases, punchy hits or brooding sustains, making lines feel intentional and expressive. Because pickup drive and effects respond to pick intensity, small changes in attack will alter tone as well as loudness. Controlling those changes is essential for achieving the moody, percussive-to-sustained character common in Adam Jones' lead work.\n\n[How to practice]\nPick a short single-note phrase in any comfortable position and repeat it while deliberately changing pick intensity: very soft, medium, and hard, then practice moving smoothly between those levels. Work on patterns that alternate muted or ghosted notes with sharp accents, record yourself and compare takes to identify where dynamics slip or overdrive becomes uneven. Prioritize clean, repeatable control first, then apply the same variations to longer phrases and through your amp/effects to hear how touch changes the final sound.",
+          "successCriteria": "You can shift instantly between subdued and aggressive pick attack within a phrase, place accents exactly where intended, sustain consistent soft or loud levels on demand, and hear those changes translate musically through your amp and effects — producing controlled, expressive lines that capture a moody, percussive-to-sustained character.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "chromatic_accents",
+          "suggestedLessonIds": [
+            "6o7p3ZAwLrE"
+          ]
+        },
+        {
+          "id": "b4998d1e-92ea-411d-b474-71c2d27e99f6",
+          "title": "String attack variety",
+          "description": "String attack variety is the set of distinct ways you start a note—pick position and angle, using pick edge vs flesh or nail, hybrid finger attacks, rakes and rest-vs-free strokes, plus selective damping—that alter timbre and articulation. It matters because those choices make single-note lines read as aggressive, glassy, muted, or singing, letting you shape mood and cut through a band mix in an Adam Jones–inspired style. Develop it by playing the same short phrase using each attack type, recording and comparing the tones, isolating troublesome transitions until each approach is clear and repeatable, then embedding those attacks into musical phrases so selection becomes instinctive.",
+          "successCriteria": "You can deliberately select and execute different attack types on demand so the same phrase yields clearly different tones; switches between attacks are clean and repeatable; your attack choices consistently enhance phrasing and sit well in a mix.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "tone_color_exploration"
+        }
+      ]
+    },
+    {
+      "id": "d5d2c42e-c1f4-4a9e-b6d1-3c441ce18001",
+      "title": "Scale & Modal Vocabulary",
+      "order": 1,
+      "steps": [
+        {
+          "id": "c306f798-f6ee-4276-bf27-64e1b00f18c2",
+          "title": "Minor pentatonic variants",
+          "description": "[What it is]\nMinor pentatonic variants are the different ways you can alter, extend, or reconfigure the basic minor pentatonic framework to create new colors — adding neighbor or chromatic tones, shifting emphasis to different scale degrees, changing fingering shapes, or blending with modal notes. These variants keep the familiar pentatonic sound but let you imply darker, more ambiguous, or more tension-filled flavors without abandoning the scale's core patterns. Learning variants means thinking of the pentatonic as a toolbox rather than a single box.\n\n[Why it matters]\nUsing variants gives your phrasing more character and prevents predictability; it helps craft the kind of heavy, textural soloing and memorable motifs associated with players in modern rock. Variants let you match phrasing to chord changes, create call-and-response with riffs, and imply modal shades while retaining strong, approachable shapes. That flexibility is crucial for making simple notes sound purposeful and moody.\n\n[How to practice]\nSystematically explore one change at a time: add an adjacent chromatic neighbor to a common pentatonic target, shift the tonal center within a shape, or extract two- or three-note fragments and move them across different positions on the neck. Improvise short, focused phrases using only the variant you're training, listen for whether the change adds tension or clarity, and refine the voicings that feel most expressive. Repeat the small experiments over a static groove, gradually combining different variants into longer lines.",
+          "successCriteria": "You can spontaneously alter pentatonic phrases so they sound distinct and intentional rather than repetitive; your lines imply chord tones or modal color when needed and sit naturally over a heavy rock backing. Listeners hear purposeful variation, tension and release, and a cohesive voice that fits the darker, textured style you’re aiming for.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "pull_off_pentatonic_run",
+          "suggestedLessonIds": [
+            "Oco-lfsJy5M",
+            "BgRzzvVWBrU",
+            "kvmUQ-mb0OY",
+            "0kB4X3w1IBk",
+            "sk36Tv6US6E"
+          ]
+        },
+        {
+          "id": "7d5dbb05-2a9d-4f28-8f34-d4290687ca03",
+          "title": "Dorian modal phrasing",
+          "description": "[What it is]\nDorian modal phrasing means shaping your melodic lines so they sound minor but with a characteristic raised sixth that gives a subtly brighter, unsettled color. Rather than running scale patterns, it’s about choosing target tones and motives that imply the Dorian sound—the raised sixth becomes a melodic landmark you visit or avoid for contrast. Phrases often sit over a static harmony or pedal tone and use space, repetition, and small intervallic turns to project the mode.\n\n[Why it matters]\nThis modal color is central to the atmospheric, slightly ambiguous quality found in the style you’re aiming for: it adds emotional nuance without sounding purely major or purely minor. Using Dorian choices helps your lines sit over sustained chords or drones while creating forward motion and tension-release that feels less predictable than straight minor phrasing. It’s a tool for making simple motifs feel more modern and expressive.\n\n[How to practice]\nWork with short motifs that target the raised sixth as a melodic goal—compose tiny call-and-response phrases where the second phrase emphasizes that note as a resolution or a tension point. Practice moving the same motif to different parts of the neck and sing or hum the line first so the modal color is internalized, then play it while experimenting with space, dynamics, and rhythmic displacement. Finally, build short solo statements that avoid full scalar runs and instead repeat, vary, and answer small cells so the Dorian character becomes a deliberate choice rather than an accidental passing tone.",
+          "successCriteria": "Your lines consistently convey a minor-but-brighter Dorian color: the raised sixth is used deliberately as a target or contrasting tone, phrases sound like curated motifs instead of scale runs, and your melodies sit naturally over sustained chords or drones with clear tension-and-release.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "one_chord_improv",
+          "suggestedLessonIds": [
+            "ued5O9cL7t0",
+            "YL_sF5EvRTI",
+            "SDFw7SAD-4E",
+            "_7hMEfWTWpM",
+            "hyZPcYf1Pe4"
+          ]
+        },
+        {
+          "id": "558145b0-16a6-4e8c-ab1c-cd71a92c80eb",
+          "title": "Phrygian coloration use",
+          "description": "[What it is]\nPhrygian coloration means deliberately using the lowered second scale degree and the close semitone relationships around it to color lines with a dark, exotic tension. In practice you emphasize and ornament that b2 against a minor tonal center, letting the half-step interval become a recurring sonic signature rather than just a passing tone. The result is a shadowy, slightly dissonant flavor that cuts through heavy textures.\n\n[Why it matters]\nFor the Adam Jones aesthetic this coloration supplies the ominous, unresolved quality his leads often rely on—it gives riffs and fills an immediate edge without needing complex harmony. It creates contrast when placed beside more conventional minor phrasing, so short motifs sound distinct and memorable. Using it thoughtfully helps your lines sit in a heavier, more atmospheric pocket that complements dense grooves.\n\n[How to practice]\nIsolate the lowered-second interval inside any comfortable minor framework and make short, repeatable motifs that land on and resolve away from that pitch; vary attack (slides, light pull-offs, fading sustain) and rhythmic placement to hear different tensions. Practice exchanging the b2 with nearby chord tones and with chromatic neighbors so you learn when it sounds like a statement versus a decoration; play those motifs against a held root or simple drone to judge the color. Start slow, increase gradually, and record short improvisations to pick the phrases that read as purposeful rather than accidental.",
+          "successCriteria": "You can place the lowered second deliberately in short motifs so lines sound ominous and intentional, and you can improvise clear phrases that use that tension and resolve it convincingly over a static tonal center—your phrases will communicate the darker, Jones-like coloration without sounding random.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "one_chord_improv",
+          "suggestedLessonIds": [
+            "ZnoKgWnMEq8"
+          ]
+        },
+        {
+          "id": "efd8f613-48d9-4df7-843e-e63123571aa8",
+          "title": "Chromatic approach lines",
+          "description": "[What it is]\nChromatic approach lines are short melodic fragments that reach a target tone by using one or more adjacent semitone steps (approaches, enclosures, or passing tones) rather than staying strictly inside a single scale. They function as connecting glue between scale or chord tones, adding linear motion and a brief, deliberate dissonance before resolving.\n\n[Why it matters]\nUsed tastefully, chromatic approaches add tension, a darker coloration, and a sense of inevitability to a phrase—qualities central to the heavy, cinematic lead lines you hear from players like Adam Jones. They make simple motifs sound more sophisticated and can blur modal boundaries so a solo feels more conversational and less purely scalar.\n\n[How to practice]\nPick a target tone and practice approaching it from chromatic neighbors both above and below, in short two- and three-note fragments; repeat each fragment, varying attack and release, then place it in different rhythmic spots. Work the fragments in different neck positions and combine them with short rests or repeated motifs to hear how they change the phrase’s shape. Start slow and increase speed only after the approaches land cleanly and musically; record short iterations and adapt the phrasing into your own motifs.",
+          "successCriteria": "Chromatic approaches consistently resolve to target tones with clear tension-and-release, sounding intentional and integrated into your phrasing rather than accidental; phrasing feels more melodic and heavier, and you can drop short chromatic fragments into improvised lines with reliable accuracy and tone.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "chromatic_accents"
+        },
+        {
+          "id": "beaa6163-94e1-485b-b8ad-efb76a822b67",
+          "title": "Intervallic leaps",
+          "description": "[What it is]\nIntervallic leaps are deliberate melodic jumps that move between notes separated by larger intervals instead of stepwise motion. They use skips across strings and position shifts to create distinct melodic contours—thirds, fourths, fifths, sixths, octaves and beyond—and rely on precise left-hand placement and right-hand targeting. On guitar this also means planning where to land so the leap sounds intentional and singable.\n\n[Why it matters]\nLeaps give solos an angular, memorable character and create contrast within a phrase: a sudden wide interval can add tension, drama, or a vocal-like shout that differentiates a line from ordinary scalar motion. For the Adam Jones aesthetic, well-placed jumps contribute to the brooding, spacious qualities of his melodic statements and help integrate guitar lines with heavy, atmospheric backing. Mastering leaps makes your phrases more varied and expressive rather than predictable.\n\n[How to practice]\nIsolate one interval type at a time and practice jumping to and landing on the target note cleanly from different starting points and hand positions in any comfortable neck region. Link each leap into short musical phrases—jump, resolve stepwise, repeat with rhythmic variation—so the leap sounds purposeful and connected to a goal note. Work on economy of motion for the fretting hand (accurate, minimal movement) and on precise picking or string-skipping for the attacking hand; mute or damp unused strings to keep the leap clear. Start slow and increase accuracy before speed, then apply leaps inside melodic ideas rather than as isolated drills so they become musical tools rather than technical gestures.",
+          "successCriteria": "Leaps land with consistent intonation and clean articulation, phrase shapes feel intentional (not accidental), and you can insert wide intervals naturally inside a melodic idea so they add contrast and emotional impact.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "spider_string_skipping"
+        },
+        {
+          "id": "c87b25d9-b79a-44c4-b4ca-922cf3bd9159",
+          "title": "Arpeggio fragment usage",
+          "description": "[What it is]\nArpeggio fragment usage means taking very short outlines of a chord—two- or three-note cells—and using those tiny shapes as melodic building blocks. Instead of running full arpeggios, you play compact fragments that imply the harmony while keeping the line focused and riff-like.\n\n[Why it matters]\nFragments let your single-note playing sound harmonically specific and more 'composed' without breaking the forward drive of a solo or riff; they create the kind of memorable, heavy melodic motifs associated with Adam Jones's style. Using small chord tones also gives you access to color notes and tension points that make phrases land with more purpose and weight.\n\n[How to practice]\nBuilding on your scale and modal vocabulary, isolate common chord outlines and extract 2–3 note fragments, then move each fragment through a chord progression so you can hear how a tiny shape implies different harmonies. Work on placing the fragment at different rhythmic points, repeating it as a motif, and answering it with a contrasting fragment to create call-and-response phrases. Start slow, increase gradually, and focus on clean execution and intentional placement so the fragment reads clearly against the underlying chords.",
+          "successCriteria": "You can insert short arpeggio fragments into solos or riffs and immediately outline the underlying chords without playing full arpeggios; phrases sound deliberate and harmonically grounded. Fragments become recognizable motifs that you can move, vary rhythmically, and connect smoothly into longer lines.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "triad_improvisation",
+          "suggestedLessonIds": [
+            "VSgGjqb-zuo",
+            "GYwdxHH9Y_k",
+            "kYcRmAA_RVQ",
+            "H6k9zIpN1Ug"
+          ]
+        },
+        {
+          "id": "11aff9b2-d357-4329-8692-97717d2a5817",
+          "title": "Double-stop melodies",
+          "description": "[What it is]\nDouble-stop melodies are two-note lines where one voice carries the tune while a second voice supplies harmony or counterpoint. On guitar this can be sung as parallel dyads, held companion notes, or short two-note motifs that move together or trade places. The texture created sits between single-note leads and full chords, giving a melodic phrase added weight and color.\n\n[Why it matters]\nDouble-stops let you thicken a solo without losing focus on the main melodic idea, making phrases sound more intentional and spacious. Carefully chosen two-note choices (close, wide, consonant or mildly dissonant) let you sculpt tension and release inside a single lick, which is central to a dramatic, textural lead style. Mastering them helps your playing cut through a mix while still sounding harmonically interesting.\n\n[How to practice]\nPick a simple melody and add a single companion note to each melody tone, then move those two-note shapes slowly and evenly so the pair sounds balanced; focus on clean fretting and consistent sustain between the notes. Work on smooth voice-leading between successive double-stops, experiment with held versus moving companion voices, and deliberately introduce small clashes then resolve them to train harmonic judgment. Vary rhythmic placement and which voice carries the melody so each pairing feels intentional and both notes can function independently when needed.",
+          "successCriteria": "You can play melodic lines doubled by a companion voice with even tone and intonation, move between paired shapes with smooth voice-leading, use close and wide pairings to create palpable tension and release, and switch which note leads without hesitation.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing",
+          "suggestedLessonIds": [
+            "vcaY3xf3o84"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2de94f40-a75b-4477-b35a-b42076f2fd8b",
+      "title": "Rhythm, Groove & Feel",
+      "order": 2,
+      "steps": [
+        {
+          "id": "944a7bd5-dbb4-4032-a85b-9780b567fc18",
+          "title": "Syncopated riffing",
+          "description": "[What it is]\nSyncopated riffing is the deliberate placement of accents, rests and note-grouping so the main rhythmic hits fall off the expected strong beats. It uses anticipations, tied notes and displaced motifs to create a lurching, off-center pulse that catches the ear. The result is a riff that breathes and pushes against the beat rather than resting squarely on it.\n\n[Why it matters]\nSyncopation is what turns straightforward patterns into memorable grooves — it gives riffs a sense of tension, forward motion and surprise. In heavier, textural guitar styles it’s a primary tool for making riffs feel human, elastic and rhythmically aggressive without increasing speed. Mastering it lets you lock with a drummer or backing loop while still sounding intentionally unruly.\n\n[How to practice]\nChoose a short, repeatable motif and practice shifting it by small subdivisions so the accent falls in different places; count the subdivisions out loud and start slow, increase gradually as it settles. Use muted strokes or rests to sharpen off-beat accents and practice playing the motif cleanly when displaced by one subdivision or tied across the beat. Loop a simple drum or backing groove and focus on locking your displaced motif into the pocket, record yourself to check consistency, and add dynamic accenting so the syncopation reads clearly in a band context.",
+          "successCriteria": "You can displace a short riff so its accents consistently land on weak beats or anticipations while retaining note clarity and groove; the riff locks with a backing groove or drum part and sounds intentionally off-center rather than sloppy.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "rhythm_training_medium",
+          "suggestedLessonIds": [
+            "YCA6YuN0Pug",
+            "2XFZ5vExH7c",
+            "dy0_MMA1Dfo",
+            "KD4Z2Dvuezg",
+            "qgt2yjFTlf0"
+          ]
+        },
+        {
+          "id": "39e3d509-1952-4d6a-b75a-22862d4b7185",
+          "title": "Odd-meter grooves",
+          "description": "[What it is]\nOdd-meter grooves are repeating riff patterns built around time signatures that don't divide evenly into groups of four. The defining feature is how you group and accent subdivisions inside that uneven bar so the pulse feels cyclical rather than off-balance. On guitar it becomes a rhythmic statement—a motif that resolves only after the full odd cycle completes.\n\n[Why it matters]\nFor the Adam Jones aesthetic, odd-meter grooves create tension, a hypnotic push, and a sense of looming heaviness that regular meters often can't produce. They give riffs a distinctive breath and make simple motifs feel unpredictable and driving when locked in with bass and drums. Mastering them expands the palette of moods and makes your playing stand out in progressive and alternative rock contexts.\n\n[How to practice]\nIsolate a short motif and loop it until the full odd cycle feels like one complete statement; count the bar and its subdivisions aloud so the grouping becomes internalized. Practice shifting the accent within the cycle (place the beat emphasis on different subdivisions) and listen for where the motif wants to resolve; repeat each shift until it feels natural. Use a steady click or drum loop as a reference, then practice moving between even and odd groupings so you can feel the change rather than think it; add simple dynamic or rest variations to test whether the groove holds when you change articulation. Gradually increase complexity only after the basic grouping and accents are locked in, and always aim for a relaxed, even pulse through the whole cycle rather than hurried or dragging notes.",
+          "successCriteria": "You can play a looping riff in an odd meter so it feels like a single, steady cycle—not rushed or lopsided—while placing accents in different parts of that cycle. You can shift the accenting and switch between even and odd feels without losing the pulse, and the groove locks with a steady rhythmic reference (metronome or drum loop). The result sounds intentional and hypnotic, with dynamics and rests reinforcing the odd grouping rather than obscuring it.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "rhythm_training_medium"
+        },
+        {
+          "id": "638f9f14-cdea-4c3b-9c2b-fad21fce5fe5",
+          "title": "Polyrhythmic feel",
+          "description": "[What it is]\nPolyrhythmic feel is the skill of superimposing one rhythmic grouping over a different steady pulse so your phrase implies a second, contrasting groove. It’s about making those two layers sound intentional and locked together rather than accidental. On guitar this comes from repeating motifs, shifting accents and subdivision awareness so a riff rides across the underlying beat.\n\n[Why it matters]\nThat tension between pulses is a big part of the hypnotic, heavy groove associated with the Adam Jones aesthetic: riffs feel simultaneously anchored and destabilized, which makes them memorable and powerful. Developing this feel also sharpens your internal pulse and hand independence, so your parts lock tighter with drums and bass. It gives you rhythmic vocabulary for creating mechanical, layered textures without relying on complicated time signatures.\n\n[How to practice]\nChoose a simple repeated figure and establish a steady pulse with a foot tap or backing loop; count the subdivisions aloud and mark where the figure’s accents land against that pulse. Isolate parts: play the steady pulse with one hand (muted or sustained) and the cross-rhythm with the other, then switch so both become autonomous. Gradually remove the counting, experiment with different accent placements and muted hits, and apply the same approach to chordal and percussive riffs until the secondary grouping feels natural and deliberate.",
+          "successCriteria": "You can sustain a steady underlying pulse while freely playing a contrasting repeated grouping and keep both parts locked. The cross-rhythm reads as an intentional groove — accents and phrase boundaries fall precisely where you expect, not by accident. Your parts sit clearly in a band context and create the layered, mechanical-hypnotic feel you intended.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "rhythmic_pocket_mastery",
+          "suggestedLessonIds": [
+            "YCA6YuN0Pug"
+          ]
+        },
+        {
+          "id": "3d8939f9-695c-4f83-80e3-54bc451fabaf",
+          "title": "Palm muting precision",
+          "description": "Palm muting precision is the controlled placement and pressure of the picking-hand palm against the strings just in front of the bridge to shape sustain, tone, and attack. Precise muting lets you dial anything from tight, percussive chugs to slightly damped, chunky notes, giving riffs a defined low‑end and rhythmic clarity. Develop it by finding a stable palm contact point, practicing small adjustments of distance and pressure to hear the tonal changes, and repeating short rhythmic patterns with consistent hand anchoring while you start slow and increase speed and consistency.",
+          "successCriteria": "You can produce even, repeatable muted chugs with consistent volume and attack; clearly switch between muted and open tones with an audible change in sustain; maintain the same muting feel across different strings and neck positions without losing rhythmic accuracy; and keep palm placement stable as you increase speed or vary pick dynamics.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "muting_discipline_drill",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "iIHx-lU0j6E",
+            "6fm2VihcB54",
+            "76ZOPqcjK8c",
+            "d41GHKVrzCI"
+          ]
+        },
+        {
+          "id": "b258b45a-47c5-488c-a04b-ceca15e1f2ce",
+          "title": "Percussive string scratches",
+          "description": "Percussive string scratches are intentional, muted scrapes across the strings—made with the pick edge, thumb, or fingertip—that create a rhythmic, non‑pitched ‘scratch’ sound to add grit and groove to a riff. They matter because they act as percussive punctuation and textural contrast, filling spaces between notes and making heavy riffs feel more aggressive and rhythmically defined. To develop them, rest the picking‑hand lightly on the strings and experiment dragging the pick or finger at different angles and pressures, producing short, medium and long scratches; practice placing those scratches on different subdivisions of a groove and alternate between finger and pick contact to vary tone and attack.",
+          "successCriteria": "You can produce consistent, repeatable scratches that sit in the pocket of a groove: clear percussive attack, controllable length and density, and the ability to move instantly between pitched notes and scratches without upsetting the timing or feel.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "strumming_funk"
+        },
+        {
+          "id": "f924fc30-69cb-495c-bc44-20cd3c4a822c",
+          "title": "Accent placement control",
+          "description": "[What it is] Accent placement control is the intentional choice of which notes, strums, or percussive hits you emphasize inside a groove. It covers both where the emphasis falls relative to the pulse (on, ahead, or behind) and how much louder or harder that emphasis is compared with surrounding notes. Controlling placement and intensity shapes a riff’s forward motion and character.\n\n[Why it matters] Well-placed accents give a riff its identity and make simple patterns feel heavy, strange, or driving without adding more notes. Accents create tension and release, help the guitar lock with drums or bass, and highlight the emotional high points of a phrase. For stylistic playing, consistent yet flexible accent choices are what make grooves memorable and expressive.\n\n[How to practice] Isolate a short riff or repeated stroke and deliberately move a single strong accent to different subdivisions of the beat, keeping the underlying pulse steady; listen for how the groove changes as the accent shifts. Practice alternating pronounced accents with soft ghosted notes so the contrast is clear, and record to verify consistency. Then apply accent shifts to longer phrases and to combinations of single notes, chords, and percussive hits so the control transfers. Start slow and increase speed only after accents remain precise and consistent.",
+          "successCriteria": "You can move the strong beat of a phrase to different positions while keeping the pulse steady; accented notes are clearly louder or more aggressive than surrounding notes, and the chosen placement consistently shapes the groove and feel you intend.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "chromatic_accents"
+        },
+        {
+          "id": "d3584968-dc36-4d4c-a85e-801174a1e28c",
+          "title": "Use of space",
+          "description": "[What it is]\nUse of space is the deliberate use of silence, rests and held tones so the gaps between notes become part of the musical statement. It's a choice about timing and density: leaving air in a phrase makes the notes you do play clearer and more expressive. Space shapes tension and release just as much as pitch and rhythm.\n\n[Why it matters]\nSpace gives riffs punch and helps individual lines cut through a full band texture — the absence of sound creates contrast that makes entries more dramatic and memorable. It also lets effects and sustain breathe, so reverb and delay become compositional elements rather than wash. Properly used, space turns repetitive material into something with forward motion and emotional weight.\n\n[How to practice]\nPlay short motives and intentionally omit the expected continuation; treat the silence as an active choice and listen to how it alters the phrase. Work call-and-response: play a concise phrase, rest for different durations, then play an answer — record and compare which pauses enhance the line. Reduce a riff to its barest form by removing notes until it still communicates, then add back only what strengthens it. Practice these patterns over a steady accompaniment so the placement of rests locks with the groove.",
+          "successCriteria": "Your playing feels deliberate: phrases land, then the silence amplifies their impact rather than sounding like missed notes. Riffs breathe and become more memorable; effects and sustained tones are audible and purposeful. Band parts sit clearer in the mix and listeners anticipate or are surprised by entrances rather than hearing nonstop activity.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        }
+      ]
+    },
+    {
+      "id": "098ca66f-1f44-4155-82a7-93d285a6fda7",
+      "title": "Chordal Texture Techniques",
+      "order": 3,
+      "steps": [
+        {
+          "id": "7ee6f3db-ff67-48e3-8ba7-91265d8d5021",
+          "title": "Octave riff voicings",
+          "description": "[What it is]\nOctave riff voicings are concise two-note voicings that pair a pitch with its octave to create a focused, punchy line that sits between lead and rhythm. They’re moveable, usually built from a compact shape that you shift up and down the neck to outline riff motion or melody. Used as riffs rather than full chords, they emphasize contour and rhythmic placement over dense harmony.\n\n[Why it matters]\nOctave voicings cut through a full band mix while leaving space for other instruments, which makes them ideal for writing memorable hooks and heavy, gritty riffs. They provide clarity and power without muddying the low end, and they help define a song’s identity with small, repeatable shapes. In the style you’re aiming for, they deliver both aggression and spaciousness depending on how you articulate and mute them.\n\n[How to practice]\nIsolate the movable octave shape and practice shifting it smoothly across different neck positions, paying attention to clean articulation and suppressing neighboring strings so only the two voices ring. Work on short motifs: play a 2–4 bar idea using only octave voicings, then vary its rhythmic placement and end with a choked or fully ringing note to hear the contrast. Practice transitions between an octave voicing and other chordal shapes (like power-leaning dyads or partial chords) so the octave can act as a hook or a bridge in a riff. Start slow, increase gradually, and record short takes to evaluate clarity, muting consistency, and how well the voicing locks with the groove.",
+          "successCriteria": "You can move a compact octave shape smoothly across the neck so it sounds clear and present in a full-band mix; adjacent strings remain quiet and transitions to nearby chordal shapes are clean. Your octave riffs function as memorable hooks that sit in the midrange—punchy when choked, sustaining when allowed to ring—and you can vary their placement and endings to create contrast within a riff.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "random_note_hunt"
+        },
+        {
+          "id": "39794991-1a0a-496b-8847-e44956b6adbd",
+          "title": "Power chord variations",
+          "description": "[What it is]\nPower chord variations are movable two-note (plus optional fill) voicings that prioritize intervalic strength and attack over full triadic color. They keep a focused low-mid punch while allowing small changes—added doubled tones, partial voices, muted attacks, and displaced pitches—to shift tension and texture without becoming full chords. Think of them as the building blocks for thick, riff-driven guitar parts.\n\n[Why it matters]\nVaried power-chord choices let you shape a riff's weight and mood quickly: a tight, clipped voicing reads as aggressive; a more open, ringing one reads as spacious or eerie. Those options are essential when you want riffs to sit with a heavy rhythm section yet leave room for single-note or atmospheric parts to breathe. Mastering variation gives you the vocabulary to craft the muscular, ambiguous tonal colors heard in heavy alternative and art-rock styles.\n\n[How to practice]\nPractice swapping between the basic dyad and three or four common variants—thicker voicings, slightly altered inner notes for tension, and muted or sustained versions—until the change is clean and musical. Work on sliding or shifting a voicing into place and on balancing a clipped attack versus a ringing sustain so you can choose contrast on the fly. Finally, experiment with inserting a single dissonant or color pitch inside a power-voicing and decide by ear when it helps the riff rather than muddies it.",
+          "successCriteria": "You can move between the basic dyad and its variants smoothly in a riff so the changes sound intentional, not accidental. Riffs made from these voicings lock into a heavy mix without clutter, offering clear contrasts between tight, percussive hits and open ringing moments. Your choice of variant consistently shapes the emotional contour of a riff—punchy, ominous, or spacious—matching the intended mood.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "chord_practice_configurable",
+          "suggestedLessonIds": [
+            "dbhF2wnnT7M"
+          ]
+        },
+        {
+          "id": "a8983bec-01ba-4cb7-998f-e6d38637151f",
+          "title": "Partial chord shapes",
+          "description": "[What it is]\nPartial chord shapes are compact voicings made from only two or three notes of a chord, deliberately leaving other tones out so the remaining intervals and colors stand out. They include dyads, shell-style grips, clipped barres and other small hand shapes that prioritize timbre and intervallic character over full, dense chords.\n\n[Why it matters]\nUsing partial shapes lets you imply full harmony with minimal movement, which produces the spacious, gritty chordal textures often heard in Adam Jones’s style. They cut through dense arrangements, highlight dissonant or ambiguous intervals, and create strong, focused sonic fingerprints that sit well with layering and effects.\n\n[How to practice]\nIsolate a handful of two- and three-note shapes and move them around the neck to compare how the same intervals change color in different positions; listen for which notes dominate and which add bite. Practice cleanly muting any strings you don’t want to sound and aim for minimal left‑hand motion so you can switch shapes smoothly; work on sliding a partial shape into place and resolving it by moving just one finger. Make short loops and experiment leaving one note ringing while altering the other voices, and deliberately choose which interval you want to emphasize instead of playing every possible note.",
+          "successCriteria": "You can voice a progression using mostly two- and three-note shapes that sound intentional and balanced: each note reads clearly, dissonances feel controlled, shape changes happen with small, efficient motions, and the textures cut through a mix without needing dense, full chords.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "chord_spotlight_drill"
+        },
+        {
+          "id": "bc8c777a-6684-4808-a771-d4474a927f9a",
+          "title": "Dissonant dyad usage",
+          "description": "[What it is]\nDissonant dyad usage is the deliberate pairing of two notes whose intervallic relationship creates audible tension rather than instant consonance. Think of these as compact, two-note chords that introduce bite—close clashes or wide unsettled intervals—that function as color, punctuation, or tension points inside a riff or accompaniment. Used alone or stacked into a riff, dyads can feel abrasive, haunting, or urgent depending on placement and sustain.\n\n[Why it matters]\nDissonant dyads are a primary way to give guitar parts an edge without relying on full, busy chord shapes; they add harmonic ambiguity and emotional weight while leaving space in the arrangement. When placed thoughtfully they can push a riff forward, create a contrast before a release, or become a signature textural motif. Learning to choose when to resolve a dyad and when to let it hang is what turns simple two-note clashes into expressive devices.\n\n[How to practice]\nStart by isolating a handful of interval types (close semitone clashes and wider, more unstable intervals) and play them in different string pairings and neck positions to hear their character in context. Practice moving a dissonant dyad into a consonant target and also practice repeating a dyad across a rhythmic pattern while varying attack and sustain; listen for what cuts through and what muddies the band sound. Record short experiments, compare how different voicings sit with distortion or clean tones, and deliberately leave some dyads unresolved so you learn tastefully when tension should resolve or persist.",
+          "successCriteria": "You can place two-note clashes that add intentional tension without sounding accidental; you can move them into or away from resolution on cue, choose voicings that cut through the band texture, and use them consistently as expressive punctuation in riffs.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "f9b58e50-4d91-42e0-b4df-ff2ec5c817f3",
+          "title": "Triad cluster voicings",
+          "description": "[What it is]\nTriad cluster voicings are close-position triads where the three chord tones are placed tightly across adjacent strings and frets so they behave more like a compact, slightly dissonant block than a spread chord. By using inversions and omitting or altering one tone you get a range of colours from glassy to gritty while keeping most energy in the midrange. They can be played as struck blocks, rolled arpeggios, or sustained beds under single-note material.\n\n[Why it matters]\nThese voicings give you a thick, ambiguous texture that sits between rhythm and lead—perfect for creating weighty hooks, ominous pads, and stabbing accents that don’t compete with bass or vocals. Because they concentrate harmonic content into a small sonic space they produce controlled tension and release, which is a big part of moody, atmospheric guitar writing. Learning them makes your chordal palette more expressive and lets you craft signature sonorities that cut through dense mixes.\n\n[How to practice]\nIsolate a handful of close triad shapes and move them slowly to new string sets and neck positions, listening for clarity and interaction between adjacent fretted notes. Practice voice-leading by changing only one finger at a time so you can hear how a single semitone or inversion shift alters the cluster’s colour. Work on clean fretting and damping unused strings with light fretting-hand contact so unwanted strings stay silent, and alternate between blocked strikes and rolled/individual-note attacks to compare textures. Start slow, increase gradually, and record short progressions to judge whether the clusters stay distinct and purposeful in the mix.",
+          "successCriteria": "You can place close triad clusters anywhere on the neck with clean articulation, move between inversions so only one voice changes at a time, and make the chordal texture sound deliberate (tense or resolved) rather than muddy. Clusters sit clearly in the band mix and transition smoothly into adjacent parts; you control whether they sound glassy, gritty, or suspended. Your right- and left-hand motions are economical enough to repeat the shapes reliably under performance conditions.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "triad_improvisation",
+          "suggestedLessonIds": [
+            "K1Af3F5mZfY",
+            "qWS22cV9REg",
+            "eQkfnY2sF-o",
+            "mNPmGi4IBXE"
+          ]
+        },
+        {
+          "id": "4ed4649e-cc34-4c0d-a772-991d6a6f884b",
+          "title": "Chordal slides",
+          "description": "[What it is]\nChordal slides are moving an entire chord shape smoothly along the neck so the harmony glides from one sonority to another while keeping the voicing intact. They can be done as a single connected motion or as a staggered, strummed shift where some strings arrive before others, producing different textures. Execution relies on steady left-hand pressure and coordinated right-hand timing so the chord's character is preserved during the move.\n\n[Why it matters]\nSlides add a sense of motion and tension between harmony points, turning static blocks of chords into a living, expressive statement; this is a big part of the sliding, cinematic chordal feel often heard in Adam Jones' playing. Used sparingly they can emphasize transitions, create vocal-like swoops, or inject a subtle unease when sliding into slightly dissonant voicings. They also help connect distant positions so your riffs and progressions feel more cohesive and dynamic.\n\n[How to practice]\nStart slow and repeat short movements: choose a comfortable chord shape and practice sliding it a short distance and back, focusing on keeping finger spacing and pressure consistent so the voicing doesn't collapse. Vary the approach by doing full-legato slides (pick once and shift), versus re-strummed slides (pick as you arrive) to hear how attack changes the texture; also practice sliding into the chord from below and above to learn different landing feels. Pay attention to muting unwanted strings and to how much vibrancy or grit you allow — practice with both a clean, pure landing and a slightly noisy, raw landing so you can choose the mood. Finally, integrate slides into short riffs and turnarounds until the motion feels natural and intentional rather than mechanical.",
+          "successCriteria": "Slides sound smooth and intentional: the chord voicing remains clear during movement, the landing is clean (or purposely gritty), and the slide enhances the phrase’s mood without blurring timing. You can execute both single-pick legato slides and re-strummed arriving slides across several chord shapes, use slides as expressive punctuation in riffs, and vary the amount of noise or sustain to suit the musical context.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "smooth_chord_transitions"
+        },
+        {
+          "id": "01b96531-c5f8-40e3-ad4d-fe1075ce0840",
+          "title": "Muted chord stabs",
+          "description": "[What it is]\nMuted chord stabs are short, choked chord attacks: you strike a chord and immediately silence it so it reads as a percussive, rhythmic punctuation rather than a sustained harmony. They usually land as tight, syncopated accents that cut through distortion and occupy a small, decisive space in a riff. Used sparingly, they create tension, groove, and conversational stops between melodic lines.\n\n[Why it matters]\nThese stabs act like punctuation marks in a guitar arrangement—adding bite and forward momentum without filling the mix with long sustained chords. In the Adam Jones style they help sculpt heavy, dynamic textures by alternating weighty sustained parts with abrupt, focused hits. Mastering them gives you control over rhythmic phrasing and the ability to make single hits feel as impactful as full riffs.\n\n[How to practice]\nBuilding on your palm-mute control, isolate one chord voicing and practice striking it then cutting the sound immediately so the result is a clean, short 'stab' rather than a ring or thud. Work on placing those stabs in different rhythmic positions relative to a steady pulse and vary which strings you include to hear how voicing changes the attack. Record short patterns, listen for consistency of length and volume, then introduce different dynamics and slight timing offsets until the stabs lock with the groove while remaining tight and articulate.",
+          "successCriteria": "Stabs are consistently short and percussive, land precisely where intended, and sit cleanly in the mix even with heavy distortion. You can vary voicing and dynamic intensity to create contrast, place stabs on and off the beat to alter feel, and use them to punctuate riffs without blurring sustain. They should read as deliberate rhythmic accents rather than accidental dead notes or unresolved ringing.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "muting_discipline_drill",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "xARmgKQmbYw"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4ec01152-286e-4663-a15a-194e5eec634e",
+      "title": "Tone & Effects Crafting",
+      "order": 4,
+      "steps": [
+        {
+          "id": "b633e189-cf5a-43fe-a115-fe28f9f8ab5b",
+          "title": "Amp voicing control",
+          "description": "[What it is]\nAmp voicing control is the habit of shaping an amplifier’s tonal character—EQ bands, presence, resonance, and channel voicings—so the guitar sits and breathes exactly how you want it in a mix or in the room. It’s not just setting bass/mid/treble; it’s sculpting how harmonics, attack, and sustain interact with your playing dynamics and effects.\n\n[Why it matters]\nA thoughtfully voiced amp turns the same riffs into distinct textures: a rhythm part can be thick and percussive or more open and airy, and a lead can sing or cut with bite without changing your technique. Good amp voicing reduces the need for constant pedal fiddling and helps your tone translate from practice space to band mix or recording.\n\n[How to practice]\nSystematically A/B single-parameter changes: change one EQ band or channel at a time, play the same phrase and listen for changes in note clarity, harmonic balance, and dynamic response. Record short clips with each setting and compare, aiming to hear what each control does to lows, mids, highs, and the string-to-amp interaction; use different guitar output settings to test responsiveness. Practice dialing two distinct target voices (a chunky rhythm and a singing lead) quickly from the same amp, then learn the minimal adjustments that move between them so you can recreate tones reliably in any room.",
+          "successCriteria": "You can consistently dial a thick, focused rhythm and a clear, singing lead from the same amp without guessing; on playback both parts keep their intended character and sit correctly in a mix. You hear which EQ band or voicing control changes note clarity versus body, and you can make targeted tweaks quickly to fix muddiness, harshness, or lack of presence.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "tone_matching_challenge"
+        },
+        {
+          "id": "0e8749f8-cd10-4e11-b09c-8f6b54d92ad9",
+          "title": "Gain staging",
+          "description": "[What it is]\nGain staging is the deliberate control of signal level at each point in your chain — from guitar output through pedals, preamp sections, and the final amplifier or interface — so each stage operates in its optimal range. It’s about choosing how much clean headroom versus harmonic saturation each device contributes, and preventing clipping, excessive noise, or muddy compression.\n\n[Why it matters]\nProper gain staging determines whether your riffs sound focused or flabby, harmonics sing or smear, and whether dynamics and articulation survive to the mix. It also keeps noise under control and makes effects respond predictably, so your tone remains consistent whether you’re playing quietly or digging in hard.\n\n[How to practice]\nStart by setting every stage to a neutral or unity position, then bring each stage up one at a time while playing the material you want to nail; listen for note definition, harmonic richness, and any unwanted distortion or loss of dynamics. Experiment with small gain changes on pedals and preamp sections to hear the difference between pleasant saturation and compressed mush, and practice switching levels so you can recreate tones quickly in different contexts. Record quick A/B takes so you can compare subtle changes, and train your ear to recognize the sweet spot where aggression and clarity coexist.",
+          "successCriteria": "You can dial levels so riffs have clear attack, sustained harmonic richness, and controlled noise; saturation sounds musical rather than flubby or gated; dynamics remain expressive across pick intensity; and tones translate reliably between live playing and recordings without sudden jumps in volume or unwanted distortion.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "naked_tone_melody"
+        },
+        {
+          "id": "2785afe2-4d09-4306-963d-88133fca5efc",
+          "title": "Delay-based phrasing",
+          "description": "[What it does]\nDelay-based phrasing treats your delay unit as an active musical voice: every played note produces timed echoes that can form rhythmic counterpoint, ambient tails, or staggered harmonies. Adjusting delay time, mix and repeat count lets a single line behave like multiple interlocking parts or a wash of texture.\n\n[Why it matters]\nFor the Adam Jones approach, delay turns concise, heavy motifs into cinematic, spacious statements without extra picking; the repeats do compositional work for you. Mastering this gives you a way to fill space, create tension-and-release, and make sparse playing sound deliberately orchestral rather than thin.\n\n[How to practice]\nChoose a short motif and test a few distinct delay time ranges and repeat counts, listening for how the echoes align with your next moves; aim for interaction, not clutter. Work on intentionally starting, reshaping, and stopping repeat trails using your existing control so echoes answer or stop on cue. Vary mix and stereo settings and practice crafting call-and-response lines where the played note and its repeats trade phrases, refining the settings until the echoes sound like part of the composition rather than an effect.\n",
+          "successCriteria": "You can place short motifs so their repeats form clear rhythmic counterpoint or ambient beds without obscuring the main line. You select delay time/mix/repeat settings fluidly for different riffs and reliably shape or end trails when needed. The overall result sounds purposeful and evocative — spacious, heavy, and in the sonic spirit of Adam Jones.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        },
+        {
+          "id": "086e1c13-e5ac-4d65-80ac-d7c036b52e53",
+          "title": "Flange and chorus textures",
+          "description": "[What it is]\nFlange and chorus are time-based modulation effects that add movement by blending a processed copy of your signal with the dry sound. Chorus uses slightly delayed, pitch-modulated copies to create a thicker, detuned 'multiple-voice' feel and a wider stereo image. Flange uses very short delays combined with feedback to create comb-filtering sweeps and a metallic, whooshing coloration.\n\n[Why it matters]\nThese textures shape the emotional and spatial character of riffs and leads — chorus softens and broadens tones for a lush, cinematic quality, while flange gives riffs a more aggressive, otherworldly edge. They let you add atmosphere without changing your playing, making heavy parts feel larger or more menacing and leads more distinctive in a mix. Controlling mix and sweep lets you choose whether the effect sits subtly under the part or becomes a defining sonic signature.\n\n[How to practice]\nPractice with two focused goals: learn subtle settings that thicken and widen without losing articulation, and bolder settings where the sweep or detune becomes a feature. For each setting, play the same chordal and single-note phrases with the effect toggled to hear how attack, sustain, and clarity change; adjust mix, depth, and rate to find usable ranges. Experiment with stereo vs mono routing and a light partner effect (reverb or delay) to understand how textures stack, and record short comparisons to judge what translates best in a mix.",
+          "successCriteria": "You can dial chorus or flange so parts feel noticeably wider or more colored while keeping note clarity; chorus thickens and widens without smearing articulation, and flange adds sweep and bite without masking pitch. You can reliably choose and tweak a texture to serve the arrangement and reproduce that sound in recordings.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "naked_tone_melody"
+        },
+        {
+          "id": "91a9338d-fc55-41ff-a235-f803a48e95cb",
+          "title": "EQ and pickup selection",
+          "description": "[What it is]\nEQ and pickup selection is the deliberate combination of your guitar's pickup switch position and your amp or pedal EQ controls to sculpt the fundamental voice of your tone. Each pickup position captures a different mix of string harmonics and outputs a different frequency balance — the neck pickup emphasizes warmth and body while the bridge delivers brightness and bite — and EQ controls then further shape or correct that raw voice before it drives the amp.\n\n[Why it matters]\nFor an Adam Jones–inspired sound, the pickup choice is foundational: his characteristic dark, saturated, yet articulate tone comes largely from playing through the neck pickup of a Gibson SG into a heavily voiced amp. Getting that combination right means riffs and leads sound weighty and defined without becoming muddy, and single-note lines cut with clarity even under heavy distortion. Wrong EQ or pickup choice undermines all other tone crafting work.\n\n[How to practice]\nCycle through each pickup position on your guitar and play the same riff, listening for where fullness, midrange presence, and attack clarity fall; note which positions suit rhythm versus lead work. Then make targeted EQ adjustments — cut problematic low-mid frequencies, add upper-mid presence for lead clarity, or roll off excess treble for warmth — and compare recordings to identify which combinations best achieve your target tone. Develop a set of two or three reliable pickup/EQ combinations you can recall quickly and test them at band volume to make sure they translate out of the bedroom.",
+          "successCriteria": "You can select a pickup and set an EQ so riffs have defined low-end without muddiness, leads sit clearly in the midrange, and the overall tone is warm and saturated yet articulate under high gain. You can move reliably between rhythm and lead voices with pickup or EQ changes alone, and your chosen settings translate consistently at rehearsal volume and in recordings.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "tone_matching_challenge"
+        },
+        {
+          "id": "bf4d76ba-00a4-40e6-955a-15a0a2be2d17",
+          "title": "Noise and feedback control",
+          "description": "[What it is]\nNoise and feedback control is the ability to keep unwanted electronics and mechanical sounds out of your tone while still being able to summon and shape noisy textures when musically useful. It covers muting technique, signal hygiene, and the deliberate use or suppression of amp/room resonance so your parts read with impact instead of sounding messy.\n\n[Why it matters]\nFor an Adam Jones–inspired approach you need gritty, textural tones that cut through without turning into a wash of hiss, buzz, or uncontrolled squeals. Good control means your aggressive textures land with intention, your dynamics remain clear, and any noisy artifacts become expressive tools rather than distractions.\n\n[How to practice]\nPractice strict muting with both hands: silence all strings between phrases and on dead notes, and make muting a reflex so only intended notes ring. Isolate parts of your signal chain by toggling effects and your guitar’s controls while listening for noise, then practice eliminating it with hand placement, palm/left‑hand muting, and volume knob gestures. Work on moving your body and picking hand relative to the amp to consistently find and control resonant spots, and train short exercises where you intentionally allow a controlled noisy flourish and then immediately suppress it — build the switch between noise-on and noise-off until it’s effortless. Start slow and increase complexity as control improves.",
+          "successCriteria": "You can play full phrases without noticeable hiss or string buzz when you want silence, then instantly produce and stop controlled noisy textures on cue; noisy artifacts sound intentional rather than accidental, and your parts remain clear and focused within a dense mix.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "muting_discipline_drill",
+          "suggestedLessonIds": [
+            "zBIQYGavvPI",
+            "sjnFJLGVQ1g"
+          ]
+        },
+        {
+          "id": "596efedf-7532-4930-8931-0e4fe914a2df",
+          "title": "Signal chain sculpting",
+          "description": "[What it is]\nSignal chain sculpting is the intentional arrangement and routing of pedals, effects returns/loops, and amp connections so each piece interacts musically with the next. It includes choices about series vs parallel paths, buffered versus true-bypass routing, level/impedance relationships, and where to place processors relative to the amp. The point is to make the whole rig behave predictably so textures stack without masking attack or harmonic clarity.\n\n[Why it matters]\nSmall ordering and routing decisions change how saturation, dynamics, and ambience coexist; good sculpting gives you thick, defined tones that respond to touch rather than a muddy wash. For an Adam Jones–inspired sound you want heavy, textural layers that remain articulate and sit in the mix rather than overpowering each other. A well-sculpted chain also makes tone more repeatable live and easier to adjust on the fly.\n\n[How to practice]\nDo controlled A/B comparisons: change only one connection or placement at a time and listen for differences in attack, sustain, harmonic complexity, and perceived space. Try series versus parallel routing, experiment with effects-loop placement for post‑amp processing, and test buffered vs true‑bypass paths while documenting what each change does. Record short phrases through each variation, make small incremental tweaks, and train your ear to identify which routing tweak produces the specific tonal shift you want.",
+          "successCriteria": "You can assemble a rig where heavy textures remain articulated and ambience sits behind rather than washing out notes; swapping a single device or rerouting produces predictable, repeatable changes. You can reliably recreate and adjust those tonal relationships in rehearsal or performance so the sound supports the song and your playing.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "tone_matching_challenge"
+        }
+      ]
+    },
+    {
+      "id": "7a56cc8e-64dc-4a26-965c-dd31f6131502",
+      "title": "Arrangement & Composition",
+      "order": 5,
+      "steps": [
+        {
+          "id": "6e9e84c5-1160-477a-8874-140f913b7c8c",
+          "title": "Riff development",
+          "description": "[What it is]\nRiff development is the process of taking a raw musical fragment — a short rhythmic figure, a two-bar groove, or an intervallic idea — and purposefully extending, shaping, and refining it into a complete, repeatable riff that functions inside a song. It includes choosing which elements to keep, what to cut, how to give the fragment a clear beginning, internal motion, and satisfying endpoint, and when to let a small idea stand on its own rather than over-composing it.\n\n[Why it matters]\nMost memorable guitar parts begin as short seeds; knowing how to develop those seeds is what separates a session of noodling from a composed part with identity. For the Adam Jones aesthetic, riff development is central: his signature parts are built from economical, dark motifs that repeat with subtle variation and grow through arrangement rather than through constant new material. Strong development also prevents the common trap of building dense, busy riffs when restraint would be more powerful.\n\n[How to practice]\nStart with the smallest possible idea — a single bar or even two or three notes — and resist adding more until that fragment is musically complete on its own. Experiment with extending it by sequencing, transposing, or rhythmically displacing it, and test each version against a minimal backing loop to judge whether the extension adds or dilutes. Practice presenting a riff in a sparse version first and then a developed version, comparing which moments benefit from added density and which benefit from space. Document your decisions so you build an instinct for when a riff is finished rather than when it's merely longer.",
+          "successCriteria": "You can take a short musical seed and develop it into a riff that sounds complete and intentional: it has a clear shape, sits naturally in a loop, and doesn't outstay its welcome. Development choices — extension, transposition, rhythmic variation — consistently strengthen the original idea, and you can recognize the moment a riff is finished rather than continuing to add material beyond its natural endpoint.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "muting_spotlight_drill"
+        },
+        {
+          "id": "2cbd1b2a-abeb-43f5-bf67-1bfaded7537f",
+          "title": "Motif variation",
+          "description": "[What it is]\nA motif is a short, memorable musical idea; motif variation means taking that idea and altering one or more of its dimensions so it sounds new while remaining recognizably related. Changes can target rhythm, pitch contour and interval relationships, register, harmonic context, articulation, or timbre. The goal is to preserve the motif's identity while creating contrast and forward motion.\n\n[Why it matters]\nEffective motif variation is how short ideas become the connective tissue of a song — it creates development, keeps repeated material interesting, and gives listeners a sense of expectation and payoff. Well-crafted variations let you build tension, shift mood, and support arrangement choices without inventing entirely new material. For a guitar-driven style, consistent motifs with purposeful changes are what make riffs and leads feel composed rather than repetitive.\n\n[How to practice]\nChoose a concise motif in any comfortable position and deliberately apply single changes one at a time: displace or compress its rhythm, invert or reverse its pitch shape, fragment it into smaller gestures, stretch or shorten note durations, move it to a different register, or place it over an alternate harmonic backdrop. Practice presenting the original then immediately one variation, then another, aiming for smooth transitions and clarity of the motif’s identity; record and listen to check whether the link between versions is obvious. Start slow, increase gradually, and build a personal catalog of go-to variation moves you can call on when arranging or composing.",
+          "successCriteria": "You can play a short motif and produce multiple distinct variants that still read as the same idea: listeners recognize the motif across versions, transitions between original and variation feel natural, and the variations serve musical goals (contrast, development, or emotional shift) rather than sounding like unrelated phrases.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "composition_challenge"
+        },
+        {
+          "id": "b8c94a27-d34d-4dc3-b2c6-de4d9697cb1d",
+          "title": "Dynamics-driven arrangement",
+          "description": "[What it is]\nDynamics-driven arrangement is the deliberate shaping of loudness, texture, and density across a song to create contrast and motion. It uses changes in how many parts play, how prominently each part sits in the mix, and when elements drop out or return to guide the listener’s attention. On guitar this covers choices from sparse, intimate lines to full, aggressive walls of sound and the transitions between them.\n\n[Why it matters]\nThoughtful dynamic arrangement turns repeated riffs or motifs into moments with distinct functions—verse, buildup, release—so the same material feels different depending on context. It produces emotional contour, prevents fatigue, and makes climaxes land harder without needing more notes. For a tone and approach like Adam Jones, dynamics are a primary expressive tool: contrast and texture make the heaviness meaningful rather than constant.\n\n[How to practice]\nTake a short riff or motif and make three versions that differ only in dynamics and texture: one that sits back and breathes, one that fills the arrangement but remains controlled, and one that is full-force. Record quick mock arrangements using drop-outs, added ambient layers, and changes in effect levels to hear how tiny dynamic shifts alter impact; compare and iterate. Practice arranging transitions so elements enter and leave cleanly, and rehearse communicating and responding to dynamic cues with other players or with backing tracks; listen for whether the main idea still registers when textures change.",
+          "successCriteria": "You can map an arrangement so its key moments are defined by clear dynamic contrast—sections feel intentionally thin or massive, transitions are clean, and the listener’s focus moves where you intend without changing tempo or adding extra notes. In recordings and rehearsals the parts balance naturally and dynamic shifts reliably enhance emotional impact.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "chromatic_accents",
+          "suggestedLessonIds": [
+            "416rgou7Ijo"
+          ]
+        },
+        {
+          "id": "3c18bbed-b657-4166-9910-6d898e5e037d",
+          "title": "Layering and counterpoint",
+          "description": "[What it is]\nLayering is the purposeful stacking of multiple guitar parts so each occupies its own rhythmic and sonic role; counterpoint is writing two or more independent melodic lines that interact harmonically and rhythmically. Together they create interlocking textures where each line retains its identity while contributing to a larger harmonic and rhythmic statement. Think of it as arranging voices that move against and with one another to make the riff feel bigger and more intricate.\n\n[Why it matters]\nWell-executed layering and counterpoint turn a single riff into a full, cinematic arrangement—adding tension, motion, and emotional depth without just turning up the volume. They let you create the dense, hypnotic interplay heard in heavy alternative rock by using simple parts that interlock rather than compete. Good counterpoint also creates moments of surprise and release when lines converge or diverge, which keeps repeated riffs engaging.\n\n[How to practice]\nStart by writing two clear parts: a primary riff and a contrasting line that moves independently in rhythm and contour; keep them simple and listen for clashes. Focus on register separation and complementary rhythms so each line has its own space; use contrary motion and staggered entries to avoid parallel, unmoving textures. Practice isolating and removing layers to test independence, then reintroduce them and balance dynamics so the counter-melody can sing without masking the riff. Transcribe an interlocking guitar passage you admire, recreate it with your own parts, and iterate—start slow, increase complexity gradually, and always check whether each layer contributes purposefully to the whole.",
+          "successCriteria": "You can write and perform at least two independent guitar parts that sound clear together, with each line maintaining its identity while forming coherent harmonies and rhythmic interplay; removing any layer still leaves the arrangement musical. The combined texture should create audible tension and release through voice-leading and rhythmic contrast rather than volume, and you can rearrange or mute layers to change the song's emotional shape with intention.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "tapping_pull_hammer"
+        },
+        {
+          "id": "789aa7f5-b5f6-444b-a179-adf807ccd162",
+          "title": "Tension and release",
+          "description": "[What it is]\nTension and release is the deliberate shaping of musical expectancy: creating moments that feel unresolved, strained, or dense and then resolving them to give a sense of relief or arrival. It combines harmonic choice, note placement, rhythmic displacement, dynamic contrast, and textural changes to make a phrase pull forward and then resolve. Successful tension manipulates the listener’s expectation so release has impact rather than feeling inevitable.\n\n[Why it matters]\nTension and release is the emotional spine of memorable riffs, transitions, and solos — it’s how a simple idea becomes dramatic and memorable. It controls momentum across an arrangement, highlights key moments, and makes sparse parts feel full and full parts feel purposeful. For a player aiming at a heavy, cinematic sound, mastering this skill turns repeated motifs into narrative gestures.\n\n[How to practice]\nIsolate one variable at a time: practice creating tension using only harmony (suspensions, modal shifts), then only rhythm (delayed hits, odd accent placement), then only dynamics or texture (muted versus ringing, adding/removing effects). Make short call-and-response exercises where the first phrase deliberately avoids resolution and the second settles it; record and compare different ways to release. Practice transitions so the move from tension to release is clear and intentional — try varying the length of the tension, the degree of dissonance, and the abruptness of the release to hear what feels most powerful. Start slow and focused, then test how tension reads at performance volume and with your typical effects chain.",
+          "successCriteria": "Riffs and phrases consistently create a felt push before a satisfying arrival; listeners can perceive the buildup and the payoff without relying on loudness alone. Releases land cleanly and purposefully, not accidental or unresolved; dynamic and textural contrasts enhance impact. You can design short passages where changing one element (harmony, rhythm, or texture) increases or decreases perceived tension in predictable ways.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        },
+        {
+          "id": "967ce537-4a74-472d-96c7-e60d0f830f7a",
+          "title": "Lead-rhythm interplay",
+          "description": "[What it is]\nLead-rhythm interplay is the practice of treating lead lines and rhythm parts as two conversational voices: the rhythm provides the foundation and rhythmic identity while the lead responds, comments, or punctuates that foundation. It’s about arranging when the lead should sit back, when it should cut through, and how motifs can pass between parts so the whole arrangement breathes.\n\n[Why it matters]\nStrong interplay keeps dense arrangements clear and powerful—the rhythm maintains groove and momentum while the lead supplies hooks, texture, and emotional punctuation without overwhelming the core riff. In a heavy, layered style this skill creates contrast and forward motion, making repeated sections feel fresh and purposeful.\n\n[How to practice]\nChoose a short riff and a compact lead motif, then practice exchanging short phrases so each part has a defined role: support, respond, or interrupt. Drill call-and-response patterns, staggered entries, and deliberate silences; vary the rhythmic placement of lead notes so sometimes they lock with the riff and sometimes they offset it. Record those trades and listen for balance: adjust note choices, dynamic level, and timing until the lead sounds like a partner to the rhythm rather than a competing voice.",
+          "successCriteria": "Leads and riffs sound like a single, coordinated conversation: the lead complements the riff’s energy, leaves space when needed, and punctuates without masking the groove. Transitions between roles are seamless, the arrangement remains clear in dense textures, and repeated sections retain interest because of purposeful interplay.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        },
+        {
+          "id": "1f6ccd85-19d9-4ad2-b04e-576c94f11097",
+          "title": "Writing in odd meters",
+          "description": "[What it is]\nWriting in odd meters means composing riffs, motifs, and song sections that live inside repeating bar cycles built from uneven beat groupings. Instead of relying on even four-beat phrases, you decide on an asymmetrical cycle and shape melodic, harmonic, and rhythmic material so the pattern reads as a coherent loop even though the grouping is irregular. The result is a repeating frame that feels cyclical but slightly off-balance, which you can use to create memorable, propulsive parts.\n\n[Why it matters]\nUsing uneven cycles gives your music a distinctive forward motion and rhythmic identity: phrases can resolve on surprising points, recurring motifs gain a hypnotic quality, and contrast with more regular sections becomes more dramatic. For someone aiming at an Adam Jones–inspired sound, odd cycles help produce those heavy, mechanical-sounding riff patterns that still feel songful and purposeful. They also expand your palette for arranging contrasts between sections and for creating signature hooks that stand out.\n\n[How to practice]\nChoose an asymmetrical cycle and write a short motif that repeats against that cycle, paying attention to where the motif starts and resolves inside the loop. Create variations that shift the motif’s starting point or accent pattern so it lands on different pulses across repetitions, and test how a complementary bass or drum pulse emphasizes the cycle. Experiment with crossing phrase boundaries (so a phrase finishes after the cycle repeats) and with simple contrasting sections that change the perceived grouping; record ideas and refine the ones that keep the listener oriented while still feeling unexpected.",
+          "successCriteria": "You can write riffs and motifs that lock comfortably into an uneven cycle and resolve convincingly within that frame; repeated phrases feel intentional rather than awkward, and sections that contrast with regular meters land clearly. Other instruments or a basic pulse can lock with your parts, and transitions between odd and even groupings feel deliberate and musical.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "composition_challenge"
+        }
+      ]
+    },
+    {
+      "id": "0d45ae28-9f35-4885-b8cd-2e4556ad1425",
+      "title": "Tool Catalog Integration",
+      "order": 6,
+      "steps": [
+        {
+          "id": "7deb2260-7603-4755-b757-85233c2e396c",
+          "title": "Sober phrasing and tone",
+          "description": "[What it is]\nSober phrasing and tone is the craft of deliberate, economical guitar playing: choosing a few well-placed notes or chords and delivering them with a focused, weighty timbre rather than flashy speed. It prioritizes restraint, clarity, and emotional gravity so every sound feels intentional.\n\n[Why it matters]\nA sober approach makes riffs and leads land with authority and leaves space for other parts, so the guitar adds depth without clutter. For the Adam Jones aesthetic, that restraint is what turns simple material into a menacing, memorable voice.\n\n[How to practice]\nIsolate short motifs and systematically remove or shorten elements until the phrase still communicates strongly—use silence and decay as part of the statement. Record alternate takes that differ only in note economy or attack and compare which reads as more purposeful; refine the timbre and sustain until the line feels solid and unembellished. Practice playing the same motif with varying degrees of intensity and choose the version where restraint gives the greatest impact.",
+          "successCriteria": "Phrases sound intentionally minimal and heavy rather than busy; each note or chord feels placed and consequential, with a consistent focused timbre across dynamics. Silences and note decay are used musically, and recorded parts sit in the mix as a supporting, authoritative voice rather than a showpiece.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "df53dcb4-f586-49f4-9625-9f3a3cf3c9ca",
+          "title": "Schism groove replication",
+          "description": "[What it is]\nSchism groove replication is the focused study of the guitar's repeating rhythmic motif and how each guitar note sits against the low‑end pulse. It emphasizes meticulous, repeatable timing, consistent articulation between sustained and shortened notes, and tiny placement shifts that give the pattern its characteristic propulsion. The aim is to make the motif sound identical on each pass while retaining the subtle micro-timing that keeps it alive.\n\n[Why it matters]\nNailing this groove is central to capturing the song's identity and the player's stylistic fingerprint; it turns a correctly fretted sequence into a convincing, authoritative performance. Working on it sharpens your internal subdivision and your ear for very small timing choices that change perceived motion. Once mastered, the groove becomes a stable base for adding leads and tasteful variations that feel organic.\n\n[How to practice]\nBreak the motif into the smallest repeatable unit and loop that until every repetition is mechanically identical, then expand outward one unit at a time. Practice with a pared-down backing track or isolated low‑end click so you can hear and adjust the exact placement of each note; record short passes and compare to the reference to spot micro-timing differences. Start very deliberately, tighten timing while preserving clarity between long and short notes, and then train seamless returns into the motif after fills so the pattern resumes without wobble.",
+          "successCriteria": "You can play the groove repeatedly for extended sections without timing drift, with the guitar's note placements matching the reference in both length and micro-timing; transitions into and out of the motif are clean and repeatable.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "rhythm_training_medium"
+        },
+        {
+          "id": "4247bc19-5a8b-418f-940c-e87a0230d2fe",
+          "title": "Forty Six And Two leads",
+          "description": "[What it is]\nForty Six And Two leads are a signature melodic voice that favors sparse, singable motifs that build tension through repetition and careful note choices. The lines often hang over a heavy groove, alternating between restrained statements and climactic, sustained notes that act as emotional peaks. The overall effect is more about phrasing and placement than technical fireworks.\n\n[Why it matters]\nMastering this lead style gives you a powerful way to add personality and atmosphere to heavy music without crowding the arrangement. These leads create a focal point that pushes and releases tension across a song, making simple motifs feel monumental and memorable. Learning to craft them trains your ear to choose notes that complement the underlying harmony and groove.\n\n[How to practice]\nTranscribe a representative lead phrase by ear and isolate the core motif; loop the backing groove and work the motif until its shape and timing become second nature. Practice varying the same motif: play it quietly, then let it open up into a full, sustained statement, paying attention to where each variation increases or releases tension. Record short takes and compare how small timing shifts and subtle pitch choices change the emotional outcome; then expand the motif into call-and-response phrases so the lead feels like a purposeful narrative over the groove.",
+          "successCriteria": "Your leads consistently sit over the band: motifs are clear, tension builds and resolves intentionally, and dynamic contrast between restrained and full statements feels natural. Listeners hear purposeful phrasing rather than technical showmanship, and you can reproduce the characteristic motifs with consistent feel and tone.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "play_by_ear"
+        },
+        {
+          "id": "740d903a-78f8-41be-9062-ff90bbea96c2",
+          "title": "Lateralus modal phrasing",
+          "description": "[What it is]\nLateralus modal phrasing is an approach that treats a small melodic cell as a rotating motif, moving its perceived tonal center and contour so each repetition feels like part of a continuous, spiraling line. It focuses on shifting modal color and delaying or altering expected resolutions to produce a searching, vocal-like melodic arc.\n\n[Why it matters]\nThis phrasing is a signature of the style you’re targeting because it turns simple material into expressive, hypnotic statements that feel both meditative and emotionally charged. Learning it gives your leads a narrative quality—motifs evolve over time instead of sounding like isolated licks.\n\n[How to practice]\nIsolate a short motif and play it repeatedly while changing its starting point inside the scale so you hear how the same shape takes on different modal colors; keep the motif consistent while varying where it resolves. Sing the motif first and then play it so your ear dictates phrasing; shape each repetition with subtle timing shifts and dynamic shading to emphasize the spiral of the line. Build small call-and-response sequences that move the motif through several tonal centers, then connect those sequences into longer, unfolding phrases.",
+          "successCriteria": "You can take a compact motif and rotate it through different tonal centers so each pass sounds like a new sentence; phrases unfold with delayed resolutions that feel intentional and emotionally evocative. Lines sound vocal and cyclical rather than mechanical, sit naturally over accompaniment, and convey the spiraling, searching quality associated with the target style.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "sing_what_you_play"
+        },
+        {
+          "id": "6ae142ca-fb9b-48bf-b1ae-f308af2122a0",
+          "title": "Parabola dynamics execution",
+          "description": "[What it is]\nParabola dynamics execution is the deliberate shaping of a phrase into a single curved gesture: a controlled rise in intensity, a distinct apex that holds attention, and a measured release. It combines changes in loudness, note density, tone color and silence so the whole statement reads like an arc rather than a sequence of isolated notes. The aim is a monumental, voice-like phrase that feels purposeful and directional.\n\n[Why it matters]\nThis macro-dynamic control creates climactic moments that lift a riff or lead from background texture into the spotlight and give repetitions a sense of progression. It clarifies musical intent inside busy arrangements and helps a phrase cut through without relying on faster runs or heavier saturation. In stylistic terms, it’s what turns simple material into something anthemic and emotionally resonant.\n\n[How to practice]\nChoose a short melodic cell and split it mentally into three stages: onset (gradual build), apex (maintain focused presence), and release (reduce intensity and leave space). Practice each stage slowly, listening for a smooth curvature of overall volume and tone rather than abrupt jumps; then link the stages so the arc breathes naturally. Record and compare runs, adjusting how many notes, how full the tone is, and how much silence you leave in each stage; vary the slope of the rise and the length of the apex to internalize different expressive shapes. Repeat until the phrase consistently reads as a single parabolic gesture in both solo and ensemble contexts.",
+          "successCriteria": "You can shape a phrase with a clear rise, a held apex that feels powerful without harshness, and a controlled release so the whole line reads as one arc. Transitions between onset, apex and release are smooth and intentional, and the phrase reliably stands out inside a mix without resorting to added noise or faster motion. You can vary the steepness and apex length to suit different emotional goals.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "e8deec2f-7836-4ae4-bde5-56a16cf004d5",
+          "title": "Stinkfist riff articulation",
+          "description": "[What it is]\nStinkfist riff articulation is the set of small timing, length and touch choices that turn the riff from a block of notes into its recognizable, elastic groove: deliberate short (choked) hits, ringing strikes, and barely-audible transitional taps placed just before or after the main pulse. It's about controlling how long each sound sings and how sharply each attack is delivered so the riff breathes and pushes.\n\n[Why it matters]\nThose micro-articulations are what give the riff its menacing, forward-moving character and make it sit with the rest of the band rather than sounding blunt or mechanical. Nailing them lets the guitar both drive the groove and create the spacey, tense quality listeners expect from this style.\n\n[How to practice]\nIsolate the core motif and exaggerate contrasts: play the short, choked strokes much shorter than the sustained ones, then gradually smooth the extremes into musical nuance. Focus on consistent right-hand approach (angle and contact) and small left-hand finger contact changes to create ghosted taps versus clear tones; record each run and compare what reads as punchy versus what rings. Start slow, increase gradually, and repeat short focused loops until the articulation choices become automatic and repeatable.",
+          "successCriteria": "The riff feels taut and elastic: short hits are consistently choked to the same length, sustained notes ring with clear tone, ghosted transitional sounds are present but not full notes, and accents land deliberately so the guitar locks with the groove while retaining a menacing, breathing quality.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "muting_spotlight_drill"
+        },
+        {
+          "id": "b9415147-0b7f-4a8b-ac5f-6350caabf620",
+          "title": "Vicarious delay textures",
+          "description": "[What it is]\nVicarious delay textures treat the delay repeats as an autonomous musical voice that responds to what you play, forming rhythmic-harmonic beds and counterlines that evolve after the pick attack. The goal is for the echoes to feel like a second player—clearly separated in timbre and placement so they support, answer, or subtly contradict your live parts.\n\n[Why it matters]\nThese textures let a single guitar occupy much more sonic real estate: simple gestures generate complex motion, atmosphere, and implied harmony without adding extra tracks. For heavier, cinematic playing, a controlled delay bed creates depth and momentum while keeping your live lines distinct and expressive.\n\n[How to practice]\nChoose a short motif and listen to how its repeats interact with new material; practice improvising over the echoing pattern so you learn to exploit the accidental harmonies and rhythmic displacements it creates. Work on shaping the repeat tone and density so the delayed voice sits behind the direct signal—use subtle filtering/modulation and level balancing rather than making the repeats louder than your playing. Practice dynamic control and deliberate muting to thin or thicken the wash, and train quick on/off or clear actions so you can change the texture mid-phrase without losing focus.",
+          "successCriteria": "Mastery feels like the delay acting as a reliable second player: repeats form predictable, musical beds that you can compose around; you can control texture density and timbre so the echoes enhance rather than clutter the mix; and you can summon or silence the wash cleanly while maintaining clear, expressive lead or rhythm lines.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        }
+      ]
+    }
+  ]
+}

@@ -17,12 +17,12 @@ import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
-  BarChart2,
   Calendar,
   Home,
   ListChecks,
   LogOut,
   MessageSquarePlus,
+  Milestone,
   Music,
   Music2,
   Settings,
@@ -115,7 +115,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
     { id: "my-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
     { id: "arsenal", name: "Guitar Arsenal", href: "/arsenal", icon: <Swords size={16} /> },
-    { id: "summary", name: "Summary", href: "/summary", icon: <BarChart2 size={16} /> },
+    { id: "summary", name: "Milestones", href: "/summary", icon: <Milestone size={16} /> },
   ];
 
   const otherNavigation = [
