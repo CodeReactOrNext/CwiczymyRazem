@@ -46,7 +46,7 @@ export default async function handler(
       const seasonId = `${year}-${month}`;
 
       notifications.push(
-        messaging.sendMulticast({
+        messaging.sendEachForMulticast({
           tokens: allEnabledTokens,
           notification: {
             title: "🎸 A new season has started!",
@@ -87,7 +87,7 @@ export default async function handler(
 
       if (title && body) {
         notifications.push(
-          messaging.sendMulticast({
+          messaging.sendEachForMulticast({
             tokens,
             notification: { title, body },
             data: { url: "/timer" },
