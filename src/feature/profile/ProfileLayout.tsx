@@ -103,7 +103,7 @@ const ProfileLayout = ({
   const glowColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? "#0891b2") : "#0891b2";
 
   return (
-    <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16 overflow-hidden md:overflow-visible'>
+    <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>
       <HeroBanner
         eyebrow='Player Profile'
         title={displayName}

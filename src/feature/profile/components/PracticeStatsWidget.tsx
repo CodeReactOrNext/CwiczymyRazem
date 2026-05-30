@@ -150,7 +150,7 @@ export const PracticeStatsWidget = ({
   }));
 
   return (
-    <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm", className)}>
+    <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm p-5 sm:p-6", className)}>
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -163,7 +163,7 @@ export const PracticeStatsWidget = ({
                   : "text-zinc-700"
               )}
             />
-            <span className="text-[11px] font-semibold text-zinc-400">This week</span>
+            <span className="text-[12px] font-semibold text-zinc-400 tracking-wide">This week</span>
           </div>
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
@@ -178,7 +178,7 @@ export const PracticeStatsWidget = ({
         {/* Chart */}
         <div className="flex-1 min-h-[130px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 18, right: 28, bottom: 0, left: 0 }} barCategoryGap="20%">
+            <BarChart data={chartData} margin={{ top: 18, right: 44, bottom: 0, left: 0 }} barCategoryGap="20%">
               <XAxis
                 dataKey="day"
                 axisLine={false}
@@ -241,14 +241,14 @@ export const PracticeStatsWidget = ({
 
               <ReferenceLine
                 y={DAILY_GOAL_MIN}
-                stroke="rgba(255,255,255,0.18)"
+                stroke="rgba(255,255,255,0.35)"
                 strokeDasharray="4 3"
                 label={{
                   value: "15 min",
                   position: "right",
-                  fill: "rgba(255,255,255,0.25)",
-                  fontSize: 8,
-                  fontWeight: 600,
+                  fill: "rgba(255,255,255,0.7)",
+                  fontSize: 10,
+                  fontWeight: 700,
                 }}
               />
 

@@ -160,9 +160,7 @@ export const StatisticsSection = () => {
             </div>
 
             {/* Heatmap below image */}
-            <div className="mt-6">
               <ActivityHeatmap />
-            </div>
           </div>
 
           {/* Right — content */}
