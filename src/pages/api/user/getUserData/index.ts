@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { todayKey } from "lib/email/cooldown";
+import { markCooldown } from "lib/email/cooldownStore";
 import { sendWelcomeEmail } from "lib/email/send";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -51,9 +53,11 @@ export default async function handler(
           sendWelcomeEmail({
             to: user.email,
             userName: user.displayName,
-          }).catch((err) =>
-            console.error("[welcome-email] failed for", user.email, err)
-          );
+          })
+            .then(() => markCooldown(uid, "welcome", todayKey()))
+            .catch((err) =>
+              console.error("[welcome-email] failed for", user.email, err)
+            );
         }
       }
 
