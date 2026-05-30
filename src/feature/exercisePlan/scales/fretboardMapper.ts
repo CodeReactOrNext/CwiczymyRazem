@@ -75,7 +75,27 @@ export function getScalePatternForPosition(
   }
 
   // Sort by MIDI pitch (pitch-ascending order)
-  return pattern.sort((a, b) => a.midiNote - b.midiNote);
+  pattern.sort((a, b) => a.midiNote - b.midiNote);
+
+  // A straight 5-fret box can capture the SAME pitch on two adjacent
+  // strings — most often at the G→B transition, whose interval is a major
+  // third (4 semitones) instead of a perfect fourth. The shared pitch then
+  // sits at the top fret of the lower string AND the bottom fret of the
+  // higher string, so after the pitch-sort it appears twice in a row and
+  // the exercise made you play the same note twice. Keep a single fingering
+  // per pitch; prefer the thicker (higher-numbered) string so the run keeps
+  // climbing through the position before crossing to the next string.
+  const deduped: FretPosition[] = [];
+  for (const pos of pattern) {
+    const prev = deduped[deduped.length - 1];
+    if (prev && prev.midiNote === pos.midiNote) {
+      if (pos.string > prev.string) deduped[deduped.length - 1] = pos;
+      continue;
+    }
+    deduped.push(pos);
+  }
+
+  return deduped;
 }
 
 /**

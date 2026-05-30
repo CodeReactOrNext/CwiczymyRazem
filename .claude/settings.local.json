@@ -40,7 +40,11 @@
       "Bash(python -)",
       "Bash(npx eslint *)",
       "Bash(echo \"---- exit: $? ----\")",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(cat > *)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }
