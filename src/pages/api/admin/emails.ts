@@ -12,6 +12,7 @@ import {
   sendStreakReminderEmail,
   sendWelcomeEmail,
 } from "lib/email/send";
+import { sendThrottled } from "lib/email/throttle";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -414,8 +415,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date();
     const dateKey = todayKey(now);
 
-    const results = await Promise.all(
-      recipients.map(async (r) => {
+    type RowResult = {
+      uid: string;
+      email: string;
+      ok: boolean;
+      error?: string;
+      cooldown?: boolean;
+    };
+
+    const settled = await sendThrottled<AdminEmailRecipient, RowResult>(
+      recipients,
+      async (r) => {
         try {
           if (!r.email) {
             return { uid: r.uid, email: r.email, ok: false, error: "Missing email" };
@@ -440,12 +450,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("[admin/emails] send failed", { uid: r.uid, email: r.email, errorMsg });
           return { uid: r.uid, email: r.email, ok: false, error: errorMsg };
         }
-      })
+      }
     );
+
+    const results: RowResult[] = settled.map((s, idx) => {
+      if (s.status === "fulfilled") return s.value;
+      const r = recipients[idx];
+      return {
+        uid: r.uid,
+        email: r.email,
+        ok: false,
+        error: String(s.reason?.message ?? s.reason ?? "Unknown error"),
+      };
+    });
 
     const sent = results.filter((r) => r.ok).length;
     const failed = results.length - sent;
-    const cooldownSkipped = results.filter((r) => !r.ok && (r as any).cooldown).length;
+    const cooldownSkipped = results.filter((r) => !r.ok && r.cooldown).length;
 
     return res.status(200).json({ sent, failed, cooldownSkipped, results });
   }
