@@ -83,6 +83,23 @@ const nextConfig = {
         destination: '/blog/practice-habits',
         permanent: true,
       },
+      // SEO consolidation: merged duplicate "guitar practice routine" posts into the
+      // canonical beginner pillar to resolve keyword cannibalization.
+      {
+        source: '/blog/beginner-guitar-practice-routine',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-routine-builder',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-routine-build-one-15-minutes',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
     ]
   },
   async headers() {

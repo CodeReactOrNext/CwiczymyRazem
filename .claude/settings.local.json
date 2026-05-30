@@ -36,7 +36,11 @@
       "Bash(Get-ChildItem -Path \"g:/cw/sss/CwiczymyRazem/src/layouts\" -Recurse -Filter \"*.tsx\")",
       "Bash(Select-Object FullName)",
       "Bash(npx firebase *)",
-      "WebFetch(domain:colorcove.org)"
+      "WebFetch(domain:colorcove.org)",
+      "Bash(python -)",
+      "Bash(npx eslint *)",
+      "Bash(echo \"---- exit: $? ----\")",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }
