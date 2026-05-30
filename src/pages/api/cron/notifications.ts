@@ -10,6 +10,7 @@ import {
   sendSeasonStartEmail,
   sendStreakReminderEmail,
 } from "lib/email/send";
+import { sendThrottled } from "lib/email/throttle";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore, messaging } from "utils/firebase/api/firebase.config";
 
@@ -228,7 +229,7 @@ export default async function handler(
     interface StreakJob {
       uid: string;
       type: "streak_d1" | "streak_d3";
-      promise: Promise<unknown>;
+      run: () => Promise<unknown>;
     }
     const jobs: StreakJob[] = [];
 
@@ -241,16 +242,17 @@ export default async function handler(
       jobs.push({
         uid: c.uid,
         type: c.type,
-        promise: sendStreakReminderEmail({
-          to: c.email,
-          userName: c.displayName,
-          streakDays: c.streakDays,
-          variant: c.variant,
-        }),
+        run: () =>
+          sendStreakReminderEmail({
+            to: c.email,
+            userName: c.displayName,
+            streakDays: c.streakDays,
+            variant: c.variant,
+          }),
       });
     });
 
-    const settled = await Promise.allSettled(jobs.map((j) => j.promise));
+    const settled = await sendThrottled(jobs, (j) => j.run());
     const succeeded: { uid: string; type: "streak_d1" | "streak_d3" }[] = [];
     settled.forEach((r, idx) => {
       if (r.status === "fulfilled") {
@@ -295,7 +297,7 @@ export default async function handler(
         points: p.points,
       }));
 
-      const jobs: { uid: string; promise: Promise<unknown> }[] = [];
+      const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       prevParticipants.forEach((p) => {
         if (isOnEmailCooldown(prevCooldowns.get(p.uid) ?? null, "season_results", now)) {
           seasonResultsCooldown += 1;
@@ -305,19 +307,20 @@ export default async function handler(
           p.place <= 5 ? SEASON_FAME_REWARDS[p.place - 1] : null;
         jobs.push({
           uid: p.uid,
-          promise: sendSeasonResultsEmail({
-            to: p.email,
-            userName: p.displayName,
-            seasonName: prevSeasonName,
-            userPlace: p.place,
-            userPoints: p.points,
-            fameEarned,
-            top3,
-          }),
+          run: () =>
+            sendSeasonResultsEmail({
+              to: p.email,
+              userName: p.displayName,
+              seasonName: prevSeasonName,
+              userPlace: p.place,
+              userPoints: p.points,
+              fameEarned,
+              top3,
+            }),
         });
       });
 
-      const settled = await Promise.allSettled(jobs.map((j) => j.promise));
+      const settled = await sendThrottled(jobs, (j) => j.run());
       const succeeded: { uid: string; type: "season_results" }[] = [];
       settled.forEach((r, idx) => {
         if (r.status === "fulfilled") {
@@ -339,7 +342,7 @@ export default async function handler(
 
     // 3b. Season start (for current season — invites previous participants)
     try {
-      const jobs: { uid: string; promise: Promise<unknown> }[] = [];
+      const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       prevParticipants.forEach((p) => {
         if (isOnEmailCooldown(prevCooldowns.get(p.uid) ?? null, "season_start", now)) {
           seasonStartCooldown += 1;
@@ -347,16 +350,17 @@ export default async function handler(
         }
         jobs.push({
           uid: p.uid,
-          promise: sendSeasonStartEmail({
-            to: p.email,
-            userName: p.displayName,
-            seasonName: currentSeasonName,
-            daysInSeason: daysInCurrentSeason,
-          }),
+          run: () =>
+            sendSeasonStartEmail({
+              to: p.email,
+              userName: p.displayName,
+              seasonName: currentSeasonName,
+              daysInSeason: daysInCurrentSeason,
+            }),
         });
       });
 
-      const settled = await Promise.allSettled(jobs.map((j) => j.promise));
+      const settled = await sendThrottled(jobs, (j) => j.run());
       const succeeded: { uid: string; type: "season_start" }[] = [];
       settled.forEach((r, idx) => {
         if (r.status === "fulfilled") {
@@ -386,7 +390,7 @@ export default async function handler(
       );
       const seasonName = `Season ${currentSeasonId}`;
 
-      const jobs: { uid: string; promise: Promise<unknown> }[] = [];
+      const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       currentParticipants.forEach((p) => {
         if (isOnEmailCooldown(cooldowns.get(p.uid) ?? null, "season_ending_soon", now)) {
           seasonEndingCooldown += 1;
@@ -394,16 +398,17 @@ export default async function handler(
         }
         jobs.push({
           uid: p.uid,
-          promise: sendSeasonEndingSoonEmail({
-            to: p.email,
-            userName: p.displayName,
-            seasonName,
-            daysLeft: daysLeftInSeason,
-          }),
+          run: () =>
+            sendSeasonEndingSoonEmail({
+              to: p.email,
+              userName: p.displayName,
+              seasonName,
+              daysLeft: daysLeftInSeason,
+            }),
         });
       });
 
-      const settled = await Promise.allSettled(jobs.map((j) => j.promise));
+      const settled = await sendThrottled(jobs, (j) => j.run());
       const succeeded: { uid: string; type: "season_ending_soon" }[] = [];
       settled.forEach((r, idx) => {
         if (r.status === "fulfilled") {
