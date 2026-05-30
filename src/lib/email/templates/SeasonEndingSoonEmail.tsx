@@ -19,6 +19,7 @@ interface TopPlayer {
 interface SeasonEndingSoonEmailProps {
   userName: string;
   seasonName: string;
+  daysLeft: number;
   top3: TopPlayer[];
   leaderboardUrl: string;
   logoUrl: string;
@@ -95,13 +96,22 @@ const daysHero = {
   margin: "0 0 24px",
 };
 
-const daysNumber = {
+const daysNumberBig = {
   fontSize: "72px",
   fontWeight: 900,
   color: colors.redMuted,
   margin: 0,
   lineHeight: 1,
   letterSpacing: "-0.04em",
+};
+
+const daysNumberWord = {
+  fontSize: "44px",
+  fontWeight: 900,
+  color: colors.redMuted,
+  margin: 0,
+  lineHeight: 1.05,
+  letterSpacing: "-0.03em",
 };
 
 const daysLabel = {
@@ -175,21 +185,65 @@ const footer = {
 
 const places = ["1st", "2nd", "3rd"];
 
+interface Copy {
+  preview: string;
+  eyebrow: string;
+  heading: string;
+  paragraph: string;
+  heroNumber: string;
+  heroLabel: string;
+  heroNumberAsWord: boolean;
+}
+
+function buildCopy(daysLeft: number, displayName: string, seasonName: string): Copy {
+  if (daysLeft <= 0) {
+    return {
+      preview: `${seasonName} ends today — last chance`,
+      eyebrow: "Final hours",
+      heading: `${displayName}, the season ends today`,
+      paragraph: `${seasonName} closes today. Last chance to push your spot on the leaderboard — every minute counts.`,
+      heroNumber: "TODAY",
+      heroLabel: "season ends",
+      heroNumberAsWord: true,
+    };
+  }
+  if (daysLeft === 1) {
+    return {
+      preview: `${seasonName} ends tomorrow`,
+      eyebrow: "1 day left",
+      heading: `${displayName}, the season ends tomorrow`,
+      paragraph: `${seasonName} closes tomorrow. This is the last day to climb — top 5 take home fame rewards.`,
+      heroNumber: "1",
+      heroLabel: "day remaining",
+      heroNumberAsWord: false,
+    };
+  }
+  return {
+    preview: `${daysLeft} days left in ${seasonName}`,
+    eyebrow: `${daysLeft} days left`,
+    heading: `${displayName}, the season ends in ${daysLeft} days`,
+    paragraph: `${seasonName} closes in ${daysLeft} days. This is your final push — every session counts toward the leaderboard. The top 5 take home fame rewards at the end.`,
+    heroNumber: String(daysLeft),
+    heroLabel: "days remaining",
+    heroNumberAsWord: false,
+  };
+}
+
 export default function SeasonEndingSoonEmail({
   userName,
   seasonName,
+  daysLeft,
   top3,
   leaderboardUrl,
   logoUrl,
 }: SeasonEndingSoonEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
+  const copy = buildCopy(daysLeft, displayName, seasonName);
 
   return (
     <Html lang="en">
       <Head />
-      <Preview>
-        7 days left in {seasonName} — make your final push
-      </Preview>
+      <Preview>{copy.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
@@ -197,19 +251,15 @@ export default function SeasonEndingSoonEmail({
           </Section>
 
           <Section style={card}>
-            <Text style={eyebrow}>7 days left</Text>
-            <Heading style={heading}>
-              {displayName}, the season ends in a week
-            </Heading>
-            <Text style={paragraph}>
-              {seasonName} closes in 7 days. This is your final push — every
-              session counts toward the leaderboard. The top 5 take home fame
-              rewards at the end.
-            </Text>
+            <Text style={eyebrow}>{copy.eyebrow}</Text>
+            <Heading style={heading}>{copy.heading}</Heading>
+            <Text style={paragraph}>{copy.paragraph}</Text>
 
             <Section style={daysHero}>
-              <Text style={daysNumber}>7</Text>
-              <Text style={daysLabel}>days remaining</Text>
+              <Text style={copy.heroNumberAsWord ? daysNumberWord : daysNumberBig}>
+                {copy.heroNumber}
+              </Text>
+              <Text style={daysLabel}>{copy.heroLabel}</Text>
             </Section>
 
             {top3.length > 0 && (

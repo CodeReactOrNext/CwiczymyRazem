@@ -210,6 +210,15 @@ const AdminEmailsPage = () => {
                         {data.context.daysInSeason} days
                       </span>
                     )}
+                    {data?.context?.daysLeft != null && (
+                      <span className="rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-red-400">
+                        {data.context.daysLeft === 0
+                          ? "ends today"
+                          : data.context.daysLeft === 1
+                          ? "ends tomorrow"
+                          : `${data.context.daysLeft} days left`}
+                      </span>
+                    )}
                     {data?.context?.top3 && data.context.top3.length > 0 && (
                       <span className="rounded-lg border border-white/5 bg-zinc-900 px-2.5 py-1">
                         Top 3: {data.context.top3.map((t) => t.displayName).join(" / ")}
