@@ -133,7 +133,6 @@ interface SendSeasonEndingSoonArgs {
   userName?: string | null;
   seasonName: string;
   daysLeft: number;
-  top3: TopPlayer[];
 }
 
 function endingSoonSubject(seasonName: string, daysLeft: number): string {
@@ -147,7 +146,6 @@ export async function sendSeasonEndingSoonEmail({
   userName,
   seasonName,
   daysLeft,
-  top3,
 }: SendSeasonEndingSoonArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
   const logoUrl =
@@ -161,7 +159,6 @@ export async function sendSeasonEndingSoonEmail({
       userName: userName ?? "",
       seasonName,
       daysLeft,
-      top3,
       leaderboardUrl: `${baseUrl}/leadboard`,
       logoUrl,
     }),

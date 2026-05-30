@@ -11,16 +11,10 @@ import {
   Text,
 } from "@react-email/components";
 
-interface TopPlayer {
-  displayName: string;
-  points: number;
-}
-
 interface SeasonEndingSoonEmailProps {
   userName: string;
   seasonName: string;
   daysLeft: number;
-  top3: TopPlayer[];
   leaderboardUrl: string;
   logoUrl: string;
 }
@@ -28,7 +22,6 @@ interface SeasonEndingSoonEmailProps {
 const colors = {
   bg: "#09090b",
   card: "#18181b",
-  cardElevated: "#27272a",
   text: "#f4f4f5",
   textMuted: "#a1a1aa",
   textDim: "#71717a",
@@ -93,7 +86,7 @@ const daysHero = {
   borderRadius: "8px",
   padding: "24px",
   textAlign: "center" as const,
-  margin: "0 0 24px",
+  margin: "0 0 28px",
 };
 
 const daysNumberBig = {
@@ -122,44 +115,6 @@ const daysLabel = {
   opacity: 0.8,
 };
 
-const standingsBox = {
-  backgroundColor: colors.cardElevated,
-  borderRadius: "8px",
-  padding: "20px",
-  margin: "0 0 28px",
-};
-
-const standingsTitle = {
-  fontSize: "13px",
-  fontWeight: 600,
-  color: colors.textMuted,
-  margin: "0 0 14px",
-};
-
-const playerRow = {
-  margin: "0 0 10px",
-};
-
-const playerPlace = {
-  fontSize: "12px",
-  fontWeight: 700,
-  color: colors.textDim,
-  margin: "0 0 2px",
-};
-
-const playerName = {
-  fontSize: "14px",
-  fontWeight: 600,
-  color: colors.text,
-  margin: 0,
-};
-
-const playerPoints = {
-  fontSize: "12px",
-  color: colors.textMuted,
-  margin: "2px 0 0",
-};
-
 const buttonWrap = {
   textAlign: "center" as const,
 };
@@ -182,8 +137,6 @@ const footer = {
   marginTop: "28px",
   lineHeight: "18px",
 };
-
-const places = ["1st", "2nd", "3rd"];
 
 interface Copy {
   preview: string;
@@ -233,7 +186,6 @@ export default function SeasonEndingSoonEmail({
   userName,
   seasonName,
   daysLeft,
-  top3,
   leaderboardUrl,
   logoUrl,
 }: SeasonEndingSoonEmailProps) {
@@ -261,21 +213,6 @@ export default function SeasonEndingSoonEmail({
               </Text>
               <Text style={daysLabel}>{copy.heroLabel}</Text>
             </Section>
-
-            {top3.length > 0 && (
-              <Section style={standingsBox}>
-                <Text style={standingsTitle}>Current standings</Text>
-                {top3.map((player, idx) => (
-                  <Section key={idx} style={playerRow}>
-                    <Text style={playerPlace}>{places[idx]}</Text>
-                    <Text style={playerName}>{player.displayName}</Text>
-                    <Text style={playerPoints}>
-                      {player.points.toLocaleString()} pts
-                    </Text>
-                  </Section>
-                ))}
-              </Section>
-            )}
 
             <Section style={buttonWrap}>
               <Button href={leaderboardUrl} style={ctaButton}>

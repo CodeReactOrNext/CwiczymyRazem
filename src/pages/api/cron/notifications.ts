@@ -384,10 +384,6 @@ export default async function handler(
       const cooldowns = await fetchCooldownsMap(
         currentParticipants.map((p) => p.uid)
       );
-      const top3 = currentParticipants.slice(0, 3).map((p) => ({
-        displayName: p.displayName,
-        points: p.points,
-      }));
       const seasonName = `Season ${currentSeasonId}`;
 
       const jobs: { uid: string; promise: Promise<unknown> }[] = [];
@@ -403,7 +399,6 @@ export default async function handler(
             userName: p.displayName,
             seasonName,
             daysLeft: daysLeftInSeason,
-            top3,
           }),
         });
       });
