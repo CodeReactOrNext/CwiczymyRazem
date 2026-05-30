@@ -16,8 +16,8 @@ import Link from 'next/link';
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
-import remarkGfm from 'remark-gfm';
 import { useEffect, useState } from 'react';
+import remarkGfm from 'remark-gfm';
 
 
 
@@ -138,10 +138,15 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
     ].filter(Boolean)
   };
 
+  // SEO <title>: prefer an explicit metaTitle, fall back to the (often longer) H1 title.
+  // Append the brand only when the result still fits within Google's ~60-char SERP limit.
+  const seoBase = frontmatter.metaTitle || frontmatter.title;
+  const pageTitle = seoBase.length <= 47 ? `${seoBase} | Riff Quest` : seoBase;
+
   return (
     <>
       <Head>
-        <title>{frontmatter.title} | Riff Quest Blog</title>
+        <title>{pageTitle}</title>
         <meta name="description" content={frontmatter.description} />
         <meta property="og:title" content={frontmatter.title} />
         <meta property="og:description" content={frontmatter.description} />
@@ -294,10 +299,20 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     });
   }
 
+  // Hub-and-spoke related posts: surface same-cluster posts first (pillar leading),
+  // then top up with the most recent posts so every article still shows three.
   const allBlogs = getAllBlogs();
-  const relatedBlogs = allBlogs
-    .filter((blog) => blog.slug !== slug)
-    .slice(0, 3);
+  const current = allBlogs.find((blog) => blog.slug === slug);
+  const others = allBlogs.filter((blog) => blog.slug !== slug);
+
+  const sameCluster = current?.cluster
+    ? others
+        .filter((blog) => blog.cluster === current.cluster)
+        .sort((a, b) => Number(b.pillar ?? false) - Number(a.pillar ?? false))
+    : [];
+
+  const fill = others.filter((blog) => !sameCluster.includes(blog));
+  const relatedBlogs = [...sameCluster, ...fill].slice(0, 3);
 
   return {
     props: {

@@ -42,12 +42,20 @@ const transformDirectives = (content: string): string => {
 
 export interface BlogFrontmatter {
   title: string;
+  /** Optional SEO title for the <title> tag. Falls back to `title` when absent.
+   *  Keep it <= ~57 chars so the rendered SERP title (incl. optional brand) stays under 60. */
+  metaTitle?: string;
   description: string;
   date: string;
   updatedAt?: string;
   image: string;
   slug: string;
   author?: string;
+  /** Topic cluster slug for hub-and-spoke internal linking. Posts sharing a cluster
+   *  are surfaced as "Read Also" for each other, with the pillar prioritised. */
+  cluster?: string;
+  /** Marks the canonical "pillar" post of its cluster (linked first from every spoke). */
+  pillar?: boolean;
 }
 
 export const getAllBlogs = (): BlogFrontmatter[] => {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "npm run export-exercises && node scripts/generateExerciseSitemap.mjs",
+    "prebuild": "npm run export-exercises && node scripts/generateExerciseSitemap.mjs && node scripts/generateBlogSitemap.mjs",
     "start": "next start",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
