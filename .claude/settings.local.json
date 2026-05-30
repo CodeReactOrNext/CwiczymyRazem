@@ -35,7 +35,8 @@
       "Bash(Format-List FullName)",
       "Bash(Get-ChildItem -Path \"g:/cw/sss/CwiczymyRazem/src/layouts\" -Recurse -Filter \"*.tsx\")",
       "Bash(Select-Object FullName)",
-      "Bash(npx firebase *)"
+      "Bash(npx firebase *)",
+      "WebFetch(domain:colorcove.org)"
     ]
   }
 }
