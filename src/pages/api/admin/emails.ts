@@ -220,10 +220,6 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
   if (type === "season_ending_soon") {
     const participants = await getSeasonParticipants(currentSeasonId);
     const cooldowns = await fetchCooldownsMap(participants.map((p) => p.uid));
-    const top3 = participants.slice(0, 3).map((p) => ({
-      displayName: p.displayName,
-      points: p.points,
-    }));
     const eligible = participants.filter(
       (p) => !isOnEmailCooldown(cooldowns.get(p.uid) ?? null, type, now)
     );
@@ -239,7 +235,6 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
       context: {
         seasonName: `Season ${currentSeasonId}`,
         daysLeft: daysLeftInSeason,
-        top3,
       },
       description: `Current season (${currentSeasonId}) participants — ${daysLeftInSeason} day${daysLeftInSeason === 1 ? "" : "s"} left.`,
     };
@@ -347,9 +342,9 @@ async function sendOne(
   }
 
   if (type === "season_ending_soon") {
-    if (!context?.seasonName || !context.top3 || context.daysLeft == null) {
+    if (!context?.seasonName || context.daysLeft == null) {
       throw new Error(
-        "season_ending_soon requires context.seasonName, context.top3 and context.daysLeft"
+        "season_ending_soon requires context.seasonName and context.daysLeft"
       );
     }
     await sendSeasonEndingSoonEmail({
@@ -357,7 +352,6 @@ async function sendOne(
       userName: recipient.displayName,
       seasonName: context.seasonName,
       daysLeft: context.daysLeft,
-      top3: context.top3,
     });
     return;
   }
