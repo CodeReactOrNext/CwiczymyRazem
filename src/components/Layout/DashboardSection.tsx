@@ -19,11 +19,12 @@ export const DashboardSection = ({
   className = "",
 }: DashboardSectionProps) => {
   const spacing = compact ? "mb-4" : "mb-5";
+  const isTitle = title || subtitle
 
   return (
     <div className={`relative overflow-hidden rounded-xl  ${className}`}>
       <div className='relative'>
-        <div
+      {isTitle &&  <div
           className={`flex items-center ${
             action ? "justify-between" : ""
           } ${spacing}`}>
@@ -37,7 +38,7 @@ export const DashboardSection = ({
             {subtitle && <p className='text-xs text-zinc-400'>{subtitle}</p>}
           </div>
           {action && action}
-        </div>
+        </div>}
 
         <div className='relative'>{children}</div>
       </div>

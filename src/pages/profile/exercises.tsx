@@ -17,7 +17,7 @@ const ProfileExercisesPage: NextPageWithLayout = () => {
   const [activeTab, setActiveTab] = useState<string>("routines");
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
       {!sessionActive && (
         <>
           <HeroBanner

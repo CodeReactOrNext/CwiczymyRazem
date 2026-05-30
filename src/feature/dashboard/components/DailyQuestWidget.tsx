@@ -41,26 +41,23 @@ export const DailyQuestWidget = () => {
     };
 
     return (
-        <Card className="flex-col justify-between">
+        <Card className="flex-col justify-between p-5 sm:p-6">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                         <Swords size={18}  className="text-lg transition-all duration-500 text-zinc-700"/>
                     <div>
-                        <h3 className="text-[11px] font-semibold text-zinc-400">Daily Quests</h3>
+                        <h3 className="text-[12px] font-semibold text-zinc-400 tracking-wide">Daily Quests</h3>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
                         <div className="flex items-center gap-1.5 mr-1">
-                            <span className="text-xs font-black text-cyan-400 tracking-tight">
+                            <span className="text-xs font-medium text-cyan-400 tracking-tight">
                                 +30
                             </span>
                             <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
                         </div>
                     )}
-                    <div className="text-xs font-bold text-zinc-400">
-                        {dailyQuest.tasks.filter(t => t.isCompleted).length}/{dailyQuest.tasks.length}
-                    </div>
                 </div>
             </div>
 
@@ -91,19 +88,19 @@ export const DailyQuestWidget = () => {
                         className={cn(
                             "flex items-center justify-between p-2.5 rounded-sm transition-all",
                             task.isCompleted
-                                ? "bg-zinc-800/40 text-zinc-400"
-                                : "bg-zinc-800/80 text-zinc-300 cursor-pointer hover:bg-zinc-700/80"
+                                ? "bg-green-900/25 text-green-400/70"
+                                : "bg-zinc-800/80 text-zinc-300 cursor-pointer hover:bg-zinc-700/80 active:scale-[0.98]"
                         )}
                     >
                         <span className={cn(
-                            "text-xs font-bold",
-                            task.isCompleted && "line-through opacity-50"
+                            "text-xs tracking-wide",
+                            task.isCompleted ? "font-medium line-through opacity-50" : "font-medium"
                         )}>
                             {task.title}
                         </span>
 
                         {task.isCompleted ? (
-                             <CheckCircle2 size={14} className="text-green-500" />
+                             <CheckCircle2 size={14} className="text-green-500/70" />
                         ) : (
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-bold text-zinc-400">

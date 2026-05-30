@@ -61,7 +61,7 @@ const TimerPractice: NextPageWithLayout = () => {
   }, [timer, dispatch]);
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
       <HeroBanner
         title="Exercises"
         subtitle="Build your skills with focused practice exercises"

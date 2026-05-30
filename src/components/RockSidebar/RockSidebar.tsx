@@ -134,9 +134,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           key={id}
           href={href}
           onClick={onClick}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
+          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 active:scale-[0.98] ${
             isActive
-              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+              ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
               : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
           }`}>
           <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
@@ -145,12 +145,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         </Link>
       );
     });
-
-  const renderSectionLabel = (label: string) => (
-    <div className="mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
-      {label}
-    </div>
-  );
 
   const userProfileSection = (mobile?: boolean) => {
     if (!userStats || !userName) return null;
@@ -214,39 +208,35 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const navContent = (mobile?: boolean) => (
     <nav
-      className={`flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent ${
+      className={`flex flex-1 flex-col overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent ${
         mobile ? "pb-20" : ""
       }`}>
-      <div>
-        {renderSectionLabel("Navigation")}
-        <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
-      </div>
+      <div className="space-y-6">
+        <div>
+          <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
+        </div>
 
-      <Separator className="bg-white/10" />
+        <Separator className="bg-white/10" />
 
-      <div>
-        {renderSectionLabel("Tools")}
-        <div className="space-y-1">{renderNavLinks(toolsNavigation, mobile ? handleLinkClick : undefined)}</div>
-      </div>
+        <div>
+          <div className="space-y-1">{renderNavLinks(toolsNavigation, mobile ? handleLinkClick : undefined)}</div>
+        </div>
 
-      <Separator className="bg-white/10" />
+        <Separator className="bg-white/10" />
 
-      <div>
-        {renderSectionLabel("Other")}
-        <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
-      </div>
+        <div>
+          <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
+        </div>
 
-      <Separator className="bg-white/10" />
+        <Separator className="bg-white/10" />
 
-      <div>
-        {renderSectionLabel("Community")}
         <div className="space-y-1">
           <button
             onClick={() => {
               if (mobile) handleLinkClick();
               setIsFeedbackOpen(true);
             }}
-            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
             <span className="text-zinc-500">
               <MessageSquarePlus size={16} />
             </span>
@@ -258,7 +248,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={mobile ? handleLinkClick : undefined}
-            className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
             <span className="text-zinc-500">
               <FaDiscord size={16} />
             </span>
@@ -270,36 +260,43 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               if (mobile) handleLinkClick();
               setIsCommunityModalOpen(true);
             }}
-            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
             <span className="text-rose-500">
               <Heart size={16} fill="currentColor" />
             </span>
             <span>Grow Riff Quest</span>
           </button>
-
-          <a
-            href="https://buymeacoffee.com/riffquest"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={mobile ? handleLinkClick : undefined}
-            className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-amber-400/80 hover:bg-amber-500/10 hover:text-amber-300">
-            <span className="text-amber-500">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
-                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
-                <line x1="6" x2="6" y1="2" y2="4"/>
-                <line x1="10" x2="10" y1="2" y2="4"/>
-                <line x1="14" x2="14" y1="2" y2="4"/>
-              </svg>
-            </span>
-            <span>Buy me a coffee</span>
-          </a>
         </div>
       </div>
 
+      <div className="hidden lg:block lg:flex-1" />
+
+      <a
+        href="https://buymeacoffee.com/riffquest"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={mobile ? handleLinkClick : undefined}
+        className="mt-10 flex items-start gap-3 rounded-xl bg-amber-500/10 p-3 transition-all duration-200 active:scale-[0.98] hover:bg-amber-500/15">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+            <line x1="6" x2="6" y1="2" y2="4"/>
+            <line x1="10" x2="10" y1="2" y2="4"/>
+            <line x1="14" x2="14" y1="2" y2="4"/>
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-amber-300">Buy me a coffee</p>
+          <p className="mt-0.5 text-xs leading-snug text-amber-400/60">
+            Support Riff Quest&apos;s development
+          </p>
+        </div>
+      </a>
+
       {mobile && (
         <>
-          <Separator className="bg-white/10" />
+          <Separator className="my-6 bg-white/10" />
           <button
             onClick={() => {
               handleLinkClick();
@@ -321,8 +318,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       <MobileBottomNav onMenuClick={() => setIsMobileOpen(true)} />
 
       {/* Desktop Sidebar */}
-      <aside className="hidden h-full border-r border-white/10 bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col">
-        <div className="border-b border-white/10 p-4">
+      <aside className="hidden h-full bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center">
               <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />

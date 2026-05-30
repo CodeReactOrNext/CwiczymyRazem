@@ -51,7 +51,7 @@ const CreatePlanPage: NextPageWithLayout = () => {
 
   return (
     <PremiumGate feature="plans">
-      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
         <HeroBanner
           title="Create Plan"
           subtitle="Build your custom practice routine"

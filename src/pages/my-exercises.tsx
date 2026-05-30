@@ -92,7 +92,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
   if (activeExercise) {
     return (
-      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
         <div className="px-4 pt-6 pb-2">
           <button
             onClick={() => setActiveExercise(null)}
@@ -115,7 +115,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
       <HeroBanner
         title="My Exercises"
         subtitle="Create and share your own guitar exercises with the community"

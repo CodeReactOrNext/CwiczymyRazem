@@ -67,7 +67,7 @@ export const ActivityLogView = ({
   }
 
   return (
-    <Card className='relative w-full p-5 sm:p-6 mb-4'>
+    <Card className='relative w-full p-5 sm:p-6 mb-6'>
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -146,35 +146,6 @@ export const ActivityLogView = ({
           </div>
         </div>
 
-        <div className='mt-5 flex w-full flex-wrap items-center justify-between gap-4'>
-          <div className='flex flex-wrap items-center gap-4'>
-            <div className='flex items-center gap-1.5'>
-              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
-                <div className='absolute left-1/2 top-1/2 h-[4px] w-[4px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white' />
-              </div>
-              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.hasTitle")}</span>
-            </div>
-            <div className='flex items-center gap-1.5'>
-              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
-                <div className='absolute left-1/2 top-1/2 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white' />
-              </div>
-              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.backDate")}</span>
-            </div>
-          </div>
-
-          <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-400'>
-            <span>Less</span>
-            <div className='flex gap-[4px]'>
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#3f3f46]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#A5F3FC]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#67E8F9]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#22D3EE]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#06B6D4]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#0891B2]' />
-            </div>
-            <span>More</span>
-          </div>
-        </div>
       </div>
 
       {hoveredItem?.report &&
