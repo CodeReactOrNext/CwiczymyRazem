@@ -20,7 +20,7 @@ import {
   CalendarCheck, Check, CheckCircle2, ChevronLeft, ChevronRight, Flame, Guitar, Info,
   Layers, ListMusic, Lock, Shield, Sparkles, Sprout, Target, TrendingUp, Trophy, X, Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -425,6 +425,18 @@ function PracticeProgressTracker({
   const activeIdx   = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
   const nextLevel   = levelStatuses[activeIdx];
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef<HTMLDivElement>(null);
+
+  // keep the focused level centered in the horizontal scroll strip
+  useEffect(() => {
+    const node = activeRef.current;
+    const container = scrollRef.current;
+    if (!node || !container) return;
+    const target = node.offsetLeft - container.clientWidth / 2 + node.clientWidth / 2;
+    container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
+  }, [activeIdx]);
+
   return (
     <div className="flex w-full flex-col gap-2 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 py-5">
       <div className="flex items-center justify-between mb-1">
@@ -446,7 +458,10 @@ function PracticeProgressTracker({
           <ChevronRight size={26} strokeWidth={2.5} />
         </button>
       </div>
-      <div className="flex w-full items-center">
+      <div
+        ref={scrollRef}
+        className="flex w-full items-center overflow-x-auto no-scrollbar snap-x snap-mandatory sm:snap-none sm:overflow-x-visible"
+      >
       {levelStatuses.map((level, idx) => {
         const isOwned   = ownedSet.has(level.id);
         const isNext    = level.id === nextLevel?.id;
@@ -462,69 +477,59 @@ function PracticeProgressTracker({
         const pct       = level.progress.max > 0 ? level.progress.value / level.progress.max : 0;
         const offset    = CIRC - (level.met ? 1 : pct) * CIRC;
         const strokeW   = isNext ? 5 : 4;
-        const iconSize  = isNext ? 22 : 18;
         const showLock  = !isOwned && level.cost > 0;
+        const ringClass = isNext
+          ? "w-[58px] h-[58px] sm:w-[68px] sm:h-[68px]"
+          : "w-12 h-12 sm:w-14 sm:h-14";
+        const iconClass = isNext ? "w-6 h-6 sm:w-7 sm:h-7" : "w-5 h-5 sm:w-6 sm:h-6";
 
         return (
-          <div key={level.id} className="flex items-center flex-1 min-w-0">
-            {/* Ring + label */}
-            <div
-              className="flex flex-col items-center gap-2 flex-1 cursor-pointer"
-              style={{ opacity: showLock ? 0.6 : isDim ? 0.7 : 1 }}
-              onClick={() => onPreviewChange(idx)}
-            >
-              <div className="relative flex items-center justify-center" style={{ width: SIZE, height: SIZE }}>
-                <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="absolute inset-0 w-full h-full -rotate-90">
+          <div
+            key={level.id}
+            ref={idx === activeIdx ? activeRef : undefined}
+            className="flex shrink-0 w-[68px] flex-col items-center gap-2 snap-center cursor-pointer sm:w-auto sm:flex-1 sm:min-w-0"
+            style={{ opacity: showLock ? 0.6 : isDim ? 0.7 : 1 }}
+            onClick={() => onPreviewChange(idx)}
+          >
+            <div className={`relative flex shrink-0 items-center justify-center ${ringClass}`}>
+              <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="absolute inset-0 w-full h-full -rotate-90">
+                <circle
+                  cx={CX} cy={CY} r={R}
+                  fill="none"
+                  stroke={showLock ? "#3f3f46" : "#52525b"}
+                  strokeWidth={strokeW}
+                  strokeDasharray={showLock ? "3 3" : undefined}
+                />
+                {!showLock && (level.met || pct > 0) && (
                   <circle
                     cx={CX} cy={CY} r={R}
                     fill="none"
-                    stroke={showLock ? "#3f3f46" : "#52525b"}
+                    stroke={ringColor}
                     strokeWidth={strokeW}
-                    strokeDasharray={showLock ? "3 3" : undefined}
+                    strokeLinecap="round"
+                    strokeDasharray={CIRC}
+                    strokeDashoffset={offset}
                   />
-                  {!showLock && (level.met || pct > 0) && (
-                    <circle
-                      cx={CX} cy={CY} r={R}
-                      fill="none"
-                      stroke={ringColor}
-                      strokeWidth={strokeW}
-                      strokeLinecap="round"
-                      strokeDasharray={CIRC}
-                      strokeDashoffset={offset}
-                    />
-                  )}
-                </svg>
-                <div className="relative flex items-center justify-center">
-                  {showLock ? (
-                    <Lock size={iconSize - 2} className="text-zinc-400" />
-                  ) : level.met ? (
-                    <CheckCircle2 size={iconSize} style={{ color: GREEN }} />
-                  ) : (
-                    <level.Icon
-                      size={iconSize}
-                      style={{ color: isNext ? baseColor : "#a1a1aa" }}
-                    />
-                  )}
-                </div>
+                )}
+              </svg>
+              <div className="relative flex items-center justify-center">
+                {showLock ? (
+                  <Lock className={`${iconClass} text-zinc-400`} />
+                ) : level.met ? (
+                  <CheckCircle2 className={iconClass} style={{ color: GREEN }} />
+                ) : (
+                  <level.Icon className={iconClass} style={{ color: isNext ? baseColor : "#a1a1aa" }} />
+                )}
               </div>
-
-              <span
-                className="text-[11px] font-semibold text-center leading-tight truncate w-full px-0.5"
-                style={{ color: showLock ? "#a1a1aa" : level.met ? GREEN : isNext ? "#fafafa" : "#d4d4d8" }}
-                title={level.name}
-              >
-                {level.name.split(" ")[0]}
-              </span>
             </div>
 
-            {/* Arrow */}
-            {idx < levelStatuses.length - 1 && (
-              <ChevronRight
-                size={14}
-                className="shrink-0"
-                style={{ color: level.met ? "#22c55e" : "#52525b" }}
-              />
-            )}
+            <span
+              className="w-full px-0.5 text-center text-[11px] font-semibold leading-tight truncate"
+              style={{ color: showLock ? "#a1a1aa" : level.met ? GREEN : isNext ? "#fafafa" : "#d4d4d8" }}
+              title={level.name}
+            >
+              {level.name.split(" ")[0]}
+            </span>
           </div>
         );
       })}
@@ -759,7 +764,7 @@ function LevelGoalCard({
   );
 
   return (
-    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm p-5 space-y-5">
+    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm p-4 sm:p-5 space-y-5">
       <div className="flex items-center gap-3">
         <div
           className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
@@ -815,7 +820,7 @@ function LevelGoalCard({
                 {dayGoalMin} min goal
               </span>
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-1 sm:gap-2">
               {dayBars.map((entry, i) => {
                 const day      = weekDays[i];
                 const isMissed = !entry.ok && !entry.isFuture && !entry.isToday;
@@ -850,7 +855,7 @@ function LevelGoalCard({
                   >
                     {/* minutes value above the bar */}
                     <span
-                      className="text-sm font-bold tabular-nums leading-none"
+                      className="text-xs sm:text-sm font-bold tabular-nums leading-none"
                       style={{ height: VALUE_H, color: valueColor }}
                     >
                       {entry.minutes > 0 ? `${entry.minutes}m` : ""}
@@ -883,8 +888,9 @@ function LevelGoalCard({
                           <X size={16} className="text-red-500/60" />
                         ) : null}
                       </span>
-                      <span className="text-sm font-bold transition-colors" style={{ color: labelColor }}>
-                        {entry.label}
+                      <span className="text-xs sm:text-sm font-bold transition-colors" style={{ color: labelColor }}>
+                        <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "narrow" })}</span>
+                        <span className="hidden sm:inline">{entry.label}</span>
                       </span>
                     </div>
                   </button>
@@ -902,7 +908,7 @@ function LevelGoalCard({
       {/* ── streak-simple (levels 3,5) ── */}
       {!isLocked && levelType === "streak-simple" && (
         <div className="space-y-4">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1 sm:gap-1.5">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -961,7 +967,7 @@ function LevelGoalCard({
       {/* ── week-cats (level 6) ── */}
       {!isLocked && levelType === "week-cats" && (
         <div className="space-y-4">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1 sm:gap-1.5">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -976,7 +982,7 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex-1 flex flex-col items-center justify-center gap-2.5 rounded-lg py-4 px-1 cursor-pointer select-none touch-manipulation outline-none transition-all hover:brightness-125"
+                  className="group flex-1 min-w-0 flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-lg py-3 px-0.5 sm:py-4 sm:px-1 cursor-pointer select-none touch-manipulation outline-none transition-all hover:brightness-125"
                   style={{
                     minHeight: 112,
                     backgroundColor: allMet ? `${color}18` : "#18181b",
@@ -985,12 +991,12 @@ function LevelGoalCard({
                   }}
                 >
                   {/* one dot per category — lit when that category hit 15+ min */}
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-2 gap-1 sm:gap-1.5">
                     {CATS.map((cat, ci) => (
                       <div
                         key={cat.k}
                         title={`${cat.label}${met[ci] ? " ✓" : ""}`}
-                        className="h-4 w-4 rounded-full transition-all"
+                        className="h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all"
                         style={{
                           backgroundColor: met[ci] ? cat.color : "#27272a",
                           boxShadow: met[ci] ? `0 0 8px ${cat.color}` : undefined,
@@ -1030,7 +1036,7 @@ function LevelGoalCard({
       {/* ── streak-cats (levels 7,8,9) ── */}
       {!isLocked && levelType === "streak-cats" && (
         <div className="space-y-4">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1 sm:gap-1.5">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -1046,10 +1052,10 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex flex-1 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
+                  className="group flex flex-1 min-w-0 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
                 >
                   <div
-                    className="flex w-full flex-col rounded-xl p-2.5 transition-all group-hover:brightness-125"
+                    className="flex w-full flex-col rounded-xl p-1.5 sm:p-2.5 transition-all group-hover:brightness-125"
                     style={{
                       minHeight: 128,
                       backgroundColor: allMet ? `${color}26` : inStreak ? `${color}18` : "#18181b",
@@ -1086,10 +1092,11 @@ function LevelGoalCard({
                     </div>
                   </div>
                   <span
-                    className="text-sm font-bold transition-colors"
+                    className="text-xs sm:text-sm font-bold transition-colors"
                     style={{ color: isShown ? color : allMet ? color : isToday ? "#e4e4e7" : "#a1a1aa" }}
                   >
-                    {day.toLocaleDateString("en-US", { weekday: "short" })}
+                    <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "narrow" })}</span>
+                    <span className="hidden sm:inline">{day.toLocaleDateString("en-US", { weekday: "short" })}</span>
                   </span>
                 </button>
               );
@@ -1120,7 +1127,7 @@ function LevelGoalCard({
         <>
           {goalBox}
           {actionButton && (
-            <div className="flex items-center justify-center sm:justify-end pt-1 border-t border-zinc-800/60 -mx-5 -mb-5 px-5 py-3.5 mt-1">
+            <div className="flex items-center justify-center sm:justify-end pt-1 border-t border-zinc-800/60 -mx-4 -mb-4 px-4 sm:-mx-5 sm:-mb-5 sm:px-5 py-3.5 mt-1">
               {actionButton}
             </div>
           )}

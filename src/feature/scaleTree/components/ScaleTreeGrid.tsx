@@ -200,7 +200,7 @@ export function ScaleTreeGrid({
 
       <div
         ref={scrollContainerRef}
-        className="relative flex-1 flex flex-col justify-start items-center w-full min-h-0 bg-[#0e0e11]/30 rounded-xl border border-white/[0.02] p-3 sm:p-6 overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="relative flex-1 flex flex-col justify-start items-start sm:items-center w-full min-h-0 bg-[#0e0e11]/30 rounded-xl border border-white/[0.02] p-3 sm:p-6 overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent"
         onScroll={updateCoordinates}
       >
         <svg
