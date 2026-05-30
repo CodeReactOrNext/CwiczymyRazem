@@ -20,6 +20,7 @@ export interface AdminEmailRecipient {
 export interface AdminEmailContext {
   seasonName?: string;
   daysInSeason?: number;
+  daysLeft?: number;
   top3?: { displayName: string; points: number }[];
 }
 

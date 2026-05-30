@@ -402,6 +402,7 @@ export default async function handler(
             to: p.email,
             userName: p.displayName,
             seasonName,
+            daysLeft: daysLeftInSeason,
             top3,
           }),
         });

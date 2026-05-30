@@ -47,6 +47,7 @@ export interface AdminEmailRecipient {
 export interface AdminEmailContext {
   seasonName?: string;
   daysInSeason?: number;
+  daysLeft?: number;
   top3?: TopPlayer[];
 }
 
@@ -74,7 +75,14 @@ function getSeasonIds(now: Date) {
   const lastDayOfMonth = new Date(year, now.getMonth() + 1, 0);
   const daysInCurrentSeason = lastDayOfMonth.getDate();
 
-  return { currentSeasonId, prevSeasonId, daysInCurrentSeason };
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const daysLeftInSeason = Math.max(
+    0,
+    Math.round((lastDayOfMonth.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  );
+
+  return { currentSeasonId, prevSeasonId, daysInCurrentSeason, daysLeftInSeason };
 }
 
 interface RankedParticipant {
@@ -160,7 +168,8 @@ async function getStreakCandidates(diffTarget: 1 | 3): Promise<
 
 async function buildRecipientsResponse(type: AdminEmailType): Promise<RecipientsResponse> {
   const now = new Date();
-  const { currentSeasonId, prevSeasonId, daysInCurrentSeason } = getSeasonIds(now);
+  const { currentSeasonId, prevSeasonId, daysInCurrentSeason, daysLeftInSeason } =
+    getSeasonIds(now);
 
   if (type === "streak_d1" || type === "streak_d3") {
     const diff = type === "streak_d1" ? 1 : 3;
@@ -229,9 +238,10 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
       cooldownExcluded: excluded,
       context: {
         seasonName: `Season ${currentSeasonId}`,
+        daysLeft: daysLeftInSeason,
         top3,
       },
-      description: `Current season (${currentSeasonId}) participants — reminder that 7 days are left.`,
+      description: `Current season (${currentSeasonId}) participants — ${daysLeftInSeason} day${daysLeftInSeason === 1 ? "" : "s"} left.`,
     };
   }
 
@@ -337,13 +347,16 @@ async function sendOne(
   }
 
   if (type === "season_ending_soon") {
-    if (!context?.seasonName || !context.top3) {
-      throw new Error("season_ending_soon requires context.seasonName and context.top3");
+    if (!context?.seasonName || !context.top3 || context.daysLeft == null) {
+      throw new Error(
+        "season_ending_soon requires context.seasonName, context.top3 and context.daysLeft"
+      );
     }
     await sendSeasonEndingSoonEmail({
       to: recipient.email,
       userName: recipient.displayName,
       seasonName: context.seasonName,
+      daysLeft: context.daysLeft,
       top3: context.top3,
     });
     return;

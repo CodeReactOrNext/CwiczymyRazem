@@ -132,13 +132,21 @@ interface SendSeasonEndingSoonArgs {
   to: string;
   userName?: string | null;
   seasonName: string;
+  daysLeft: number;
   top3: TopPlayer[];
+}
+
+function endingSoonSubject(seasonName: string, daysLeft: number): string {
+  if (daysLeft <= 0) return `Final hours of ${seasonName} — last chance`;
+  if (daysLeft === 1) return `${seasonName} ends tomorrow — final push`;
+  return `${daysLeft} days left in ${seasonName} — make your final push`;
 }
 
 export async function sendSeasonEndingSoonEmail({
   to,
   userName,
   seasonName,
+  daysLeft,
   top3,
 }: SendSeasonEndingSoonArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
@@ -148,10 +156,11 @@ export async function sendSeasonEndingSoonEmail({
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: `7 days left in ${seasonName} — make your final push`,
+    subject: endingSoonSubject(seasonName, daysLeft),
     react: SeasonEndingSoonEmail({
       userName: userName ?? "",
       seasonName,
+      daysLeft,
       top3,
       leaderboardUrl: `${baseUrl}/leadboard`,
       logoUrl,
