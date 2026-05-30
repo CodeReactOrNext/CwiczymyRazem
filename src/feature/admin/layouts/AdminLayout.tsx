@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Crown,
   LogOut,
+  Mail,
   Map,
   Menu,
   Music,
@@ -33,6 +34,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
     { name: "Discovery", href: "/admin/discovery",icon: SearchCheck  },
     { name: "YT Scraper", href: "/admin/youtube-scraper", icon: FaYoutube },
     { name: "Roadmaps",  href: "/admin/roadmaps", icon: Map          },
+    { name: "Emails",    href: "/admin/emails",   icon: Mail         },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
