@@ -57,10 +57,24 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.resource.data.authorId == request.auth.uid;
 
-      // Author can update their own exercise (but cannot change authorId)
-      allow update: if request.auth != null
-        && resource.data.authorId == request.auth.uid
-        && !("authorId" in request.resource.data.diff(resource.data).affectedKeys());
+      // Author can update their own exercise (but cannot change authorId).
+      // Any signed-in user may update ONLY the rating aggregate fields, so
+      // people can rate exercises they don't own (rateExercise writes the new
+      // average/count onto the exercise doc inside its transaction).
+      allow update: if request.auth != null && (
+        (
+          resource.data.authorId == request.auth.uid
+          && !("authorId" in request.resource.data.diff(resource.data).affectedKeys())
+        )
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['averageRating', 'ratingCount'])
+          && request.resource.data.averageRating is number
+          && request.resource.data.averageRating >= 0
+          && request.resource.data.averageRating <= 5
+          && request.resource.data.ratingCount is int
+          && request.resource.data.ratingCount >= 0
+        )
+      );
 
       allow delete: if request.auth != null
         && resource.data.authorId == request.auth.uid;
