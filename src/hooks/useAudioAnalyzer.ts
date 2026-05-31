@@ -81,6 +81,7 @@ export const useAudioAnalyzer = () => {
   const tickDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastFrequenciesRef = useRef<number[]>([]);
+  const resumeHandlerRef = useRef<(() => void) | null>(null);
 
   // Real-time refs for fast access without triggering re-renders
   const frequencyRef = useRef<number>(0);
@@ -107,6 +108,17 @@ export const useAudioAnalyzer = () => {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       const audioContext = new AudioContextClass();
       audioContextRef.current = audioContext;
+
+      // After `await getUserMedia` the browser often considers the user gesture
+      // consumed, so the freshly-created AudioContext starts in "suspended" state.
+      // A suspended context never runs the AudioWorklet's process() → no buffers
+      // are posted → volume/frequency stay 0 (mic appears dead even though
+      // permission was granted). Resume it explicitly, like every other audio
+      // path in the app does. This is why the issue was intermittent and only
+      // cleared up after switching browsers (fresh autoplay/activation state).
+      if (audioContext.state === "suspended") {
+        try { await audioContext.resume(); } catch { /* ignore */ }
+      }
 
       const source = audioContext.createMediaStreamSource(stream);
       sourceRef.current = source;
@@ -263,6 +275,19 @@ export const useAudioAnalyzer = () => {
       workletNode.connect(silentGain);
       silentGain.connect(audioContext.destination);
 
+      // Safety net: the context can be re-suspended mid-session (tab backgrounded,
+      // OS audio-device switch, autoplay policy) — which silently kills the mic
+      // signal until the page is reloaded. Resume it on the next user interaction
+      // or when the tab becomes visible again.
+      const resumeIfSuspended = () => {
+        const ctx = audioContextRef.current;
+        if (ctx && ctx.state === "suspended") ctx.resume().catch(() => { /* ignore */ });
+      };
+      resumeHandlerRef.current = resumeIfSuspended;
+      document.addEventListener("pointerdown", resumeIfSuspended);
+      document.addEventListener("keydown", resumeIfSuspended);
+      document.addEventListener("visibilitychange", resumeIfSuspended);
+
       setState(prev => ({ ...prev, isListening: true, error: null }));
 
     } catch (err: any) {
@@ -272,6 +297,12 @@ export const useAudioAnalyzer = () => {
   }, []);
 
   const close = useCallback(() => {
+    if (resumeHandlerRef.current) {
+      document.removeEventListener("pointerdown", resumeHandlerRef.current);
+      document.removeEventListener("keydown", resumeHandlerRef.current);
+      document.removeEventListener("visibilitychange", resumeHandlerRef.current);
+      resumeHandlerRef.current = null;
+    }
     if (workletNodeRef.current) {
       workletNodeRef.current.port.onmessage = null;
       workletNodeRef.current.disconnect();

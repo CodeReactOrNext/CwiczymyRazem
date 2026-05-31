@@ -29,7 +29,6 @@ import {
   Swords,
   Timer,
   Trophy,
-  Video,
   X,
 } from "lucide-react";
 import { Heart } from "lucide-react";
@@ -119,7 +118,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
-    { id: "recordings", name: "Recordings", href: "/recordings", icon: <Video size={16} /> },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
   ];
 
@@ -224,13 +222,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
         <Separator className="bg-white/10" />
 
-        <div>
-          <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
-        </div>
-
-        <Separator className="bg-white/10" />
-
         <div className="space-y-1">
+          {renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}
+
           <button
             onClick={() => {
               if (mobile) handleLinkClick();

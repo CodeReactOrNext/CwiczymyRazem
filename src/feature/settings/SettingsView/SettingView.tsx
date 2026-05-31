@@ -10,13 +10,11 @@ import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
 import ProfileCustomization from "feature/settings/components/ProfileCustomization";
-import StatisticRestart from "feature/settings/components/StatisticsRestart";
-import SubscriptionSettings from "feature/settings/components/SubscriptionSettings";
 import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { CreditCard,Lock, Share2, ShieldAlert, User } from "lucide-react";
+import { Lock, Share2, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -62,38 +60,14 @@ const SettingsView = () => {
                   </div>
                   <span className="font-bold">Social Media</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="security" 
+                <TabsTrigger
+                  value="security"
                   className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
                   <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
                     <Lock className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Security</span>
-                </TabsTrigger>
-                
-                <TabsTrigger
-                  value="subscription"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-emerald-500/10 group-data-[state=active]:text-emerald-500 transition-colors">
-                    <CreditCard className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Subscription</span>
-                </TabsTrigger>
-
-                <div className="py-2 px-4">
-                   <div className="h-px w-full bg-zinc-800" />
-                </div>
-
-                <TabsTrigger
-                  value="danger" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:text-red-500 data-[state=active]:bg-red-500/10 hover:bg-red-500/5 border border-transparent group text-muted-foreground font-bold"
-                >
-                  <div className="p-2 rounded bg-red-500/5 group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white transition-colors">
-                    <ShieldAlert className="h-4 w-4" />
-                  </div>
-                  <span>Danger Zone</span>
                 </TabsTrigger>
              </TabsList>
           </div>
@@ -129,13 +103,6 @@ const SettingsView = () => {
                )}
             </TabsContent>
 
-            <TabsContent value="subscription" className="mt-0">
-              <SubscriptionSettings />
-            </TabsContent>
-
-            <TabsContent value="danger" className="mt-0">
-              <StatisticRestart />
-            </TabsContent>
           </div>
         </div>
       </Tabs>
