@@ -1,12 +1,24 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { ExerciseCheckmark } from "feature/skills/components/ExerciseCheckmark";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight } from "lucide-react";
+import { Check, ChevronRight, X } from "lucide-react";
 
 interface SkillCardProps {
   skill: GuitarSkill;
   currentPoints: number;
+  exerciseProgress?: {
+    completed: number;
+    total: number;
+    states: { done: boolean; title: string }[];
+  };
   onSkillClick: () => void;
 }
 
@@ -36,17 +48,20 @@ const COLOR_CLASSES: Record<string, { iconBg: string; iconBorder: string; iconTe
 export const SkillCard = ({
   skill,
   currentPoints,
+  exerciseProgress,
   onSkillClick,
 }: SkillCardProps) => {
   const { t } = useTranslation("skills");
   const colors = COLOR_CLASSES[skill.category] || COLOR_CLASSES.technique;
   const Icon = skill.icon;
 
+  const hasExercises = !!exerciseProgress && exerciseProgress.total > 0;
+
   return (
     <div
       onClick={onSkillClick}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg bg-white/[0.02] p-3.5 backdrop-blur-sm transition-all duration-300",
+        "group relative flex items-start gap-3 rounded-lg bg-white/[0.02] p-3.5 backdrop-blur-sm transition-all duration-300",
         "border border-white/[0.02] cursor-pointer hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-black/20"
       )}
     >
@@ -66,6 +81,28 @@ export const SkillCard = ({
         <p className={cn("truncate text-[12px] font-semibold transition-colors", colors.iconText)}>
           {currentPoints} <span className="opacity-70 font-medium">XP</span>
         </p>
+
+        {hasExercises && (
+          <TooltipProvider delayDuration={120}>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {exerciseProgress!.states.map((state, i) => (
+                <Tooltip key={i}>
+                  <TooltipTrigger asChild>
+                    <ExerciseCheckmark done={state.done} />
+                  </TooltipTrigger>
+                  <TooltipContent className="flex items-center gap-1.5">
+                    {state.done ? (
+                      <Check className="h-3 w-3 text-emerald-600" strokeWidth={3} />
+                    ) : (
+                      <X className="h-3 w-3 text-zinc-500" strokeWidth={3} />
+                    )}
+                    {state.title}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          </TooltipProvider>
+        )}
       </div>
 
       <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300">

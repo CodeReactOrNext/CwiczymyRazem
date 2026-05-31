@@ -21,6 +21,7 @@ import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
+import { ExerciseCheckmark } from "./ExerciseCheckmark";
 import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
@@ -139,6 +140,28 @@ export const SkillDashboard = ({
     }, {} as Record<string, Record<string, DashboardExercise[]>>);
   }, []);
 
+  const skillProgressMap = useMemo(() => {
+    const map: Record<
+      string,
+      { completed: number; total: number; states: { done: boolean; title: string }[] }
+    > = {};
+    exercisesAgregat.forEach((exercise) => {
+      const skillId = exercise.relatedSkills[0] || "general";
+      if (!map[skillId]) map[skillId] = { completed: 0, total: 0, states: [] };
+      map[skillId].total += 1;
+
+      const progress = progressMap.get(exercise.id);
+      const isCompleted =
+        !!progress &&
+        ((progress.completedBpms?.length ?? 0) > 0 ||
+          (progress.micHighScore != null && progress.micHighScore > 0) ||
+          (progress.earTrainingHighScore != null && progress.earTrainingHighScore > 0));
+      map[skillId].states.push({ done: isCompleted, title: exercise.title as string });
+      if (isCompleted) map[skillId].completed += 1;
+    });
+    return map;
+  }, [progressMap]);
+
   const { filteredTree, uniqueDifficulties } = useMemo(() => {
     if (!selectedSkillId) return { filteredTree: {}, uniqueDifficulties: [] };
     const skillData = guitarSkills.find(s => s.id === selectedSkillId);
@@ -251,6 +274,7 @@ export const SkillDashboard = ({
                       category={category}
                       skills={categorySkills}
                       userSkills={userSkills}
+                      skillProgressMap={skillProgressMap}
                       onSkillClick={(id) => setSelectedSkillId(id)}
                     />
                   );
@@ -278,7 +302,7 @@ export const SkillDashboard = ({
       <Sheet open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
           <SheetContent
             side="right"
-            className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col"
+            className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col rounded-l-[8px] overflow-hidden"
           >
             {/* Header */}
             <div className="flex-shrink-0 px-6 pt-5 pb-3 border-b border-zinc-900">
@@ -348,7 +372,7 @@ export const SkillDashboard = ({
                         <div
                           key={challenge.id}
                           onClick={() => setShowUpgradeModal(true)}
-                          className="group flex rounded-2xl border border-amber-500/20 bg-zinc-900/30 overflow-hidden transition-all duration-300 cursor-pointer hover:border-amber-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] relative"
+                          className="group flex rounded-[8px] border border-amber-500/20 bg-zinc-900/30 overflow-hidden transition-all duration-300 cursor-pointer hover:border-amber-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] relative"
                         >
                           <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5">
                             <div className="flex items-start justify-between gap-3">
@@ -370,7 +394,7 @@ export const SkillDashboard = ({
                         <div
                           key={challenge.id}
                           className={cn(
-                            "group flex rounded-2xl border overflow-hidden transition-all duration-300 relative",
+                            "group flex rounded-[8px] border overflow-hidden transition-all duration-300 relative",
                             hasBeenAttempted
                               ? "border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 hover:border-zinc-500 shadow-md shadow-black/40"
                               : "border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700 shadow-sm shadow-black/20"
@@ -379,12 +403,8 @@ export const SkillDashboard = ({
                           <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5 relative z-10">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0 flex items-center gap-2.5 flex-wrap">
+                              <ExerciseCheckmark done={hasBeenAttempted} />
                               <p className={cn("text-[16px] font-bold leading-snug transition-colors", hasBeenAttempted ? "text-white" : "text-zinc-300 group-hover:text-zinc-100")}>{challenge.title}</p>
-                              {hasBeenAttempted && (
-                                <div className="flex items-center justify-center flex-shrink-0 bg-emerald-500/10 rounded-full h-5 w-5 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]" title="Practiced">
-                                  <FaCheck className="h-2.5 w-2.5 text-emerald-400" />
-                                </div>
-                              )}
                             </div>
                             <button
                               onClick={() => handleStartChallenge(challenge)}
