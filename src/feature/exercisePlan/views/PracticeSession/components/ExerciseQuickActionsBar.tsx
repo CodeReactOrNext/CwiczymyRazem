@@ -1,14 +1,10 @@
+import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Volume2, VolumeX, X } from "lucide-react";
-import { memo, useState } from "react";
-import { createPortal } from "react-dom";
-import { FaCheck, FaInfoCircle, FaLightbulb } from "react-icons/fa";
+import { Minus, Plus, Volume2, VolumeX } from "lucide-react";
+import { memo, useRef, useState } from "react";
 import { GiMetronome } from "react-icons/gi";
 
-import { BpmProgressGrid } from "../../../components/BpmProgressGrid";
-import { Metronome } from "../../../components/Metronome/Metronome";
 import type { Exercise } from "../../../types/exercise.types";
-import { useBpmProgressContext } from "../contexts/BpmProgressContext";
 
 interface ExerciseQuickActionsBarProps {
   exercise: Exercise;
@@ -19,10 +15,15 @@ interface ExerciseQuickActionsBarProps {
   compact?: boolean;
 }
 
-type ModalType = "metronome" | "bpm" | null;
-
 const tempoColor = (bpm: number) =>
   bpm < 80 ? "text-emerald-400" : bpm < 120 ? "text-amber-400" : "text-red-400";
+
+const sliderRange = (bpm: number) =>
+  bpm < 80
+    ? "[&_[data-slot=slider-range]]:bg-emerald-500"
+    : bpm < 120
+    ? "[&_[data-slot=slider-range]]:bg-amber-500"
+    : "[&_[data-slot=slider-range]]:bg-red-500";
 
 export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   exercise,
@@ -32,142 +33,117 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   examMode = false,
   compact = false,
 }: ExerciseQuickActionsBarProps) {
-  const [openModal, setOpenModal] = useState<ModalType>(null);
-  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
+  const [isEditing, setIsEditing] = useState(false);
+  const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const hasMetronome = !!exercise.metronomeSpeed && !examMode;
-  const hasBpmProgress = !!exercise.metronomeSpeed && bpmStages.length > 0 && !exercise.gpFileUrl && !examMode;
-
   if (!hasMetronome) return null;
 
   const bpm: number = metronome.bpm;
-  const h = compact ? "h-8" : "h-12";
+  const setBpm = metronome.setBpm;
+  const minBpm = metronome.minBpm;
+  const maxBpm = metronome.maxBpm;
 
-  const toggle = (modal: ModalType) => setOpenModal(openModal === modal ? null : modal);
-  const close = () => setOpenModal(null);
+  const startEdit = () => {
+    setInput(String(bpm));
+    setIsEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+  const commit = () => {
+    const parsed = parseInt(input, 10);
+    if (!isNaN(parsed)) setBpm(Math.min(maxBpm, Math.max(minBpm, parsed)));
+    setIsEditing(false);
+  };
+
+  const stepBtn = cn(
+    "flex items-center justify-center shrink-0 rounded-lg bg-zinc-900/60 text-zinc-200 transition-colors hover:bg-zinc-700 hover:text-white disabled:opacity-40 disabled:hover:bg-zinc-900/60",
+    compact ? "h-7 w-7" : "h-8 w-8"
+  );
 
   return (
-    <>
-      <div className={cn("flex items-center justify-center gap-1.5 flex-wrap", compact ? "" : "gap-3 mb-4")}>
+    <div className={cn("flex w-full justify-center", compact ? "" : "mb-4")}>
+      <div className={cn(
+        "flex w-full items-center gap-3 rounded-xl bg-zinc-800 shadow-lg shadow-black/30",
+        compact ? "h-10 max-w-[320px] px-3" : "h-12 max-w-md px-4"
+      )}>
+        <GiMetronome className={cn("shrink-0 text-zinc-400", compact ? "h-4 w-4" : "h-5 w-5")} />
 
+        <button
+          className={stepBtn}
+          onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
+          disabled={bpm <= minBpm}
+          title="Slower"
+        >
+          <Minus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
+        </button>
 
-        {hasMetronome && (
-          <div className={cn(
-            "flex items-center rounded-[8px] overflow-hidden transition-all",
-            h,
-            openModal === "metronome"
-              ? "bg-zinc-800/60"
-              : "bg-white/5"
-          )}>
-            <button
-              onClick={() => toggle("metronome")}
-              className={cn(
-                "flex items-center gap-1.5 h-full text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors",
-                compact ? "px-2" : "px-3"
-              )}
-            >
-              <GiMetronome className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-              {!compact && <span className="text-[10px] font-semibold tracking-wide hidden sm:block">Tempo</span>}
-            </button>
-
-            <button
-              onClick={() => toggle("metronome")}
-              className={cn(
-                "flex items-center justify-center h-full transition-colors hover:bg-white/5",
-                compact ? "px-2" : "px-4",
-                tempoColor(bpm)
-              )}
-            >
-              <span className={cn("font-mono font-black", compact ? "text-[10px]" : "text-sm")}>{bpm}</span>
-            </button>
-
-            <button
-              onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
-              className={cn(
-                "flex items-center justify-center h-full transition-colors",
-                compact ? "px-2" : "px-2.5",
-                isMetronomeMuted
-                  ? "text-zinc-600 hover:text-zinc-300 hover:bg-white/5"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              )}
-              title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
-            >
-              {isMetronomeMuted
-                ? <VolumeX className={cn(compact ? "h-3 w-3" : "h-4 w-4")} />
-                : <Volume2 className={cn(compact ? "h-3 w-3" : "h-4 w-4")} />
-              }
-            </button>
-          </div>
-        )}
-
-        {hasBpmProgress && (
-          <button
-            onClick={() => toggle("bpm")}
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="number"
+            value={input}
+            min={minBpm}
+            max={maxBpm}
+            onChange={(e) => setInput(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit();
+              if (e.key === "Escape") setIsEditing(false);
+            }}
             className={cn(
-              "flex items-center gap-2 px-4 rounded-[8px] transition-all font-bold",
-              h,
-              openModal === "bpm"
-                ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+              "w-14 shrink-0 rounded-md bg-zinc-900/60 px-1 text-center font-mono font-black tabular-nums text-cyan-400 outline-none ring-2 ring-cyan-500",
+              compact ? "text-lg" : "text-2xl"
+            )}
+          />
+        ) : (
+          <button
+            onClick={startEdit}
+            title="Click to edit BPM"
+            className={cn(
+              "shrink-0 font-mono font-black tabular-nums tracking-tight transition-transform active:scale-95",
+              compact ? "text-lg" : "text-2xl",
+              tempoColor(bpm)
             )}
           >
-            <FaCheck className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
-            {!compact && <span className="text-[10px] font-semibold tracking-wide">Speeds mastered</span>}
-            <span className={cn(
-              "font-mono px-1 rounded bg-white/5",
-              compact ? "text-[10px]" : "text-xs px-1.5 py-0.5",
-              completedBpms.length > 0 ? "text-emerald-400" : "text-zinc-500"
-            )}>
-              {completedBpms.length}/{bpmStages.length}
-            </span>
+            {bpm}
           </button>
         )}
-      </div>
 
-      {openModal && createPortal(
-        <div
-          className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={close}
+        <Slider
+          value={[bpm]}
+          min={minBpm}
+          max={maxBpm}
+          step={1}
+          onValueChange={(v) => setBpm(v[0])}
+          className={cn("flex-1 cursor-pointer", sliderRange(bpm))}
+        />
+
+        <button
+          className={stepBtn}
+          onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
+          disabled={bpm >= maxBpm}
+          title="Faster"
         >
-          <div
-            className="relative w-full max-w-xl mx-4 bg-zinc-900 border border-white/10 rounded-[8px] shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={close}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors z-10"
-            >
-              <X size={18} />
-            </button>
+          <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
+        </button>
 
-
-
-            {openModal === "metronome" && (
-              <div className="p-6">
-                <Metronome
-                  metronome={metronome}
-                  isMuted={isMetronomeMuted}
-                  onMuteToggle={setIsMetronomeMuted}
-                  locked={examMode}
-                />
-              </div>
-            )}
-
-            {openModal === "bpm" && (
-              <div className="p-6">
-                <BpmProgressGrid
-                  bpmStages={bpmStages}
-                  completedBpms={completedBpms}
-                  recommendedBpm={exercise.metronomeSpeed!.recommended}
-                  onToggle={onBpmToggle}
-                  isLoading={isBpmLoading}
-                />
-              </div>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+        <button
+          onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
+          title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
+          className={cn(
+            "flex items-center justify-center shrink-0 rounded-lg transition-colors",
+            compact ? "h-7 w-7" : "h-8 w-8",
+            isMetronomeMuted
+              ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
+              : "text-cyan-400 hover:bg-cyan-500/10"
+          )}
+        >
+          {isMetronomeMuted
+            ? <VolumeX className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
+            : <Volume2 className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />}
+        </button>
+      </div>
+    </div>
   );
 });

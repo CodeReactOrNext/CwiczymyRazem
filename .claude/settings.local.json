@@ -41,7 +41,8 @@
       "Bash(npx eslint *)",
       "Bash(echo \"---- exit: $? ----\")",
       "Bash(echo \"exit: $?\")",
-      "Bash(cat > *)"
+      "Bash(cat > *)",
+      "PowerShell(npx tsc --noEmit 2>&1)"
     ],
     "additionalDirectories": [
       "\\tmp"

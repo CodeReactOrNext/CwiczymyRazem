@@ -1,5 +1,4 @@
 import { cn } from "assets/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Lock, Unlock } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { FaCheck, FaInfoCircle, FaLightbulb, FaSignal, FaGraduationCap } from "react-icons/fa";
@@ -71,7 +70,7 @@ export const ExerciseInstructionsInline = ({
   if (!hasInstructions && !displayAmount) return null;
 
   return (
-    <div className="w-full bg-zinc-950/40 border-t border-white/5 overflow-hidden text-left">
+    <div className="w-full overflow-hidden text-left">
       <div className="w-full px-6 py-3 flex items-center justify-between transition-colors hover:bg-white/[0.02]">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -105,15 +104,19 @@ export const ExerciseInstructionsInline = ({
         </div>
       </div>
 
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+          isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+      >
+        <div
+          className={cn(
+            "min-h-0 overflow-hidden transition-opacity duration-300",
+            isExpanded ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                 <div className="space-y-8">
                   {exercise.whyItMatters && (
@@ -220,9 +223,8 @@ export const ExerciseInstructionsInline = ({
                 )}
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          </div>
+        </div>
+      </div>
   );
 };

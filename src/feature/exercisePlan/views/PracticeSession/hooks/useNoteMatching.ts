@@ -127,7 +127,7 @@ export function useNoteMatching({
       const beatsPerSec      = effectiveBpm / 60;
       const beatDurationMs   = 60000 / effectiveBpm;
       const onsetRecencyMs   = Math.min(800, Math.max(200, beatDurationMs * 0.8));
-      const windowMs         = Math.min(500, Math.max(150, beatDurationMs * 0.35));
+      const windowMs         = Math.min(420, Math.max(130, beatDurationMs * 0.30));
       const windowBeats      = (windowMs / 1000) * beatsPerSec;
       const earlyWindowBeats = (Math.max(16, Math.min(50, beatDurationMs * 0.05)) / 1000) * beatsPerSec;
 

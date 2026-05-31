@@ -73,7 +73,7 @@ const TablatureViewerInner = ({
   return (
     <div
       className={cn(
-        "w-full bg-[#0a0a0a] rounded-lg p-4 relative h-[300px] select-none overflow-hidden",
+        "w-full bg-[#09090b]  p-4 relative h-[300px] select-none overflow-hidden",
         !isPlaying && "cursor-grab active:cursor-grabbing",
         className,
       )}

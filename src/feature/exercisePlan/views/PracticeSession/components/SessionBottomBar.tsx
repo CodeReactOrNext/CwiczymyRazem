@@ -59,7 +59,7 @@ export const SessionBottomBar = memo(({
 
   return (
     <>
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-white/5">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}

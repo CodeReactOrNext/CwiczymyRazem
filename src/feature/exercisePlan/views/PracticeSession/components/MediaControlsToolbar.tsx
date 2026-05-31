@@ -1,6 +1,7 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { Snail, X } from "lucide-react";
+import { Check, ChevronDown, Snail, X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
@@ -32,6 +33,8 @@ interface MediaControlsToolbarProps {
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
   disableTuner?: boolean;
+  baseBpm?: number;
+  trailing?: React.ReactNode;
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -50,6 +53,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   volumeRef,
   compact = false,
   disableTuner = false,
+  baseBpm,
+  trailing,
 }: MediaControlsToolbarProps) {
   const [isTunerOpen, setIsTunerOpen] = useState(false);
 
@@ -63,37 +68,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     return (
       <div className="flex flex-col gap-1.5">
         {hasMetronome && (
-          <div className={cn(
-            "flex items-center rounded-lg overflow-hidden transition-all",
-            isSlowed ? "bg-cyan-500/5" : "bg-white/5"
-          )}>
-            <div className={cn(
-              "flex items-center justify-center w-7 shrink-0 h-8 select-none",
-              isSlowed ? "text-cyan-400" : "text-zinc-500"
-            )}>
-              <Snail className="h-3 w-3" />
-            </div>
-            {SPEED_MODES.map(({ value, label }) => {
-              const active = speedMultiplier === value;
-              const isNormal = value === 1;
-              return (
-                <button
-                  key={value}
-                  onClick={() => onSpeedMultiplierChange(isNormal ? 1 : active ? 1 : value)}
-                  className={cn(
-                    "flex items-center justify-center flex-1 h-8 text-[10px] font-mono font-semibold transition-all",
-                    active && isNormal
-                      ? "bg-white/10 text-white"
-                      : active
-                      ? "bg-cyan-500/15 text-cyan-300"
-                      : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <SpeedDropdown
+            compact
+            speedMultiplier={speedMultiplier}
+            onSpeedMultiplierChange={onSpeedMultiplierChange}
+            baseBpm={baseBpm}
+            isSlowed={isSlowed}
+            h="h-8"
+          />
         )}
 
         <div className="flex gap-1.5 flex-wrap">
@@ -103,15 +85,19 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               disabled={isRiddleMode}
               title={isAudioMuted ? "Backing track off" : "Backing track on"}
               className={cn(
-                "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
+                "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                 isAudioMuted
-                  ? "bg-white/5 text-zinc-400 hover:text-white"
-                  : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
+                  ? "bg-zinc-800 text-zinc-400 hover:text-white"
+                  : "bg-cyan-950 text-cyan-400 hover:bg-cyan-900",
                 isRiddleMode && "opacity-50 cursor-not-allowed"
               )}
             >
               <GiGuitar className="text-sm" />
             </button>
+          )}
+
+          {hasAudioTrack && hasMicControls && (
+            <div className="h-8 w-px bg-white/10 self-center mx-0.5" aria-hidden />
           )}
 
           {hasMicControls && (
@@ -120,10 +106,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onMicToggle}
                 title={isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
                 className={cn(
-                  "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
+                  "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                   isMicEnabled
-                    ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                    : "bg-white/5 text-zinc-400 hover:text-white"
+                    ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white"
                 )}
               >
                 <FaMicrophone className="h-3 w-3" />
@@ -133,7 +119,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={onRecalibrate}
                   title="Recalibrate"
-                  className="flex items-center justify-center h-8 w-8 rounded-lg transition-all bg-white/5 text-zinc-400 hover:text-white"
+                  className="flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90 bg-zinc-800 text-zinc-400 hover:text-white"
                 >
                   <FaSync className="h-3 w-3" />
                 </button>
@@ -144,10 +130,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   onClick={() => setIsTunerOpen(true)}
                   title="Tuner"
                   className={cn(
-                    "flex items-center justify-center h-8 w-8 rounded-lg transition-all",
+                    "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                     isTunerOpen
-                      ? "bg-violet-500/10 text-violet-400"
-                      : "bg-white/5 text-zinc-400 hover:text-white"
+                      ? "bg-violet-950 text-violet-400"
+                      : "bg-zinc-800 text-zinc-400 hover:text-white"
                   )}
                 >
                   <TuningForkIcon className="h-3 w-3" />
@@ -155,6 +141,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               )}
             </>
           )}
+          {trailing}
         </div>
 
         {isTunerOpen && hasTuner && createPortal(
@@ -172,85 +159,63 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-      {hasMetronome && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className={cn(
-              "flex items-center rounded-lg overflow-hidden transition-all",
-              h,
-              isSlowed ? "bg-cyan-500/5" : "bg-white/5"
-            )}>
-              <div className={cn(
-                "flex items-center gap-1.5 px-3 h-full select-none",
-                isSlowed ? "text-cyan-400" : "text-zinc-500"
-              )}>
-                <Snail className="h-4 w-4 shrink-0" />
-                <span className="text-[10px] font-semibold tracking-wide hidden sm:block">Slow</span>
-              </div>
-              {SPEED_MODES.map(({ value, label }) => {
-                const active = speedMultiplier === value;
-                const isNormal = value === 1;
-                return (
-                  <button
-                    key={value}
-                    onClick={() => onSpeedMultiplierChange(isNormal ? 1 : active ? 1 : value)}
-                    className={cn(
-                      "flex items-center justify-center px-3 h-full text-xs font-mono font-semibold transition-all",
-                      active && isNormal
-                        ? "bg-white/10 text-white"
-                        : active
-                        ? "bg-cyan-500/15 text-cyan-300"
-                        : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
-                    )}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Play at reduced speed — great for learning difficult passages. Click active mode to return to normal.
-          </TooltipContent>
-        </Tooltip>
+      {/* ── PLAYBACK zone: speed + backing track ── */}
+      {(hasMetronome || hasAudioTrack) && (
+        <div className="flex items-center gap-1.5">
+          {hasMetronome && (
+            <SpeedDropdown
+              speedMultiplier={speedMultiplier}
+              onSpeedMultiplierChange={onSpeedMultiplierChange}
+              baseBpm={baseBpm}
+              isSlowed={isSlowed}
+              h={h}
+            />
+          )}
+
+          {hasAudioTrack && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onAudioToggle}
+                  disabled={isRiddleMode}
+                  className={cn(
+                    "flex items-center justify-center w-12 rounded-lg transition-all active:scale-95",
+                    h,
+                    isAudioMuted
+                      ? "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                      : "bg-cyan-950 text-cyan-400 hover:bg-cyan-900",
+                    isRiddleMode && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <GiGuitar className="text-lg" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {isAudioMuted ? "Backing track off" : "Backing track on"}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       )}
 
-      {hasAudioTrack && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={onAudioToggle}
-              disabled={isRiddleMode}
-              className={cn(
-                "flex items-center justify-center w-12 rounded-lg transition-all",
-                h,
-                isAudioMuted
-                  ? "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                  : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
-                isRiddleMode && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <GiGuitar className="text-lg" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {isAudioMuted ? "Backing track off" : "Backing track on"}
-          </TooltipContent>
-        </Tooltip>
+      {/* ── Divider between playback and input zones ── */}
+      {(hasMetronome || hasAudioTrack) && hasMicControls && (
+        <div className="h-7 w-px bg-white/10 self-center" aria-hidden />
       )}
 
+      {/* ── INPUT zone: mic / recalibrate / tuner ── */}
       {hasMicControls && (
-        <>
+        <div className="flex items-center gap-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={onMicToggle}
                 className={cn(
-                  "flex items-center gap-2 px-4 rounded-lg transition-all font-semibold",
+                  "flex items-center gap-2 px-4 rounded-lg transition-all font-semibold active:scale-95",
                   h,
                   isMicEnabled
-                    ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                    : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
                 )}
               >
                 <FaMicrophone className="h-4 w-4 shrink-0" />
@@ -270,7 +235,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={onRecalibrate}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-lg transition-all bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 active:scale-95",
                     h
                   )}
                 >
@@ -288,11 +253,11 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <button
                   onClick={() => setIsTunerOpen(true)}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-lg transition-all",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all active:scale-95",
                     h,
                     isTunerOpen
-                      ? "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"
-                      : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                      ? "bg-violet-950 text-violet-400 hover:bg-violet-900"
+                      : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
                   )}
                 >
                   <TuningForkIcon className="h-4 w-4 shrink-0" />
@@ -302,8 +267,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               <TooltipContent side="bottom">Chromatic tuner</TooltipContent>
             </Tooltip>
           )}
-        </>
+        </div>
       )}
+
+      {trailing}
 
       {isTunerOpen && hasTuner && createPortal(
         <TunerDialog
@@ -317,6 +284,67 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     </div>
   );
 });
+
+function SpeedDropdown({
+  speedMultiplier,
+  onSpeedMultiplierChange,
+  baseBpm,
+  isSlowed,
+  h,
+  compact = false,
+}: {
+  speedMultiplier: number;
+  onSpeedMultiplierChange: (value: number) => void;
+  baseBpm?: number;
+  isSlowed: boolean;
+  h: string;
+  compact?: boolean;
+}) {
+  const current = SPEED_MODES.find((m) => m.value === speedMultiplier) ?? SPEED_MODES[0];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          title="Playback speed — slow down to learn tricky passages"
+          className={cn(
+            "flex items-center rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+            h,
+            compact ? "gap-1.5 px-2" : "gap-2 px-3",
+            isSlowed
+              ? "bg-cyan-950 text-cyan-300 hover:bg-cyan-900"
+              : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700"
+          )}
+        >
+          <Snail className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
+          <span className={cn("font-mono font-bold", compact ? "text-[10px]" : "text-sm")}>{current.label}</span>
+          <ChevronDown className={cn("opacity-60 shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="min-w-[9rem] border border-white/10 bg-zinc-900 text-white">
+        {SPEED_MODES.map(({ value, label }) => {
+          const active = speedMultiplier === value;
+          return (
+            <DropdownMenuItem
+              key={value}
+              onSelect={() => onSpeedMultiplierChange(value)}
+              className={cn(
+                "flex cursor-pointer items-center gap-2 text-xs font-semibold focus:bg-zinc-800 focus:text-white",
+                active ? "text-cyan-300" : "text-zinc-300"
+              )}
+            >
+              <span className="w-9 font-mono">{label}</span>
+              {baseBpm ? (
+                <span className="font-mono text-[10px] text-zinc-500">{Math.round(baseBpm * value)} BPM</span>
+              ) : null}
+              {active && <Check className="ml-auto h-3.5 w-3.5 text-cyan-300" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function TuningForkIcon({ className }: { className?: string }) {
   return (
