@@ -17,6 +17,7 @@ import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
+import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SessionSidebar } from "./SessionSidebar";
 import { useSessionUI } from "../contexts/SessionUIContext";
@@ -161,6 +162,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
                     frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
                     disableTuner={p.currentExercise.disableTuner}
+                    baseBpm={p.metronome?.bpm}
+                    trailing={<SpeedsMasteredButton exercise={p.currentExercise} examMode={!!p.examMode} />}
                   />
                   <ExerciseQuickActionsBar
                     exercise={p.currentExercise}

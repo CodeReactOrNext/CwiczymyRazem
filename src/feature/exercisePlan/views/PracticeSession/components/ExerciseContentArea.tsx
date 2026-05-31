@@ -105,7 +105,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl"
+      "relative w-full overflow-hidden rounded-xl bg-[#1a1a1d] shadow-xl shadow-black/40"
     )}>
 
       {/* Ear Training */}

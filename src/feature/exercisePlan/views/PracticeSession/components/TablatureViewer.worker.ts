@@ -136,6 +136,16 @@ let lastRestActive = false;
 // Whether user is playing sound during a rest (set by main thread)
 let showRestWarning = false;
 
+// Lighten a "#rrggbb" colour toward white by `amt` (0..1). Non-hex passes through.
+function lightenHex(hex: string, amt: number): string {
+  if (hex.length !== 7 || hex[0] !== "#") return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const mix = (c: number) => Math.round(c + (255 - c) * amt);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
 // ── Bend badge ────────────────────────────────────────────────────────────────
 function drawBendBadge(
   label: string, icon: string,
@@ -535,6 +545,8 @@ function render() {
 
         if (!isHit && note.isPalmMute) fillColor = "#78716c";
         else if (!isHit && isDead) fillColor = "#374151";
+        // Active/hit notes get a lighter block instead of a white digit.
+        else if (isActive || isHit) fillColor = lightenHex(note.color, 0.72);
 
         // ── Active glow — translucent ring behind block ───────────────────
         if (isActive && !isHit) {
@@ -705,7 +717,7 @@ function render() {
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
           const fs = hasDynamics ? Math.max(9, Math.round(13 * (0.75 + 0.25 * dyn))) : 13;
-          ctx.fillStyle = isActive || isHit ? "#ffffff" : "#000000";
+          ctx.fillStyle = "#000000";
           ctx.font = `bold ${fs}px Inter, sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";

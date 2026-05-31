@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
@@ -66,7 +67,7 @@ export const MainTimerSection = ({
           {/* Session Stats (Left) */}
           <div className="flex items-center gap-4 pr-8 mr-4">
              <div className="flex flex-col items-end gap-1">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">Session</span>
+                <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Session</span>
                 <div className="flex items-center gap-2 text-white">
                     <FaHistory className="h-3.5 w-3.5 text-cyan-500/50" />
                     <span className="font-mono text-lg font-black tracking-wide">{formattedTotalSession}</span>
@@ -76,8 +77,12 @@ export const MainTimerSection = ({
 
           {/* Exercise Time Display */}
           <div className="flex flex-col items-start gap-1">
+             <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Exercise</span>
              <div className="flex items-center gap-2">
-                 <div className="font-mono text-3xl font-black text-white leading-none tracking-tight">
+                 <div className={cn(
+                   "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-300",
+                   isFinished ? "text-emerald-400" : isPlaying ? "text-cyan-400" : "text-white"
+                 )}>
                      {formattedTimeLeft}
                  </div>
              </div>
