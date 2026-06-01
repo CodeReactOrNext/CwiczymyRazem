@@ -61,6 +61,8 @@ export const useMetronome = ({
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
+  // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
+  const [volume, setVolume] = useState(0.5);
 
   const audioContextRef      = useRef<AudioContext | null>(null);
   const nextNoteTimeRef      = useRef<number>(0);
@@ -71,8 +73,13 @@ export const useMetronome = ({
   const audioStartTimeRef    = useRef<number | null>(null);
   const beatCounterRef       = useRef<number>(0);
   const isMutedRef           = useRef(isMuted);
+  const volumeRef            = useRef(volume);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef= useRef<number>(0);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   // Keep schedulerRef current so the worklet message handler never captures a stale closure.
   const schedulerRef    = useRef<(() => void) | null>(null);
@@ -132,6 +139,9 @@ export const useMetronome = ({
   const playSound = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
+    const peak = 0.85 * volumeRef.current;
+    if (peak <= 0.0001) return;
+
     const context    = audioContextRef.current;
     const oscillator = context.createOscillator();
     const gainNode   = context.createGain();
@@ -140,8 +150,8 @@ export const useMetronome = ({
     oscillator.frequency.value = isAccent ? 1200 : 800;
 
     gainNode.gain.setValueAtTime(0, time);
-    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.001);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    gainNode.gain.linearRampToValueAtTime(peak, time + 0.001);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
 
     oscillator.connect(gainNode);
     gainNode.connect(context.destination);
@@ -284,6 +294,8 @@ export const useMetronome = ({
     minBpm,
     maxBpm,
     setBpm,
+    volume,
+    setVolume,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -294,8 +306,8 @@ export const useMetronome = ({
     audioContext: audioContextRef.current,
     audioStartTime: audioStartTimeRef.current,
   }), [
-    bpm, isPlaying, countInRemaining, minBpm, maxBpm, 
-    setBpm, toggleMetronome, startMetronome, stopMetronome, 
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm,
+    setBpm, volume, setVolume, toggleMetronome, startMetronome, stopMetronome,
     restartMetronome, handleSetRecommendedBpm, recommendedBpm
   ]);
 };

@@ -1,6 +1,7 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Minus, Plus, Volume2, VolumeX } from "lucide-react";
+import { Minus, Plus, Volume1, Volume2, VolumeX } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { GiMetronome } from "react-icons/gi";
 
@@ -44,6 +45,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   const setBpm = metronome.setBpm;
   const minBpm = metronome.minBpm;
   const maxBpm = metronome.maxBpm;
+  const volume: number = metronome.volume ?? 0.5;
+  const setVolume = metronome.setVolume as ((v: number) => void) | undefined;
+
+  const VolumeIcon = isMetronomeMuted || volume <= 0.0001 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   const startEdit = () => {
     setInput(String(bpm));
@@ -128,21 +133,57 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
         </button>
 
-        <button
-          onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
-          title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
-          className={cn(
-            "flex items-center justify-center shrink-0 rounded-lg transition-colors",
-            compact ? "h-7 w-7" : "h-8 w-8",
-            isMetronomeMuted
-              ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
-              : "text-cyan-400 hover:bg-cyan-500/10"
-          )}
-        >
-          {isMetronomeMuted
-            ? <VolumeX className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
-            : <Volume2 className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />}
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              title="Metronome volume"
+              className={cn(
+                "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50",
+                compact ? "h-7 w-7" : "h-8 w-8",
+                isMetronomeMuted
+                  ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
+                  : "text-cyan-400 hover:bg-cyan-500/10"
+              )}
+            >
+              <VolumeIcon className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 border border-white/10 bg-zinc-900 p-3 text-white">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+                Metronome volume
+              </span>
+              <span className="font-mono text-[10px] text-zinc-500">
+                {isMetronomeMuted ? "Muted" : `${Math.round(volume * 100)}%`}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
+                title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
+                className={cn(
+                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                  isMetronomeMuted
+                    ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
+                    : "text-cyan-400 hover:bg-cyan-500/10"
+                )}
+              >
+                <VolumeIcon className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <Slider
+                value={[isMetronomeMuted ? 0 : volume]}
+                min={0}
+                max={1}
+                step={0.05}
+                onValueChange={(v) => {
+                  if (isMetronomeMuted && v[0] > 0) setIsMetronomeMuted(false);
+                  setVolume?.(v[0]);
+                }}
+                className="flex-1 cursor-pointer [&_[data-slot=slider-range]]:bg-cyan-500"
+              />
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
