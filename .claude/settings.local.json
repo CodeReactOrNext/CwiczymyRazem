@@ -42,7 +42,9 @@
       "Bash(echo \"---- exit: $? ----\")",
       "Bash(echo \"exit: $?\")",
       "Bash(cat > *)",
-      "PowerShell(npx tsc --noEmit 2>&1)"
+      "PowerShell(npx tsc --noEmit 2>&1)",
+      "WebFetch(domain:www.youtube.com)",
+      "PowerShell($out = npx tsc --noEmit 2>&1; \"EXIT=$LASTEXITCODE\"; \"TOTAL ERRORS: \" + \\($out | Select-String -Pattern \"error TS\"\\).Count; $out | Select-String -Pattern \"error TS\" | Select-Object -First 20)"
     ],
     "additionalDirectories": [
       "\\tmp"

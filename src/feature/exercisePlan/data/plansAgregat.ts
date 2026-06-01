@@ -6,6 +6,7 @@ import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/daily
 import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
 import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
 import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
+import { guitarPlayalongsPlans } from "feature/exercisePlan/data/plans/guitarPlayalongs/guitarPlayalongsPlans";
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
 import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
 import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
@@ -80,6 +81,17 @@ const FREE_PLAN_IDS = new Set([
   "musician_fitness_lvl2_s18",
   "musician_fitness_lvl2_s19",
   "musician_fitness_lvl2_s20",
+  // Guitar Playalongs — free
+  "gp_pentatonic_10min_workout",
+  "gp_sweep_picking_15min",
+  "gp_speed_builder_part1",
+  "gp_stamina_picking_workout",
+  "gp_gallop_picking_10_levels",
+  "gp_alternate_picking_speed_builder",
+  "gp_rock_metal_riffs",
+  "gp_music_theory_essential",
+  "gp_drop2_chords_arpeggios",
+  "gp_pentatonic_tutorial",
 ]);
 
 export const defaultPlans: ExercisePlan[] = [
@@ -89,6 +101,7 @@ export const defaultPlans: ExercisePlan[] = [
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,
   pentatonicPlayalongPlan,
+  ...guitarPlayalongsPlans,
   fretboardAwarenessPlan,
   harmonicVoiceLeadingPlan,
   creativePhrasingPlan,

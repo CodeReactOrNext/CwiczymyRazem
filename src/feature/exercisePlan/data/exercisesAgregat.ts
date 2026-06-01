@@ -4,6 +4,7 @@ import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exeris
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
@@ -165,6 +166,17 @@ const FREE_EXERCISE_IDS = new Set([
   "musician_fitness_lvl2_s18",
   "musician_fitness_lvl2_s19",
   "musician_fitness_lvl2_s20",
+  // Guitar Playalongs — free
+  "gp_pentatonic_10min_workout",
+  "gp_sweep_picking_15min",
+  "gp_speed_builder_part1",
+  "gp_stamina_picking_workout",
+  "gp_gallop_picking_10_levels",
+  "gp_alternate_picking_speed_builder",
+  "gp_rock_metal_riffs",
+  "gp_music_theory_essential",
+  "gp_drop2_chords_arpeggios",
+  "gp_pentatonic_tutorial",
 ]);
 
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
@@ -310,6 +322,7 @@ const rawExercises: Exercise[] = [
   musicianFitnessLvl1S7Exercise,
   musicianFitnessLvl1S8Exercise,
   pentatonicPlayalongExercise,
+  ...guitarPlayalongsExercises,
   jpStretching,
 
   alternatePickingCrossStringExercise,

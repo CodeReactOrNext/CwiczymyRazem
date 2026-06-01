@@ -1,9 +1,7 @@
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { memo } from "react";
-import {
-  FaExternalLinkAlt, FaFacebook, FaHeart, FaInstagram, FaTwitter, FaVolumeMute, FaVolumeUp,
-} from "react-icons/fa";
+import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
@@ -22,15 +20,15 @@ interface SessionSidebarProps {
 }
 
 export const SessionSidebar = memo(function SessionSidebar({
-  currentExercise,
   activeExercise,
   audioTracks,
   setTrackConfigs,
 }: SessionSidebarProps) {
   const hasAudioMixer = activeExercise.backingTracks && activeExercise.backingTracks.length > 0;
-  const hasLinks = currentExercise.links && currentExercise.links.length > 0;
 
-  if (!hasAudioMixer && !hasLinks) return null;
+  // Support Author links are now rendered inside the Exercise Instructions panel
+  // (see ExerciseInstructionsInline) to keep them grouped with the exercise info.
+  if (!hasAudioMixer) return null;
 
   return (
     <div className="space-y-6 flex flex-col w-full max-w-xs">
@@ -77,42 +75,6 @@ export const SessionSidebar = memo(function SessionSidebar({
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
-
-      {hasLinks && (
-        <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
-          <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-wide">
-            <FaHeart className="animate-pulse" />
-            <span>Support Author</span>
-          </div>
-          <div className="flex flex-col gap-2">
-            {currentExercise.links!.map((link, idx) => {
-              let Icon = FaExternalLinkAlt;
-              if (link.url.includes("facebook"))                              Icon = FaFacebook;
-              if (link.url.includes("instagram"))                             Icon = FaInstagram;
-              if (link.url.includes("twitter") || link.url.includes("x.com")) Icon = FaTwitter;
-              if (link.url.includes("patreon"))                               Icon = FaHeart;
-              return (
-                <a
-                  key={idx}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between group px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={cn(
-                      "h-4 w-4",
-                      link.url.includes("patreon") ? "text-red-500" : "text-zinc-400 group-hover:text-white"
-                    )} />
-                    <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
-                  </div>
-                  <FaExternalLinkAlt className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
-                </a>
-              );
-            })}
           </div>
         </div>
       )}
