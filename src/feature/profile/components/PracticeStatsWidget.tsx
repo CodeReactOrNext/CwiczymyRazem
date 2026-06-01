@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
+  YAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
 import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
@@ -179,6 +180,11 @@ export const PracticeStatsWidget = ({
         <div className="flex-1 min-h-[130px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 18, right: 44, bottom: 0, left: 0 }} barCategoryGap="20%">
+              {/* Hidden Y axis fixes the scale so the 15-min goal line stays visible
+                  even on low-practice days (otherwise the domain collapses to dataMax
+                  and the reference line gets discarded for overflowing). */}
+              <YAxis hide domain={[0, maxMinutes]} />
+
               <XAxis
                 dataKey="day"
                 axisLine={false}

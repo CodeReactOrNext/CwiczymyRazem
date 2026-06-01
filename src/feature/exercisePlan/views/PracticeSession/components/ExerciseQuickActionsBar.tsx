@@ -148,24 +148,33 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               <VolumeIcon className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 border border-white/10 bg-zinc-900 p-3 text-white">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+          <DropdownMenuContent
+            align="end"
+            sideOffset={8}
+            className="w-60 rounded-xl border border-white/10 bg-zinc-900/95 p-3.5 text-white shadow-xl shadow-black/40 backdrop-blur-md"
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
                 Metronome volume
               </span>
-              <span className="font-mono text-[10px] text-zinc-500">
+              <span
+                className={cn(
+                  "min-w-[2.75rem] rounded-md px-1.5 py-0.5 text-center font-mono text-[11px] font-bold tabular-nums",
+                  isMetronomeMuted ? "bg-zinc-800 text-zinc-500" : "bg-cyan-500/10 text-cyan-300"
+                )}
+              >
                 {isMetronomeMuted ? "Muted" : `${Math.round(volume * 100)}%`}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
                 title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
                 className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors active:scale-95",
                   isMetronomeMuted
-                    ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
-                    : "text-cyan-400 hover:bg-cyan-500/10"
+                    ? "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
+                    : "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
                 )}
               >
                 <VolumeIcon className="h-4 w-4" strokeWidth={2.5} />
@@ -179,7 +188,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                   if (isMetronomeMuted && v[0] > 0) setIsMetronomeMuted(false);
                   setVolume?.(v[0]);
                 }}
-                className="flex-1 cursor-pointer [&_[data-slot=slider-range]]:bg-cyan-500"
+                className={cn(
+                  "flex-1 cursor-pointer",
+                  "[&>span:first-child]:bg-cyan-500/15 [&>span:first-child>span]:bg-cyan-500",
+                  "[&_[role=slider]]:border-cyan-400 [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-[0_0_8px_rgba(34,211,238,0.5)]"
+                )}
               />
             </div>
           </DropdownMenuContent>
