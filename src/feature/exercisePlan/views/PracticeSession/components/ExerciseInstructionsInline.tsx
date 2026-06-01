@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { ChevronDown, ChevronUp, Lock, Unlock } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { FaCheck, FaInfoCircle, FaLightbulb, FaSignal, FaGraduationCap } from "react-icons/fa";
+import { FaCheck, FaInfoCircle, FaLightbulb, FaSignal, FaGraduationCap, FaHeart, FaExternalLinkAlt, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
@@ -33,6 +33,8 @@ export const ExerciseInstructionsInline = ({
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
   const hasInstructions = !!(exercise.instructions?.length || exercise.tips?.length);
+  const hasLinks = !!(exercise.links && exercise.links.length > 0);
+  const isPlayalong = !!exercise.isPlayalong;
 
   const displayAmount = rewardAmount || (
     exercise.difficulty === "easy" ? 1 :
@@ -67,7 +69,43 @@ export const ExerciseInstructionsInline = ({
     }
   }, [isPlaying, isLocked]);
 
-  if (!hasInstructions && !displayAmount) return null;
+  if (!hasInstructions && !displayAmount && !hasLinks) return null;
+
+  const supportAuthorBlock = hasLinks ? (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2.5 text-red-400">
+        <FaHeart size={14} className="animate-pulse" />
+        <h4 className="text-xs font-bold">Support Author</h4>
+      </div>
+      <div className="flex flex-col gap-2">
+        {exercise.links!.map((link, idx) => {
+          let Icon = FaExternalLinkAlt;
+          if (link.url.includes("facebook"))                              Icon = FaFacebook;
+          if (link.url.includes("instagram"))                             Icon = FaInstagram;
+          if (link.url.includes("twitter") || link.url.includes("x.com")) Icon = FaTwitter;
+          if (link.url.includes("patreon"))                               Icon = FaHeart;
+          return (
+            <a
+              key={idx}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between group px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-sm"
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={cn(
+                  "h-4 w-4",
+                  link.url.includes("patreon") ? "text-red-500" : "text-zinc-400 group-hover:text-white"
+                )} />
+                <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
+              </div>
+              <FaExternalLinkAlt className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className="w-full overflow-hidden text-left">
@@ -148,7 +186,9 @@ export const ExerciseInstructionsInline = ({
                   )}
                 </div>
 
-                {(exercise.requiresBackingTrack || (exercise.tips && exercise.tips.length > 0)) && (
+                {isPlayalong ? (
+                  hasLinks && <div className="space-y-6">{supportAuthorBlock}</div>
+                ) : (exercise.requiresBackingTrack || (exercise.tips && exercise.tips.length > 0)) && (
                   <div className="space-y-6">
                     {exercise.requiresBackingTrack && (
                       <div className="p-3.5 bg-amber-500/10 rounded-lg flex items-start gap-3 text-amber-400 text-sm leading-relaxed font-semibold">
@@ -179,8 +219,10 @@ export const ExerciseInstructionsInline = ({
                   </div>
                 )}
 
-                {displayAmount > 0 && (
+                {(displayAmount > 0 || (hasLinks && !isPlayalong)) && (
                   <div className="space-y-6">
+                    {displayAmount > 0 && (
+                    <>
                     {/* Difficulty Section */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-zinc-400">
@@ -219,6 +261,10 @@ export const ExerciseInstructionsInline = ({
                         })}
                       </div>
                     </div>
+                    </>
+                    )}
+
+                    {hasLinks && !isPlayalong && supportAuthorBlock}
                   </div>
                 )}
               </div>
