@@ -215,7 +215,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
         <img 
           className='absolute z-20 object-contain' 
           style={specialGuitarImgStyle} 
-          src={`/static/images/rank/${imgPath}.png`} 
+          src={`/static/images/rank/${imgPath}.webp`} 
           alt='' 
           onError={() => setGuitarError(true)}
         />
@@ -227,7 +227,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
               <img 
                 className='absolute z-20 object-contain cursor-pointer' 
                 style={specialGuitarImgStyle} 
-                src={`/static/images/rank/${imgPath}.png`} 
+                src={`/static/images/rank/${imgPath}.webp`} 
                 alt='' 
                 onError={() => setGuitarError(true)}
               />
@@ -243,7 +243,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
                   </span>
                 </div>
                 <div className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg" style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}18 0%, transparent 70%)` }}>
-                  <img src={`/static/images/rank/${imgPath}.png`} alt={specialGuitarDef.name} className="object-contain drop-shadow-xl h-52 w-auto -rotate-90" />
+                  <img src={`/static/images/rank/${imgPath}.webp`} alt={specialGuitarDef.name} className="object-contain drop-shadow-xl h-52 w-auto -rotate-90" />
                 </div>
                 <div className="flex items-center justify-between px-3 py-2 text-[10px] text-gray-400" style={{ borderTop: `1px solid ${specialGuitarColor}20`, background: `${specialGuitarColor}08` }}>
                   <span className="font-semibold text-gray-300">{guitarYear ?? `${specialGuitarDef.yearFrom}–${specialGuitarDef.yearTo}`}</span>
@@ -258,7 +258,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
         <img 
           className='absolute -rotate-90 z-20' 
           style={size === "sm" ? { display: "none" } : { ...badgePosition }} 
-          src={`/static/images/rank/${imgPath}.png`} 
+          src={`/static/images/rank/${imgPath}.webp`} 
           alt='' 
           onError={() => setGuitarError(true)}
         />

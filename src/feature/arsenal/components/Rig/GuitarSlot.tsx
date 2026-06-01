@@ -90,7 +90,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
         }}
       >
         <img
-          src={`/static/images/rank/${guitar.imageId}.png`}
+          src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
           className="-rotate-90 object-contain"
           style={{ height: 180, width: 180 }}

@@ -78,7 +78,7 @@ export const GuitarPickerModal = ({
               >
                 <div className="flex items-center justify-center w-full" style={{ height: 90 }}>
                   <img
-                    src={`/static/images/rank/${guitar.imageId}.png`}
+                    src={`/static/images/rank/${guitar.imageId}.webp`}
                     alt={guitar.name}
                     className="-rotate-90 object-contain"
                     style={{ height: 80, width: 80 }}
