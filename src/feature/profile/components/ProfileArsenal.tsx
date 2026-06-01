@@ -137,7 +137,7 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
         }}
       >
         <img
-          src={`/static/images/rank/${guitar.imageId}.png`}
+          src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
           className="object-contain -rotate-90"
           style={{ height: "85%", width: "85%", maxHeight: 110 }}

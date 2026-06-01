@@ -172,7 +172,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   return (
                     <img
                       className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
-                      src={`/static/images/rank/${imgPath}.png`}
+                      src={`/static/images/rank/${imgPath}.webp`}
                       alt='equipped guitar'
                     />
                   );

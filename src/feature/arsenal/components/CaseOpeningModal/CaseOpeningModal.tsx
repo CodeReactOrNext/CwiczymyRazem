@@ -175,7 +175,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                         <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(180deg, ${rs.baseColor}25 0%, transparent 60%)` }} />
                         {item.kind === "guitar" ? (
                           <img
-                            src={`/static/images/rank/${item.def.imageId}.png`}
+                            src={`/static/images/rank/${item.def.imageId}.webp`}
                             alt={item.def.name}
                             className="relative z-10 h-24 w-24 -rotate-45 object-contain drop-shadow-2xl"
                           />
@@ -236,7 +236,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       <div className="absolute inset-0 rounded opacity-30" style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)` }} />
                       {winDef.kind === "guitar" ? (
                         <img
-                          src={`/static/images/rank/${winDef.def.imageId}.png`}
+                          src={`/static/images/rank/${winDef.def.imageId}.webp`}
                           alt={winDef.def.name}
                           className="relative z-10 h-44 w-44 sm:h-64 sm:w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
                         />

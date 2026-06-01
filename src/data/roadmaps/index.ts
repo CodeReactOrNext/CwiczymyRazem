@@ -10,12 +10,12 @@ import rhythmBasics from "./rhythm-guitar-basics.json";
 
 const roadmaps: StaticRoadmap[] = [
   johnMayer as StaticRoadmap,
-  { ...adamJones, image: "/images/roadmap/adam.png" } as StaticRoadmap,
-  { ...hendrix, image: "/images/roadmap/hendrix.png" } as StaticRoadmap,
-  { ...petrucci, image: "/images/roadmap/petrucci.png" } as StaticRoadmap,
-  { ...martyFriedman, image: "/images/roadmap/friedman.png" } as StaticRoadmap,
-  { ...guitarImprov, image: "/images/roadmap/impro.png" } as StaticRoadmap,
-  { ...rhythmBasics, image: "/images/roadmap/rythm.png" } as StaticRoadmap,
+  { ...adamJones, image: "/images/roadmap/adam.webp" } as StaticRoadmap,
+  { ...hendrix, image: "/images/roadmap/hendrix.webp" } as StaticRoadmap,
+  { ...petrucci, image: "/images/roadmap/petrucci.webp" } as StaticRoadmap,
+  { ...martyFriedman, image: "/images/roadmap/friedman.webp" } as StaticRoadmap,
+  { ...guitarImprov, image: "/images/roadmap/impro.webp" } as StaticRoadmap,
+  { ...rhythmBasics, image: "/images/roadmap/rythm.webp" } as StaticRoadmap,
 ];
 
 export default roadmaps;

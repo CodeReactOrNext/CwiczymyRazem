@@ -89,7 +89,7 @@ const ItemTooltipCard = ({
 }) => {
   const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
   const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.png`
+    ? `/static/images/rank/${itemImageId}.webp`
     : `/static/images/effects/${itemImageId}.png`;
 
   const guitarDef = itemType === "guitar"
@@ -166,7 +166,7 @@ const FirebaseLogsCaseOpenItem = ({
   const date = new Date(timestamp);
   const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
   const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.png`
+    ? `/static/images/rank/${itemImageId}.webp`
     : `/static/images/effects/${itemImageId}.png`;
 
   return (

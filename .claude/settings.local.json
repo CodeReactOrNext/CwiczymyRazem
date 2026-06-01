@@ -44,10 +44,12 @@
       "Bash(cat > *)",
       "PowerShell(npx tsc --noEmit 2>&1)",
       "WebFetch(domain:www.youtube.com)",
-      "PowerShell($out = npx tsc --noEmit 2>&1; \"EXIT=$LASTEXITCODE\"; \"TOTAL ERRORS: \" + \\($out | Select-String -Pattern \"error TS\"\\).Count; $out | Select-String -Pattern \"error TS\" | Select-Object -First 20)"
+      "PowerShell($out = npx tsc --noEmit 2>&1; \"EXIT=$LASTEXITCODE\"; \"TOTAL ERRORS: \" + \\($out | Select-String -Pattern \"error TS\"\\).Count; $out | Select-String -Pattern \"error TS\" | Select-Object -First 20)",
+      "Bash(cd \"g:/cw/sss/CwiczymyRazem\" && rm public/images/roadmap/*.png && ls public/images/roadmap/)"
     ],
     "additionalDirectories": [
-      "\\tmp"
+      "\\tmp",
+      "G:\\cw\\sss\\CwiczymyRazem\\public\\images\\roadmap"
     ]
   }
 }

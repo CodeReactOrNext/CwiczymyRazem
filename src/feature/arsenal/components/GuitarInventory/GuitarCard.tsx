@@ -136,7 +136,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         )}
 
         <img
-          src={`/static/images/rank/${guitar.imageId}.png`}
+          src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
           className="relative z-10 object-contain -rotate-90"
           style={{
