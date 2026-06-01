@@ -37,6 +37,8 @@ export const useMobileMetronome = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
   const [audioInitialized, setAudioInitialized] = useState(false);
+  // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
+  const [volume, setVolume] = useState(0.5);
 
   const audioContextRef    = useRef<AudioContext | null>(null);
   const ownsAudioContextRef= useRef(true);
@@ -50,6 +52,8 @@ export const useMobileMetronome = ({
   const beatCounterRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
+  const volumeRef = useRef(volume);
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
   const onPlayStartRef = useRef(onPlayStart);
   const onTickRef      = useRef(onTick);
   useEffect(() => { onPlayStartRef.current = onPlayStart; }, [onPlayStart]);
@@ -130,6 +134,9 @@ export const useMobileMetronome = ({
   const scheduleNote = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
+    const peak = 0.85 * volumeRef.current;
+    if (peak <= 0.0001) return;
+
     const oscillator = audioContextRef.current.createOscillator();
     const noteGain = audioContextRef.current.createGain();
 
@@ -138,8 +145,8 @@ export const useMobileMetronome = ({
 
     // Use a per-note gain node to avoid interfering with global gain or concurrent notes
     noteGain.gain.setValueAtTime(0, time);
-    noteGain.gain.linearRampToValueAtTime(0.3, time + 0.001);
-    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    noteGain.gain.linearRampToValueAtTime(peak, time + 0.001);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
 
     oscillator.connect(noteGain);
     noteGain.connect(gainNodeRef.current || audioContextRef.current.destination);
@@ -313,6 +320,8 @@ export const useMobileMetronome = ({
     minBpm,
     maxBpm,
     setBpm,
+    volume,
+    setVolume,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -325,8 +334,8 @@ export const useMobileMetronome = ({
     audioContext: audioContextRef.current,
     audioStartTime: audioStartTimeRef.current,
   }), [
-    bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, 
-    toggleMetronome, startMetronome, stopMetronome, restartMetronome, 
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
+    toggleMetronome, startMetronome, stopMetronome, restartMetronome,
     handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized
   ]);
 }; 
