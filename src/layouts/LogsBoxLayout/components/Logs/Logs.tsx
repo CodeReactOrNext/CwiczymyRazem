@@ -13,7 +13,9 @@ import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 // challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import type {
   FirebaseLogsCaseOpenInterface,
@@ -24,6 +26,7 @@ import type {
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { useTranslation } from "hooks/useTranslation";
 import { Video, ExternalLink } from "lucide-react";
 import Link from "next/link";
@@ -439,16 +442,25 @@ const FirebaseLogsItem = ({
   log,
   isNew,
   currentUserId,
+  onPreviewPlan,
+  onPreviewExercise,
 }: {
   log: FirebaseLogsInterface;
   isNew: boolean;
   currentUserId: string;
+  onPreviewPlan: (plan: ExercisePlan) => void;
+  onPreviewExercise: (exercise: Exercise) => void;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
   const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
   const date = new Date(timestamp as string);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
+
+  // Match logged exercise back to a known exercise definition (logs only store the title).
+  const matchedExercise: Exercise | null = exerciseTitle
+    ? exercisesAgregat.find(ex => ex.title === exerciseTitle) ?? null
+    : null;
 
   const _currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
   
@@ -503,21 +515,43 @@ const FirebaseLogsItem = ({
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
           {planTitle && (
+            plan ? (
+              <button
+                type="button"
+                onClick={() => onPreviewPlan(plan)}
+                title="Click to preview and start this plan"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="tracking-wide mr-1.5 opacity-80">Plan</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
+              </button>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
                 <span className="tracking-wide mr-1.5 opacity-80">
                     Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>
               </span>
+            )
           )}
 
           {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
+            matchedExercise ? (
+              <button
+                type="button"
+                onClick={() => onPreviewExercise(matchedExercise)}
+                title="Click to preview and start this exercise"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="font-bold tracking-wide mr-1.5 opacity-80">Exercise</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{exerciseTitle}</span>
+              </button>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
                 <span className="font-bold tracking-wide mr-1.5 opacity-80">
                     Exercise
                 </span>
                 <span className="font-medium">{exerciseTitle}</span>
               </span>
+            )
           )}
 
           {micPerformance && !(micPerformance.score === 0 && micPerformance.accuracy === 100) && (
@@ -794,6 +828,8 @@ const FirebaseLogsDailyQuestItem = ({
 const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
+  const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const spanRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -863,19 +899,30 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
               currentUserId={currentUserId}
             />
           ) : (
-            <FirebaseLogsItem 
-              log={log as FirebaseLogsInterface} 
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)} 
+            <FirebaseLogsItem
+              log={log as FirebaseLogsInterface}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}
+              onPreviewPlan={setPreviewPlan}
+              onPreviewExercise={setPreviewExercise}
             />
           )}
         </div>
       ))}
 
-      <RecordingViewModal 
+      <RecordingViewModal
         isOpen={!!activeRecordingId}
         onClose={() => setActiveRecordingId(null)}
         recordingId={activeRecordingId}
+      />
+
+      <ActivityStartModal
+        plan={previewPlan}
+        exercise={previewExercise}
+        onClose={() => {
+          setPreviewPlan(null);
+          setPreviewExercise(null);
+        }}
       />
     </>
   );
