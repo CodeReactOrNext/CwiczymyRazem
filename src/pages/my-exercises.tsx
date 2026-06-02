@@ -6,7 +6,7 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { ChevronLeft, Globe, Lock, Music2, Play, Plus, Star, Trash2 } from "lucide-react";
+import { ChevronLeft, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
@@ -76,6 +76,11 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
   const handleCreate = () => {
     router.push("/tab-editor");
+  };
+
+  const handleEdit = (ex: CommunityExercise) => {
+    localStorage.setItem("tab-editor-draft", JSON.stringify(ex.tablature ?? []));
+    router.push(`/tab-editor?edit=${ex.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -225,6 +230,15 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     View
                   </button>
                 )}
+
+                {/* Edit */}
+                <button
+                  onClick={() => handleEdit(ex)}
+                  className="shrink-0 p-2 rounded border border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-cyan-400 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all"
+                  title="Edit exercise"
+                >
+                  <Pencil size={14} />
+                </button>
 
                 {/* Delete */}
                 <button

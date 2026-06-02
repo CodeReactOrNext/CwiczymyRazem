@@ -11,6 +11,7 @@ import {
   runTransaction,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import type { CreateCommunityExerciseInput, CommunityExercise, CommunityExerciseRating } from "feature/communityExercises/types";
@@ -52,6 +53,33 @@ export const getCommunityExercises = async (): Promise<CommunityExercise[]> => {
   } catch (error) {
     logger.error(error, { context: "getCommunityExercises" });
     return [];
+  }
+};
+
+export const getCommunityExerciseById = async (exerciseId: string): Promise<CommunityExercise | null> => {
+  try {
+    const snap = await getDoc(doc(db, COLLECTION, exerciseId));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() } as CommunityExercise;
+  } catch (error) {
+    logger.error(error, { context: "getCommunityExerciseById" });
+    return null;
+  }
+};
+
+export const updateCommunityExercise = async (
+  exerciseId: string,
+  input: CreateCommunityExerciseInput
+): Promise<boolean> => {
+  try {
+    await updateDoc(doc(db, COLLECTION, exerciseId), {
+      ...input,
+      updatedAt: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    logger.error(error, { context: "updateCommunityExercise" });
+    return false;
   }
 };
 

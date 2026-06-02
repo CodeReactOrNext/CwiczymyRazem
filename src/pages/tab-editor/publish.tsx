@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { createCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
+import { createCommunityExercise, getCommunityExerciseById, updateCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
 import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
 import type { DifficultyLevel, ExerciseCategory, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
@@ -34,6 +34,9 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
 
+  const editId = typeof router.query.edit === "string" ? router.query.edit : null;
+  const isEditing = !!editId;
+
   const [tablature, setTablature] = useState<TablatureMeasure[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -59,6 +62,30 @@ const PublishExercisePage: NextPageWithLayout = () => {
       } catch {}
     }
   }, []);
+
+  // In edit mode, load the existing exercise and prefill the form.
+  useEffect(() => {
+    if (!editId) return;
+    getCommunityExerciseById(editId).then(ex => {
+      if (!ex) return;
+      setTitle(ex.title);
+      setDescription(ex.description);
+      setCategory(ex.category);
+      setDifficulty(ex.difficulty);
+      setSelectedSkills(ex.relatedSkills ?? []);
+      setTimeInMinutes(ex.timeInMinutes);
+      if (ex.metronomeSpeed) {
+        setBpmMin(ex.metronomeSpeed.min);
+        setBpmMax(ex.metronomeSpeed.max);
+        setBpmRecommended(ex.metronomeSpeed.recommended);
+      }
+      setInstructions(ex.instructions?.length ? ex.instructions : [""]);
+      setTips(ex.tips?.length ? ex.tips : [""]);
+      setIsPublic(ex.isPublic);
+      // Fall back to the saved tablature if the editor draft was lost.
+      setTablature(prev => (prev.length > 0 ? prev : ex.tablature ?? []));
+    });
+  }, [editId]);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -95,15 +122,17 @@ const PublishExercisePage: NextPageWithLayout = () => {
       isPublic,
     };
 
-    const id = await createCommunityExercise(
-      input,
-      userAuth,
-      userInfo.displayName || "Anonymous"
-    );
+    const ok = isEditing
+      ? await updateCommunityExercise(editId, input)
+      : !!(await createCommunityExercise(
+          input,
+          userAuth,
+          userInfo.displayName || "Anonymous"
+        ));
 
     setIsSubmitting(false);
 
-    if (id) {
+    if (ok) {
       localStorage.removeItem("tab-editor-draft");
       setSubmitted(true);
     } else {
@@ -146,17 +175,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-black text-white tracking-tight">
-              {isPublic ? "Exercise Published!" : "Exercise Saved Privately!"}
+              {isEditing ? "Changes Saved!" : isPublic ? "Exercise Published!" : "Exercise Saved Privately!"}
             </h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              {isPublic
+              {isEditing
+                ? "Your exercise has been updated."
+                : isPublic
                 ? "Your exercise is now live in the Community library. Other users can discover, practice, and rate it."
                 : "Your exercise is saved privately. Only you can see and practice it. You can make it public at any time."}
             </p>
           </div>
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => router.push("/profile/skills?tab=community")}
+              onClick={() => router.push(isEditing ? "/my-exercises" : "/profile/skills?tab=community")}
               className={cn(
                 "px-5 py-2.5 text-sm font-bold rounded-lg transition-all",
                 isPublic
@@ -164,7 +195,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   : "bg-cyan-500 text-black hover:bg-cyan-400"
               )}
             >
-              {isPublic ? "View in Library" : "View My Exercises"}
+              {isEditing ? "Back to My Exercises" : isPublic ? "View in Library" : "View My Exercises"}
             </button>
             <button
               onClick={() => router.push("/tab-editor")}
@@ -196,9 +227,11 @@ const PublishExercisePage: NextPageWithLayout = () => {
               Back to Editor
             </button>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-white">Publish Exercise</h1>
+              <h1 className="text-3xl font-black tracking-tight text-white">{isEditing ? "Edit Exercise" : "Publish Exercise"}</h1>
               <p className="text-zinc-400 mt-1 text-sm leading-relaxed">
-                Share your exercise with the community. Fill in the details below so others know how to practice it.
+                {isEditing
+                  ? "Update the details of your exercise below. Changes are saved immediately."
+                  : "Share your exercise with the community. Fill in the details below so others know how to practice it."}
               </p>
             </div>
           </div>
@@ -525,7 +558,9 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   : "bg-cyan-500 hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
               )}
             >
-              {isSubmitting ? (isPublic ? "Publishing…" : "Saving…") : (isPublic ? "Publish Exercise" : "Save Privately")}
+              {isSubmitting
+                ? (isEditing ? "Saving…" : isPublic ? "Publishing…" : "Saving…")
+                : (isEditing ? "Save Changes" : isPublic ? "Publish Exercise" : "Save Privately")}
             </button>
           </div>
         </div>

@@ -88,6 +88,22 @@ export default function TabEditor() {
     }
   }, []);
 
+  // When arriving in edit mode, load the exercise's tablature draft into the editor.
+  const editId = typeof router.query.edit === "string" ? router.query.edit : null;
+  useEffect(() => {
+    if (!editId) return;
+    const raw = localStorage.getItem("tab-editor-draft");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setMeasures(parsed);
+        saveHistory(parsed);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId]);
+
   useTablatureAudio({
     measures,
     bpm,
@@ -781,12 +797,12 @@ export default function TabEditor() {
               <button
                 onClick={() => {
                   localStorage.setItem('tab-editor-draft', JSON.stringify(measures));
-                  router.push('/tab-editor/publish');
+                  router.push(editId ? `/tab-editor/publish?edit=${editId}` : '/tab-editor/publish');
                 }}
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg transition-all text-[10px] font-bold text-emerald-400"
               >
                 <LucidePlus size={12} />
-                <span>PUBLISH</span>
+                <span>{editId ? 'SAVE CHANGES' : 'PUBLISH'}</span>
               </button>
               <button
                 onClick={clearAll}
