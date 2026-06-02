@@ -100,7 +100,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
 
 
       if (rateSong.fulfilled.match(resultAction)) {
-        toast.success(isNewRating ? "+5 Points! Rating updated." : "Rating updated.");
+        toast.success(isNewRating ? "+3 Points! Rating updated." : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
 
         if (isNewRating) {

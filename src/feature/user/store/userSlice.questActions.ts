@@ -85,7 +85,7 @@ export const claimQuestRewardAction = createAsyncThunk(
       if (userId && state.user.currentUserStats) {
         const userRef = doc(db, "users", userId);
 
-        await updateSeasonalPoints(userId, 30);
+        await updateSeasonalPoints(userId, 10);
 
         await updateDoc(userRef, {
           "statistics.points": state.user.currentUserStats.points,
