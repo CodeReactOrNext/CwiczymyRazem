@@ -109,10 +109,10 @@ export default async function handler(
     if (isNewRating) {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        "statistics.points": increment(5)
+        "statistics.points": increment(3)
       });
-      addedPoints = 5;
-      await updateSeasonalPoints(userId, 5);
+      addedPoints = 3;
+      await updateSeasonalPoints(userId, 3);
     }
 
     // Add Log ...

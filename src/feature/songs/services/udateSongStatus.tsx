@@ -39,16 +39,16 @@ export const updateSongStatus = async (
     let pointsAdded = 0;
     if (status === "learned" && oldStatus !== "learned") {
       await updateDoc(userDocRef, {
-        "statistics.points": increment(100)
+        "statistics.points": increment(40)
       });
-      pointsAdded = 100;
-      await updateSeasonalPoints(userId, 100);
+      pointsAdded = 40;
+      await updateSeasonalPoints(userId, 40);
     } else if (oldStatus === "learned" && status !== "learned") {
       await updateDoc(userDocRef, {
-        "statistics.points": increment(-100)
+        "statistics.points": increment(-40)
       });
-      pointsAdded = -100;
-      await updateSeasonalPoints(userId, -100);
+      pointsAdded = -40;
+      await updateSeasonalPoints(userId, -40);
     }
 
     await setDoc(userSongsRef, {

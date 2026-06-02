@@ -17,10 +17,10 @@ export const removeUserSong = async (userId: string, songId: string) => {
     let pointsAdded = 0;
     if (oldStatus === "learned") {
       await updateDoc(userDocRef, {
-        "statistics.points": increment(-200)
+        "statistics.points": increment(-40)
       });
-      pointsAdded = -200;
-      await updateSeasonalPoints(userId, -200);
+      pointsAdded = -40;
+      await updateSeasonalPoints(userId, -40);
     }
 
     await updateDoc(songRef, {

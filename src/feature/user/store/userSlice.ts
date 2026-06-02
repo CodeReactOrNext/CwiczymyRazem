@@ -229,7 +229,7 @@ const userSlice = createSlice({
       const allCompleted = quest.tasks.every(t => t.isCompleted);
       if (allCompleted && !quest.isRewardClaimed) {
         quest.isRewardClaimed = true;
-        const newPoints = (state.currentUserStats.points || 0) + 30;
+        const newPoints = (state.currentUserStats.points || 0) + 10;
         state.currentUserStats.points = newPoints;
 
         const newLvl = levelUpUser(state.currentUserStats.lvl || 1, newPoints);
@@ -256,12 +256,12 @@ const userSlice = createSlice({
     builder
       .addCase(rateSong.pending, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) + 25;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) + 3;
         }
       })
       .addCase(rateSong.rejected, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) - 25;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) - 3;
         }
       })
       // Challenges removed
