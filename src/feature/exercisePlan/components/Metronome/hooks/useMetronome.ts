@@ -179,11 +179,18 @@ export const useMetronome = ({
       } else {
         if (startTimeRef.current === null) {
           const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - ctx.currentTime) * 1000);
-          startTimeRef.current = Date.now() + msUntilBeat - pausedElapsedTimeRef.current;
+          // When resuming from a pause, snap the resume offset to a WHOLE number of
+          // beats. Otherwise resuming mid-beat (e.g. at beat 5.3) makes the click grid
+          // land at 5.3 / 6.3 / … instead of on the beat, drifting away from the notes.
+          // On a fresh start pausedElapsed is 0, so this is a no-op there.
+          const beatsPaused      = secondsPerBeat > 0 ? Math.round((pausedAudioElapsedRef.current / 1000) / secondsPerBeat) : 0;
+          const snappedElapsedMs = beatsPaused * secondsPerBeat * 1000;
+          startTimeRef.current = Date.now() + msUntilBeat - snappedElapsedMs;
           if (audioContextRef.current) {
-            audioStartTimeRef.current = nextNoteTimeRef.current - (pausedAudioElapsedRef.current / 1000);
+            audioStartTimeRef.current = nextNoteTimeRef.current - (snappedElapsedMs / 1000);
           }
-          beatCounterRef.current = 0;
+          // Continue the accent grid from the resumed beat so downbeats stay aligned.
+          beatCounterRef.current = beatsPaused;
           onPlayStartRef.current?.();
           setTimeout(() => setCountInRemaining(0), 0);
         }
