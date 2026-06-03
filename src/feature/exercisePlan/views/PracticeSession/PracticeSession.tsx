@@ -153,7 +153,11 @@ export const PracticeSession = ({
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
   });
 
-  const effectiveBpm           = Math.round(metronome.bpm * speedMultiplier);
+  // Must NOT be rounded: the metronome schedules its clicks from the exact
+  // `bpm * speedMultiplier`, so the tablature audio + visual cursor (which use
+  // effectiveBpm) must use the same exact value or they drift apart at non-100%
+  // speeds (e.g. 55 × 0.75 = 41.25 vs rounded 41).
+  const effectiveBpm           = metronome.bpm * speedMultiplier;
   const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
   // ── Ear training ──────────────────────────────────────────────────────────
@@ -417,7 +421,7 @@ export const PracticeSession = ({
       <SessionDialogs
         showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
-        onFinish={onFinish} resetTimer={resetTimer} startTimer={startTimer}
+        onFinish={onFinish} handleRestart={handleRestart}
         sessionPhase={sessionPhase} examMode={isExamMode}
         handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
