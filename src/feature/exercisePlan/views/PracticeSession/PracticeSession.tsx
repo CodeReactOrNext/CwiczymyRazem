@@ -64,7 +64,7 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 export const PracticeSession = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
-  examMode, onExamComplete, skipExitDialog = false,
+  examMode, examBpm, onExamComplete, skipExitDialog = false,
 }: PracticeSessionProps) => {
   const router = useRouter();
 
@@ -83,6 +83,12 @@ export const PracticeSession = ({
   const isPlaying = timer.timerEnabled;
   const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
   const examModeObject = typeof examMode === 'object' ? examMode : undefined;
+  // In exam mode the metronome tempo is fixed: lock min === max === bpm so it
+  // can't be changed (slider/±/edit all clamp to this single value).
+  const lockedExamBpm = examModeObject ? examModeObject.requiredBpm : (isExamMode ? examBpm : undefined);
+  // Scale (theory) exams keep the metronome and backing-track controls visible —
+  // unlike regular exercise exams, the metronome is the audible guide here.
+  const isScaleExam = isExamMode && currentExercise.category === "theory";
 
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
@@ -137,10 +143,10 @@ export const PracticeSession = ({
   useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     examModeObject ? examModeObject.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
-    minBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.min,
-    maxBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.max,
-    recommendedBpm: examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.recommended,
+    initialBpm:     lockedExamBpm ?? (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
+    maxBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.max,
+    recommendedBpm: lockedExamBpm ?? activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
@@ -170,7 +176,11 @@ export const PracticeSession = ({
       nextAudioMuted = pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0);
     }
 
-    resetForExercise({ isAudioMuted: nextAudioMuted });
+    // In exam mode with a backing track, the backing guides the tempo, so the
+    // metronome click is redundant — mute it (it still runs to keep timing/sync).
+    const nextMetronomeMuted = isExamMode && !!currentExercise.examBacking;
+
+    resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted });
   }, [currentExercise.id]);
 
   const activeTablature = riddleMeasures
@@ -393,7 +403,7 @@ export const PracticeSession = ({
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
-        examMode={examModeObject} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
+        examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart}
         canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}

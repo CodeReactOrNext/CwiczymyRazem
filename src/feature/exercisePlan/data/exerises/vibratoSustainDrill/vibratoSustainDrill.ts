@@ -7,7 +7,7 @@ export const vibratoSustainDrillExercise: Exercise = {
   whyItMatters: "Developing clean vibrato requires complete physical control over finger and wrist movement. By introducing intentional rests, this exercise trains you to immediately activate and deactivate the vibrato technique at precise times without resetting your hand placement or drifting in pitch and tempo.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 56 / 60,
+  timeInMinutes: 54 / 60,
   instructions: [
     "Sustain each note cleanly before starting a steady, controlled pitch modulation.",
     "Maintain consistent width and speed throughout the duration of the note.",
@@ -29,7 +29,7 @@ export const vibratoSustainDrillExercise: Exercise = {
         { duration: 4, notes: [{ string: 2, fret: 7, isVibrato: true }] },
       ],
     },
-    // M2: B quarter (beat 1) → rest (beat 2) → B half note vibrato (beats 3-4)
+    // M2: B quarter (beat 1) → rest half note vibrato (beats 3-4)
     {
       timeSignature: [4, 4],
       beats: [

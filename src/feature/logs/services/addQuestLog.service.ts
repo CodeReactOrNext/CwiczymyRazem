@@ -29,7 +29,7 @@ export const firebaseAddQuestLog = async (uid: string) => {
       userAvatarFrame,
       avatarUrl,
       timestamp: new Date().toISOString(),
-      points: 30, // Reward points
+      points: 10, // Reward points
     };
 
     await trackedSetDoc(logsDocRef, logData);
@@ -44,7 +44,7 @@ export const firebaseAddQuestLog = async (uid: string) => {
             ...(avatarUrl && { icon_url: avatarUrl }),
           },
           title: "🌟 Daily Quests Completed!",
-          description: `**${userName}** has finished all daily challenges! \n\n**+30 PKT** rewards claimed!`,
+          description: `**${userName}** has finished all daily challenges! \n\n**+10 PKT** rewards claimed!`,
           color: 0xf1c40f, // Gold
           timestamp: new Date().toISOString(),
         }]
