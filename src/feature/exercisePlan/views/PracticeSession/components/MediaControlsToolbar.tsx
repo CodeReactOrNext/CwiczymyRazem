@@ -35,6 +35,9 @@ interface MediaControlsToolbarProps {
   disableTuner?: boolean;
   baseBpm?: number;
   trailing?: React.ReactNode;
+  examMode?: boolean;
+  /** Keep the backing-track (guitar) toggle available even in exam mode (e.g. scale exams). */
+  showBackingInExam?: boolean;
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -55,8 +58,16 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   disableTuner = false,
   baseBpm,
   trailing,
+  examMode = false,
+  showBackingInExam = false,
 }: MediaControlsToolbarProps) {
   const [isTunerOpen, setIsTunerOpen] = useState(false);
+
+  // In exam mode the speed control is always hidden (tempo is fixed). The backing
+  // track (guitar) toggle is hidden too, unless the exam explicitly keeps it
+  // (e.g. scale exams, where hearing the reference scale is allowed).
+  const showSpeed   = !examMode;
+  const showBacking = !examMode || showBackingInExam;
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
@@ -67,7 +78,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   if (compact) {
     return (
       <div className="flex flex-col gap-1.5">
-        {hasMetronome && (
+        {showSpeed && hasMetronome && (
           <SpeedDropdown
             compact
             speedMultiplier={speedMultiplier}
@@ -79,7 +90,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
         )}
 
         <div className="flex gap-1.5 flex-wrap">
-          {hasAudioTrack && (
+          {showBacking && hasAudioTrack && (
             <button
               onClick={onAudioToggle}
               disabled={isRiddleMode}
@@ -96,20 +107,22 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             </button>
           )}
 
-          {hasAudioTrack && hasMicControls && (
+          {showBacking && hasAudioTrack && hasMicControls && (
             <div className="h-8 w-px bg-white/10 self-center mx-0.5" aria-hidden />
           )}
 
           {hasMicControls && (
             <>
               <button
-                onClick={onMicToggle}
-                title={isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
+                onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+                disabled={examMode && isMicEnabled}
+                title={examMode && isMicEnabled ? "Pitch Detect required during exam" : isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
                 className={cn(
                   "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                   isMicEnabled
                     ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-                    : "bg-zinc-800 text-zinc-400 hover:text-white"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white",
+                  examMode && isMicEnabled && "cursor-not-allowed active:scale-100 hover:bg-emerald-950"
                 )}
               >
                 <FaMicrophone className="h-3 w-3" />
@@ -160,9 +173,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
       {/* ── PLAYBACK zone: speed + backing track ── */}
-      {(hasMetronome || hasAudioTrack) && (
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
         <div className="flex items-center gap-1.5">
-          {hasMetronome && (
+          {showSpeed && hasMetronome && (
             <SpeedDropdown
               speedMultiplier={speedMultiplier}
               onSpeedMultiplierChange={onSpeedMultiplierChange}
@@ -172,7 +185,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             />
           )}
 
-          {hasAudioTrack && (
+          {showBacking && hasAudioTrack && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -199,7 +212,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
       )}
 
       {/* ── Divider between playback and input zones ── */}
-      {(hasMetronome || hasAudioTrack) && hasMicControls && (
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && hasMicControls && (
         <div className="h-7 w-px bg-white/10 self-center" aria-hidden />
       )}
 
@@ -209,13 +222,15 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={onMicToggle}
+                onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+                disabled={examMode && isMicEnabled}
                 className={cn(
                   "flex items-center gap-2 px-4 rounded-lg transition-all font-semibold active:scale-95",
                   h,
                   isMicEnabled
                     ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-                    : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700",
+                  examMode && isMicEnabled && "cursor-not-allowed active:scale-100 hover:bg-emerald-950"
                 )}
               >
                 <FaMicrophone className="h-4 w-4 shrink-0" />
@@ -223,7 +238,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              {isMicEnabled
+              {examMode && isMicEnabled
+                ? "Pitch Detect required during the exam"
+                : isMicEnabled
                 ? "Microphone active — app is listening to your guitar"
                 : "Enable microphone to detect what you're playing"}
             </TooltipContent>

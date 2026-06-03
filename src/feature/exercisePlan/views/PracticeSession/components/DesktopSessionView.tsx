@@ -8,7 +8,6 @@ import React, { Dispatch, RefObject, SetStateAction } from "react";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.types";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
-import { ExamModeBanner } from "./ExamModeBanner";
 import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
 import { ExerciseInfoGrid } from "./ExerciseInfoGrid";
@@ -82,6 +81,8 @@ interface DesktopSessionViewProps {
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
   examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
+  isExamMode:               boolean;
+  isScaleExam:              boolean;
   exerciseKey:              number;
   isLastExercise:           boolean;
   handleRestart:            () => void;
@@ -114,11 +115,6 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   return (
     <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
-      {p.examMode && (
-        <ExamModeBanner
-          examMode={p.examMode}
-        />
-      )}
       <TooltipProvider>
         <div>
           <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8")}>
@@ -163,14 +159,16 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
                     disableTuner={p.currentExercise.disableTuner}
                     baseBpm={p.metronome?.bpm}
-                    trailing={<SpeedsMasteredButton exercise={p.currentExercise} examMode={!!p.examMode} />}
+                    examMode={p.isExamMode}
+                    showBackingInExam={p.isScaleExam}
+                    trailing={<SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />}
                   />
                   <ExerciseQuickActionsBar
                     exercise={p.currentExercise}
                     metronome={p.metronome}
                     isMetronomeMuted={p.isMetronomeMuted}
                     setIsMetronomeMuted={p.setIsMetronomeMuted}
-                    examMode={!!p.examMode}
+                    examMode={p.isExamMode}
                   />
                   <ExerciseContentArea
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
