@@ -1,10 +1,11 @@
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useTranslation } from "hooks/useTranslation";
-import { Globe, Lock } from "lucide-react";
+import { ArrowUpRight, Globe, Lock } from "lucide-react";
 import Image from "next/image";
+import type { ComponentType } from "react";
 import {
   FaBrain,
   FaClock,
@@ -13,7 +14,6 @@ import {
   FaLayerGroup,
   FaListUl,
   FaMusic,
-  FaPlay,
   FaTrashAlt,
   FaVideo,
   FaYoutube} from "react-icons/fa";
@@ -36,45 +36,57 @@ interface PlanCardProps {
 const categoryStyles = {
   technique: {
     gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-blue-500/20",
     icon: FaGuitar,
     text: "text-blue-400",
+    iconTile: "bg-blue-500/10 text-blue-400",
     badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    glow: "bg-blue-500/25",
+    cta: "group-hover:bg-blue-500 group-hover:text-zinc-950",
   },
   theory: {
     gradient: "from-emerald-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-emerald-500/20",
     icon: FaBrain,
     text: "text-emerald-400",
+    iconTile: "bg-emerald-500/10 text-emerald-400",
     badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    glow: "bg-emerald-500/25",
+    cta: "group-hover:bg-emerald-500 group-hover:text-zinc-950",
   },
   creativity: {
     gradient: "from-purple-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-purple-500/20",
     icon: FaMusic,
     text: "text-purple-400",
+    iconTile: "bg-purple-500/10 text-purple-400",
     badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    glow: "bg-purple-500/25",
+    cta: "group-hover:bg-purple-500 group-hover:text-zinc-950",
   },
   hearing: {
     gradient: "from-amber-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-amber-500/20",
     icon: FaMusic,
     text: "text-amber-400",
+    iconTile: "bg-amber-500/10 text-amber-400",
     badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    glow: "bg-amber-500/25",
+    cta: "group-hover:bg-amber-500 group-hover:text-zinc-950",
   },
   mixed: {
     gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-red-500/20",
     icon: FaLayerGroup,
     text: "text-red-400",
+    iconTile: "bg-red-500/10 text-red-400",
     badge: "bg-red-500/10 text-red-400 border-red-500/20",
+    glow: "bg-red-500/25",
+    cta: "group-hover:bg-red-500 group-hover:text-zinc-950",
   },
   playalong: {
     gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-red-500/30",
     icon: FaYoutube,
     text: "text-red-400",
+    iconTile: "bg-red-500/10 text-red-400",
     badge: "bg-red-500/10 text-red-400 border-red-500/20",
+    glow: "bg-red-500/25",
+    cta: "group-hover:bg-red-500 group-hover:text-zinc-950",
   },
 };
 
@@ -112,43 +124,73 @@ export const PlanCard = ({
   const hasPlayalong = plan.exercises.some(ex => ex.isPlayalong || ex.youtubeVideoId);
   const hasVideo = plan.exercises.some(ex => ex.videoUrl && !ex.youtubeVideoId);
 
-  const style = hasPlayalong ? categoryStyles.playalong : (categoryStyles[plan.category as keyof typeof categoryStyles] || categoryStyles.mixed);
-  const Icon = style.icon;
+  const categoryStyle = hasPlayalong ? categoryStyles.playalong : (categoryStyles[plan.category as keyof typeof categoryStyles] || categoryStyles.mixed);
+
+  // User-chosen appearance (last step of the wizard) overrides the category-derived defaults.
+  const colorOverride = getPlanColor(plan.color);
+  const style = colorOverride ?? categoryStyle;
+  const Icon: ComponentType<{ className?: string }> =
+    getPlanIcon(plan.icon) ?? categoryStyle.icon;
+
+  const isInteractive = isLocked ? !!onUpgrade : !!onSelect;
 
   return (
     <Card
       className={cn(
-        "relative flex flex-col justify-between overflow-hidden p-5 rounded-lg transition-background bg-gradient-to-br",
+        "group relative flex flex-col justify-between overflow-hidden p-5 rounded-lg transition-background bg-gradient-to-br",
         style.gradient,
         isLoading && "opacity-80 pointer-events-none",
-        isLocked ? "cursor-pointer" : "click-behavior"
+        !isLocked && "click-behavior",
+        isInteractive && "cursor-pointer"
       )}
       onClick={isLocked ? onUpgrade : onSelect}>
 
-      {/* Header: Category Icon & Badges */}
-      <div className="mb-3 flex items-start justify-between">
-        <div className="flex flex-wrap items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-zinc-950/50">
-                <Icon className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-400" : style.text)} />
-            </div>
-            <Badge variant="secondary" className={cn(
-              "capitalize tracking-wide px-2 py-0.5 text-[11px] font-medium",
-              isLocked ? "bg-zinc-800/80 text-zinc-300 border-zinc-700/50" : style.badge
-            )}>
-                {t(`exercises:categories.${plan.category}` as any)}
-            </Badge>
+      {/* Decorative accent glow — intensifies on hover */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl opacity-40 transition-opacity duration-500 group-hover:opacity-75",
+          isLocked ? "bg-zinc-500/15" : style.glow
+        )}
+      />
+      {/* Brand watermark — large accent glyph tucked into the top-right corner */}
+      <Icon
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute -right-6 -top-6 h-28 w-28 opacity-[0.12] transition-opacity duration-500 group-hover:opacity-[0.18]",
+          isLocked ? "text-zinc-500" : style.text
+        )}
+      />
 
+      {/* Header: Category Icon & Badges */}
+      <div className="relative mb-3 flex items-start justify-between">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <div className={cn(
+              "flex h-9 w-9 items-center justify-center rounded",
+              isLocked ? "bg-zinc-800/60 text-zinc-400" : style.iconTile
+            )}>
+                <Icon className="h-4 w-4" />
+            </div>
+            <span className="text-[11px] font-medium capitalize tracking-wide text-zinc-300">
+                {t(`exercises:categories.${plan.category}` as any)}
+            </span>
+
+            {!isLocked && (
+                <span className="text-[11px] font-medium capitalize tracking-wide text-zinc-500">
+                    {t(`exercises:difficulty.${difficulty}` as any)}
+                </span>
+            )}
             {hasPlayalong && !isLocked && (
-                <Badge title="Playalong" className="bg-zinc-800/80 text-zinc-400 border-transparent text-[11px] h-5 px-2 font-medium">
-                    <FaYoutube className="mr-1.5 h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
+                    <FaYoutube className="h-2.5 w-2.5" />
                     Playalong
-                </Badge>
+                </span>
             )}
             {hasVideo && !isLocked && (
-                <Badge title="Video" className="bg-zinc-800/80 text-zinc-400 border-transparent text-[11px] h-5 px-2 font-medium">
-                    <FaVideo className="mr-1.5 h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
+                    <FaVideo className="h-2.5 w-2.5" />
                     Video
-                </Badge>
+                </span>
             )}
         </div>
         <div className="flex items-center gap-2">
@@ -187,21 +229,17 @@ export const PlanCard = ({
                     )}
                 </div>
             )}
-            {isLocked ? (
+            {isLocked && (
               <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
                 <Lock className="h-3 w-3 text-amber-500" />
                 <span className="text-[11px] font-medium text-amber-500">Pro</span>
               </div>
-            ) : (
-              <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[11px] h-5 px-2 font-medium capitalize text-muted-foreground whitespace-nowrap">
-                  {t(`exercises:difficulty.${difficulty}` as any)}
-              </Badge>
             )}
         </div>
       </div>
 
       {/* Main Content with Avatar */}
-      <div className="flex gap-4">
+      <div className="relative flex gap-4">
         {plan.author && (
             <div className={cn(
               "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg",
@@ -225,7 +263,7 @@ export const PlanCard = ({
                 </span>
             )}
             <h3 className={cn(
-              "text-base font-bold leading-tight",
+              "font-display text-[17px] font-bold leading-tight tracking-tight",
               isLocked ? "text-foreground/90" : "text-foreground"
             )}>
                 {title}
@@ -240,52 +278,48 @@ export const PlanCard = ({
       </div>
 
       {/* Footer: Stats & Action */}
-      <div className="mt-4 flex items-center justify-between">
+      <div className="relative mt-5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-muted-foreground")}>
-                <FaClock className="h-3.5 w-3.5" />
+            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}>
+                <FaClock className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
                 <span>{totalDuration} min</span>
             </div>
-            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-muted-foreground")}>
-                <FaListUl className="h-3.5 w-3.5" />
+            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}>
+                <FaListUl className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
                 <span>{plan.exercises.length}</span>
             </div>
         </div>
 
         {isLocked ? (
-          <Button
-            size="sm"
-            className="h-8 px-3 text-xs font-semibold gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/25"
-            variant="outline"
+          <button
+            type="button"
+            aria-label="Upgrade to Pro"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 transition-colors duration-300 group-hover:bg-amber-500 group-hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
             onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
           >
-            <Lock className="h-3 w-3" />
-            Upgrade
-          </Button>
+            <Lock className="h-4 w-4" />
+          </button>
         ) : onStart && (
-           <Button
-            size="sm"
-            className="h-8 px-3 text-xs font-semibold transition-colors"
+          <button
+            type="button"
+            aria-label={startButtonText || "Start"}
+            className={cn(
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-200 transition-colors duration-300",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
+              style.cta
+            )}
             onClick={(e) => {
                 e.stopPropagation();
                 onStart();
             }}
             disabled={isLoading}
-           >
-            <span className="flex items-center gap-2">
-              {isLoading ? (
-                  <>
-                    <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Loading...</span>
-                  </>
-              ) : (
-                  <>
-                   <span>{startButtonText || "Start"}</span>
-                    <FaPlay className="ml-2 h-2 w-2" />
-                  </>
-              )}
-            </span>
-           </Button>
+          >
+            {isLoading ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              <ArrowUpRight className="h-4 w-4" />
+            )}
+          </button>
         )}
       </div>
     </Card>

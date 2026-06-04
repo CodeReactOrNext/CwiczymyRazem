@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
-import { getDisplayStreak, getPointsToLvlUp, getStreakFromActivityLog } from "utils/gameLogic";
+import { getPointsToLvlUp, getReconciledStreak } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
@@ -62,17 +62,16 @@ const ProfileLayout = ({
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
 
-  // Streak: same logic as the header — trust the stored counter, but heal it
-  // against the real logged practice days (immune to the old timezone reset).
-  const { didPracticeToday, dayWithoutBreak: storedStreak } = getDisplayStreak({
+  // Streak: same logic as the header — the activity log (local time) is the
+  // timezone-correct source of truth, with the stored counter as a fallback
+  // until the log loads. See getReconciledStreak.
+  const { dayWithoutBreak: streak } = getReconciledStreak({
     actualDayWithoutBreak: statistics.actualDayWithoutBreak || 0,
     lastReportDate,
+    reportDates: (reportList ?? []).map(
+      (report: { date: Date | string }) => report.date
+    ),
   });
-  const logStreak = getStreakFromActivityLog(
-    (reportList ?? []).map((report: { date: Date | string }) => report.date),
-    { includeToday: didPracticeToday }
-  );
-  const streak = reportList?.length ? Math.max(storedStreak, logStreak) : storedStreak;
 
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())

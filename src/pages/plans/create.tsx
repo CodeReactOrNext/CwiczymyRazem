@@ -24,7 +24,8 @@ const CreatePlanPage: NextPageWithLayout = () => {
     title: string,
     description: string,
     exercises: Exercise[],
-    isPublic: boolean
+    isPublic: boolean,
+    appearance?: { icon?: string; color?: string }
   ): Promise<void> => {
     try {
       if (!userAuth) return;
@@ -39,6 +40,8 @@ const CreatePlanPage: NextPageWithLayout = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
+        icon: appearance?.icon,
+        color: appearance?.color,
       });
 
       toast.success(t("exercises:my_plans.create_success") as string);
