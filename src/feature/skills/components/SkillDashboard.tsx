@@ -206,7 +206,7 @@ export const SkillDashboard = ({
 
   if (selectedChallenge) {
     return (
-      <div className="w-full min-h-[600px] bg-second-800 rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl relative">
+      <div className="w-full min-h-[600px] bg-zinc-900/40 rounded-lg overflow-hidden relative">
         <div className="absolute top-6 left-6 z-[100]">
            <Button 
             variant="ghost" 
@@ -239,7 +239,7 @@ export const SkillDashboard = ({
         className="w-full"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
-          <TabsList className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded p-1 w-fit h-auto">
+          <TabsList className="flex gap-1 bg-zinc-900 rounded p-1 w-fit h-auto">
             <TabsTrigger
               value="skill-tree"
               className="px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
@@ -302,10 +302,10 @@ export const SkillDashboard = ({
       <Sheet open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
           <SheetContent
             side="right"
-            className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col rounded-l-[8px] overflow-hidden"
+            className="w-full sm:max-w-xl p-0 bg-zinc-950 flex flex-col rounded-l-lg overflow-hidden"
           >
             {/* Header */}
-            <div className="flex-shrink-0 px-6 pt-5 pb-3 border-b border-zinc-900">
+            <div className="flex-shrink-0 px-6 pt-5 pb-4">
               <SheetTitle className="text-2xl font-bold text-white tracking-tight">
                 {selectedSkillName}
               </SheetTitle>
@@ -315,7 +315,7 @@ export const SkillDashboard = ({
               <>
                 {/* Difficulty tab buttons */}
                 <div className="flex-shrink-0 px-6 pt-4 pb-0">
-                  <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded p-1">
+                  <div className="flex gap-1 bg-zinc-900 rounded p-1">
                     {uniqueDifficulties.map((d) => {
                       const isActive = currentDifficulty === d;
                       const label = d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
@@ -372,7 +372,7 @@ export const SkillDashboard = ({
                         <div
                           key={challenge.id}
                           onClick={() => setShowUpgradeModal(true)}
-                          className="group flex rounded-[8px] border border-amber-500/20 bg-zinc-900/30 overflow-hidden transition-all duration-300 cursor-pointer hover:border-amber-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] relative"
+                          className="group flex rounded-lg border border-amber-500/20 bg-zinc-900/30 overflow-hidden transition-colors cursor-pointer hover:border-amber-500/50 hover:bg-zinc-900/60 relative"
                         >
                           <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5">
                             <div className="flex items-start justify-between gap-3">
@@ -394,10 +394,10 @@ export const SkillDashboard = ({
                         <div
                           key={challenge.id}
                           className={cn(
-                            "group flex rounded-[8px] border overflow-hidden transition-all duration-300 relative",
+                            "group flex rounded-lg overflow-hidden transition-background relative",
                             hasBeenAttempted
-                              ? "border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 hover:border-zinc-500 shadow-md shadow-black/40"
-                              : "border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700 shadow-sm shadow-black/20"
+                              ? "bg-zinc-900/80 hover:bg-zinc-800"
+                              : "bg-zinc-900/40 hover:bg-zinc-900/70"
                           )}
                         >
                           <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5 relative z-10">
@@ -408,7 +408,7 @@ export const SkillDashboard = ({
                             </div>
                             <button
                               onClick={() => handleStartChallenge(challenge)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-all flex-shrink-0 scale-95 group-hover:scale-100"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors flex-shrink-0"
                             >
                               <ChevronRight size={14} strokeWidth={2.5} />
                               Start
@@ -427,10 +427,10 @@ export const SkillDashboard = ({
 
                           {/* Metrics row */}
                           {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0) || hasLeaderboard) && (
-                            <div className="flex flex-wrap items-center gap-5 pt-3.5 mt-3 border-t border-zinc-800/40">
+                            <div className="flex flex-wrap items-center gap-5 pt-4 mt-3">
                               {hasBpmProgress && (
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-zinc-300">
-                                  <FaCheck className="h-3.5 w-3.5 text-main-400" />
+                                  <FaCheck className="h-3.5 w-3.5 text-emerald-400" />
                                   {completedBpms.length}/{bpmStages.length} BPM
                                 </div>
                               )}
@@ -454,7 +454,7 @@ export const SkillDashboard = ({
                                 <div className="flex-1 flex justify-end">
                                   <button
                                     onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
-                                    className="inline-flex items-center gap-2 text-[11px] font-bold capitalize tracking-wider px-3 py-1.5 rounded border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-all shadow-sm"
+                                    className="inline-flex items-center gap-2 text-[11px] font-bold capitalize tracking-wider px-3 py-1.5 rounded border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-colors"
                                   >
                                     <Trophy className="h-4 w-4" />
                                     <span className={cn(hasBeenAttempted ? "" : "opacity-0 invisible w-0")}>Leaderboard</span>

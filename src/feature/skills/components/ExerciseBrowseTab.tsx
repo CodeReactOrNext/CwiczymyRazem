@@ -8,7 +8,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { Trophy, ChevronLeft, ChevronRight, Ear, Info, Mic, Search, Lock } from "lucide-react";
+import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 
@@ -45,12 +45,17 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
 const DIFFICULTIES = ["all", "easy", "medium", "hard"] as const;
 
+type SortKey = "default" | "name" | "difficulty" | "time";
+const DIFFICULTY_RANK: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
+const exTitle = (ex: { title: unknown; id: string }): string =>
+  typeof ex.title === "string" ? ex.title : ((ex.title as any)?.en ?? ex.id);
+
 const filterPill = (active: boolean) =>
   cn(
-    "px-3 py-1 rounded text-[11px] font-semibold border transition-all capitalize whitespace-nowrap",
+    "px-3 py-1 rounded text-[11px] font-semibold transition-colors capitalize whitespace-nowrap",
     active
-      ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-      : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
+      ? "bg-cyan-500/15 text-cyan-300"
+      : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
   );
 
 export const ExerciseBrowseTab = ({
@@ -69,6 +74,17 @@ export const ExerciseBrowseTab = ({
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
   const [isLoadingRanks, setIsLoadingRanks] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("default");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const toggleSort = (key: Exclude<SortKey, "default">) => {
+    if (sortKey === key) {
+      setSortDir(d => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
 
   const availableSkills = useMemo(() => {
     const skillSet = new Set<GuitarSkillId>();
@@ -100,21 +116,26 @@ export const ExerciseBrowseTab = ({
         return true;
       })
       .sort((a, b) => {
+        const dir = sortDir === "asc" ? 1 : -1;
+        if (sortKey === "name") return exTitle(a).localeCompare(exTitle(b)) * dir;
+        if (sortKey === "difficulty")
+          return ((DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99)) * dir;
+        if (sortKey === "time")
+          return ((a.timeInMinutes ?? 0) - (b.timeInMinutes ?? 0)) * dir;
+        // default: attempted first, then alphabetical
         const aAttempted = !!progressMap.get(a.id);
         const bAttempted = !!progressMap.get(b.id);
         if (aAttempted !== bAttempted) return aAttempted ? -1 : 1;
-        const aTitle = typeof a.title === "string" ? a.title : (a.title as any)?.en ?? "";
-        const bTitle = typeof b.title === "string" ? b.title : (b.title as any)?.en ?? "";
-        return aTitle.localeCompare(bTitle);
+        return exTitle(a).localeCompare(exTitle(b));
       });
-  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, progressMap]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, progressMap, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageExercises = filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   // reset to page 1 whenever filters change
-  useEffect(() => { setPage(1); }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill]);
+  useEffect(() => { setPage(1); }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, sortKey, sortDir]);
 
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -172,12 +193,41 @@ export const ExerciseBrowseTab = ({
     };
   };
 
+  const renderSortHead = (
+    col: Exclude<SortKey, "default">,
+    label: string,
+    align: "left" | "right" = "left",
+  ) => {
+    const active = sortKey === col;
+    return (
+      <th className={cn("px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500", align === "right" ? "text-right" : "text-left")}>
+        <button
+          onClick={() => toggleSort(col)}
+          className={cn(
+            "group/sort inline-flex items-center gap-1 rounded transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
+            align === "right" && "flex-row-reverse",
+            active && "text-zinc-300",
+          )}
+        >
+          {label}
+          {active ? (
+            sortDir === "asc"
+              ? <ChevronUp className="h-3 w-3 text-cyan-400" />
+              : <ChevronDown className="h-3 w-3 text-cyan-400" />
+          ) : (
+            <ChevronsUpDown className="h-3 w-3 opacity-0 transition-opacity group-hover/sort:opacity-50" />
+          )}
+        </button>
+      </th>
+    );
+  };
+
   return (
     <TooltipProvider delayDuration={300}>
     <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-6 pb-24 flex flex-col gap-5">
 
       {/* ── Filters bar ── */}
-      <div className="flex flex-col gap-3 bg-zinc-900/60 border border-zinc-800 rounded px-5 py-4">
+      <div className="flex flex-col gap-3 bg-zinc-900/60 rounded-lg px-5 py-4">
 
         {/* Search */}
         <div className="relative">
@@ -186,7 +236,7 @@ export const ExerciseBrowseTab = ({
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search exercises…"
-            className="w-full pl-9 pr-4 h-9 rounded bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+            className="w-full pl-9 pr-4 h-9 rounded-lg bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-colors"
           />
         </div>
 
@@ -254,16 +304,32 @@ export const ExerciseBrowseTab = ({
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded border border-zinc-800">
+        <div className="overflow-x-auto rounded-lg border border-zinc-800">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900/80">
-                <th className="text-left px-4 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Name</th>
+                <th className="text-left px-4 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">
+                  <button
+                    onClick={() => toggleSort("name")}
+                    className={cn(
+                      "group/sort inline-flex items-center gap-1 rounded transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
+                      sortKey === "name" && "text-zinc-300",
+                    )}
+                  >
+                    Name
+                    {sortKey === "name" ? (
+                      sortDir === "asc"
+                        ? <ChevronUp className="h-3 w-3 text-cyan-400" />
+                        : <ChevronDown className="h-3 w-3 text-cyan-400" />
+                    ) : (
+                      <ChevronsUpDown className="h-3 w-3 opacity-0 transition-opacity group-hover/sort:opacity-50" />
+                    )}
+                  </button>
+                </th>
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Category</th>
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Difficulty</th>
+                {renderSortHead("difficulty", "Difficulty")}
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Bpm</th>
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Min</th>
+                {renderSortHead("time", "Time", "right")}
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Rank</th>
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500 min-w-[160px]">Progress</th>
                 <th className="px-3 py-3 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
@@ -276,7 +342,6 @@ export const ExerciseBrowseTab = ({
                 const bpmStages = exercise.metronomeSpeed ? generateBpmStages(exercise.metronomeSpeed) : [];
                 const completedBpms = progress?.completedBpms || [];
                 const micScore = progress?.micHighScore;
-                const micAccuracy = progress?.micHighScoreAccuracy;
                 const earScore = progress?.earTrainingHighScore;
                 const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
                 const hasBeenAttempted = !!progress && (
@@ -291,12 +356,14 @@ export const ExerciseBrowseTab = ({
                 const skillData = skillId ? guitarSkills.find(s => s.id === skillId) : null;
                 const SkillIcon = skillData?.icon;
                 const bpmPct = hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0;
+                const hasLeaderboard = bpmStages.length > 0 || !!exercise.riddleConfig || (!!exercise.tablature && exercise.tablature.length > 0);
 
                 return (
                   <tr
                     key={exercise.id}
+                    onClick={() => setPreviewExercise(exercise as Exercise)}
                     className={cn(
-                      "border-b border-zinc-800/50 transition-colors",
+                      "border-b border-zinc-800/50 cursor-pointer transition-colors",
                       hasBeenAttempted
                         ? "bg-zinc-900/60 hover:bg-zinc-800/80"
                         : "bg-zinc-950/40 hover:bg-zinc-900/60"
@@ -306,13 +373,13 @@ export const ExerciseBrowseTab = ({
                     <td className="px-4 py-3.5">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 max-w-[220px] cursor-default">
+                          <div className="flex items-center gap-2 cursor-pointer">
                             {hasBeenAttempted && (
                               <div className="flex-shrink-0 flex items-center justify-center bg-emerald-500/10 rounded-full h-4 w-4 border border-emerald-500/20">
                                 <FaCheck className="h-2 w-2 text-emerald-400" />
                               </div>
                             )}
-                            <span className={cn("font-semibold leading-snug truncate", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
+                            <span className={cn("font-semibold leading-snug", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
                               {title}
                             </span>
                             {isLocked && (
@@ -335,14 +402,14 @@ export const ExerciseBrowseTab = ({
 
                     {/* Category */}
                     <td className="px-3 py-3.5">
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed)}>
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium capitalize tracking-wider border", CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed)}>
                         {exercise.category}
                       </span>
                     </td>
 
                     {/* Difficulty */}
                     <td className="px-3 py-3.5">
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", DIFFICULTY_COLORS[exercise.difficulty])}>
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium capitalize tracking-wider border", DIFFICULTY_COLORS[exercise.difficulty])}>
                         {exercise.difficulty}
                       </span>
                     </td>
@@ -359,19 +426,11 @@ export const ExerciseBrowseTab = ({
                       )}
                     </td>
 
-                    {/* BPM */}
-                    <td className="px-3 py-3.5 text-zinc-500 text-xs font-mono whitespace-nowrap">
-                      {exercise.metronomeSpeed
-                        ? `${exercise.metronomeSpeed.min}–${exercise.metronomeSpeed.max}`
-                        : <span className="text-zinc-700">—</span>
-                      }
-                    </td>
-
-                    {/* Min */}
-                    <td className="px-3 py-3.5 text-zinc-500 text-xs">
+                    {/* Time */}
+                    <td className="px-3 py-3.5 text-right text-zinc-500 text-xs tabular-nums whitespace-nowrap">
                       {exercise.timeInMinutes < 1
-                        ? `${Math.round(exercise.timeInMinutes * 60)}s`
-                        : `${exercise.timeInMinutes}`
+                        ? `${Math.round(exercise.timeInMinutes * 60)} s`
+                        : `${exercise.timeInMinutes} min`
                       }
                     </td>
 
@@ -382,15 +441,15 @@ export const ExerciseBrowseTab = ({
                       ) : leaderboardRanks[exercise.id] ? (
                         <button
                           onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
-                          className="flex items-center gap-2 group/rank cursor-pointer hover:opacity-80 transition-opacity"
+                          className="flex items-center gap-2 group/rank cursor-pointer rounded hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
                           title="View Leaderboard"
                         >
                           <div className={cn(
-                            "flex items-center justify-center w-6 h-6 rounded border font-bold text-[11px] shadow-sm transition-all group-hover/rank:scale-110 group-hover/rank:border-white/30",
-                            leaderboardRanks[exercise.id] === 1 ? "bg-amber-500/20 border-amber-500/40 text-amber-500 shadow-amber-500/10" :
-                            leaderboardRanks[exercise.id] === 2 ? "bg-zinc-300/20 border-zinc-300/40 text-zinc-300 shadow-zinc-300/10" :
-                            leaderboardRanks[exercise.id] === 3 ? "bg-amber-700/20 border-amber-700/40 text-amber-600 shadow-amber-700/10" :
-                            "bg-zinc-800/40 border-zinc-700/50 text-zinc-400"
+                            "flex items-center justify-center w-6 h-6 rounded font-bold text-[11px] transition-colors",
+                            leaderboardRanks[exercise.id] === 1 ? "bg-amber-500/20 text-amber-500" :
+                            leaderboardRanks[exercise.id] === 2 ? "bg-zinc-300/20 text-zinc-300" :
+                            leaderboardRanks[exercise.id] === 3 ? "bg-amber-700/20 text-amber-600" :
+                            "bg-zinc-800/40 text-zinc-400"
                           )}>
                             {leaderboardRanks[exercise.id]}
                           </div>
@@ -402,49 +461,20 @@ export const ExerciseBrowseTab = ({
 
                     {/* Progress */}
                     <td className="px-3 py-3.5">
-                      {!hasBeenAttempted ? (
-                        <span className="text-zinc-700 text-xs">—</span>
-                      ) : (
-                        <div className="flex flex-col gap-1.5">
-                          {hasBpmProgress && (
-                            <div className="flex flex-col gap-0.5">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[11px] font-bold text-zinc-300 tabular-nums">
-                                  {completedBpms.length}/{bpmStages.length} BPM
-                                </span>
-                                <span className="text-[10px] text-zinc-600">({bpmPct}%)</span>
-                              </div>
-                              <div className="h-1 w-24 rounded-full bg-zinc-800 overflow-hidden">
-                                <div
-                                  className="h-full rounded-full bg-zinc-600 transition-all"
-                                  style={{ width: `${bpmPct}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                          {micScore != null && micScore > 0 && (
-                            <div className="flex items-center gap-1.5">
-                              <Mic className="h-3 w-3 text-zinc-500 shrink-0" />
-                              <span className="text-[11px] font-semibold text-zinc-200 tabular-nums">
-                                {micScore.toLocaleString()} pts
-                              </span>
-                              {micAccuracy != null && (
-                                <span className="text-[10px] text-zinc-500">({micAccuracy}%)</span>
-                              )}
-                            </div>
-                          )}
-                          {earScore != null && earScore > 0 && (
-                            <div className="flex items-center gap-1.5">
-                              <Ear className="h-3 w-3 text-zinc-500 shrink-0" />
-                              <span className="text-[11px] font-semibold text-zinc-200 tabular-nums">
-                                {earScore.toLocaleString()} pts
-                              </span>
-                            </div>
-                          )}
-                          {!hasBpmProgress && micScore == null && earScore == null && (
-                            <span className="text-[11px] text-zinc-400 font-semibold">Done</span>
-                          )}
+                      {hasBpmProgress ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-1 w-20 rounded-full bg-zinc-800 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-zinc-500 transition-all"
+                              style={{ width: `${bpmPct}%` }}
+                            />
+                          </div>
+                          <span className="text-[11px] font-bold text-zinc-300 tabular-nums">{bpmPct}%</span>
                         </div>
+                      ) : hasBeenAttempted ? (
+                        <span className="text-[11px] font-semibold text-zinc-400">Done</span>
+                      ) : (
+                        <span className="text-zinc-700 text-xs">—</span>
                       )}
                     </td>
 
@@ -453,23 +483,33 @@ export const ExerciseBrowseTab = ({
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={(e) => { e.stopPropagation(); setPreviewExercise(exercise as Exercise); }}
-                          className="flex items-center justify-center h-7 w-7 rounded border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/60 transition-all"
+                          className="flex items-center justify-center h-7 w-7 rounded bg-zinc-800/40 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
                           title="Exercise details"
                         >
                           <Info size={13} />
                         </button>
+                        {hasLeaderboard && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
+                            className="flex items-center justify-center h-7 w-7 rounded bg-zinc-800/40 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+                            title="Leaderboard"
+                            aria-label="Leaderboard"
+                          >
+                            <Trophy size={13} />
+                          </button>
+                        )}
                         {isLocked ? (
                           <button
-                            onClick={onShowUpgrade}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition-colors"
+                            onClick={(e) => { e.stopPropagation(); onShowUpgrade(); }}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
                           >
                             <Lock size={10} />
                             Pro
                           </button>
                         ) : (
                           <button
-                            onClick={() => onStartExercise(buildChallenge(exercise))}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-all scale-95 hover:scale-100"
+                            onClick={(e) => { e.stopPropagation(); onStartExercise(buildChallenge(exercise)); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900"
                           >
                             <ChevronRight size={12} strokeWidth={2.5} />
                             Start

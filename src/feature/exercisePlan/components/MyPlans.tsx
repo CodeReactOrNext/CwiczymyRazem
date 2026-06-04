@@ -14,7 +14,7 @@ import { FaPlus } from "react-icons/fa";
 import { BookOpen, Flame, Music, Zap } from "lucide-react";
 
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-import { selectUserAuth, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { useRouter } from "next/router";
@@ -71,6 +71,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
   const [internalTab, setInternalTab] = useState(
@@ -191,6 +192,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       await updateExercisePlan(planId, {
         isPublic: newIsPublic,
         authorUsername: userName ?? undefined,
+        authorAvatar: userAvatar ?? undefined,
       });
       toast.success(newIsPublic ? "Plan published to community" : "Plan unpublished");
     } catch (error) {
