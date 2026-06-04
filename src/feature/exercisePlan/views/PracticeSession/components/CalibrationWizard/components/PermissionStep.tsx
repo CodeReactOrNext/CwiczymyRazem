@@ -26,8 +26,8 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-        <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-          <img src="/images/calibration/perm.png" alt="Microphone Permission" className="w-full h-full object-cover" />
+        <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] bg-zinc-900/60 flex items-center justify-center">
+          <FaMicrophone className="text-6xl text-emerald-400/80" />
         </div>
 
         <div className="space-y-3 max-w-[280px]">

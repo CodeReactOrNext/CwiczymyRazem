@@ -452,7 +452,7 @@ const FirebaseLogsItem = ({
   onPreviewExercise: (exercise: Exercise) => void;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
   const date = new Date(timestamp as string);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
@@ -575,10 +575,21 @@ const FirebaseLogsItem = ({
           )}
 
           {songTitle && songArtist && (
+            songId ? (
+              <Link
+                href={`/songs?view=management&songId=${songId}`}
+                title="Click to open this song"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
+                <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+              </Link>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
                 <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
                 <span className="font-medium">{songArtist} - {songTitle}</span>
               </span>
+            )
           )}
 
           </div>
