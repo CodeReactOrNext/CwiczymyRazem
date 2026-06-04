@@ -26,7 +26,6 @@ import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights
 import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
 import { StatsSection } from "./components/StatsSection";
-import { UserRecordingsSection } from "./components/UserRecordingsSection";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -268,7 +267,7 @@ const ProfileLayout = ({
 
         {/* Skills Section */}
         {userSkills && (
-          <div className='rounded-2xl bg-zinc-900/30 p-6'>
+          <div className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'>
             <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
@@ -277,16 +276,13 @@ const ProfileLayout = ({
         {/* Arsenal Section */}
         <ProfileArsenal userAuth={userAuth} />
 
-        {/* Recordings Section */}
-        <UserRecordingsSection userId={userAuth} />
-
         {/* Achievement Sections */}
         <div className='space-y-8'>
-          <SeasonalAchievements userId={userAuth} />
+          <SeasonalAchievements userId={userAuth} hideWhenEmpty />
 
           <div className='space-y-4 px-2'>
             <div className='flex items-center gap-2'>
-              <h2 className='text-xl font-bold text-white uppercase tracking-wider'>Achievements</h2>
+              <h2 className='text-xl font-bold text-white capitalize tracking-wider'>Achievements</h2>
               <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
                 {achievements?.length || 0}
               </span>
