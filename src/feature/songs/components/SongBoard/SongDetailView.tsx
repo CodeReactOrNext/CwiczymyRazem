@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
@@ -111,6 +112,7 @@ const LegendItem = ({ color, label, glow }: { color: string; label: string; glow
 export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onBack }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const userAuth = useAppSelector(selectUserAuth);
   const [isRating, setIsRating] = useState(false);
   const [sections, setSections] = useState<SongSection[]>([]);
@@ -125,6 +127,12 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   // Show the optimistic value immediately, fall back to what the store has persisted.
   const userRating = optimisticRating ?? persistedRating;
   const tier = getSongTier(song.tier || avgDifficulty);
+
+  // Reset the optimistic override when switching to a different song,
+  // otherwise the previous song's rating would linger in the box.
+  useEffect(() => {
+    setOptimisticRating(null);
+  }, [song.id]);
 
   // Once the store catches up with our optimistic value, drop the local override.
   useEffect(() => {
@@ -145,6 +153,10 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
         artist: song.artist,
         tier: tier.tier
       }));
+      // Drop the cached song lists so re-opening this song shows the fresh rating
+      // instead of a stale snapshot (react-query caches songs for 5 min).
+      queryClient.invalidateQueries({ queryKey: ["songs"] });
+      queryClient.invalidateQueries({ queryKey: ["user-songs"] });
     } catch (error) {
       console.error("Error rating song:", error);
       setOptimisticRating(null); // rollback on failure

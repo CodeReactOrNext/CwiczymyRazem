@@ -353,7 +353,7 @@ const FirebaseLogsSongItem = ({
           </p>
           {showRating && ratingTier && (
             <span
-              className="inline-flex items-center gap-1 rounded-[8px] border px-1.5 py-0.5 text-[10px] font-bold"
+              className="inline-flex items-center gap-1 rounded-[4px] border px-1.5 py-0.5 text-[10px] font-bold"
               style={{
                 color: ratingTier.color,
                 backgroundColor: `${ratingTier.color}1a`,
