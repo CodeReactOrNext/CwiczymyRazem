@@ -7,7 +7,14 @@ import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 export const makeRatingData = (
   data: ReportFormikInterface,
   totalTime: number,
-  actualDayWithoutBreak: number
+  actualDayWithoutBreak: number,
+  // The client's real "now" instant (full timestamp, with time-of-day). Anchoring
+  // reportDate to the client clock — the same source as clientTodayISO — keeps the
+  // stored date on the user's intended local day regardless of the server's
+  // timezone, while preserving the time-of-day so viewer-local rendering (charts,
+  // summary) reconverts correctly. Must NOT be UTC-midnight: that would render a
+  // day early for users behind UTC.
+  now: Date = new Date()
 ) => {
   const streak = actualDayWithoutBreak;
   const multipler = getDailyStreakMultiplier(streak);
@@ -21,8 +28,8 @@ export const makeRatingData = (
   return {
     totalPoints: totalPoints,
     reportDate: data.countBackDays
-      ? getDateFromPast(data.countBackDays)
-      : new Date(),
+      ? getDateFromPast(data.countBackDays, now)
+      : now,
     bonusPoints: {
       streak: streak,
       multiplier: multipler,
