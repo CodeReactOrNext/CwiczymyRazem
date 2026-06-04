@@ -453,7 +453,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                  />
                               </div>
                            </TooltipTrigger>
-                           <TooltipContent className="bg-zinc-950 shadow-2xl">
+                           <TooltipContent className="bg-zinc-950 text-zinc-100 shadow-2xl">
                               {userRating !== undefined
                                  ? `You rated this song ${userRating}/10 — click a star to change it`
                                  : "Click a star to rate this song's difficulty (1–10)"}
