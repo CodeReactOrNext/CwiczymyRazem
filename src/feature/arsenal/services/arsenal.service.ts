@@ -26,9 +26,9 @@ export const fetchInventory = async (): Promise<ArsenalUserData & { fame: number
   return data;
 };
 
-export const equipGuitar = async (guitarId: number | string): Promise<void> => {
+export const equipGuitar = async (guitarId: number | string, itemId?: string): Promise<void> => {
   const idToken = await getIdToken();
-  await axios.post("/api/arsenal/equip-guitar", { idToken, guitarId });
+  await axios.post("/api/arsenal/equip-guitar", { idToken, guitarId, itemId });
 };
 
 export const clearNewFlags = async (): Promise<void> => {

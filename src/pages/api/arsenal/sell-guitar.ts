@@ -61,16 +61,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Remove item from inventory
     const newInventory = inventory.filter((_: any, i: number) => i !== itemIndex);
 
-    // Clear equipped guitar if selling it
+    // Clear equipped guitar if selling the equipped item
     let equippedGuitarId = data.arsenal?.equippedGuitarId;
-    if (equippedGuitarId === item.guitarId) {
+    let equippedItemId = data.arsenal?.equippedItemId ?? null;
+    const sellingEquipped = equippedItemId
+      ? equippedItemId === item.id
+      : equippedGuitarId === item.guitarId;
+    if (sellingEquipped) {
       equippedGuitarId = null;
+      equippedItemId = null;
     }
 
     // Update user data
     await userRef.update({
       "arsenal.inventory": newInventory,
       "arsenal.equippedGuitarId": equippedGuitarId,
+      "arsenal.equippedItemId": equippedItemId,
       "statistics.fame": (data.statistics?.fame || 0) + fameReward,
     });
 
