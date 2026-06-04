@@ -27,8 +27,9 @@ import type {
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { Video, ExternalLink } from "lucide-react";
+import { Video, ExternalLink, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
@@ -322,9 +323,11 @@ const FirebaseLogsSongItem = ({
   currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame } = log;
+  const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame, difficulty_rate } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status, t);
+  const showRating = status === "difficulty_rate" && difficulty_rate !== undefined;
+  const ratingTier = showRating ? getSongTier(difficulty_rate as number) : null;
 
   return (
     <LogItem isNew={isNew}>
@@ -348,6 +351,20 @@ const FirebaseLogsSongItem = ({
             )}
             {status !== "difficulty_rate" && "."}
           </p>
+          {showRating && ratingTier && (
+            <span
+              className="inline-flex items-center gap-1 rounded-[8px] border px-1.5 py-0.5 text-[10px] font-bold"
+              style={{
+                color: ratingTier.color,
+                backgroundColor: `${ratingTier.color}1a`,
+                borderColor: `${ratingTier.color}40`,
+              }}
+              title={`Difficulty rated ${difficulty_rate}/10 (${ratingTier.label})`}
+            >
+              <Star className="h-2.5 w-2.5 fill-current" />
+              {difficulty_rate}/10
+            </span>
+          )}
         </div>
 
         <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">

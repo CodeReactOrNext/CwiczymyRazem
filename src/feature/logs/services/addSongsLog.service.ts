@@ -40,6 +40,8 @@ export const firebaseAddSongsLog = async (
     status,
     avatarUrl: avatarUrl || userData.avatar || null,
     userAvatarFrame,
+    // Firestore rejects `undefined`, so only attach the rating when present.
+    ...(difficulty_rate !== undefined && { difficulty_rate }),
     timestamp: new Date().toISOString(),
   };
 
