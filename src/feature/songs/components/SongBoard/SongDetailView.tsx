@@ -20,9 +20,10 @@ import {
   TooltipTrigger 
 } from "assets/components/ui/tooltip";
 import { 
-  Clock, 
-  Music, 
-  Play, 
+  Check,
+  Clock,
+  Music,
+  Play,
   Star, 
   Target, 
   Trash2,
@@ -117,16 +118,28 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const [isSaving, setIsSaving] = useState(false);
   const [raterProfiles, setRaterProfiles] = useState<Record<string, { displayName: string; avatar: string; lvl: number }>>({});
   
+  const [optimisticRating, setOptimisticRating] = useState<number | null>(null);
+
   const avgDifficulty = song.avgDifficulty || 0;
-  const userRating = song.difficulties?.find(d => d.userId === userAuth)?.rating;
+  const persistedRating = song.difficulties?.find(d => d.userId === userAuth)?.rating;
+  // Show the optimistic value immediately, fall back to what the store has persisted.
+  const userRating = optimisticRating ?? persistedRating;
   const tier = getSongTier(song.tier || avgDifficulty);
-  
+
+  // Once the store catches up with our optimistic value, drop the local override.
+  useEffect(() => {
+    if (optimisticRating !== null && persistedRating === optimisticRating) {
+      setOptimisticRating(null);
+    }
+  }, [persistedRating, optimisticRating]);
+
   const handleRate = async (rating: number) => {
     if (!userAuth || !song.id || isRating) return;
     setIsRating(true);
+    setOptimisticRating(rating);
     try {
-      await dispatch(rateSong({ 
-        songId: song.id, 
+      await dispatch(rateSong({
+        songId: song.id,
         rating,
         title: song.title,
         artist: song.artist,
@@ -134,6 +147,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
       }));
     } catch (error) {
       console.error("Error rating song:", error);
+      setOptimisticRating(null); // rollback on failure
     } finally {
       setIsRating(false);
     }
@@ -405,24 +419,49 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                   <div className="group/rate px-1">
                      <div className="flex items-center justify-between mb-3">
                         <p className="text-[10px] font-semibold text-zinc-400">My rating</p>
-                        {isRating && <div className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />}
+                        {isRating ? (
+                           <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-cyan-400">
+                              <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                              Saving…
+                           </span>
+                        ) : userRating !== undefined ? (
+                           <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400">
+                              <Check size={11} strokeWidth={3} />
+                              Rated
+                           </span>
+                        ) : (
+                           <span className="inline-flex items-center gap-1 rounded-[8px] border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400 animate-pulse">
+                              Tap to rate
+                           </span>
+                        )}
                      </div>
-                     <div className="flex items-center justify-between">
-                        <span className={cn(
-                           "text-4xl font-black transition-colors leading-none",
-                           userRating !== undefined ? "text-white" : "text-zinc-700"
-                        )}>
-                           {userRating !== undefined ? userRating : "--"}
-                        </span>
-                        <StarRatingDisplay 
-                           rating={userRating || 0} 
-                           color={userRating !== undefined ? getSongTier(userRating).color : "#52525b"} 
-                           size={20} 
-                           onRate={handleRate}
-                        />
-                     </div>
-                     <p className="text-[9px] text-zinc-600 mt-3 opacity-0 group-hover/rate:opacity-100 transition-opacity">
-                        Click stars to {userRating !== undefined ? "change" : "set"} your rating
+                     <TooltipProvider>
+                        <Tooltip>
+                           <TooltipTrigger asChild>
+                              <div className="flex items-center justify-between cursor-pointer rounded-lg -mx-1 px-1 py-1 transition-colors hover:bg-white/5">
+                                 <span className={cn(
+                                    "text-4xl font-black transition-colors leading-none",
+                                    userRating !== undefined ? "text-white" : "text-zinc-700"
+                                 )}>
+                                    {userRating !== undefined ? userRating : "--"}
+                                 </span>
+                                 <StarRatingDisplay
+                                    rating={userRating || 0}
+                                    color={userRating !== undefined ? getSongTier(userRating).color : "#52525b"}
+                                    size={20}
+                                    onRate={handleRate}
+                                 />
+                              </div>
+                           </TooltipTrigger>
+                           <TooltipContent className="bg-zinc-950 shadow-2xl">
+                              {userRating !== undefined
+                                 ? `You rated this song ${userRating}/10 — click a star to change it`
+                                 : "Click a star to rate this song's difficulty (1–10)"}
+                           </TooltipContent>
+                        </Tooltip>
+                     </TooltipProvider>
+                     <p className="text-[9px] text-zinc-500 mt-3 transition-opacity">
+                        Click the stars to {userRating !== undefined ? "change" : "set"} your rating
                      </p>
                   </div>
 

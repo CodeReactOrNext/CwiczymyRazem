@@ -1,6 +1,4 @@
 import { cn } from "assets/lib/utils";
-import { ChevronDown, ChevronUp, Lock, Unlock } from "lucide-react";
-import React, { useEffect, useState } from "react";
 import { FaCheck, FaInfoCircle, FaLightbulb, FaSignal, FaGraduationCap, FaHeart, FaExternalLinkAlt, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -26,12 +24,10 @@ const skillLabel = (id?: string) => {
   }
 };
 
-export const ExerciseInstructionsInline = ({ 
-  exercise, isPlaying, rewardSkillId, rewardAmount 
+export const ExerciseInstructionsInline = ({
+  exercise, rewardSkillId, rewardAmount
 }: ExerciseInstructionsInlineProps) => {
   const { t } = useTranslation("skills");
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [isLocked, setIsLocked] = useState(false);
   const hasInstructions = !!(exercise.instructions?.length || exercise.tips?.length);
   const hasLinks = !!(exercise.links && exercise.links.length > 0);
   const isPlayalong = !!exercise.isPlayalong;
@@ -58,16 +54,6 @@ export const ExerciseInstructionsInline = ({
     if (skillTranslated !== `skills.${id}.name`) return skillTranslated;
     return skillLabel(id);
   };
-
-  useEffect(() => {
-    // When locked, keep the panel open regardless of play state
-    if (isLocked) return;
-    if (isPlaying) {
-      setIsExpanded(false);
-    } else {
-      setIsExpanded(true);
-    }
-  }, [isPlaying, isLocked]);
 
   if (!hasInstructions && !displayAmount && !hasLinks) return null;
 
@@ -109,52 +95,14 @@ export const ExerciseInstructionsInline = ({
 
   return (
     <div className="w-full overflow-hidden text-left">
-      <div className="w-full px-6 py-3 flex items-center justify-between transition-colors hover:bg-white/[0.02]">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-4 group flex-1 text-left"
-        >
-          <div className="flex items-center gap-2.5 text-zinc-500 group-hover:text-zinc-300 transition-colors">
-            <FaInfoCircle size={14} className={cn(isExpanded ? "text-zinc-400" : "")} />
-            <span className="text-xs font-bold text-zinc-400 group-hover:text-zinc-300 transition-colors">Exercise Instructions</span>
-          </div>
-        </button>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setIsLocked((v) => !v)}
-            title={isLocked ? "Unlock — auto-collapse while playing" : "Lock open — keep instructions open while playing"}
-            className={cn(
-              "p-1.5 rounded-md transition-colors",
-              isLocked
-                ? "text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20"
-                : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.04]"
-            )}
-          >
-            {isLocked ? <Lock size={14} /> : <Unlock size={14} />}
-          </button>
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 text-zinc-600 hover:text-zinc-400 transition-colors"
-          >
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
+      <div className="w-full px-6 py-3 flex items-center">
+        <div className="flex items-center gap-2.5 text-zinc-400">
+          <FaInfoCircle size={14} className="text-zinc-400" />
+          <span className="text-xs font-bold text-zinc-400">Exercise Instructions</span>
         </div>
       </div>
 
-      <div
-        className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
-          isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        )}
-      >
-        <div
-          className={cn(
-            "min-h-0 overflow-hidden transition-opacity duration-300",
-            isExpanded ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
+      <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                 <div className="space-y-8">
                   {exercise.whyItMatters && (
@@ -269,8 +217,6 @@ export const ExerciseInstructionsInline = ({
                 )}
               </div>
             </div>
-          </div>
-        </div>
       </div>
   );
 };

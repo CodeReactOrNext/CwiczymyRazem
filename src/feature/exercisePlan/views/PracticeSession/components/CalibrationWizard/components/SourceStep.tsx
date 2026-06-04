@@ -22,11 +22,6 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
         </button>
       </div>
       
-      <div className="w-full h-32 rounded-lg overflow-hidden mb-6 relative shadow-2xl">
-        <img src="/images/calibration/source.png" alt="Connection types" className="w-full h-full object-cover object-center opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
-      </div>
-
       <p className="text-zinc-400 text-sm mb-4 font-medium">How is your guitar connected to the computer?</p>
 
       <div className="grid grid-cols-2 gap-3">
