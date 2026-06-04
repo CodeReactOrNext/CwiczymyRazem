@@ -84,10 +84,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         <div key={difficulty} className="space-y-6">
           <div className="flex items-center gap-3">
             <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-            <h3 className={`text-xs font-black uppercase tracking-[0.2em] ${difficultyLabel.color}`}>
+            <h3 className={`text-xs font-black tracking-[0.2em] ${difficultyLabel.color}`}>
               {t(`common:difficulty.${difficulty}`)}
             </h3>
-            <div className="h-px flex-1 bg-white/5" />
           </div>
 
           <motion.div
@@ -121,7 +120,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className='space-y-8 font-openSans px-3 md:px-6 lg:px-8 py-6 md:py-8'
+        className='space-y-8 px-3 md:px-6 lg:px-8 py-6 md:py-8'
       >
 
           {isLoading ? (
@@ -140,31 +139,31 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 </button>
               )}
               <Tabs defaultValue="routines" className="w-full">
-              <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit border border-white/5 h-auto">
+              <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
                 <TabsTrigger
                   value="routines"
-                  className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
                 >
                   <Music size={16} />
                   <span>Routines</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="playalongs"
-                  className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
                 >
                   <Zap size={16} />
                   <span>Playalongs</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="my_plans"
-                  className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
                 >
                   <Flame size={16} />
                   <span>My Plans</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="community"
-                  className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
                 >
                   <Globe size={16} />
                   <span>Community</span>
@@ -181,8 +180,8 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
               <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-12">
                 {customPlans.length === 0 ? (
-                  <div className='rounded-2xl border border-dashed border-white/5 p-12 text-center bg-zinc-900/10'>
-                    <p className='text-zinc-500 text-sm'>
+                  <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
+                    <p className='text-zinc-400 text-sm'>
                       {t("exercises:my_plans.no_custom_plans")}
                     </p>
                   </div>
@@ -213,9 +212,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
               <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-12">
                 {communityPlans.length === 0 ? (
-                  <div className='rounded-2xl border border-dashed border-white/5 p-12 text-center bg-zinc-900/10'>
-                    <p className='text-zinc-500 text-sm'>No community plans published yet.</p>
-                    <p className='text-zinc-600 text-xs mt-2'>Go to My Plans and publish one of your plans to share it here.</p>
+                  <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
+                    <p className='text-zinc-400 text-sm'>No community plans published yet.</p>
+                    <p className='text-zinc-500 text-xs mt-2'>Go to My Plans and publish one of your plans to share it here.</p>
                   </div>
                 ) : (
                   <motion.div
