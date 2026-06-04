@@ -106,11 +106,15 @@ export function useStrummingMatcher({
       const currentLoopIdx = Math.floor(totalPixels / bpw);
       if (currentLoopIdx > prevLoopIdxRef.current) {
         prevLoopIdxRef.current = currentLoopIdx;
-        // Keep slotFeedbackRefInternal so the viewer can show a fade-out of the
-        // previous rep's results — it will be overwritten slot-by-slot as the
-        // new rep progresses. Only clear the processed-slots guard so each slot
-        // gets re-evaluated in the new rep.
-        processedSlotsRef.current.clear();
+        // NOTE: do NOT clear processedSlotsRef here. The processed-slots guard,
+        // prevAbsSlot and rawSlot are all *absolute* (monotonically increasing)
+        // slot indices, so every slot is processed exactly once and the next rep
+        // naturally gets fresh indices — no re-evaluation is needed. Clearing the
+        // guard at the bar boundary used to wipe the just-recorded hit on the
+        // last slot of the rep, which fires its miss-check on that same boundary
+        // tick, causing the final 8th-note to always be overwritten as a "miss".
+        // slotFeedbackRefInternal is intentionally kept so the viewer can fade
+        // out the previous rep's results; it is overwritten slot-by-slot.
       }
 
       // ── Miss detection: mark slot when cursor passes it ────────────────
