@@ -21,7 +21,6 @@ export type NavPagesTypes =
   | "my-plans"
   | "gp-tabs"
   | "arsenal"
-  | "practice-finder"
   | "journey"
   | "scale-tree"
   | "my-exercises"
