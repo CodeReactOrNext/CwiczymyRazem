@@ -12,6 +12,7 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
+import { getLocalDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import {
@@ -144,7 +145,7 @@ const userSlice = createSlice({
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateKey();
 
       // Templates
       const taskTemplates: { type: DailyQuestTaskType; title: string; target: number }[] = [
@@ -201,7 +202,7 @@ const userSlice = createSlice({
       if (!state.currentUserStats?.dailyQuest) return;
 
       // Check if today
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateKey();
       if (state.currentUserStats.dailyQuest.date !== today) return;
 
       const quest = state.currentUserStats.dailyQuest;
@@ -289,7 +290,7 @@ const userSlice = createSlice({
 
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
-          const today = new Date().toISOString().split('T')[0];
+          const today = getLocalDateKey();
 
           state.currentUserStats = {
             ...payload.currentUserStats,

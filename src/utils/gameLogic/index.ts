@@ -2,6 +2,7 @@ import { AchievementManager } from "feature/achievements/utils/AchievementsManag
 
 import { checkIsPracticeToday } from "./checkIsPracticeToday";
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
+import { getDisplayStreak } from "./getDisplayStreak";
 import { getPointsToLvlUp } from "./getPointsToLvlUp";
 import { getUpdatedActualDayWithoutBreak } from "./getUpdatedActualDayWithoutBreak";
 import { levelUpUser } from "./levelUpUser";
@@ -11,6 +12,7 @@ export {
   AchievementManager,
   checkIsPracticeToday,
   getDailyStreakMultiplier,
+  getDisplayStreak,
   getPointsToLvlUp,
   getUpdatedActualDayWithoutBreak,
   levelUpUser,

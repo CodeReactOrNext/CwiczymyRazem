@@ -237,6 +237,7 @@ const ReportView = () => {
     const enrichedInputData = {
       ...inputData,
       clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
+      clientNowISO: new Date().toISOString(),
     };
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));

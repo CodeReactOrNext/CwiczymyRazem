@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
+import { getDisplayStreak } from "utils/gameLogic";
 
 const DAILY_GOAL_MIN = 15;
 const DAILY_GOAL_MS = DAILY_GOAL_MIN * 60 * 1000;
@@ -105,10 +105,10 @@ export const PracticeStatsWidget = ({
 
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
-  const userLastReportDate = new Date(lastReportDate);
-  const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const isStreak = getUpdatedActualDayWithoutBreak(actualDayWithoutBreak, userLastReportDate, didPracticeToday);
-  const dayWithoutBreak = isStreak === 1 && !didPracticeToday ? 0 : actualDayWithoutBreak;
+  const { dayWithoutBreak } = getDisplayStreak({
+    actualDayWithoutBreak,
+    lastReportDate,
+  });
 
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
 

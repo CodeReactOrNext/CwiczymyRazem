@@ -4,7 +4,7 @@ import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
+import { getDisplayStreak } from "utils/gameLogic";
 
 export const StreakBox = () => {
   const userAuth = useAppSelector(selectUserAuth);
@@ -14,15 +14,10 @@ export const StreakBox = () => {
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
 
-  const userLastReportDate = new Date(lastReportDate);
-  const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const isStreak = getUpdatedActualDayWithoutBreak(
+  const { didPracticeToday, dayWithoutBreak } = getDisplayStreak({
     actualDayWithoutBreak,
-    userLastReportDate,
-    didPracticeToday
-  );
-
-  const dayWithoutBreak = isStreak === 1 && !didPracticeToday ? 0 : actualDayWithoutBreak;
+    lastReportDate,
+  });
 
   return (
     <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
