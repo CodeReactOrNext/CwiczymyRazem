@@ -102,7 +102,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     title: string,
     description: string,
     exercises: Exercise[],
-    isPublic: boolean
+    isPublic: boolean,
+    appearance?: { icon?: string; color?: string }
   ): Promise<void> => {
     try {
       if (!userAuth) {
@@ -124,6 +125,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
+        icon: appearance?.icon,
+        color: appearance?.color,
       };
 
       const planId = await createExercisePlan(userAuth, formattedPlanData);
@@ -150,6 +153,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         exercises: updatedPlan.exercises,
         category: updatedPlan.category,
         difficulty: updatedPlan.difficulty,
+        icon: updatedPlan.icon,
+        color: updatedPlan.color,
       });
 
       setPlans((prevPlans) =>

@@ -4,7 +4,7 @@ import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import { getDisplayStreak, getStreakFromActivityLog } from "utils/gameLogic";
+import { getReconciledStreak } from "utils/gameLogic";
 
 export const StreakBox = () => {
   const userAuth = useAppSelector(selectUserAuth);
@@ -14,22 +14,15 @@ export const StreakBox = () => {
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
 
-  const { didPracticeToday, dayWithoutBreak: storedStreak } = getDisplayStreak({
+  // The stored counter can drift from the truth in either direction after a
+  // timezone slip; the activity log (local time) is authoritative once loaded.
+  const { didPracticeToday, dayWithoutBreak } = getReconciledStreak({
     actualDayWithoutBreak,
     lastReportDate,
+    reportDates: (reportList ?? []).map(
+      (report: { date: Date | string }) => report.date
+    ),
   });
-
-  // The stored counter can be permanently reset to 1 by a single timezone slip,
-  // so reconstruct the streak from the actual logged practice days (local time)
-  // and take the larger value — heals corrupted counters without ever
-  // undercounting a genuine long streak.
-  const logStreak = getStreakFromActivityLog(
-    (reportList ?? []).map((report: { date: Date | string }) => report.date),
-    { includeToday: didPracticeToday }
-  );
-  const dayWithoutBreak = reportList?.length
-    ? Math.max(storedStreak, logStreak)
-    : storedStreak;
 
   return (
     <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>

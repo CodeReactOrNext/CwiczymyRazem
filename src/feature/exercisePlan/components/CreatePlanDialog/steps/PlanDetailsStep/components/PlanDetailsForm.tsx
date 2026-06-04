@@ -1,16 +1,20 @@
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
+import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type {
   Exercise,
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
+import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
+import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Globe, Lock } from "lucide-react";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 
 import { usePlanDetailsForm } from "../hooks/usePlanDetailsForm";
 import { DescriptionField } from "./DescriptionField";
+import { PlanAppearancePicker } from "./PlanAppearancePicker";
 import { TitleField } from "./TitleField";
 
 interface PlanDetailsFormProps {
@@ -33,6 +37,23 @@ export const PlanDetailsForm = ({
     initialData,
   });
 
+  // Reactive form values — drives the live preview as the user types / picks.
+  const watched = useWatch({ control });
+
+  const previewPlan: ExercisePlan = {
+    id: "preview",
+    title: watched.title || "Your plan title",
+    description:
+      watched.description || "A short description of your plan shows up here.",
+    exercises: selectedExercises,
+    category: determinePlanCategory(selectedExercises),
+    difficulty: determinePlanDifficulty(selectedExercises),
+    userId: "",
+    image: null,
+    icon: watched.icon,
+    color: watched.color,
+  };
+
   return (
     <motion.form
       initial={{ opacity: 0, y: 20 }}
@@ -44,6 +65,35 @@ export const PlanDetailsForm = ({
       <div className='space-y-4'>
         <TitleField register={register} />
         <DescriptionField register={register} />
+      </div>
+
+      {/* Appearance: icon + color with live preview */}
+      <div className='space-y-3'>
+        <p className='text-xs font-bold tracking-wider text-zinc-500'>Appearance</p>
+        <div className='grid gap-5 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <p className='text-[11px] font-medium text-zinc-600'>Preview</p>
+            <PlanCard plan={previewPlan} onStart={() => {}} startButtonText={t("common:start") as string} />
+          </div>
+          <Controller
+            name="icon"
+            control={control}
+            render={({ field: iconField }) => (
+              <Controller
+                name="color"
+                control={control}
+                render={({ field: colorField }) => (
+                  <PlanAppearancePicker
+                    icon={iconField.value}
+                    color={colorField.value}
+                    onIconChange={iconField.onChange}
+                    onColorChange={colorField.onChange}
+                  />
+                )}
+              />
+            )}
+          />
+        </div>
       </div>
 
       {/* Visibility */}

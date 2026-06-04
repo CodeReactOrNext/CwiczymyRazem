@@ -9,6 +9,8 @@ export interface PlanDetailsFormData {
   title: string;
   description: string;
   isPublic: boolean;
+  icon?: string;
+  color?: string;
 }
 
 interface UsePlanDetailsFormProps {
@@ -29,11 +31,13 @@ export const usePlanDetailsForm = ({
     return typeof val === "string" ? val : (val.pl || val.en || "");
   };
 
-  const { register, handleSubmit, formState, control } = useForm<PlanDetailsFormData>({
+  const { register, handleSubmit, formState, control, watch, setValue } = useForm<PlanDetailsFormData>({
     defaultValues: {
       title: getInitialValue(initialData?.title),
       description: getInitialValue(initialData?.description),
       isPublic: initialData?.isPublic ?? false,
+      icon: initialData?.icon,
+      color: initialData?.color,
     }
   });
 
@@ -42,6 +46,8 @@ export const usePlanDetailsForm = ({
       title: data.title,
       description: data.description,
       isPublic: data.isPublic,
+      icon: data.icon,
+      color: data.color,
       image: initialData?.image ?? null,
       createdAt: initialData?.createdAt ?? new Date(),
       updatedAt: new Date(),
@@ -56,6 +62,8 @@ export const usePlanDetailsForm = ({
     register,
     formState,
     control,
+    watch,
+    setValue,
     handleSubmit: handleSubmit(handleFormSubmit),
   };
 }; 

@@ -187,4 +187,9 @@ export interface ExercisePlan {
   };
   isPublic?: boolean;
   authorUsername?: string;
+  /** Optional appearance overrides chosen in the create/edit wizard. Resolved to
+   *  Tailwind classes / icon component via feature/exercisePlan/data/planAppearance.
+   *  When absent, PlanCard falls back to the category-derived style. */
+  icon?: string;
+  color?: string;
 }
