@@ -13,7 +13,7 @@ export const ExerciseCheckmark = React.forwardRef<
   <span
     ref={ref}
     className={cn(
-      "flex h-5 w-5 flex-shrink-0 cursor-default items-center justify-center rounded border transition-transform hover:scale-110",
+      "flex h-5 w-5 flex-shrink-0 cursor-default items-center justify-center rounded border transition-colors",
       done
         ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-400"
         : "border-white/5 bg-white/[0.02] text-zinc-600",

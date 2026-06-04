@@ -23,7 +23,7 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <div className="bg-second-600 overflow-visible flex flex-col min-h-screen">
       <HeroBanner
         title="Skills"
         subtitle="Track and develop your guitar playing skills"

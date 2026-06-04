@@ -134,6 +134,11 @@ export const PlanCard = ({
 
   const isInteractive = isLocked ? !!onUpgrade : !!onSelect;
 
+  // Author can come from a built-in plan (StaticImageData avatar) or a published
+  // community plan (string avatar URL + authorUsername).
+  const authorName = plan.author?.name ?? plan.authorUsername;
+  const authorAvatar = plan.author?.avatar ?? plan.authorAvatar;
+
   return (
     <Card
       className={cn(
@@ -240,26 +245,36 @@ export const PlanCard = ({
 
       {/* Main Content with Avatar */}
       <div className="relative flex gap-4">
-        {plan.author && (
+        {authorAvatar && (
             <div className={cn(
               "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg",
               isLocked && "grayscale opacity-50"
             )}>
-                <Image
-                    src={plan.author.avatar}
-                    alt={plan.author.name}
-                    fill
-                    className="object-cover"
-                />
+                {typeof authorAvatar === "string" ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={authorAvatar}
+                        alt={authorName ?? ""}
+                        referrerPolicy="no-referrer"
+                        className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <Image
+                        src={authorAvatar}
+                        alt={authorName ?? ""}
+                        fill
+                        className="object-cover"
+                    />
+                )}
             </div>
         )}
         <div className="flex-1 space-y-1">
-            {(plan.author || plan.authorUsername) && (
+            {authorName && (
                 <span className={cn(
                   "text-[11px] font-medium leading-none",
                   isLocked ? "text-zinc-400" : "text-primary/80"
                 )}>
-                    {plan.author?.name ?? plan.authorUsername}
+                    {authorName}
                 </span>
             )}
             <h3 className={cn(
