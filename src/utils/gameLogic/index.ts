@@ -4,6 +4,7 @@ import { checkIsPracticeToday } from "./checkIsPracticeToday";
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { getDisplayStreak } from "./getDisplayStreak";
 import { getPointsToLvlUp } from "./getPointsToLvlUp";
+import { getStreakFromActivityLog } from "./getStreakFromActivityLog";
 import { getUpdatedActualDayWithoutBreak } from "./getUpdatedActualDayWithoutBreak";
 import { levelUpUser } from "./levelUpUser";
 import { makeRatingData } from "./makeRatingData";
@@ -14,6 +15,7 @@ export {
   getDailyStreakMultiplier,
   getDisplayStreak,
   getPointsToLvlUp,
+  getStreakFromActivityLog,
   getUpdatedActualDayWithoutBreak,
   levelUpUser,
   makeRatingData,

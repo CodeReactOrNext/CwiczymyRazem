@@ -79,7 +79,7 @@ const TimerPlans: NextPageWithLayout = () => {
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none min-h-screen ">
       <HeroBanner
         title="Exercises"
         subtitle="Build your skills with focused practice exercises"
@@ -88,7 +88,7 @@ const TimerPlans: NextPageWithLayout = () => {
         rightContent={
           <button
             onClick={() => router.push("/timer")}
-            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
+            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-background rounded-lg bg-white/5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             Back
           </button>

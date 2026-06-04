@@ -17,10 +17,10 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
-import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
-import { getPointsToLvlUp } from "utils/gameLogic";
+import { getDisplayStreak, getPointsToLvlUp, getStreakFromActivityLog } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
@@ -60,7 +60,19 @@ const ProfileLayout = ({
   } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
-  const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+
+  // Streak: same logic as the header — trust the stored counter, but heal it
+  // against the real logged practice days (immune to the old timezone reset).
+  const { didPracticeToday, dayWithoutBreak: storedStreak } = getDisplayStreak({
+    actualDayWithoutBreak: statistics.actualDayWithoutBreak || 0,
+    lastReportDate,
+  });
+  const logStreak = getStreakFromActivityLog(
+    (reportList ?? []).map((report: { date: Date | string }) => report.date),
+    { includeToday: didPracticeToday }
+  );
+  const streak = reportList?.length ? Math.max(storedStreak, logStreak) : storedStreak;
 
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
@@ -198,7 +210,18 @@ const ProfileLayout = ({
 
             {/* Info */}
             <div className='space-y-2 bg-black/40 backdrop-blur-md px-4 py-3 rounded-xl border border-white/5 shadow-2xl'>
-              <DaySinceMessage date={new Date(lastReportDate)} />
+              <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
+                <DaySinceMessage date={new Date(lastReportDate)} />
+                {streak > 0 && (
+                  <div className='flex items-center gap-1.5 rounded-[4px] bg-orange-500/15 px-2.5 py-1 border border-orange-500/30'>
+                    <FaFire className='text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' size={13} />
+                    <span className='text-xs font-black text-white tabular-nums'>{streak}</span>
+                    <span className='text-[11px] font-semibold tracking-wide text-orange-400/90'>
+                      day streak
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className='flex flex-wrap gap-x-4 gap-y-1'>
                 <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-400'>
                   <div className='h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]'></div>

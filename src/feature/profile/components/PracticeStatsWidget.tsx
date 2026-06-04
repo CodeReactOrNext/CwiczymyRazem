@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { getDisplayStreak } from "utils/gameLogic";
+import { getDisplayStreak, getStreakFromActivityLog } from "utils/gameLogic";
 
 const DAILY_GOAL_MIN = 15;
 const DAILY_GOAL_MS = DAILY_GOAL_MIN * 60 * 1000;
@@ -105,10 +105,21 @@ export const PracticeStatsWidget = ({
 
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
-  const { dayWithoutBreak } = getDisplayStreak({
+  const { didPracticeToday, dayWithoutBreak: storedStreak } = getDisplayStreak({
     actualDayWithoutBreak,
     lastReportDate,
   });
+
+  // Reconstruct the streak from the real logged practice days (local time) and
+  // take the larger value, so a counter that was reset to 1 by an earlier
+  // timezone slip self-heals. See getStreakFromActivityLog.
+  const logStreak = getStreakFromActivityLog(
+    reportList.map((r) => r.date),
+    { includeToday: didPracticeToday }
+  );
+  const dayWithoutBreak = reportList.length
+    ? Math.max(storedStreak, logStreak)
+    : storedStreak;
 
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
 
