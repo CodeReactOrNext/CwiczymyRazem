@@ -9,6 +9,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 interface EquipGuitarPayload {
   guitarId: number | string;
+  itemId?: string;
   year?: number;
   country?: string;
 }
@@ -18,7 +19,7 @@ export const useEquipGuitar = () => {
   const dispatch = useAppDispatch();
 
   return useMutation({
-    mutationFn: ({ guitarId }: EquipGuitarPayload) => equipGuitar(guitarId),
+    mutationFn: ({ guitarId, itemId }: EquipGuitarPayload) => equipGuitar(guitarId, itemId),
     onSuccess: (_data, { guitarId, year, country }) => {
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
       const imageId = GUITARS_BY_ID.get(guitarId)?.imageId ?? guitarId;

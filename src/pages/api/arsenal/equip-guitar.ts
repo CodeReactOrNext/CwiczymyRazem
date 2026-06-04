@@ -7,9 +7,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, guitarId } = req.body as {
+  const { idToken, guitarId, itemId } = req.body as {
     idToken: string;
     guitarId: number | string;
+    itemId?: string;
   };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
@@ -32,19 +33,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
-    const inventory: { guitarId: number | string; year?: number; country?: string }[] = data.arsenal?.inventory || [];
+    const inventory: { id: string; guitarId: number | string; year?: number; country?: string }[] = data.arsenal?.inventory || [];
 
-    // Validate ownership
-    const ownedItem = inventory.find((item) => item.guitarId === guitarId);
+    // Prefer matching the unique inventory item so duplicates of the same guitarId
+    // can be equipped independently. Fall back to guitarId for backward compatibility.
+    const ownedItem = itemId
+      ? inventory.find((item) => item.id === itemId)
+      : inventory.find((item) => item.guitarId === guitarId);
     if (!ownedItem) {
       return res.status(403).json({ error: "Guitar not in inventory" });
     }
 
-    const guitarDef = GUITARS_BY_ID.get(guitarId);
-    const imageId = guitarDef?.imageId ?? guitarId;
+    const guitarDef = GUITARS_BY_ID.get(ownedItem.guitarId);
+    const imageId = guitarDef?.imageId ?? ownedItem.guitarId;
 
     await userRef.update({
-      "arsenal.equippedGuitarId": guitarId,
+      "arsenal.equippedGuitarId": ownedItem.guitarId,
+      "arsenal.equippedItemId": ownedItem.id,
       selectedGuitar: imageId,
       selectedGuitarYear: ownedItem.year ?? null,
       selectedGuitarCountry: ownedItem.country ?? null,

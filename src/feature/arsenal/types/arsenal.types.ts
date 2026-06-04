@@ -119,6 +119,8 @@ export const DEFAULT_RIG: RigSetup = {
 export interface ArsenalUserData {
   inventory: InventoryItem[];
   equippedGuitarId: number | string | null;
+  /** Unique inventory item id of the equipped guitar — distinguishes duplicates of the same guitarId */
+  equippedItemId: string | null;
   rig: RigSetup;
   effectInventory: EffectInventoryItem[];
 }

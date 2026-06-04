@@ -69,8 +69,8 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
           <GuitarCard
             key={item.id}
             item={item}
-            isEquipped={data.equippedGuitarId === item.guitarId}
-            onEquip={(guitarId, year, country) => equip({ guitarId, year, country })}
+            isEquipped={data.equippedItemId === item.id}
+            onEquip={(guitarId, year, country) => equip({ guitarId, itemId: item.id, year, country })}
             isEquipping={isEquipping}
             onSellClick={handleSellClick}
             isSelling={isSelling}

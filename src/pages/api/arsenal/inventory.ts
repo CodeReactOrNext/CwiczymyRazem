@@ -34,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const arsenal: ArsenalUserData = {
         inventory: [],
         equippedGuitarId,
+        equippedItemId: null,
         rig: DEFAULT_RIG,
         effectInventory: [],
       };
@@ -42,9 +43,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const storedRig = data.arsenal.rig;
+    const inventory: ArsenalUserData["inventory"] = data.arsenal.inventory || [];
+    const equippedGuitarId = data.arsenal.equippedGuitarId ?? null;
+    // Migrate older accounts that tracked the equipped guitar only by guitarId:
+    // resolve to the first matching inventory item so exactly one copy is marked equipped.
+    const equippedItemId =
+      data.arsenal.equippedItemId ??
+      (equippedGuitarId != null
+        ? inventory.find((item) => item.guitarId === equippedGuitarId)?.id ?? null
+        : null);
     const arsenal: ArsenalUserData = {
-      inventory: data.arsenal.inventory || [],
-      equippedGuitarId: data.arsenal.equippedGuitarId ?? null,
+      inventory,
+      equippedGuitarId,
+      equippedItemId,
       rig: {
         guitarSlots: storedRig?.guitarSlots ?? DEFAULT_RIG.guitarSlots,
         pedalboardItems: Array.isArray(storedRig?.pedalboardItems)
