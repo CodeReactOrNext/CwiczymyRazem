@@ -7,6 +7,7 @@ import type {
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
 import { doc, getDoc } from "firebase/firestore";
+import { Guitar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -27,7 +28,6 @@ const RpgTooltip = ({ tooltip }: { tooltip: TooltipData }) => (
     <div
       style={{
         background: "linear-gradient(160deg, #1a1a2e 0%, #0f0f1a 100%)",
-        border: "1px solid #333",
         borderRadius: 8,
         padding: "10px 14px",
         minWidth: 160,
@@ -61,7 +61,7 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
           <div className="h-1 w-full mb-3 rounded-full" style={{ background: `linear-gradient(90deg, ${rs.baseColor}, transparent)` }} />
           {/* Name block */}
           <div className="mb-3">
-            <div className="text-[11px] font-semibold tracking-widest uppercase mb-1" style={{ color: rs.baseColor }}>
+            <div className="text-[11px] font-semibold tracking-widest mb-1" style={{ color: rs.baseColor }}>
               {guitar.rarity} · {guitar.brand}
             </div>
             <div className="text-2xl font-bold text-white leading-tight">
@@ -69,16 +69,16 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
             </div>
           </div>
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 pt-3 border-t" style={{ borderColor: `${rs.baseColor}25` }}>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2 pt-4">
             {item.year && (
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-zinc-500">Year</div>
+                <div className="text-[10px] tracking-widest text-zinc-500">Year</div>
                 <div className="text-base font-semibold text-zinc-100">{item.year}</div>
               </div>
             )}
             {item.country && (
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-zinc-500">Origin</div>
+                <div className="text-[10px] tracking-widest text-zinc-500">Origin</div>
                 <div className="text-base font-semibold text-zinc-100">{item.country}</div>
               </div>
             )}
@@ -91,36 +91,27 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
   if (!guitar || !rs) {
     return (
       <div
-        className="relative flex flex-col items-center justify-center rounded-md"
-        style={{
-          height: 320,
-          border: "1px dashed #2a2a2a",
-          background: "#0c0c10",
-        }}
+        className="relative flex flex-col items-center justify-center gap-2 rounded-lg bg-zinc-800/40"
+        style={{ height: 320 }}
       >
-        <span className="text-[9px] uppercase tracking-widest text-zinc-700 font-black">Slot {slotIndex + 1}</span>
+        <Guitar className="h-7 w-7 text-zinc-600" />
+        <span className="text-[11px] tracking-wide text-zinc-500">Slot {slotIndex + 1}</span>
       </div>
     );
   }
 
   return (
     <div
-      className="relative flex flex-col overflow-hidden rounded-md cursor-default select-none"
+      className="relative flex flex-col overflow-hidden rounded-lg cursor-default select-none"
       style={{
         height: 320,
         background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
-        border: `1px solid ${rs.baseColor}28`,
-        borderBottom: `3px solid ${rs.baseColor}`,
-        boxShadow: `0 8px 24px rgba(0,0,0,0.6)`,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
     >
-      {/* Rarity stripe */}
-      <div className="h-[3px] w-full flex-shrink-0" style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}90, transparent)` }} />
-
       {/* Header */}
-      <div className="px-3 pt-3 pb-0 flex flex-col gap-0.5">
+      <div className="px-3 pt-4 pb-0 flex flex-col gap-0.5">
         <p className="text-xs font-semibold tracking-wide leading-none truncate" style={{ color: rs.baseColor }}>
           {guitar.brand}
         </p>
@@ -165,19 +156,19 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
       y: e.clientY,
       content: (
         <div className="space-y-1.5">
-          <div className="text-[8px] font-black uppercase tracking-[0.3em]" style={{ color: rs.baseColor }}>
+          <div className="text-[9px] font-bold tracking-[0.2em]" style={{ color: rs.baseColor }}>
             {effect.rarity}
           </div>
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: rs.baseColor }}>
+            <div className="text-[10px] font-bold tracking-[0.15em]" style={{ color: rs.baseColor }}>
               {effect.brand}
             </div>
-            <div className="text-sm font-black text-white uppercase tracking-wide leading-tight">
+            <div className="text-sm font-bold text-white tracking-wide leading-tight">
               {effect.name}
             </div>
           </div>
-          <div className="pt-1 border-t" style={{ borderColor: `${rs.baseColor}30` }}>
-            <div className="text-[7px] uppercase tracking-widest text-zinc-600">Type</div>
+          <div className="pt-2">
+            <div className="text-[8px] tracking-widest text-zinc-500">Type</div>
             <div className="text-[10px] font-bold text-zinc-300">{effect.type}</div>
           </div>
         </div>
@@ -251,23 +242,25 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   };
 
   return (
-    <div className="rounded-2xl bg-zinc-900/30 p-6" onMouseMove={handleMouseMove}>
+    <div className="rounded-lg bg-zinc-900/30 p-4 sm:p-6" onMouseMove={handleMouseMove}>
       <h2 className="mb-6 text-2xl font-bold text-white">Rig</h2>
 
       {/* Guitar Slots */}
-      <div className="mb-6">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-3">Guitars</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {guitarItems.map((item, i) => (
-            <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} />
-          ))}
+      {hasGuitars && (
+        <div className="mb-6">
+          <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Guitars</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {guitarItems.map((item, i) => (
+              <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Pedalboard */}
       {hasPedals && (
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-3">Pedalboard</p>
+          <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Pedalboard</p>
           <div
             style={{
               background: "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
@@ -284,7 +277,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
                 ))}
               </div>
-              <span className="text-[8px] font-black uppercase tracking-[0.35em] text-zinc-600">Pedalboard</span>
+              <span className="text-[8px] font-black tracking-[0.35em] text-zinc-600">Pedalboard</span>
               <div className="flex gap-2">
                 {[0, 1].map((i) => (
                   <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
@@ -309,12 +302,12 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                 <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
                 </div>
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Amp</span>
+                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Amp</span>
               </div>
 
               {/* Instr jack — bottom right */}
               <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Instr</span>
+                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Instr</span>
                 <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
                 </div>
