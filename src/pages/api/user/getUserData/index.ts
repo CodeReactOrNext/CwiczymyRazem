@@ -85,6 +85,12 @@ export default async function handler(
           feedbackAskedAt: userData?.feedbackAskedAt ?? null,
           feedbackDismissCount: userData?.feedbackDismissCount ?? 0,
           feedbackLastDismissedAt: userData?.feedbackLastDismissedAt ?? null,
+          emailNotifications: {
+            streakReminders:
+              userData?.emailNotifications?.streakReminders ?? true,
+            seasonUpdates:
+              userData?.emailNotifications?.seasonUpdates ?? true,
+          },
         },
         userAuth: uid,
         currentUserStats: {

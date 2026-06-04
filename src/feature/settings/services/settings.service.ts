@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import type { EmailNotificationPreferences } from "types/api.types";
 import { db, firebaseUpdateUserDocument, storage } from "utils/firebase/client/firebase.utils";
 import { shuffleUid } from "utils/user/shuffleUid";
 
@@ -75,7 +76,14 @@ export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
 export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
-}; export const firebaseUpdateProfileCustomization = async (
+}; export const firebaseUpdateEmailNotifications = async (
+  preferences: EmailNotificationPreferences
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { emailNotifications: preferences });
+};
+
+export const firebaseUpdateProfileCustomization = async (
   selectedFrame?: number,
   selectedGuitar?: number | string
 ) => {
