@@ -117,19 +117,21 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
           <Changelog month="2026-05" />
         </div>
       )}
-      <div className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
-        {showedCategory === "logs" && logs && (
-          <div onClick={markLogsAsRead}>
-            <Logs 
-              logs={logs} 
-              marksLogsAsRead={markLogsAsRead} 
-              currentUserId={currentUserId}
-            />
-          </div>
-        )}
+      {(showedCategory === "logs" || showedCategory === "chat") && (
+        <div className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
+          {showedCategory === "logs" && logs && (
+            <div onClick={markLogsAsRead}>
+              <Logs
+                logs={logs}
+                marksLogsAsRead={markLogsAsRead}
+                currentUserId={currentUserId}
+              />
+            </div>
+          )}
 
-        {showedCategory === "chat" && <Chat />}
-      </div>
+          {showedCategory === "chat" && <Chat />}
+        </div>
+      )}
     </Card>
   );
 };

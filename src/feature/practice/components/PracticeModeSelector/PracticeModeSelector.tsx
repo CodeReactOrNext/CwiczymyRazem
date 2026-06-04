@@ -13,7 +13,6 @@ import {
   Map,
   Music,
   Route,
-  Search,
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -196,7 +195,6 @@ export const PracticeModeSelector = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("skills",    Brain,    "Skills", "Specific skill focus",         "/profile/skills",     "emerald")}
                 {listItem("exercises", Dumbbell, "Exercises",  "Full exercise library",             "/profile/skills?tab=browse",  "emerald")}
-                {listItem("finder", Search, "Practice Finder", "Lessons and exercises", "/practice-finder", "emerald", !isMaster, "Master")}
               </div>
             </div>
 
