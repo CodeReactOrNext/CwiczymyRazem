@@ -20,6 +20,7 @@ interface RankedParticipant {
   points: number;
   displayName: string;
   email: string;
+  seasonUpdates: boolean;
 }
 
 function diffInDays(today: Date, other: Date): number {
@@ -55,6 +56,11 @@ async function getSeasonParticipants(seasonId: string): Promise<RankedParticipan
     .map((p: RankedBase, idx: number) => ({
       ...p,
       email: (userDocs[idx].data()?.email as string) ?? "",
+      // Opt-in by default: only an explicit `false` disables season emails.
+      // Kept on every participant (not filtered out here) so places and the
+      // top-3 list shown in other users' emails stay accurate.
+      seasonUpdates:
+        userDocs[idx].data()?.emailNotifications?.seasonUpdates !== false,
     }))
     .filter((p) => !!p.email);
 }
@@ -204,6 +210,9 @@ export default async function handler(
       const email: string | null = data.email ?? null;
       if (!email) return;
 
+      // Respect opt-out: only an explicit `false` disables streak emails.
+      if (data.emailNotifications?.streakReminders === false) return;
+
       const lastReportDateStr = data.statistics?.lastReportDate;
       if (!lastReportDateStr) return;
 
@@ -299,6 +308,7 @@ export default async function handler(
 
       const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       prevParticipants.forEach((p) => {
+        if (!p.seasonUpdates) return;
         if (isOnEmailCooldown(prevCooldowns.get(p.uid) ?? null, "season_results", now)) {
           seasonResultsCooldown += 1;
           return;
@@ -344,6 +354,7 @@ export default async function handler(
     try {
       const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       prevParticipants.forEach((p) => {
+        if (!p.seasonUpdates) return;
         if (isOnEmailCooldown(prevCooldowns.get(p.uid) ?? null, "season_start", now)) {
           seasonStartCooldown += 1;
           return;
@@ -392,6 +403,7 @@ export default async function handler(
 
       const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       currentParticipants.forEach((p) => {
+        if (!p.seasonUpdates) return;
         if (isOnEmailCooldown(cooldowns.get(p.uid) ?? null, "season_ending_soon", now)) {
           seasonEndingCooldown += 1;
           return;

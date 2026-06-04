@@ -3,13 +3,14 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 // Challenges removed
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
-import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateProfileCustomization, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
+import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateProfileCustomization, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { signIn, signOut } from "next-auth/react";
 import posthog from "posthog-js";
 import type {
+  EmailNotificationPreferences,
   FetchedReportDataInterface,
   updateSocialInterface,
   updateUserInterface,
@@ -210,6 +211,20 @@ export const updateProfileCustomization = createAsyncThunk(
     try {
       await firebaseUpdateProfileCustomization(selectedFrame, selectedGuitar);
       return { selectedFrame, selectedGuitar };
+    } catch (error) {
+      udpateDataErrorHandler(error as SerializedError);
+      return Promise.reject();
+    }
+  }
+);
+
+export const updateEmailNotifications = createAsyncThunk(
+  "user/updateEmailNotifications",
+  async (preferences: EmailNotificationPreferences) => {
+    try {
+      await firebaseUpdateEmailNotifications(preferences);
+      updateUserDataSuccess();
+      return preferences;
     } catch (error) {
       udpateDataErrorHandler(error as SerializedError);
       return Promise.reject();

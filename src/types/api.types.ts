@@ -36,6 +36,18 @@ export interface DailyQuest {
   isRewardClaimed: boolean;
 }
 
+export interface EmailNotificationPreferences {
+  /** Daily streak / "come back and practice" reminder emails */
+  streakReminders: boolean;
+  /** Season start, ending-soon and results emails */
+  seasonUpdates: boolean;
+}
+
+export const DEFAULT_EMAIL_NOTIFICATIONS: EmailNotificationPreferences = {
+  streakReminders: true,
+  seasonUpdates: true,
+};
+
 export interface UserDataInterface {
   userInfo: {
     displayName: string;
@@ -47,6 +59,7 @@ export interface UserDataInterface {
     selectedGuitar?: number | string;
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
+    emailNotifications?: EmailNotificationPreferences;
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -148,6 +161,7 @@ export interface userSliceInitialState {
     feedbackAskedAt?: Timestamp | null;
     feedbackDismissCount?: number;
     feedbackLastDismissedAt?: Timestamp | null;
+    emailNotifications?: EmailNotificationPreferences;
   } | null;
   timer: TimerInterface;
   currentActivity: {

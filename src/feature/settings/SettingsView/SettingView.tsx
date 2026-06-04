@@ -5,6 +5,7 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import EmailChange from "feature/settings/components/EmailChange";
+import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
@@ -14,7 +15,7 @@ import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { Lock, Share2, User } from "lucide-react";
+import { Bell, Lock, Share2, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -61,6 +62,15 @@ const SettingsView = () => {
                   <span className="font-bold">Social Media</span>
                 </TabsTrigger>
                 <TabsTrigger
+                  value="notifications"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                >
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
+                    <Bell className="h-4 w-4" />
+                  </div>
+                  <span className="font-bold">Notifications</span>
+                </TabsTrigger>
+                <TabsTrigger
                   value="security"
                   className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
@@ -82,6 +92,10 @@ const SettingsView = () => {
 
             <TabsContent value="socials" className="mt-0">
               <MediaLinks />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="mt-0">
+              <EmailNotificationSettings />
             </TabsContent>
 
             <TabsContent value="security" className="mt-0 space-y-6">

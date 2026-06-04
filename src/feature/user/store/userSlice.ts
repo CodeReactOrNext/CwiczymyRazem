@@ -26,6 +26,7 @@ import {
   logUserOff,
   rateSong,
   restartUserStats,
+  updateEmailNotifications,
   updateProfileCustomization,
   updateUserEmail,
   updateUserPassword,
@@ -382,6 +383,12 @@ const userSlice = createSlice({
           }
         }
       })
+      .addCase(updateEmailNotifications.fulfilled, (state, { payload }) => {
+        state.isFetching = null;
+        if (state.userInfo) {
+          state.userInfo.emailNotifications = payload;
+        }
+      })
       .addCase(autoLogIn.rejected, (state) => {
         state.isFetching = null;
         state.userAuth = null;
@@ -399,7 +406,8 @@ const userSlice = createSlice({
           updateUserPassword.pending,
           updateUserEmail.pending,
           uploadUserSocialData.pending,
-          updateProfileCustomization.pending
+          updateProfileCustomization.pending,
+          updateEmailNotifications.pending
         ),
         (state) => {
           state.isFetching = "updateData";
@@ -422,7 +430,8 @@ const userSlice = createSlice({
           logInViaGoogleCredential.rejected,
           createAccount.rejected,
           uploadUserSocialData.rejected,
-          updateProfileCustomization.rejected
+          updateProfileCustomization.rejected,
+          updateEmailNotifications.rejected
         ),
         (state) => {
           state.isFetching = null;
