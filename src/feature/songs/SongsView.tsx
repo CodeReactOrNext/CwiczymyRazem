@@ -311,7 +311,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-5rem)] overflow-hidden font-openSans">
+      <div className="flex flex-col h-[calc(100dvh-6rem)] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
         {/* Mobile View Switcher */}
         {!detailsTarget && (
           <div className="flex xl:hidden bg-zinc-900/80 border-b border-white/5 p-1.5 backdrop-blur-md">
