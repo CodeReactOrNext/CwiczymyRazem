@@ -59,7 +59,7 @@ export default function PracticeExercisePage() {
         stars
       );
     }
-    router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy * 100) } });
+    router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy) } });
   };
 
   const isDataReady = router.isReady && !!plan;
