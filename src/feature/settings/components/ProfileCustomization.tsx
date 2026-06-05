@@ -68,7 +68,7 @@ const ProfileCustomization = () => {
   const isChanged = selectedFrame !== userInfo?.selectedFrame;
 
   return (
-    <Card className="border-zinc-800/50 bg-zinc-900/20">
+    <Card className="border-none bg-zinc-900/20">
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
           {/* Header */}
@@ -77,7 +77,7 @@ const ProfileCustomization = () => {
               <h3 className="text-lg font-bold text-foreground">Personalization</h3>
               <p className="text-sm text-muted-foreground">Customize your profile frame</p>
             </div>
-            <div className="flex items-center gap-3 bg-zinc-900/50 rounded-lg px-4 py-2 border border-zinc-800">
+            <div className="flex items-center gap-3 bg-zinc-900/50 rounded-lg px-4 py-2">
                <Trophy className="h-4 w-4 text-cyan-500" />
                <div>
                   <p className="text-[10px] font-bold text-zinc-500 capitalize tracking-wider">Level</p>
@@ -89,11 +89,11 @@ const ProfileCustomization = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Preview */}
             <div className="lg:col-span-4">
-              <div className="relative overflow-hidden rounded-lg bg-zinc-950 p-6 border border-zinc-800/50">
+              <div className="relative overflow-hidden rounded-lg bg-zinc-950 p-6">
                 <div className="absolute top-3 right-3">
-                   <div className="flex items-center gap-1.5 bg-zinc-900/50 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/5">
+                   <div className="flex items-center gap-1.5 bg-zinc-900/50 backdrop-blur-sm rounded-full px-2.5 py-1">
                       <div className="h-1 w-1 rounded-full bg-cyan-400 animate-pulse" />
-                      <span className="text-[9px] font-bold text-white capitalize tracking-wider">Preview</span>
+                      <span className="text-[9px] font-bold text-zinc-100 capitalize tracking-wider">Preview</span>
                    </div>
                 </div>
                 
@@ -107,7 +107,7 @@ const ProfileCustomization = () => {
                     />
                   </div>
                   <div className="text-center">
-                     <p translate="no" className="text-base font-bold text-white">@{userInfo?.displayName}</p>
+                     <p translate="no" className="text-base font-bold text-zinc-100">@{userInfo?.displayName}</p>
                      <p className="text-xs text-zinc-500 font-medium">Level {currentLevel}</p>
                   </div>
                 </div>
@@ -137,7 +137,7 @@ const ProfileCustomization = () => {
                   </span>
                 </div>
                 
-                <ScrollArea className="h-[280px] w-full rounded-lg border border-zinc-800/50 bg-zinc-950/30 p-2">
+                <ScrollArea className="h-[280px] w-full rounded-lg bg-zinc-950/30 p-2">
                   <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 p-2">
                     {FRAMES.map((frame) => {
                       const isUnlocked = currentLevel >= frame.lvl;
@@ -149,18 +149,18 @@ const ProfileCustomization = () => {
                           disabled={!isUnlocked}
                           onClick={() => setSelectedFrame(frame.lvl)}
                           className={cn(
-                            "group relative flex flex-col items-center gap-2 p-2 rounded-lg transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-cyan-500",
-                            isUnlocked 
-                              ? "cursor-pointer hover:bg-zinc-900/80" 
+                            "group relative flex flex-col items-center gap-2 p-2 rounded-lg transition-background outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                            isUnlocked
+                              ? "cursor-pointer hover:bg-zinc-900/80"
                               : "opacity-40 cursor-not-allowed grayscale",
-                            isSelected 
-                              ? "bg-zinc-900 border border-cyan-500/30" 
-                              : "hover:border-zinc-700 bg-transparent border border-transparent"
+                            isSelected
+                              ? "bg-zinc-900 ring-1 ring-cyan-500/30"
+                              : "bg-transparent"
                           )}
                           title={`Level ${frame.lvl}: ${frame.label}`}
                         >
                           <div className={cn(
-                               "w-12 h-12 rounded-lg flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105",
+                               "w-12 h-12 rounded-lg flex items-center justify-center",
                                frame.class,
                                isSelected && "ring-2 ring-cyan-400 ring-offset-2 ring-offset-zinc-950"
                           )}>
@@ -174,7 +174,7 @@ const ProfileCustomization = () => {
                             )}>
                               {frame.label}
                             </span>
-                            <span className="text-[9px] font-medium text-zinc-600 bg-zinc-900/50 px-1.5 py-0.5 rounded-sm">
+                            <span className="text-[9px] font-medium text-zinc-500 bg-zinc-900/50 px-1.5 py-0.5 rounded">
                               LVL {frame.lvl}
                             </span>
                           </div>

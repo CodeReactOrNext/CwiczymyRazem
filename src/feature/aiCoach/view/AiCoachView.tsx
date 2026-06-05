@@ -97,7 +97,7 @@ const AiCoachView = () => {
           rightContent={
             <button
               onClick={() => setSelectedId(null)}
-              className="flex w-fit items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
+              className="flex w-fit items-center gap-2 rounded-lg bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -130,7 +130,7 @@ const AiCoachView = () => {
             <Loader2 className="h-7 w-7 animate-spin text-cyan-500" />
           </div>
         ) : roadmaps.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-20 text-zinc-700">
+          <div className="flex flex-col items-center justify-center gap-3 py-20 text-zinc-500">
             <Map className="h-10 w-10 opacity-30" />
             <span className="text-sm">No roadmaps available yet.</span>
           </div>
@@ -153,14 +153,14 @@ const AiCoachView = () => {
         {/* ─── Suggest a roadmap ─── */}
         <button
           onClick={() => setSuggestOpen(true)}
-          className="mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition hover:bg-zinc-900/70"
+          className="mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background hover:bg-zinc-900/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
             <Lightbulb className="h-4 w-4 text-zinc-400" />
           </div>
           <div>
             <p className="text-sm font-semibold text-zinc-300">Suggest a roadmap</p>
-            <p className="text-xs text-zinc-600">Missing a topic? Let us know what you'd like to see next.</p>
+            <p className="text-xs text-zinc-500">Missing a topic? Let us know what you'd like to see next.</p>
           </div>
         </button>
 

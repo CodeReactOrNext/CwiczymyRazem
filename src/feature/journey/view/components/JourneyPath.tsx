@@ -246,7 +246,7 @@ function StepNode({ step, onClick, isLast, moduleId }: {
               {/* Exam */}
               <button
                 onClick={goToExam}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-[13px] font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-[13px] font-bold text-zinc-950 transition-background hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
               >
                 <Target size={14} />
                 {isCompleted ? "Retake Exam" : "Start Exam"}

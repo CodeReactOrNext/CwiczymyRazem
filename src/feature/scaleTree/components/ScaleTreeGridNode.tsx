@@ -311,7 +311,7 @@ export function ScaleTreeGridNode({
       onMouseLeave={onMouseLeave}
     >
       <motion.div
-        whileHover={isLocked ? {} : { scale: 1.1, y: -2 }}
+        whileHover={isLocked ? {} : { y: -3 }}
         whileTap={isLocked ? {} : { scale: 0.95 }}
         className={`relative flex items-center justify-center animate-fade-in ${
           isSingleString

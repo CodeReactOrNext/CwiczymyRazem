@@ -80,7 +80,7 @@ export function ScaleTreeView() {
   return (
     <div
       ref={containerRef}
-      className="relative flex h-full w-full overflow-hidden rounded-xl bg-[#08080a] border border-white/5"
+      className="relative flex h-full w-full overflow-hidden rounded-lg bg-[#08080a]"
     >
       <div className="hidden md:flex">
         <ScaleTreeSidebar
@@ -111,7 +111,7 @@ export function ScaleTreeView() {
               <div className="relative">
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-md bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white"
+                  className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   aria-label="Close sidebar"
                 >
                   <X className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function ScaleTreeView() {
 
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="absolute left-3 top-3 z-10 flex h-9 items-center gap-1.5 rounded-lg border border-white/[0.06] bg-[#0b0b0d] px-2.5 backdrop-blur-md shadow-2xl md:hidden"
+        className="absolute left-3 top-3 z-10 flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900/80 px-2.5 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:hidden"
         aria-label="Open scale selector"
       >
         <Menu className="h-4 w-4 text-zinc-300" />

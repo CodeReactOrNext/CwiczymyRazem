@@ -126,7 +126,7 @@ const STEP_CLS: Record<StepStatus, string> = {
 
 const STATUS_DOT: Record<StepStatus, string> = {
   "not-started": "bg-zinc-600",
-  "in-progress": "bg-amber-400 shadow-sm shadow-amber-500/40",
+  "in-progress": "bg-amber-400",
   done: "bg-cyan-500",
 };
 
@@ -716,7 +716,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                 <span className="text-zinc-600">·</span>
                 <span>{roadmap.phases.length} phases</span>
               </div>
-              <h2 className="text-xl font-bold text-white md:text-2xl">{roadmap.title}</h2>
+              <h2 className="font-display text-xl font-bold text-zinc-100 md:text-2xl">{roadmap.title}</h2>
               {/* progress bar inside header */}
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex-1 h-1 overflow-hidden rounded-full bg-zinc-800/80">
@@ -848,7 +848,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
 
           <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
             {/* Root node */}
-            <div className="max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100 shadow-lg shadow-black/30">
+            <div className="max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100">
               {roadmap.goal}
             </div>
 
@@ -965,8 +965,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
             {phases.length > 0 && (
               <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
                 progress === 100
-                  ? "bg-cyan-950/20 text-cyan-400 shadow-lg shadow-cyan-950/30"
-                  : "bg-zinc-900/30 text-zinc-600 opacity-40"
+                  ? "bg-cyan-950/20 text-cyan-400"
+                  : "bg-zinc-900/30 text-zinc-500 opacity-40"
               }`}>
                 {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
               </div>
@@ -986,11 +986,11 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
           />
 
           {/* ─── Drawer panel ─── */}
-          <div className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-xl flex-col bg-zinc-950 shadow-2xl shadow-black/60 transition-transform duration-300 ${drawerInfo ? "translate-x-0" : "translate-x-full"}`}>
+          <div className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-xl flex-col bg-zinc-950 transition-transform duration-300 ${drawerInfo ? "translate-x-0" : "translate-x-full"}`}>
             {drawerInfo && (
               <>
                 {/* ── Sticky header ── */}
-                <div className="shrink-0 border-b border-zinc-800/50 bg-zinc-950/95 backdrop-blur-md">
+                <div className="shrink-0 bg-zinc-950/95 backdrop-blur-md">
                   <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4">
                     <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-2">
@@ -1013,7 +1013,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                       )}
                       <button
                         onClick={() => setDrawerStepId(null)}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+                        aria-label="Close"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -1046,7 +1047,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                 </div>
 
                 {/* ── Mobile close bar ── */}
-                <div className="flex shrink-0 items-center justify-center border-b border-zinc-800/40 py-2 sm:hidden">
+                <div className="flex shrink-0 items-center justify-center py-2 sm:hidden">
                   <button
                     onClick={() => setDrawerStepId(null)}
                     className="flex items-center gap-2 rounded px-4 py-1.5 text-xs font-medium text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
@@ -1066,7 +1067,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
 
                       {/* ── Exercise ── */}
                       {adminMode ? (
-                        <div className="border-b border-zinc-800/40 px-6 py-5">
+                        <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
                             <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
                           </p>
@@ -1145,7 +1146,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                         </div>
                       ) : (
                         (loadingExerciseIds.has(drawerInfo.step.id) || drawerInfo.step.suggestedExerciseId) && (
-                          <div className="border-b border-zinc-800/40 px-6 py-5">
+                          <div className="px-6 py-5">
                             {loadingExerciseIds.has(drawerInfo.step.id) ? (
                               <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
                                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
@@ -1184,10 +1185,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                       <div className="border-b border-zinc-800/40 px-6 py-5">
                         {adminMode ? (
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Description</label>
+                            <label className="text-[10px] font-bold tracking-widest text-zinc-500">Description</label>
                             <textarea
                               rows={8}
-                              className="w-full resize-y rounded border border-zinc-700 bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                              className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
                               value={drawerInfo.step.description}
                               onChange={(e) => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { description: e.target.value })}
                             />
@@ -1212,14 +1213,14 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
 
                       {/* ── Success criteria ── */}
                       {(drawerInfo.step.successCriteria || adminMode) && (
-                        <div className="border-b border-zinc-800/40 px-6 py-5">
+                        <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
                             <Target className="h-3.5 w-3.5 text-cyan-500" /> Success criteria
                           </p>
                           {adminMode ? (
                             <textarea
                               rows={3}
-                              className="w-full resize-y rounded border border-zinc-700 bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                              className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
                               value={drawerInfo.step.successCriteria}
                               onChange={(e) => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { successCriteria: e.target.value })}
                             />
@@ -1271,7 +1272,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                                   value={customLessonInput[drawerInfo.step.id] ?? ""}
                                   onChange={(e) => setCustomLessonInput((prev) => ({ ...prev, [drawerInfo.step.id]: e.target.value }))}
                                   onKeyDown={(e) => { if (e.key === "Enter") handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? ""); }}
-                                  className="flex-1 rounded border border-zinc-700 bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-red-600"
+                                  className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
                                 />
                                 <button
                                   onClick={() => handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? "")}
@@ -1294,7 +1295,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                                   value={customLessonInput[drawerInfo.step.id] ?? ""}
                                   onChange={(e) => setCustomLessonInput((prev) => ({ ...prev, [drawerInfo.step.id]: e.target.value }))}
                                   onKeyDown={(e) => { if (e.key === "Enter") handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? ""); }}
-                                  className="flex-1 rounded border border-zinc-700 bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-red-600"
+                                  className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
                                 />
                                 <button
                                   onClick={() => handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? "")}
