@@ -13,7 +13,7 @@ const ReportFormLayout = ({ children }: ReportFormLayoutProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}>
-        <Form className='mx-auto flex max-w-6xl flex-col gap-6 p-4 py-5 text-white sm:p-5 md:gap-8'>
+        <Form className='mx-auto flex max-w-6xl flex-col gap-6 p-4 py-5 text-zinc-100 sm:p-5 md:gap-8'>
           {children}
         </Form>
       </motion.div>

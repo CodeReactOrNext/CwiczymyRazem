@@ -1,6 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import type { QuestionMarkProps } from "components/UI/QuestionMark";
 import QuestionMark from "components/UI/QuestionMark";
+import { HABBITS_POINTS_VALUE } from "constants/ratingValue";
 import { useField } from "formik";
 import { motion } from "framer-motion";
 import {
@@ -55,15 +56,14 @@ const HealthHabbitsBox = ({
 
   return (
     <motion.div
-      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}>
       <Card
         onClick={handleCheckboxClick}
-        className={`group relative cursor-pointer overflow-hidden rounded-xl p-0 transition-all duration-300 hover:shadow-sm ${
+        className={`group relative cursor-pointer overflow-hidden rounded-lg p-0 transition-colors duration-300 ${
           isActive
-            ? "bg-emerald-500/5 ring-1 ring-emerald-500/20 backdrop-blur-sm border-white/10"
-            : "bg-zinc-900/30 border-white/5 hover:bg-zinc-900/50"
+            ? "bg-emerald-500/10 ring-1 ring-emerald-500/20 backdrop-blur-sm"
+            : "bg-zinc-900/30 hover:bg-zinc-900/50"
         }`}>
         <div className='block w-full p-4'>
           <div className='cursor-pointer'>
@@ -72,12 +72,12 @@ const HealthHabbitsBox = ({
             <div className='flex items-center gap-3'>
               <div
                 className={`
-                  flex h-5 w-5 items-center justify-center rounded-md border
-                  transition-all duration-300
+                  flex h-5 w-5 items-center justify-center rounded border
+                  transition-colors duration-300
                   ${
                     isActive
                       ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-400"
-                      : "border-gray-700/30 bg-black/20 text-transparent"
+                      : "border-zinc-700 bg-zinc-800/40 text-transparent"
                   }
                 `}>
                 <FaCheck
@@ -92,26 +92,35 @@ const HealthHabbitsBox = ({
                   className={`transition-colors duration-300 ${
                     isActive
                       ? "text-emerald-400"
-                      : "text-gray-600 group-hover:text-gray-400"
+                      : "text-zinc-500 group-hover:text-zinc-400"
                   }`}>
                   {HabitIcon}
                 </span>
                 <p
-                  className={`font-openSans text-sm font-normal  md:text-sm ${
+                  className={`font-sans text-sm font-normal  md:text-sm ${
                     isActive
-                      ? "text-white"
-                      : "text-gray-400 group-hover:text-gray-300"
+                      ? "text-zinc-100"
+                      : "text-zinc-400 group-hover:text-zinc-300"
                   }`}>
                   {title}
                 </p>
                 <QuestionMark description={questionMarkProps.description} className="!text-sm opacity-50" />
               </div>
+
+              {isActive && (
+                <span
+                  key={name + "-points"}
+                  className='flex shrink-0 items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-400 duration-300 animate-in fade-in zoom-in-95 slide-in-from-right-1'>
+                  +{HABBITS_POINTS_VALUE}
+                  <img
+                    src='/images/points.png'
+                    alt='points'
+                    className='h-3.5 w-3.5 object-contain'
+                  />
+                </span>
+              )}
             </div>
           </div>
-
-          {isActive && (
-            <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#4a7edd]/30 to-transparent' />
-          )}
         </div>
       </Card>
     </motion.div>
