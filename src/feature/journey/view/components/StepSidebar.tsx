@@ -204,7 +204,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 onComplete(step.id);
               }}
               disabled={isLocked || isSaving || !canComplete}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-white py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {isSaving ? "Saving..." : "Done & Complete"}
               <CheckCircle2 size={18} />
@@ -227,7 +227,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 router.push(`/practice/exercise/${step.suggestedExerciseId}?mode=exam&bpm=${bpm}&stepId=${step.id}&moduleId=${moduleId}`);
               }}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-lg bg-amber-400 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Target size={16} />
               {isCompleted ? "Retake" : "Exam"}

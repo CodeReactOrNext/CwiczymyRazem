@@ -254,7 +254,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 
                     {/* CTA button */}
                     <button
-                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-6 py-3.5 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3.5 text-sm font-semibold text-zinc-200 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       {completed > 0 ? "Continue Learning" : "Start Module"}
                       <ChevronRight size={18} strokeWidth={2.5} />

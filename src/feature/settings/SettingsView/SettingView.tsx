@@ -45,7 +45,7 @@ const SettingsView = () => {
              <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1.5">
                 <TabsTrigger 
                   value="profile" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
                     <User className="h-4 w-4" />
@@ -54,7 +54,7 @@ const SettingsView = () => {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="socials" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-blue-500/10 group-data-[state=active]:text-blue-500 transition-colors">
                     <Share2 className="h-4 w-4" />
@@ -63,7 +63,7 @@ const SettingsView = () => {
                 </TabsTrigger>
                 <TabsTrigger
                   value="notifications"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
                     <Bell className="h-4 w-4" />
@@ -72,7 +72,7 @@ const SettingsView = () => {
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
                     <Lock className="h-4 w-4" />
@@ -100,13 +100,13 @@ const SettingsView = () => {
 
             <TabsContent value="security" className="mt-0 space-y-6">
                {isViaGoogle ? (
-                  <div className="rounded-lg bg-cyan-50 border border-cyan-100 p-6 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600">
+                  <div className="flex items-center gap-4 rounded-lg bg-cyan-500/10 p-6">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-400">
                        <Lock className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-cyan-900">Google OAuth Authentication</p>
-                      <p className="text-sm text-cyan-700">{t("settings:logged_in_via_google")}</p>
+                      <p className="font-semibold text-cyan-300">Google OAuth Authentication</p>
+                      <p className="text-sm text-zinc-400">{t("settings:logged_in_via_google")}</p>
                     </div>
                   </div>
                ) : (

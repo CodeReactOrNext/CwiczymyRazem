@@ -6,7 +6,7 @@ import { withAuth } from "utils/auth/serverAuth";
 
 const JourneyPage: NextPageWithLayout = () => {
   return (
-    <div className="flex min-h-screen flex-col overflow-visible rounded-lg bg-zinc-950 lg:mt-16">
+    <div className="bg-second-600 flex min-h-screen flex-col overflow-visible rounded-lg lg:mt-16">
       <JourneyView />
     </div>
   );

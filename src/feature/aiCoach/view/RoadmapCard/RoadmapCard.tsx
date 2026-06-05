@@ -42,7 +42,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
 
   return (
     <div
-      className="group relative cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl transition-all hover:brightness-110"
+      className="group relative cursor-pointer overflow-hidden rounded-lg bg-zinc-900/60 transition-background hover:bg-zinc-900/80"
       onClick={onOpen}
     >
       <div className="flex flex-col md:flex-row">
@@ -76,12 +76,12 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
 
           {/* Tag badge */}
           <div
-            className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-lg border bg-black/60 px-3 py-1 text-[10px] font-bold tracking-widest backdrop-blur-sm"
-            style={{ borderColor: `rgba(${accentRgb},0.35)`, color: `rgb(${accentRgb})` }}
+            className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded bg-black/60 px-3 py-1 text-[10px] font-bold tracking-widest backdrop-blur-sm"
+            style={{ color: `rgb(${accentRgb})` }}
           >
             <span
               className="h-1.5 w-1.5 rounded-full"
-              style={{ background: `rgb(${accentRgb})`, boxShadow: `0 0 6px 2px rgba(${accentRgb},0.6)` }}
+              style={{ background: `rgb(${accentRgb})` }}
             />
             {tag}
           </div>
@@ -92,10 +92,10 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
           <div>
             <div className="mb-3">
               <span className="text-xs font-semibold tracking-widest text-zinc-500">
-                {roadmap.level} · {roadmap.phases.length} phases
+                {roadmap.phases.length} phases
               </span>
             </div>
-            <h2 className="text-2xl font-black text-white md:text-3xl">{roadmap.title}</h2>
+            <h2 className="font-display text-2xl font-black text-zinc-100 md:text-3xl">{roadmap.title}</h2>
             {roadmap.goal && roadmap.goal !== roadmap.title && (
               <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-400">{roadmap.goal}</p>
             )}
@@ -118,7 +118,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
             </div>
 
             <button
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-3.5 text-sm font-semibold text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-700"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3.5 text-sm font-semibold text-zinc-200 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               {ctaLabel}
               <ChevronRight size={18} strokeWidth={2.5} />

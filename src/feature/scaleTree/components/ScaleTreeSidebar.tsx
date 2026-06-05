@@ -65,12 +65,12 @@ export function ScaleTreeSidebar({
   const families = ['pentatonic', 'diatonic', 'mode'] as const;
 
   return (
-    <div className="flex h-full w-[280px] sm:w-[320px] flex-col border-r border-white/5 bg-[#0a0a0c] p-4 select-none">
+    <div className="flex h-full w-[280px] sm:w-[320px] flex-col bg-[#0a0a0c] p-4 select-none">
       <div className="mb-6 px-2">
         <h2 className="text-sm font-bold tracking-widest text-zinc-400 capitalize">
           Scale Selector
         </h2>
-        <p className="text-[10px] text-zinc-600 mt-1">
+        <p className="text-[10px] text-zinc-500 mt-1">
           Select a scale to view its skill tree and box positions.
         </p>
       </div>
@@ -101,14 +101,11 @@ export function ScaleTreeSidebar({
                     <motion.button
                       key={item.id}
                       onClick={() => onSelectScale(item.scaleType)}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      className={`relative w-full flex flex-col p-3.5 text-left transition-all border ${
+                      className={`relative w-full flex flex-col rounded-lg p-3.5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
                         isActive
-                          ? 'bg-[#121215] border-white/10'
-                          : 'bg-[#0c0c0e] border-white/[0.02] hover:bg-[#101012] hover:border-white/5'
+                          ? 'bg-zinc-800/60'
+                          : 'bg-zinc-900/40 hover:bg-zinc-800/40'
                       }`}
-                      style={{ borderRadius: '8px' }}
                     >
                       {isActive && (
                         <div
@@ -120,7 +117,7 @@ export function ScaleTreeSidebar({
                       <div className="flex items-center justify-between w-full">
                         <span
                           className={`text-sm font-semibold tracking-wide transition-colors ${
-                            isActive ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200'
+                            isActive ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-200'
                           }`}
                         >
                           {item.label}
@@ -149,12 +146,11 @@ export function ScaleTreeSidebar({
                             </span>
                           </div>
 
-                          <div className="relative h-2 w-full rounded-full bg-white/[0.04] overflow-hidden border border-white/[0.03]">
+                          <div className="relative h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
                             <motion.div
                               className="absolute inset-y-0 left-0 rounded-full"
                               style={{
                                 backgroundColor: meta.color,
-                                boxShadow: progressPercent > 0 ? `0 0 6px ${meta.color}80` : 'none',
                               }}
                               initial={{ width: 0 }}
                               animate={{ width: `${progressPercent}%` }}

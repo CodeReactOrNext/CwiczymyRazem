@@ -55,7 +55,7 @@ export const GuitarStartDate = () => {
 
   return (
     <div className='flex flex-col gap-6'>
-      <h3 className='font-openSans text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
+      <h3 className='font-sans text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
         {t("guitarStartDate.title")}
       </h3>
 
@@ -76,7 +76,7 @@ export const GuitarStartDate = () => {
         </Select>
         
         {date && (
-            <div className="bg-muted/50 border border-muted p-3 rounded-lg text-sm text-foreground">
+            <div className="bg-muted/50 p-3 rounded-lg text-sm text-foreground">
                 <span role="img" aria-label="guitar" className="mr-2">🎸</span>
                 {t("guitarStartDate.duration_years", { years: durationYears })}
             </div>

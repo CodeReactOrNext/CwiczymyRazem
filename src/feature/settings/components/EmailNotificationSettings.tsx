@@ -60,7 +60,7 @@ const Toggle = ({
   >
     <span
       className={cn(
-        "inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200",
+        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200",
         checked ? "translate-x-[22px]" : "translate-x-0.5"
       )}
     />
@@ -89,7 +89,7 @@ const EmailNotificationSettings = () => {
   };
 
   return (
-    <Card className="border-zinc-800/50 bg-zinc-900/20">
+    <Card className="border-none bg-zinc-900/20">
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
           {/* Header */}
@@ -114,7 +114,7 @@ const EmailNotificationSettings = () => {
               return (
                 <div
                   key={opt.key}
-                  className="flex items-start justify-between gap-4 rounded-lg border border-zinc-800/50 bg-zinc-950/30 p-4"
+                  className="flex items-start justify-between gap-4 rounded-lg bg-zinc-950/30 p-4"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className={cn("p-2 rounded shrink-0", opt.iconClass)}>

@@ -739,7 +739,7 @@ export default function TabEditor() {
           <LucideMonitor className="text-white/30" size={32} />
         </div>
         <div className="space-y-3">
-          <h2 className="text-xl font-black uppercase tracking-tight text-white">Desktop Only</h2>
+          <h2 className="text-xl font-black tracking-tight text-white">Desktop Only</h2>
           <p className="text-sm text-white/40 max-w-xs leading-relaxed">
             Tab Editor requires a keyboard and larger screen. Please open it on a desktop or laptop computer.
           </p>
@@ -764,9 +764,9 @@ export default function TabEditor() {
                     <LucideChevronLeft size={20} />
                   </button>
                   <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center rotate-3">
-                      <LucideWand2 className="text-black" size={18} />
+                      <LucideWand2 className="text-zinc-950" size={18} />
                   </div>
-                  <h1 className="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40 uppercase">
+                  <h1 className="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">
                   Tab Editor
                   </h1>
               </div>
@@ -777,14 +777,14 @@ export default function TabEditor() {
                 onClick={() => setIsImportModalOpen(true)}
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-[10px] font-black group"
               >
-                <span>PASTE CODE</span>
+                <span>Paste code</span>
               </button>
               <button
                 onClick={copyCode}
-                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-black hover:bg-cyan-400 rounded-lg transition-all text-[10px] font-black group shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg transition-all text-[10px] font-black group"
               >
                 <LucideCopy size={14} />
-                <span>COPY EXPORT</span>
+                <span>Copy export</span>
               </button>
               <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
               <button
@@ -792,7 +792,7 @@ export default function TabEditor() {
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-bold text-cyan-400"
               >
                 <LucideWand2 size={12} />
-                <span>SPIDER GEN</span>
+                <span>Spider gen</span>
               </button>
               <button
                 onClick={() => {
@@ -802,14 +802,14 @@ export default function TabEditor() {
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg transition-all text-[10px] font-bold text-emerald-400"
               >
                 <LucidePlus size={12} />
-                <span>{editId ? 'SAVE CHANGES' : 'PUBLISH'}</span>
+                <span>{editId ? 'Save changes' : 'Publish'}</span>
               </button>
               <button
                 onClick={clearAll}
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 rounded-lg transition-all text-[10px] font-bold text-white/40 hover:text-red-400"
               >
                 <LucideEraser size={12} />
-                <span>CLEAR</span>
+                <span>Clear</span>
               </button>
               <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
               <div className="flex items-center gap-1 bg-black rounded-lg border border-white/10 p-1">
@@ -817,7 +817,7 @@ export default function TabEditor() {
                   onClick={() => isPlaying ? stopPlayback() : startPlayback()}
                   className={cn(
                     "p-2 w-8 h-8 flex items-center justify-center rounded transition-all",
-                    isPlaying ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]" : "bg-white/10 text-white hover:bg-white/20"
+                    isPlaying ? "bg-red-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
                   )}
                 >
                   {isPlaying ? <LucideSquare size={14} fill="currentColor" /> : <LucidePlay size={14} fill="currentColor" className="ml-0.5" />}
@@ -832,7 +832,7 @@ export default function TabEditor() {
                   {isMuted ? <LucideVolumeX size={14} /> : <LucideVolume2 size={14} />}
                 </button>
                 <div className="px-2 py-1 flex flex-col justify-center min-w-[40px]">
-                  <span className="text-[7px] uppercase font-black text-white/20 leading-tight">BPM</span>
+                  <span className="text-[7px] font-black text-white/20 leading-tight">BPM</span>
                   <input
                       type="number"
                       value={bpm}
@@ -846,8 +846,8 @@ export default function TabEditor() {
                             key={d}
                             onClick={() => setGlobalDuration(d)}
                             className={cn(
-                                "px-2 h-7 flex items-center justify-center rounded transition-all text-[8px] font-black uppercase whitespace-nowrap",
-                                d === (measures[0]?.beats[0]?.duration) ? "bg-cyan-500 text-black" : "text-white/40 hover:text-white hover:bg-white/5"
+                                "px-2 h-7 flex items-center justify-center rounded transition-all text-[8px] font-black whitespace-nowrap",
+                                d === (measures[0]?.beats[0]?.duration) ? "bg-cyan-500 text-zinc-950" : "text-white/40 hover:text-white hover:bg-white/5"
                             )}
                         >
                             {d === 1 && "1/4"}
@@ -861,8 +861,8 @@ export default function TabEditor() {
                 <button
                     onClick={() => setAutoAdvance(!autoAdvance)}
                     className={cn(
-                        "px-2 h-8 flex items-center justify-center rounded transition-all text-[8px] font-black uppercase tracking-widest gap-2",
-                        autoAdvance ? "bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 text-white/40 hover:text-white"
+                        "px-2 h-8 flex items-center justify-center rounded transition-all text-[8px] font-black tracking-widest gap-2",
+                        autoAdvance ? "bg-cyan-500 text-zinc-950" : "bg-white/5 text-white/40 hover:text-white"
                     )}
                 >
                     <div className={cn("w-1 h-1 rounded-full", autoAdvance ? "bg-black animate-pulse" : "bg-white/20")} />
@@ -891,7 +891,7 @@ export default function TabEditor() {
                   className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-cyan-400">Import Tablature</h3>
+                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Tablature</h3>
                     <p className="text-sm text-white/40 font-medium">Paste your exercise code snippet or JSON array here.</p>
                   </div>
 
@@ -905,13 +905,13 @@ export default function TabEditor() {
                   <div className="flex gap-4">
                     <button
                       onClick={() => { setIsImportModalOpen(false); setImportText(""); }}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={importCode}
-                      className="flex-1 py-3 bg-cyan-500 text-black hover:bg-cyan-400 rounded-lg text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Import & Load
                     </button>
@@ -937,14 +937,14 @@ export default function TabEditor() {
                   className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
+                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
                     <p className="text-sm text-white/40 font-medium">Configure your spider pattern parameters.</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-white/40">Finger Permutation</label>
+                        <label className="text-[10px] font-black text-white/40">Finger Permutation</label>
                         <input
                           type="text"
                           value={spiderConfig.permutation}
@@ -955,7 +955,7 @@ export default function TabEditor() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase text-white/40">Start Fret</label>
+                          <label className="text-[10px] font-black text-white/40">Start Fret</label>
                           <input
                             type="number"
                             value={spiderConfig.startFret}
@@ -964,7 +964,7 @@ export default function TabEditor() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase text-white/40">End Fret</label>
+                          <label className="text-[10px] font-black text-white/40">End Fret</label>
                           <input
                             type="number"
                             value={spiderConfig.endFret}
@@ -977,7 +977,7 @@ export default function TabEditor() {
 
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-white/40">Rhythm (Duration)</label>
+                        <label className="text-[10px] font-black text-white/40">Rhythm (Duration)</label>
                         <select
                           value={spiderConfig.duration}
                           onChange={(e) => setSpiderConfig({...spiderConfig, duration: parseFloat(e.target.value)})}
@@ -1014,13 +1014,13 @@ export default function TabEditor() {
                   <div className="flex gap-4 pt-4">
                     <button
                       onClick={() => setIsSpiderModalOpen(false)}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={generateSpider}
-                      className="flex-1 py-3 bg-cyan-500 text-black hover:bg-cyan-400 rounded-lg text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Generate Spider
                     </button>
@@ -1034,10 +1034,9 @@ export default function TabEditor() {
           <section className="space-y-4">
               <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Real-time Visualization</h2>
+                  <h2 className="text-[10px] font-black tracking-[0.3em] text-white/40">Real-time Visualization</h2>
               </div>
-              <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-duration-500" />
+              <div className="relative">
                   <TablatureViewer
                       measures={measures}
                       bpm={bpm}
@@ -1057,12 +1056,12 @@ export default function TabEditor() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden shadow-2xl relative"
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden relative"
                 >
                   <div className="bg-white/[0.02] p-4 flex items-center justify-between border-b border-white/10">
                     <div className="flex items-center gap-6">
                         <div className="bg-white/5 px-3 py-1 rounded-full">
-                          <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Measure #{mIdx + 1}</span>
+                          <span className="text-[10px] font-black text-white/40 tracking-tighter">Measure #{mIdx + 1}</span>
                         </div>
                           <div className="flex items-center gap-4 text-[10px] font-bold text-white/20">
                             <span>4 / 4 TIME</span>
@@ -1079,7 +1078,7 @@ export default function TabEditor() {
                                                 : "hover:bg-white/5 text-white/20"
                                         )}
                                     >
-                                        {s === 12 ? "Triplet (12)" : s === 24 ? "Sextuplet (24)" : `${s} STEPS`}
+                                        {s === 12 ? "Triplet (12)" : s === 24 ? "Sextuplet (24)" : `${s} steps`}
                                     </button>
                                 ))}
                             </div>
@@ -1161,7 +1160,7 @@ export default function TabEditor() {
                               {/* Selection Rect Overlay */}
                               <div
                                 id={`selection-box-${mIdx}`}
-                                className="absolute z-20 pointer-events-none border border-cyan-400 bg-cyan-400/20 shadow-[0_0_10px_rgba(6,182,212,0.1)] hidden"
+                                className="absolute z-20 pointer-events-none border border-cyan-400 bg-cyan-400/20 hidden"
                               />
                             {/* String Labels */}
                             <div className="flex flex-col justify-between py-2 mb-10 text-[10px] font-black text-white/20 w-4">
@@ -1198,7 +1197,7 @@ export default function TabEditor() {
                                           className={cn(
                                             "w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-all border-2 relative group-cell",
                                             isSelected
-                                              ? "border-cyan-500 bg-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                                              ? "border-cyan-500 bg-cyan-500/20"
                                               : isInActiveSelection
                                                 ? "border-cyan-500/40 bg-cyan-500/10"
                                                 : isCrosshair
@@ -1206,7 +1205,7 @@ export default function TabEditor() {
                                                   : isBeatMark
                                                     ? "border-white/10 bg-white/[0.03] hover:bg-white/10"
                                                     : "border-white/5 bg-transparent hover:bg-white/5",
-                                            note ? "text-white scale-100" : "text-white/10 scale-95 hover:scale-100",
+                                            note ? "text-white" : "text-white/10",
                                             note?.isPalmMute ? "border-b-amber-500/40" : ""
                                           )}
                                         >
@@ -1236,7 +1235,7 @@ export default function TabEditor() {
                                                 <span className="text-[8px] font-black mt-0.5 text-amber-500/70 leading-none">PM</span>
                                               )}
                                               {note.isAccented && (
-                                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
+                                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                                               )}
                                             </div>
                                           ) : (
@@ -1257,7 +1256,7 @@ export default function TabEditor() {
                                             onClick={() => updateDuration(mIdx, bIdx, d)}
                                             className={cn(
                                                 "h-4 px-1 rounded flex items-center justify-center transition-all whitespace-nowrap",
-                                                beat.duration === d ? "bg-cyan-500 text-[7px] text-black font-black" : "text-[7px] font-black text-white/20 hover:text-white/40"
+                                                beat.duration === d ? "bg-cyan-500 text-[7px] text-zinc-950 font-black" : "text-[7px] font-black text-white/20 hover:text-white/40"
                                             )}
                                         >
                                             {d === 1 && "1/4"}
@@ -1285,8 +1284,8 @@ export default function TabEditor() {
                   <LucidePlus size={24} />
               </div>
               <div className="flex flex-col items-center">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30 group-hover:text-cyan-400 transition-all">Add New Measure</span>
-                  <span className="text-[10px] font-bold text-white/10 uppercase mt-1">Append more steps to your pattern</span>
+                  <span className="text-xs font-black tracking-[0.2em] text-white/30 group-hover:text-cyan-400 transition-all">Add New Measure</span>
+                  <span className="text-[10px] font-bold text-white/10 mt-1">Append more steps to your pattern</span>
               </div>
             </button>
           </section>
@@ -1296,72 +1295,72 @@ export default function TabEditor() {
         {/* Floating Shortcuts Sidebar */}
         <div className="fixed top-1/2 -translate-y-1/2 right-6 z-40 hidden xl:flex flex-col gap-4 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-lg shadow-2xl">
             <div className="flex flex-col items-center gap-1 border-b border-white/5 pb-4 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/40 italic">Shortcuts</span>
+                <span className="text-[10px] font-black tracking-widest text-white/40 italic">Shortcuts</span>
             </div>
 
             <div className="space-y-4">
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10 shadow-lg shadow-black">↑</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↑</kbd>
                     </div>
                     <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10 shadow-lg shadow-black">←</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10 shadow-lg shadow-black">↓</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10 shadow-lg shadow-black">→</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">←</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↓</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">→</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20 mt-1">Navigate</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20 mt-1">Navigate</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <kbd className="px-3 h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10 shadow-lg shadow-black">0-9</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Fret</span>
+                    <kbd className="px-3 h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">0-9</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 text-center">
                     <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-400/20 text-amber-400 rounded text-[11px] font-black border border-amber-400/20 shadow-lg shadow-black">H</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-red-400/20 text-red-400 rounded text-[11px] font-black border border-red-400/20 shadow-lg shadow-black">P</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-400/20 text-amber-400 rounded text-[11px] font-black border border-amber-400/20">H</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-red-400/20 text-red-400 rounded text-[11px] font-black border border-red-400/20">P</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Legato</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Legato</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-400/20 text-cyan-400 rounded text-[11px] font-black border border-cyan-400/20 shadow-lg shadow-black shadow-cyan-500/10">A</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Accent</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-zinc-400/20 text-zinc-400 rounded text-[11px] font-black border border-zinc-400/20 shadow-lg shadow-black">D</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-300/20 text-cyan-300 rounded text-[11px] font-black border border-cyan-300/20 shadow-lg shadow-black">V</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Dead / Vib</span>
+                    <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-400/20 text-cyan-400 rounded text-[11px] font-black border border-cyan-400/20">A</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Accent</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-purple-400/20 text-purple-400 rounded text-[11px] font-black border border-purple-400/20 shadow-lg shadow-black">T</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-500/20 text-amber-500 rounded text-[11px] font-black border border-amber-500/20 shadow-lg shadow-black">M</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-zinc-400/20 text-zinc-400 rounded text-[11px] font-black border border-zinc-400/20">D</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-300/20 text-cyan-300 rounded text-[11px] font-black border border-cyan-300/20">V</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Tap / PM</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Dead / Vib</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-1">
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-purple-400/20 text-purple-400 rounded text-[11px] font-black border border-purple-400/20">T</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-500/20 text-amber-500 rounded text-[11px] font-black border border-amber-500/20">M</kbd>
+                    </div>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Tap / PM</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/5">
-                    <kbd className="px-2 h-7 flex items-center justify-center bg-red-500/10 text-red-500 rounded text-[9px] font-black border border-red-500/20 shadow-lg shadow-black">DEL</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Clear</span>
+                    <kbd className="px-2 h-7 flex items-center justify-center bg-red-500/10 text-red-500 rounded text-[9px] font-black border border-red-500/20">DEL</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Clear</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-cyan-500/10 text-cyan-400 rounded text-[9px] font-black border border-cyan-500/20 shadow-lg shadow-black">CTRL+Z</kbd>
+                        <kbd className="px-2 h-7 flex items-center justify-center bg-cyan-500/10 text-cyan-400 rounded text-[9px] font-black border border-cyan-500/20">CTRL+Z</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Undo</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Undo</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-white/10 rounded text-[10px] font-black border border-white/10 shadow-lg shadow-black">SCROLL</kbd>
+                        <kbd className="px-2 h-7 flex items-center justify-center bg-white/10 rounded text-[10px] font-black border border-white/10">SCROLL</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Fret +/-</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret +/-</span>
                 </div>
             </div>
       </div>
@@ -1373,8 +1372,8 @@ export default function TabEditor() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     className={cn(
-                        "fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg font-black text-xs uppercase tracking-widest shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl",
-                        toast.type === 'success' ? "bg-cyan-500 text-black" : "bg-red-500 text-white"
+                        "fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg font-black text-xs tracking-widest shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl",
+                        toast.type === 'success' ? "bg-cyan-500 text-zinc-950" : "bg-red-500 text-white"
                     )}
                 >
                     <div className={cn("w-2 h-2 rounded-full", toast.type === 'success' ? "bg-black animate-pulse" : "bg-white animate-bounce")} />
@@ -1395,14 +1394,14 @@ export default function TabEditor() {
                 >
                     <button
                         onClick={handleCopySelection}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Copy</span>
                         <span className="text-[10px] opacity-30">CTRL+C</span>
                     </button>
                     <button
                         onClick={() => { handlePasteAtCursor(); setContextMenu(null); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Paste</span>
                         <span className="text-[10px] opacity-30">CTRL+V</span>
@@ -1410,7 +1409,7 @@ export default function TabEditor() {
                     <div className="h-px bg-white/5 my-1" />
                     <button
                         onClick={() => { handleCopySelection(); handleDeleteSelection(); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Cut</span>
                         <span className="text-[10px] opacity-30">CTRL+X</span>
@@ -1418,7 +1417,7 @@ export default function TabEditor() {
                     <div className="h-px bg-white/5 my-1" />
                     <button
                         onClick={handleDeleteSelection}
-                        className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded text-xs font-black uppercase tracking-widest text-red-400/60 hover:text-red-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded text-xs font-black tracking-widest text-red-400/60 hover:text-red-400 flex items-center justify-between transition-all"
                     >
                         <span>Clear Area</span>
                         <span className="text-[10px] opacity-30">DEL</span>

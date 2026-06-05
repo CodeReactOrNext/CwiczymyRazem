@@ -35,10 +35,10 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
   return (
     <button
       onClick={handleClick}
-      className="group flex w-full items-start gap-4 rounded-2xl border border-zinc-700/60 bg-zinc-900/80 p-3 text-left transition hover:border-red-500/40 hover:bg-red-950/10"
+      className="group flex w-full items-start gap-4 rounded-lg bg-zinc-900/60 p-3 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
     >
       {/* Thumbnail */}
-      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-xl bg-zinc-800">
+      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-zinc-800">
         <img
           src={lesson.thumbnailUrl}
           alt={lesson.title}

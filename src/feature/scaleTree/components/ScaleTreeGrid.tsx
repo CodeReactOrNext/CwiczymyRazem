@@ -186,7 +186,7 @@ export function ScaleTreeGrid({
           {family} Tree
         </span>
         <div className="flex items-center gap-3 mt-1 sm:mt-1.5">
-          <h1 className="text-lg sm:text-2xl font-bold text-white tracking-wide capitalize">
+          <h1 className="font-display text-lg sm:text-2xl font-bold text-zinc-100 tracking-wide capitalize">
             {SCALE_LABEL[scaleType] || scaleType}
           </h1>
           <div
@@ -200,7 +200,7 @@ export function ScaleTreeGrid({
 
       <div
         ref={scrollContainerRef}
-        className="relative flex-1 flex flex-col justify-start items-start sm:items-center w-full min-h-0 bg-[#0e0e11]/30 rounded-xl border border-white/[0.02] p-3 sm:p-6 overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="relative flex-1 flex flex-col justify-start items-start sm:items-center w-full min-h-0 bg-[#0e0e11]/30 rounded-lg p-3 sm:p-6 overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent"
         onScroll={updateCoordinates}
       >
         <svg
@@ -261,7 +261,7 @@ export function ScaleTreeGrid({
                     </span>
                   </div>
 
-                  <div className="flex-1 flex justify-between items-center bg-black/15 rounded-lg border border-white/[0.01] p-1.5 sm:p-3 gap-1 sm:gap-2">
+                  <div className="flex-1 flex justify-between items-center bg-black/15 rounded-lg p-1.5 sm:p-3 gap-1 sm:gap-2">
                     {posNodes.map((node) => (
                       <div key={node.id} id={`node-slot-${node.id}`} className="flex-shrink-0">
                         <ScaleTreeGridNode

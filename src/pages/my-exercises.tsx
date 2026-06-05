@@ -97,17 +97,17 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
   if (activeExercise) {
     return (
-      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+      <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
         <div className="px-4 pt-6 pb-2">
           <button
             onClick={() => setActiveExercise(null)}
-            className="flex items-center gap-1.5 text-zinc-500 hover:text-white text-sm font-semibold transition-colors"
+            className="flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200 text-sm font-semibold transition-colors"
           >
             <ChevronLeft size={16} />
             Back to My Exercises
           </button>
         </div>
-        <div className="flex-1 overflow-hidden rounded-2xl mx-4 mb-4 border border-zinc-900 shadow-2xl">
+        <div className="flex-1 overflow-hidden rounded-lg mx-4 mb-4">
           <PracticeSession
             plan={activeExercise as any}
             onFinish={() => setActiveExercise(null)}
@@ -120,7 +120,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
       <HeroBanner
         title="My Exercises"
         subtitle="Create and share your own guitar exercises with the community"
@@ -134,23 +134,23 @@ const MyExercisesPage: NextPageWithLayout = () => {
         {isLoading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 bg-zinc-900 border border-zinc-800 rounded-lg animate-pulse" />
+              <div key={i} className="h-20 bg-zinc-900/40 rounded-lg animate-pulse" />
             ))}
           </div>
         ) : exercises.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-            <div className="w-16 h-16 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-              <Music2 className="text-zinc-600" size={28} />
+            <div className="w-16 h-16 rounded-lg bg-zinc-900/60 flex items-center justify-center">
+              <Music2 className="text-zinc-500" size={28} />
             </div>
             <div className="space-y-2">
-              <p className="text-white font-semibold">No exercises yet</p>
-              <p className="text-zinc-500 text-sm max-w-xs">
+              <p className="text-zinc-100 font-semibold">No exercises yet</p>
+              <p className="text-zinc-400 text-sm max-w-xs">
                 Use the Tab Editor to build a tablature, then publish it as a community exercise.
               </p>
             </div>
             <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold rounded-lg transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+              className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 text-sm font-bold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <Plus size={16} />
               Create your first exercise
@@ -161,12 +161,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
             {exercises.map(ex => (
               <div
                 key={ex.id}
-                className="flex items-center gap-4 bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-lg px-5 py-4 transition-all"
+                className="flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg px-5 py-4 transition-background"
               >
                 {/* Title + meta */}
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-white truncate">{ex.title}</p>
+                    <p className="font-semibold text-zinc-100 truncate">{ex.title}</p>
                     {ex.isPublic ? (
                       <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
                         <Globe size={9} />
@@ -190,7 +190,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       {ex.difficulty}
                     </span>
                     {ex.metronomeSpeed && (
-                      <span className="text-[10px] text-zinc-600 font-mono">
+                      <span className="text-[10px] text-zinc-500 font-mono">
                         {ex.metronomeSpeed.min}–{ex.metronomeSpeed.max} BPM
                       </span>
                     )}
@@ -205,17 +205,17 @@ const MyExercisesPage: NextPageWithLayout = () => {
                         <Star size={12} className="text-amber-400" fill="currentColor" />
                         <span className="text-sm font-bold text-zinc-200">{ex.averageRating.toFixed(1)}</span>
                       </div>
-                      <span className="text-[10px] text-zinc-600">{ex.ratingCount} rating{ex.ratingCount !== 1 ? "s" : ""}</span>
+                      <span className="text-[10px] text-zinc-500">{ex.ratingCount} rating{ex.ratingCount !== 1 ? "s" : ""}</span>
                     </>
                   ) : ex.isPublic ? (
-                    <span className="text-[10px] text-zinc-700">No ratings yet</span>
+                    <span className="text-[10px] text-zinc-500">No ratings yet</span>
                   ) : null}
                 </div>
 
                 {/* Play */}
                 <button
                   onClick={() => setActiveExercise(buildChallenge(ex))}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-700 bg-zinc-800/40 text-zinc-300 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 text-xs font-semibold transition-all"
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <Play size={12} fill="currentColor" />
                   Practice
@@ -225,7 +225,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 {ex.isPublic && (
                   <button
                     onClick={() => router.push("/profile/skills?tab=community")}
-                    className="shrink-0 px-3 py-1.5 rounded border border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 text-xs font-semibold transition-all"
+                    className="shrink-0 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   >
                     View
                   </button>
@@ -234,8 +234,9 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 {/* Edit */}
                 <button
                   onClick={() => handleEdit(ex)}
-                  className="shrink-0 p-2 rounded border border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-cyan-400 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all"
+                  className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-cyan-400 hover:bg-zinc-800 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   title="Edit exercise"
+                  aria-label="Edit exercise"
                 >
                   <Pencil size={14} />
                 </button>
@@ -244,8 +245,9 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => handleDelete(ex.id)}
                   disabled={deletingId === ex.id}
-                  className="shrink-0 p-2 rounded border border-zinc-800 bg-zinc-900/40 text-zinc-600 hover:text-rose-400 hover:border-rose-500/40 hover:bg-rose-500/5 disabled:opacity-40 transition-all"
+                  className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-rose-400 hover:bg-zinc-800 disabled:opacity-40 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   title="Delete exercise"
+                  aria-label="Delete exercise"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -254,7 +256,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
             <button
               onClick={handleCreate}
-              className="w-full mt-4 py-4 border-2 border-dashed border-zinc-800 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02] rounded-lg flex items-center justify-center gap-2 text-zinc-600 hover:text-cyan-400 text-sm font-semibold transition-all"
+              className="w-full mt-4 py-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg flex items-center justify-center gap-2 text-zinc-500 hover:text-cyan-400 text-sm font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <Plus size={16} />
               Create another exercise

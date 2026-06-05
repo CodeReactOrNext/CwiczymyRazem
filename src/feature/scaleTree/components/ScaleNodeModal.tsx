@@ -69,7 +69,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20"
+            className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -78,7 +78,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute left-1/2 top-1/2 z-30 w-[90vw] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-md"
+            className="absolute left-1/2 top-1/2 z-30 w-[90vw] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-zinc-900/95 backdrop-blur-md"
           >
             {/* Header */}
             <div className="flex items-start justify-between p-4 pb-2">
@@ -86,12 +86,13 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
                 <p className={`text-[10px] font-semibold capitalize tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
                   {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
                 </p>
-                <h2 className="mt-0.5 text-base font-bold leading-tight text-white">{node.label}</h2>
+                <h2 className="mt-0.5 text-base font-bold leading-tight text-zinc-100">{node.label}</h2>
                 <p className="text-xs text-zinc-500">{node.subtitle}</p>
               </div>
               <button
                 onClick={onClose}
-                className="ml-3 mt-0.5 flex-shrink-0 text-zinc-600 transition-colors hover:text-zinc-300"
+                aria-label="Close"
+                className="ml-3 mt-0.5 flex-shrink-0 rounded text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <X size={15} />
               </button>
@@ -114,7 +115,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
 
             {/* Tablature preview */}
             {tablature && tablature.length > 0 && (
-              <div className="mx-4 mb-3 overflow-hidden rounded-lg border border-white/5 bg-zinc-950">
+              <div className="mx-4 mb-3 overflow-hidden rounded-lg bg-zinc-950">
                 <TablaturePreview measures={tablature} />
               </div>
             )}
