@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -75,19 +76,20 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         <button
           onClick={onClose}
           data-vaul-no-drag
-          className="absolute right-4 top-4 z-10 rounded-full bg-black/60 p-2 text-white backdrop-blur-md transition hover:bg-black/80"
+          aria-label="Close"
+          className="absolute right-4 top-4 z-10 rounded-full bg-black/60 p-2 text-zinc-200 backdrop-blur-md transition-background hover:bg-black/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <X size={20} />
         </button>
-        
+
         <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
           <div className="mb-1.5 flex items-center gap-2">
-            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${status.cls}`}>
+            <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-widest", status.cls)}>
               {status.label}
             </span>
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Step {step.order}</span>
+            <span className="text-[10px] font-bold tracking-widest text-zinc-500">Step {step.order}</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white">{step.title}</h2>
+          <h2 className="font-display text-xl font-black text-zinc-100 sm:text-2xl">{step.title}</h2>
         </div>
       </div>
 
@@ -102,13 +104,13 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
               <div key={i} className="text-sm leading-relaxed text-zinc-300">
                 {block.type === "text" && <p>{block.body}</p>}
                 {block.type === "callout" && (
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
-                        <p className="font-bold text-zinc-200 mb-1">{block.label}</p>
-                        <p className="text-zinc-500">{block.body}</p>
+                    <div className="rounded-lg bg-zinc-800/40 p-4">
+                        <p className="mb-1 font-bold text-zinc-200">{block.label}</p>
+                        <p className="text-zinc-400">{block.body}</p>
                     </div>
                 )}
                 {block.type === "image" && (
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-zinc-800 mt-2">
+                    <div className="relative mt-2 aspect-video w-full overflow-hidden rounded-lg">
                         <Image src={block.url || ""} alt="" fill className="object-cover" />
                     </div>
                 )}
@@ -123,16 +125,16 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         {step.checklist && step.checklist.length > 0 && (
           <div className="space-y-4">
             {!isCompleted && (
-              <div className="flex items-start gap-3 rounded-xl bg-amber-500/10 p-4 border border-amber-500/20 text-amber-200/80">
-                <AlertCircle size={18} className="shrink-0 mt-0.5 text-amber-500" />
+              <div className="flex items-start gap-3 rounded-lg bg-amber-500/10 p-4 text-amber-200/80">
+                <AlertCircle size={18} className="mt-0.5 shrink-0 text-amber-500" />
                 <p className="text-xs font-medium leading-relaxed">
                   Please complete all mandatory tasks below by ticking the checkboxes to proceed to the next stage.
                 </p>
               </div>
             )}
-            <div className="rounded-2xl bg-zinc-900 p-5 border border-zinc-800 space-y-4">
+            <div className="space-y-4 rounded-lg bg-zinc-900/40 p-5">
               <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">Your Tasks</h3>
+                  <h3 className="text-sm font-black tracking-wider text-zinc-100">Your Tasks</h3>
                   <span className="text-[10px] font-bold text-zinc-500">{checklistState.filter(Boolean).length}/{checklistState.length}</span>
               </div>
               <div className="space-y-2">
@@ -140,9 +142,10 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                   <button
                     key={i}
                     onClick={() => setChecklistState(prev => prev.map((v, idx) => idx === i ? !v : v))}
-                    className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                      checklistState[i] ? "bg-emerald-500/10 text-emerald-400" : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                    }`}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      checklistState[i] ? "bg-emerald-500/10 text-emerald-400" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800"
+                    )}
                   >
                     {checklistState[i] ? <SquareCheck size={18} /> : <Square size={18} />}
                     <span className="text-xs font-medium">{item.text}</span>
@@ -156,24 +159,25 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         {/* Song Picker */}
         {step.songPicker && step.songPicker.length > 0 && (
             <div className="space-y-4">
-                <h3 className="text-sm font-black text-white uppercase tracking-wider">Choose a target</h3>
+                <h3 className="text-sm font-black tracking-wider text-zinc-100">Choose a target</h3>
                 <div className="grid grid-cols-1 gap-2">
                     {pickerLoading ? (
-                        <div className="h-16 animate-pulse bg-zinc-900 rounded-xl" />
+                        <div className="h-16 animate-pulse rounded-lg bg-zinc-900/40" />
                     ) : (
                         pickerSongs.map(song => (
                             <button
                                 key={song.id}
                                 onClick={() => setSelectedSongId(song.id)}
-                                className={`flex items-center gap-3 rounded-xl border p-2 text-left transition ${
-                                    selectedSongId === song.id ? "border-white bg-zinc-800" : "border-zinc-800 bg-zinc-900"
-                                }`}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-lg p-2 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                    selectedSongId === song.id ? "bg-zinc-800 ring-1 ring-cyan-500/40" : "bg-zinc-900/40 hover:bg-zinc-800/60"
+                                )}
                             >
                                 <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg">
                                     <Image src={song.coverUrl || ""} alt="" fill className="object-cover" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate text-xs font-bold text-white">{song.title}</p>
+                                    <p className="truncate text-xs font-bold text-zinc-100">{song.title}</p>
                                     <p className="truncate text-[10px] text-zinc-500">{song.artist}</p>
                                 </div>
                             </button>
@@ -185,7 +189,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
       </div>
 
       {/* Footer Actions */}
-      <div className="mt-auto border-t border-zinc-800 bg-zinc-950 p-4 sm:p-6 space-y-3">
+      <div className="mt-auto space-y-3 bg-zinc-950 p-4 sm:p-6">
         {step.modalOnly ? (
           !isCompleted && (
             <button
@@ -200,7 +204,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 onComplete(step.id);
               }}
               disabled={isLocked || isSaving || !canComplete}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-zinc-950 transition hover:bg-zinc-200 disabled:opacity-40"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {isSaving ? "Saving..." : "Done & Complete"}
               <CheckCircle2 size={18} />
@@ -211,7 +215,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
             <button
               onClick={handleStartExercise}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 py-3 text-sm font-bold text-white transition hover:bg-zinc-800 disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Play size={16} fill="currentColor" />
               Practice
@@ -223,7 +227,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 router.push(`/practice/exercise/${step.suggestedExerciseId}?mode=exam&bpm=${bpm}&stepId=${step.id}&moduleId=${moduleId}`);
               }}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 py-3 text-sm font-bold text-zinc-950 transition hover:bg-amber-300 disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Target size={16} />
               {isCompleted ? "Retake" : "Exam"}
@@ -231,10 +235,10 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
           </div>
         )}
         {isCompleted && (
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400">
+            <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400">
                 <CheckCircle2 size={14} /> Completed
                 {step.stars && <span className="ml-2 flex items-center gap-0.5">
-                    {[1,2,3].map(n => <Star key={n} size={10} className={n <= step.stars! ? "fill-current" : "text-zinc-800"} />)}
+                    {[1,2,3].map(n => <Star key={n} size={10} className={n <= step.stars! ? "fill-current" : "text-zinc-700"} />)}
                 </span>}
             </div>
         )}
