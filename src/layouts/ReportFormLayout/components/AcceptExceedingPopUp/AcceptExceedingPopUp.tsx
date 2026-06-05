@@ -26,11 +26,11 @@ const AcceptExceedingPopUp = ({
   };
 
   return (
-    <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 rounded-xl'>
-      <p className='font-openSans text-base'>
+    <div className='m-auto mx-2 flex min-h-[300px] max-w-md flex-col items-center justify-center gap-4 rounded-lg bg-zinc-900 p-6 text-center shadow-xl'>
+      <p className='font-sans text-base text-zinc-100'>
         {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
       </p>
-      <p className='font-openSans text-sm'>{t("exceeding_time")}</p>
+      <p className='font-sans text-sm text-zinc-400'>{t("exceeding_time")}</p>
       <div className='flex gap-4'>
         <Button onClick={handleAccept} disabled={isFetching}>
           {t("report_button")}

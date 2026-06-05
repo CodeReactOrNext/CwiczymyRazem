@@ -33,10 +33,10 @@ const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps
   ];
 
   return (
-    <div className="mb-6 rounded-xl  bg-cyan-500/5 p-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-3 duration-500">
+    <div className="mb-6 rounded-lg bg-cyan-500/10 p-4 backdrop-blur-sm duration-500 animate-in fade-in slide-in-from-top-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
-          <p className="text-sm font-bold text-cyan-400 mb-1.5">
+          <p className="mb-1.5 text-sm font-bold text-cyan-400">
             {t("toast.stoper_entered")}
           </p>
           <div className="flex flex-wrap gap-3 text-xs text-zinc-400">
@@ -49,7 +49,7 @@ const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps
                       style={{ backgroundColor: SKILL_COLORS[key] }}
                     />
                     {label}:{" "}
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-zinc-100">
                       {convertMsToHM(timerData[key])}
                     </span>
                   </span>

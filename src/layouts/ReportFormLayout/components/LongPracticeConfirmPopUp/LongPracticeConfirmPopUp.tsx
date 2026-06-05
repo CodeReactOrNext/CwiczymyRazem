@@ -24,14 +24,14 @@ const LongPracticeConfirmPopUp = ({
   };
 
   return (
-    <div className='m-auto mx-2 flex max-w-md flex-col items-center justify-center gap-4 rounded-xl border-2 border-amber-500/40 bg-second p-6 text-center'>
-      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20'>
+    <div className='m-auto mx-2 flex max-w-md flex-col items-center justify-center gap-4 rounded-lg bg-zinc-900 p-6 text-center shadow-xl'>
+      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10'>
         <AlertTriangle className='h-6 w-6 text-amber-400' />
       </div>
-      <p className='font-openSans text-lg font-bold text-white'>
+      <p className='font-sans text-lg font-bold text-zinc-100'>
         That&apos;s a long session!
       </p>
-      <p className='font-openSans text-sm text-zinc-300'>
+      <p className='font-sans text-sm text-zinc-400'>
         You&apos;re about to report{" "}
         <span className='font-bold text-amber-400'>
           {convertMsToHM(totalTime)}
@@ -39,7 +39,7 @@ const LongPracticeConfirmPopUp = ({
         of practice. We know that&apos;s a lot — please double-check it&apos;s not a
         mistake before submitting.
       </p>
-      <p className='font-openSans text-xs text-zinc-500'>
+      <p className='font-sans text-xs text-zinc-500'>
         Are you sure you want to report this time?
       </p>
       <div className='flex gap-4'>

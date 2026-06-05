@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import type {
   WheelPickerOption} from "assets/components/wheel-picker";
 import {
@@ -9,7 +10,6 @@ import QuestionMark from "components/UI/QuestionMark";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
-import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
@@ -45,7 +45,6 @@ const TimeInputBox = ({
   errors,
 }: TimeInputBoxProps) => {
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
-  const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [editingHours, setEditingHours] = useState(false);
   const [editingMinutes, setEditingMinutes] = useState(false);
@@ -119,7 +118,7 @@ const TimeInputBox = ({
 
   const getGradientStyle = () => {
     if (!hasValue) {
-      return "from-gray-900/20 to-transparent";
+      return "from-zinc-800/40 to-transparent";
     }
 
     switch (skillId) {
@@ -132,26 +131,18 @@ const TimeInputBox = ({
       case "theory":
         return "from-[#a44aed10] via-[#a44aed20] to-transparent";
       default:
-        return "from-gray-800 via-gray-900 to-transparent";
+        return "from-zinc-800 via-zinc-900 to-transparent";
     }
   };
 
   return (
     <Card
-      className={`overflow-hidden p-0 transition-all duration-300 hover:shadow-lg ${
-        error
-          ? "ring-error-300 ring-1"
-          : hasValue
-          ? "ring-1 ring-gray-700/30"
-          : "hover:ring-1 hover:ring-gray-700/40"
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
+      className={cn(
+        "overflow-hidden p-0 transition-colors duration-300",
+        error && "ring-1 ring-red-500/40"
+      )}>
       <div
-        className={`relative flex h-full flex-col bg-gradient-to-br p-5 transition-all duration-300 ${getGradientStyle()}`}
-        style={{
-          boxShadow: error ? "0 0 5px 0 var(--error-200)" : "none",
-        }}>
+        className={`relative flex h-full flex-col bg-gradient-to-br p-5 transition-colors duration-300 ${getGradientStyle()}`}>
         {/* Apple-style glass gradient bar at top - only show when has value */}
         {hasValue && (
           <div
@@ -167,31 +158,24 @@ const TimeInputBox = ({
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className='flex items-center gap-4'>
-            <motion.div
-              animate={{ scale: isHovered ? 1.05 : 1 }}
-              transition={{ duration: 0.3 }}
-              className={`flex h-12 w-12 items-center justify-center rounded-full opacity-90 ${
-                hasValue ? "" : "opacity-60"
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                hasValue ? "opacity-90" : "opacity-90"
               }`}
               style={{
                 background: hasValue
                   ? `linear-gradient(135deg, ${skillColor}20, ${skillColor}10)`
-                  : "linear-gradient(135deg, #33333320, #22222210)",
-                border: hasValue
-                  ? `1px solid ${skillColor}30`
-                  : "1px solid #33333330",
-                boxShadow:
-                  isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
+                  : "linear-gradient(135deg, #52525b40, #3f3f4630)",
               }}>
               <Icon
                 className='text-2xl'
-                style={{ color: hasValue ? skillColor : "#666666" }}
+                style={{ color: hasValue ? skillColor : "#a1a1aa" }}
               />
-            </motion.div>
+            </div>
             <div className='flex items-center gap-1.5'>
               <span
-                className={`md:text-md font-openSans text-sm ${
-                  hasValue ? "text-white" : "text-gray-400"
+                className={`md:text-md font-sans text-sm ${
+                  hasValue ? "text-zinc-100" : "text-zinc-300"
                 }`}>
                 {title}
               </span>
@@ -215,7 +199,7 @@ const TimeInputBox = ({
               </span>
             )}
             <ChevronDown
-              className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
             />
           </div>
         </div>
@@ -225,7 +209,7 @@ const TimeInputBox = ({
             {/* Hours */}
             <div className='flex flex-1 flex-col items-center gap-2'>
               <div
-                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-lg bg-zinc-800/60 backdrop-blur-sm"
                 onDoubleClick={startEditHours}
                 title="Double-click to type">
                 {editingHours ? (
@@ -241,7 +225,7 @@ const TimeInputBox = ({
                       if (e.key === "Enter") commitHours(editHoursValue);
                       if (e.key === "Escape") setEditingHours(false);
                     }}
-                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className="w-full bg-transparent text-center text-2xl font-bold text-zinc-100 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     autoFocus
                   />
                 ) : (
@@ -251,25 +235,25 @@ const TimeInputBox = ({
                     onValueChange={(value) => setFieldValue(hoursName, value)}
                     infinite
                     classNames={{
-                      optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
-                      highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
+                      optionItem: "text-zinc-400 text-lg font-medium cursor-pointer transition-colors",
+                      highlightWrapper: "bg-white/10 text-zinc-100 text-xl font-bold backdrop-blur-md"
                     }}
                   />
                 )}
               </div>
-              <span className='text-[10px] font-bold tracking-wider text-slate-500'>
-                HOURS
+              <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
+                Hours
               </span>
             </div>
 
-            <span className='mb-6 text-2xl font-medium text-slate-500/50'>
+            <span className='mb-6 text-2xl font-medium text-zinc-500/50'>
               :
             </span>
 
             {/* Minutes */}
             <div className='flex flex-1 flex-col items-center gap-2'>
               <div
-                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-lg bg-zinc-800/60 backdrop-blur-sm"
                 onDoubleClick={startEditMinutes}
                 title="Double-click to type">
                 {editingMinutes ? (
@@ -285,7 +269,7 @@ const TimeInputBox = ({
                       if (e.key === "Enter") commitMinutes(editMinutesValue);
                       if (e.key === "Escape") setEditingMinutes(false);
                     }}
-                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    className="w-full bg-transparent text-center text-2xl font-bold text-zinc-100 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     autoFocus
                   />
                 ) : (
@@ -295,14 +279,14 @@ const TimeInputBox = ({
                     onValueChange={(value) => setFieldValue(minutesName, value)}
                     infinite
                     classNames={{
-                      optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
-                      highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
+                      optionItem: "text-zinc-400 text-lg font-medium cursor-pointer transition-colors",
+                      highlightWrapper: "bg-white/10 text-zinc-100 text-xl font-bold backdrop-blur-md"
                     }}
                   />
                 )}
               </div>
-              <span className='text-[10px] font-bold tracking-wider text-slate-500'>
-                MIN
+              <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
+                Min
               </span>
             </div>
           </div>
