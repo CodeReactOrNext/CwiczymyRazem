@@ -40,12 +40,12 @@ export const ExerciseCard = ({
     <div
       onClick={handleClick}
       className={cn(
-        "group relative flex flex-col rounded-[8px] border border-transparent transition-all duration-500 cursor-pointer overflow-hidden",
+        "group relative flex flex-col rounded-lg border border-transparent transition-all duration-500 cursor-pointer overflow-hidden",
         "active:scale-[0.98]",
         isLocked
           ? "bg-zinc-950/40 ring-1 ring-inset ring-amber-500/20"
           : isSelected
-            ? "bg-zinc-900/40 ring-1 ring-inset ring-cyan-500/50 shadow-[0_0_20px_-5px_rgba(6,182,212,0.3)]"
+            ? "bg-zinc-900/40 ring-1 ring-inset ring-cyan-500/50"
             : "bg-zinc-900/20 ring-1 ring-inset ring-white/5 hover:ring-white/15 hover:bg-zinc-800/40"
       )}
     >
@@ -92,7 +92,7 @@ export const ExerciseCard = ({
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-4">
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded-[8px] border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
               exercise.category === "technique"  && "text-emerald-400 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10",
               exercise.category === "theory"     && "text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/10",
               exercise.category === "creativity" && "text-purple-400 group-hover:border-purple-500/30 group-hover:bg-purple-500/10",
@@ -102,7 +102,7 @@ export const ExerciseCard = ({
             </Badge>
 
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded-[8px] border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
               exercise.difficulty === "easy"   && "text-green-400 group-hover:border-green-500/30 group-hover:bg-green-500/10",
               exercise.difficulty === "medium" && "text-yellow-400 group-hover:border-yellow-500/30 group-hover:bg-yellow-500/10",
               exercise.difficulty === "hard"   && "text-red-400 group-hover:border-red-500/30 group-hover:bg-red-500/10",
@@ -111,12 +111,12 @@ export const ExerciseCard = ({
             </Badge>
 
             {exercise.isPlayalong && (
-              <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded-[8px] shadow-none">
+              <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
                 <FaYoutube className="mr-1 h-3.5 w-3.5" />Playalong
               </Badge>
             )}
             {exercise.videoUrl && !exercise.isPlayalong && (
-              <Badge className="bg-cyan-500/10 text-cyan-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded-[8px] shadow-none">
+              <Badge className="bg-cyan-500/10 text-cyan-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
                 <Video className="mr-1 h-3.5 w-3.5" />Video
               </Badge>
             )}
@@ -127,7 +127,7 @@ export const ExerciseCard = ({
               return (
                 <span
                   key={skill.id}
-                  className="inline-flex items-center gap-1 mt-0.5 sm:mt-0 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors bg-white/[0.03] border border-white/5 rounded-[8px]"
+                  className="inline-flex items-center gap-1 mt-0.5 sm:mt-0 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors bg-white/[0.03] border border-white/5 rounded"
                 >
                   {Icon && <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />}
                   {t(`common:skills.${skill.id}` as any)}
@@ -148,25 +148,25 @@ export const ExerciseCard = ({
 
           {/* Action button on Desktop */}
           {isLocked ? (
-            <div className="flex items-center gap-1.5 rounded-[8px] bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20 shadow-sm">
+            <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
               <Lock className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+              <span className="text-[11px] font-bold text-amber-500">Pro</span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-[8px] transition-all duration-300 shadow-sm overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 hover:shadow-[0_0_15px_-3px_rgba(255,255,255,0.2)] ring-1 ring-white/10 hover:scale-105"
+                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
                 title="Preview Exercise Details"
               >
                 <Info className="h-4 w-4" />
               </button>
               <div className={cn(
-                "flex items-center justify-center min-w-[36px] h-[36px] rounded-[8px] transition-all duration-500 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.5)] overflow-hidden shrink-0",
+                "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-500 overflow-hidden shrink-0",
                 isSelected
                   ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/30 group-hover:bg-red-500/20 group-hover:text-red-400 group-hover:ring-red-500/30"
-                  : "bg-white/5 text-zinc-300 ring-1 ring-white/10 group-hover:bg-cyan-500 group-hover:text-black group-hover:ring-cyan-500 group-hover:shadow-[0_0_15px_-3px_rgba(6,182,212,0.6)] group-hover:scale-105"
+                  : "bg-white/5 text-zinc-300 ring-1 ring-white/10 group-hover:bg-cyan-500 group-hover:text-black group-hover:ring-cyan-500"
               )}>
                 {isSelected ? (
                   <>
@@ -187,21 +187,21 @@ export const ExerciseCard = ({
              {isSelected ? "Exercise added" : "Pick this exercise"}
            </span>
            {isLocked ? (
-             <div className="flex items-center gap-1.5 rounded-[8px] bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20 shadow-sm">
+             <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
                <Lock className="h-3.5 w-3.5 text-amber-500" />
-               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+               <span className="text-[11px] font-bold text-amber-500">Pro</span>
              </div>
            ) : (
              <div className="flex flex-row items-center gap-2">
                <button
                  type="button"
                  onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-[8px] transition-all duration-300 shadow-sm overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10"
+                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10"
                >
                  <Info className="h-4 w-4" />
                </button>
                <div className={cn(
-                 "flex items-center justify-center min-w-[36px] h-[36px] rounded-[8px] transition-all duration-500 shadow-sm overflow-hidden",
+                 "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-500 overflow-hidden",
                  isSelected
                    ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/30"
                    : "bg-white/5 text-zinc-300 ring-1 ring-white/10"

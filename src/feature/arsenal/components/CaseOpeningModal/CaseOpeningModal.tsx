@@ -105,7 +105,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
     <AnimatePresence>
       {isOpen && strip.length > 0 && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center overflow-y-auto py-6 font-openSans"
+          className="fixed inset-0 z-[100] flex flex-col items-center overflow-y-auto py-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -137,7 +137,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             {/* Roulette */}
             <div
               ref={containerRef}
-              className="relative w-full overflow-hidden rounded border-2 border-zinc-700/80 bg-zinc-950/90 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]"
+              className="relative w-full overflow-hidden rounded-lg bg-zinc-950/90"
               style={{ height: 220 }}
             >
               <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[4px] bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)]" />
@@ -220,7 +220,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     />
                     <motion.div
                       className={cn(
-                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded bg-zinc-950/90 border-b-8",
+                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded-lg bg-zinc-950/90 border-b-8",
                         RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{ borderBottomColor: rarityStyles.baseColor }}

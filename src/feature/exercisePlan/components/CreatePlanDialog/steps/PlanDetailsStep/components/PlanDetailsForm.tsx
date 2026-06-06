@@ -102,7 +102,7 @@ export const PlanDetailsForm = ({
         control={control}
         render={({ field }) => (
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Visibility</p>
+            <p className="text-xs font-bold tracking-wider text-zinc-500">Visibility</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"

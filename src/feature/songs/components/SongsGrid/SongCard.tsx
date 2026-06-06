@@ -13,14 +13,13 @@ import {
   Bookmark,
   Check,
   Music,
+  Play,
   Plus,
-  Settings2,
   Star,
   TrendingUp,
   Trophy,
   Users,
   Loader2,
-  ArrowRight,
   ChevronRight,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -35,6 +34,7 @@ interface SongCardProps {
   footerAction?: { label: string; icon: ReactNode };
   onStatusChange?: (status: SongStatus | undefined) => void;
   isPracticeMode?: boolean;
+  onPractice?: () => void;
 }
 
 export const SongCard = ({
@@ -44,6 +44,7 @@ export const SongCard = ({
   footerAction,
   onStatusChange,
   isPracticeMode,
+  onPractice,
 }: SongCardProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -204,20 +205,32 @@ export const SongCard = ({
               onOpenDetails();
             }}
             variant="ghost"
-            className={cn(
-              "h-8 flex-1 group/btn flex items-center justify-between rounded-lg px-3 text-[10px] font-bold transition-all gap-3",
-              isPracticeMode
-                ? "bg-white text-black hover:bg-zinc-100 group-hover/btn:text-black"
-                : "text-zinc-300 hover:bg-white/5"
-            )}
+            className="h-8 flex-1 group/btn flex items-center justify-between rounded-lg px-3 text-[10px] font-bold transition-all gap-3 text-zinc-300 hover:bg-white/5"
           >
-            <span className={cn("tracking-wide", isPracticeMode && "!text-black")}>{isPracticeMode ? "Practice" : "View Details"}</span>
-            {isPracticeMode ? (
-              <ArrowRight className="h-3 w-3 opacity-70 transition-transform group-hover/btn:translate-x-0.5 !text-black ml-1" />
-            ) : (
-              <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:translate-x-1 group-hover:opacity-100 ml-1" />
-            )}
+            <span className="tracking-wide">View Details</span>
+            <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:translate-x-1 group-hover:opacity-100 ml-1" />
           </Button>
+
+          {userStatus && onPractice && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPractice();
+                    }}
+                    className="h-8 w-9 shrink-0 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-zinc-900 border-white/10 text-zinc-200 font-bold">
+                  Practice
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
           {!isPracticeMode && onStatusChange && (
             <TooltipProvider delayDuration={200}>
