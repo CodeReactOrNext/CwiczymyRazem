@@ -16,6 +16,7 @@ import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
+import { NotationToggleButton } from "./NotationToggleButton";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SessionSidebar } from "./SessionSidebar";
@@ -161,7 +162,17 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     baseBpm={p.metronome?.bpm}
                     examMode={p.isExamMode}
                     showBackingInExam={p.isScaleExam}
-                    trailing={<SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />}
+                    trailing={
+                      <>
+                        {p.effectiveRawGpFile && (
+                          <NotationToggleButton
+                            showAlphaTabScore={p.showAlphaTabScore}
+                            onToggle={p.handleToggleAlphaTabScore}
+                          />
+                        )}
+                        <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
+                      </>
+                    }
                   />
                   <ExerciseQuickActionsBar
                     exercise={p.currentExercise}

@@ -141,7 +141,6 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           showAlphaTabScore={showAlphaTabScore}
-          onToggleAlphaTabScore={onToggleAlphaTabScore}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}
           effectiveBpm={effectiveBpm}
