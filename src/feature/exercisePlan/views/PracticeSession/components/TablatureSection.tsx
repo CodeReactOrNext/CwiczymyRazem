@@ -9,7 +9,6 @@ interface TablatureSectionProps {
   activeTablature: TablatureMeasure[];
   rawGpFile?: File;
   showAlphaTabScore: boolean;
-  onToggleAlphaTabScore: () => void;
   isAudioPlaying: boolean;
   startTime: number | null;
   effectiveBpm: number;
@@ -30,7 +29,6 @@ export const TablatureSection = memo(function TablatureSection({
   activeTablature,
   rawGpFile,
   showAlphaTabScore,
-  onToggleAlphaTabScore,
   isAudioPlaying,
   startTime,
   effectiveBpm,
@@ -50,15 +48,6 @@ export const TablatureSection = memo(function TablatureSection({
 
   return (
     <div className="relative w-full my-8 bg-[#0f0f12] rounded-lg">
-      {rawGpFile && (
-        <button
-          onClick={onToggleAlphaTabScore}
-          className="absolute top-2 right-2 z-10 flex items-center gap-1.5 rounded-md bg-black/50 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
-          title={showAlphaTabScore ? "Switch to tablature" : "Switch to notation"}
-        >
-          {showAlphaTabScore ? "TAB" : "♩ Notation"}
-        </button>
-      )}
       {showAlphaTabScore && rawGpFile ? (
         <AlphaTabScoreViewer
           rawGpFile={rawGpFile}
