@@ -121,13 +121,13 @@ function getStatus(step: RoadmapStep): StepStatus {
 const STEP_CLS: Record<StepStatus, string> = {
   "not-started": "bg-zinc-900 text-zinc-300 hover:bg-zinc-800/80",
   "in-progress": "bg-amber-500/10 text-amber-200",
-  done: "bg-cyan-950/30 text-zinc-500",
+  done: "bg-green-950/30 text-green-600/70",
 };
 
 const STATUS_DOT: Record<StepStatus, string> = {
   "not-started": "bg-zinc-600",
   "in-progress": "bg-amber-400",
-  done: "bg-cyan-500",
+  done: "bg-green-500",
 };
 
 const STATUS_LABEL: Record<StepStatus, string> = {
@@ -145,7 +145,7 @@ const STATUS_BTNS: { status: StepStatus; label: string }[] = [
 const PATH_COLOR: Record<StepStatus, string> = {
   "not-started": "#3f3f46",
   "in-progress": "#78350f",
-  done: "#164E63",
+  done: "#14532d",
 };
 
 const PHASE_COLORS = [
@@ -720,9 +720,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               {/* progress bar inside header */}
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex-1 h-1 overflow-hidden rounded-full bg-zinc-800/80">
-                  <div className="h-full rounded-full bg-cyan-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+                  <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
                 </div>
-                <span className="text-xs font-semibold text-cyan-400 tabular-nums shrink-0">
+                <span className="text-xs font-semibold text-green-400 tabular-nums shrink-0">
                   {doneCount}/{allSteps.length}
                   {inProgressCount > 0 && <span className="ml-1.5 text-amber-400">· {inProgressCount} in progress</span>}
                 </span>
@@ -735,8 +735,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
                 <span className="flex items-center gap-1.5">
-                  <Zap className="h-4 w-4 text-cyan-500" />
-                  <span className="font-semibold text-cyan-500">{progress}%</span>
+                  <Zap className="h-4 w-4 text-green-500" />
+                  <span className="font-semibold text-green-500">{progress}%</span>
                 </span>
                 <span className="text-zinc-700">·</span>
                 <span>{doneCount}/{allSteps.length} steps</span>
@@ -745,7 +745,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               </div>
             </div>
             <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full rounded-full bg-cyan-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+              <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
             </div>
           </div>
         )}
@@ -812,7 +812,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
           {([
             { dot: "bg-zinc-600", label: "To do" },
             { dot: "bg-amber-400", label: "In progress" },
-            { dot: "bg-cyan-500", label: "Done" },
+            { dot: "bg-green-500", label: "Done" },
           ] as { dot: string; label: string }[]).map(({ dot, label }) => (
             <span key={label} className="flex items-center gap-1.5 text-xs text-zinc-400">
               <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
@@ -855,7 +855,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
             <div className="relative w-full">
               <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
               <div
-                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-cyan-600/50 transition-all duration-700 sm:block"
+                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-green-600/50 transition-all duration-700 sm:block"
                 style={{ height: `${progress}%` }}
               />
 
@@ -870,7 +870,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                     {/* ── MOBILE layout ── */}
                     <div className="flex w-full flex-col gap-3 sm:hidden">
                       <div className="flex items-center gap-2.5">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
@@ -927,7 +927,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                         ref={(el) => { if (el) phaseNodeRefs.current.set(phase.id, el); else phaseNodeRefs.current.delete(phase.id); }}
                         className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
@@ -965,7 +965,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
             {phases.length > 0 && (
               <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
                 progress === 100
-                  ? "bg-cyan-950/20 text-cyan-400"
+                  ? "bg-green-950/20 text-green-400"
                   : "bg-zinc-900/30 text-zinc-500 opacity-40"
               }`}>
                 {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
@@ -1034,7 +1034,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                               isActive
                                 ? s === "not-started" ? "bg-zinc-700 text-zinc-100"
                                   : s === "in-progress" ? "bg-amber-500/15 text-amber-300"
-                                  : "bg-cyan-900/40 text-cyan-400"
+                                  : "bg-green-900/40 text-green-400"
                                 : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300"
                             }`}
                           >
