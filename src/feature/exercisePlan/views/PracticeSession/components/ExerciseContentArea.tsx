@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import { ExerciseImage } from "./ExerciseImage";
@@ -104,6 +106,12 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rewardSkillId,
   rewardAmount,
 }: ExerciseContentAreaProps) {
+  const { backingVideoId, setBackingVideoId } = useSessionUI();
+
+  useEffect(() => {
+    setBackingVideoId(null);
+  }, [currentExercise.id, setBackingVideoId]);
+
   const hasTablature =
     activeTablature &&
     activeTablature.length > 0 &&
@@ -178,6 +186,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           setTimerTime={setTimerTime}
           onVideoEnd={onVideoEnd}
         />
+      ) : currentExercise.requiresBackingTrack ? (
+        backingVideoId
+          ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
+          : <BackingTrackPicker exerciseTitle={currentExercise.title} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <StrummingSection
           patterns={currentExercise.strummingPatterns}
