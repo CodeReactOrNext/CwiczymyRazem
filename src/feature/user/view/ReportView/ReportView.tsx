@@ -54,7 +54,7 @@ type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const router = useRouter();
-  const { songId, songTitle, songArtist, planId, planTitle, applyTimer } = router.query;
+  const { songId, songTitle, songArtist, planId, planTitle, applyTimer, returnTo } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
@@ -364,7 +364,7 @@ const ReportView = () => {
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
         <RatingPopUpLayout
-          onClick={() => setView('form')}
+          onClick={() => returnTo ? router.push(returnTo as string) : setView('form')}
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}

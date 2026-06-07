@@ -47,6 +47,9 @@ interface ExerciseContentAreaProps {
   // Rhythm detection
   isMicEnabled?: boolean;
   volumeRef?: React.MutableRefObject<number>;
+  onSeek?: (beatPosition: number) => void;
+  onLoopRestart?: (loopStartBeat: number) => void;
+  isExamMode?: boolean;
 
   // Video / playalong
   startTimer: () => void;
@@ -95,6 +98,9 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isPlaying,
   isMicEnabled,
   volumeRef,
+  onSeek,
+  onLoopRestart,
+  isExamMode,
   rewardSkillId,
   rewardAmount,
 }: ExerciseContentAreaProps) {
@@ -141,6 +147,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           showAlphaTabScore={showAlphaTabScore}
+          onSeek={onSeek}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}
           effectiveBpm={effectiveBpm}
@@ -155,6 +162,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           hideNotes={activeExercise.hideTablatureNotes}
           hideDynamicsLane={!!rawGpFile}
           volumeRef={volumeRef}
+          isExamMode={isExamMode}
+          onLoopRestart={onLoopRestart}
         />
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         <VideoSection

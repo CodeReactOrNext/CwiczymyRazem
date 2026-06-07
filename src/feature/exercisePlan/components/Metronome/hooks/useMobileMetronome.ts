@@ -206,7 +206,7 @@ export const useMobileMetronome = ({
     }
   }, []);
 
-  const startMetronome = useCallback(() => {
+  const startMetronome = useCallback((options?: { skipCountIn?: boolean }) => {
     if (!initializeAudio()) return;
 
     resumeAudioContext();
@@ -216,12 +216,13 @@ export const useMobileMetronome = ({
     }
 
     if (audioContextRef.current) {
-      nextNoteTimeRef.current = audioContextRef.current.currentTime;
-      countInTargetRef.current = 4;
-      setCountInRemaining(4);
-      startTimeRef.current = null;
+      const useCountIn = !options?.skipCountIn;
+      nextNoteTimeRef.current   = audioContextRef.current.currentTime;
+      countInTargetRef.current  = useCountIn ? 4 : 0;
+      setCountInRemaining(useCountIn ? 4 : 0);
+      startTimeRef.current      = null;
       audioStartTimeRef.current = null;
-      beatCounterRef.current = 0;
+      beatCounterRef.current    = 0;
       scheduler();
     }
 
@@ -312,6 +313,16 @@ export const useMobileMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  const seekToBeats = useCallback((beats: number) => {
+    // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
+    // without waiting for the next React render cycle.
+    if (startTimeRef.current !== null) return;
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    const elapsedMs = beats * secondsPerBeat * 1000;
+    pausedElapsedTimeRef.current  = elapsedMs;
+    pausedAudioElapsedRef.current = elapsedMs;
+  }, [bpm, speedMultiplier]);
+
   // Expose the same interface as the original hook
   return useMemo(() => ({
     bpm,
@@ -326,6 +337,7 @@ export const useMobileMetronome = ({
     startMetronome,
     stopMetronome,
     restartMetronome,
+    seekToBeats,
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,
@@ -335,7 +347,7 @@ export const useMobileMetronome = ({
     audioStartTime: audioStartTimeRef.current,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
-    toggleMetronome, startMetronome, stopMetronome, restartMetronome,
+    toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
     handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized
   ]);
 }; 

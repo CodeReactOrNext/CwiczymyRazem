@@ -1,5 +1,5 @@
 import type { Dispatch, RefObject, SetStateAction } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -37,6 +37,8 @@ interface UseSessionControlsOptions {
   saveCurrentScores:      () => Promise<void>;
   noteMatchingHandle:     RefObject<NoteMatchingHandle | null>;
   loopsCompletedRef:      { current: number };
+  tabRestartKey:          number;
+  setTabRestartKey:       Dispatch<SetStateAction<number>>;
 }
 
 export function useSessionControls({
@@ -47,8 +49,8 @@ export function useSessionControls({
   isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+  tabRestartKey, setTabRestartKey,
 }: UseSessionControlsOptions) {
-  const [tabRestartKey, setTabRestartKey] = useState(0);
   const isPlayingRef = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
 

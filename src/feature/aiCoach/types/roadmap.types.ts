@@ -9,6 +9,8 @@ export interface RoadmapStep {
   suggestedExerciseId?: string;
   noExercise?: boolean;
   suggestedLessonIds?: string[];
+  exerciseCompleted?: boolean;
+  completedLessonIds?: string[];
 }
 
 export interface RoadmapPhase {

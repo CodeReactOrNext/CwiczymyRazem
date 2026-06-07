@@ -7,7 +7,7 @@ const BLOCK_CORNER = 5;    // rounded corner radius
 const BLOCK_GAP = 4;    // gap between consecutive block right edges and next beat
 const BLOCK_PAD = 4;    // left padding from beat start
 const NOTE_RADIUS = BLOCK_H / 2; // kept for badge connector math
-const STAFF_TOP = 85;
+const STAFF_TOP = 62;
 const STEM_TOP_Y = 12;
 const RHY_HEAD_Y = STAFF_TOP - 36;
 const RHY_HEAD_R = 3.5;
@@ -129,6 +129,13 @@ let audioCurrentReceivedAt: number | null = null;
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
 let pausedScrollX = 0;
+
+// Hover preview — world-X of the measure start being hovered (null = no hover)
+let hoverStartX: number | null = null;
+
+// Sub-loop range in beats (null = full song loop)
+let loopStartBeat: number | null = null;
+let loopEndBeat:   number | null = null;
 
 // Rest-active state — track changes to avoid flooding main thread
 let lastRestActive = false;
@@ -334,8 +341,16 @@ function render() {
       ? (audioNow - audioStartSec)
       : startWallMs !== null ? (Date.now() - startWallMs) / 1000 : 0;
     beatsElapsed = computeBeatsElapsed(elapsed);
-    const looped = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
-    cursorPos = looped * dynBW;
+    let loopBeat: number;
+    if (loopStartBeat !== null && loopEndBeat !== null && loopEndBeat > loopStartBeat
+        && beatsElapsed >= loopStartBeat) {
+      const loopDur = loopEndBeat - loopStartBeat;
+      const relBeat = beatsElapsed - loopStartBeat;
+      loopBeat = loopStartBeat + (relBeat % loopDur);
+    } else {
+      loopBeat = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
+    }
+    cursorPos = loopBeat * dynBW;
     scrollX = Math.max(0, cursorPos - W / 4);
     // Update paused pos so dragging starts from current position
     pausedCursorPos = cursorPos;
@@ -881,10 +896,55 @@ function render() {
     }
 
     if (beat.chordName && inView) {
-      ctx.fillStyle = "#22d3ee";
-      ctx.font = "black 22px Inter, system-ui, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(beat.chordName, beatL, STAFF_TOP - 58);
+      const label = beat.chordName;
+      const fSize = 13;
+      const padX  = 9;
+      const padY  = 4;
+      ctx.font         = `bold ${fSize}px Inter, system-ui, sans-serif`;
+      ctx.textAlign    = "left";
+      ctx.textBaseline = "top";
+      const textW  = ctx.measureText(label).width;
+      const pillW  = textW + padX * 2;
+      const pillH  = fSize + padY * 2;   // 21px
+      const arrowH = 5;
+      const pillX  = beatPx;
+      const pillY  = STAFF_TOP - pillH - arrowH - 22;  // leave gap above rhythm area
+      const connX  = pillX + pillW / 2;
+
+      // Glow pass (drawn before the pill so glow stays behind)
+      ctx.shadowColor = "rgba(255,255,255,0.45)";
+      ctx.shadowBlur  = 8;
+
+      // Pill + downward arrow as one path
+      const r = 6;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(pillX + r, pillY);
+      ctx.lineTo(pillX + pillW - r, pillY);
+      ctx.arcTo(pillX + pillW, pillY,         pillX + pillW, pillY + r,         r);
+      ctx.lineTo(pillX + pillW, pillY + pillH - r);
+      ctx.arcTo(pillX + pillW, pillY + pillH, pillX + pillW - r, pillY + pillH, r);
+      // right half of arrow base → tip → left half
+      ctx.lineTo(connX + 5, pillY + pillH);
+      ctx.lineTo(connX,     pillY + pillH + arrowH);
+      ctx.lineTo(connX - 5, pillY + pillH);
+      ctx.lineTo(pillX + r, pillY + pillH);
+      ctx.arcTo(pillX,      pillY + pillH, pillX, pillY + pillH - r, r);
+      ctx.lineTo(pillX,     pillY + r);
+      ctx.arcTo(pillX,      pillY,         pillX + r, pillY,         r);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      // Chord label — dark text on white background for maximum contrast
+      ctx.fillStyle    = "#0f172a";
+      ctx.textAlign    = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText(label, pillX + padX, pillY + padY);
+
+      // Restore state used by surrounding draw code
+      ctx.textBaseline = "middle";
     }
   }
 
@@ -971,6 +1031,67 @@ function render() {
     ctx.fillRect(0, 0, cursorPos, H);
   }
 
+  // ── Loop range overlay ────────────────────────────────────────────────────
+  if (loopStartBeat !== null && loopEndBeat !== null && loopEndBeat > loopStartBeat) {
+    const lsx = loopStartBeat * dynBW;
+    const lex = loopEndBeat * dynBW;
+
+    // Dim the areas outside the loop range
+    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.fillRect(0, 0, lsx, H);
+    ctx.fillRect(lex, 0, totalBeats * dynBW - lex, H);
+
+    // Loop boundary lines
+    ctx.strokeStyle = "rgba(6,182,212,0.65)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(lsx, 0); ctx.lineTo(lsx, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(lex, 0); ctx.lineTo(lex, H); ctx.stroke();
+
+    // Small label at the start boundary
+    ctx.fillStyle = "rgba(6,182,212,0.55)";
+    ctx.font = "bold 9px Inter, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("⟳", lsx + 4, 3);
+  }
+
+  // ── Hover seek preview — dashed line at measure snap point ───────────────
+  if (hoverStartX !== null && !isPlaying) {
+    // Dashed vertical line showing where cursor would jump to
+    ctx.strokeStyle = "rgba(6,182,212,0.5)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(hoverStartX, 0);
+    ctx.lineTo(hoverStartX, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Small play-triangle indicator at the top of the line
+    const tx = hoverStartX + 3;
+    const ty = 6;
+    ctx.fillStyle = "rgba(6,182,212,0.75)";
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + 9, ty + 6);
+    ctx.lineTo(tx, ty + 12);
+    ctx.closePath();
+    ctx.fill();
+
+    // Measure number label
+    let measureIdx = 0;
+    for (let i = 0; i < measureEndXs.length; i++) {
+      if (measureEndXs[i] * dynBW > hoverStartX + 1) { measureIdx = i; break; }
+      measureIdx = i + 1;
+    }
+    ctx.fillStyle = "rgba(6,182,212,0.65)";
+    ctx.font = "bold 10px Inter, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(`M${measureIdx + 1}`, tx + 12, ty + 1);
+  }
+
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
   if (cursorPos > 0 || isPlaying) {
     ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444";
@@ -1052,6 +1173,8 @@ self.onmessage = (e: MessageEvent) => {
       tempoMap = msg.tempoMap ?? [];
       pausedCursorPos = 0;
       pausedScrollX = 0;
+      loopStartBeat = null;
+      loopEndBeat   = null;
       recomputeLoopSeconds();
       break;
     }
@@ -1062,7 +1185,17 @@ self.onmessage = (e: MessageEvent) => {
       countInRemaining = msg.countInRemaining;
       audioStartSec = msg.audioStartSec ?? null;
       if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; }
+      if (isPlaying) hoverStartX = null; // clear hover when playback starts
       recomputeLoopSeconds();
+      break;
+    }
+    case 'HOVER': {
+      hoverStartX = msg.startX ?? null;
+      break;
+    }
+    case 'LOOP_RANGE': {
+      loopStartBeat = msg.startBeat ?? null;
+      loopEndBeat   = msg.endBeat   ?? null;
       break;
     }
     case 'TICK': {
@@ -1110,6 +1243,7 @@ self.onmessage = (e: MessageEvent) => {
       pausedCursorPos = 0;
       missedNotes = {};
       showRestWarning = false;
+      // loop range is intentionally NOT cleared here so it survives loop restarts
       break;
     }
     case 'STOP': {

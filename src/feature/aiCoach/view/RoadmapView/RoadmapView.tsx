@@ -1,5 +1,5 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Check, ChevronRight, Dumbbell, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -136,10 +136,10 @@ const STATUS_LABEL: Record<StepStatus, string> = {
   done: "Done",
 };
 
-const STATUS_BTNS: { status: StepStatus; label: string }[] = [
-  { status: "not-started", label: "To do" },
-  { status: "in-progress", label: "In progress" },
-  { status: "done", label: "✓ Done" },
+const STATUS_BTNS = [
+  { status: "not-started" as StepStatus, label: "Not yet", Icon: CircleDashed },
+  { status: "in-progress" as StepStatus, label: "Practicing", Icon: Zap },
+  { status: "done" as StepStatus, label: "Got it!", Icon: CheckCircle2 },
 ];
 
 const PATH_COLOR: Record<StepStatus, string> = {
@@ -667,6 +667,38 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     }
   };
 
+  const handleToggleExercise = () => {
+    if (!drawerInfo) return;
+    const newPhases = phases.map((p) =>
+      p.id !== drawerInfo.phase.id ? p : {
+        ...p,
+        steps: p.steps.map((s) =>
+          s.id !== drawerInfo.step.id ? s : { ...s, exerciseCompleted: !s.exerciseCompleted }
+        ),
+      }
+    );
+    setPhases(newPhases);
+    persist(newPhases).catch(() => toast.error("Failed to save."));
+  };
+
+  const handleToggleLesson = (videoId: string) => {
+    if (!drawerInfo) return;
+    const current = drawerInfo.step.completedLessonIds ?? [];
+    const next = current.includes(videoId)
+      ? current.filter((id) => id !== videoId)
+      : [...current, videoId];
+    const newPhases = phases.map((p) =>
+      p.id !== drawerInfo.phase.id ? p : {
+        ...p,
+        steps: p.steps.map((s) =>
+          s.id !== drawerInfo.step.id ? s : { ...s, completedLessonIds: next }
+        ),
+      }
+    );
+    setPhases(newPhases);
+    persist(newPhases).catch(() => toast.error("Failed to save."));
+  };
+
   const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
     const newPhases = phases.map((phase) =>
       phase.id !== phaseId ? phase : {
@@ -1022,22 +1054,28 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                   </div>
 
                   {/* Status buttons */}
-                  <div className="px-6 pb-4">
+                  <div className="px-6 pb-5">
+                    <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                      Your progress on this skill
+                    </p>
                     <div className="grid grid-cols-3 gap-2">
-                      {STATUS_BTNS.map(({ status: s, label }) => {
+                      {STATUS_BTNS.map(({ status: s, label, Icon }) => {
                         const isActive = getStatus(drawerInfo.step) === s;
                         return (
                           <button
                             key={s}
                             onClick={() => setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)}
-                            className={`rounded py-2 text-xs font-semibold transition-all ${
+                            className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-3.5 text-xs font-semibold transition-all ${
                               isActive
-                                ? s === "not-started" ? "bg-zinc-700 text-zinc-100"
-                                  : s === "in-progress" ? "bg-amber-500/15 text-amber-300"
-                                  : "bg-green-900/40 text-green-400"
-                                : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300"
+                                ? s === "not-started"
+                                  ? "bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500"
+                                  : s === "in-progress"
+                                  ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
+                                  : "bg-green-900/50 text-green-400 ring-1 ring-green-500/40"
+                                : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
                             }`}
                           >
+                            <Icon className="h-4 w-4" />
                             {label}
                           </button>
                         );
@@ -1065,8 +1103,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                   ) : drawerInfo.step.description ? (
                     <div className="flex flex-col gap-0">
 
-                      {/* ── Exercise ── */}
-                      {adminMode ? (
+                      {/* ── Exercise (admin only at top) ── */}
+                      {adminMode && (
                         <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
                             <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
@@ -1144,41 +1182,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                             </div>
                           )}
                         </div>
-                      ) : (
-                        (loadingExerciseIds.has(drawerInfo.step.id) || drawerInfo.step.suggestedExerciseId) && (
-                          <div className="px-6 py-5">
-                            {loadingExerciseIds.has(drawerInfo.step.id) ? (
-                              <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
-                                <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
-                              </div>
-                            ) : (() => {
-                              const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
-                              if (!ex) return null;
-                              return (
-                                <>
-                                  <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                                    <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
-                                  </p>
-                                  <button
-                                    onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
-                                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-lg bg-cyan-950/30 px-4 py-4 text-left transition-all hover:bg-cyan-950/50"
-                                  >
-                                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 transition group-hover:bg-cyan-500/25">
-                                      <Dumbbell className="h-5 w-5 text-cyan-400" />
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                                      {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                                    </div>
-                                    <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
-                                  </button>
-                                </>
-                              );
-                            })()}
-                          </div>
-                        )
                       )}
 
                       {/* ── Description ── */}
@@ -1232,8 +1235,142 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                         </div>
                       )}
 
-                      {/* ── YouTube lessons ── */}
-                      {adminMode ? (
+                      {/* ── User: Suggested resources ── */}
+                      {!adminMode && (() => {
+                        const hasExercise = loadingExerciseIds.has(drawerInfo.step.id) || !!drawerInfo.step.suggestedExerciseId;
+                        const hasLessons = loadingLessonsId === drawerInfo.step.id ||
+                          (lessonsCache[drawerInfo.step.id]?.length ?? 0) > 0;
+                        if (!hasExercise && !hasLessons) return null;
+                        return (
+                          <>
+                            {/* Resources section header */}
+                            <div className="border-t border-zinc-800/40 px-6 pt-5 pb-3">
+                              <div className="flex items-center gap-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Suggested resources</p>
+                                <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-600">optional</span>
+                              </div>
+                              <p className="mt-1 text-[11px] text-zinc-600">
+                                These don't affect your skill progress — check them off as you use them.
+                              </p>
+                            </div>
+
+                            {/* Exercise */}
+                            {hasExercise && (
+                              <div className="px-6 pb-5">
+                                {loadingExerciseIds.has(drawerInfo.step.id) ? (
+                                  <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
+                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
+                                    <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
+                                  </div>
+                                ) : (() => {
+                                  const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
+                                  if (!ex) return null;
+                                  const isCompleted = !!drawerInfo.step.exerciseCompleted;
+                                  return (
+                                    <div className="space-y-0">
+                                      <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                                        <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
+                                      </p>
+                                      <div className={`rounded-lg ring-1 transition-all ${
+                                        isCompleted ? "ring-green-500/40" : "ring-zinc-800/60"
+                                      }`}>
+                                        <button
+                                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=/ai-coach`)}
+                                          className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-t-lg px-4 py-4 text-left transition-all ${
+                                            isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
+                                          }`}
+                                        >
+                                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
+                                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition group-hover:bg-cyan-500/25 ${
+                                            isCompleted ? "bg-green-500/15" : "bg-cyan-500/15"
+                                          }`}>
+                                            {isCompleted
+                                              ? <CheckCircle2 className="h-5 w-5 text-green-400" />
+                                              : <Dumbbell className="h-5 w-5 text-cyan-400" />}
+                                          </div>
+                                          <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
+                                            {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
+                                          </div>
+                                          <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
+                                        </button>
+                                        <button
+                                          onClick={handleToggleExercise}
+                                          className={`flex w-full items-center gap-3 rounded-b-lg border-t px-4 py-3 text-xs font-medium transition-colors ${
+                                            isCompleted
+                                              ? "border-green-500/20 bg-green-950/30 text-green-400"
+                                              : "border-zinc-800/60 bg-zinc-900/60 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
+                                          }`}
+                                        >
+                                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                                            isCompleted ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                                          }`}>
+                                            {isCompleted && <Check className="h-3 w-3 text-green-400" />}
+                                          </span>
+                                          {isCompleted ? "Practiced ✓" : "Mark as practiced"}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            )}
+
+                            {/* YouTube lessons */}
+                            {hasLessons && (
+                              <div className="px-6 pb-6">
+                                <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                                  <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
+                                </p>
+                                {loadingLessonsId === drawerInfo.step.id ? (
+                                  <div className="space-y-2">
+                                    {[0, 1, 2].map((i) => (
+                                      <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
+                                        <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
+                                        <div className="flex-1 space-y-2">
+                                          <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                                          <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    {lessonsCache[drawerInfo.step.id].map((lesson) => {
+                                      const isWatched = drawerInfo.step.completedLessonIds?.includes(lesson.videoId) ?? false;
+                                      return (
+                                        <div key={lesson.videoId} className={`rounded-lg ring-1 transition-all ${
+                                          isWatched ? "ring-green-500/40" : "ring-zinc-800/60"
+                                        }`}>
+                                          <YouTubeLessonCard lesson={lesson} className="rounded-b-none" />
+                                          <button
+                                            onClick={() => handleToggleLesson(lesson.videoId)}
+                                            className={`flex w-full items-center gap-3 rounded-b-lg border-t px-3 py-3 text-xs font-medium transition-colors ${
+                                              isWatched
+                                                ? "border-green-500/20 bg-green-950/20 text-green-400"
+                                                : "border-zinc-800/60 bg-zinc-900/40 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
+                                            }`}
+                                          >
+                                            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                                              isWatched ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                                            }`}>
+                                              {isWatched && <Check className="h-3 w-3 text-green-400" />}
+                                            </span>
+                                            {isWatched ? "Watched ✓" : "Mark as watched"}
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+
+                      {/* ── YouTube lessons (admin only) ── */}
+                      {adminMode && (
                         <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
                             <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
@@ -1309,33 +1446,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                             </div>
                           )}
                         </div>
-                      ) : (
-                        (loadingLessonsId === drawerInfo.step.id || (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
-                          <div className="px-6 py-5">
-                            <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
-                              <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-                            </p>
-                            {loadingLessonsId === drawerInfo.step.id ? (
-                              <div className="space-y-2">
-                                {[0, 1, 2].map((i) => (
-                                  <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                                    <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                                    <div className="flex-1 space-y-2">
-                                      <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                                      <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                {lessonsCache[drawerInfo.step.id].map((lesson) => (
-                                  <YouTubeLessonCard key={lesson.videoId} lesson={lesson} />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )
                       )}
 
                     </div>
