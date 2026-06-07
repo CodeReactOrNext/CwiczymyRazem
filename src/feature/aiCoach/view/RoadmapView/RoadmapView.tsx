@@ -1275,7 +1275,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                                         isCompleted ? "ring-green-500/40" : "ring-zinc-800/60"
                                       }`}>
                                         <button
-                                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=/ai-coach`)}
+                                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=${encodeURIComponent(`/ai-coach?roadmapId=${roadmap.id}`)}`)}
                                           className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-t-lg px-4 py-4 text-left transition-all ${
                                             isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
                                           }`}
