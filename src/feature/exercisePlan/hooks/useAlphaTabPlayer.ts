@@ -12,7 +12,7 @@ interface UseAlphaTabPlayerProps {
   bpm: number;
   /** True only when audio should play (after count-in) */
   isPlaying: boolean;
-  /** startTime changes on each new play session — used to restart AlphaTab */
+  /** startTime changes on each new play session — used only to detect count-in end; not a restart signal */
   startTime: number | null;
   onLoopComplete?: () => void;
   /** Called immediately after api.play() on each loop restart — use to re-anchor the cursor. */
@@ -29,6 +29,13 @@ interface UseAlphaTabPlayerProps {
   trackConfigs?: Record<string, AlphaTabTrackConfig>;
   /** MUST be memoized by the caller */
   backingTrackIds?: string[];
+  /**
+   * When this value changes AlphaTab is stopped and reset to position 0 so the next
+   * play() starts from the beginning.  Pass tabRestartKey from the session so that
+   * explicit restarts (restart button, speed change) go back to beat 0 instead of
+   * resuming from the last paused position.
+   */
+  resetKey?: number;
 }
 
 /**
@@ -52,6 +59,7 @@ export const useAlphaTabPlayer = ({
   metronomeVolume = 1,
   trackConfigs = {},
   backingTrackIds = [],
+  resetKey,
 }: UseAlphaTabPlayerProps) => {
   const apiRef             = useRef<any>(null);
   const playRef            = useRef<AlphaTabPlayerHandle['play'] | null>(null);
@@ -66,7 +74,11 @@ export const useAlphaTabPlayer = ({
   const onLoopRestartRef        = useRef(onLoopRestart);
   const onAudioContextReadyRef  = useRef(onAudioContextReady);
   // Guards api.stop() — must not be called before api.play() has run at least once.
-  const hasStartedRef           = useRef(false);
+  const hasStartedRef = useRef(false);
+  // True when AlphaTab was paused (not stopped) — next play() should resume, not restart.
+  const wasPausedRef     = useRef(false);
+  // Tracks the previous isPlaying value to detect actual transitions vs startTime-only changes.
+  const prevIsPlayingRef = useRef(false);
 
   useEffect(() => { isPlayingRef.current             = isPlaying;            }, [isPlaying]);
   useEffect(() => { bpmRef.current                   = bpm;                  }, [bpm]);
@@ -74,7 +86,7 @@ export const useAlphaTabPlayer = ({
   useEffect(() => { onLoopRestartRef.current         = onLoopRestart;        }, [onLoopRestart]);
   useEffect(() => { onAudioContextReadyRef.current   = onAudioContextReady;  }, [onAudioContextReady]);
 
-  // ── Create AlphaTabApi — only when rawGpFile first arrives ────────────────
+  // Create AlphaTabApi — only when rawGpFile first arrives.
   // Guard: apiRef.current !== null prevents re-creation if rawGpFile object changes
   // (file reloads are handled by the separate load effect below).
   useEffect(() => {
@@ -151,6 +163,7 @@ export const useAlphaTabPlayer = ({
       isReadyRef.current     = false;
       pendingPlayRef.current = false;
       hasStartedRef.current  = false;
+      wasPausedRef.current   = false;
       currentFileRef.current = null;
       div.remove();
       playRef.current  = null;
@@ -159,10 +172,10 @@ export const useAlphaTabPlayer = ({
     };
   // rawGpFile in deps: effect re-evaluates when file arrives (null→File transition).
   // The apiRef.current guard prevents double-creation if deps fire again with same state.
-   
+
   }, [rawGpFile]);
 
-  // ── Load file into existing API ───────────────────────────────────────────
+  // Load file into existing API.
   useEffect(() => {
     const api = apiRef.current;
     if (!rawGpFile || !api || rawGpFile === currentFileRef.current) return;
@@ -177,7 +190,7 @@ export const useAlphaTabPlayer = ({
     });
   }, [rawGpFile]);
 
-  // ── BPM update — just adjust speed, never restart ────────────────────────
+  // BPM update — just adjust speed, never restart.
   // Separated from play/stop so a metronome slider change does not trigger
   // api.stop() → api.play() (which would cause "stop without start" in the worklet).
   useEffect(() => {
@@ -185,7 +198,7 @@ export const useAlphaTabPlayer = ({
     if (api) api.playbackSpeed = bpm / (originalBpmRef.current || 120);
   }, [bpm]);
 
-  // ── AlphaTab built-in metronome volume ────────────────────────────────────
+  // AlphaTab built-in metronome volume.
   // countInVolume stays 0 — our metronome handles the count-in clicks.
   // metronomeVolume is driven by the caller (0 when user mutes, 1 otherwise).
   useEffect(() => {
@@ -193,28 +206,65 @@ export const useAlphaTabPlayer = ({
     if (api) api.metronomeVolume = metronomeVolume;
   }, [metronomeVolume]);
 
-  // ── Playback control ──────────────────────────────────────────────────────
+  // Playback control — pause/resume without losing position.
+  //
+  // prevIsPlayingRef distinguishes "isPlaying changed" from "startTime changed while
+  // isPlaying was already true".  The latter happens when count-in ends (startTime goes
+  // null → value); without this guard the effect would restart AlphaTab every time
+  // count-in ends, sending audio back to beat 0.
+  //
+  // On pause  → api.pause()  (preserves cursor position)
+  // On resume → api.play()   (continues from paused position if wasPausedRef is true,
+  //                            or starts fresh if wasPausedRef is false)
   useEffect(() => {
     const api = apiRef.current;
     if (!api) return;
 
+    const wasPlaying = prevIsPlayingRef.current;
+    prevIsPlayingRef.current = isPlaying;
+
     if (isPlaying) {
-      api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
-      if (isReadyRef.current) {
-        if (hasStartedRef.current) api.stop();
-        api.play();
-        hasStartedRef.current = true;
-      } else {
-        pendingPlayRef.current = true;
+      if (!wasPlaying) {
+        // isPlaying just turned true — resume from pause or start fresh.
+        api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
+        if (isReadyRef.current) {
+          if (!wasPausedRef.current && hasStartedRef.current) api.stop();
+          api.play();
+          hasStartedRef.current = true;
+          wasPausedRef.current  = false;
+        } else {
+          pendingPlayRef.current = true;
+          wasPausedRef.current   = false;
+        }
       }
+      // startTime changed while already playing (count-in ended) — no-op, don't restart.
     } else {
-      pendingPlayRef.current = false;
-      if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
+      if (wasPlaying) {
+        // isPlaying just turned false — pause to preserve cursor position.
+        pendingPlayRef.current = false;
+        if (hasStartedRef.current) {
+          try { api.pause(); } catch { /* ignore */ }
+          wasPausedRef.current = true;
+        }
+      }
+      // startTime changed while already stopped — no-op.
     }
-   
   }, [isPlaying, startTime]);
 
-  // ── Per-track mute / volume ───────────────────────────────────────────────
+  // Explicit restart (e.g. restart button, speed change).
+  // Clears the paused state and stops AlphaTab so the next play() starts from beat 0.
+  // This effect MUST be declared after the playback control effect so that when both
+  // isPlaying and resetKey change in the same render (restart scenario), the pause
+  // state set by the playback effect is correctly overridden here.
+  useEffect(() => {
+    wasPausedRef.current = false;
+    if (hasStartedRef.current && apiRef.current) {
+      try { apiRef.current.stop(); } catch { /* ignore */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  // Per-track mute / volume.
   // trackConfigs and backingTrackIds MUST be memoized by the caller.
   useEffect(() => {
     const api   = apiRef.current;
