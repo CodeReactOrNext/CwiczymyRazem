@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 export const STRING_SPACING = 32;
 export const NOTE_RADIUS    = 11;
-export const STAFF_TOP      = 85;
+export const STAFF_TOP      = 62;
 export const STRING_COLORS  = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc"] as const;
 
 export interface NoteRD {
