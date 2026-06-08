@@ -3,12 +3,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 const RARITY_FAME_VALUES: Record<string, number> = {
-  Common: 1,
-  Uncommon: 2,
-  Rare: 5,
-  Epic: 10,
-  Legendary: 20,
-  Mythic: 50,
+  Common: 8,
+  Uncommon: 15,
+  Rare: 40,
+  Epic: 75,
+  Legendary: 150,
+  Mythic: 375,
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -9,6 +10,10 @@ import { useState, useEffect } from "react";
 import type { ArsenalUserData } from "../../types/arsenal.types";
 import { SellConfirmDialog } from "./SellConfirmDialog";
 import { GuitarCard } from "./GuitarCard";
+
+const GUITAR_FAME_VALUES: Record<string, number> = {
+  Common: 15, Uncommon: 30, Rare: 75, Epic: 150, Legendary: 300, Mythic: 750,
+};
 
 interface GuitarInventoryProps {
   data: ArsenalUserData;
@@ -78,17 +83,24 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
         ))}
       </div>
 
-      <SellConfirmDialog
-        isOpen={isDialogOpen}
-        guitarId={selectedGuitarId || 0}
-        onConfirm={handleConfirmSell}
-        onCancel={() => {
-          setIsDialogOpen(false);
-          setSelectedItemId(null);
-          setSelectedGuitarId(null);
-        }}
-        isLoading={isSelling}
-      />
+      {(() => {
+        const guitar = selectedGuitarId != null ? GUITARS_BY_ID.get(selectedGuitarId) : null;
+        return guitar ? (
+          <SellConfirmDialog
+            isOpen={isDialogOpen}
+            itemType="Guitar"
+            itemName={`${guitar.brand} ${guitar.name}`}
+            fameReward={GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
+            onConfirm={handleConfirmSell}
+            onCancel={() => {
+              setIsDialogOpen(false);
+              setSelectedItemId(null);
+              setSelectedGuitarId(null);
+            }}
+            isLoading={isSelling}
+          />
+        ) : null;
+      })()}
     </>
   );
 };
