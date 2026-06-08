@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 
 import type { ArsenalUserData } from "../../types/arsenal.types";
 import { EffectCard } from "./EffectCard";
-import { SellConfirmDialog as EffectSellConfirmDialog } from "./SellConfirmDialog";
+import { SellConfirmDialog } from "./SellConfirmDialog";
+
+const EFFECT_FAME_VALUES: Record<string, number> = {
+  Common: 8, Uncommon: 15, Rare: 40, Epic: 75, Legendary: 150, Mythic: 375,
+};
 
 interface EffectCollectionProps {
   data: ArsenalUserData;
@@ -31,14 +36,28 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   if (!data.effectInventory || data.effectInventory.length === 0) return null;
 
-  // Group by effectId, count duplicates
-  const groupedMap = new Map<number | string, { item: typeof data.effectInventory[0]; count: number }>();
+  const pedalboardItemIds = new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []);
+
+  // Group by effectId; display = newest copy, sell target = oldest non-pedalboard copy
+  const groupedMap = new Map<number | string, { item: typeof data.effectInventory[0]; sellItemId: string | null; count: number }>();
   for (const item of data.effectInventory) {
     const existing = groupedMap.get(item.effectId);
-    if (!existing || item.acquiredAt > existing.item.acquiredAt) {
-      groupedMap.set(item.effectId, { item, count: (existing?.count ?? 0) + 1 });
+    const onBoard = pedalboardItemIds.has(item.id);
+
+    if (!existing) {
+      groupedMap.set(item.effectId, { item, sellItemId: onBoard ? null : item.id, count: 1 });
     } else {
-      groupedMap.set(item.effectId, { item: existing.item, count: existing.count + 1 });
+      const displayItem = item.acquiredAt > existing.item.acquiredAt ? item : existing.item;
+      let sellItemId = existing.sellItemId;
+      if (!onBoard) {
+        if (sellItemId === null) {
+          sellItemId = item.id;
+        } else {
+          const prevSellItem = data.effectInventory.find(i => i.id === sellItemId)!;
+          if (item.acquiredAt < prevSellItem.acquiredAt) sellItemId = item.id;
+        }
+      }
+      groupedMap.set(item.effectId, { item: displayItem, sellItemId, count: existing.count + 1 });
     }
   }
   const items = Array.from(groupedMap.values()).sort((a, b) => b.item.acquiredAt - a.item.acquiredAt);
@@ -61,8 +80,6 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
     }
   };
 
-  const pedalboardItemIds = new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []);
-
   return (
     <>
       <div className="flex flex-col gap-3 mt-8">
@@ -71,10 +88,11 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
           <p className="text-base font-black text-white capitalize tracking-wide">Pedals</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {items.map(({ item, count }) => (
+          {items.map(({ item, sellItemId, count }) => (
             <EffectCard
               key={item.id}
               item={item}
+              sellItemId={sellItemId}
               count={count}
               isOnPedalboard={pedalboardItemIds.has(item.id)}
               onSellClick={handleSellClick}
@@ -84,17 +102,24 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
         </div>
       </div>
 
-      <EffectSellConfirmDialog
-        isOpen={isDialogOpen}
-        guitarId={selectedEffectId || 0}
-        onConfirm={handleConfirmSell}
-        onCancel={() => {
-          setIsDialogOpen(false);
-          setSelectedItemId(null);
-          setSelectedEffectId(null);
-        }}
-        isLoading={isSelling}
-      />
+      {(() => {
+        const effect = selectedEffectId != null ? EFFECTS_BY_ID.get(selectedEffectId) : null;
+        return effect ? (
+          <SellConfirmDialog
+            isOpen={isDialogOpen}
+            itemType="Effect"
+            itemName={`${effect.brand} ${effect.name}`}
+            fameReward={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
+            onConfirm={handleConfirmSell}
+            onCancel={() => {
+              setIsDialogOpen(false);
+              setSelectedItemId(null);
+              setSelectedEffectId(null);
+            }}
+            isLoading={isSelling}
+          />
+        ) : null;
+      })()}
     </>
   );
 };
