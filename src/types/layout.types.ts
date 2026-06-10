@@ -23,5 +23,6 @@ export type NavPagesTypes =
   | "arsenal"
   | "journey"
   | "scale-tree"
+  | "scoring"
   | "my-exercises"
   | null;
