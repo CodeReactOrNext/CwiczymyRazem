@@ -249,6 +249,7 @@ export const SongLearningSection = ({
           disableDnd={disableDnd}
           isMobile={isMobile}
           onSongRemove={handleSongRemoval}
+          activeId={activeId}
         />
         <SongStatusCard
           id="learning"
@@ -264,6 +265,7 @@ export const SongLearningSection = ({
           isCollapsedInitially={false}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          activeId={activeId}
         />
         <SongStatusCard
           id="learned"
@@ -279,6 +281,7 @@ export const SongLearningSection = ({
           isCollapsedInitially={true}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          activeId={activeId}
         />
       </div>
 

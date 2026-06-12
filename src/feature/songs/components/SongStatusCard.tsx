@@ -29,6 +29,7 @@ interface SongStatusCardProps {
   onPracticeWithGp?: (song: Song) => void;
   isCollapsedInitially?: boolean;
   disableDnd?: boolean;
+  activeId?: string | null;
 }
 
 export const SongStatusCard = ({
@@ -46,6 +47,7 @@ export const SongStatusCard = ({
   onOpenDetails,
   activeOverContainer,
   disableDnd = false,
+  activeId,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[id as keyof typeof STATUS_CONFIG];
@@ -135,24 +137,27 @@ export const SongStatusCard = ({
                       {id === "learned" && "Nothing mastered yet"}
                   </div>
                 ) : (
-                  songs?.map((song) => (
-                    <SortableSongItem
-                      key={song.id}
-                      song={song}
-                      config={config}
-                      isMobile={isMobile ?? false}
-                      droppableId={id}
-                      nextStatus={nextStatus}
-                      getPrimaryActionText={getPrimaryActionText}
-                      onStatusChange={onStatusChange || (() => {})}
-                      onSongRemove={onSongRemove || (() => {})}
-                      progress={progressMap?.[song.id] ?? null}
-                      isPremium={isPremium}
-                      onPracticeWithGp={onPracticeWithGp}
-                      onOpenDetails={onOpenDetails}
-                      disableDnd={disableDnd}
-                    />
-                  ))
+                  <AnimatePresence initial={false}>
+                    {songs?.map((song) => (
+                      <SortableSongItem
+                        key={song.id}
+                        song={song}
+                        config={config}
+                        isMobile={isMobile ?? false}
+                        droppableId={id}
+                        nextStatus={nextStatus}
+                        getPrimaryActionText={getPrimaryActionText}
+                        onStatusChange={onStatusChange || (() => {})}
+                        onSongRemove={onSongRemove || (() => {})}
+                        progress={progressMap?.[song.id] ?? null}
+                        isPremium={isPremium}
+                        onPracticeWithGp={onPracticeWithGp}
+                        onOpenDetails={onOpenDetails}
+                        disableDnd={disableDnd}
+                        isDragActive={activeId != null}
+                      />
+                    ))}
+                  </AnimatePresence>
                 )}
               </SortableContext>
             </div>
