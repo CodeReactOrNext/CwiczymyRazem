@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { 
   Tooltip, 
@@ -148,6 +148,10 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   }, []);
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  // The list the card started in. dragOver moves the card across lists in the cache,
+  // so by dragEnd findContainer(activeId) already returns the *new* list — we need the
+  // original to know whether the status actually changed and must be persisted.
+  const dragSourceContainer = useRef<SongStatus | null>(null);
   const [mobileTab, setMobileTab] = useState<'explore' | 'collection'>('explore');
   const [isMobile, setIsMobile] = useState(false);
 
@@ -204,7 +208,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    const id = event.active.id as string;
+    dragSourceContainer.current = findContainer(id) ?? null;
+    setActiveId(id);
   };
 
   const handleDragOver = (event: any) => {
@@ -258,43 +264,47 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
     setActiveId(null);
 
+    const sourceContainer = dragSourceContainer.current;
+    dragSourceContainer.current = null;
+
     if (!overId || !userAuth) return;
 
-    const activeContainer = findContainer(activeId);
-    const overContainer = findContainer(overId);
+    // dragOver has already moved the card into its target list in the cache,
+    // so this is the *final* container the card now lives in.
+    const finalContainer = findContainer(activeId);
+    if (!finalContainer) return;
 
-    if (!activeContainer || !overContainer) return;
+    const activeSong = userSongs[finalContainer].find((s) => s.id === activeId);
+    if (!activeSong) return;
 
-    const activeItems = userSongs[activeContainer];
-    const overItems = userSongs[overContainer];
-    const activeIndex = activeItems.findIndex((s) => s.id === activeId);
-    const overIndex = overItems.findIndex((s) => s.id === overId);
-
-    if (activeContainer === overContainer) {
-      if (activeIndex !== overIndex && overIndex !== -1) {
-        const newItems = arrayMove(activeItems, activeIndex, overIndex);
-        updateUserSongsCache({
-          ...userSongs,
-          [activeContainer]: newItems,
-        });
-        await updateUserSongOrder(userAuth, newItems);
-      }
-    } else {
-      // Cross-container move is now handled by onDragOver for the UI,
-      // but we still need to persist the change and the final order.
-      const activeSong = overItems.find(s => s.id === activeId);
-      if (!activeSong) return;
-
+    if (sourceContainer && sourceContainer !== finalContainer) {
+      // Cross-list move: the UI was updated by onDragOver, but the status field
+      // still needs to be persisted (updateUserSongOrder only writes `order`),
+      // otherwise the next refetch reads the stale status and the card jumps back.
       await handleStatusChange(
         activeId,
-        overContainer,
+        finalContainer,
         activeSong.title,
         activeSong.artist,
         { skipOptimisticUpdate: true, skipRefetch: true }
       );
-      
-      await updateUserSongOrder(userAuth, userSongs[activeContainer]);
-      await updateUserSongOrder(userAuth, userSongs[overContainer]);
+
+      await updateUserSongOrder(userAuth, userSongs[sourceContainer]);
+      await updateUserSongOrder(userAuth, userSongs[finalContainer]);
+    } else {
+      // Reorder within the same list.
+      const items = userSongs[finalContainer];
+      const activeIndex = items.findIndex((s) => s.id === activeId);
+      const overIndex = items.findIndex((s) => s.id === overId);
+
+      if (activeIndex !== overIndex && overIndex !== -1) {
+        const newItems = arrayMove(items, activeIndex, overIndex);
+        updateUserSongsCache({
+          ...userSongs,
+          [finalContainer]: newItems,
+        });
+        await updateUserSongOrder(userAuth, newItems);
+      }
     }
   };
 
@@ -406,26 +416,6 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 />
                 
                 <div className="space-y-12">
-                  {userSongs.wantToLearn.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-zinc-500/10 flex items-center justify-center text-zinc-400">
-                           <Music size={16} />
-                        </div>
-                        <h2 className="text-xl font-bold text-white">Want to learn</h2>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {userSongs.wantToLearn.map((song) => (
-                          <SongCard 
-                            key={song.id} 
-                            song={song} 
-                            onOpenDetails={() => setDetailsTarget(song)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {userSongs.learning.length > 0 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
@@ -436,10 +426,32 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {userSongs.learning.map((song) => (
-                          <SongCard 
-                            key={song.id} 
-                            song={song} 
+                          <SongCard
+                            key={song.id}
+                            song={song}
                             onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.wantToLearn.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-zinc-500/10 flex items-center justify-center text-zinc-400">
+                           <Music size={16} />
+                        </div>
+                        <h2 className="text-xl font-bold text-white">Want to learn</h2>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {userSongs.wantToLearn.map((song) => (
+                          <SongCard
+                            key={song.id}
+                            song={song}
+                            onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
                           />
                         ))}
                       </div>
@@ -456,10 +468,11 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {userSongs.learned.map((song) => (
-                          <SongCard 
-                            key={song.id} 
-                            song={song} 
+                          <SongCard
+                            key={song.id}
+                            song={song}
                             onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
                           />
                         ))}
                       </div>
@@ -614,6 +627,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                     hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
                     onStatusChange={refreshSongs}
                     userSongs={userSongs}
+                    updateUserSongsCache={updateUserSongsCache}
                   />
                 )}
               </div>

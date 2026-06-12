@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
 import { Button } from "assets/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
@@ -27,6 +28,7 @@ interface SortableSongItemProps {
   onPracticeWithGp?: (song: Song) => void;
   onOpenDetails?: (song: Song) => void;
   disableDnd?: boolean;
+  isDragActive?: boolean;
 }
 
 function formatPracticeMs(ms: number): string {
@@ -179,6 +181,7 @@ export const SortableSongItem = ({
   onPracticeWithGp,
   onOpenDetails,
   disableDnd = false,
+  isDragActive = false,
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
   const router = useRouter();
@@ -204,14 +207,29 @@ export const SortableSongItem = ({
     position: "relative" as const,
   };
 
+  // framer-motion never touches `opacity` here: the drag-hidden state is driven by
+  // the `opacity-0` class below, and dnd-kit's drop animation also pokes inline opacity.
+  // If framer fought over it too, a just-dropped card could get stuck at opacity:0.
+  // So framer only animates height (smooth collapse/expand). During an active drag we
+  // disable it entirely (no exit) so the source list doesn't collapse and desync dnd-kit.
+  const motionProps = isDragActive
+    ? {}
+    : {
+        initial: { height: 0 },
+        animate: { height: "auto" as const },
+        exit: { height: 0 },
+        transition: { duration: 0.2, ease: "easeOut" as const },
+      };
+
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
+      {...motionProps}
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex items-center gap-3 px-3 py-2.5 transition-colors select-none",
+        "group relative flex items-center gap-3 px-3 py-2.5 transition-colors select-none overflow-hidden",
         isMobile ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         (!disableDnd && !isMobile) && "touch-none",
         isDragging ? "opacity-0" : "hover:bg-zinc-800/60 active:bg-zinc-800",
@@ -308,6 +326,6 @@ export const SortableSongItem = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </motion.div>
   );
 };

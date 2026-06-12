@@ -20,6 +20,11 @@ interface SongsGridProps {
     learning: Song[];
     learned: Song[];
   };
+  updateUserSongsCache: (songs: {
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  }) => void;
 }
 
 export const SongsGrid = ({
@@ -31,16 +36,39 @@ export const SongsGrid = ({
   hasFilters,
   onStatusChange,
   userSongs,
+  updateUserSongsCache,
 }: SongsGridProps) => {
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
-    onChange: () => {}, // Handled by refreshSongs in SongsView
+    onChange: updateUserSongsCache,
     userSongs,
     onTableStatusChange: onStatusChange,
   });
+
+  // Adding a library song that isn't in the collection yet: handleStatusChange's
+  // optimistic move can't help (it only reshuffles songs already in userSongs), so
+  // we insert the full song into the cache here. The sidebar reads the same cache,
+  // so it appears instantly; the refetch afterwards reconciles order/progress.
+  const handleAddOrMove = (song: Song, status: SongStatus) => {
+    const isInCollection =
+      userSongs.wantToLearn.some((s) => s.id === song.id) ||
+      userSongs.learning.some((s) => s.id === song.id) ||
+      userSongs.learned.some((s) => s.id === song.id);
+
+    if (!isInCollection) {
+      updateUserSongsCache({
+        ...userSongs,
+        [status]: [...userSongs[status], song],
+      });
+      return handleStatusChange(song.id, status, song.title, song.artist, {
+        skipOptimisticUpdate: true,
+      });
+    }
+    return handleStatusChange(song.id, status, song.title, song.artist);
+  };
 
   if (!userSongs) {
     return <div>Loading...</div>;
@@ -72,7 +100,7 @@ export const SongsGrid = ({
                 }}
                 onStatusChange={(status) => {
                   if (status) {
-                    handleStatusChange(song.id, status, song.title, song.artist);
+                    handleAddOrMove(song, status);
                   }
                 }}
               />

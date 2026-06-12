@@ -13,6 +13,7 @@ import {
   Bookmark,
   Check,
   Music,
+  Play,
   Plus,
   Settings2,
   Star,
@@ -35,6 +36,7 @@ interface SongCardProps {
   footerAction?: { label: string; icon: ReactNode };
   onStatusChange?: (status: SongStatus | undefined) => void;
   isPracticeMode?: boolean;
+  onPlay?: () => void;
 }
 
 export const SongCard = ({
@@ -44,6 +46,7 @@ export const SongCard = ({
   footerAction,
   onStatusChange,
   isPracticeMode,
+  onPlay,
 }: SongCardProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -218,6 +221,27 @@ export const SongCard = ({
               <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:translate-x-1 group-hover:opacity-100 ml-1" />
             )}
           </Button>
+
+          {onPlay && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPlay();
+                    }}
+                    className="h-8 w-9 shrink-0 rounded-lg border border-cyan-500/30 bg-cyan-500/15 text-cyan-400 transition-all hover:bg-cyan-500 hover:text-white active:scale-95"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-zinc-900 border-white/10 text-zinc-200 font-bold">
+                  Practice
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
           {!isPracticeMode && onStatusChange && (
             <TooltipProvider delayDuration={200}>
