@@ -15,6 +15,7 @@ interface SongsGridProps {
   onPageChange: (page: number) => void;
   onAddSong: () => void;
   onStatusChange: () => void;
+  onPractice?: (song: Song) => void;
   userSongs: {
     wantToLearn: Song[];
     learning: Song[];
@@ -35,6 +36,7 @@ export const SongsGrid = ({
   onAddSong,
   hasFilters,
   onStatusChange,
+  onPractice,
   userSongs,
   updateUserSongsCache,
 }: SongsGridProps) => {
@@ -103,6 +105,7 @@ export const SongsGrid = ({
                     handleAddOrMove(song, status);
                   }
                 }}
+                onPractice={userStatus && onPractice ? () => onPractice(song) : undefined}
               />
             );
           })}

@@ -149,7 +149,7 @@ const SongSelectPage: NextPageWithLayout = () => {
     ];
 
     return (
-        <div className="bg-second-600 rounded overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+        <div className="flex flex-col min-h-screen rounded-lg bg-zinc-900/40 lg:mt-16">
             <HeroBanner
               title="Practice Session"
               subtitle="Select a song to start practicing"
@@ -180,7 +180,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                         placeholder="Search title..."
                                         value={libraryTitleQuery}
                                         onChange={(e) => setLibraryTitleQuery(e.target.value)}
-                                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-cyan-500/20 transition-colors font-medium"
                                     />
                                 </div>
 
@@ -193,7 +193,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                         placeholder="Search artist..."
                                         value={libraryArtistQuery}
                                         onChange={(e) => setLibraryArtistQuery(e.target.value)}
-                                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-cyan-500/20 transition-colors font-medium"
                                     />
                                 </div>
                             </div>
@@ -209,7 +209,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                             setSortBy(newSort);
                                             setSortDirection(newDir as "asc" | "desc");
                                         }}
-                                        className="h-12 px-4 pr-10 bg-zinc-900/60 border border-white/5 rounded text-white font-medium shadow-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all appearance-none cursor-pointer"
+                                        className="h-12 px-4 pr-10 bg-zinc-900/60 border border-white/5 rounded-lg text-white font-medium focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-colors appearance-none cursor-pointer"
                                     >
                                         <option value="popularity-desc">Most Popular</option>
                                         <option value="popularity-asc">Least Popular</option>
@@ -226,7 +226,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                     <select
                                         value={difficultyFilter}
                                         onChange={(e) => setDifficultyFilter(e.target.value)}
-                                        className="h-12 px-4 pr-10 bg-zinc-900/60 border border-white/5 rounded text-white font-medium shadow-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all appearance-none cursor-pointer"
+                                        className="h-12 px-4 pr-10 bg-zinc-900/60 border border-white/5 rounded-lg text-white font-medium focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-colors appearance-none cursor-pointer"
                                     >
                                         <option value="">All Levels</option>
                                         <option value="easy">Easy</option>
@@ -259,7 +259,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                         {isLibraryLoading && libraryPage === 1 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {[...Array(8)].map((_, i) => (
-                                    <div key={i} className="h-48 rounded bg-white/5 animate-pulse border border-white/5 shadow-2xl" />
+                                    <div key={i} className="h-48 rounded-lg bg-white/5 animate-pulse" />
                                 ))}
                             </div>
                         ) : librarySongs.length > 0 ? (
@@ -285,7 +285,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                         <Button
                                             onClick={() => setLibraryPage(prev => prev + 1)}
                                             disabled={isLibraryLoading}
-                                            className="h-12 px-8 bg-cyan-500 text-black hover:bg-cyan-400 font-bold rounded transition-all active:scale-95"
+                                            className="h-12 px-8 bg-cyan-500 text-black hover:bg-cyan-400 font-bold rounded-lg transition-colors active:scale-95"
                                         >
                                             {isLibraryLoading ? "Loading..." : "Load More Songs"}
                                         </Button>
@@ -294,10 +294,10 @@ const SongSelectPage: NextPageWithLayout = () => {
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-700">
-                                <div className="h-24 w-24 rounded bg-white/5 flex items-center justify-center mb-8 shadow-2xl border border-white/5">
+                                <div className="h-24 w-24 rounded-lg bg-white/5 flex items-center justify-center mb-8">
                                     <Music className="h-10 w-10 text-zinc-500" />
                                 </div>
-                                <h2 className="text-2xl font-black text-white mb-3 capitalize tracking-tight">
+                                <h2 className="text-2xl font-bold text-white mb-3 capitalize tracking-tight">
                                     No songs found
                                 </h2>
                                 <p className="text-zinc-400 max-w-md mb-10 text-sm leading-relaxed">
@@ -328,7 +328,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search by title or artist..."
-                                    className="pl-11 h-12 bg-white/5 border-white/10 rounded focus:border-cyan-500/50 transition-all shadow-2xl"
+                                    className="pl-11 h-12 bg-white/5 border-white/10 rounded focus:border-cyan-500/50 transition-all"
                                 />
                                 {searchQuery && (
                                     <button
@@ -342,7 +342,7 @@ const SongSelectPage: NextPageWithLayout = () => {
 
                             {/* Tabs */}
                             <div className="overflow-x-auto pb-0.5 -mx-1 px-1">
-                                <TabsList className="bg-zinc-900/80 p-1 rounded w-max border border-white/5 h-auto">
+                                <TabsList className="bg-zinc-900/80 p-1 rounded-lg w-max h-auto">
                                     {tabs.map((tab) => (
                                         <TabsTrigger
                                             key={tab.id}
@@ -360,7 +360,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                     {isLoading ? (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                             {[...Array(8)].map((_, i) => (
-                                                <div key={i} className="h-48 rounded bg-white/5 animate-pulse border border-white/5 shadow-2xl" />
+                                                <div key={i} className="h-48 rounded-lg bg-white/5 animate-pulse" />
                                             ))}
                                         </div>
                                     ) : filteredSongs.length > 0 ? (
@@ -382,10 +382,10 @@ const SongSelectPage: NextPageWithLayout = () => {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-700">
-                                            <div className="h-24 w-24 rounded bg-white/5 flex items-center justify-center mb-8 shadow-2xl border border-white/5">
+                                            <div className="h-24 w-24 rounded-lg bg-white/5 flex items-center justify-center mb-8">
                                                 <Music className="h-10 w-10 text-zinc-500" />
                                             </div>
-                                            <h2 className="text-2xl font-black text-white mb-3 capitalize tracking-tight">
+                                            <h2 className="text-2xl font-bold text-white mb-3 capitalize tracking-tight">
                                                 {searchQuery ? "No songs found" : "Your practice list is empty"}
                                             </h2>
                                             <p className="text-zinc-400 max-w-md mb-10 text-sm leading-relaxed">
@@ -395,7 +395,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                                             </p>
                                             {!searchQuery && (
                                                 <Link href="/songs?view=library">
-                                                    <Button className="h-14 px-10 bg-white text-black hover:bg-zinc-100 font-black rounded flex items-center gap-3 transition-transform active:scale-95 shadow-2xl capitalize text-xs tracking-widest">
+                                                    <Button className="h-14 px-10 bg-white text-black hover:bg-zinc-100 font-bold rounded-lg flex items-center gap-3 transition-colors active:scale-95 text-sm">
                                                         Go to Library <ArrowRight className="h-4 w-4" />
                                                     </Button>
                                                 </Link>

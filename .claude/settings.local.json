@@ -47,7 +47,11 @@
       "PowerShell($out = npx tsc --noEmit 2>&1; \"EXIT=$LASTEXITCODE\"; \"TOTAL ERRORS: \" + \\($out | Select-String -Pattern \"error TS\"\\).Count; $out | Select-String -Pattern \"error TS\" | Select-Object -First 20)",
       "Bash(cd \"g:/cw/sss/CwiczymyRazem\" && rm public/images/roadmap/*.png && ls public/images/roadmap/)",
       "PowerShell(npx vitest run src/utils/gameLogic/test/makeRatingData.test.ts src/utils/gameLogic/test/reportUpdateUserState.test.ts 2>&1)",
-      "PowerShell(npx vitest run src/utils/gameLogic/test/getDisplayStreak.test.ts)"
+      "PowerShell(npx vitest run src/utils/gameLogic/test/getDisplayStreak.test.ts)",
+      "Bash(echo \"keywords refs: $?\")",
+      "Bash(sed -n '25,31p' practice-guitar-every-day-simple-steps.mdx)",
+      "Bash(sed -n '37,52p' guitar-learning-without-a-teacher.mdx)",
+      "Bash(npx next *)"
     ],
     "additionalDirectories": [
       "\\tmp",

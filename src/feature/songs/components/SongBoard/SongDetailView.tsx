@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
 import type { SongSection, MasteryLevel } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
@@ -143,6 +144,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
   const handleRate = async (rating: number) => {
     if (!userAuth || !song.id || isRating) return;
+    const isNewRating = !persistedRating;
     setIsRating(true);
     setOptimisticRating(rating);
     try {
@@ -153,6 +155,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
         artist: song.artist,
         tier: tier.tier
       }));
+      if (isNewRating) {
+        dispatch(updateQuestProgress({ type: 'rate_song' }));
+      }
       // Drop the cached song lists so re-opening this song shows the fresh rating
       // instead of a stale snapshot (react-query caches songs for 5 min).
       queryClient.invalidateQueries({ queryKey: ["songs"] });

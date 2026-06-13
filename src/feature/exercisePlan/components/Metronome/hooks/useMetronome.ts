@@ -228,24 +228,24 @@ export const useMetronome = ({
     return workletNodeRef.current;
   }, []);
 
-  const startMetronome = useCallback(() => {
+  const startMetronome = useCallback((options?: { skipCountIn?: boolean }) => {
     const ctx = audioContextRef.current;
     if (!ctx) return;
 
     if (ctx.state === 'suspended') ctx.resume();
 
-    nextNoteTimeRef.current  = ctx.currentTime;
-    countInTargetRef.current = 4;
-    startTimeRef.current     = null;
-    audioStartTimeRef.current= null;
-    beatCounterRef.current   = 0;
-    setCountInRemaining(4);
+    const useCountIn = !options?.skipCountIn;
+    nextNoteTimeRef.current   = ctx.currentTime;
+    countInTargetRef.current  = useCountIn ? 4 : 0;
+    startTimeRef.current      = null;
+    audioStartTimeRef.current = null;
+    beatCounterRef.current    = 0;
+    setCountInRemaining(useCountIn ? 4 : 0);
 
     const node = ensureWorkletNode();
     if (node) {
       node.port.postMessage({ type: 'start' });
     } else {
-      // Worklet not yet ready — run the first tick immediately so there's no silent gap.
       scheduler();
     }
 
@@ -294,6 +294,16 @@ export const useMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  const seekToBeats = useCallback((beats: number) => {
+    // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
+    // without waiting for the next React render cycle.
+    if (startTimeRef.current !== null) return;
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    const elapsedMs = beats * secondsPerBeat * 1000;
+    pausedElapsedTimeRef.current  = elapsedMs;
+    pausedAudioElapsedRef.current = elapsedMs;
+  }, [bpm, speedMultiplier]);
+
   return useMemo(() => ({
     bpm,
     isPlaying,
@@ -307,6 +317,7 @@ export const useMetronome = ({
     startMetronome,
     stopMetronome,
     restartMetronome,
+    seekToBeats,
     handleSetRecommendedBpm,
     recommendedBpm,
     startTime: startTimeRef.current,
@@ -315,6 +326,6 @@ export const useMetronome = ({
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm,
     setBpm, volume, setVolume, toggleMetronome, startMetronome, stopMetronome,
-    restartMetronome, handleSetRecommendedBpm, recommendedBpm
+    restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm
   ]);
 };

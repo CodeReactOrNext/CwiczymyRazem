@@ -3,7 +3,7 @@ import Document, { Head, Html, Main, NextScript } from "next/document";
 class MyDocument extends Document {
   render(): React.JSX.Element {
     return (
-      <Html lang='pl' className='dark'>
+      <Html lang='en' className='dark'>
         <Head>
           <link
             rel='icon'

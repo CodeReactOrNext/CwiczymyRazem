@@ -100,6 +100,12 @@ const nextConfig = {
         destination: '/blog/guitar-practice-routine-for-beginners',
         permanent: true,
       },
+      // Tool page removed in 94770b1b but still ranking in search (pos ~6) — keep the equity.
+      {
+        source: '/guitar-practice-builder',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
     ]
   },
   async headers() {

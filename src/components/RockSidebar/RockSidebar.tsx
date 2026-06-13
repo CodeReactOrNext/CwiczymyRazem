@@ -21,6 +21,7 @@ import {
   Home,
   ListChecks,
   LogOut,
+  Medal,
   MessageSquarePlus,
   Milestone,
   Music,
@@ -83,6 +84,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/plans")) return "plans";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/recordings")) return "recordings";
+    if (pathname.startsWith("/scoring")) return "scoring";
     if (pathname.startsWith("/my-exercises")) return "my-exercises";
     if (pathname.startsWith("/tab-editor")) return "my-exercises";
     return null;
@@ -118,6 +120,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
+    { id: "scoring", name: "How Points Work", href: "/scoring", icon: <Medal size={16} /> },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
   ];
 

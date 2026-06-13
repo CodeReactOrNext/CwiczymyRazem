@@ -6,12 +6,12 @@ import { RARITY_STYLES } from "../RarityBadge";
 
 const CASE_ACCENT: Record<string, { cardBg: string; button: string; header: string }> = {
   standard: {
-    cardBg: "bg-zinc-900/40 border-zinc-800",
+    cardBg: "bg-zinc-900/40",
     button: "bg-zinc-200 hover:bg-white text-zinc-900",
     header: "text-zinc-100",
   },
   premium: {
-    cardBg: "bg-slate-900/40 border-blue-900/30",
+    cardBg: "bg-blue-950/20",
     button: "bg-blue-600 hover:bg-blue-500 text-white",
     header: "text-blue-100",
   },
@@ -53,17 +53,12 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
 
       <div
         className={cn(
-          "relative flex flex-col gap-6 rounded-lg border p-6 overflow-hidden",
+          "relative flex flex-col gap-6 rounded-lg p-6 overflow-hidden",
           !isElite && accent.cardBg
         )}
         style={
           isElite
-            ? {
-                background: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)",
-                border: "1px solid rgba(251,191,36,0.35)",
-                boxShadow:
-                  "0 0 40px rgba(251,191,36,0.07), 0 0 80px rgba(251,191,36,0.03), inset 0 1px 0 rgba(251,191,36,0.12)",
-              }
+            ? { background: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)" }
             : undefined
         }
       >
@@ -106,7 +101,7 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
               style={{ animation: "elite-pulse 2.8s ease-in-out infinite" }}
             >
               <Crown size={11} strokeWidth={2} style={{ color: "#fbbf24" }} />
-              <span className="text-[8px] font-black tracking-[0.35em] uppercase" style={{ color: "#fbbf24" }}>
+              <span className="text-[8px] font-black tracking-[0.35em]" style={{ color: "#fbbf24" }}>
                 Premium
               </span>
               <Crown size={11} strokeWidth={2} style={{ color: "#fbbf24" }} />
@@ -167,14 +162,7 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
         </div>
 
         {/* Cost & Open */}
-        <div
-          className="relative flex flex-col gap-4 mt-auto pt-4 z-10"
-          style={{
-            borderTop: isElite
-              ? "1px solid rgba(251,191,36,0.15)"
-              : "1px solid rgba(255,255,255,0.05)",
-          }}
-        >
+        <div className="relative flex flex-col gap-4 mt-auto pt-6 z-10">
           <div className="flex items-center justify-between px-1">
             <span className="text-sm font-medium text-zinc-400">Cost</span>
             <div className="flex items-center gap-1.5 text-sm font-bold">
@@ -206,7 +194,6 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
                 ? {
                     background: "linear-gradient(135deg, #b45309, #f59e0b, #b45309)",
                     color: "#0a0600",
-                    boxShadow: "0 0 22px rgba(251,191,36,0.28), 0 4px 14px rgba(0,0,0,0.5)",
                   }
                 : undefined
             }

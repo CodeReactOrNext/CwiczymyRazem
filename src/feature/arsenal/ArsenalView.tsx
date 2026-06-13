@@ -52,9 +52,9 @@ export const ArsenalView = () => {
       />
 
       <div className="p-4">
-        <div className="font-openSans flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <Tabs defaultValue="cases" className="w-full">
-            <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit border border-white/5 h-auto">
+            <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
               <TabsTrigger 
                 value="cases" 
                 className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"

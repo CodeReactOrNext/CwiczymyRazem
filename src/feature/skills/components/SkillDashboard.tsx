@@ -199,30 +199,40 @@ export const SkillDashboard = ({
     setSelectedChallenge(challenge);
   }, []);
 
+  const returnTo = router.query.returnTo as string | undefined;
+
   const handleFinish = () => {
     setIsFinishing(true);
-    router.push("/report");
+    router.push(returnTo ? `/report?returnTo=${encodeURIComponent(returnTo)}` : "/report");
+  };
+
+  const handleClose = () => {
+    if (returnTo) {
+      router.push(returnTo);
+    } else {
+      setSelectedChallenge(null);
+    }
   };
 
   if (selectedChallenge) {
     return (
       <div className="w-full min-h-[600px] bg-zinc-900/40 rounded-lg overflow-hidden relative">
         <div className="absolute top-6 left-6 z-[100]">
-           <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setSelectedChallenge(null)}
+           <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
             className="text-zinc-500 hover:text-white hover:bg-white/10"
            >
               <ChevronLeft size={16} className="mr-2" />
-              Back to Skills
+              {returnTo ? "Back to Roadmap" : "Back to Skills"}
            </Button>
         </div>
         <PracticeSession
           plan={selectedChallenge as any}
           onFinish={handleFinish}
           isFinishing={isFinishing}
-          onClose={() => setSelectedChallenge(null)}
+          onClose={handleClose}
           forceFullDuration={true}
         />
       </div>

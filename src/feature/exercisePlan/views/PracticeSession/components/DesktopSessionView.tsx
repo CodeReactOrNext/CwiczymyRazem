@@ -16,6 +16,7 @@ import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
+import { NotationToggleButton } from "./NotationToggleButton";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SessionSidebar } from "./SessionSidebar";
@@ -105,6 +106,18 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   const { openLeaderboard } = useSessionUI();
   const [isMobile, setIsMobile] = React.useState(false);
 
+  const handleTablatureSeek = React.useCallback((beatPosition: number) => {
+    if (!p.metronome.isPlaying) {
+      p.metronome.seekToBeats?.(beatPosition);
+    }
+  }, [p.metronome]);
+
+  const handleLoopRestart = React.useCallback((loopStartBeat: number) => {
+    p.metronome.stopMetronome();
+    p.metronome.seekToBeats(loopStartBeat);
+    setTimeout(() => p.metronome.startMetronome({ skipCountIn: true }), 0);
+  }, [p.metronome]);
+
   React.useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -161,7 +174,17 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     baseBpm={p.metronome?.bpm}
                     examMode={p.isExamMode}
                     showBackingInExam={p.isScaleExam}
-                    trailing={<SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />}
+                    trailing={
+                      <>
+                        {p.effectiveRawGpFile && (
+                          <NotationToggleButton
+                            showAlphaTabScore={p.showAlphaTabScore}
+                            onToggle={p.handleToggleAlphaTabScore}
+                          />
+                        )}
+                        <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
+                      </>
+                    }
                   />
                   <ExerciseQuickActionsBar
                     exercise={p.currentExercise}
@@ -190,6 +213,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     setVideoDuration={p.setVideoDuration} setTimerTime={p.setTimerTime}
                     onVideoEnd={p.handleNextExerciseClick} isPlaying={p.isPlaying}
                     isMicEnabled={p.isMicEnabled} volumeRef={p.volumeRef}
+                    onSeek={handleTablatureSeek}
+                    onLoopRestart={handleLoopRestart}
+                    isExamMode={p.isExamMode}
                     rewardSkillId={p.skillRewardSkillId}
                     rewardAmount={p.skillRewardAmount}
                   />

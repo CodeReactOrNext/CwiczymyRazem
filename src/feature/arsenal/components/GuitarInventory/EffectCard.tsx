@@ -9,13 +9,14 @@ import { RARITY_STYLES } from "../RarityBadge";
 
 interface EffectCardProps {
   item: EffectInventoryItem;
+  sellItemId: string | null;
   count: number;
   isOnPedalboard: boolean;
   onSellClick: (inventoryItemId: string, effectId: number | string) => void;
   isSelling: boolean;
 }
 
-export const EffectCard = ({ item, count, isOnPedalboard, onSellClick, isSelling }: EffectCardProps) => {
+export const EffectCard = ({ item, sellItemId, count, isOnPedalboard, onSellClick, isSelling }: EffectCardProps) => {
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
 
@@ -120,8 +121,8 @@ export const EffectCard = ({ item, count, isOnPedalboard, onSellClick, isSelling
         style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
       >
         <button
-          onClick={() => onSellClick(item.id, item.effectId)}
-          disabled={isSelling || (count === 1 && isOnPedalboard)}
+          onClick={() => sellItemId && onSellClick(sellItemId, item.effectId)}
+          disabled={isSelling || !sellItemId}
           className="flex-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
           title={count === 1 && isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined}
         >
