@@ -2,20 +2,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const nakedToneMelodyExercise: Exercise = {
   id: "naked_tone_melody",
-  title: "Naked Tone — Half Note Melody",
+  title: "Clean Tone — Slow Melody",
   description:
-    "Play slow, long melodies with zero effects to improve fundamental touch.",
-  whyItMatters: "Effects like delay, reverb, and distortion can hide dynamic inconsistencies and weak fret connection. Playing with a 'naked' clean tone forces you to focus on the exact moment of finger contact, note duration, and articulation.",
+    "Play a slow melody with a clean, plain sound to build a solid, even touch.",
+  whyItMatters: "Use a plain, clean sound: an acoustic guitar as-is, or an electric on a clean setting with no added echo (reverb/delay) or distortion. A clean sound has nowhere to hide, so you can clearly hear how well each note sounds — its timing, its length, and how firmly you press the string.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Connect your guitar directly to a clean amp with absolutely no reverb, delay, or gain.",
-    "Let each half note ring for its exact duration, connecting them smoothly without gaps."
+    "Play on an acoustic guitar, or on an electric with a clean sound and no added echo or distortion.",
+    "Let each note ring for its full length, connecting them smoothly without gaps."
   ],
   tips: [
-    "Listen for fret buzz, uneven volume, or weak finger pressure—fix these mechanical issues instantly.",
-    "Control your pick attack to ensure every note sounds warm and balanced."
+    "Listen for buzzing, uneven volume, or notes that don't ring clearly, and press a little firmer to fix them.",
+    "Pick each string with the same steady strength so every note sounds even."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 55 },
   relatedSkills: ["articulation"],

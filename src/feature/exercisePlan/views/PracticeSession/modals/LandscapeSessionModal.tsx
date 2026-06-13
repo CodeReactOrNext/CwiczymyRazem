@@ -133,6 +133,7 @@ export function LandscapeSessionModal({
                   hasPlayedRiddleOnce={hasPlayedRiddleOnce}
                   isPlaying={isPlaying}
                   isListening={isListening}
+                  isMicEnabled={isMicEnabled}
                   frequencyRef={frequencyRef}
                   tabResetKey={tabResetKey}
                   setVideoDuration={setVideoDuration}
@@ -206,7 +207,7 @@ export function LandscapeSessionModal({
                       <MediaControlsToolbar
                         hasMetronome={!!currentExercise.metronomeSpeed}
                         hasAudioTrack={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack}
-                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableMic}
+                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal) && !currentExercise.disableMic}
                         speedMultiplier={speedMultiplier ?? 1}
                         onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
                         isAudioMuted={isAudioMuted}

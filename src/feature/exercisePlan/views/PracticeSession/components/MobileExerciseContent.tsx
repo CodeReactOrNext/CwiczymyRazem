@@ -1,11 +1,12 @@
-import React from "react";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import React from "react";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { NoteHuntDetector } from "./NoteHuntDetector";
 import { TablatureViewer } from "./TablatureViewer";
 
 interface MobileExerciseContentProps {
@@ -18,6 +19,7 @@ interface MobileExerciseContentProps {
   hasPlayedRiddleOnce?: boolean;
   isPlaying: boolean;
   isListening: boolean;
+  isMicEnabled?: boolean;
   frequencyRef?: React.MutableRefObject<number>;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
@@ -43,6 +45,7 @@ export function MobileExerciseContent({
   hasPlayedRiddleOnce,
   isPlaying,
   isListening,
+  isMicEnabled,
   frequencyRef,
   tabResetKey,
   setVideoDuration,
@@ -62,6 +65,16 @@ export function MobileExerciseContent({
 
   return (
     <>
+      {currentExercise.customGoal && (
+        <div className="flex w-full justify-center py-2" key={currentExercise.customGoal}>
+          <NoteHuntDetector
+            targetNote={currentExercise.customGoal}
+            description={currentExercise.customGoalDescription}
+            isMicEnabled={!!isMicEnabled}
+            isListening={isListening}
+          />
+        </div>
+      )}
       {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
         <EarTrainingView
           difficulty={currentExercise.riddleConfig.difficulty}

@@ -9,14 +9,14 @@ export const metronomeGapTestExercise: Exercise = {
   category: "theory",
   timeInMinutes: 5,
   instructions: [
-    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
-    "Audit your dynamic consistency and attack angle using a clean tone.",
-    "Transition between positions fluidly without disrupting the rhythmic grid."
+    "Lock in with the metronome for the first few bars until the tempo feels steady.",
+    "When the click goes silent, keep playing in exactly the same tempo — don't speed up or slow down.",
+    "When the metronome comes back, check whether you're still in time with it."
   ],
   tips: [
-    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
-    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
-    "Maintain an upright, relaxed posture to prevent muscle fatigue."
+    "Count out loud or tap your foot during the silent bars to hold the pulse.",
+    "Rushing usually means you're tense — relax your hands and breathe steadily.",
+    "If you drift off, start the metronome again and shorten the silent gap until it feels easy."
   ],
   metronomeSpeed: {
     min: 40,

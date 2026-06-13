@@ -7,7 +7,7 @@ export const singWhatYouPlayExercise: Exercise = {
   whyItMatters: "This exercise bridges the gap between your physical muscle memory and your internal ear. By forcing your vocal cords to match the notes your fingers are playing, you eliminate the delay between musical thought and execution, ensuring you play what you hear rather than just running visual patterns on the fretboard.",
   difficulty: "hard",
   category: "hearing",
-  timeInMinutes: 10,
+  timeInMinutes: 5,
   instructions: [
     "Select a scale or a single string to limit the initial complexity.",
     "Play a short 3- to 4-note melodic phrase on the guitar.",

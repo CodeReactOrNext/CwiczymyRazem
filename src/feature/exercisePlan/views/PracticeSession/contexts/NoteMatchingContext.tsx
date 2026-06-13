@@ -1,9 +1,10 @@
-import { createContext, useContext, useMemo, useRef, type MutableRefObject, type ReactNode } from "react";
-
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import { createContext, type MutableRefObject, type ReactNode,useContext, useMemo, useRef } from "react";
 
 import type { StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
 import type { GameState } from "../hooks/noteMatchingFeedback";
+import type { NoteHuntState } from "../hooks/useNoteHunt";
+import { useNoteHunt } from "../hooks/useNoteHunt";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
@@ -18,6 +19,8 @@ interface NoteMatchingContextValue {
   gameState: GameState;
   maxPossibleScore: number;
   sessionAccuracy: number;
+  /** Live note-hunt state — populated only for customGoal exercises. */
+  noteHunt: NoteHuntState | null;
 }
 
 // ── Imperative handle (what PracticeSession reads in event handlers) ──────────
@@ -49,6 +52,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   gameState: defaultGameState,
   maxPossibleScore: 0,
   sessionAccuracy: 100,
+  noteHunt: null,
 });
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -70,6 +74,8 @@ interface NoteMatchingProviderProps {
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
   // inputs for useStrummingMatcher
   activeStrumPattern: StrumPattern | undefined;
+  // input for useNoteHunt (customGoal exercises)
+  customGoal: string | undefined;
   // callback
   onReset: () => void;
 }
@@ -89,6 +95,7 @@ export function NoteMatchingProvider({
   audioRefs,
   getAdjustedTargetFreq,
   activeStrumPattern,
+  customGoal,
   onReset,
 }: NoteMatchingProviderProps) {
   const {
@@ -130,12 +137,22 @@ export function NoteMatchingProvider({
     currentExerciseIndex,
   });
 
+  const isNoteHunt = !!customGoal;
+  const noteHunt = useNoteHunt(
+    customGoal ?? "",
+    audioRefs.frequencyRef,
+    audioRefs.volumeRef,
+    isMicEnabled && isNoteHunt,
+  );
+
   const isStrummingExercise = !!activeStrumPattern;
-  const gameState = isStrummingExercise ? strumGameState : tabGameState;
-  const sessionAccuracy = isStrummingExercise ? strumAccuracy : tabAccuracy;
+  const gameState = isNoteHunt ? noteHunt.gameState : isStrummingExercise ? strumGameState : tabGameState;
+  const sessionAccuracy = isNoteHunt ? noteHunt.accuracy : isStrummingExercise ? strumAccuracy : tabAccuracy;
+  const effectiveMaxPossibleScore = isNoteHunt ? noteHunt.maxPossibleScore : maxPossibleScore;
+  const effectiveMaxCombo = isNoteHunt ? noteHunt.maxCombo : maxCombo;
 
   // noteTimeline is only needed for the end-of-session snapshot
-  const noteTimeline = useMemo((): ("hit" | "miss")[] => {
+  const tabNoteTimeline = useMemo((): ("hit" | "miss")[] => {
     const keys = new Set([...Object.keys(hitNotes), ...Object.keys(missedNotes)]);
     return Array.from(keys)
       .sort((a, b) => {
@@ -148,9 +165,18 @@ export function NoteMatchingProvider({
       .map(key => (hitNotes[key] ? "hit" : "miss"));
   }, [hitNotes, missedNotes]);
 
+  // For the note hunt, the timeline is one "hit" per octave found plus a "miss"
+  // for each octave still missing — so the success screen shows real progress.
+  const noteTimeline = useMemo((): ("hit" | "miss")[] => {
+    if (!isNoteHunt) return tabNoteTimeline;
+    const total = noteHunt.octaves.length;
+    const found = noteHunt.maxCombo;
+    return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
+  }, [isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo, tabNoteTimeline]);
+
   // Always-current ref so snapshot() never reads stale closure values
   const latestRef = useRef({ score: 0, accuracy: 100, maxCombo: 0, maxPossibleScore: 0, noteTimeline: [] as ("hit" | "miss")[] });
-  latestRef.current = { score: gameState.score, accuracy: sessionAccuracy, maxCombo, maxPossibleScore, noteTimeline };
+  latestRef.current = { score: gameState.score, accuracy: sessionAccuracy, maxCombo: effectiveMaxCombo, maxPossibleScore: effectiveMaxPossibleScore, noteTimeline };
 
   // Populate the imperative handle on every render — safe, it's just a ref assignment
   handleRef.current = {
@@ -159,9 +185,9 @@ export function NoteMatchingProvider({
   };
 
   const value = useMemo<NoteMatchingContextValue>(
-    () => ({ hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy }),
+    () => ({ hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState, maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, noteHunt: isNoteHunt ? noteHunt : null }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt],
   );
 
   return (

@@ -18,9 +18,8 @@ export const beginnerDailyExercisesPlan: ExercisePlan = {
   exercises: [
     openGRepetitionExercise,
     stringRepetitionExercise,
-    spiderChromaticsExercise,
     randomNoteHuntExercise,
-
+    spiderChromaticsExercise,
   ],
   userId: "system",
   image: null, // Image will be added once approved or handled
@@ -33,10 +32,10 @@ export const megaBeginnerFirstStepsPlan: ExercisePlan = {
   difficulty: "easy",
   category: "technique",
   exercises: [
+    quarterNotesDrillExercise,
     nakedToneMelodyExercise,
     strummingBasicExercise,
     chordPracticeExercise,
-    quarterNotesDrillExercise,
   ],
   userId: "system",
   image: null,

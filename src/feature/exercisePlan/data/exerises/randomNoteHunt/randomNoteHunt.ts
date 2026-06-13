@@ -1,38 +1,15 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
-const getRandomNote = () => {
-  const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  return notes[Math.floor(Math.random() * notes.length)];
-};
-
-let cachedNote: string | null = null;
-let lastAccess = 0;
-
-const getStableRandomNote = () => {
-  const now = Date.now();
-  if (!cachedNote || now - lastAccess > 1000) {
-    cachedNote = getRandomNote();
-  }
-  lastAccess = now;
-  return cachedNote;
-};
-
 export const randomNoteHuntExercise: Exercise = {
   id: "random_note_hunt",
   isHiddenFromLanding: true,
-  get title() {
-    return `Random Note Hunt: ${getStableRandomNote()}`;
-  },
-  get customGoal() {
-    return getStableRandomNote();
-  },
-  customGoalDescription: "Find this note everywhere on the neck",
-  description: "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
+  title: "Random Note Hunt",
+  description: "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
   difficulty: "easy",
   category: "theory",
   timeInMinutes: 2,
   instructions: [
-    "Find and play the selected note on every string where it occurs, starting from the low E string and moving up.",
+    "Pick a note, then find and play it on every string where it occurs, starting from the low E string and moving up.",
     "Repeat the process, but this time start from the highest string and move down.",
     "Try to find the note in different octaves.",
   ],
@@ -45,7 +22,5 @@ export const randomNoteHuntExercise: Exercise = {
   whyItMatters: "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck.",
   metronomeSpeed: null,
   relatedSkills: ["music_theory"],
-  disableMic: true,
   disableBackingTrack: true,
-  disableTuner: true,
 };

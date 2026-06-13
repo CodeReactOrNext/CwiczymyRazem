@@ -1,5 +1,4 @@
 import type { ExercisePlan } from "../../../types/exercise.types";
-import { legatoSextuplets457Exercise } from "../../exerises/legatoSextuplets457/legatoSextuplets457";
 import { spiderBasicExercise } from "../../exerises/spiderBasic/spiderBasic";
 import { spiderPermutation1234Exercise } from "../../exerises/spiderPermutation1234/spiderPermutation1234";
 import { spiderStairsHardExercise } from "../../exerises/spiderStairsHard/spiderStairsHard";
@@ -21,7 +20,6 @@ export const spiderMasterPlan: ExercisePlan = {
     SpiderStringSkippingExercise,
     spiderXExercise,
     spiderXExtendedExercise,
-    legatoSextuplets457Exercise,
   ],
   userId: "system",
   image: spiderImage,

@@ -4,7 +4,6 @@ import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/compl
 import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
 import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
 import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
-import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
 import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
 import { guitarPlayalongsPlans } from "feature/exercisePlan/data/plans/guitarPlayalongs/guitarPlayalongsPlans";
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
@@ -32,12 +31,10 @@ import { musicianFitnessLvl2S18Plan } from "feature/exercisePlan/data/plans/meta
 import { musicianFitnessLvl2S19Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S19";
 import { musicianFitnessLvl2S20Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S20";
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
-import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
 import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
 import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
 import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPlan/spiderMasterPlan";
 import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
-import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
 
@@ -106,9 +103,6 @@ export const defaultPlans: ExercisePlan[] = [
   harmonicVoiceLeadingPlan,
   creativePhrasingPlan,
   advancedImprovisationPlan,
-  expressiveLeadPlayingPlan,
-  rhythmicPrecisionPlan,
-  theIntervalMapPlan,
   megaBeginnerFirstStepsPlan,
   beginnerDailyExercisesPlan,
   earRhythmFundamentalsPlan,

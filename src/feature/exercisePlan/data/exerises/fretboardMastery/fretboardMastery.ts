@@ -4,7 +4,7 @@ export const fretboardMasteryExercise: Exercise = {
   id: "fretboard_mastery",
   title: "Fretboard Mastery",
   description:
-    "Instantly locate and memorize natural and accidental notes across all strings.",
+    "Take a short melodic phrase you know and play it in multiple positions across the neck, navigating by note names instead of shapes.",
   whyItMatters: "Complete fretboard visualization removes the guesswork from your playing. Knowing note names instantly allows you to transpose keys, construct chords, and find scale shapes on the fly without relying on fixed geometric patterns.",
   difficulty: "hard",
   category: "theory",

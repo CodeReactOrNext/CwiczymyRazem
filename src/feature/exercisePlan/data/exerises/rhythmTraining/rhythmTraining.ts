@@ -1,9 +1,87 @@
-import type { Exercise, TablatureNote } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise, TablatureBeat, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
-const n = (isAccented?: boolean) => ({
-  notes: [{ string: 6, fret: 0, ...(isAccented ? { isAccented: true } : {}) }],
+type Difficulty = "easy" | "medium" | "hard";
+
+// ── Rhythm generator ─────────────────────────────────────────────────────────
+// Each exercise's tablature is generated from small one/two/three-beat rhythmic
+// "cells" picked at random and packed into 4/4 measures. The result stays fixed
+// for a whole session (pausing never changes it) and is re-rolled only when the
+// exercise is entered or restarted, via rerollCustomGoal() — same pattern as
+// randomNoteHunt. See PracticeSession.
+
+const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+// A single muted note on the low E string (matches the original exercise).
+const note = (duration: number): TablatureBeat => ({
+  duration,
+  notes: [{ string: 6, fret: 0 }],
 });
-const rest = { notes: [] as TablatureNote[] };
+const rest = (duration: number): TablatureBeat => ({ duration, notes: [] });
+
+/** A rhythmic building block that fills exactly `beats` quarter-note beats. */
+interface Cell {
+  beats: number;
+  make: () => TablatureBeat[];
+}
+
+// Pools are weighted simply by repeating an entry to make it more likely.
+const CELL_POOLS: Record<Difficulty, Cell[]> = {
+  easy: [
+    { beats: 1, make: () => [note(1)] },                 // quarter
+    { beats: 1, make: () => [note(1)] },                 // quarter (weighted)
+    { beats: 1, make: () => [rest(1)] },                 // quarter rest
+    { beats: 1, make: () => [note(0.5), note(0.5)] },    // two eighths
+    { beats: 2, make: () => [note(2)] },                 // half
+    { beats: 2, make: () => [note(2)] },                 // half (weighted)
+    { beats: 3, make: () => [note(3)] },                 // dotted half
+  ],
+  medium: [
+    { beats: 1, make: () => [note(1)] },                       // quarter
+    { beats: 1, make: () => [note(0.5), note(0.5)] },          // two eighths
+    { beats: 1, make: () => [note(0.5), note(0.5)] },          // two eighths (weighted)
+    { beats: 1, make: () => [rest(0.5), note(0.5)] },          // off-beat eighth
+    { beats: 1, make: () => [note(0.5), rest(0.5)] },          // eighth + rest
+    { beats: 1, make: () => [rest(1)] },                       // quarter rest
+    { beats: 2, make: () => [note(1.5), note(0.5)] },          // dotted quarter + eighth
+  ],
+  hard: [
+    { beats: 1, make: () => [note(0.25), note(0.25), note(0.25), note(0.25)] }, // four 16ths
+    { beats: 1, make: () => [note(0.5), note(0.25), note(0.25)] },              // gallop
+    { beats: 1, make: () => [note(0.25), note(0.25), note(0.5)] },              // reverse gallop
+    { beats: 1, make: () => [rest(0.25), note(0.25), rest(0.25), note(0.25)] }, // 16th syncopation
+    { beats: 1, make: () => [note(0.333), note(0.333), note(0.333)] },          // triplet
+    { beats: 1, make: () => [note(0.5), note(0.5)] },                           // two eighths
+  ],
+};
+
+/** Builds one 4/4 measure by packing random cells until the bar is full, then
+ *  accents the first sounding note of each cell to mark the pulse. */
+const generateMeasure = (difficulty: Difficulty): TablatureMeasure => {
+  const pool = CELL_POOLS[difficulty];
+  const beats: TablatureBeat[] = [];
+  let remaining = 4;
+
+  while (remaining > 0) {
+    const cell = pick(pool.filter((c) => c.beats <= remaining));
+    const cellBeats = cell.make();
+    // Accent the first sounding (non-rest) note in this beat group.
+    const firstNote = cellBeats.find((b) => b.notes.length > 0);
+    if (firstNote) firstNote.notes = firstNote.notes.map((n) => ({ ...n, isAccented: true }));
+    beats.push(...cellBeats);
+    remaining -= cell.beats;
+  }
+
+  return { timeSignature: [4, 4], beats };
+};
+
+const generateTablature = (difficulty: Difficulty, measureCount = 5): TablatureMeasure[] =>
+  Array.from({ length: measureCount }, () => generateMeasure(difficulty));
+
+let easyTablature = generateTablature("easy");
+let mediumTablature = generateTablature("medium");
+let hardTablature = generateTablature("hard");
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const rhythmTrainingEasy: Exercise = {
   id: "rhythm_training_easy",
@@ -14,64 +92,21 @@ export const rhythmTrainingEasy: Exercise = {
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Maintain a relaxed, pendulum-like strumming motion of the wrist and forearm.",
-    "Execute even, fluid down and up strokes, keeping pick depth shallow.",
-    "Use light fretting-hand pressure releases to mute the strings cleanly on rhythmic rests."
+    "Rest your fretting hand lightly on one string so it's muted and produces only a percussive click, no clear pitch.",
+    "Pick that muted string on each note shown, holding quarter and half notes for their full length.",
+    "On rests, stop picking and let the silence last exactly as long as it should."
   ],
   tips: [
-    "Angle the pick slightly so it glides smoothly across the strings rather than catching.",
-    "Focus on the dynamic contrast between accented strums and quiet ghost strokes.",
-    "Keep your arm moving continuously, even during silent rests, to internalize the groove."
+    "Count aloud '1 - 2 - 3 - 4' with the metronome so every note lands exactly on the beat.",
+    "Keep the accented first note of each group a touch louder to feel the pulse.",
+    "Don't rush out of the rests — a held note or a silence is still part of the rhythm."
   ],
   metronomeSpeed: { min: 50, max: 85, recommended: 65 },
   relatedSkills: ["rhythm"],
-  tablature: [
-    // Measure 1: Quarter notes (4×1.0)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1, ...n(true) },
-        { duration: 1, ...n() },
-        { duration: 1, ...n() },
-        { duration: 1, ...n() },
-      ],
-    },
-    // Measure 2: Half notes (2×2.0) — play on beats 1 and 3
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 2, ...n(true) },
-        { duration: 2, ...n() },
-      ],
-    },
-    // Measure 3: Dotted half + quarter (3.0 + 1.0)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 3, ...n(true) },
-        { duration: 1, ...n() },
-      ],
-    },
-    // Measure 4: Quarter-quarter-half (1+1+2)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1, ...n(true) },
-        { duration: 1, ...n() },
-        { duration: 2, ...n() },
-      ],
-    },
-    // Measure 5: Quarter with rests — play-rest-play-rest
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1, ...n(true) },
-        { duration: 1, ...rest },
-        { duration: 1, ...n() },
-        { duration: 1, ...rest },
-      ],
-    },
-  ],
+  get tablature() {
+    return easyTablature;
+  },
+  rerollCustomGoal: () => { easyTablature = generateTablature("easy"); },
 };
 
 export const rhythmTrainingMedium: Exercise = {
@@ -94,72 +129,10 @@ export const rhythmTrainingMedium: Exercise = {
   ],
   metronomeSpeed: { min: 65, max: 115, recommended: 85 },
   relatedSkills: ["rhythm"],
-  tablature: [
-    // Measure 1: Straight eighth notes (8×0.5)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.5, ...n(true) },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-      ],
-    },
-    // Measure 2: Syncopated 8ths — rest-note-rest-note (off-beat emphasis)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n(true) },
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n() },
-      ],
-    },
-    // Measure 3: Quarter + two eighths + quarter + two eighths
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1, ...n(true) },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 1, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-      ],
-    },
-    // Measure 4: Dotted quarter + eighth pattern (1.5+0.5+1.5+0.5)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1.5, ...n(true) },
-        { duration: 0.5, ...n() },
-        { duration: 1.5, ...n() },
-        { duration: 0.5, ...n() },
-      ],
-    },
-    // Measure 5: Eighth notes with rests — play-play-rest-play per beat
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.5, ...n(true) },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...n() },
-        { duration: 0.5, ...rest },
-        { duration: 0.5, ...n() },
-      ],
-    },
-  ],
+  get tablature() {
+    return mediumTablature;
+  },
+  rerollCustomGoal: () => { mediumTablature = generateTablature("medium"); },
 };
 
 export const rhythmTrainingHard: Exercise = {
@@ -182,108 +155,8 @@ export const rhythmTrainingHard: Exercise = {
   ],
   metronomeSpeed: { min: 75, max: 135, recommended: 95 },
   relatedSkills: ["rhythm"],
-  tablature: [
-    // Measure 1: Straight 16th notes (16×0.25)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.25, ...n(true) },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-      ],
-    },
-    // Measure 2: 16th syncopation — rest on downbeats, play off-beats
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n(true) },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...rest },
-        { duration: 0.25, ...n() },
-      ],
-    },
-    // Measure 3: Gallop — 8th + two 16ths, repeated (0.5 + 0.25 + 0.25) × 4
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.5, ...n(true) },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.5, ...n(true) },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.5, ...n(true) },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-        { duration: 0.5, ...n(true) },
-        { duration: 0.25, ...n() },
-        { duration: 0.25, ...n() },
-      ],
-    },
-    // Measure 4: Triplet feel (12×0.333)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.333, ...n(true) },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n(true) },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n(true) },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n(true) },
-        { duration: 0.333, ...n() },
-        { duration: 0.333, ...n() },
-      ],
-    },
-    // Measure 5: Polyrhythmic — 16th groupings of 3 across 4/4 (accent every 3rd 16th)
-    {
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.25, ...n(true) },  // 1 — accent
-        { duration: 0.25, ...n() },       // 2
-        { duration: 0.25, ...n() },       // 3
-        { duration: 0.25, ...n(true) },   // 4 — accent
-        { duration: 0.25, ...n() },       // 5
-        { duration: 0.25, ...n() },       // 6
-        { duration: 0.25, ...n(true) },   // 7 — accent
-        { duration: 0.25, ...n() },       // 8
-        { duration: 0.25, ...n() },       // 9
-        { duration: 0.25, ...n(true) },   // 10 — accent
-        { duration: 0.25, ...n() },       // 11
-        { duration: 0.25, ...n() },       // 12
-        { duration: 0.25, ...n(true) },   // 13 — accent
-        { duration: 0.25, ...n() },       // 14
-        { duration: 0.25, ...n() },       // 15
-        { duration: 0.25, ...n() },       // 16
-      ],
-    },
-  ],
+  get tablature() {
+    return hardTablature;
+  },
+  rerollCustomGoal: () => { hardTablature = generateTablature("hard"); },
 };

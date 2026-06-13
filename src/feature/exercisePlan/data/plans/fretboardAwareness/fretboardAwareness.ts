@@ -11,9 +11,9 @@ export const fretboardAwarenessPlan: ExercisePlan = {
   difficulty: "medium",
   category: "theory",
   exercises: [
+    randomNoteHuntExercise,
     naturalNotesMapExercise,
-    fretboardMasteryExercise,
-    randomNoteHuntExercise
+    fretboardMasteryExercise
   ],
   userId: "system",
   image: null,

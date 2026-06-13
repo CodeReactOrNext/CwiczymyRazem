@@ -9,7 +9,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const quarterNotesDrillExercise: Exercise = {
   id: "quarter_notes_drill",
-  isHiddenFromLibrary: true,
+  isHiddenFromLibrary: false,
   title: "Quarter Notes Drill",
   description:
     "Develop strict timing and pick attack consistency using quarter-note pulses.",
