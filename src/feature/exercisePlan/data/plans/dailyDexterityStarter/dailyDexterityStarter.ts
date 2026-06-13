@@ -12,10 +12,10 @@ export const dailyDexterityStarterPlan: ExercisePlan = {
   difficulty: "easy",
   category: "technique",
   exercises: [
-    spiderBasicExercise,
     spiderOneStringExercise,
     stringRepetitionExercise,
-    chromaticAccentsExercise
+    chromaticAccentsExercise,
+    spiderBasicExercise
   ],
   userId: "system",
   image: null,

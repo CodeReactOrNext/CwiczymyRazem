@@ -170,6 +170,11 @@ export const PracticeSession = ({
   } = useEarTraining({ currentExercise, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
   useEffect(() => {
+    // Dynamic customGoal (e.g. Random Note Hunt): pick a fresh target on entry,
+    // then keep it fixed for the session so pausing never changes it. This runs
+    // once per exercise and the resetForExercise() below re-renders to show it.
+    currentExercise.rerollCustomGoal?.();
+
     let nextAudioMuted = true;
     if (isExamMode) {
       nextAudioMuted = true;
@@ -293,6 +298,7 @@ export const PracticeSession = ({
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
+      customGoal={currentExercise.customGoal}
       onReset={handleNoteMatchingReset}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>

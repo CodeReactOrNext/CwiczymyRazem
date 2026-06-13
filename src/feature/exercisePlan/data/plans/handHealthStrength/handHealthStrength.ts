@@ -13,9 +13,9 @@ export const handHealthStrengthPlan: ExercisePlan = {
   category: "technique",
   exercises: [
     jpStretching,
-    fretStretchDrillExercise,
+    chromaticSpiderWalkExercise,
     pinkyPowerDrillExercise,
-    chromaticSpiderWalkExercise
+    fretStretchDrillExercise
   ],
   userId: "system",
   image: null,

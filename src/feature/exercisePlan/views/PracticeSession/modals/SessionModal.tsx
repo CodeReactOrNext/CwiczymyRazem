@@ -1,9 +1,9 @@
 import { cn } from "assets/lib/utils";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
-import { motion } from "framer-motion";
 import { useIsLandscape } from "hooks/useIsLandscape";
 import React, { useState } from "react";
 
+import { categoryGradients } from "../../../constants/categoryStyles";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
@@ -11,7 +11,6 @@ import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
-import { categoryGradients } from "../../../constants/categoryStyles";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
@@ -108,7 +107,7 @@ const SessionModal = ({
   const category = currentExercise.category || "mixed";
   const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
 
-  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableMic;
+  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal) && !currentExercise.disableMic;
   const hasAudioTrack  = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
 
@@ -166,6 +165,7 @@ const SessionModal = ({
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
             isPlaying={isPlaying}
             isListening={isListening}
+            isMicEnabled={isMicEnabled}
             frequencyRef={frequencyRef}
             tabResetKey={tabResetKey}
             setVideoDuration={setVideoDuration}
@@ -181,36 +181,13 @@ const SessionModal = ({
             onPlayRiddle={handleToggleTimer}
           />
 
-          {currentExercise.customGoal && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-              key={currentExercise.customGoal}
-              className="flex flex-col items-center gap-3"
-            >
-              <div className="relative group">
-                <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-lg opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-                <div className="relative w-24 h-24 rounded-lg bg-zinc-900/80 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-                  <span className="text-5xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-                    {currentExercise.customGoal}
-                  </span>
-                </div>
-              </div>
-              {currentExercise.customGoalDescription && (
-                <p className="text-[10px] text-zinc-500 font-bold tracking-widest">
-                  {currentExercise.customGoalDescription}
-                </p>
-              )}
-            </motion.div>
-          )}
-
           {currentExercise.spotifyId && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
               <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
             </div>
           )}
 
-          {isMicEnabled && <MobileMicGameHud />}
+          {isMicEnabled && !currentExercise.customGoal && <MobileMicGameHud />}
 
           <MobileTimerDisplay isPlaying={isPlaying} />
 

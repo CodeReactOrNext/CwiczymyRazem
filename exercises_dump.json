@@ -233,11 +233,11 @@
   },
   {
     "id": "random_note_hunt",
-    "title": "Random Note Hunt: A#",
+    "title": "Random Note Hunt: E",
     "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
     "difficulty": "easy",
     "category": "theory",
-    "customGoal": "A#",
+    "customGoal": "E",
     "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
   },
   {

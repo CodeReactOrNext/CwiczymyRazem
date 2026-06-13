@@ -10,7 +10,7 @@ export const spiderXExtendedExercise: Exercise = {
   whyItMatters: "The extended version introduces shifting positions along with diagonal string changes. This builds outstanding spatial awareness, finger dexterity, and high-level picking synchronization.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 5,
   instructions: [
     "Execute horizontal position shifts seamlessly while maintaining diagonal picking.",
     "Keep pick strokes minimal and synchronized with fretting finger contacts."

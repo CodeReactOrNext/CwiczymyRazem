@@ -10,14 +10,14 @@ export const oneStringBackingExercise: Exercise = {
   category: "creativity",
   timeInMinutes: 10,
   instructions: [
-    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
-    "Audit your dynamic consistency and attack angle using a clean tone.",
-    "Transition between positions fluidly without disrupting the rhythmic grid."
+    "Pick one string and improvise over the backing track using only that string.",
+    "Move along the string to find the notes that sound good — slide between them instead of jumping.",
+    "Leave space between phrases: play a short idea, let it breathe, then answer it."
   ],
   tips: [
-    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
-    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
-    "Maintain an upright, relaxed posture to prevent muscle fatigue."
+    "Use slides, bends, and vibrato to make single notes expressive — that's what keeps one string interesting.",
+    "Listen to the backing track and aim to land on notes that fit the chord underneath.",
+    "Start with just 2-3 notes and a simple rhythm; add range only once it feels musical."
   ],
   metronomeSpeed: null,
   relatedSkills: ["phrasing", "improvisation"],

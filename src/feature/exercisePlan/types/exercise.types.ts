@@ -155,6 +155,10 @@ export interface Exercise {
   hideTablatureNotes?: boolean;
   customGoal?: string;
   customGoalDescription?: string;
+  /** For exercises whose customGoal is randomized: picks a fresh target. Called
+   *  once when the exercise is entered or restarted, so the goal stays stable
+   *  during a session (e.g. across pauses). See randomNoteHunt. */
+  rerollCustomGoal?: () => void;
   riddleConfig?: ExerciseRiddleConfig;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;

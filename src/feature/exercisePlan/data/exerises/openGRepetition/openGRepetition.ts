@@ -8,14 +8,14 @@ export const openGRepetitionExercise: Exercise = {
   category: "technique",
   timeInMinutes: 1.5,
   instructions: [
-    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
-    "Audit your dynamic consistency and attack angle using a clean tone.",
-    "Transition between positions fluidly without disrupting the rhythmic grid."
+    "Pick the open G string (the 3rd string) in a steady, even stream along with the metronome.",
+    "Keep every note the same length and the same volume.",
+    "Use a clean, plain sound so you can clearly hear each note."
   ],
   tips: [
-    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
-    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
-    "Maintain an upright, relaxed posture to prevent muscle fatigue."
+    "Pick with small, controlled movements so the rhythm stays even.",
+    "Lightly rest your hands against the strings you're not playing to keep them quiet.",
+    "Sit up straight and stay relaxed to avoid tiring out."
   ],
   whyItMatters: "This exercise improves timing consistency and alternate picking control by training you to play evenly with the metronome. It helps build the precision and stability needed for clean rhythm guitar playing.",
   metronomeSpeed: {

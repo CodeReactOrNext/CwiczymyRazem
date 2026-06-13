@@ -6,9 +6,9 @@ export const chordPracticeExercise: Exercise = {
   title: "Chord Practice (Configurable)",
   description: "Practice clean transitions and finger placement across a customizable selection of chords.",
   whyItMatters: "Mastering transitions between diverse chord families is essential for smooth rhythm playing. This exercise builds muscle memory and hand independence, ensuring all strings ring clearly without unintended muting.",
-  difficulty: "medium",
+  difficulty: "easy",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 5,
   instructions: [
     "Position your thumb behind the middle of the neck to support a curved fretting arch.",
     "Arpeggiate each chord slowly to verify that every string rings out clearly."

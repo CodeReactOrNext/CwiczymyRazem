@@ -7,7 +7,7 @@ export const pinkyPowerDrillExercise: Exercise = {
   whyItMatters: "Most guitarists suffer from an under-developed pinky finger, leading to uneven speed and restricted fretboard patterns. Isolating the pinky improves hand balance, dexterity, and overall fretting agility.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 8,
   instructions: [
     "Start each pattern with a strong, clean pinky contact.",
     "Ensure the pinky finger remains curved and does not collapse at the joints."
