@@ -105,7 +105,7 @@ export const SongsGrid = ({
                     handleAddOrMove(song, status);
                   }
                 }}
-                onPractice={userStatus && onPractice ? () => onPractice(song) : undefined}
+                onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
               />
             );
           })}

@@ -20,6 +20,7 @@ import {
   CalendarCheck, Check, CheckCircle2, ChevronLeft, ChevronRight, Flame, Guitar, Info,
   Layers, ListMusic, Lock, Shield, Sparkles, Sprout, Target, TrendingUp, Trophy, X, Zap,
 } from "lucide-react";
+import { cn } from "assets/lib/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -683,7 +684,7 @@ function LevelGoalCard({
         }}
       >
         <Lock size={18} />
-        <span>Unlock for</span>
+        <span>Unlock once for</span>
         <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">{nextLevel.cost}</span>
         {!canAfford && <span className="text-xs font-medium text-zinc-500">(need {nextLevel.cost - fame} more)</span>}
@@ -791,11 +792,27 @@ function LevelGoalCard({
         </div>
 
         <div className="text-right shrink-0">
-          <p className="tabular-nums leading-none font-black" style={{ color }}>
-            <span className="text-3xl">{value}</span>
-            <span className="text-lg text-zinc-600">/{max}</span>
-          </p>
-          <p className="text-[10px] text-zinc-600 mt-1">{Math.round((value / max) * 100)}% done</p>
+          {isLocked ? (
+            <>
+              <p className="flex items-center justify-end gap-1 text-xs font-semibold text-zinc-500 line-through">
+                <img src="/images/coin.png" alt="" className="h-3 w-3 object-contain opacity-50" />
+                <span className="tabular-nums">{nextLevel.cost} once</span>
+              </p>
+              <p className="mt-0.5 flex items-center justify-end gap-1 font-black leading-none text-amber-400">
+                <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
+                <span className="text-2xl tabular-nums">+{nextLevel.reward}</span>
+                <span className="text-sm text-zinc-500">/wk</span>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="tabular-nums leading-none font-black" style={{ color }}>
+                <span className="text-3xl">{value}</span>
+                <span className="text-lg text-zinc-600">/{max}</span>
+              </p>
+              <p className="text-[10px] text-zinc-600 mt-1">{Math.round((value / max) * 100)}% done</p>
+            </>
+          )}
         </div>
       </div>
 
@@ -1118,9 +1135,22 @@ function LevelGoalCard({
       )}
 
       {isLocked ? (
-        /* Locked level: no charts — just the goal and a centered unlock button */
+        /* Locked level: no charts — just the goal, the investment explainer and a centered unlock button */
         <div className="flex flex-col items-center gap-5 py-4">
           {goalBox}
+          {(() => {
+            const weeks = Math.max(1, Math.ceil(nextLevel.cost / nextLevel.reward));
+            return (
+              <div className="flex w-full max-w-md items-start gap-2.5">
+                <TrendingUp size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden />
+                <p className="text-[12px] leading-snug text-zinc-400">
+                  One-time investment. It pays for itself in{" "}
+                  <span className="font-semibold text-zinc-200">{weeks} week{weeks > 1 ? "s" : ""}</span>, then you keep claiming{" "}
+                  <span className="font-semibold text-amber-400">+{nextLevel.reward} Fame every week</span> you hit the goal — for good.
+                </p>
+              </div>
+            );
+          })()}
           {actionButton}
         </div>
       ) : (
@@ -1141,8 +1171,19 @@ function LevelGoalCard({
 
 const RULES_DISMISSED_KEY = "practiceLevels.rulesDismissed";
 
+// One worked example (the Groove level from the Discord thread): pay 40 once,
+// earn +30 every week — turns positive in week 2 and keeps growing.
+const EXAMPLE_STEPS: { label: string; net: string; positive?: boolean; note?: string }[] = [
+  { label: "Unlock",  net: "−40" },
+  { label: "Week 1",  net: "−10" },
+  { label: "Week 2",  net: "+20", positive: true, note: "Paid back" },
+  { label: "Week 3",  net: "+50", positive: true },
+  { label: "…onward", net: "+30/wk", positive: true },
+];
+
 function RulesAlert() {
   const [dismissed, setDismissed] = useState(true);
+  const [replayKey, setReplayKey] = useState(0);
 
   useEffect(() => {
     setDismissed(localStorage.getItem(RULES_DISMISSED_KEY) === "1");
@@ -1158,8 +1199,8 @@ function RulesAlert() {
   const steps = [
     {
       Icon: Lock,
-      title: "Unlock",
-      desc: <>Buy a level with Fame.<span className="text-zinc-500"> First one is free.</span></>,
+      title: "Unlock once",
+      desc: <>Pay Fame once to keep a level for good.<span className="text-zinc-500"> First one is free.</span></>,
     },
     {
       Icon: CheckCircle2,
@@ -1168,8 +1209,8 @@ function RulesAlert() {
     },
     {
       Icon: Sparkles,
-      title: "Claim",
-      desc: <>Collect your Fame reward.</>,
+      title: "Claim weekly",
+      desc: <>Collect the Fame reward — again every week.</>,
     },
   ];
 
@@ -1206,7 +1247,46 @@ function RulesAlert() {
         ))}
       </div>
 
-      <p className="mt-4 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 border-t border-amber-500/10 pt-3 text-[13px] text-zinc-400">
+      {/* Worked example — watch the balance flip positive in week 2 */}
+      <div className="mt-5">
+        <button
+          type="button"
+          onClick={() => setReplayKey(k => k + 1)}
+          className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-amber-200/80 transition-colors hover:text-amber-200"
+          aria-label="Replay example"
+        >
+          Example: unlock 40, earn +30 / week
+          <Sparkles size={12} className="text-amber-400" />
+        </button>
+        <div key={replayKey} className="flex items-stretch gap-1.5">
+          {EXAMPLE_STEPS.map((s, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex min-w-0 flex-1 animate-in fade-in-0 slide-in-from-bottom-2 flex-col items-center justify-center gap-0.5 rounded px-1 py-2 text-center",
+                s.positive ? "bg-emerald-500/10" : "bg-zinc-800/40"
+              )}
+              style={{
+                animationDelay: `${i * 240}ms`,
+                animationDuration: "450ms",
+                animationFillMode: "both",
+              }}
+            >
+              <span className="truncate text-[10px] font-semibold text-zinc-400">{s.label}</span>
+              <span className={cn("text-sm font-black tabular-nums", s.positive ? "text-emerald-400" : "text-zinc-200")}>
+                {s.net}
+              </span>
+              {s.note && (
+                <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400">
+                  <Check size={10} strokeWidth={3} />{s.note}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[13px] text-zinc-400">
         <img src="/images/coin.png" alt="Fame" className="h-4 w-4 object-contain" />
         <span>Everything resets every weekend — your goals and claims start fresh each new week. One claim per level a week; higher levels pay more.</span>
       </p>
