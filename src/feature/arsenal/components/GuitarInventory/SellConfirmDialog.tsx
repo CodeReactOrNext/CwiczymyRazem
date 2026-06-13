@@ -1,35 +1,21 @@
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-
-const RARITY_FAME_VALUES: Record<string, number> = {
-  Common: 1,
-  Uncommon: 2,
-  Rare: 5,
-  Epic: 10,
-  Legendary: 20,
-  Mythic: 50,
-};
-
 interface SellConfirmDialogProps {
   isOpen: boolean;
-  guitarId: number | string;
+  itemType: "Guitar" | "Effect";
+  itemName: string;
+  fameReward: number;
   onConfirm: () => void;
   onCancel: () => void;
   isLoading: boolean;
 }
 
-export const SellConfirmDialog = ({ isOpen, guitarId, onConfirm, onCancel, isLoading }: SellConfirmDialogProps) => {
+export const SellConfirmDialog = ({ isOpen, itemType, itemName, fameReward, onConfirm, onCancel, isLoading }: SellConfirmDialogProps) => {
   if (!isOpen) return null;
-
-  const guitar = GUITARS_BY_ID.get(guitarId);
-  if (!guitar) return null;
-
-  const fameReward = RARITY_FAME_VALUES[guitar.rarity] || 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-zinc-900 rounded-lg p-6 max-w-sm w-full mx-4 border border-zinc-700">
-        <h2 className="text-lg font-bold text-white mb-2">Sell Guitar?</h2>
-        <p className="text-sm text-zinc-400 mb-4">{guitar.brand} {guitar.name}</p>
+        <h2 className="text-lg font-bold text-white mb-2">Sell {itemType}?</h2>
+        <p className="text-sm text-zinc-400 mb-4">{itemName}</p>
 
         <div className="bg-zinc-800/50 rounded p-3 mb-6 text-center">
           <p className="text-xs text-zinc-400 mb-1">You will receive</p>

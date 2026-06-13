@@ -15,13 +15,11 @@ import {
   Music,
   Play,
   Plus,
-  Settings2,
   Star,
   TrendingUp,
   Trophy,
   Users,
   Loader2,
-  ArrowRight,
   ChevronRight,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -207,19 +205,10 @@ export const SongCard = ({
               onOpenDetails();
             }}
             variant="ghost"
-            className={cn(
-              "h-8 flex-1 group/btn flex items-center justify-between rounded-lg px-3 text-[10px] font-bold transition-all gap-3",
-              isPracticeMode
-                ? "bg-white text-black hover:bg-zinc-100 group-hover/btn:text-black"
-                : "text-zinc-300 hover:bg-white/5"
-            )}
+            className="h-8 flex-1 group/btn flex items-center justify-between rounded-lg px-3 text-[10px] font-bold transition-all gap-3 text-zinc-300 hover:bg-white/5"
           >
-            <span className={cn("tracking-wide", isPracticeMode && "!text-black")}>{isPracticeMode ? "Practice" : "View Details"}</span>
-            {isPracticeMode ? (
-              <ArrowRight className="h-3 w-3 opacity-70 transition-transform group-hover/btn:translate-x-0.5 !text-black ml-1" />
-            ) : (
-              <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:translate-x-1 group-hover:opacity-100 ml-1" />
-            )}
+            <span className="tracking-wide">View Details</span>
+            <ChevronRight className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:translate-x-1 group-hover:opacity-100 ml-1" />
           </Button>
 
           {onPlay && (

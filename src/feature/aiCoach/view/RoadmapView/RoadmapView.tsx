@@ -1,5 +1,5 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Check, ChevronRight, Dumbbell, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -121,13 +121,13 @@ function getStatus(step: RoadmapStep): StepStatus {
 const STEP_CLS: Record<StepStatus, string> = {
   "not-started": "bg-zinc-900 text-zinc-300 hover:bg-zinc-800/80",
   "in-progress": "bg-amber-500/10 text-amber-200",
-  done: "bg-cyan-950/30 text-zinc-500",
+  done: "bg-green-950/30 text-green-600/70",
 };
 
 const STATUS_DOT: Record<StepStatus, string> = {
   "not-started": "bg-zinc-600",
   "in-progress": "bg-amber-400",
-  done: "bg-cyan-500",
+  done: "bg-green-500",
 };
 
 const STATUS_LABEL: Record<StepStatus, string> = {
@@ -136,16 +136,16 @@ const STATUS_LABEL: Record<StepStatus, string> = {
   done: "Done",
 };
 
-const STATUS_BTNS: { status: StepStatus; label: string }[] = [
-  { status: "not-started", label: "To do" },
-  { status: "in-progress", label: "In progress" },
-  { status: "done", label: "✓ Done" },
+const STATUS_BTNS = [
+  { status: "not-started" as StepStatus, label: "Not yet", Icon: CircleDashed },
+  { status: "in-progress" as StepStatus, label: "Practicing", Icon: Zap },
+  { status: "done" as StepStatus, label: "Got it!", Icon: CheckCircle2 },
 ];
 
 const PATH_COLOR: Record<StepStatus, string> = {
   "not-started": "#3f3f46",
   "in-progress": "#78350f",
-  done: "#164E63",
+  done: "#14532d",
 };
 
 const PHASE_COLORS = [
@@ -667,6 +667,38 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     }
   };
 
+  const handleToggleExercise = () => {
+    if (!drawerInfo) return;
+    const newPhases = phases.map((p) =>
+      p.id !== drawerInfo.phase.id ? p : {
+        ...p,
+        steps: p.steps.map((s) =>
+          s.id !== drawerInfo.step.id ? s : { ...s, exerciseCompleted: !s.exerciseCompleted }
+        ),
+      }
+    );
+    setPhases(newPhases);
+    persist(newPhases).catch(() => toast.error("Failed to save."));
+  };
+
+  const handleToggleLesson = (videoId: string) => {
+    if (!drawerInfo) return;
+    const current = drawerInfo.step.completedLessonIds ?? [];
+    const next = current.includes(videoId)
+      ? current.filter((id) => id !== videoId)
+      : [...current, videoId];
+    const newPhases = phases.map((p) =>
+      p.id !== drawerInfo.phase.id ? p : {
+        ...p,
+        steps: p.steps.map((s) =>
+          s.id !== drawerInfo.step.id ? s : { ...s, completedLessonIds: next }
+        ),
+      }
+    );
+    setPhases(newPhases);
+    persist(newPhases).catch(() => toast.error("Failed to save."));
+  };
+
   const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
     const newPhases = phases.map((phase) =>
       phase.id !== phaseId ? phase : {
@@ -720,9 +752,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               {/* progress bar inside header */}
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex-1 h-1 overflow-hidden rounded-full bg-zinc-800/80">
-                  <div className="h-full rounded-full bg-cyan-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+                  <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
                 </div>
-                <span className="text-xs font-semibold text-cyan-400 tabular-nums shrink-0">
+                <span className="text-xs font-semibold text-green-400 tabular-nums shrink-0">
                   {doneCount}/{allSteps.length}
                   {inProgressCount > 0 && <span className="ml-1.5 text-amber-400">· {inProgressCount} in progress</span>}
                 </span>
@@ -735,8 +767,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
                 <span className="flex items-center gap-1.5">
-                  <Zap className="h-4 w-4 text-cyan-500" />
-                  <span className="font-semibold text-cyan-500">{progress}%</span>
+                  <Zap className="h-4 w-4 text-green-500" />
+                  <span className="font-semibold text-green-500">{progress}%</span>
                 </span>
                 <span className="text-zinc-700">·</span>
                 <span>{doneCount}/{allSteps.length} steps</span>
@@ -745,7 +777,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               </div>
             </div>
             <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full rounded-full bg-cyan-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+              <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
             </div>
           </div>
         )}
@@ -812,7 +844,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
           {([
             { dot: "bg-zinc-600", label: "To do" },
             { dot: "bg-amber-400", label: "In progress" },
-            { dot: "bg-cyan-500", label: "Done" },
+            { dot: "bg-green-500", label: "Done" },
           ] as { dot: string; label: string }[]).map(({ dot, label }) => (
             <span key={label} className="flex items-center gap-1.5 text-xs text-zinc-400">
               <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
@@ -855,7 +887,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
             <div className="relative w-full">
               <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
               <div
-                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-cyan-600/50 transition-all duration-700 sm:block"
+                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-green-600/50 transition-all duration-700 sm:block"
                 style={{ height: `${progress}%` }}
               />
 
@@ -870,7 +902,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                     {/* ── MOBILE layout ── */}
                     <div className="flex w-full flex-col gap-3 sm:hidden">
                       <div className="flex items-center gap-2.5">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
@@ -927,7 +959,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                         ref={(el) => { if (el) phaseNodeRefs.current.set(phase.id, el); else phaseNodeRefs.current.delete(phase.id); }}
                         className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40" : phaseColor.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
@@ -965,7 +997,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
             {phases.length > 0 && (
               <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
                 progress === 100
-                  ? "bg-cyan-950/20 text-cyan-400"
+                  ? "bg-green-950/20 text-green-400"
                   : "bg-zinc-900/30 text-zinc-500 opacity-40"
               }`}>
                 {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
@@ -1022,22 +1054,28 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                   </div>
 
                   {/* Status buttons */}
-                  <div className="px-6 pb-4">
+                  <div className="px-6 pb-5">
+                    <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                      Your progress on this skill
+                    </p>
                     <div className="grid grid-cols-3 gap-2">
-                      {STATUS_BTNS.map(({ status: s, label }) => {
+                      {STATUS_BTNS.map(({ status: s, label, Icon }) => {
                         const isActive = getStatus(drawerInfo.step) === s;
                         return (
                           <button
                             key={s}
                             onClick={() => setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)}
-                            className={`rounded py-2 text-xs font-semibold transition-all ${
+                            className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-3.5 text-xs font-semibold transition-all ${
                               isActive
-                                ? s === "not-started" ? "bg-zinc-700 text-zinc-100"
-                                  : s === "in-progress" ? "bg-amber-500/15 text-amber-300"
-                                  : "bg-cyan-900/40 text-cyan-400"
-                                : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300"
+                                ? s === "not-started"
+                                  ? "bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500"
+                                  : s === "in-progress"
+                                  ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
+                                  : "bg-green-900/50 text-green-400 ring-1 ring-green-500/40"
+                                : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
                             }`}
                           >
+                            <Icon className="h-4 w-4" />
                             {label}
                           </button>
                         );
@@ -1065,8 +1103,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                   ) : drawerInfo.step.description ? (
                     <div className="flex flex-col gap-0">
 
-                      {/* ── Exercise ── */}
-                      {adminMode ? (
+                      {/* ── Exercise (admin only at top) ── */}
+                      {adminMode && (
                         <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
                             <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
@@ -1144,41 +1182,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                             </div>
                           )}
                         </div>
-                      ) : (
-                        (loadingExerciseIds.has(drawerInfo.step.id) || drawerInfo.step.suggestedExerciseId) && (
-                          <div className="px-6 py-5">
-                            {loadingExerciseIds.has(drawerInfo.step.id) ? (
-                              <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
-                                <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
-                              </div>
-                            ) : (() => {
-                              const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
-                              if (!ex) return null;
-                              return (
-                                <>
-                                  <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                                    <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
-                                  </p>
-                                  <button
-                                    onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
-                                    className="group relative flex w-full items-center gap-4 overflow-hidden rounded-lg bg-cyan-950/30 px-4 py-4 text-left transition-all hover:bg-cyan-950/50"
-                                  >
-                                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 transition group-hover:bg-cyan-500/25">
-                                      <Dumbbell className="h-5 w-5 text-cyan-400" />
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                                      {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                                    </div>
-                                    <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
-                                  </button>
-                                </>
-                              );
-                            })()}
-                          </div>
-                        )
                       )}
 
                       {/* ── Description ── */}
@@ -1232,8 +1235,142 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                         </div>
                       )}
 
-                      {/* ── YouTube lessons ── */}
-                      {adminMode ? (
+                      {/* ── User: Suggested resources ── */}
+                      {!adminMode && (() => {
+                        const hasExercise = loadingExerciseIds.has(drawerInfo.step.id) || !!drawerInfo.step.suggestedExerciseId;
+                        const hasLessons = loadingLessonsId === drawerInfo.step.id ||
+                          (lessonsCache[drawerInfo.step.id]?.length ?? 0) > 0;
+                        if (!hasExercise && !hasLessons) return null;
+                        return (
+                          <>
+                            {/* Resources section header */}
+                            <div className="border-t border-zinc-800/40 px-6 pt-5 pb-3">
+                              <div className="flex items-center gap-2">
+                                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Suggested resources</p>
+                                <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-600">optional</span>
+                              </div>
+                              <p className="mt-1 text-[11px] text-zinc-600">
+                                These don't affect your skill progress — check them off as you use them.
+                              </p>
+                            </div>
+
+                            {/* Exercise */}
+                            {hasExercise && (
+                              <div className="px-6 pb-5">
+                                {loadingExerciseIds.has(drawerInfo.step.id) ? (
+                                  <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
+                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
+                                    <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
+                                  </div>
+                                ) : (() => {
+                                  const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
+                                  if (!ex) return null;
+                                  const isCompleted = !!drawerInfo.step.exerciseCompleted;
+                                  return (
+                                    <div className="space-y-0">
+                                      <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                                        <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
+                                      </p>
+                                      <div className={`rounded-lg ring-1 transition-all ${
+                                        isCompleted ? "ring-green-500/40" : "ring-zinc-800/60"
+                                      }`}>
+                                        <button
+                                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=${encodeURIComponent(`/ai-coach?roadmapId=${roadmap.id}`)}`)}
+                                          className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-t-lg px-4 py-4 text-left transition-all ${
+                                            isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
+                                          }`}
+                                        >
+                                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
+                                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition group-hover:bg-cyan-500/25 ${
+                                            isCompleted ? "bg-green-500/15" : "bg-cyan-500/15"
+                                          }`}>
+                                            {isCompleted
+                                              ? <CheckCircle2 className="h-5 w-5 text-green-400" />
+                                              : <Dumbbell className="h-5 w-5 text-cyan-400" />}
+                                          </div>
+                                          <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
+                                            {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
+                                          </div>
+                                          <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
+                                        </button>
+                                        <button
+                                          onClick={handleToggleExercise}
+                                          className={`flex w-full items-center gap-3 rounded-b-lg border-t px-4 py-3 text-xs font-medium transition-colors ${
+                                            isCompleted
+                                              ? "border-green-500/20 bg-green-950/30 text-green-400"
+                                              : "border-zinc-800/60 bg-zinc-900/60 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
+                                          }`}
+                                        >
+                                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                                            isCompleted ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                                          }`}>
+                                            {isCompleted && <Check className="h-3 w-3 text-green-400" />}
+                                          </span>
+                                          {isCompleted ? "Practiced ✓" : "Mark as practiced"}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            )}
+
+                            {/* YouTube lessons */}
+                            {hasLessons && (
+                              <div className="px-6 pb-6">
+                                <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                                  <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
+                                </p>
+                                {loadingLessonsId === drawerInfo.step.id ? (
+                                  <div className="space-y-2">
+                                    {[0, 1, 2].map((i) => (
+                                      <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
+                                        <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
+                                        <div className="flex-1 space-y-2">
+                                          <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                                          <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    {lessonsCache[drawerInfo.step.id].map((lesson) => {
+                                      const isWatched = drawerInfo.step.completedLessonIds?.includes(lesson.videoId) ?? false;
+                                      return (
+                                        <div key={lesson.videoId} className={`rounded-lg ring-1 transition-all ${
+                                          isWatched ? "ring-green-500/40" : "ring-zinc-800/60"
+                                        }`}>
+                                          <YouTubeLessonCard lesson={lesson} className="rounded-b-none" />
+                                          <button
+                                            onClick={() => handleToggleLesson(lesson.videoId)}
+                                            className={`flex w-full items-center gap-3 rounded-b-lg border-t px-3 py-3 text-xs font-medium transition-colors ${
+                                              isWatched
+                                                ? "border-green-500/20 bg-green-950/20 text-green-400"
+                                                : "border-zinc-800/60 bg-zinc-900/40 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
+                                            }`}
+                                          >
+                                            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                                              isWatched ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                                            }`}>
+                                              {isWatched && <Check className="h-3 w-3 text-green-400" />}
+                                            </span>
+                                            {isWatched ? "Watched ✓" : "Mark as watched"}
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+
+                      {/* ── YouTube lessons (admin only) ── */}
+                      {adminMode && (
                         <div className="px-6 py-5">
                           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
                             <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
@@ -1309,33 +1446,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                             </div>
                           )}
                         </div>
-                      ) : (
-                        (loadingLessonsId === drawerInfo.step.id || (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
-                          <div className="px-6 py-5">
-                            <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
-                              <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-                            </p>
-                            {loadingLessonsId === drawerInfo.step.id ? (
-                              <div className="space-y-2">
-                                {[0, 1, 2].map((i) => (
-                                  <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                                    <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                                    <div className="flex-1 space-y-2">
-                                      <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                                      <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                {lessonsCache[drawerInfo.step.id].map((lesson) => (
-                                  <YouTubeLessonCard key={lesson.videoId} lesson={lesson} />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )
                       )}
 
                     </div>

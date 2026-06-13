@@ -22,9 +22,10 @@ const LEVEL_STYLES: Record<string, string> = {
 
 interface YouTubeLessonCardProps {
   lesson: YouTubeLessonResult;
+  className?: string;
 }
 
-const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
+const YouTubeLessonCard = ({ lesson, className }: YouTubeLessonCardProps) => {
   const handleClick = () => {
     window.open(`https://www.youtube.com/watch?v=${lesson.videoId}`, "_blank", "noopener,noreferrer");
   };
@@ -35,7 +36,7 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
   return (
     <button
       onClick={handleClick}
-      className="group flex w-full items-start gap-4 rounded-lg bg-zinc-900/60 p-3 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      className={`group flex w-full items-start gap-4 rounded-lg bg-zinc-900/60 p-3 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${className ?? ""}`}
     >
       {/* Thumbnail */}
       <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-zinc-800">

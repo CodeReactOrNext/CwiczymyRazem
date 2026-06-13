@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import { ExerciseImage } from "./ExerciseImage";
@@ -47,6 +49,9 @@ interface ExerciseContentAreaProps {
   // Rhythm detection
   isMicEnabled?: boolean;
   volumeRef?: React.MutableRefObject<number>;
+  onSeek?: (beatPosition: number) => void;
+  onLoopRestart?: (loopStartBeat: number) => void;
+  isExamMode?: boolean;
 
   // Video / playalong
   startTimer: () => void;
@@ -95,9 +100,18 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isPlaying,
   isMicEnabled,
   volumeRef,
+  onSeek,
+  onLoopRestart,
+  isExamMode,
   rewardSkillId,
   rewardAmount,
 }: ExerciseContentAreaProps) {
+  const { backingVideoId, setBackingVideoId } = useSessionUI();
+
+  useEffect(() => {
+    setBackingVideoId(null);
+  }, [currentExercise.id, setBackingVideoId]);
+
   const hasTablature =
     activeTablature &&
     activeTablature.length > 0 &&
@@ -141,7 +155,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           showAlphaTabScore={showAlphaTabScore}
-          onToggleAlphaTabScore={onToggleAlphaTabScore}
+          onSeek={onSeek}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}
           effectiveBpm={effectiveBpm}
@@ -156,6 +170,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           hideNotes={activeExercise.hideTablatureNotes}
           hideDynamicsLane={!!rawGpFile}
           volumeRef={volumeRef}
+          isExamMode={isExamMode}
+          onLoopRestart={onLoopRestart}
         />
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         <VideoSection
@@ -170,6 +186,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           setTimerTime={setTimerTime}
           onVideoEnd={onVideoEnd}
         />
+      ) : currentExercise.requiresBackingTrack ? (
+        backingVideoId
+          ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
+          : <BackingTrackPicker exerciseTitle={currentExercise.title} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <StrummingSection
           patterns={currentExercise.strummingPatterns}

@@ -188,9 +188,9 @@ export const SelectExercisesStep = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       className='space-y-8'>
-      <div className='border-b border-white/5 pb-6 flex items-start justify-between gap-4'>
+      <div className='pb-8 flex items-start justify-between gap-4'>
         <div>
-          <h2 className='text-3xl font-black tracking-tighter text-zinc-100'>
+          <h2 className='text-3xl font-bold text-zinc-100'>
             {t("exercises:my_plans.create_dialog.exercises")}
           </h2>
           <p className='text-sm text-zinc-500 font-medium max-w-md leading-relaxed mt-1'>
@@ -200,7 +200,7 @@ export const SelectExercisesStep = ({
         <Button
           onClick={onNext}
           disabled={selectedExercises.length === 0}
-          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-[8px] font-bold tracking-widest transition-all disabled:opacity-40">
+          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-all disabled:opacity-40">
           Next step
           <ArrowRight className="h-4 w-4" />
         </Button>
@@ -218,7 +218,7 @@ export const SelectExercisesStep = ({
                 key={label}
                 type="button"
                 onClick={onClick}
-                className={`inline-flex items-center gap-2 h-8 px-3 rounded-[8px] border text-xs font-bold tracking-tight transition-all ${cls}`}
+                className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border text-xs font-bold tracking-tight transition-colors ${cls}`}
               >
                 <FaPlus className="h-2.5 w-2.5 shrink-0" />
                 {label}
@@ -242,7 +242,7 @@ export const SelectExercisesStep = ({
             <button
               type="button"
               onClick={() => setSourceTab("library")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
                 sourceTab === "library"
                   ? "bg-zinc-800 text-white"
                   : "text-zinc-500 hover:text-zinc-300"
@@ -254,7 +254,7 @@ export const SelectExercisesStep = ({
             <button
               type="button"
               onClick={() => setSourceTab("community")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
                 sourceTab === "community"
                   ? "bg-zinc-800 text-white"
                   : "text-zinc-500 hover:text-zinc-300"
@@ -319,7 +319,7 @@ export const SelectExercisesStep = ({
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
                 </div>
               ) : filteredCommunityExercises.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-white/5 p-12 text-center">
+                <div className="rounded-lg border border-dashed border-white/5 p-12 text-center">
                   <p className="text-zinc-500 text-sm">
                     {communitySearch ? "No exercises match your search." : "No community exercises published yet."}
                   </p>

@@ -143,7 +143,7 @@ export const ExerciseInstructionsInline = ({
                         <FaInfoCircle size={16} className="shrink-0 text-amber-500 mt-0.5" />
                         <div>
                           <div className="text-[11px] font-bold text-amber-500/80 mb-1">Backing track recommended</div>
-                          You should use a backing track for this exercise!
+                          Use the backing track finder above to play along.
                         </div>
                       </div>
                     )}

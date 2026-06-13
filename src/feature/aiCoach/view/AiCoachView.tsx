@@ -8,6 +8,7 @@ import {
 } from "feature/aiCoach/services/userProgress.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { ArrowLeft, Lightbulb, Loader2, Map } from "lucide-react";
+import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -37,11 +38,20 @@ function mergeWithProgress(
 
 const AiCoachView = () => {
   const userAuth = useAppSelector(selectUserAuth);
+  const router = useRouter();
 
   const [progressMap, setProgressMap] = useState<Record<string, UserRoadmapProgress>>({});
   const [loadingProgress, setLoadingProgress] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const roadmapId = router.query.roadmapId as string | undefined;
+    if (roadmapId && roadmaps.find((r) => r.id === roadmapId)) {
+      setSelectedId(roadmapId);
+    }
+  }, [router.isReady, router.query.roadmapId]);
 
   useEffect(() => {
     if (!userAuth) return;

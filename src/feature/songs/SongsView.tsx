@@ -626,6 +626,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                     onAddSong={() => setIsModalOpen(true)}
                     hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
                     onStatusChange={refreshSongs}
+                    onPractice={(song) => setPracticeTarget(song)}
                     userSongs={userSongs}
                     updateUserSongsCache={updateUserSongsCache}
                   />

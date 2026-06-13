@@ -201,6 +201,8 @@ export const PracticeSession = ({
 
   // ── Audio subsystem ───────────────────────────────────────────────────────
 
+  const [tabRestartKey, setTabRestartKey] = useState(0);
+
   const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm,
@@ -212,6 +214,7 @@ export const PracticeSession = ({
     metronomeAudioStartTime: metronome.audioStartTime,
     stopMetronome: metronome.stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
+    tabRestartKey,
   });
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
@@ -247,7 +250,7 @@ export const PracticeSession = ({
   // ── Controls & handlers ───────────────────────────────────────────────────
 
   const {
-    tabRestartKey, handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
@@ -258,6 +261,7 @@ export const PracticeSession = ({
     isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+    tabRestartKey, setTabRestartKey,
   });
 
   // ── Misc effects ──────────────────────────────────────────────────────────
