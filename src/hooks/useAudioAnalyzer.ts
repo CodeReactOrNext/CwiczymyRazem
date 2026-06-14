@@ -1,6 +1,7 @@
 
 import { useCallback,useEffect, useMemo, useRef, useState } from "react";
-import { computeChromagram } from "utils/audio/noteUtils";
+
+import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 
 interface AudioAnalyzerState {
   isListening: boolean;
@@ -80,19 +81,16 @@ export const useAudioAnalyzer = () => {
   const onsetDetectorRef = useRef<any>(null);
   const tickDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const lastFrequenciesRef = useRef<number[]>([]);
   const resumeHandlerRef = useRef<(() => void) | null>(null);
 
-  // Real-time refs for fast access without triggering re-renders
+  // Real-time refs for fast access without triggering re-renders.
+  // (Smoothing/throttle state now lives inside the shared buffer processor.)
   const frequencyRef = useRef<number>(0);
   const volumeRef = useRef<number>(0);
   const rawVolumeRef = useRef<number>(0);
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
-  const lastStateUpdateRef = useRef<number>(0);
-  const prevTickRmsRef = useRef<number>(0);
-  const lastTickFireRef = useRef<number>(0);
 
   const init = useCallback(async () => {
     try {
@@ -134,20 +132,10 @@ export const useAudioAnalyzer = () => {
       const Aubio = AubioModule.default || AubioModule;
       const aubio = await Aubio();
 
-      // yinfft is O(N log N) via FFT. Reverting to 2048 for faster transient response
-      const pitchDetector = new aubio.Pitch("yinfft", 2048, 512, audioContext.sampleRate);
-      (pitchDetector as any).setTolerance(0.7);
-      pitchDetectorRef.current = pitchDetector;
-
-      const onsetDetector = new (aubio.Onset as any)("hfc", 2048, 512, audioContext.sampleRate);
-      onsetDetector.setThreshold(0.3);
-      onsetDetectorRef.current = onsetDetector;
-
-      // specflux reacts to broadband spectral change — fires on muted/dead notes
-      // that hfc misses. Lower threshold for smaller-magnitude percussive hits.
-      const tickDetector = new (aubio.Onset as any)("specflux", 2048, 512, audioContext.sampleRate);
-      tickDetector.setThreshold(0.15);
-      tickDetectorRef.current = tickDetector;
+      const detectors = createGuitarDetectors(aubio, audioContext.sampleRate);
+      pitchDetectorRef.current = detectors.pitch;
+      onsetDetectorRef.current = detectors.onset;
+      tickDetectorRef.current = detectors.tick;
 
       // AudioWorklet: accumulates 128-sample quanta → 2048-sample buffers on main thread.
       // Avoids deprecated ScriptProcessorNode and runs audio collection off the main thread.
@@ -159,112 +147,25 @@ export const useAudioAnalyzer = () => {
       const workletNode = new AudioWorkletNode(audioContext, "guitar-input-processor");
       workletNodeRef.current = workletNode;
 
-      const normalizedBuf = new Float32Array(2048);
+      const process = createGuitarBufferProcessor({
+        detectors,
+        getGain: () => inputGainRef.current,
+        analyser: analyserNodeRef, // chromagram-at-onset snapshots (web path)
+        targets: {
+          frequencyRef, volumeRef, rawVolumeRef, confidenceRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
+        },
+        onActive: () => {
+          setState(prev =>
+            prev.isListening === true && prev.error === null
+              ? prev
+              : { ...prev, isListening: true, error: null }
+          );
+        },
+      });
 
       workletNode.port.onmessage = (event: MessageEvent<Float32Array>) => {
-        const inputBuffer = event.data;
-        const gain = inputGainRef.current;
-
-        // 1. Apply gain and calculate RMS volume + peak from gained signal
-        let sum = 0;
-        let peak = 0;
-        for (let i = 0; i < inputBuffer.length; i++) {
-          const s = inputBuffer[i] * gain;
-          sum += s * s;
-          const abs = Math.abs(s);
-          if (abs > peak) peak = abs;
-        }
-        const rms = Math.sqrt(sum / inputBuffer.length);
-        const volume = Math.max(0, Math.min(1, rms * 10));
-        // Raw RMS without gain — gain-independent signal presence indicator
-        const rawRms = gain > 0 ? rms / gain : rms;
-        rawVolumeRef.current = Math.max(0, Math.min(1, rawRms * 10));
-
-        // 2. Normalize gained buffer for aubio — scale to peak=0.9 so the pitch
-        //    detector always receives a strong signal regardless of mic input level.
-        const scale = peak > 0.0001 ? 0.9 / peak : 0;
-        for (let i = 0; i < inputBuffer.length; i++) {
-          normalizedBuf[i] = inputBuffer[i] * gain * scale;
-        }
-
-        // 3. Detect onset & pitch in hop-size chunks (512 samples)
-        let isOnset = false;
-        let isTick = false;
-        let frequency = 0;
-        let pitchConfidence = 0;
-        const HOP = 512;
-        for (let offset = 0; offset < 2048; offset += HOP) {
-          const chunk = normalizedBuf.subarray(offset, offset + HOP);
-          if (onsetDetector.do(chunk)) isOnset = true;
-          if (tickDetector.do(chunk)) isTick = true;
-          frequency = pitchDetector.do(chunk);
-          pitchConfidence = (pitchDetector as any).getConfidence();
-        }
-
-        const nowMs = Date.now();
-
-        if (isOnset) {
-          lastOnsetTimeRef.current = nowMs;
-          // Snapshot chromagram at onset — smoothingTimeConstant=0.1 means this
-          // frame already reflects ~90% of the new attack.
-          const snap = computeChromagram(analyser);
-          if (snap) onsetChromaRef.current = snap;
-        }
-
-        // 4. Threshold & median stabilization
-        const VOLUME_THRESHOLD = 0.001; // Lowered to catch low E string on mics with high-pass filters
-        let stabilizedFreq = 0;
-        
-        // Ignore attack phase for pitch (transients cause random pitch jumps)
-        const isAttackPhase = isOnset || (nowMs - lastOnsetTimeRef.current < 30);
-
-        if (rms > VOLUME_THRESHOLD && frequency > 20 && !isAttackPhase) {
-          lastFrequenciesRef.current.push(frequency);
-          if (lastFrequenciesRef.current.length > 5) lastFrequenciesRef.current.shift();
-          const sorted = [...lastFrequenciesRef.current].sort((a, b) => a - b);
-          stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
-        } else {
-          if (rms <= VOLUME_THRESHOLD) {
-            lastFrequenciesRef.current = [];
-          } else if (!isAttackPhase && lastFrequenciesRef.current.length > 0) {
-            // Keep previous pitch if Aubio momentarily loses confidence but string is still ringing
-            const sorted = [...lastFrequenciesRef.current].sort((a, b) => a - b);
-            stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
-          }
-        }
-
-        frequencyRef.current = stabilizedFreq;
-        volumeRef.current = volume;
-        confidenceRef.current = stabilizedFreq > 0 ? pitchConfidence : 0;
-
-        // Percussive-tick detection for muted/dead notes. Refractory period (60ms)
-        // blocks double-triggers within a single attack envelope.
-        const rmsDelta = rms - prevTickRmsRef.current;
-        prevTickRmsRef.current = rms;
-        const isRmsTransient = rmsDelta > 0.006 && rms > 0.004;
-        const tickCandidate = isTick || isOnset || isRmsTransient;
-        if (tickCandidate && nowMs - lastTickFireRef.current > 60) {
-          lastTickFireRef.current = nowMs;
-          lastTickTimeRef.current = nowMs;
-        }
-
-        // Throttle React state updates to ~10Hz
-        // Throttle React state updates to ~10Hz for slow-changing UI state
-        const now = Date.now();
-        if (now - lastStateUpdateRef.current >= 100) {
-          lastStateUpdateRef.current = now;
-          
-          setState(prev => {
-            if (prev.isListening === true && prev.error === null) {
-              return prev; 
-            }
-            return {
-              ...prev,
-              isListening: true,
-              error: null,
-            };
-          });
-        }
+        process(event.data);
       };
 
       source.connect(workletNode);
@@ -328,7 +229,6 @@ export const useAudioAnalyzer = () => {
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     tickDetectorRef.current = null;
-    lastFrequenciesRef.current = [];
     onsetChromaRef.current = null;
     frequencyRef.current = 0;
     volumeRef.current = 0;
@@ -336,8 +236,6 @@ export const useAudioAnalyzer = () => {
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
-    prevTickRmsRef.current = 0;
-    lastTickFireRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false }));
   }, []);

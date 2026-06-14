@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
+import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
 import { useLiveTuner } from "../hooks/useLiveTuner";
 
@@ -138,6 +139,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 </button>
               )}
 
+              {/* Electron-only amp simulator (renders nothing on web) */}
+              <AmpSimButton compact />
+
               {hasTuner && (
                 <button
                   onClick={() => setIsTunerOpen(true)}
@@ -263,6 +267,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               <TooltipContent side="bottom">Recalibrate microphone</TooltipContent>
             </Tooltip>
           )}
+
+          {/* Electron-only amp simulator (renders nothing on web) */}
+          <AmpSimButton h={h} />
 
           {hasTuner && (
             <Tooltip>

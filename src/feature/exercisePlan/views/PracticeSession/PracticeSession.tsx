@@ -2,7 +2,7 @@ import "react-circular-progressbar/dist/styles.css";
 
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserInfo} from "feature/user/store/userSlice";
-import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
+import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -227,7 +227,7 @@ export const PracticeSession = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useAudioAnalyzer();
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useGuitarAudioInput();
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
