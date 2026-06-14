@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
+    "electron": "electron .",
+    "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,green \"npm:dev\" \"wait-on tcp:127.0.0.1:3000 && electron .\"",
     "build": "next build",
     "prebuild": "npm run export-exercises && node scripts/generateExerciseSitemap.mjs && node scripts/generateBlogSitemap.mjs",
     "start": "next start",
@@ -113,6 +116,9 @@
     "zod": "^4.3.6",
     "zustand": "^5.0.8"
   },
+  "optionalDependencies": {
+    "audify": "^1.10.1"
+  },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@eslint/eslintrc": "^3.3.5",
@@ -132,6 +138,9 @@
     "@welldone-software/why-did-you-render": "^10.0.1",
     "autoprefixer": "10.4.12",
     "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^10.0.3",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -150,6 +159,7 @@
     "tailwindcss-themer": "^2.0.3",
     "typescript": "^6.0.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wait-on": "^9.0.10"
   }
 }
