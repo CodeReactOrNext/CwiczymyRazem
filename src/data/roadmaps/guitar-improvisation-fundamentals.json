@@ -1,661 +1,619 @@
 {
-  "id": "e820d54e-b502-4247-9dfb-97862c9f4731",
+  "id": "5431b95a-0733-4595-ae38-d600b132cbbe",
   "title": "Guitar Improvisation Fundamentals",
   "goal": "Guitar Improvisation Fundamentals",
-  "level": "Beginner",
+  "level": "Intermediate",
   "phases": [
     {
-      "id": "5d4a522d-18ad-442f-bc6a-4eed3811aaba",
-      "title": "Fundamental Chords and Rhythm",
+      "id": "61c0d257-8fe0-4d8d-85c3-d5fc31202039",
+      "title": "Early Improv Taste",
       "order": 0,
       "steps": [
         {
-          "id": "0f230b5d-5370-4716-81d6-563b4ceb4c6b",
-          "title": "Open chord shapes",
-          "description": "[What it is]\nOpen chord shapes are compact left‑hand finger patterns that combine fretted notes with ringing open strings near the nut. They create full, resonant chords with relatively small hand stretches and are among the first harmonic vocab you’ll use on the instrument.\n\n[Why it matters]\nThese shapes provide immediate musical payoff: they let you accompany songs, hear harmonic movement clearly, and build the ear for chord quality and voice-leading. Solid open‑shape technique also reduces tension, speeds up learning of rhythm and strumming, and gives dependable sounds to support early improvisation.\n\n[How to practice]\nPlace the fingers deliberately into each shape and pluck strings one at a time to confirm every note rings cleanly; adjust finger angle and thumb placement to eliminate buzzing or accidental muting. Practice holding each shape with minimal motion, then work on moving smoothly between two shapes while keeping fingers close to the strings; add steady strums once the individual notes are clean. Focus on relaxed hand tension, economy of motion, and listening for even volume and clear ringing across all strings.",
-          "successCriteria": "Each open shape rings with no buzzes or muted strings, you can form and strum the shape cleanly without looking, transitions to nearby shapes feel economical and controlled, and your overall tone is even and responsive to gentle dynamic changes.",
-          "sessionsRequired": 8,
+          "id": "125d56be-44fe-4867-abdd-73065e882063",
+          "title": "Playing and varying simple melodies",
+          "description": "[What it is]\nThis is simply spending time playing lots of short, familiar melodies on the guitar and then starting to change them a little — swapping a note, shifting the rhythm, or ending the line differently. It is less about any single tune and more about living inside many melodies so your ear learns what a melody actually is and how it moves.\n\n[Why it matters]\nBefore you can invent your own lines you need an internal feel for melody: how notes connect, where a phrase breathes, and what makes a line sound finished. Playing many melodies and really listening builds that instinct, and beginning to vary them is the first real step from reproducing music to creating it — the foundation everything else in improvisation rests on.\n\n[How to practice]\nPick a few short, simple melodies you can already hum (nursery tunes, song hooks, easy riffs) and play them slowly by ear, listening to their shape and where each phrase resolves. Once a melody sits comfortably in your hands, change one thing at a time — a single note, the rhythm, or the last note — and listen to how the character shifts. Sing along, try the same melody in a different spot on the neck, and keep the small variations you like. Stay relaxed and unhurried; the goal is to absorb how melodies work and to hear them clearly, not to play fast.",
+          "successCriteria": "You can play several simple melodies by ear with clean phrasing and hear where each phrase rises, falls, and resolves. You can take a melody and make small variations (a changed note, rhythm, or ending) that still sound musical, and you have a clear felt sense of what makes a line sound like a complete melody — the groundwork for inventing your own.",
+          "sessionsRequired": 6,
           "order": 0,
-          "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "OdbcisEH95Q",
-            "1QN5js2Ry8k"
+          "suggestedExerciseId": "sing_what_you_play",
+          "lessons": [
+            {
+              "videoId": "n1stpeg6_Yk",
+              "title": "TOP 10 ICONIC MELODIES Every Guitarist Should Know",
+              "channelName": "Paul Davids",
+              "thumbnailUrl": "https://i.ytimg.com/vi/n1stpeg6_Yk/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "dvhwxqDM_70",
+              "title": "No Singer? Try a Melody Duet. :)",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/dvhwxqDM_70/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "d1Oe3m7GuR0",
+              "title": "3 Easy Steps To Play Vocal Melodies On Guitar",
+              "channelName": "Breakthrough Guitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/d1Oe3m7GuR0/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "102538ba-7ad1-4cb6-8435-5f4252ec34b2",
-          "title": "Chord change fluidity",
-          "description": "Chord change fluidity is the ability to move between chords smoothly and reliably so the sound stays steady and musical. It matters because seamless changes keep the groove intact and free you to listen and improvise rather than fight timing gaps or buzzing. Develop it by practicing slow, focused transitions between two chords at a time, minimizing unnecessary finger movement (use the smallest motion that works), keeping both hands relaxed, and repeating short loops while gradually increasing speed and consistency.",
-          "successCriteria": "Changes sound even and uninterrupted during simple strumming; fingers land cleanly with minimal extra motion and the hands stay relaxed. You can complete common chord switches without long pauses or audible dead notes, and maintain a consistent rhythmic feel while doing so.",
-          "sessionsRequired": 8,
+          "id": "f589f25b-beab-44a7-b66e-0775a79f3032",
+          "title": "Sing-and-play phrases",
+          "description": "[What it is]\nSing-and-play phrases means voicing a short melody with your voice first, then immediately matching that same short idea on the guitar. The focus is on small, singable lines — one idea at a time — so your ear, voice, and hands connect on the same musical thought. This is not about playing long runs; it’s about shaping a clear musical sentence and reproducing it on the instrument.\n\n[Why it matters]\nThis skill trains you to turn ideas in your head into playable guitar phrases, so what you imagine and what you play are the same. It builds melodic awareness, improves phrasing, and makes improvisation feel like a natural conversation instead of a technical exercise. Over time it shortens the gap between hearing a motif and responding with the instrument.\n\n[How to practice]\nStart by singing a very short, simple melodic idea until you can hum it steadily, then find the same pitches on the guitar in any comfortable position and play them back. Use a call-and-response routine: sing once, play once, then repeat while refining timing and pitch match; record yourself to check how closely the played phrase follows your sung phrase. Gradually increase variety — change the rhythm, shape the ending differently, or sing a slightly altered line and match that — always keeping the voice as the primary guide.",
+          "successCriteria": "You can sing a short melodic idea and immediately play the same phrase on guitar with matching pitch shape, rhythm, and expressive intent; the transition from voice to instrument feels quick and deliberate rather than hesitant.",
+          "sessionsRequired": 6,
           "order": 1,
-          "suggestedExerciseId": "chord_practice_configurable"
+          "suggestedExerciseId": "call_and_response_phrasing",
+          "lessons": [
+            {
+              "videoId": "ABqQGxzSoIw",
+              "title": "How To Improvise Solo On Guitar (Only Way That Actually Works)",
+              "channelName": "Guitar Lessons with Bazok",
+              "thumbnailUrl": "https://i.ytimg.com/vi/ABqQGxzSoIw/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
+          ]
         },
         {
-          "id": "4bfc6c70-30d7-42c7-9d9b-924f7e2ffcfb",
-          "title": "Basic strumming patterns",
-          "description": "[What it is]\nBasic strumming patterns are simple, repeatable combinations of down and up strokes that create the rhythmic foundation for a song. They organize time into a predictable pulse and give the music a steady feel you can rely on while you play.\n\n[Why it matters]\nA clean, consistent strumming pattern makes accompaniment feel solid and musical; it helps listeners sense the groove and supports any solo or vocal line. Even simple patterns let you control dynamics and phrasing, so your playing sounds intentional rather than accidental.\n\n[How to practice]\nStart by isolating short patterns and repeating them slowly with steady, relaxed wrist motion, focusing on even contact and consistent stroke size. Practice with muted strings so you can hear rhythm quality without worrying about notes, then apply the pattern while keeping dynamics and small accents controlled. Gradually combine a few basic patterns and switch between them smoothly; record short takes to hear where the timing or volume wavers and correct those spots.",
-          "successCriteria": "Your strumming hand produces even, consistent down and up strokes that repeat the intended pattern without uneven gaps; accents and louder/softer strokes occur where you want them. The pattern can be maintained steadily through several measures and transferred reliably to accompaniment, and recordings of your practice sound rhythmically stable and musical.",
+          "id": "458ccf67-98ad-41db-8548-e19e9e2e5010",
+          "title": "Target-tone listening",
+          "description": "[What it is]\nTarget-tone listening is the habit of hearing a single pitch in your head or in the accompaniment and aiming for that exact pitch with your voice or fingers before you play. It’s about choosing one sound as the destination of a short musical idea and training your ear to recognize it quickly.\n\n[Why it matters]\nWhen you can hear and aim for target tones, your improvised lines resolve cleanly and feel intentional instead of random. This skill gives your phrases direction, helps you connect lines to the underlying harmony, and makes call-and-response or singing-then-playing much more reliable.\n\n[How to practice]\nStart by listening to a short backing or drone, pick one tone in your head, hum it, then find and play that tone on the guitar; repeat until matching is quick and confident. Practice short exercises where you sing a target, pause, and then play it; then reverse by playing and immediately singing to check accuracy. Gradually shorten the time between hearing and playing and practice picking different targets inside short phrases so hearing-to-playing becomes automatic.",
+          "successCriteria": "You can hear a single target tone and match it on the guitar without hunting, choose appropriate tones that make a phrase feel resolved, and reliably land on those tones within a short musical idea. Phrases sound directed rather than wandering, and you can alternate between singing a target and playing it with consistent accuracy.",
           "sessionsRequired": 8,
           "order": 2,
-          "suggestedExerciseId": "strumming_down_up",
-          "suggestedLessonIds": [
-            "QJtHzTqAwV0",
-            "NCV9IgeSYuU",
-            "xItenkWdNtw",
-            "4_oGCqR0rn8",
-            "XxYGZmXcK88"
+          "noExercise": true,
+          "lessons": [
+            {
+              "videoId": "a8MjUOCerrE",
+              "title": "Target Notes the Easy Way (guitar solos to the next level)",
+              "channelName": "GuitarLessonsVancouver",
+              "thumbnailUrl": "https://i.ytimg.com/vi/a8MjUOCerrE/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "gIzaxGV4yc8",
+              "title": "Target Notes For Guitar",
+              "channelName": "Chris Sherland Guitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/gIzaxGV4yc8/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "c7de3c00-e374-43e0-b057-4a5578393a6d",
-          "title": "Downstroke consistency",
-          "description": "Building on your basic strumming patterns, downstroke consistency means making each downward strum land with the same motion, angle, and relative force so the sound and attack are predictable. It matters because steady, even downstrokes give chords and rhythm a solid pulse, clearer dynamics, and a reliable foundation for improvising. Develop it with short, focused repetitions: use a relaxed wrist motion, keep the motion identical each time, pay attention to follow-through and hand relaxation, and gradually increase length and smoothness of the stroke.",
-          "successCriteria": "You can play a string of downstrokes that sound even in volume and attack, with no obvious extra accents or limp strokes; the motion feels automatic and relaxed so you can focus attention elsewhere (timing, chords, or melody).",
-          "sessionsRequired": 8,
+          "id": "94e313b0-b44d-4566-8af4-7616a47403da",
+          "title": "Short phrase transcribing",
+          "description": "[What it is]\nShort phrase transcribing is the habit of listening to a short melodic idea and copying it by ear onto your guitar and on paper. You aim to capture the pitch sequence, the rhythmic shape, and the small expressive details that make the phrase recognizable. It’s focused, bite-size transcription — one short line at a time.\n\n[Why it matters]\nThis skill trains your ear to recognize musical building blocks you can later reuse when improvising. Translating what you hear into what your hands do closes the gap between hearing ideas and playing them, so learning feels practical and repeatable. It also grows your vocabulary: each phrase you transcribe becomes raw material for future solos.\n\n[How to practice]\nChoose a very short phrase, listen until you can hum it, then find the first note on the guitar and work outward a small step at a time, repeating only tiny sections until they match. Pay equal attention to rhythm and small articulations (stops, slides, accents), write a quick sketch so you don’t forget it, and compare your result to the original; start slow and increase speed only after the match is confident. Repeat with many different short phrases and occasionally try to vary the phrase slightly so you learn to adapt as well as copy.",
+          "successCriteria": "You can listen to a short melodic phrase once or twice and reproduce its pitch contour, rhythm, and basic articulation on the guitar without guessing. You can notate or sketch the phrase clearly enough to play it back later and you can create a simple, musical variation of the phrase on the spot.",
+          "sessionsRequired": 7,
           "order": 3,
-          "suggestedExerciseId": "strumming_basic",
-          "suggestedLessonIds": [
-            "XxYGZmXcK88",
-            "HOAM5N_kd4E"
-          ]
-        },
-        {
-          "id": "a2b2e769-26ab-4882-bec6-91e925a5d664",
-          "title": "Upstroke control",
-          "description": "Upstroke control is the upward motion of the picking or plucking hand that strikes the strings with a focused, lighter attack. It matters because clean, predictable upstrokes add brighter accents, clearer articulation, and more dynamic variety to both rhythm playing and single-note phrases. Develop it by keeping the wrist relaxed, using small repeatable motions, practicing isolated upstroke repetitions slowly across a comfortable string area, and then integrating them into alternating patterns and dynamic-control drills while maintaining consistent contact and release.",
-          "successCriteria": "Upstrokes sound even and clean, with controllable brightness and volume; they land precisely where intended without extra string noise or tension and fit naturally into the groove.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "strumming_pattern_14"
-        },
-        {
-          "id": "7fa9c089-b77c-4094-880b-243fc5368a79",
-          "title": "Finger independence exercises",
-          "description": "Exercises that train each fretting finger to move, press, and release independently so other fingers don’t lift or tense unintentionally. This develops clarity in single-note lines and chord tones and reduces wasted motion in the fretting hand. Practice short, slow drills that isolate one finger at a time—lifting and placing it while the others either hold or stay relaxed—focus on small controlled motions, relaxed wrist, and gradual increases in speed only when movement stays clean and tension-free.",
-          "successCriteria": "You can move any single finger without unwanted movement from the others; individual notes and chord notes sound clear without buzzing. Short melodic fragments and finger combinations feel smooth and repeatable while your fretting hand remains relaxed.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "finger_independence_1a",
-          "suggestedLessonIds": [
-            "RAaXrvO9RA8",
-            "ZoS0RxlN_E0",
-            "3ee486LAZ2E",
-            "NeNBXDw5uE4",
-            "bBcxaVqYOvg"
-          ]
-        },
-        {
-          "id": "016a10ba-7754-44f4-a8ca-4afeb91a8377",
-          "title": "Right-hand muting",
-          "description": "Right-hand muting is the technique of using the fleshy side of the palm or the fingertips of your picking hand to touch strings so they stop ringing or produce a controlled, percussive choke. It matters because it gives you clean, intentional rhythm and phrasing—removing unwanted ring, shaping note length, and adding percussive accents. Develop it by alternating between letting notes ring and immediately damping the strings, practicing light palm rests and fingertip dampening across different strings and dynamic levels, and using short percussive drills to train timing and pressure—start slow and increase subtlety as control improves.",
-          "successCriteria": "Muting is reliable and musical: unwanted notes stop cleanly without killing sustain of intended notes, percussive mutes are crisp and timed, and you can add or remove sustain on demand to shape riffs and improvised lines.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "muting_spotlight_drill",
-          "suggestedLessonIds": [
-            "8OOoUEhhvHw",
-            "d41GHKVrzCI",
-            "iIHx-lU0j6E",
-            "lRVhrOuIiE4",
-            "6fm2VihcB54"
+          "suggestedExerciseId": "earTrainingEasy",
+          "lessons": [
+            {
+              "videoId": "bd8M2fhK6Z8",
+              "title": "5' Guitar Exercise: Find Melodies You Know - JustinGuitar - Guitar Lesson [EX-101]",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/bd8M2fhK6Z8/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "xNlyoGud2A0",
+              "title": "The Transcribing Process - The Transcribing Course - Solo Guitar Lesson [TR-101]",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/xNlyoGud2A0/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         }
       ]
     },
     {
-      "id": "0c059fec-58e0-4f50-bb3a-94d89674a4f8",
-      "title": "Picking and Right-Hand Control",
+      "id": "c73827eb-1c44-4e89-861f-edab282ec837",
+      "title": "Fretboard & Core Scales",
       "order": 1,
       "steps": [
         {
-          "id": "df8d080b-b212-444a-a626-b455cbe6b23c",
-          "title": "Pick grip stability",
-          "description": "Pick grip stability is holding the pick so it stays aligned and controlled between your fingers rather than twisting, slipping, or squeezing uncontrollably. A stable grip produces even attack, clearer single-note lines, and predictable dynamics as you begin to use more precise picking techniques. Develop it by finding a relaxed, secure hold, then practice short, focused repetitions—checking the pick position between attempts, slightly varying pressure and angle to find a consistent feel, and slowly increasing duration and speed as the grip stays steady.",
-          "successCriteria": "The pick no longer twists or digs in during normal playing; attack and volume feel consistent, strokes require less corrective motion, and single-note lines and simple runs sound even and controlled.",
-          "sessionsRequired": 8,
+          "id": "1a4c9e21-3b7d-4e58-9c0a-6f2d8b1e5a37",
+          "title": "Notes on the fretboard",
+          "description": "[What it is]\nKnowing the notes on the fretboard means being able to name any pitch under your fingers and find a given note in several places across the neck. It includes recognizing the natural notes on each string, using octave shapes to jump between registers, and seeing how the same note repeats in different positions.\n\n[Why it matters]\nImprovisation gets stuck when you only know shapes but not what you are actually playing. When you can name notes, you can target chord tones, transpose ideas, and connect scale positions instead of being trapped in one box. It turns the neck from a maze of patterns into a map you can navigate.\n\n[How to practice]\nLearn the natural notes one string at a time, saying each note out loud as you play it, then test yourself by finding a named note on every string. Use octave shapes to locate the same note in two or three places, and practice spotting all the locations of one note (for example all the A's) across the neck. Work in short daily bursts and gradually speed up recognition until you can find any note without hunting.",
+          "successCriteria": "You can name any note you play and find a given note in at least two or three positions on the neck without hesitation. You use octave shapes to move an idea between registers, and you can locate the notes of a chord or scale by name rather than only by pattern.",
+          "sessionsRequired": 7,
           "order": 0,
-          "suggestedExerciseId": "tone_color_exploration",
-          "suggestedLessonIds": [
-            "o2Z0lvEB9Qs",
-            "8-grcbKnbps",
-            "pOZ-2rWdZE0",
-            "ENGk6hQ22kI",
-            "iV63qAhwwkw"
+          "suggestedExerciseId": "random_note_hunt",
+          "lessons": [
+            {
+              "videoId": "kNgpKxHo0H4",
+              "title": "Memorize the Fretboard in 3 MINUTES!",
+              "channelName": "Redlight Blue",
+              "thumbnailUrl": "https://i.ytimg.com/vi/kNgpKxHo0H4/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "UYkCSSwlCQ4",
+              "title": "How The Pros Unlock The Fretboard (stop memorizing)",
+              "channelName": "Rhett Shull",
+              "thumbnailUrl": "https://i.ytimg.com/vi/UYkCSSwlCQ4/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "s6lqWYXvEds",
+              "title": "Give me 7 Minutes, I'll Change the Way You See The Fretboard",
+              "channelName": "Daniel Seriff",
+              "thumbnailUrl": "https://i.ytimg.com/vi/s6lqWYXvEds/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "af406328-6245-468d-8c99-3f0c4db02367",
-          "title": "Alternate picking basics",
-          "description": "Alternate picking basics is a steady back-and-forth pick motion that strikes successive single notes with small, economical movements. It matters because it creates even tone and timing, reduces wasted motion, and builds the mechanical foundation for accurate, faster single-note playing. Develop it by practicing short, repeated single-note patterns slowly with a relaxed wrist/arm, keeping each stroke compact and even, then gradually increase speed while maintaining consistent tone and minimal tension.",
-          "successCriteria": "Lines sound even and steady with each note having similar clarity and volume; your picking hand stays relaxed and uses small motions; you can smoothly raise speed without jerky accents or increased tension, and transitions between adjacent notes feel controlled.",
-          "sessionsRequired": 8,
+          "id": "2c5e1b73-4d8f-4a90-b1e2-6c9d3f0a8e21",
+          "title": "What a scale is",
+          "description": "[What it is]\nA scale is simply an ordered set of notes — a chosen selection of pitches arranged from low to high that belong together and share a tonal home. Each scale is defined by the pattern of distances (steps) between its notes, and that pattern is what gives the scale its character and name. Understanding this means seeing a scale as a palette of notes you draw from, not just a finger pattern to run up and down.\n\n[Why it matters]\nAlmost everything in improvisation — melodies, licks, target notes, soloing over chords — comes from choosing notes inside a scale. Once you understand what a scale really is (a curated set of notes with a home and a built-in mood), the scales you learn next stop being random shapes and become tools you can use with intent. It also makes the relationships between scales (major, minor, pentatonic) obvious instead of something to memorize.\n\n[How to practice]\nPick one simple scale and play it slowly, listening to how it sounds as a whole and noticing the note that feels like home. Say or think the step pattern as you go, and stop on different notes to hear how each one feels stable or restless against that home note. Compare two short scales side by side to hear how changing the note selection changes the mood, and try making a tiny melody using only those notes so the scale feels like a usable palette rather than an exercise.",
+          "successCriteria": "You can explain in your own words what a scale is — an ordered set of notes with a tonal home and a characteristic step pattern — and you can hear which note functions as home. You understand that scales are palettes you choose notes from when improvising, and you can make a short melody using only the notes of a single scale.",
+          "sessionsRequired": 4,
           "order": 1,
-          "suggestedExerciseId": "alternate_picking_pentatonic_a_positions",
-          "suggestedLessonIds": [
-            "6kZJm6k1b0g",
-            "VQjsYPIXI2Q",
-            "v2OuK2ECy10",
-            "-SzJ147UNcE",
-            "SCNlFwCXLWQ"
+          "lessons": [
+            {
+              "videoId": "qBeyDkoyiWA",
+              "title": "How I wish Scales & Modes were explained to me as a student",
+              "channelName": "Nahre Sol",
+              "thumbnailUrl": "https://i.ytimg.com/vi/qBeyDkoyiWA/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "0d76d244-7f5e-441b-83f1-d03e635ac2af",
-          "title": "Picking accuracy drills",
-          "description": "Picking accuracy drills are short, focused exercises that train the pick to strike the intended string cleanly and consistently while minimizing unwanted contact and uneven attack. They matter because accurate picking makes single-note lines and fast passages sound articulate and controlled, and it frees you to play with clearer dynamics and phrasing. Develop this by repeating small, targeted patterns in any comfortable neck position, keeping pick motion compact (small wrist/forearm movements), listening closely for stray noise, and progressing slowly — only increase speed when each repetition stays clean.",
-          "successCriteria": "Notes sound distinct and even in volume, with no accidental string hits or buzzing; transitions between adjacent strings are crisp and predictable. Picking feels controlled and relaxed rather than tense, and short patterns remain clean as you push for more speed and endurance.",
+          "id": "1da2f5da-7739-4db9-8c7b-a42275fd0aee",
+          "title": "Major scale essentials",
+          "description": "[What it is]\nThe major scale is a seven-note sequence that provides the primary tonal framework used in many melodies and harmonies. Its pattern of step sizes gives each note a clear role — some feel like resting places, others like motion-builders that lead back to the home note. Learning it means recognizing the scale's sound both going up and coming down.\n\n[Why it matters]\nThe major scale is the source of the common major chords and melodic choices in a major key; knowing it helps you pick notes that sound resolved or create tension when improvising. It gives you a reliable palette for building simple melodies, connecting phrases, and responding to harmony. Once the scale is familiar, you can more confidently shape phrases that fit a major-key context.\n\n[How to practice]\nSing the scale first so you know how it should sound, then play it slowly in a comfortable hand position and increase speed gradually while keeping an even tone. Practice short exercises: repeat two- and three-note fragments, change their direction, and use call-and-response (play a phrase, then answer with a scale-based variation). Finish exercises by deliberately ending phrases on notes that feel like resolution versus those that feel like they need to move, so you learn each scale degree's character.",
+          "successCriteria": "You can sing and play the major scale ascending and descending with an even, confident sound in at least one comfortable position. You can pick scale tones to create short improvised phrases that clearly sound like they belong together and to a major key. You can use short motifs and call-and-response patterns and deliberately resolve phrases on stable scale tones so listeners hear a sense of completion.",
           "sessionsRequired": 8,
           "order": 2,
-          "suggestedExerciseId": "muting_spotlight_drill",
-          "suggestedLessonIds": [
-            "8-grcbKnbps",
-            "o2Z0lvEB9Qs",
-            "3uD8ulksL7s"
-          ]
-        },
-        {
-          "id": "9a7c6c57-7e59-4873-9ca5-90a4c51894f0",
-          "title": "Down-up motion coordination",
-          "description": "Down-up motion coordination is the controlled, cyclical coordination of consecutive downstrokes and upstrokes so each pick pass is even, relaxed, and predictably placed in time. It matters because consistent down-up flow produces an even tone and steady rhythmic spacing, reduces wasted motion and tension, and makes faster patterns and dynamic control possible. Develop it by using small, relaxed wrist/forearm motions; exaggerate the down and up phases slowly, concentrate on equal volume and spacing between strokes, and gradually speed up as the motion stays relaxed and even.",
-          "successCriteria": "Strokes produce a consistent tone and even spacing with no unintended accents; hand motion feels relaxed and economical with minimal wasted movement; you can sustain steady down–up subdivisions across short phrases and reproduce that evenness when changing speed or pattern.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "pentatonic_box1_up_down"
-        },
-        {
-          "id": "cf35cfcf-1eb0-463b-aaeb-e0b433e0ad9c",
-          "title": "Economy picking introduction",
-          "description": "Economy picking is a right-hand technique that blends directional strokes with small sweep-like motions so the pick takes the shortest path when changing strings. It matters because reducing unnecessary motion makes single-note lines smoother, more even, and easier to accelerate without tension. Develop it by practicing slow, controlled string-to-string changes where the pick continues in the same direction on a string change, keeping wrist and forearm movements compact and relaxed; start with short repeating patterns and only increase speed once clarity and economy of motion are maintained.",
-          "successCriteria": "Runs across strings sound even and connected, pick motion feels compact and relaxed, and you can cleanly increase speed without added tension or loss of articulation at string changes.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "economy_picking_angular",
-          "suggestedLessonIds": [
-            "qBRYZE2k0U8",
-            "c0tq2PNpbok",
-            "MWzbeD2tRj0",
-            "-SzJ147UNcE",
-            "ginvHRCavBA"
-          ]
-        },
-        {
-          "id": "655f5cdc-06f2-4a30-99ce-535010e46859",
-          "title": "Palm mute timing",
-          "description": "Building on your right-hand muting, palm mute timing is the precise control of when a palm mute is applied and released so that muted and ringing notes arrive exactly where the music needs them. It matters because those timed mutes shape groove and dynamics, creating clear staccato contrasts or cleaner sustain in riffs and single-note lines. Develop it by practicing slow alternations between muted and unmuted strokes, keeping hand movement minimal and release points consistent; start slow, increase gradually, and apply the pattern to short riffs and simple improvised phrases.",
-          "successCriteria": "Muted and open notes switch cleanly with no unwanted ringing or accidental chokes; muted notes have consistent decay and dynamic level; you can intentionally produce tight, percussive attacks or looser, sustaining tones and place those changes precisely within a musical phrase.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "rhythm_training_easy",
-          "suggestedLessonIds": [
-            "8OOoUEhhvHw",
-            "6fm2VihcB54",
-            "76ZOPqcjK8c",
-            "d41GHKVrzCI",
-            "lRVhrOuIiE4"
-          ]
-        },
-        {
-          "id": "3130b088-efd4-4b23-8217-353dc073cdc9",
-          "title": "Fingerstyle coordination",
-          "description": "[What it is]\nFingerstyle coordination is the ability to use individual right-hand fingers (thumb and one or more fingers) to pluck strings in controlled, independent patterns while the left hand supplies chords or single notes. It means coordinating timing, attack, and relative volume so simultaneous or interlocking parts sound intentional and balanced. Good coordination keeps the hand relaxed and movements small to conserve speed and accuracy.\n\n[Why it matters]\nThis skill lets you play basslines, harmony, and melody together, create clear arpeggios, and add rhythmic detail that enhances musical expression. It expands the kinds of textures you can produce on the guitar without a pick, making solo arrangements and accompaniment more interesting. Reliable finger independence also makes transitioning between patterns and dynamics smoother.\n\n[How to practice]\nBegin with simple, repetitive patterns that assign one finger to each string involved; play slowly, keep motion minimal, and focus on even tone from each finger. Gradually combine different fingerings and rhythmic groupings, introduce short melodic fragments against a steady thumb bass, and only increase speed when clarity and evenness are maintained. Record or listen back to check that the melody or highest voice is clearly audible above the accompaniment, and watch for unnecessary tension in the hand and wrist to correct early.",
-          "successCriteria": "You can pluck independent fingers with consistent tone and timing so accompaniment and melody are clearly distinct; arpeggios sound even and transitions between patterns are smooth. The right hand remains relaxed with small, efficient movements, and you can apply common finger patterns to short musical phrases without losing clarity.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "mini_arpeggio"
-        }
-      ]
-    },
-    {
-      "id": "063dd1d4-d119-4a69-8cd2-c886d654c1a0",
-      "title": "Single-Note Playing Skills",
-      "order": 2,
-      "steps": [
-        {
-          "id": "780aa8da-5f7b-4ec3-ab40-b8bcc8fb9209",
-          "title": "Chromatic fretting accuracy",
-          "description": "Chromatic fretting accuracy is the ability to cleanly and precisely sound consecutive adjacent notes on the neck so each step in a chromatic run rings clearly. It matters because accurate chromatic motion keeps fills and transitions clean—avoiding buzzes, muted notes, or extra unwanted tones that break a line. Develop it with short, focused repetitions: place each fingertip close to its target, use only enough pressure for a clear note, move with minimal motion between adjacent positions, and practice slowly, increasing gradually as every note stays clean.",
-          "successCriteria": "Chromatic passages sound smooth and even: every note rings with consistent volume and no buzzing, muting, or accidental extra notes. Your fingers move small, efficient distances between adjacent notes and land precisely without hesitation, allowing chromatic runs to be repeated reliably at performance-relevant tempos.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "spider_one_string"
-        },
-        {
-          "id": "e9b36978-3000-499e-ba21-7cfb0f1f66fc",
-          "title": "Hammer-on technique",
-          "description": "A hammer-on is a single-note technique where you sound a new, higher pitch by sharply bringing a fretting finger down onto the string so the note rings without re-articulation. It matters because it produces smooth, connected (legato) phrasing and lets single-note lines feel more vocal and fluid. To develop it, practice a quick, controlled downward motion supported by a small wrist/forearm movement so the finger lands solidly just behind the fret; repeat clean single-string hammer-ons slowly, focus on consistent pressure and clear tone, then link them into short musical phrases as they ring reliably.",
-          "successCriteria": "Hammer-ons ring clearly and at full, even volume compared with surrounding notes, with no buzzing or dead notes; the fretting finger lands confidently behind the fret and transitions smoothly into subsequent notes, allowing short legato phrases to flow without audible gaps.",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "hammer_on_sequence_5_7_9",
-          "suggestedLessonIds": [
-            "7hDdZAjKBjY",
-            "TTBdEDZexOg",
-            "zv0PTZVW4dI",
-            "Q-famECZNHw",
-            "P6_ipwWZROs"
-          ]
-        },
-        {
-          "id": "4bc47f98-86bf-4a75-a2ee-4888cbb3c9a3",
-          "title": "Pull-off technique",
-          "description": "A pull-off is a fretting-hand motion where you lift a pressed finger with a quick, controlled flick so the next note rings on its own. It matters because it produces smooth, connected single-note lines and small ornaments while reducing extra hand movement. To develop it, keep the fretting finger firm, then pull slightly down-and-back as you lift so the string is briefly plucked by the finger motion; keep the motion short and focused. Practice slowly, listen for even tone and volume, and adjust finger angle and pressure until each pull-off speaks cleanly without buzzing.",
-          "successCriteria": "Pull-offs sound clear and consistent in volume, with smooth transitions between notes and no unwanted string noise; the motion is compact and repeatable under normal playing speed and pressure. You can execute two or more connected notes with pull-offs that ring reliably and evenly.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "pull_off_pentatonic_run",
-          "suggestedLessonIds": [
-            "zv0PTZVW4dI",
-            "yQxpSFeAZYw",
-            "M6GIre0x4kQ",
-            "a_XSCPlcIVU",
-            "TTBdEDZexOg"
-          ]
-        },
-        {
-          "id": "10ffc253-810d-4830-ac46-91d0f3dd9d5b",
-          "title": "Slide transitions control",
-          "description": "Slide transitions control is the ability to move a fretting finger smoothly from one pitch to another while maintaining consistent pressure and contact so the pitch glides cleanly. It matters because clean slides connect notes into legato phrases, add expressiveness, and prevent gaps or unwanted noise between tones. Develop it by practicing slow, deliberate slides of different distances, keeping steady finger pressure, minimizing unnecessary lateral motion, and concentrating on a clean start and precise stop; relax the wrist and arm and increase speed only after the motion is reliable.",
-          "successCriteria": "Slides sound even in volume and pitch, with clear beginnings and endings and no extra buzzing or unintended pitch smear. You can control the slide’s distance and speed to land exactly on the intended pitch every time and use the motion reliably within short melodic phrases. The motion feels relaxed and repeatable under normal playing conditions.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "one_string_backing"
-        },
-        {
-          "id": "f1fc4c69-d184-43d7-a7a2-af20daa4e73b",
-          "title": "String-to-string accuracy",
-          "description": "String-to-string accuracy is the ability to hit one intended string cleanly when moving your pick and fretting hand across strings, without striking or muting adjacent strings. It matters because clean single-note lines depend on precise targeting — messy string crossings make phrases sound cluttered and obscure your ideas. Develop it by practicing slow, focused crossings (both directions), keeping your picking motion small and direct, using gentle muting with unused fingers or the palm, and only increasing speed once each cross is reliably clean.",
-          "successCriteria": "Notes sound clear and isolated when you move across strings; there is no audible buzz or accidental ringing from neighbouring strings. Your attack and tone stay consistent whether crossing up or down, and you can repeat targeted string changes reliably at performance speed. Cross-string passages feel controlled rather than accidental.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "pentatonic_string_crossing_3"
-        },
-        {
-          "id": "9eff41ff-de16-4d5b-b286-946f304ca0ed",
-          "title": "Legato motion control",
-          "description": "Legato motion control is the left-hand technique of connecting successive single notes so they sound smooth and uninterrupted, relying on compact finger movements and minimal extra picking. It matters because legato lines give improvisation a vocal, flowing quality and let you shape phrases with even dynamics and sustain. Develop it by keeping finger motions small and economical, rolling pressure cleanly between fingers, synchronizing the left-hand connection timing, and practicing slow, focused slurs that move across the neck until the motion becomes automatic.",
-          "successCriteria": "Lines sound connected with no audible gaps or unwanted string noise; note volume and attack stay consistent while you shift positions or cross strings, and transitions feel effortless rather than forced.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "hammer_on_pentatonic_run",
-          "suggestedLessonIds": [
-            "tVKAbx3KLXY",
-            "sstArwUX2AQ",
-            "DlqPITGLr2s",
-            "pkcb9Wcnkxo",
-            "cZPiY2WdijM"
-          ]
-        },
-        {
-          "id": "871d2969-5ccd-455a-9734-807c43630ab0",
-          "title": "Note duration consistency",
-          "description": "[What it is]\nNote duration consistency means intentionally controlling how long each note rings or stops so the rhythm of your single-note lines is predictable and even. It covers sustaining notes for their intended lengths, releasing them cleanly, and making short notes equally short across different strings and positions. Consistent durations make your lines sound deliberate rather than sloppy.\n\n[Why it matters]\nWhen you control note lengths you create clearer phrases, stronger rhythmic placement, and a more professional sound — melodies lock with the accompaniment and rhythmic ideas communicate clearly. Inconsistent note lengths blur phrasing, hide melodic intent, and undermine timing even when your fretting and picking are accurate. Reliable duration control is a foundation for groove, articulation, and expressive phrasing.\n\n[How to practice]\nPractice single-note exercises where you hold, release, and mute notes to specific target lengths while counting or using a steady click; start slow and increase speed only after consistency is comfortable. Drill short vs. sustained versions of the same line so your hand learns both clean releases and controlled sustain, and add deliberate muted stops to train clean endings. Record short attempts and listen for notes that ring too long or get choked; focus on matching attack force and finger release timing so the same duration is achievable anywhere on the neck.",
-          "successCriteria": "Notes begin and end exactly where you intend; sustained notes ring clearly for the expected length and short notes end cleanly without unintended ringing. Phrases sit consistently with a steady pulse and sound deliberate rather than uneven, across different strings and positions. You can reproduce the same note durations reliably in short improvisations and exercises.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "naked_tone_melody"
-        }
-      ]
-    },
-    {
-      "id": "d9a758e7-1774-481a-af38-c646f7ab8c7e",
-      "title": "Scales and Pattern Basics",
-      "order": 3,
-      "steps": [
-        {
-          "id": "fca9f6a8-2789-4922-b9ac-8b216c267c01",
-          "title": "Minor pentatonic shapes",
-          "description": "[What it is]\nMinor pentatonic shapes are the set of five-note fingering patterns that map the minor pentatonic scale across the neck. Each shape is a compact, repeatable hand position that tiles along the fretboard, giving you a predictable physical layout to find scale tones quickly. Learning them means memorizing how the pattern feels and where the fingers land so you can move the pattern around the neck.\n\n[Why it matters]\nThese shapes provide a dependable pool of notes you can draw from when improvising in a minor context, so you spend less time guessing and more time shaping musical ideas. They make it easier to create simple, memorable licks and to move confidently between different registers of the neck. Using shapes as a foundation helps you develop phrasing, timing, and ear-guided choices faster than learning single notes in isolation.\n\n[How to practice]\nStart with one shape in any comfortable neck position: play it up and down slowly until the fingering feels automatic, then add the adjacent shape and practice shifting between them. Work in short motifs—play a small phrase, pause, then vary it—so the patterns become musical rather than mechanical; focus on clear, ringing notes and economical hand movement. Gradually link two or more shapes and experiment with small pitch inflections or rhythmic variations to make the patterns sound like phrases, not just runs.",
-          "successCriteria": "You can play each pentatonic shape from memory in any comfortable position, shift between adjacent shapes smoothly, and connect small motifs across shapes so your ideas sound intentional. Notes ring clearly, left-hand movement is economical, and your improvised phrases have clear starts, middles, and endings rather than aimless runs.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "pentatonic_box1_up_down",
-          "suggestedLessonIds": [
-            "0kB4X3w1IBk",
-            "OaOnTSAyx_M",
-            "BgRzzvVWBrU",
-            "Oco-lfsJy5M",
-            "kvmUQ-mb0OY"
-          ]
-        },
-        {
-          "id": "8ec0ca4b-0455-45f6-8552-9197ea66e592",
-          "title": "Major scale familiarity",
-          "description": "[What it is]\nThe major scale is a seven-note sequence that sounds bright and stable; it’s the basic melody pattern behind a huge amount of music. On guitar you use that repeating sequence to create melodies, outline harmonies, and orient your ear to where a phrase feels resolved.\n\n[Why it matters]\nKnowing the major scale gives you a reliable set of notes to improvise with and helps you hear which notes sound like a comfortable 'home' and which create tension. It’s also a foundation you’ll reuse when learning other scales and when shaping simple, singable phrases.\n\n[How to practice]\nPlay the scale slowly in a comfortable area of the neck while humming or singing each note so the sound and the shape connect in your ear and hands. Work with small melodic cells: make short two- or three-note motifs, move them up and down the scale, and practice stopping on notes that feel like a natural ending. Repeat those motifs in different positions and use call-and-response (play a phrase, then answer with a different phrase built from the scale) to turn dry repetition into musical ideas.",
-          "successCriteria": "You can play the major scale smoothly up and down in a comfortable position, recognize its bright sound by ear, create short melodies that clearly resolve, and use its notes to outline simple musical ideas.",
-          "sessionsRequired": 8,
-          "order": 1,
           "suggestedExerciseId": "scale_practice_configurable",
-          "suggestedLessonIds": [
-            "-iEAxS26pL0",
-            "00fHMNiINN8",
-            "BmDiDy_Dzn8",
-            "r-1mbf8X9Cg",
-            "i4zGDoRvn5o"
+          "lessons": [
+            {
+              "videoId": "v44NY4fyxHA",
+              "title": "Major scales: Everything you need to know in 7 minutes",
+              "channelName": "Brad Harrison Music",
+              "thumbnailUrl": "https://i.ytimg.com/vi/v44NY4fyxHA/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "i4zGDoRvn5o",
+              "title": "Scale for Beginners. Start Here.",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/i4zGDoRvn5o/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "18718c02-19c5-4ce5-a29e-f26321bb6664",
-          "title": "Blues scale introduction",
-          "description": "[What it is]\nThe blues scale is a compact, expressive scale built from a small set of notes plus one added 'blue' tone that creates intentional tension. It’s a go-to vocabulary for blues, rock, and jazz phrasing because that extra note gives simple melodic color and grit without complex theory. Learning it gives you a reliable palette of sounds for soloing over common progressions.\n\n[Why it matters]\nThis scale instantly shapes the emotional character of a line — the blue tone creates a push-and-release feeling that listeners recognize as bluesy. For beginners it’s an efficient bridge from single-note playing to musical improvisation: a few shapes produce many usable licks and call-and-response phrases. Using it helps you focus on phrasing, dynamics, and timing rather than juggling lots of notes.\n\n[How to practice]\nMemorize the pattern in at least two different neck locations and repeat simple two- and four-note motifs that include the blue tone so it becomes a natural target. Practice short call-and-response ideas: play a phrase, then answer it using the scale’s blue note to add tension, and end phrases on a resolved-sounding note to hear the effect. Work on small expressive techniques around the blue tone — slides, small bends, or quick hammer/pull gestures — and train your ear by copying short blues phrases and then improvising short 4-bar responses. Start slow and increase speed only after the patterns and phrasing feel comfortable.",
-          "successCriteria": "You can play the scale pattern smoothly in at least two neck locations, use the blue tone deliberately to add tension and release, and improvise short, musical phrases that sound intentionally 'bluesy' rather than random.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "pentatonic_box1_up_down",
-          "suggestedLessonIds": [
-            "EILFkSGNkdA",
-            "BgRzzvVWBrU",
-            "r-1mbf8X9Cg",
-            "WosRlsDB9zk",
-            "0LAEd2ttmmQ"
-          ]
-        },
-        {
-          "id": "3ec13d3e-8322-40b3-92fd-f73a41dc57a7",
-          "title": "Scale fingering economy",
-          "description": "Scale fingering economy is choosing and executing fingerings that use the smallest, most direct motions—keeping fingers close to the strings and moving only as much as needed to clear the next note. It matters because minimized movement produces cleaner tone, steadier timing, less tension, and makes phrasing and speed easier to control. Develop it by practicing short scale fragments slowly, planning a single efficient fingering for each passage, deliberately keeping fingers low between notes, and repeating those exact motions until they become automatic; increase speed only while preserving the small movements.",
-          "successCriteria": "Runs feel effortless and relaxed: each note sounds with consistent volume and clarity, finger motion is minimal and controlled, and transitions between notes or directions show no unnecessary reaching or flapping. Phrases are repeatable with the same clean result every time and you can increase speed without losing evenness or introducing tension.",
+          "id": "2b5d0f32-4c8e-4a69-8d1b-7e3f9c2a6b48",
+          "title": "Pentatonic scales",
+          "description": "[What it is]\nThe pentatonic is a five-note scale and the most-used sound in guitar improvisation. It comes in two flavors that share the exact same shapes on the neck: minor pentatonic (darker, bluesy) and major pentatonic (brighter, sweeter) — the only real difference is which note you treat as home. Learn one set of shapes and you have both.\n\n[Why it matters]\nPentatonics reduce your note choices to a small, reliable palette where almost everything sounds good, so you can focus on phrasing, rhythm, and expression instead of dodging wrong notes. They are the first-call scale for rock, blues, and pop solos, and understanding that major and minor pentatonic are the same shape with a different home unlocks a huge part of the fretboard at once.\n\n[How to practice]\nLearn one comfortable pentatonic shape and play it slowly until your fingers move without thought, then find and sing the home note and make tiny two- and three-note motifs that resolve to it. Play the same shape over a minor backing to hear the bluesy minor sound, then over a major backing to hear the brighter major sound, so you feel how the same notes change character with the home note. Connect to a neighboring shape so lines flow, and use short call-and-response drills (play a phrase, rest, answer it), keeping clean tone and tasteful space rather than just running the scale up and down.",
+          "successCriteria": "You can play a pentatonic shape cleanly, hear and target its home note, and improvise short, musical phrases over both minor and major backing. You understand that minor and major pentatonic share the same shapes with a different tonal home, and you can switch between the two sounds deliberately and link phrases across neighboring shapes.",
           "sessionsRequired": 8,
           "order": 3,
-          "suggestedExerciseId": "spider_basic",
-          "suggestedLessonIds": [
-            "FVvYj_T2q_w"
-          ]
-        },
-        {
-          "id": "7e0ef950-031d-401a-a963-1383288fbaec",
-          "title": "Scale sequencing patterns",
-          "description": "[What it is]\nScale sequencing patterns are short, repeatable orders of notes taken from a scale that you play as moving motifs rather than as straight up-and-down runs. They break a scale into musical chunks and shift the starting point so the same intervallic idea appears in different places. Practicing sequences trains your ear to hear shape and your hands to move predictably between scale tones.\n\n[Why it matters]\nSequences give you ready-made melodic fragments to use while improvising, turning abstract scale notes into memorable phrases. They improve spatial awareness on the neck so a pattern learned in one spot can be moved and heard in another. That makes it easier to connect ideas, create motifs, and respond spontaneously when jamming.\n\n[How to practice]\nChoose a small grouping pattern and repeat it while shifting the starting note through the scale so the motif travels across the neck; start slow and increase speed only as you stay clean. Alternate directions, vary where you begin the pattern, and practice stopping or landing on different scale tones so the patterns become musical phrases, not just exercises. Record short runs and listen back to check for even timing, smooth string changes, and whether the motif sounds like a coherent idea you could use in improvisation.",
-          "successCriteria": "You can play several short sequences evenly and smoothly at a comfortable speed, move each sequence up and down the neck without hesitation, and start a sequence from any note in the scale. The patterns sound like usable musical phrases when you improvise, not just mechanical drills, and transitions between sequences are clean and predictable.",
-          "sessionsRequired": 8,
-          "order": 4,
           "suggestedExerciseId": "pentatonic_box1_up_down",
-          "suggestedLessonIds": [
-            "0kB4X3w1IBk",
-            "fC_K8HhjCLs"
+          "lessons": [
+            {
+              "videoId": "X9rYOhX77mA",
+              "title": "THIS is how you learn the PENTATONICS",
+              "channelName": "Paul Davids",
+              "thumbnailUrl": "https://i.ytimg.com/vi/X9rYOhX77mA/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "TBEwqZSTu2s",
+              "title": "How to Play The Pentatonic Scale (Fully Explained)",
+              "channelName": "Kevin Nickens",
+              "thumbnailUrl": "https://i.ytimg.com/vi/TBEwqZSTu2s/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "02e6d010-cf55-413e-8eb6-2cfe8a0dde76",
-          "title": "Scale visualization skills",
-          "description": "[What it is]\nScale visualization is the mental map that links note locations across the neck so you can picture and hear a scale as a continuous landscape instead of isolated fingerings. It means recognizing repeating patterns and interval relationships so you can predict where the next tones live without needing to search.\n\n[Why it matters]\nWhen you can visualize scales, improvisation becomes more fluid: you find melodic routes, avoid dead ends, and make musical choices faster. That clarity helps you connect ideas across the instrument and play with more intention and fewer pauses.\n\n[How to practice]\nPractice by choosing a short melodic idea and imagining moving it to other areas of the neck before playing it, alternating mental rehearsal with actual playing. Hum or sing the line as you picture its path, trace interval jumps with your eyes, and slowly shift the same small motif across different regions until the locations feel automatic. Use brief, focused daily drills that combine silent visualization and hands-on checking to build reliable neck-wide maps.",
-          "successCriteria": "You can picture and hear a short melodic idea in a new area of the neck and play it without pausing, smoothly move the same motif between different regions, and your improvised lines sound connected and intentional rather than fragmented.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "natural_notes_map"
-        },
-        {
-          "id": "f4c110b9-c768-49ab-b642-68dfc03eac30",
-          "title": "Connecting scale positions",
-          "description": "[What it is]\nConnecting scale positions is the ability to move smoothly from one fingering area to the next so your lines run across the neck without stopping. It means linking short melodic fragments into one continuous phrase rather than sounding like separate boxes.\n\n[Why it matters]\nWhen you can connect positions your solos and melodies feel more fluid and musical; you stop sounding 'boxed in' and can reach wider note choices and melodic directions. It also makes targeting important notes easier, since you can approach them from multiple directions rather than always starting in the same spot.\n\n[How to practice]\nPractice small, repeatable shifts: play a short two- or three-note motif in one position, then shift into the adjacent position and repeat the motif in a new shape until the move feels smooth. Use simple call-and-response exercises where you play a phrase, shift, and answer the phrase in the next area; focus on clean fretting and steady picking during the move. Gradually increase the distance and variety of the connecting paths, and practice both ascending and descending links until transitions are confident and musical.",
-          "successCriteria": "You can move between positions without audible pauses or missed notes, maintain consistent tone and rhythmic feel through the shift, and create short melodies that cross position boundaries naturally. Shifts feel repeatable and reliable so you can choose different paths while improvising.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "pentatonic_box1_up_down",
-          "suggestedLessonIds": [
-            "P4m4vVAcmTw"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "cfdaf74f-7ffd-4156-ae0e-847af32b7ef0",
-      "title": "Rhythm, Timing, Groove",
-      "order": 4,
-      "steps": [
-        {
-          "id": "9c57d2d6-1348-41a8-8197-a1297af47f06",
-          "title": "Metronome subdivision control",
-          "description": "[What it is]\nMetronome subdivision control is the ability to hear, feel, and play the smaller parts of the beat indicated by a click, so your notes consistently land on the intended subdivision of the pulse. It means using the metronome not only for the main clicks but for the internal divisions that shape timing: evenly split beats, triplet feels, or other groupings. This skill trains your internal clock so you play precisely where you intend inside each beat.\n\n[Why it matters]\nClear subdivision control keeps solos and grooves steady and makes rhythmic ideas sound intentional rather than loose or rushed. It lets you place accents, anticipate chord changes, and create convincing syncopation because you know exactly which part of the beat you’re targeting. In group playing it’s the difference between locking with the rhythm section and sounding out of time.\n\n[How to practice]\nWork with a metronome that lets you switch between main beats and subdivided clicks; start by splitting each beat into simple equal parts and practice playing short, repeatable patterns that line up with those subdivisions. Accent one subdivision at a time, then play phrases that start on different subdivisions so you learn to shift placement without losing the pulse; record and listen back to check alignment. Begin slow and increase speed gradually, aim for even spacing and tiny timing adjustments rather than forceful corrections, and repeat across different feels (duple, triple, and small groupings) until the internal subdivision is steady without the click.",
-          "successCriteria": "You consistently place notes and accents exactly on intended subdivisions and can switch between different subdivided feels without losing the steady pulse; your phrases lock with a click and still feel even when the metronome is off, and rhythmic ideas sound deliberate and in time rather than rushed, hesitant, or uneven.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "rhythmic_pocket_mastery"
-        },
-        {
-          "id": "22453942-fca3-4910-8d7b-1ffcac833595",
-          "title": "Syncopation awareness",
-          "description": "[What it is] Syncopation is the rhythmic practice of placing accents, emphasis, or silence where the listener doesn't expect them relative to the steady pulse. It usually means stressing weaker subdivisions or creating rests on strong beats to produce surprise and forward motion. In short, syncopation is playing slightly against the obvious beat to make a rhythm feel more lively and conversational.\n\n[Why it matters] Syncopation is a major part of groove and style; it turns even simple lines into compelling rhythmic statements that catch the ear. It creates tension and release inside a phrase, helping your solos and rhythm parts interact dynamically with other players. Becoming aware of syncopation expands your toolkit for phrasing, making your improvisation feel more musical and less mechanically even.\n\n[How to practice] Start by tapping a steady pulse and deliberately accenting different weaker subdivisions so you can feel the shift of emphasis. Transfer those accents to short single-note motifs or small riff fragments, deliberately leaving some strong beats silent so the off‑beat accents stand out. Use call-and-response: play a syncopated idea, then play a straight version and notice the difference in feel; record yourself to check whether the underlying pulse stays steady while accents move. Begin slowly and increase speed only after the accents feel natural and consistent within the pulse.",
-          "successCriteria": "You can place clear, intentional accents on off-beat subdivisions while the steady pulse remains audible; your phrases produce noticeable tension and release. You can play and respond to short syncopated patterns without collapsing the underlying beat, and listeners reliably perceive the change in groove when you shift accents.",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "rhythm_training_medium",
-          "suggestedLessonIds": [
-            "2XFZ5vExH7c",
-            "dy0_MMA1Dfo",
-            "r3HNaLANUrE",
-            "YCA6YuN0Pug",
-            "BkvQsj-uW_Y"
-          ]
-        },
-        {
-          "id": "7615fd38-552a-4624-9a0f-07cb1308fefe",
-          "title": "Backbeat locking",
-          "description": "[What it is]\nBackbeat locking means placing and sustaining strong, repeatable accents on the backbeat so your playing sits as a steady, reliable part of the groove. \"Locking\" is about exact timing and consistent attack: those accents must occur in the same spot every time and feel like an intentional anchor in the music. It’s more about placement and feel than volume alone.\n\n[Why it matters]\nWhen your backbeat is locked, the whole band feels tighter and rhythms become danceable and dependable; listeners and other players instinctively lock to that pulse. It gives your parts purpose—supporting solos, vocal lines, and the rhythm section—so the groove breathes and doesn’t wobble. Good backbeat locking makes simple parts sound confident and professional.\n\n[How to practice]\nPlay along with a steady rhythmic backing (a drum loop, drum machine, or a partner) and deliberately emphasize the backbeat with a clear, repeatable attack—make those hits identical each cycle. Record short takes and listen back to check whether your accents fall exactly with the groove; adjust tiny timing shifts until they match. Then vary context: use percussive body hits, single-note accents, or sustained sounds and practice reproducing the same locked placement in each texture; start slow, increase gradually and aim for consistency rather than force.",
-          "successCriteria": "You can consistently place accented hits on the backbeat so they line up with a steady groove and feel unchanging from bar to bar. Other players or a backing track will feel anchored by your accents; the groove sounds cohesive and your parts sound intentional rather than wandering. You can reproduce that placement across different textures and make small timing choices (sit slightly behind or on the beat) deliberately and reliably.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "rhythm_training_easy"
-        },
-        {
-          "id": "e8cdadff-c8a2-4a2e-b875-cdc69ea5da6a",
-          "title": "Groove feel development",
-          "description": "[What it is]\nGroove feel is the combination of tiny timing choices, accent placement, note durations, and dynamics that creates a consistent, compelling rhythmic \"pocket.\" It’s less about which notes you play and more about how you place and emphasize them in time so the music breathes and moves.\n\n[Why it matters]\nA strong groove turns technically correct playing into something listeners and bandmates can feel and respond to; it gives solos and accompaniment emotional shape and makes phrasing communicative rather than mechanical. Learning groove helps your improvisation land with purpose—relaxed, driving, or laid-back—depending on how you place notes and accents.\n\n[How to develop]\nWork with simple backing loops or play-along material and focus on small timing shifts and dynamic accents instead of adding more notes. Record short phrases and compare how they feel when you place them slightly behind, on, and ahead of the pulse; practice repeating a one- or two-bar idea while varying placement and emphasis until each version sounds intentional. Use short, focused repetitions and listen closely—aim for consistent feel, deliberate microtiming choices, and the ability to change the pocket on purpose.",
-          "successCriteria": "Your playing consistently sits in a clear pocket: repeated phrases maintain a steady, engaging pulse and listeners feel the groove. You can deliberately place phrases slightly behind, on, or ahead of the beat and change the feel using accents and dynamics. Bandmates or backing tracks naturally lock in with your feel, and your improvisations sound musical and purposeful rather than mechanical.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing",
-          "suggestedLessonIds": [
-            "kOtT5c8pD1U"
-          ]
-        },
-        {
-          "id": "86ad61bc-fb6a-479d-9862-1c22a9af1a7f",
-          "title": "Rhythmic phrasing",
-          "description": "[What rhythmic phrasing is]\nRhythmic phrasing is the way you shape a melody or solo using note lengths, rests, accents and repeated rhythmic shapes so the line feels like a complete thought. It’s less about which notes you play and more about how you place them in time to create tension, surprise, or resolution. Good phrasing uses space and contrast as much as sound.\n\n[Why it matters]\nRhythmic phrasing is what makes a guitar part feel musical and human instead of mechanical: it gives your playing personality and a sense of direction. It helps listeners follow your ideas, makes solos more memorable, and lets your lines lock with other musicians or a backing track. Even simple note choices can sound expressive when phrased well.\n\n[How to practice]\nChoose a short, simple motif and practice several versions that change only the rhythm — add rests, shift accents, shorten or lengthen notes, and repeat with small variations. Record yourself, listen back, and pick which version communicates best; then try to play that version consistently while keeping a steady pulse. Practice trading space and sound: deliberately leave gaps, answer a short phrase with a contrasting one, and gradually increase the variety of rhythmic shapes you use.",
-          "successCriteria": "Your phrases sound intentional and singable: they use space, clear accents, and rhythmic variation to create call-and-response or forward motion. Listeners can feel the structure of your ideas and your lines lock naturally with a steady pulse.",
-          "sessionsRequired": 8,
+          "id": "3c6e1a43-5d9f-4b7a-9e2c-8f4a0d3b7c59",
+          "title": "Blues scale and blue notes",
+          "description": "[What it is]\nThe blues scale is the minor pentatonic with one extra note — the 'blue note' — added to give that crying, expressive blues color. Blue notes are pitches you bend toward or pass through to create tension and vocal-like inflection rather than rest on for long.\n\n[Why it matters]\nThe blues scale is the single most common vehicle for beginner improvisation: it instantly makes lines sound soulful and works over blues, rock, and many pop progressions. Learning to use the blue note tastefully teaches you the difference between tones that rest and tones that pull, which is the heart of expressive phrasing.\n\n[How to practice]\nStart from a minor pentatonic shape you already know and add the blue note, playing the scale slowly so you hear where the new tone creates tension. Practice approaching the blue note from below and above, sliding or bending into it, and resolving it to a stable neighbor rather than landing on it. Improvise short licks over a simple blues groove, using the blue note as a passing color, and listen for when it adds feeling versus when it sounds out of place.",
+          "successCriteria": "You can play the blues scale cleanly and use the blue note as a passing or bent color tone that resolves naturally, so your lines sound expressive rather than wrong. You can build short blues phrases over a simple groove that use tension and release, and you know when to pass through the blue note versus land on a stable tone.",
+          "sessionsRequired": 7,
           "order": 4,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing",
-          "suggestedLessonIds": [
-            "VNSfej3sPII",
-            "LNe3bdHBdp4",
-            "kHYfCNrW-M4",
-            "Ib5qv48K7ww"
+          "lessons": [
+            {
+              "videoId": "Pf1xm5DXLjs",
+              "title": "What nobody teaches you about the BLUES SCALE",
+              "channelName": "Paul Davids",
+              "thumbnailUrl": "https://i.ytimg.com/vi/Pf1xm5DXLjs/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "O0Wcz-1secY",
+              "title": "How to Add the Blue Note (The Blues Scale Explained)",
+              "channelName": "Desi Serna | Guitar Music Theory",
+              "thumbnailUrl": "https://i.ytimg.com/vi/O0Wcz-1secY/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         },
         {
-          "id": "c55c0e73-9ae4-491c-b175-9a307e389bad",
-          "title": "Call-and-response timing",
-          "description": "[What it is]\nCall-and-response timing is the idea of playing a short musical phrase (the \"call\") and then leaving a deliberate, timed space for an answer (the \"response\") — either from another musician, a backing loop, or your own follow-up. The skill is about where and how that response lands so the two phrases feel like a musical conversation rather than two independent lines. Timing and the use of silence are as important as the notes you play.\n\n[Why it matters]\nBeing able to trade phrases cleanly makes your improvisation sound purposeful: listeners perceive give-and-take, tension and release, and clearer musical ideas. It also trains you to listen and react rhythmically to other players or tracks, preventing overcrowded playing and creating moments that breathe. Strong call-and-response timing instantly improves the musicality and communication in a group setting or solo performance.\n\n[How to practice]\nRecord a simple phrase or set up a short loop, play a call, then leave different-sized gaps before answering with a complementary phrase; start slow and increase gradually while keeping the answer precisely placed. Practice trading one- and two-phrase exchanges with a partner or a loop, focusing on entering and landing your responses so they feel connected to the call. Vary phrase length and accent placement, and practice using silence intentionally — confident rests often make your responses land more clearly than nonstop playing.",
-          "successCriteria": "Your answers consistently land so they feel like a direct reply to the call rather than overlapping or trailing; pauses sound intentional and enhance the musical line; you can adapt the timing of responses to match a partner or backing track and make exchanges sound conversational and musical.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "call_and_response_phrasing",
-          "suggestedLessonIds": [
-            "WfYhNtcJoGs",
-            "skHz_euslQI",
-            "eN-5gFupRu8",
-            "IcNMpoLAp8U"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "2faf91af-8d48-42d4-92c0-76441af0cb50",
-      "title": "Chord Tones and Harmony",
-      "order": 5,
-      "steps": [
-        {
-          "id": "5fa0d209-13a4-4f2e-a9de-d9e173d06367",
-          "title": "Triad recognition fretboard",
-          "description": "[What it is]\nTriad recognition on the fretboard means immediately seeing and hearing the three-note chord shapes (root, third, fifth) and their inversions wherever you look on the neck. It’s the ability to point to a small cluster of notes and know whether it forms a major, minor, or other basic triad and which note is the root.\n\n[Why it matters]\nTriads are the building blocks of harmony; recognizing them lets you target strong chord tones when soloing, outline chord changes with single-note lines, and choose complementary voicings quickly. When you can spot triads by shape and sound, your improvisations lock to the harmony and sound more intentional.\n\n[How to practice]\nPractice by scanning one region of the neck and naming or playing the three notes that form a triad in different inversions across adjacent string sets, then move that same exercise to other regions. Use a call-and-response drill: hear or play a chord, pause, then find and play a matching triad shape and its inversion; repeat until recognition is instant. Add sung or hummed confirmations—sing the third or root of the triad you see—to connect visual patterns with ear recognition and then apply the shapes as short arpeggio fragments in simple progressions.",
-          "successCriteria": "You can quickly identify and play major and minor triads and their inversions anywhere on the neck, outline chord changes with single-note triad fragments, and reliably choose triad tones when improvising so your lines sound harmonically clear.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "triad_improvisation",
-          "suggestedLessonIds": [
-            "qWS22cV9REg",
-            "eQkfnY2sF-o",
-            "K1Af3F5mZfY",
-            "U9UKn6ycg4s",
-            "mNPmGi4IBXE"
-          ]
-        },
-        {
-          "id": "f89b0163-380c-4d9e-9537-549648c55dbd",
-          "title": "Arpeggio shape fluency",
-          "description": "[What it is]\nArpeggio shape fluency is the ability to play the notes of a chord as clear, repeatable patterns across the neck so your fingers move confidently and without hesitation. It means you can run common arpeggio shapes up and down, keeping each note even and audible while shifting positions smoothly.\n\n[Why it matters]\nArpeggios make the underlying harmony audible inside your single-note lines, so your improvisation sounds like it belongs to the chord changes. They give your solos focused targets to land on and make melodic statements that outline the song’s chords instead of sounding random.\n\n[How to practice]\nPractice a few simple arpeggio shapes slowly in any comfortable area of the neck, repeating small sequences until the motion becomes automatic; aim for clean string crossings and even volume. Vary where you start each shape and practice ascending and descending, then link two or three shapes together so you can move between them smoothly. Add simple rhythmic variation to the same shapes to build musical flexibility rather than just speed.",
-          "successCriteria": "You can move through arpeggio shapes in different places on the neck without pausing, with each note sounding clear and balanced; your lines consistently outline the harmony so listeners hear the chord beneath your solo; you can connect shapes smoothly and use simple rhythmic variations while staying accurate.",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "mini_arpeggio",
-          "suggestedLessonIds": [
-            "GYwdxHH9Y_k",
-            "kYcRmAA_RVQ"
-          ]
-        },
-        {
-          "id": "800e55da-a484-4f4f-940a-0a5026e550aa",
-          "title": "Targeting chord tones",
-          "description": "[What it is]\nTargeting chord tones means choosing single notes in your improvisation that are members of the underlying chord and deliberately landing on them at important moments. Instead of running only scale patterns, you aim melodic phrases so they emphasize the notes that define each harmony. This creates lines that clearly relate to the chord progression.\n\n[Why it matters]\nWhen your phrases resolve to chord tones, listeners perceive the harmony more clearly and your solo sounds intentional rather than random. Emphasizing those notes makes chord changes feel anchored and gives your phrases stronger musical direction. It also makes it easier for a band or backing track to lock in with what you play.\n\n[How to practice]\nChoose a simple chord sequence and, for each chord, pick one or two chord tones to target on the strong beats; play short, small phrases that land on those tones and then expand the surrounding notes. Practice humming or singing the target tone before you play it to strengthen the ear connection, then repeat the same idea in different positions on the neck. Start with very small note sets and slow movement, then gradually allow passing and embellishing notes between targets as it feels secure.",
-          "successCriteria": "Your improvised lines consistently land on chord tones at key moments so the harmony reads clearly; solos sound intentional and connected to each chord; you can choose and hit target notes without pausing to think, and you can move between targets smoothly as chords change.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "chord_tone_improvisation",
-          "suggestedLessonIds": [
-            "NmLmJIEXTQo"
-          ]
-        },
-        {
-          "id": "73d7e78c-78c3-43d1-9ac0-0833f15451b0",
-          "title": "Guide-tone movement",
-          "description": "[What it is]\nBuilding on your targeting chord tones, guide-tone movement is the practice of following the small, inner-note shifts that define how one chord turns into the next. Instead of playing full chords or long scalar runs, you focus on the two or so voices that carry the harmony’s direction and move them smoothly from chord to chord. This creates simple melodic lines that outline the progression without extra clutter.\n\n[Why it matters]\nGuide-tone motion reveals the essential harmonic changes so your playing sounds more connected and intentional; listeners hear the chord progression even when you play sparsely. It makes both comping and improvisation sound more “inside” the harmony because the important color notes are emphasized and resolved. Developing this awareness helps your lines target chord changes naturally, making solos and fills land more convincingly.\n\n[How to practice]\nPick a short, common chord progression and isolate the inner voices that change between chords; sing or play just those voices as you move through the progression. Practice connecting those voices by moving them stepwise or with the smallest possible interval, then add a simple, complementary top voice or bass note once the motion is secure. Work in small sections, start slow and increase speed as accuracy improves, and repeat the same motion in different neck areas to build fluency and recognition.",
-          "successCriteria": "You can play or sing the essential inner voices through a chord progression so the harmony reads clearly, with those voices moving smoothly and predictably between chords. Your comping or single-line ideas will sound like they ‘fit’ the changes because the important color notes are being connected deliberately.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "guide_tone_voice_leading"
-        },
-        {
-          "id": "6490b5be-d9cd-4ff9-93d9-86844ae05f56",
-          "title": "Voice-leading basics",
-          "description": "[What it is]\nVoice-leading is the practice of connecting one harmony to the next by moving individual notes smoothly, so the overall sound flows rather than jumping. Think of it as creating small melodic links between harmonies so each transition feels natural and sung rather than mechanical.\n\n[Why it matters]\nGood voice-leading makes progressions sound coherent and helps melodies or accompaniment tell a musical story—listeners hear motion inside the harmony, not just blocky changes. It also gives your comping and improvisation more direction: simple, small note moves can imply the same harmony more clearly than large jumps or full re-voicings.\n\n[How to practice]\nStart by isolating one or two voices and practice moving them to the closest note that fits the next harmony, keeping other voices steady when possible. Work with short two- or three-chord progressions, play only the connecting voices as single lines, and listen for smooth, stepwise motion; repeat slowly and increase spacing of practice so the ear learns to hear the connection. Try varying which voice moves so you learn different approaches (moving a bass voice versus an inner voice), and record yourself to judge how natural the transitions sound.",
-          "successCriteria": "Transitions between harmonies sound smooth and purposeful: connecting notes move by small, musical intervals and create clear lines that imply the changes. You can play or pick out one- or two-note lines that outline a progression without sounding jumpy, and you can choose which voice moves so the harmony still reads clearly.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "guide_tone_voice_leading"
-        },
-        {
-          "id": "e0457e01-1242-44bf-a999-fd8a1790369c",
-          "title": "Tonality ear training",
-          "description": "[What it is]\nTonality ear training is the ability to hear and name the music's \"home\" note or center, sense whether a passage sounds stable or tense, and notice when the harmony shifts to a new center. It also means recognizing which individual tones fit comfortably with the current harmony and which ones create purposeful tension.\n\n[Why it matters]\nFor improvisation, this skill lets you pick notes that either resolve or push the music in a deliberate way, so your lines sound intentional rather than random. It helps you follow harmonic movement by ear, anticipate where phrases will land, and make melodic choices that communicate direction and emotion.\n\n[How to practice]\nWork with short backing loops: hum or sing the perceived home note, then play or sing single notes and judge whether each one feels like it belongs or creates tension; confirm by listening for resolution. Use call-and-response drills where you listen to a short phrase and then reproduce the tonal center before improvising over it, and gradually introduce deliberate \"outside\" tones and practice naming or identifying them by ear. Short, focused daily sessions that compare stable versus tense sounds and that force you to articulate the center will build this skill quickly.",
-          "successCriteria": "You can reliably hum or play the perceived home note of a backing progression, tell whether a given note fits the current harmony or creates tension, adjust your choices in real time to resolve or sustain tension, and detect when the harmony shifts to a new center.",
+          "id": "12ef06ca-e9d0-436b-9fb8-8e8eea7d5a15",
+          "title": "Scale-degree awareness",
+          "description": "[What it is]\nScale-degree awareness is the habit of hearing and thinking of each step of a scale as a numbered, functional place in a melody. Instead of treating notes as isolated sounds, you recognize their role — whether they feel like a resting point, a push toward resolution, or a colorful passing tone.\n\n[Why it matters]\nKnowing scale degrees turns improvisation from random picking into intentional storytelling: you can aim for notes that create rest, tension, or motion and shape phrases that resolve satisfyingly. That intention makes lines sound musical and purposeful, and it gives you simple targets when responding to a chord or backing sound.\n\n[How to practice]\nGive each scale step a number and sing or speak those numbers while playing short melodies so the sound and label connect. Do call-and-response drills where you improvise a short phrase and then identify the degree of the final note, and practice improvising while deliberately aiming for a chosen degree to feel how it changes the phrase. Use a single sustained pitch or simple backing sound to hear how each degree behaves against a harmonic center; start slow and increase speed as recognition becomes automatic.",
+          "successCriteria": "You can hear and name which scale degree a short melody note belongs to without long thought. You can intentionally target a chosen degree during short improvised phrases and make lines that clearly create tension and resolution. Recognition and selection of degrees feel immediate when you sing or play.",
           "sessionsRequired": 8,
           "order": 5,
           "suggestedExerciseId": "sing_what_you_play",
-          "suggestedLessonIds": [
-            "3F0U1kXlaUQ",
-            "NmLmJIEXTQo"
+          "lessons": [
+            {
+              "videoId": "tojM1qapHSU",
+              "title": "Learn Scale Degrees - Music Theory for Guitar Players",
+              "channelName": "Signals Music Studio",
+              "thumbnailUrl": "https://i.ytimg.com/vi/tojM1qapHSU/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "qHyHXF2lyLg",
+              "title": "Practical Music Theory #3: Scale Degrees & Intervals",
+              "channelName": "Song Notes by David Pots",
+              "thumbnailUrl": "https://i.ytimg.com/vi/qHyHXF2lyLg/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "PSUKRB_G6N0",
+              "title": "Names of Scale Degrees - Three Minute Music Theory #26",
+              "channelName": "Three Minute Music Theory",
+              "thumbnailUrl": "https://i.ytimg.com/vi/PSUKRB_G6N0/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
+          ]
+        },
+        {
+          "id": "fbaa72d1-fcd9-4f76-976c-be61d169b14c",
+          "title": "Interval recognition",
+          "description": "[What it is]\nBuilding on your scale-degree awareness, interval recognition is the skill of hearing and identifying the distance between two pitches — whether they sound together or one after the other. It gives clear, repeatable landmarks for choosing notes, shaping melodic direction, and remembering phrases by ear.\n\n[Why it matters]\nStrong interval recognition shortens the gap between what you hear in your head and what your hands play. Intervals become reliable landmarks, so your note choices feel intentional rather than accidental and you can recall and reproduce phrases by ear instead of hunting for them.\n\n[How to practice]\nDo short, focused drills: listen to two tones and decide if they form a small step or a larger leap, and whether they move up or down; sing the interval back before you play it. Alternate melodic examples (notes in sequence) with harmonic examples (notes at the same time), and use call-and-response with an app, teacher, or recording to reinforce recognition. Gradually increase variety so you can identify interval quality (more consonant versus more tense) and reproduce it on the guitar in a comfortable position. Avoid relying only on visual shapes under the left hand — that builds fingering but poor aural recall — always check both the direction and the size of an interval, and include short melodic phrases rather than only isolated intervals so the skill transfers directly to improvisation.",
+          "successCriteria": "You can hear and name common interval sizes and their direction, sing an interval on demand, and reliably reproduce that interval on the guitar when improvising or transcribing. Intervals become usable landmarks so your note choices feel intentional rather than accidental.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "earTrainingEasy",
+          "lessons": [
+            {
+              "videoId": "OaQPdxy9YXQ",
+              "title": "Practice Guitar Scales Like This // Intervals & Triads",
+              "channelName": "Hayes Griffin",
+              "thumbnailUrl": "https://i.ytimg.com/vi/OaQPdxy9YXQ/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "77JzblP6URE",
+              "title": "INTERVALS | Music Theory Ep. 5",
+              "channelName": "Paul Davids",
+              "thumbnailUrl": "https://i.ytimg.com/vi/77JzblP6URE/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            },
+            {
+              "videoId": "FcKPXVKPJsc",
+              "title": "Intervals: The Key To Understanding Everything On Guitar",
+              "channelName": "Andrew Clarke",
+              "thumbnailUrl": "https://i.ytimg.com/vi/FcKPXVKPJsc/mqdefault.jpg",
+              "duration": 0,
+              "score": 0
+            }
           ]
         }
       ]
     },
     {
-      "id": "bde38cca-3986-49fa-ad07-7d1323400302",
-      "title": "Phrasing and Musical Application",
-      "order": 6,
+      "id": "68cf8bc7-e461-4bc4-8474-79b83c236671",
+      "title": "Rhythm and Phrasing",
+      "order": 2,
       "steps": [
         {
-          "id": "fd425dc4-eecd-47ee-9285-05cd1f441819",
-          "title": "Simple solo construction",
-          "description": "[What it is]\nSimple solo construction is the process of building a short, coherent solo by combining small melodic ideas into a clear musical sentence. It focuses on using motifs (brief, repeatable ideas), contrast, and deliberate beginnings and endings so your solo feels like a story rather than a sequence of random notes. The goal is unity and direction: memorable snippets linked together with intent.\n\n[Why it matters]\nLearning to construct simple solos gives your playing purpose — listeners can follow a theme and feel phrases develop and resolve. It makes improvisation easier under pressure because you rely on a few strong ideas rather than trying to play everything you know. Well-constructed solos are more musical, communicative, and easier to remember and refine.\n\n[How to practice]\nWork in short blocks: create one small motif, repeat it, then change one element (rhythm, interval direction, or note emphasis) to make a simple variation. Practice connecting two contrasting ideas so the transition feels natural, and practice ending a phrase so it sounds settled; record short attempts and listen for a clear opening, development, and finish. Experiment with leaving deliberate space between phrases, and gradually lengthen the solo by adding another linked motif once each shorter unit sounds strong and intentional.",
-          "successCriteria": "You can play a short solo that uses a couple of recurring motifs, has clear contrast and a felt beginning, middle and end, and sounds deliberate rather than scattered. Listeners perceive phrasing and resolution, and you can repeat or slightly vary your motifs on demand.",
-          "sessionsRequired": 8,
+          "id": "017aad65-b301-4147-a336-9a3f57e125c4",
+          "title": "Rhythmic subdivision",
+          "description": "[What it is]\nRhythmic subdivision is the skill of dividing a steady beat into smaller, even parts so you can place notes and rests precisely between pulses. Think of it as the grid under your rhythm: halves, thirds, quarters, and smaller groupings that tell you exactly when to play or hold. Learning to hear and feel those smaller units lets you make timing choices that are intentional instead of accidental.\n\n[Why it matters]\nSubdivision gives your playing clear timing and more expressive options—it’s what makes a phrase land on the beat, sit behind it, or push ahead of it. It also makes syncopation, precise rests, and controlled accents possible, so your improvisation sounds deliberate and musical. When you can subdivide reliably, you’ll lock tighter with other players and shape phrases that feel rhythmically confident.\n\n[How to practice]\nStart by working with a steady pulse and speak or clap the smaller subdivisions while you play a simple melody: first split the pulse in two, then three, then four, and notice how the notes line up. Practice moving accents onto different subdivisions and ending short phrases on various subdivision points so you learn control over placement. Use a steady reference sound to check accuracy, start slow and increase speed only after subdivisions feel even and consistent, and alternate listening-focused drills with hands-on playing so the feeling and the execution match.",
+          "successCriteria": "You can consistently hear and tap subdivisions while playing simple phrases, placing notes and rests precisely between the main pulses. Phrases start, end, and accent on chosen subdivisions without losing the steady underlying beat, and simple syncopations feel intentional rather than accidental. Your timing stays steady when you shift accents or split the pulse into different groupings.",
+          "sessionsRequired": 7,
           "order": 0,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing",
-          "suggestedLessonIds": [
-            "-El2m16TS5o",
-            "aHPJdU9h_RU",
-            "H6ar_P0xmYY",
-            "fg1n_i-D7v0",
-            "jI2_DEelq3w"
-          ]
+          "suggestedExerciseId": "rhythm_training_easy"
         },
         {
-          "id": "9bd4bf2b-5aaa-4212-af20-aa0821e397a3",
-          "title": "Improvising over progressions",
-          "description": "[What it is]\nImprovising over progressions means making up melodies in the moment that move together with a series of changing chords. It’s about reacting to each harmonic change so your phrases feel connected to the underlying sequence, creating a solo that tells a musical story from start to finish.\n\n[Why it matters]\nWhen you can improvise over progressions your playing fits the song — solos sound intentional rather than random. That skill helps you communicate with other musicians, lock into the form of a tune, and shape phrases that resolve naturally as the harmony moves.\n\n[How to practice]\nLoop a short, simple chord sequence and sing or hum ideas before trying them on the guitar; this trains your ear and makes phrasing more musical. Work one chord at a time at first (play a small idea while the chord sounds), then connect those ideas so they lead into the next chord; repeat and vary a small motif across the progression to build coherence. Leave deliberate space in your lines and record short takes to listen back, picking one small area to improve each session. Start slow and expand the length and complexity of your ideas as confidence grows.",
-          "successCriteria": "Solos sound like coherent musical sentences that outline the chord changes: phrases start, develop, and resolve in ways that clearly relate to each chord change; you can craft and vary motifs across the progression and respond in real time to the harmony.",
-          "sessionsRequired": 8,
+          "id": "fc38ea96-aa69-4636-8f35-cc2bb3d0b931",
+          "title": "Playing with metronome",
+          "description": "[What it is]\nPlaying with a metronome means sounding your phrases against a steady click so the beat becomes a fixed reference. The click is a neutral timing anchor that shows whether your notes and rests happen exactly where you intend. It’s not a metronome for its own sake but a mirror for your internal pulse.\n\n[Why it matters]\nA reliable internal pulse makes improvisation feel confident and musical — your ideas land where you mean them and sit comfortably with other players. The metronome exposes tendencies like rushing or lagging that are hard to detect while you play, and it gives a clear way to measure improvement. Once timing is steady, you gain freedom to use slight pushes or delays intentionally as expressive choices.\n\n[How to practice]\nBegin by playing simple, comfortable phrases while aligning their beginnings and ends with the click; listen to whether each note sits on or between clicks. Work toward internalizing the pulse by practicing with the click on for some passes, then silent in your head for others, and by starting and stopping cleanly in time. Increase challenge gradually: hold longer phrases through silent gaps, vary where your phrase enters relative to the click, and record short takes to check consistency.",
+          "successCriteria": "You maintain a steady pulse that matches the click without needing constant correction, start and stop phrases cleanly in time, and your recordings show consistent timing through rests and transitions; you can also place phrases slightly ahead of or behind the beat on purpose and hear the effect.",
+          "sessionsRequired": 7,
           "order": 1,
-          "suggestedExerciseId": "improv_prompt_easy",
-          "suggestedLessonIds": [
-            "9YDevp0mz3I",
-            "RzheY9rjPfo",
-            "OaQJKZ-EYSA",
-            "U1e0tvpIGEg",
-            "YOEgFAp2NbQ"
-          ]
+          "suggestedExerciseId": "rhythm_training_easy"
         },
         {
-          "id": "0828dd89-a464-4292-8a5a-4e8d19186072",
-          "title": "Dynamics and space",
-          "description": "[What it is]\nDynamics and space means controlling how loud or soft you play and intentionally leaving silence between phrases. Dynamics covers volume shades and accents; space is the deliberate use of rests and gaps so musical lines can breathe. Together they shape your lines so they read like spoken sentences instead of a nonstop stream of notes.\n\n[Why it matters]\nUsing dynamics and space makes your improvisation expressive: quiet passages build tension, louder notes release it, and silence highlights important moments. These choices help listeners follow motifs and make your solos memorable, while also giving the rest of the band room to breathe. Played well, dynamics and space turn technical ability into musical storytelling.\n\n[How to practice]\nPick a short, comfortable phrase and repeat it, experimenting with soft, medium, and accented versions, then add a deliberate rest after the phrase to hear the difference. Record short runs where you intentionally leave gaps and contrast loud and soft sections; compare takes to learn which choices create interest. Practice controlling your attack (lighter vs. stronger pick/finger contact) and train yourself to stop playing when nothing needs saying instead of filling every moment.",
-          "successCriteria": "Your phrases show clear loud/soft shaping and accents that change how the line feels; silences sound intentional and make following notes land with more impact. Solos contain memorable moments and breathing space rather than constant note density, and you can reliably change volume and leave gaps on command. Listeners consistently perceive tension and release in your playing.",
-          "sessionsRequired": 8,
+          "id": "01c59997-8ec7-4de0-9e9b-2ffdbdf87b0e",
+          "title": "Syncopation basics",
+          "description": "[What it is] Syncopation is the art of placing accents, notes, or silences away from the strong, expected pulses so the rhythm surprises the ear while a steady underlying beat remains implied. On guitar this often shows up as accented short notes, delayed attacks, tied notes, or well-timed rests that create forward motion and tension.\n\n[Why it matters] Syncopation is a primary tool for making phrases feel alive, grooving, and conversational instead of mechanical. It helps your lines interact with the rhythm section, adds emotional contrast, and makes simple licks sound more interesting without changing the notes themselves.\n\n[How to practice] Keep a steady internal pulse, then practice placing single accents on the weaker moments between pulses by clapping or speaking them first, then moving those accents to the guitar. Work with short exercises that trade back and forth between accented off-pulses and silence, practice delaying or anticipating an attack until it feels natural, and record yourself to confirm the pulse stays steady while your accents shift. Gradually increase complexity—longer phrases, tied notes, and varied rest placement—only after the basic accents feel comfortable.",
+          "successCriteria": "You can place clear accents on off-beats while the underlying pulse stays steady; your phrases create a sense of push or surprise without sounding rushed. Listeners can still feel the beat while your playing moves across it, and you can use rests and delayed attacks to make simple lines feel musical and groovy.",
+          "sessionsRequired": 7,
           "order": 2,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing",
-          "suggestedLessonIds": [
-            "416rgou7Ijo",
-            "8R4Ab4-FxX4",
-            "Wu9PpJWjXRg"
-          ]
+          "suggestedExerciseId": "strumming_pattern_25"
         },
         {
-          "id": "6c3c452a-ce01-41c5-878b-933b9cff163d",
-          "title": "Bend and vibrato usage",
-          "description": "Bend and vibrato usage is the controlled act of altering a note's pitch for expression: a bend raises (or releases) pitch by pushing/pulling the string, and vibrato produces a steady oscillation around a sustained pitch using wrist or finger motion. These techniques make single-note lines sing, add emotional shading, and help your phrases feel alive and vocal. Develop them by practicing controlled, repeatable bend motions to hold stable pitch, then add a focused wrist- or finger-driven vibrato at the peak; work in small, deliberate repetitions, listen for steady intonation, and gradually vary width and speed for musical effect.",
-          "successCriteria": "Bends consistently reach and hold the intended pitch without wobble and return cleanly; vibrato is even and musical, with controllable width and speed. You can sustain a bent note, add vibrato at the peak, and deploy both techniques purposefully within improvised phrases so they enhance phrasing rather than distract.",
+          "id": "0737cae6-f134-406b-a6b6-599ca2808ccb",
+          "title": "Rest and phrasing",
+          "description": "[What it is]\nRest and phrasing are how you shape musical sentences by combining played notes with deliberate silence. A rest is an intentional pause; phrasing is the choice of where to start, stop, breathe, and group notes so a line feels like a sentence rather than a continuous stream. Together they control the contour, emphasis, and momentum of your improvisation.\n\n[Why it matters]\nUsing silence gives your lines weight: a well-placed rest creates tension, makes what comes next more meaningful, and helps listeners follow your musical ideas. Good phrasing prevents runs from sounding mechanical, highlights important tones, and makes call-and-response between your ideas — or between you and the band — clear and expressive. Resting also creates space for the rhythm and groove to be heard, which makes your playing feel musical instead of busy.\n\n[How to practice]\nPlay short melodic shapes then stop, listening to how the silence changes the phrase; vary the length of the pause to feel its effect. Practice answering a short played idea with silence instead of filling every gap — record and listen for which pauses added clarity or tension. Experiment with ending phrases early, delaying the next entry, and using rests near the end of a line to create expectation; focus on making pauses sound intentional, not like mistakes.",
+          "successCriteria": "Your improvised lines have clear breath: rests sound deliberate and enhance tension or release, not like accidental gaps. Phrases feel like sentences with beginnings and endings, and listeners can hear motives returning and evolving because you leave space around them. You can stop yourself from filling every gap and use silence to make single notes or short motifs stand out.",
           "sessionsRequired": 8,
           "order": 3,
-          "suggestedExerciseId": "bend_and_release",
-          "suggestedLessonIds": [
-            "39mhhYpaFS0",
-            "v7hTZgHtI9Q",
-            "Rwr-kIZA740",
-            "jC7f2aNNOoQ",
-            "TrYWfqO2qmc"
-          ]
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
         },
         {
-          "id": "3ee9af4a-c094-438f-a85c-27f3d9458877",
-          "title": "Motif development",
-          "description": "[What a motif is]\nA motif is a short, repeatable musical idea — a small rhythm and melody that can be recognized when it returns. Think of it as a musical sentence fragment you can repeat, alter, and move around to build larger phrases.\n\n[Why it matters]\nUsing motifs gives your improvisation shape and makes solos memorable instead of a string of unrelated notes. Developing a motif creates direction and narrative: listeners hear a pattern, expect variation, and are rewarded when you answer or transform it.\n\n[How to practice]\nChoose a tiny idea (two to four notes or a short rhythm) in any comfortable position and play it clearly, then repeat it with one small change each time — change the rhythm, move it up or down, reverse its order, add a short slide or rest, or alter an accent. Practice turning that single idea into a short call-and-response: state the motif, answer it with a variation, then return to the original. Gradually string several variations together so the motif evolves across several measures; focus on clarity, small incremental changes, and using silence and dynamics to make the motif stand out.",
-          "successCriteria": "You can state a brief idea and recognize it when it returns, create several clear variations on it, and weave those variations into a solo so listeners perceive a coherent theme and development. Your improvised lines will feel purposeful—motifs reappear, transform, and lead naturally from one phrase to the next.",
+          "id": "011d8a6b-f772-4cdf-bb0c-74c96014a2e9",
+          "title": "Accent placement",
+          "description": "[What it is]\nAccent placement is the deliberate choice of which notes, beats, or syllables you emphasize inside a phrase so they stand out against surrounding sounds. It’s a musical decision about loudness, timing and articulation that gives a line shape and intention rather than a steady stream of equal notes. Building on your rhythmic foundation, accents can fall on strong beats, weak beats, or offbeats to change the feel without changing the notes.\n\n[Why it matters]\nAccents turn a sequence of notes into a clear musical sentence: they create tension and release, mark phrase openings and closings, and communicate swing or push. Thoughtful accenting helps your improvised lines lock with the groove and draws listeners’ attention to your melodic choices. Good accent placement makes even simple material sound intentional and expressive.\n\n[How to practice]\nChoose a short melodic pattern and repeat it while consciously moving the accent around — try the first note, then a middle note, then an offbeat — and listen to how the phrase’s meaning changes. Record short runs, compare different accent choices, and aim for clarity: the accented note should be noticeably stronger or slightly longer without disrupting steady time. Gradually increase variety: accent on weaker subdivisions, use a ghosted approach before an accent, and practice transferring accents while maintaining your pulse and dynamics.",
+          "successCriteria": "You can place accents deliberately so they’re clearly audible and change the phrase’s direction without losing steady time; accented notes feel intentional and communicate groove or emphasis to a listener. You can move the accent within a repeated pattern and hear how it alters phrasing, and you can apply accent choices consistently while soloing so lines have clearer shape and stronger musical statements.",
           "sessionsRequired": 8,
           "order": 4,
+          "suggestedExerciseId": "chromatic_accents"
+        },
+        {
+          "id": "287df68d-4a5d-4c74-b181-90c5cf6f157b",
+          "title": "Dynamics control",
+          "description": "[What it is]\nDynamics control is the intentional shaping of loudness when you play — how soft or loud each note, chord, or phrase is produced. It covers small changes (a gentler pluck) and larger contrasts (a quiet opening that grows into a strong finish). On guitar those choices come from how you attack the strings, how you damp or sustain them, and how you shape the contour of a phrase over time.\n\n[Why it matters]\nDynamics make phrases expressive: they create contrast, guide the listener's ear, and give improvisation a sense of direction and emotion. Clear dynamic choices help your lines either sit back with the accompaniment or stand out when you want them to command attention. Even simple melodies become musical statements when their loudness is managed purposefully.\n\n[How to practice]\nPractice repeating a short, comfortable phrase and deliberately vary its volume across takes, listening for steady timing and clean tone as you change loudness; start slow and increase fluidity. Work on smooth crescendos and decrescendos inside single phrases, and practice producing the same note at different volumes using lighter and firmer attacks, plus gentle palm or thumb damping to shape sustain. Record short runs to compare and refine control, then apply the same attention to longer improvised lines.",
+          "successCriteria": "You can play the same phrase at distinctly different volumes without altering timing or intonation; you can create smooth soft-to-loud and loud-to-soft shapes inside phrases; your lines reliably sit or cut through an accompaniment when you want them to, and dynamic choices sound deliberate rather than accidental.",
+          "sessionsRequired": 6,
+          "order": 5,
+          "suggestedExerciseId": "dynamic_crescendo"
+        }
+      ]
+    },
+    {
+      "id": "7b3e1a92-2c4d-4f6a-9e1b-5a8c3d2f7e10",
+      "title": "Harmony for Improvisers",
+      "order": 3,
+      "steps": [
+        {
+          "id": "4d7f2b54-6e0a-4c8b-8f3d-9a5b1e4c8d60",
+          "title": "Triads and chord tones",
+          "description": "[What it is]\nTriads are the three-note building blocks (root, third, fifth) that form basic chords, and chord tones are those same notes seen from the melodic side — the pitches that most strongly belong to a chord. Learning to find a chord's triad on the neck means you can see the strongest target notes for any chord at a glance.\n\n[Why it matters]\nChord tones are the anchors that make improvised lines sound connected to the harmony. When you know the triad of the chord you are playing over, you know exactly which notes will sound resolved and which add tension, which removes guesswork and makes your phrases outline the progression clearly.\n\n[How to practice]\nFor each common chord, locate its root, third, and fifth in one position and play them as a small shape, saying the note names so you connect them to fretboard knowledge. Practice finding the same triad in two or three places on the neck, then improvise tiny phrases that begin or end on a chord tone. Move a single triad through a short progression so you see how the target notes shift from chord to chord, and combine chord tones with neighboring scale notes to hear stable versus colorful tones.",
+          "successCriteria": "You can locate the root, third, and fifth of common chords in at least one position and recognize them as the strongest target notes while improvising. Your short phrases land on chord tones at chord changes so the harmony is audible, and you can trace a triad through a simple progression.",
+          "sessionsRequired": 8,
+          "order": 0
+        },
+        {
+          "id": "5e8a3c65-7f1b-4d9c-9a4e-0b6c2f5d9e71",
+          "title": "Chord progressions basics",
+          "description": "[What it is]\nA chord progression is the ordered sequence of chords that gives a song its harmonic story. This skill is about hearing and understanding common progressions — like I-IV-V or ii-V-I — as functional motion (home, away, tension, return) rather than as random chords, and knowing which key they belong to.\n\n[Why it matters]\nImprovisation is a response to harmony, so you have to know what the chords are doing. Recognizing common progressions lets you anticipate changes, choose scales that fit the key, and aim for the right target tones before the chord even arrives. It turns reacting into predicting.\n\n[How to practice]\nLearn a few of the most common progressions in one key and play their chords while naming each one's function (the home chord, the tension chord, the resolution). Listen to simple songs and try to hear when the harmony leaves home and when it returns, then play a single scale over the whole progression and notice how the same note feels different against each chord. Practice predicting the next chord by ear, and improvise simple lines that emphasize the home tone when the progression resolves.",
+          "successCriteria": "You can recognize and play a few common progressions, name what each chord is doing (home, tension, resolution), and identify the key. You can anticipate where a progression is heading and choose notes that fit, emphasizing resolution when the harmony returns home.",
+          "sessionsRequired": 8,
+          "order": 1
+        },
+        {
+          "id": "b537298f-4efb-40e9-bb48-4b1d15b26950",
+          "title": "Chord–scale relationship",
+          "description": "[What it is]\nThe chord–scale relationship is the practical link between the chords playing underneath and the pool of scale notes you choose from when improvising. It means knowing which scale tones sound stable against a given chord (the chord tones) and which tones add color or tension (the non-chord tones). Practically, it lets you match single-note choices to the changing harmony so your lines sound like they belong to the chords.\n\n[Why it matters]\nUsing chord–scale awareness makes solos feel intentional instead of random; landing on chord tones at chord changes gives a sense of resolution, while tasteful use of color tones creates movement and interest. It also helps you predict which notes will clash and which will blend, so you can shape phrases that outline the underlying progression. Developing this sense is what turns random runs into musical sentences that communicate the song's harmony.\n\n[How to practice]\nFor each chord in a progression, identify its chord tones and then sing or play short phrases that emphasize those tones on the chord changes; make small motifs that move from a chord tone to a nearby color tone and back. Practice connecting those motifs smoothly through the changes so your lines trace the harmony rather than leap around it. Gradually increase variety: use arpeggio outlines, approach chord tones from stepwise motion or short neighbor tones, and listen for which choices feel resolved versus tense.",
+          "successCriteria": "Your improvised lines consistently land on chord tones at the moments the harmony changes, and your use of non-chord tones sounds deliberately colorful rather than accidental. Phrases outline the underlying chords clearly so a listener can sense the progression, and you can choose notes that either reinforce or gently contrast the current chord when you want to add tension.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "chord_tone_improvisation"
+        },
+        {
+          "id": "6f9b4d76-8a2c-4e0d-8b5f-1c7d3a6e0f82",
+          "title": "Arpeggios over chords",
+          "description": "[What it is]\nAn arpeggio is the notes of a chord played one at a time instead of together. Arpeggiating over a progression means outlining each chord melodically by running through its chord tones, so your line spells out the harmony note by note.\n\n[Why it matters]\nArpeggios are the most direct way to make a solo follow the chords, because every note you play belongs to the current chord. They give you a reliable source of strong target tones, smooth voice-leading between chords, and a way to sound 'inside' the harmony even with simple ideas. They bridge raw scales and truly harmony-aware lines.\n\n[How to practice]\nLearn the arpeggio shape for a common chord in one position and play it slowly up and down, naming the chord tones. Then play it over a backing of that chord and make short melodic fragments from its notes rather than running it straight. Move the arpeggio through a simple progression, connecting the nearest chord tone of one chord to the next so lines flow smoothly, and mix arpeggio notes with neighboring scale tones so the outline sounds musical rather than mechanical.",
+          "successCriteria": "You can play arpeggios for common chords in at least one position and use their notes to outline a progression so the harmony is clearly audible in your single-note lines. You connect chord tones smoothly from one chord to the next and blend arpeggios with scale tones to make musical, harmony-aware phrases.",
+          "sessionsRequired": 8,
+          "order": 3
+        },
+        {
+          "id": "7a0c5e87-9b3d-4f1e-9c6a-2d8e4b7f1a93",
+          "title": "Twelve-bar blues form",
+          "description": "[What it is]\nThe twelve-bar blues is a short, repeating chord form built from just three chords arranged in a fixed twelve-measure pattern. It is the most common framework in blues, rock, and early pop, and it gives you a predictable map of where the chords go and when they change.\n\n[Why it matters]\nLearning one standard form means you always have a place to apply everything else — scales, target tones, phrasing, and licks — over real, moving harmony. Because the form repeats and is widely known, it is the ideal playground for jamming with others and for building solos that follow changes rather than sitting on one chord.\n\n[How to practice]\nMemorize the order and timing of the three chords until you can feel the changes coming without counting. Play the blues or pentatonic scale over the whole form first, then start aiming for a chord tone each time the chord changes so your lines track the harmony. Practice marking the arrival of each chord with a target note, leave space at the turnaround, and gradually build short solos that develop an idea across the full twelve bars over a backing.",
+          "successCriteria": "You can hear and feel the twelve-bar blues changes without counting, play a fitting scale over the whole form, and aim for chord tones as the chords change so your solo follows the harmony. You can develop a simple idea across the full form and handle the turnaround, making the solo feel connected to the changes rather than static.",
+          "sessionsRequired": 8,
+          "order": 4
+        },
+        {
+          "id": "ccc94ce0-b0db-4f77-88bc-a7465df02be1",
+          "title": "Call-and-response phrases",
+          "description": "[What it is]\nCall-and-response is musical conversation: you play a short phrase (the \"call\") and then play a second phrase (the \"response\") that answers, mirrors, or contrasts it. The response can echo the rhythm or shape of the call, provide a contrasting idea, or complete the musical sentence so the two phrases feel linked.\n\n[Why it matters]\nThis skill trains you to listen and react in real time, turning isolated licks into coherent musical ideas. It gives solos structure, helps with pacing and space, and makes your playing sound like a conversation rather than a string of unrelated notes.\n\n[How to practice]\nPick a simple, short call and practice several different responses: echo it, change the rhythm, flip the contour, or end on a resolving tone. Work with a loop or a short backing phrase, leave deliberate space after the call, and focus on making the response feel like an answer (clear start, purposeful direction, and a satisfying end). Record short call-and-response exchanges, listen back, and tweak choices until the pair sounds connected and expressive; gradually vary length and complexity as it becomes natural.",
+          "successCriteria": "You can play a clear call and follow with distinct, purposeful responses that sound connected (echoing, contrasting, or resolving the call), use silence effectively between phrases, and make short exchanges that form complete musical ideas across a simple harmonic backdrop.",
+          "sessionsRequired": 7,
+          "order": 5,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        }
+      ]
+    },
+    {
+      "id": "c9c8eeb6-343d-422a-901f-94d26a566e44",
+      "title": "Patterns, Licks, Motifs",
+      "order": 4,
+      "steps": [
+        {
+          "id": "c96d1d21-fca8-49f3-a1a9-c2cb6400c3bf",
+          "title": "Pentatonic motifs",
+          "description": "[What it is]\nBuilding on your familiarity with the pentatonic scale, pentatonic motifs are short, repeatable melodic cells—usually a few notes—that act as identifiable musical ideas. They combine a specific pitch shape plus a rhythmic signature so the ear recognizes them when you repeat or vary them. Use motifs as the atoms of a solo: repeat, truncate, sequence, or ornament them to make longer, coherent phrases.\n\n[Why it matters]\nMotifs give your improvisation unity and personality: a few strong motifs make a solo sound intentional rather than a string of random licks. They make it easier to develop ideas on the fly, create call-and-answer moments with the accompaniment, and build tension and release by changing rhythm or pitch emphasis. Consistent motif use helps listeners follow your musical story and makes your playing more memorable.\n\n[How to practice]\nPick a very short pentatonic shape and lock its rhythm; repeat it until it sounds deliberate, then make three small changes—move the rhythm, change the ending note, or shorten it—and repeat again. Sequence that motif to other positions on the neck, keeping its contour, then practice answering the motif with a different one or with silence to create space. Record short runs where you establish one motif and develop it over a phrase; focus on clean articulation, rhythmic variation, and tasteful small ornaments rather than speed.",
+          "successCriteria": "You can state a short pentatonic motif clearly, repeat and vary it so it remains recognizable, move or sequence it across the neck while preserving its contour, and use rhythmic changes or small ornaments to develop it into longer, cohesive phrases that sound intentional and memorable.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "improv_prompt_easy"
+        },
+        {
+          "id": "0ab8cd67-7d47-49c0-aac0-e29e55c1fe1d",
+          "title": "Connecting scale fragments",
+          "description": "[What it is]\nConnecting scale fragments means joining short, bite-sized melodic cells so they read as one continuous musical line. You do this by choosing small connector motions — stepwise approaches, short passing tones, repeated rhythmic tags, or tiny arpeggio snippets — that bridge the gap between fragments. The aim is to make the move between ideas sound deliberate and melodic rather than like two separate licks stitched together.\n\n[Why it matters]\nSeamless connections turn isolated phrases into coherent musical sentences that hold a listener's attention and show clear direction. They let you develop an idea across several measures, move across the neck or register smoothly, and control tension and release through small, purposeful choices. When connections are fluid the improvisation feels like a conversation instead of a patchwork of quotations.\n\n[How to practice]\nPick two short fragments and practice linking them by inserting one or two stepwise or chromatic approach notes, or by repeating a rhythm that carries through the change; try several connector shapes and choose the ones that preserve melodic flow. Practice shifting register or position at the connector so the phrase continues without an audible break — start slow and increase gradually. Vary the rhythmic treatment of the connector (hold it, shorten it, syncopate it) until the link becomes a musical option you can call on spontaneously. Record short examples and listen back for any places the ear hears a jump; rework those spots until the transition feels inevitable rather than accidental.",
+          "successCriteria": "Lines that use multiple fragments sound like single, continuous phrases: transitions are smooth, intentional, and preserve melodic direction. You can improvise short 4–8 bar ideas that develop one motif across register or position changes without audible breaks, and you can choose different connector shapes to change the feel of the same phrase.",
+          "sessionsRequired": 8,
+          "order": 1,
           "suggestedExerciseId": "call_and_response_phrasing"
         },
         {
-          "id": "9945e26d-2feb-4816-bb0c-2abb2a5339e5",
-          "title": "Transcription practice",
-          "description": "[What it is]\nTranscription practice means listening closely to short guitar phrases or solos and figuring out exactly what you hear, then playing or writing them down from memory. It's about matching pitch, rhythm, timing nuances, and the way notes are shaped rather than relying on someone else's tab. Treat each snippet as a small puzzle to decode by ear.\n\n[Why it matters]\nThis trains the ear to recognize intervals, rhythmic shapes, and expressive detail, so borrowed ideas become internalized vocabulary rather than copies you forget. Transcribing reveals practical phrasing, note choices, and timing that you can adapt into your own improvisation. Over time it shortens the gap between hearing a line and being able to play a similar idea spontaneously.\n\n[How to practice]\nWork on very short clips — loop a small phrase and first hum or clap its rhythm until it's stable in your head. Then find the pitches on the guitar and write a simple reference (tab, notation, or a quick description) so you can check accuracy. Use audio slowing tools sparingly to catch tricky bits, compare your result to the original, and repeat until you can play the phrase from memory and transplant its shape into different musical contexts.",
-          "successCriteria": "You can accurately reproduce short phrases by ear so that pitch, rhythm, and phrasing feel match the recording; you can record or notate what you’ve transcribed well enough to recall it later; you can hum a phrase and then play it, and comfortably adapt its shape into your own improvised lines.",
+          "id": "be130882-8870-4665-8284-a1662c5766f6",
+          "title": "Transposing licks",
+          "description": "[What it is]\nTransposing licks means taking a short melodic idea and moving it intact to a different tonal center so the intervallic shape and rhythmic character stay the same while the starting pitch changes. It’s about preserving the contour, phrasing, and relative steps of a lick rather than copying exact finger positions. The goal is to make one musical cell usable in many harmonic situations.\n\n[Why it matters]\nBeing able to transpose quickly makes your vocabulary flexible: a favorite riff becomes usable over different chords, keys, and positions without sounding out of place. It also trains your ear and fretboard mapping so you recognize the same musical idea across the neck and adapt it to changing harmony. As a result your solos will sound more coherent and creative because you can recycle and develop strong ideas wherever the progression goes.\n\n[How to practice]\nChoose one short lick and first sing or hum its shape so you internalize the intervals, then play it starting from a different pitch and check that the relative distances match what you hear. Practice shifting the whole phrase up and down the neck, keeping articulation (slides, bends, hammer-ons, vibrato) and rhythm consistent, and focus on landing cleanly on the important notes. Work deliberately: transpose to a few different tonal centers, then try the same lick over different chord qualities and make small adjustments so it fits harmonically. Gradually increase the number of licks you can transpose and aim to hear the transposition before you play it.",
+          "successCriteria": "You can move a chosen lick to any comfortable tonal center and it sounds natural and in tune; the phrase keeps its original contour, rhythm, and articulation while fitting the new harmony. Shifts happen smoothly without pausing to search, and you can hear the transposed version mentally before playing. You can also adapt the same lick to at least two different chord qualities while preserving its musical identity.",
           "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "play_by_ear"
+          "order": 2,
+          "suggestedExerciseId": "sing_what_you_play"
         },
         {
-          "id": "eafc5cf2-ea60-44ee-b019-ee1df4ae64f2",
-          "title": "Performance and jamming",
-          "description": "[What it is]\nPerformance and jamming is the skill of playing with other people or in front of an audience while listening and reacting in real time. It means making musical choices that fit the group—when to play, when to support, when to stop—and communicating through sound and simple cues.\n\n[Why it matters]\nThis skill turns practiced lines and patterns into music that communicates and connects with others. Good jamming builds confidence, helps you hear how your parts fit in the mix, and trains you to respond to unexpected choices from bandmates without losing the feel.\n\n[How to practice]\nPractice by playing with a partner, a small group, or backing tracks, taking turns leading and following; start slow, increase gradually. Work on clear entry and exit cues, short call-and-response exchanges, and intentional use of space and dynamics; record sessions and listen back to identify moments that worked and where you crowded or disappeared.",
-          "successCriteria": "You can enter and leave a jam cleanly, support the group sonically, trade short solos or ideas that sound intentional, and react musically to others without disrupting the groove. Your playing shows awareness of space and dynamics, and you can listen, adapt, and contribute in a way listeners hear as musical and confident.",
+          "id": "6077837c-aa65-4f2b-ad83-2dca1373d647",
+          "title": "Phrase embellishments",
+          "description": "[What it is]\nPhrase embellishments are the small, tasteful additions you add to a melodic idea to make it sound personal and expressive. They include brief extra notes, tiny pitch inflections, slight timing nudges, or small changes in attack and duration that decorate a basic phrase without changing its core shape. Used well, they make a simple line sound like a conversation rather than a mechanical repeat.\n\n[Why it matters]\nEmbellishments turn repeating motifs into varied, memorable statements and help you convey mood and intent when improvising. They make your playing more dynamic and keep listeners engaged because the same idea is presented with subtle surprise each time. Tasteful use also helps you sit better with the underlying harmony and rhythm by choosing when to add color and when to stay plain.\n\n[How to practice]\nChoose a short phrase and practice adding one small change at a time: a quick extra note, a slight change in pitch, a tiny slide into the note, a different attack, or a short rhythmic delay; keep the rest of the phrase unchanged and listen for what sounds right. Record or loop a backing figure, try each embellishment slowly, then compare the plain phrase to the decorated version so you can hear which choices enhance the line. Gradually combine two decorations, keep phrasing sparse at first, and habitually ask whether each embellishment serves the musical idea rather than just filling space.",
+          "successCriteria": "You can take a simple melodic phrase and add a small, tasteful decoration that sounds intentional and musical; the embellishment feels natural, is cleanly executed, and enhances the phrase without overcrowding it. Listeners can hear the original idea beneath the ornament, and you can choose when to leave a phrase plain or decorated to support the groove and mood.",
+          "sessionsRequired": 7,
+          "order": 3,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "259b0671-9242-4e9d-af7c-390e8f7f3443",
+          "title": "Rhythmic variations",
+          "description": "[What it is]\nRhythmic variations are about changing the timing and shape of a phrase without changing its pitches — making the same notes feel different by altering when they start, how long they last, and where the accents land. You use small changes (longer or shorter note values, brief gaps, displaced downbeats, or shifted accents) to create new rhythmic versions of the same musical idea.\n\n[Why it matters]\nRhythmic variation is what makes improvisation feel alive: it creates contrast, surprise, and forward motion so your playing doesn't sound repetitive. Healthy use of timing choices helps phrases fit the groove, convey different moods, and draw the listener's ear to different parts of your line.\n\n[How to practice]\nBuilding on your rhythmic foundation, choose a short two- or four-bar phrase and make several distinct rhythmic versions of it: lengthen or shorten notes, insert tiny silent spaces, start the phrase later in the bar, or break it into quicker subdivisions. Record or listen back to each version and pick the ones that feel most musical; then repeat them until the timing is confident and intentional. Start slow and increase speed only after each variation stays clean and in the pocket.",
+          "successCriteria": "You can take a simple phrase and produce multiple clearly different rhythmic versions that lock with the underlying groove; the variations feel intentional (not accidental) and change the emotional character of the line; you can displace a phrase and land it confidently so the timing adds contrast rather than confusion.",
+          "sessionsRequired": 6,
+          "order": 4,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        }
+      ]
+    },
+    {
+      "id": "8ea862b7-411c-4dce-8bfd-2e00d68e920b",
+      "title": "Improvisation Concepts",
+      "order": 5,
+      "steps": [
+        {
+          "id": "b31df206-3aea-460c-8263-4d033e763a3a",
+          "title": "Target-tone approach",
+          "description": "[What it is]\nThe Target‑tone approach is a way of thinking about each phrase as aiming for a specific chord‑defining note. You choose one note inside the current chord as the destination and shape your line so it arrives there with intent. Approaches can be stepwise, use passing (including chromatic) notes, small bends, or rhythmic anticipation to make the arrival musical.\n\n[Why it matters]\nLanding on chord‑defining tones makes your single‑note lines clearly outline the harmony, so solos sound connected to the progression rather than random. Targets create clear phrase destinations, which strengthens tension and release and helps listeners follow chord changes. Using targets also focuses your note choices and reduces guessing when improvising.\n\n[How to practice]\nChoose a short progression and pick one clear target tone per chord; improvise short phrases whose goal is to land on that tone, experimenting with stepwise approaches, chromatic leads, or small embellishments. Practice arriving on the target at different rhythmic placements and then connect successive targets so your lines voice‑lead smoothly through the changes. Record short runs, listen for how clearly the harmony is outlined, and iterate: vary approaches and keep the phrases short until landing on the target feels intentional and natural.",
+          "successCriteria": "You reliably end or resolve short phrases on the chosen chord tones so the harmony is audible through your lines; targets can be approached in multiple ways (step, chromatic, ornament) without losing clarity; phrases connect across changes with a sense of direction and purpose.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "chord_tone_improvisation"
+        },
+        {
+          "id": "5f2e358a-b9e4-490e-9743-2b3ca1a5ffc8",
+          "title": "Guide-tone concept",
+          "description": "[What it is]\nGuide-tones are the small set of chord tones that most strongly define a harmony’s identity—typically the third and seventh of a chord. Played as short two-note lines or inner-voice movements, they act like a roadmap that tells the ear which chord is sounding without playing the full chord.\n\n[Why it matters]\nUsing guide-tones makes your solos and comping sound harmonically precise and conversational: a few well-placed guide-tones can imply complex changes and create smooth voice-leading between chords. They help your phrases land on notes that resolve naturally and make harmonic motion perceptible even when you’re using sparse lines.\n\n[How to practice]\nIsolate progressions and play only the guide-tones as simple two-note lines, aiming for minimal movement between successive chords so you hear the voice-leading clearly. Turn those two-note cells into short motifs, vary their rhythm and add passing or approach tones to taste, then check that each phrase clearly implies the underlying harmony. Practice calling and answering with just guide-tone statements so you learn to support a chord change with the fewest, most effective notes.",
+          "successCriteria": "You consistently hit the guide-tones on chord changes and your lines make the harmony obvious with only one or two notes; voice-leading between chords is smooth (small, logical shifts) and your improvisations sound harmonically grounded and intentional rather than vague.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "34303f14-af87-467d-9d30-6a6907c2026f",
+          "title": "Motivic development",
+          "description": "[What it is]\nMotivic development is the practice of taking a small musical idea and shaping it as you play so the solo feels like one conversation instead of a series of unconnected lines. You restate a short motif and evolve it gradually rather than abandoning it after one statement.\n\n[Why it matters]\nIt makes your improvisation memorable, logical, and emotionally satisfying by turning repetition into evolution; listeners can follow a single idea growing across the solo instead of hearing scattered licks.\n\n[How to practice]\nChoose a very short idea (a two- or three-note figure or a tiny rhythm) and repeat it, making only one small change each time: alter the rhythm, stretch or shorten note lengths, change the contour, add a tiny embellishment, or insert a rest. Work in short chains — statement, variation, response — then link those chains so the motif grows across several phrases; record and listen to how the idea changes. Keep the changes deliberate and small so the original idea stays recognizable, and start slow, adding speed and complexity only when the variations feel natural. Don't over-change the idea until it disappears or repeat it mechanically without listening — each variation should answer what you just played — and resist introducing a new motif too soon; let the first idea breathe and evolve before moving on.",
+          "successCriteria": "Your solo contains a short idea that returns in recognizable form while changing over time; listeners can hear a through-line. Variations feel purposeful (small rhythmic or melodic edits) rather than random, and you can carry the motif across several phrases without losing its identity. Playing and listening back, you can point to how one phrase grew into the next.",
+          "sessionsRequired": 9,
+          "order": 2,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "8b1d6f98-0c4e-4a2f-8d7b-3e9f5c8a2b04",
+          "title": "Modes introduction",
+          "description": "[What it is]\nModes are scales that share the same set of notes but start from a different home tone, so each one has its own characteristic flavor and mood. This introductory skill is about understanding that idea — same notes, different center — and recognizing the sound of a few of the most useful modes rather than memorizing all seven at once.\n\n[Why it matters]\nModes are the foundation for the color choices you make when improvising; without grasping how a shifted home note changes a scale's mood, modal coloring stays abstract. A basic feel for a brighter mode versus a darker one gives you a vocabulary for matching the sound of your lines to the emotional character you want.\n\n[How to practice]\nTake a scale you already know and play it starting and resolving on a different note, listening to how the mood changes even though the notes are the same. Focus on one or two contrasting modes at a time, find each one's characteristic tone (the note that gives it its flavor), and improvise short phrases that highlight that tone over a single sustained chord or drone. Compare two modes back to back over the same backing so the difference in color is obvious to your ear before you add speed or complexity.",
+          "successCriteria": "You understand that modes share notes but differ by home tone, and you can hear and produce the contrasting moods of at least two modes over a drone or static chord. You can find and emphasize a mode's characteristic tone in short phrases, giving you a basic palette of colors to draw on before refining it in modal coloring.",
+          "sessionsRequired": 7,
+          "order": 3
+        },
+        {
+          "id": "5b4dec6b-b745-407e-885f-e928a1eebf2b",
+          "title": "Modal coloring",
+          "description": "[What it is]\nModal coloring is the practice of choosing or emphasizing particular modal flavors (the different modal scales) when you improvise so the same harmony takes on a distinct mood. Rather than changing the chords, you change which tones you bring forward so the progression sounds brighter, darker, more open, or more tense. Those characteristic \"color\" tones are what give each mode its identity.\n\n[Why it matters]\nUsing modal color gives you immediate expressive variety—one progression can feel like several different pieces just by shifting the modal emphasis. It helps your solos and phrases tell a clearer emotional story and makes your choices sound intentional instead of random. Listeners will sense the change even if they can't name the theory behind it.\n\n[How to practice]\nChoose a simple chord progression in any comfortable position and play the same short phrase repeatedly while swapping modal flavors; for each flavor, deliberately highlight the mode’s characteristic color tone(s) by holding them a little longer, sliding into them, or slightly altering articulation. Record short runs and compare how the mood shifts when those tones are present versus when they are avoided, and repeat the exercise with different rhythmic placements and small melodic variations. Start slow, increase gradually, and focus on making the modal change obvious to your ear before adding speed or complexity.",
+          "successCriteria": "You can make a single progression sound clearly different by emphasizing a chosen modal color; listeners notice a consistent mood change when you highlight the mode’s color tones; your improvised phrases naturally include and resolve to those tones without sounding forced.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "one_chord_improv"
+        },
+        {
+          "id": "d58e7953-6260-483e-8f8d-5dbec5c81ed3",
+          "title": "Dynamics storytelling",
+          "description": "[What it is]\nDynamics storytelling is the deliberate use of volume, touch and note intensity to shape a solo like a narrative — with quiet moments, building motion, and pointed climaxes. It includes micro-choices (how hard you attack a note, how long you let it breathe) and macro-arcs (how a phrase grows or recedes over several bars). The goal is to make your playing feel like a sequence of purposeful gestures rather than a continuous, even stream of notes.\n\n[Why it matters]\nClear dynamic shapes guide the listener through your ideas: they signal beginnings, highlight important phrases, create tension and release, and make motifs stand out when repeated. Dynamics also increase emotional impact: the same melodic idea can feel intimate, urgent, or triumphant depending on how you shape its intensity. Well-shaped dynamics make solos memorable and give your accompaniments room to respond.\n\n[How to practice]\nPick a short melodic idea and play several versions that differ only in intensity and touch: whisper it, state it firmly, then build it into a bold statement, listening for contrast between each version. Work on smooth crescendos and decrescendos across a phrase so changes feel intentional, and record A/B takes to judge whether quiet parts remain clear and loud parts remain controlled. Practice designing a full solo arc beforehand (opening, development, peak, resolution) and execute it while listening critically for balance and emotional trajectory.",
+          "successCriteria": "Your solos have recognizable emotional arcs (introductory intimacy, gradual build, clear peak, and a satisfying resolution). Repeated motifs are distinguished by dynamic choices so the listener can follow their development. Quiet passages remain present and expressive; louder passages feel purposeful, not accidental. Bandmates or listeners can anticipate and respond to the shape of your phrases rather than just individual notes.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "dynamic_crescendo"
+        },
+        {
+          "id": "3ae0870f-77f0-4db0-8df1-0a51f9510c9e",
+          "title": "Trading fours",
+          "description": "[What it is]\nBuilding on your motivic development, trading fours is a short, back-and-forth solo conversation where players alternate delivering four-bar musical statements. Each turn is a concise musical sentence: present a clear idea, shape it, and stop so the other player can answer. The constraint of four bars forces focus on economy, rhythmic placement, and memorable phrasing.\n\n[Why it matters]\nTrading fours trains real-time listening, quick decision-making, and ensemble awareness because you must react to what the other player just played and fit your idea into a tight window. It sharpens dynamics, tension/release, and the ability to create contrast between successive statements, which makes group improvisation more engaging. Repeated trading builds confidence in taking risks and in crafting short, effective solos.\n\n[How to practice]\nStart with a partner or a steady loop and alternate strictly every four bars; begin with simple motifs and concentrate on clean entrances and clear endings, starting slow and increasing gradually. Practice specific goals for each turn (answering, repeating, varying rhythm, or using space) and intentionally reference an element your partner used rather than launching an unrelated idea. Record trades to evaluate whether your entries are punctual, whether your replies develop or contrast the previous statement, and to fine-tune dynamics and phrasing.",
+          "successCriteria": "You and your partner deliver distinct four-bar statements that feel like a conversation: entries are clean, turns do not overlap, and each reply clearly references or contrasts the previous idea. Listeners can follow recurring motifs and perceive tension/release across exchanges; you can take a turn that builds, answers, or changes direction confidently. Playing feels interactive rather than soloistic, with controlled dynamics and purposeful use of space.",
           "sessionsRequired": 8,
           "order": 6,
-          "suggestedExerciseId": "improv_prompt_easy",
-          "suggestedLessonIds": [
-            "V1QefxAM1tI"
-          ]
+          "suggestedExerciseId": "call_and_response_phrasing"
+        }
+      ]
+    },
+    {
+      "id": "6ff15353-aacc-4d1e-bf2f-b3b7e511ee19",
+      "title": "Full Improvisation Integration",
+      "order": 6,
+      "steps": [
+        {
+          "id": "de8cc0ab-af3c-430a-8711-b7d68504721e",
+          "title": "Improvisation checklist",
+          "description": "[What it is]\nA short, portable list of the small decisions and checks you run through before and during an improvised solo: the song section you're entering, the simple sonic setup you want, a one-line goal for the phrase, and a safe fallback you can use if things go sideways. It’s not a full plan for every note — it’s a lightweight map that keeps choices clear and reduces hesitation.\n\n[Why it matters]\nHaving a checklist turns improvisation from a scramble of options into a series of deliberate, reversible choices, so your lines feel intentional and you recover cleanly from mistakes. It also speeds learning: when you consistently evaluate the same handful of items, weak spots show up faster and become fixable.\n\n[How to practice]\nWrite a short checklist of 4–8 concrete items that fit your needs (for example: confirm song section, set tone/volume, pick one simple idea to start, decide on when to leave space, choose a fallback pattern, note a mood or target). Use it before each practice or jam, then run quick mock solos where the only rule is to follow the checklist; refine the list from what trips you up. Over time make the checklist compact enough to run in a few seconds so it becomes an automatic pre-solo habit.",
+          "successCriteria": "You can mentally run the checklist in a few seconds and make a clear, repeatable decision set before and during solos; you recover cleanly using your fallback without breaking time; your improvisations show more consistency in shape and purpose, and recordings reveal steady, targeted improvement tied to checklist items.",
+          "sessionsRequired": 5,
+          "order": 0
+        },
+        {
+          "id": "af243412-bba0-4c73-b2a6-9729881ce728",
+          "title": "Jam with backing",
+          "description": "[What it is]\nJamming with backing means improvising live over a prerecorded or live accompaniment while listening and reacting to the harmonic and rhythmic context. You play short ideas, connect them into longer statements, and shape your solo to the feel and arrangement you hear. The goal is musical conversation: your lines should respond to and influence the backing, not just run through patterns.\n\n[Why it matters]\nThis skill trains real-time musical decision‑making: choosing when to enter, when to leave space, how to build tension and release, and how to shape a complete solo rather than a string of unrelated licks. It also develops listening skills for texture, dynamics, and changes in the accompaniment so your playing feels integrated. Playing with backing is the closest practice to performing with other musicians, so it builds confidence and musicality faster than isolated drills.\n\n[How to practice]\nStart each session by listening to the backing for a full pass before you play — notice the energy, instrument layers, and places where the arrangement opens up. Improvise in short, repeatable phrases, answer the track’s rhythmic or melodic cues, and deliberately leave space between ideas; then expand those phrases into longer statements over multiple choruses. Record several takes, compare them, and focus each practice on one change: entrances/exits, dynamic contrast, rhythmic placement, or creating a clear solo arc from quiet beginning to a strong resolution. Finally, vary the accompaniment style (sparser vs. busier) so you learn to adapt your choices to different textures and band roles.",
+          "successCriteria": "You enter and exit confidently in ways that fit the backing, sustain musical shape across multiple choruses, and choose phrases that respond to the accompaniment. Your solos use space and dynamic contrast, repeat and develop ideas so sections feel connected, and you can adjust intensity to match sparser or busier backings. Recorded takes show clear improvement, and you can comfortably carry a song-length solo without losing orientation to the accompaniment.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "improv_prompt_easy"
+        },
+        {
+          "id": "74912f12-e001-4b6b-b392-b5950ff1376d",
+          "title": "Building solos",
+          "description": "[What it is]\nA solo is a sequence of connected musical phrases you play over a song that together make a short, coherent statement. It’s less about nonstop notes and more about ideas — an opening idea, some development, a peak moment, and a satisfying ending. Think of it like telling a very short story with your instrument.\n\n[Why it matters]\nA built solo gives the song personality and keeps listeners engaged; it turns technical ability into expressive communication. When your solos have shape and contrast they become memorable, not just flashy. Developing this skill also makes improvising more intentional and repeatable, so you can recreate good moments reliably.\n\n[How to practice]\nOutline a simple plan before you play: choose an opening phrase, two or three ways to vary it, a place to increase intensity, and a closing phrase that feels finished. Work in short blocks — create a motif, repeat it with small changes, leave space, then push toward a peak and resolve. Record, listen back, pick one motif that works, and practice linking and varying it until the whole solo reads as a single, purposeful arc.",
+          "successCriteria": "You can craft a solo with a clear beginning, development, high point, and resolution that sounds intentional rather than random; you repeat and vary a short motif so listeners can recognize it; and you can reproduce and alter that motif reliably when you play again.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "call_and_response_phrasing"
+        },
+        {
+          "id": "faa59791-5d71-4e51-b96e-01f3c0f1b7b4",
+          "title": "Ear-based soloing",
+          "description": "[What it is]\nEar-based soloing means you hear or imagine a melodic idea first and then translate it to the guitar. It’s about matching sung or heard shapes to the fretboard, choosing notes that fit the harmony by listening rather than relying on memorized patterns. The focus is on pitch relationships, contour, and how notes resolve against the underlying chords.\n\n[Why it matters]\nThis skill makes your solos sound intentional and connected to the music—they respond to the band and the moment instead of repeating stock licks. Playing from your ear lets you express musical ideas more naturally and creates memorable, singable phrases. It also improves musical memory and helps you adapt when the harmony or feel changes on the fly.\n\n[How to practice]\nHum or sing short melodies and immediately find and play them, then vary them slightly until the translation becomes automatic; record and compare to correct tuning and shape. Use short looped progressions or a repeated groove and do call-and-response drills (sing → play, play → sing) and focused transcription of brief solos by ear only. Gradually expand phrase length, emphasize pitch accuracy and contour, and practice choosing tones that create clear tension and release against the chords.",
+          "successCriteria": "You can reliably sing or imagine a short melodic idea and play it on the guitar with accurate pitch and musical shape; your solos respond to the harmony, create clear tension/release, and feel communicative rather than pattern-driven.",
+          "sessionsRequired": 12,
+          "order": 3
+        },
+        {
+          "id": "8e72c689-f393-48d3-aeaa-ccbdfb9ed67a",
+          "title": "Recording and critique",
+          "description": "[What it is]\nRecording and critique is the routine of capturing your improvised ideas, listening back with focused ears, and turning observations into concrete practice decisions. It means treating recordings as data: spotting patterns, strengths, and recurring problems you can’t fully perceive while playing.\n\n[Why it matters]\nListening to your own takes gives you objective feedback — it reveals timing slips, overused licks, unclear phrasing, tone inconsistencies, and moments of real musical interest. Regularly critiquing recordings accelerates progress because it converts vague goals into specific, repeatable changes you can train.\n\n[How to practice]\nSet short, focused recording goals (one aspect per take), make brief runs, then listen back and mark exact moments that succeed or need work. Turn each critique into one targeted exercise, re-record to check the result, and occasionally get an outside listener’s brief notes to catch blind spots.",
+          "successCriteria": "You reliably record short improvisations, identify 3–5 concrete issues or highlights per take (e.g., phrasing, repetition, dynamics), design and apply a focused exercise that addresses one issue, and hear measurable improvement across subsequent takes. You can pick the best take and explain in a sentence why it succeeds musically.",
+          "sessionsRequired": 8,
+          "order": 4
         }
       ]
     }
