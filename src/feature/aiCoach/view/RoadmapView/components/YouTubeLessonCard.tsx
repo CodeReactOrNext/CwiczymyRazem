@@ -73,7 +73,7 @@ const YouTubeLessonCard = ({ lesson, className, onClick }: YouTubeLessonCardProp
               {lesson.level}
             </span>
           )}
-          {lesson.duration && (
+          {!!lesson.duration && (
             <span className="flex items-center gap-1 text-[11px] text-zinc-500">
               <Clock className="h-3 w-3" />
               {formatDuration(lesson.duration)}
