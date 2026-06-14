@@ -23,10 +23,16 @@ const LEVEL_STYLES: Record<string, string> = {
 interface YouTubeLessonCardProps {
   lesson: YouTubeLessonResult;
   className?: string;
+  /** Override the default behaviour (open on YouTube) — e.g. open a practice window. */
+  onClick?: () => void;
 }
 
-const YouTubeLessonCard = ({ lesson, className }: YouTubeLessonCardProps) => {
+const YouTubeLessonCard = ({ lesson, className, onClick }: YouTubeLessonCardProps) => {
   const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     window.open(`https://www.youtube.com/watch?v=${lesson.videoId}`, "_blank", "noopener,noreferrer");
   };
 

@@ -49,7 +49,25 @@ export const RigView = ({ data }: RigViewProps) => {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Pedalboard */}
+      {/* Guitars */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Instruments</p>
+          <p className="text-base font-black text-white capitalize tracking-wide">Guitars</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {([0, 1, 2] as const).map((slotIndex) => (
+            <GuitarSlot
+              key={slotIndex}
+              slotIndex={slotIndex}
+              itemId={rig.guitarSlots[slotIndex]}
+              inventory={data.inventory}
+              onOpenPicker={setPickerSlot}
+              onRemove={handleGuitarRemove}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Pedalboard */}
       <div className="flex flex-col gap-3">

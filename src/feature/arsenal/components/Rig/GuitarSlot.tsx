@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { Guitar, Plus, X } from "lucide-react";
 
@@ -21,23 +22,23 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
     return (
       <button
         onClick={() => onOpenPicker(slotIndex)}
-        className="relative flex flex-col items-center justify-center gap-3 rounded border border-dashed border-zinc-700/50 bg-zinc-900/20 min-h-[260px] w-full transition-all duration-200 hover:border-zinc-500/70 hover:bg-zinc-900/50 group overflow-hidden"
+        className={cn(
+          "group flex min-h-[300px] w-full flex-col items-center justify-center gap-3 rounded-lg bg-zinc-900/40 p-4",
+          "transition-background hover:bg-zinc-800/50",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        )}
       >
-        {/* Guitar icon with glow on hover */}
-        <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-zinc-800/40 border border-zinc-700/40 group-hover:border-zinc-600/60 group-hover:bg-zinc-800/70 transition-all duration-200">
-          <Guitar size={28} className="text-zinc-600 group-hover:text-zinc-300 transition-colors duration-200" strokeWidth={1.2} />
-          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-zinc-700/10" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 transition-background group-hover:bg-zinc-700/60">
+          <Guitar size={28} strokeWidth={1.2} className="text-zinc-400 transition-colors group-hover:text-zinc-200" />
         </div>
-
-        {/* Label */}
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[10px] font-black capitalize tracking-widest text-zinc-500 group-hover:text-zinc-300 transition-colors duration-200">
+          <span className="text-sm font-bold text-zinc-300 transition-colors group-hover:text-zinc-100">
             Add Guitar
           </span>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <Plus size={10} className="text-zinc-400" />
-            <span className="text-[8px] font-semibold capitalize tracking-widest text-zinc-400">Choose from collection</span>
-          </div>
+          <span className="flex items-center gap-1 text-xs text-zinc-500">
+            <Plus size={11} />
+            Choose from collection
+          </span>
         </div>
       </button>
     );
@@ -45,47 +46,53 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
 
   return (
     <div
-      className="relative flex flex-col rounded overflow-hidden"
+      className="group relative flex min-h-[300px] flex-col overflow-hidden rounded-lg"
       style={{
-        background: `linear-gradient(160deg, ${rs.baseColor}22 0%, #0f0f12 40%, #0f0f12 100%)`,
-        border: `1px solid ${rs.baseColor}30`,
-        borderBottom: `3px solid ${rs.baseColor}`,
+        background: `linear-gradient(160deg, ${rs.baseColor}22 0%, #0f0f12 42%, #0f0f12 100%)`,
       }}
     >
-      {/* Slot number badge */}
-      <div
-        className="absolute top-2 left-2 z-20 w-5 h-5 flex items-center justify-center text-[9px] font-black rounded"
-        style={{ backgroundColor: `${rs.baseColor}20`, color: rs.baseColor, border: `1px solid ${rs.baseColor}40` }}
-      >
-        {slotIndex + 1}
-      </div>
-
       {/* Remove button */}
       <button
         onClick={() => onRemove(slotIndex)}
-        className="absolute top-2 right-2 z-20 rounded bg-zinc-900/80 border border-zinc-700 p-1 text-zinc-500 hover:text-white hover:border-zinc-500 transition-colors"
+        aria-label="Remove guitar from slot"
+        className={cn(
+          "absolute right-2 top-2 z-20 rounded bg-zinc-900/70 p-1 text-zinc-400",
+          "transition-background hover:bg-zinc-800 hover:text-white",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        )}
       >
-        <X size={12} />
+        <X size={13} />
       </button>
 
       {/* Header */}
-      <div className="px-3 pt-2.5 pb-1">
-        <p className="text-[9px] font-semibold tracking-wide leading-none truncate" style={{ color: rs.baseColor }}>
+      <div className="flex flex-col gap-1 px-4 pt-4">
+        <p className="truncate text-xs font-bold capitalize leading-none" style={{ color: rs.baseColor }}>
           {guitar.brand}
         </p>
-        <p className="text-[15px] font-bold text-white leading-snug truncate">
+        <p className="truncate text-base font-bold leading-snug text-zinc-100">
           {guitar.name}
         </p>
-        <p className="text-[8px] font-medium capitalize tracking-widest mt-0.5" style={{ color: `${rs.baseColor}bb` }}>
-          {guitar.rarity}
-        </p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+          <span className="rounded bg-zinc-800/60 px-2 py-0.5 text-[10px] font-semibold capitalize" style={{ color: `${rs.baseColor}dd` }}>
+            {guitar.rarity}
+          </span>
+          {item.year && (
+            <span className="rounded bg-zinc-800/60 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+              {item.year}
+            </span>
+          )}
+          {item.country && (
+            <span className="truncate rounded bg-zinc-800/60 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+              {item.country}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Image */}
       <div
-        className="flex items-end justify-center overflow-hidden"
+        className="flex flex-1 items-center justify-center overflow-hidden"
         style={{
-          height: 200,
           background: `radial-gradient(ellipse at 50% 100%, ${rs.baseColor}25 0%, ${rs.baseColor}06 45%, transparent 70%)`,
         }}
       >
@@ -93,28 +100,18 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
           src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
           className="-rotate-90 object-contain"
-          style={{ height: 180, width: 180 }}
+          style={{ height: 170, width: 170 }}
         />
       </div>
 
-      {/* Meta */}
-      <div className="flex items-center border-t border-zinc-800/60 min-h-[26px]">
-        {item.year && (
-          <div className="flex-1 flex items-center justify-center py-1 border-r border-zinc-800/60">
-            <span className="text-[8px] font-black text-zinc-500 capitalize tracking-widest">{item.year}</span>
-          </div>
-        )}
-        {item.country && (
-          <div className="flex-1 flex items-center justify-center py-1">
-            <span className="text-[8px] font-black text-zinc-500 capitalize tracking-widest truncate px-1">{item.country}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Edit button */}
+      {/* Change button */}
       <button
         onClick={() => onOpenPicker(slotIndex)}
-        className="w-full py-1.5 text-[9px] font-black capitalize tracking-widest border-t border-zinc-800/60 text-zinc-600 hover:text-white hover:bg-zinc-800/40 transition-colors"
+        className={cn(
+          "w-full py-2 text-xs font-bold capitalize tracking-wide text-zinc-400",
+          "transition-background hover:bg-zinc-800/40 hover:text-zinc-100",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        )}
       >
         Change
       </button>

@@ -1,5 +1,5 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -10,6 +10,7 @@ import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
+import LessonPracticeModal from "./components/LessonPracticeModal";
 import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────
@@ -108,6 +109,74 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
   );
 };
 
+// ─── Step description (parsed [Section] blocks) ─────────────────────────────
+
+interface DescSection {
+  heading: string | null;
+  lines: string[];
+}
+
+function parseDescriptionSections(desc: string): DescSection[] {
+  const out: DescSection[] = [];
+  let current: DescSection | null = null;
+  desc.split("\n").forEach((raw) => {
+    const line = raw.trim();
+    const headingMatch = line.match(/^\[(.+)\]$/);
+    if (headingMatch) {
+      current = { heading: headingMatch[1], lines: [] };
+      out.push(current);
+      return;
+    }
+    if (line === "") return;
+    if (!current) {
+      current = { heading: null, lines: [] };
+      out.push(current);
+    }
+    current.lines.push(line);
+  });
+  return out.filter((s) => s.heading || s.lines.length);
+}
+
+const SECTION_ICONS: { match: RegExp; Icon: typeof Info; color: string }[] = [
+  { match: /what it is/i, Icon: Info, color: "text-sky-400" },
+  { match: /why it matters/i, Icon: Lightbulb, color: "text-amber-400" },
+  { match: /how to (practice|develop|do it)/i, Icon: ListChecks, color: "text-cyan-400" },
+];
+
+const StepDescription: React.FC<{ description: string }> = ({ description }) => {
+  const sections = useMemo(() => parseDescriptionSections(description), [description]);
+  return (
+    <div className="space-y-5">
+      {sections.map((sec, i) => {
+        const meta = sec.heading ? SECTION_ICONS.find((m) => m.match.test(sec.heading as string)) : undefined;
+        const Icon = meta?.Icon ?? Sparkles;
+        return (
+          <div key={i} className="space-y-2">
+            {sec.heading && (
+              <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                <Icon className={`h-3.5 w-3.5 ${meta?.color ?? "text-zinc-500"}`} />
+                {sec.heading}
+              </p>
+            )}
+            <div className="space-y-2 text-sm leading-relaxed text-zinc-300">
+              {sec.lines.map((line, j) =>
+                line.startsWith("- ") ? (
+                  <div key={j} className="flex items-start gap-2.5">
+                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-700" />
+                    <span>{line.slice(2)}</span>
+                  </div>
+                ) : (
+                  <p key={j}>{line}</p>
+                )
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ───────────────────────────────────────────────────────────────────────────
 
 type StepStatus = "not-started" | "in-progress" | "done";
@@ -188,6 +257,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   useEffect(() => { phasesRef.current = phases; }, [phases]);
 
   const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
+  const [practiceLesson, setPracticeLesson] = useState<YouTubeLessonResult | null>(null);
   const [loadingDetailIds, setLoadingDetailIds] = useState<Set<string>>(new Set());
   const [loadingExerciseIds, setLoadingExerciseIds] = useState<Set<string>>(new Set());
 
@@ -286,7 +356,21 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   const allSteps = useMemo(() => phases.flatMap((p) => p.steps), [phases]);
   const doneCount = useMemo(() => allSteps.filter((s) => getStatus(s) === "done").length, [allSteps]);
   const inProgressCount = useMemo(() => allSteps.filter((s) => getStatus(s) === "in-progress").length, [allSteps]);
-  const progress = allSteps.length > 0 ? Math.round((doneCount / allSteps.length) * 100) : 0;
+  // Progress is session-based so partially-practiced steps still move the bar.
+  const { completedSessions, totalSessions } = useMemo(
+    () =>
+      allSteps.reduce(
+        (acc, s) => {
+          const req = s.sessionsRequired || 0;
+          acc.totalSessions += req;
+          acc.completedSessions += Math.min(s.sessionsCompleted || 0, req);
+          return acc;
+        },
+        { completedSessions: 0, totalSessions: 0 }
+      ),
+    [allSteps]
+  );
+  const progress = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
 
   const openDrawer = async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => {
     setDrawerStepId(step.id);
@@ -337,37 +421,19 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     if (!adminMode && !lessonsCache[step.id] && !loadingLessonsId) {
       setLoadingLessonsId(step.id);
       const fetchLessons = async () => {
+        const inline = enrichedStep.lessons ?? [];
+        let fromIds: YouTubeLessonResult[] = [];
         if (enrichedStep.suggestedLessonIds?.length) {
           const firestoreLessons = await firebaseGetLessonsByIds(enrichedStep.suggestedLessonIds);
-          return firestoreLessons.map((l) => ({
+          fromIds = firestoreLessons.map((l) => ({
             videoId: l.videoId, title: l.title, channelName: l.channelName,
             thumbnailUrl: l.thumbnailUrl, duration: l.duration, level: l.level,
             topics: l.topics, score: l.qualityScore ?? 0,
-          })) as YouTubeLessonResult[];
+          }));
         }
-        const res = await fetch("/api/search-youtube-lessons", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            stepTitle: enrichedStep.title, stepDescription: enrichedStep.description || "",
-            roadmapGoal: roadmap.goal, roadmapLevel: roadmap.level,
-          }),
-        });
-        const data = await res.json();
-        const lessons: YouTubeLessonResult[] = data.lessons ?? [];
-        if (lessons.length > 0) {
-          const lessonIds = lessons.map((l) => l.videoId);
-          setPhases((prev) => {
-            const newPhases = prev.map((p) =>
-              p.id !== phase.id ? p : {
-                ...p, steps: p.steps.map((s) => s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }),
-              }
-            );
-            persist(newPhases);
-            return newPhases;
-          });
-        }
-        return lessons;
+        // Inline lessons (authored in the roadmap JSON) take priority; dedupe by videoId.
+        const seen = new Set(inline.map((l) => l.videoId));
+        return [...inline, ...fromIds.filter((l) => !seen.has(l.videoId))];
       };
       fetchLessons()
         .then((lessons) => setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })))
@@ -375,36 +441,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
         .finally(() => setLoadingLessonsId(null));
     }
 
-    if (adminMode) return;
-    if (enrichedStep.suggestedExerciseId || step.suggestedExerciseId) return;
-    setLoadingExerciseIds((prev) => new Set(prev).add(step.id));
-    try {
-      const exRes = await fetch("/api/search-exercise", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          stepTitle: step.title, description: enrichedStep.description || step.description || "",
-          goal: roadmap.goal, level: roadmap.level,
-        }),
-      });
-      const exData = await exRes.json();
-      const firstExId = exData.exercise_ids?.[0] ?? null;
-      if (!firstExId) return;
-      setPhases((prev) => {
-        const phasesWithEx = prev.map((p) =>
-          p.id !== phase.id ? p : {
-            ...p, steps: p.steps.map((s) => s.id !== step.id ? s : { ...s, suggestedExerciseId: firstExId }),
-          }
-        );
-        persist(phasesWithEx);
-        onUpdate?.({ ...roadmap, phases: phasesWithEx, updatedAt: new Date().toISOString() });
-        return phasesWithEx;
-      });
-    } catch (err) {
-      console.warn("Failed to search exercise:", err);
-    } finally {
-      setLoadingExerciseIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
-    }
   };
 
   // ─── Admin helpers ───────────────────────────────────────────────────────
@@ -895,6 +931,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                 const stepsRight = phaseIdx % 2 === 0;
                 const phaseColor = PHASE_COLORS[phaseIdx % PHASE_COLORS.length];
                 const phaseAllDone = phase.steps.every((s) => getStatus(s) === "done");
+                const phaseDone = phase.steps.filter((s) => getStatus(s) === "done").length;
 
                 return (
                   <div key={phase.id} className="flex w-full flex-col py-6 sm:items-center sm:py-10">
@@ -906,6 +943,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
+                        {!phaseAllDone && (
+                          <span className="ml-auto shrink-0 text-[11px] font-medium tabular-nums text-zinc-500">{phaseDone}/{phase.steps.length}</span>
+                        )}
                       </div>
                       <div className="ml-4 flex flex-col gap-3 pl-4">
                         {phase.steps.map((step, stepIdx) => {
@@ -963,6 +1003,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                           {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
                         </span>
                         <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
+                        {!phaseAllDone && (
+                          <span className="text-[11px] font-medium tabular-nums text-zinc-500">{phaseDone}/{phase.steps.length}</span>
+                        )}
                       </div>
 
                       {/* RIGHT column */}
@@ -1197,20 +1240,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                             />
                           </div>
                         ) : (
-                          <div className="space-y-3 text-sm leading-relaxed text-zinc-400">
-                            {drawerInfo.step.description.split("\n").map((line, i) => {
-                              const sectionMatch = line.match(/^\[(.+)\]$/);
-                              if (sectionMatch) return <p key={i} className="mt-4 text-[10px] font-semibold capitalize tracking-widest text-zinc-600 first:mt-0">{sectionMatch[1]}</p>;
-                              if (line.startsWith("- ")) return (
-                                <div key={i} className="flex items-start gap-2.5">
-                                  <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-700" />
-                                  <span className="text-zinc-300">{line.slice(2)}</span>
-                                </div>
-                              );
-                              if (line.trim() === "") return null;
-                              return <p key={i} className="text-zinc-300">{line}</p>;
-                            })}
-                          </div>
+                          <StepDescription description={drawerInfo.step.description} />
                         )}
                       </div>
 
@@ -1342,7 +1372,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                                         <div key={lesson.videoId} className={`rounded-lg ring-1 transition-all ${
                                           isWatched ? "ring-green-500/40" : "ring-zinc-800/60"
                                         }`}>
-                                          <YouTubeLessonCard lesson={lesson} className="rounded-b-none" />
+                                          <YouTubeLessonCard lesson={lesson} className="rounded-b-none" onClick={() => setPracticeLesson(lesson)} />
                                           <button
                                             onClick={() => handleToggleLesson(lesson.videoId)}
                                             className={`flex w-full items-center gap-3 rounded-b-lg border-t px-3 py-3 text-xs font-medium transition-colors ${
@@ -1461,6 +1491,14 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
           </div>
         </>,
         document.body
+      )}
+
+      {practiceLesson && (
+        <LessonPracticeModal
+          lesson={practiceLesson}
+          returnTo={`/ai-coach?roadmapId=${roadmap.id}`}
+          onClose={() => setPracticeLesson(null)}
+        />
       )}
     </>
   );

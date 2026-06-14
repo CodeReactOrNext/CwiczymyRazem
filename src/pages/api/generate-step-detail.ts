@@ -41,7 +41,7 @@ SKILL LEVEL:
 - "Absolute Beginner": plain language, no jargon
 - Other levels: skip basics from prior steps; assume they are mastered
 - successCriteria: what mastery feels/sounds like — no BPM or fret numbers
-- sessionsRequired: a single integer between 6 and 12
+- sessionsRequired: integer 4–14, CALIBRATED to this skill's real difficulty and scope — do NOT default every step to the same number. Quick refinement of an existing motion ≈ 4–6; a substantial new technique or coordination ≈ 7–9; a deep musical skill that needs long-term assimilation (improvising over changes, transcription, ear/tonality, phrasing, motif development) ≈ 10–14. Vary the value across steps to reflect genuine effort.
 
 Return ONLY valid JSON:
 {

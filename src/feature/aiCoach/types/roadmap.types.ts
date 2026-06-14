@@ -1,3 +1,5 @@
+import type { YouTubeLessonResult } from "./youtubeLesson.types";
+
 export interface RoadmapStep {
   id: string;
   title: string;
@@ -9,6 +11,8 @@ export interface RoadmapStep {
   suggestedExerciseId?: string;
   noExercise?: boolean;
   suggestedLessonIds?: string[];
+  /** Lessons authored directly in the roadmap JSON (rendered without a Firestore lookup). */
+  lessons?: YouTubeLessonResult[];
   exerciseCompleted?: boolean;
   completedLessonIds?: string[];
 }
