@@ -7,7 +7,7 @@ export const sweepNeoclassicalExercise: Exercise = {
   whyItMatters: "Sweeping is the ultimate high-speed arpeggio technique. This neoclassical drill focuses on the sync between the picking hand 'sweep' and fretting hand 'rolls', ensuring every note is perfectly separated and articulate.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 6,
   instructions: [
     "Drag the pick across the strings in a single, continuous, sweeping motion.",
     "Roll your fretting fingers to isolate each note and prevent chord bleeding."
