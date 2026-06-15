@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const hybridPickingIndependenceExercise: Exercise = {
   id: "hybrid_picking_independence",
@@ -7,7 +7,7 @@ export const hybridPickingIndependenceExercise: Exercise = {
   whyItMatters: "Hybrid picking bridges the gap between pick control and fingerstyle agility. Using the pick for low strings and fingers for high strings allows you to cross wide string gaps effortlessly, which is essential for modern rock, country, and jazz fusion styles.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
     "Use the pick for lower strings and pluck higher strings with your middle and ring fingers.",
     "Maintain a consistent volume balance between picked and plucked notes."

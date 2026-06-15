@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const stringSkippingMelodicExercise: Exercise = {
   id: "string_skipping_melodic",
@@ -7,7 +7,7 @@ export const stringSkippingMelodicExercise: Exercise = {
   whyItMatters: "Melodic string skips add dramatic pitch changes to your solos. This exercise trains your picking hand to find strings instantly without looking, building excellent spatial accuracy.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 8,
   instructions: [
     "Maintain strict pick control, keeping your hand relaxed during wide jumps.",
     "Ensure notes do not bleed together during string-skipping transitions."

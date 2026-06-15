@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chickenPickinExercise: Exercise = {
   id: "chicken_pickin",
@@ -7,7 +7,7 @@ export const chickenPickinExercise: Exercise = {
   whyItMatters: "Chicken picking is a cornerstone of country and blues lead styles. Snapping the string with your fingers while muting it with your picking hand creates a percussive, high-attack note definition that adds rhythmic energy and dynamic contrast to your playing.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
     "Snap the higher strings aggressively with your middle and ring fingers.",
     "Keep your picking-hand palm rested lightly on the lower strings for instant damping."

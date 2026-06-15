@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const dynamicCrescendoExercise: Exercise = {
   id: "dynamic_crescendo",
@@ -7,7 +7,7 @@ export const dynamicCrescendoExercise: Exercise = {
   whyItMatters: "This exercise trains exact physical control over pick depth and attack velocity. Differentiating volume levels smoothly (crescendo and decrescendo) separates expressive, professional guitarists from mechanical ones.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
     "Execute notes cleanly while suppressing all sympathetic string vibrations.",
     "Audit your dynamic consistency and attack angle using a clean tone.",
@@ -22,7 +22,7 @@ export const dynamicCrescendoExercise: Exercise = {
   examBacking: { url: "/static/sounds/exercise/dynamic-control.mp3", sourceBpm: 70 },
   relatedSkills: ["articulation", "alternate_picking"],
   tablature: [
-    // M1: Crescendo (pp → ff) — gradual volume increase
+    // M1: Crescendo (pp â†’ ff) â€” gradual volume increase
     {
       timeSignature: [4, 4],
       beats: [
@@ -36,7 +36,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 1.0 }] },
       ],
     },
-    // M2: Decrescendo (ff → pp) — gradual volume decrease
+    // M2: Decrescendo (ff â†’ pp) â€” gradual volume decrease
     {
       timeSignature: [4, 4],
       beats: [
@@ -50,7 +50,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 0.1 }] },
       ],
     },
-    // M3: Swell (pp → ff → pp) — crescendo then decrescendo
+    // M3: Swell (pp â†’ ff â†’ pp) â€” crescendo then decrescendo
     {
       timeSignature: [4, 4],
       beats: [
@@ -64,7 +64,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 0.1 }] },
       ],
     },
-    // M4: Subito dynamics — sudden pp↔ff contrast
+    // M4: Subito dynamics â€” sudden ppâ†”ff contrast
     {
       timeSignature: [4, 4],
       beats: [
@@ -78,7 +78,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 1.0 }] },
       ],
     },
-    // M5: Crescendo applied to chromatic line — dynamics + movement
+    // M5: Crescendo applied to chromatic line â€” dynamics + movement
     {
       timeSignature: [4, 4],
       beats: [

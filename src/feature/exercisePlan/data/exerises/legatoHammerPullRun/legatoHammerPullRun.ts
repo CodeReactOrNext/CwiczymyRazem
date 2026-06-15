@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const legatoHammerPullRunExercise: Exercise = {
   id: "legato_hammer_pull_run",
@@ -7,7 +7,7 @@ export const legatoHammerPullRunExercise: Exercise = {
   whyItMatters: "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 3,
   instructions: [
     "Pick only the first note on each string, executing all other notes with legato.",
     "Coordinate string transitions quickly to prevent gaps in the rhythmic flow."
@@ -23,7 +23,7 @@ export const legatoHammerPullRunExercise: Exercise = {
   },
   relatedSkills: ["legato"],
   tablature: [
-    // M1: Ascending 4-note groups — strings 6-5-4-3 at 5th position
+    // M1: Ascending 4-note groups â€” strings 6-5-4-3 at 5th position
     {
       timeSignature: [4, 4],
       beats: [
@@ -53,7 +53,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 6, fret: 8 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 7, isHammerOn: true }] },
       ],
     },
-    // M4: Position shift — ascending at 7th position, strings 6-5-4-3
+    // M4: Position shift â€” ascending at 7th position, strings 6-5-4-3
     {
       timeSignature: [4, 4],
       beats: [
@@ -63,7 +63,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 3, fret: 7 }] }, { duration: 0.25, notes: [{ string: 3, fret: 9, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 10, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 9, isPullOff: true }] },
       ],
     },
-    // M5: Position shift — ascending strings 2-1, then descend
+    // M5: Position shift â€” ascending strings 2-1, then descend
     {
       timeSignature: [4, 4],
       beats: [
@@ -73,7 +73,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 2, fret: 12 }] }, { duration: 0.25, notes: [{ string: 2, fret: 10, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 8, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 10, isHammerOn: true }] },
       ],
     },
-    // M6: Descending at 7th position — strings 3-4-5-6
+    // M6: Descending at 7th position â€” strings 3-4-5-6
     {
       timeSignature: [4, 4],
       beats: [

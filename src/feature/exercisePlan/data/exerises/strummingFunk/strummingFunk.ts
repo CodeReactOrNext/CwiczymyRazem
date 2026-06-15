@@ -1,4 +1,4 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const strummingFunkExercise: Exercise = {
   id: "strumming_funk",
@@ -7,7 +7,7 @@ export const strummingFunkExercise: Exercise = {
   whyItMatters: "Funk rhythm relies heavily on percussive 'scratching' and precise accents. This exercise trains your fretting hand to squeeze the neck only on accented notes and relax to mute the strings on others, building elite hand sync.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 6,
   instructions: [
     "Maintain a constant, rapid 16th-note strumming motion in your right hand.",
     "Squeeze the neck only on accented beats, relaxing instantly to create percussive scratches."
