@@ -51,7 +51,7 @@
           "successCriteria": "You can sing a short melodic idea and immediately play the same phrase on guitar with matching pitch shape, rhythm, and expressive intent; the transition from voice to instrument feels quick and deliberate rather than hesitant.",
           "sessionsRequired": 6,
           "order": 1,
-          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedExerciseId": "sing_what_you_play",
           "lessons": [
             {
               "videoId": "ABqQGxzSoIw",
@@ -70,7 +70,7 @@
           "successCriteria": "You can hear a single target tone and match it on the guitar without hunting, choose appropriate tones that make a phrase feel resolved, and reliably land on those tones within a short musical idea. Phrases sound directed rather than wandering, and you can alternate between singing a target and playing it with consistent accuracy.",
           "sessionsRequired": 8,
           "order": 2,
-          "noExercise": true,
+          "suggestedExerciseId": "earTrainingEasy",
           "lessons": [
             {
               "videoId": "a8MjUOCerrE",
@@ -264,7 +264,7 @@
           "successCriteria": "You can hear and name which scale degree a short melody note belongs to without long thought. You can intentionally target a chosen degree during short improvised phrases and make lines that clearly create tension and resolution. Recognition and selection of degrees feel immediate when you sing or play.",
           "sessionsRequired": 8,
           "order": 5,
-          "suggestedExerciseId": "sing_what_you_play",
+          "suggestedExerciseId": "scale_practice_configurable",
           "lessons": [
             {
               "videoId": "tojM1qapHSU",
@@ -341,7 +341,7 @@
           "successCriteria": "You can consistently hear and tap subdivisions while playing simple phrases, placing notes and rests precisely between the main pulses. Phrases start, end, and accent on chosen subdivisions without losing the steady underlying beat, and simple syncopations feel intentional rather than accidental. Your timing stays steady when you shift accents or split the pulse into different groupings.",
           "sessionsRequired": 7,
           "order": 0,
-          "suggestedExerciseId": "rhythm_training_easy",
+          "suggestedExerciseId": "rhythmic_pocket_mastery",
           "lessons": [
             {
               "videoId": "C1qgok9Djus",
@@ -448,6 +448,7 @@
           "successCriteria": "You can locate the root, third, and fifth of common chords in at least one position and recognize them as the strongest target notes while improvising. Your short phrases land on chord tones at chord changes so the harmony is audible, and you can trace a triad through a simple progression.",
           "sessionsRequired": 8,
           "order": 0,
+          "suggestedExerciseId": "triad_improvisation",
           "lessons": [
             {
               "videoId": "TyUb5O-a9bQ",
@@ -482,6 +483,7 @@
           "successCriteria": "You can recognize and play a few common progressions, name what each chord is doing (home, tension, resolution), and identify the key. You can anticipate where a progression is heading and choose notes that fit, emphasizing resolution when the harmony returns home.",
           "sessionsRequired": 8,
           "order": 1,
+          "suggestedExerciseId": "smooth_chord_transitions",
           "lessons": [
             {
               "videoId": "fCNuaubi95Q",
@@ -543,6 +545,7 @@
           "successCriteria": "You can play arpeggios for common chords in at least one position and use their notes to outline a progression so the harmony is clearly audible in your single-note lines. You connect chord tones smoothly from one chord to the next and blend arpeggios with scale tones to make musical, harmony-aware phrases.",
           "sessionsRequired": 8,
           "order": 3,
+          "suggestedExerciseId": "mini_arpeggio",
           "lessons": [
             {
               "videoId": "fxpn2pf0zf8",
@@ -576,7 +579,7 @@
           "successCriteria": "You can state a short pentatonic motif clearly, repeat and vary it so it remains recognizable, move or sequence it across the neck while preserving its contour, and use rhythmic changes or small ornaments to develop it into longer, cohesive phrases that sound intentional and memorable.",
           "sessionsRequired": 8,
           "order": 0,
-          "suggestedExerciseId": "improv_prompt_easy",
+          "suggestedExerciseId": "hammer_on_pentatonic_run",
           "lessons": [
             {
               "videoId": "aZH5YWOY2Fc",
@@ -611,7 +614,7 @@
           "successCriteria": "Lines that use multiple fragments sound like single, continuous phrases: transitions are smooth, intentional, and preserve melodic direction. You can improvise short 4–8 bar ideas that develop one motif across register or position changes without audible breaks, and you can choose different connector shapes to change the feel of the same phrase.",
           "sessionsRequired": 8,
           "order": 1,
-          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedExerciseId": "scale_practice_configurable",
           "lessons": [
             {
               "videoId": "gkcw9CzLA-A",
@@ -638,7 +641,7 @@
           "successCriteria": "You can locate a chord, its triad shapes, and the surrounding scale in the same area of the neck and move between them without hunting. Your improvised lines outline the harmony using triads and resolve cleanly to chord tones, and you can connect these shapes across positions and through a simple progression with smooth voice-leading.",
           "sessionsRequired": 6,
           "order": 2,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing",
+          "suggestedExerciseId": "triad_improvisation",
           "lessons": [
             {
               "videoId": "E7KBw24O5Jo",
@@ -742,6 +745,7 @@
           "successCriteria": "You understand that modes share notes but differ by home tone, and you can hear and produce the contrasting moods of at least two modes over a drone or static chord. You can find and emphasize a mode's characteristic tone in short phrases, giving you a basic palette of colors to draw on before refining it in modal coloring.",
           "sessionsRequired": 7,
           "order": 2,
+          "suggestedExerciseId": "one_chord_improv",
           "lessons": [
             {
               "videoId": "a6d7dWwawd8",
@@ -809,7 +813,8 @@
           "description": "[What it is]\nA short, portable list of the small decisions and checks you run through before and during an improvised solo: the song section you're entering, the simple sonic setup you want, a one-line goal for the phrase, and a safe fallback you can use if things go sideways. It’s not a full plan for every note — it’s a lightweight map that keeps choices clear and reduces hesitation.\n\n[Why it matters]\nHaving a checklist turns improvisation from a scramble of options into a series of deliberate, reversible choices, so your lines feel intentional and you recover cleanly from mistakes. It also speeds learning: when you consistently evaluate the same handful of items, weak spots show up faster and become fixable.\n\n[How to practice]\nWrite a short checklist of 4–8 concrete items that fit your needs (for example: confirm song section, set tone/volume, pick one simple idea to start, decide on when to leave space, choose a fallback pattern, note a mood or target). Use it before each practice or jam, then run quick mock solos where the only rule is to follow the checklist; refine the list from what trips you up. Over time make the checklist compact enough to run in a few seconds so it becomes an automatic pre-solo habit.",
           "successCriteria": "You can mentally run the checklist in a few seconds and make a clear, repeatable decision set before and during solos; you recover cleanly using your fallback without breaking time; your improvisations show more consistency in shape and purpose, and recordings reveal steady, targeted improvement tied to checklist items.",
           "sessionsRequired": 5,
-          "order": 0
+          "order": 0,
+          "suggestedExerciseId": "improv_prompt_easy"
         },
         {
           "id": "af243412-bba0-4c73-b2a6-9729881ce728",
@@ -818,7 +823,7 @@
           "successCriteria": "You enter and exit confidently in ways that fit the backing, sustain musical shape across multiple choruses, and choose phrases that respond to the accompaniment. Your solos use space and dynamic contrast, repeat and develop ideas so sections feel connected, and you can adjust intensity to match sparser or busier backings. Recorded takes show clear improvement, and you can comfortably carry a song-length solo without losing orientation to the accompaniment.",
           "sessionsRequired": 8,
           "order": 1,
-          "suggestedExerciseId": "improv_prompt_easy"
+          "suggestedExerciseId": "improv_prompt_medium"
         },
         {
           "id": "74912f12-e001-4b6b-b392-b5950ff1376d",
@@ -826,8 +831,7 @@
           "description": "[What it is]\nA solo is a sequence of connected musical phrases you play over a song that together make a short, coherent statement. It’s less about nonstop notes and more about ideas — an opening idea, some development, a peak moment, and a satisfying ending. Think of it like telling a very short story with your instrument.\n\n[Why it matters]\nA built solo gives the song personality and keeps listeners engaged; it turns technical ability into expressive communication. When your solos have shape and contrast they become memorable, not just flashy. Developing this skill also makes improvising more intentional and repeatable, so you can recreate good moments reliably.\n\n[How to practice]\nOutline a simple plan before you play: choose an opening phrase, two or three ways to vary it, a place to increase intensity, and a closing phrase that feels finished. Work in short blocks — create a motif, repeat it with small changes, leave space, then push toward a peak and resolve. Record, listen back, pick one motif that works, and practice linking and varying it until the whole solo reads as a single, purposeful arc.",
           "successCriteria": "You can craft a solo with a clear beginning, development, high point, and resolution that sounds intentional rather than random; you repeat and vary a short motif so listeners can recognize it; and you can reproduce and alter that motif reliably when you play again.",
           "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "call_and_response_phrasing"
+          "order": 2
         },
         {
           "id": "faa59791-5d71-4e51-b96e-01f3c0f1b7b4",
@@ -843,7 +847,8 @@
           "description": "[What it is]\nRecording and critique is the routine of capturing your improvised ideas, listening back with focused ears, and turning observations into concrete practice decisions. It means treating recordings as data: spotting patterns, strengths, and recurring problems you can’t fully perceive while playing.\n\n[Why it matters]\nListening to your own takes gives you objective feedback — it reveals timing slips, overused licks, unclear phrasing, tone inconsistencies, and moments of real musical interest. Regularly critiquing recordings accelerates progress because it converts vague goals into specific, repeatable changes you can train.\n\n[How to practice]\nSet short, focused recording goals (one aspect per take), make brief runs, then listen back and mark exact moments that succeed or need work. Turn each critique into one targeted exercise, re-record to check the result, and occasionally get an outside listener’s brief notes to catch blind spots.",
           "successCriteria": "You reliably record short improvisations, identify 3–5 concrete issues or highlights per take (e.g., phrasing, repetition, dynamics), design and apply a focused exercise that addresses one issue, and hear measurable improvement across subsequent takes. You can pick the best take and explain in a sentence why it succeeds musically.",
           "sessionsRequired": 8,
-          "order": 4
+          "order": 4,
+          "suggestedExerciseId": "improv_prompt_hard"
         }
       ]
     }
