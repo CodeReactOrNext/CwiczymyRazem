@@ -130,9 +130,24 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             const totalMins = Math.floor(tMins + hMins);
             if (totalMins > 0) {
                dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMins }));
+               dispatch(updateQuestProgress({ type: 'long_session', amount: totalMins }));
             }
             if (tMins > 0) {
                dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: tMins }));
+            }
+            if (hMins > 0) {
+               dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hMins }));
+            }
+
+            // A song session counts technique + hearing as practice categories,
+            // so it should feed the combo quests just like a plan session does.
+            const songActiveCategories = [tMins, hMins].filter((m) => m > 0).length;
+            if (songActiveCategories > 0) {
+               dispatch(updateQuestProgress({ type: 'well_rounded', amount: songActiveCategories }));
+            }
+            const songCategoriesOverFive = [tMins, hMins].filter((m) => m >= 5).length;
+            if (songCategoriesOverFive > 0) {
+               dispatch(updateQuestProgress({ type: 'two_categories_min', amount: songCategoriesOverFive }));
             }
 
             // Record session for the specific song progress

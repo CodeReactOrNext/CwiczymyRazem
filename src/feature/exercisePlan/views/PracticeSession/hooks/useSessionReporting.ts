@@ -99,6 +99,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setReportResult(result.raitingData);
 
         dispatch(updateQuestProgress({ type: 'practice_plan' }));
+        dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
 
         if (plan.id.startsWith('auto')) {
           dispatch(updateQuestProgress({ type: 'auto_plan' }));
@@ -114,9 +115,40 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         const totalMin = techMin + theoryMin + hearMin + creatMin;
         if (totalMin > 0) {
           dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMin }));
+          dispatch(updateQuestProgress({ type: 'long_session', amount: totalMin }));
         }
         if (techMin > 0) {
           dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMin }));
+        }
+        if (theoryMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_theory_time', amount: theoryMin }));
+        }
+        if (hearMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hearMin }));
+        }
+        if (creatMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_creativity_time', amount: creatMin }));
+          dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creatMin }));
+        }
+
+        const activeCategories = [techMin, theoryMin, hearMin, creatMin].filter((m) => m > 0).length;
+        if (activeCategories > 0) {
+          dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
+        }
+        const categoriesOverFive = [techMin, theoryMin, hearMin, creatMin].filter((m) => m >= 5).length;
+        if (categoriesOverFive > 0) {
+          dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+        }
+        if (techMin > 0 && theoryMin > 0) {
+          dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));
+        }
+
+        const exercisesPracticed = completedExercises.length;
+        if (exercisesPracticed > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: exercisesPracticed }));
+        }
+        if (Object.keys(reportData.skillPointsGained || {}).length > 0) {
+          dispatch(updateQuestProgress({ type: 'improve_skill' }));
         }
       } catch (error) {
         console.error('Auto report failed:', error);

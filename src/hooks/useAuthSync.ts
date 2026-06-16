@@ -1,6 +1,7 @@
 import type { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
+import { initializeDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,12 +18,23 @@ const useAuthSync = () => {
   const autoLogInFailed = useSelector(selectAutoLogInFailed);
   const retryCount = useRef(0);
   const isSyncing = useRef(false);
+  const questInitialized = useRef(false);
 
   useEffect(() => {
     // Reset retry count when user logs in successfully
     if (userStats && userAuth) {
       retryCount.current = 0;
       isSyncing.current = false;
+
+      // Initialize the daily quest globally as soon as the user is fully logged
+      // in, not only when the profile dashboard mounts. Without this, quest
+      // progress dispatched before visiting the dashboard is silently dropped
+      // by the date guard in completeQuestTask. generateDailyQuest is idempotent
+      // (regenerates only when the stored date is not today), so this is safe.
+      if (!questInitialized.current) {
+        questInitialized.current = true;
+        dispatch(initializeDailyQuestAction());
+      }
       return;
     }
 

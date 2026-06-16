@@ -159,13 +159,31 @@ const userSlice = createSlice({
         { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15 },
         { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10 },
         { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1 },
+        { type: 'practice_theory_time', title: 'Practice Theory for 10 minutes', target: 10 },
+        { type: 'practice_hearing_time', title: 'Train your Ear for 10 minutes', target: 10 },
+        { type: 'practice_creativity_time', title: 'Be Creative for 10 minutes', target: 10 },
+        { type: 'creativity_focus', title: 'Spend 15 minutes on Creativity', target: 15 },
+        { type: 'long_session', title: 'Practice for 30 minutes total', target: 30 },
+        { type: 'well_rounded', title: 'Practice 3 different categories', target: 3 },
+        { type: 'two_categories_min', title: 'Practice 2 categories for 5 min each', target: 2 },
+        { type: 'balanced_session', title: 'Practice Technique & Theory in one session', target: 2 },
+        { type: 'rate_multiple_songs', title: 'Rate 3 Songs', target: 3 },
+        { type: 'complete_two_plans', title: 'Complete 2 Practice Plans', target: 2 },
+        { type: 'improve_skill', title: 'Earn points in any Skill', target: 1 },
+        { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3 },
       ];
 
       // If quest exists for today, do nothing
       if (state.currentUserStats.dailyQuest?.date === today && state.currentUserStats.dailyQuest?.tasks?.length > 0) return;
 
-      // Shuffle and pick 3
-      const shuffled = [...taskTemplates].sort(() => 0.5 - Math.random());
+      // Shuffle and pick 3. Use Fisher-Yates for a uniform distribution;
+      // sort(() => 0.5 - Math.random()) is biased and over-selects the
+      // templates near the start of the array.
+      const shuffled = [...taskTemplates];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
       const selected = shuffled.slice(0, 3);
 
       const tasks = selected.map((t, index) => {

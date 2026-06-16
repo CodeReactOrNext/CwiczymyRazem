@@ -19,6 +19,18 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
     practice_total_time: "/timer/song-select",
     practice_technique_time: "/timer/plans",
     practice_specific_exercise: "/profile/skills", // Base path, handled dynamically
+    practice_theory_time: "/timer/plans",
+    practice_hearing_time: "/timer/plans",
+    practice_creativity_time: "/timer/plans",
+    creativity_focus: "/timer/plans",
+    long_session: "/timer/song-select",
+    well_rounded: "/timer/plans",
+    two_categories_min: "/timer/plans",
+    balanced_session: "/timer/plans",
+    rate_multiple_songs: "/songs?view=library",
+    complete_two_plans: "/timer/plans",
+    improve_skill: "/profile/skills",
+    practice_three_exercises: "/timer/plans",
 };
 
 export const DailyQuestWidget = () => {

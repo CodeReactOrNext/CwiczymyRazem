@@ -157,6 +157,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
       }));
       if (isNewRating) {
         dispatch(updateQuestProgress({ type: 'rate_song' }));
+        dispatch(updateQuestProgress({ type: 'rate_multiple_songs' }));
       }
       // Drop the cached song lists so re-opening this song shows the fresh rating
       // instead of a stale snapshot (react-query caches songs for 5 min).

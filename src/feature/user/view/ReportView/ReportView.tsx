@@ -257,6 +257,10 @@ const ReportView = () => {
 
     if (inputData.planId) {
         dispatch(updateQuestProgress({ type: 'practice_plan' }));
+        dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
+        // Structured practice (a plan or a specific exercise) awards skill points
+        // server-side even though the manual form does not populate skillPointsGained.
+        dispatch(updateQuestProgress({ type: 'improve_skill' }));
         if (inputData.planId.startsWith('auto')) {
             dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
@@ -266,21 +270,55 @@ const ReportView = () => {
         if (inputData.planId.startsWith('exercise-')) {
             const exerciseId = inputData.planId.replace('exercise-', '');
             dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId, amount: 1 }));
-        } 
+            dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: 1 }));
+        }
         // Case 2: Started from Skill Dashboard / Daily Quest (no prefix, planId is exerciseId)
         else {
             dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: inputData.planId, amount: 1 }));
+            dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: 1 }));
         }
     }
 
     const totalMinutes = Math.floor(sumTime / 60000);
     if (totalMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMinutes }));
+        dispatch(updateQuestProgress({ type: 'long_session', amount: totalMinutes }));
     }
 
     const techMinutes = Number(inputData.techniqueHours || 0) * 60 + Number(inputData.techniqueMinutes || 0);
     if (techMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMinutes }));
+    }
+
+    const theoryMinutes = Number(inputData.theoryHours || 0) * 60 + Number(inputData.theoryMinutes || 0);
+    if (theoryMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_theory_time', amount: theoryMinutes }));
+    }
+
+    const hearingMinutes = Number(inputData.hearingHours || 0) * 60 + Number(inputData.hearingMinutes || 0);
+    if (hearingMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hearingMinutes }));
+    }
+
+    const creativityMinutes = Number(inputData.creativityHours || 0) * 60 + Number(inputData.creativityMinutes || 0);
+    if (creativityMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_creativity_time', amount: creativityMinutes }));
+        dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creativityMinutes }));
+    }
+
+    const activeCategories = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m > 0).length;
+    if (activeCategories > 0) {
+        dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
+    }
+    const categoriesOverFive = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m >= 5).length;
+    if (categoriesOverFive > 0) {
+        dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+    }
+    if (techMinutes > 0 && theoryMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));
+    }
+    if (inputData.skillPointsGained && Object.keys(inputData.skillPointsGained).length > 0) {
+        dispatch(updateQuestProgress({ type: 'improve_skill' }));
     }
 
     const totalMinutesForCapture =
