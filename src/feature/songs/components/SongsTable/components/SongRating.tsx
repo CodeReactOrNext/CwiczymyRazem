@@ -105,6 +105,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
 
         if (isNewRating) {
             dispatch(updateQuestProgress({ type: 'rate_song' }));
+            dispatch(updateQuestProgress({ type: 'rate_multiple_songs' }));
         }
 
         queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {

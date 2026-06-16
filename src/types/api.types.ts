@@ -18,7 +18,19 @@ export type DailyQuestTaskType =
   | 'practice_plan'
   | 'practice_total_time'
   | 'practice_technique_time'
-  | 'practice_specific_exercise';
+  | 'practice_specific_exercise'
+  | 'practice_theory_time'
+  | 'practice_hearing_time'
+  | 'practice_creativity_time'
+  | 'creativity_focus'
+  | 'long_session'
+  | 'well_rounded'
+  | 'two_categories_min'
+  | 'balanced_session'
+  | 'rate_multiple_songs'
+  | 'complete_two_plans'
+  | 'improve_skill'
+  | 'practice_three_exercises';
 
 export interface DailyQuestTask {
   id: string;
