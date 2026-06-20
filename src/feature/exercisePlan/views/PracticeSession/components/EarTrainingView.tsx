@@ -41,7 +41,7 @@ export const EarTrainingView = ({
       {/* Score Display */}
       <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 z-10">
           <div className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg backdrop-blur-md">
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
+              <span className="text-[10px] sm:text-xs font-bold capitalize tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
               <span className="text-lg sm:text-xl font-black text-emerald-400">{score}</span>
           </div>
           {highScore != null && highScore > 0 && (
@@ -50,7 +50,7 @@ export const EarTrainingView = ({
               score > highScore ? "bg-amber-950/60" : ""
             )}>
               <Trophy className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", score > highScore ? "text-amber-400" : "text-purple-400")} />
-              <span className={cn("text-[10px] sm:text-xs font-bold uppercase tracking-widest mr-1", score > highScore ? "text-amber-400" : "text-purple-400")}>
+              <span className={cn("text-[10px] sm:text-xs font-bold capitalize tracking-widest mr-1", score > highScore ? "text-amber-400" : "text-purple-400")}>
                 {score > highScore ? "New!" : "Best"}
               </span>
               <span className={cn("text-lg sm:text-xl font-black", score > highScore ? "text-amber-400" : "text-purple-300")}>{highScore}</span>
@@ -140,7 +140,7 @@ export const EarTrainingView = ({
       <div className="flex items-center gap-4 w-full">
           {/* Play/Replay Button */}
           <Button 
-            className="flex-1 h-12 sm:h-14 text-base sm:text-lg font-bold tracking-wide uppercase"
+            className="flex-1 h-12 sm:h-14 text-base sm:text-lg font-bold tracking-wide capitalize"
             variant={isPlaying ? "destructive" : "default"}
             onClick={onPlayRiddle}
           >

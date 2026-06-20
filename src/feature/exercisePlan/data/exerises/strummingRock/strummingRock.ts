@@ -5,7 +5,7 @@ export const strummingRockExercise: Exercise = {
   title: "Rock Strumming Patterns",
   description: "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
   whyItMatters: "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 8,
   instructions: [
@@ -16,7 +16,7 @@ export const strummingRockExercise: Exercise = {
     "Keep the pendulum motion going even during rests or empty strums.",
     "Accent the downbeats to lock in with the simulated rhythm section."
   ],
-  metronomeSpeed: { min: 60, max: 140, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 140, recommended: 90 },
   relatedSkills: ["rhythm"],
   strummingPatterns: [
     {

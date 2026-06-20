@@ -17,7 +17,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     "Mute idle strings with your picking-hand palm to keep the flow dead-silent."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },

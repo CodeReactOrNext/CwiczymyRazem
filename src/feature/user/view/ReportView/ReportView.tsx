@@ -580,7 +580,7 @@ const ReportView = () => {
                                 { label: "Alt Picking", icon: "🔄" },
                                 { label: "Sweep Picking", icon: "🌪️" },
                                 { label: "Tapping", icon: "👆" },
-                                { label: "Hybrid Picking", icon: "🤏" },
+                                { label: "Picking Control", icon: "🤏" },
                                 { label: "String Skipping", icon: "⏩" },
                                 { label: "Down Picking", icon: "⬇️" },
                               ]},

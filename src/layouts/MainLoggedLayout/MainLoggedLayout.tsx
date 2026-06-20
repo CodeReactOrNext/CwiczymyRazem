@@ -17,6 +17,7 @@ interface LandingLayoutProps {
   userAvatar?: string;
   pageId: NavPagesTypes;
   variant: "primary" | "secondary" | "landing" | "fullscreen";
+  wide?: boolean;
   children: React.ReactNode;
 }
 
@@ -28,6 +29,7 @@ const MainLoggedLayout = ({
   children,
   pageId,
   variant,
+  wide = false,
 }: LandingLayoutProps) => {
   const { t } = useTranslation();
 
@@ -107,7 +109,7 @@ const MainLoggedLayout = ({
                 </div>
               </div>
             ) : (
-              <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 md:pt-8 md:pb-8 lg:px-8'>
+              <div className={`z-20 mx-auto w-full px-0 pb-24 md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
                   <div className='relative'>
                     {children}
                   </div>

@@ -16,7 +16,7 @@ export const chromaticSpiderWalkExercise: Exercise = {
     "Keep your fretting fingers hovering close to the fretboard to minimize travel time.",
     "Ensure each note is fully muted the instant the next finger makes contact."
   ],
-  metronomeSpeed: { min: 60, max: 140, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 140, recommended: 90 },
   relatedSkills: ["finger_independence"],
   tablature: [
     {

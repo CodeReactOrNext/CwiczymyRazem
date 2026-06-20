@@ -46,7 +46,7 @@ export const MobileTimerDisplay = ({
           </div>
           
           <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900/50 border border-white/5">
-             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-500/50 mb-1">Session</span>
+             <span className="text-[9px] font-black capitalize tracking-[0.2em] text-cyan-500/50 mb-1">Session</span>
              <div className="flex items-center gap-2 text-cyan-400">
                  <FaHistory className="h-3 w-3 text-cyan-500/50" />
                  <span className="text-sm font-mono font-black">{formattedTotalSession}</span>

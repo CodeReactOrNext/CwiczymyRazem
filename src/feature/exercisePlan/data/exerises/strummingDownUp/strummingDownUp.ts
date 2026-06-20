@@ -5,7 +5,7 @@ export const strummingDownUpExercise: Exercise = {
   title: "Down-Up Strumming",
   description: "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
   whyItMatters: "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 7,
   instructions: [

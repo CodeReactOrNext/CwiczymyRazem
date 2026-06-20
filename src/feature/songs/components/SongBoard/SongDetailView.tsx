@@ -39,6 +39,7 @@ import {
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { SpotifyPlayer } from "../SpotifyPlayer";
+import { TierBadge } from "../SongsGrid/TierBadge";
 
 interface SongDetailViewProps {
   song: Song;
@@ -90,10 +91,10 @@ const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: numbe
 const InfoRow = ({ label, value, icon: Icon }: any) => (
   <div className="flex items-center justify-between group py-1">
     <div className="flex items-center gap-3">
-       <Icon className="h-3.5 w-3.5 text-zinc-500" />
-       <span className="text-[11px] font-bold text-zinc-500 capitalize">{label}</span>
+       <Icon className="h-4 w-4 text-zinc-500" />
+       <span className="text-xs font-bold text-zinc-400 capitalize">{label}</span>
     </div>
-    <span className="text-[11px] font-bold text-white text-right max-w-[150px] truncate">{value}</span>
+    <span className="text-xs font-bold text-white text-right max-w-[150px] truncate">{value}</span>
   </div>
 );
 
@@ -106,7 +107,7 @@ const LegendItem = ({ color, label, glow }: { color: string; label: string; glow
            boxShadow: glow ? `0 0 10px ${color}80` : 'none'
         }} 
      />
-     <span className="text-[10px] font-bold text-zinc-500 tracking-tight">{label}</span>
+     <span className="text-xs font-bold text-zinc-400 tracking-tight">{label}</span>
   </div>
 );
 
@@ -267,7 +268,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                 className="gap-2 text-zinc-400 hover:text-white bg-white/5 backdrop-blur-md rounded-full px-4"
               >
                 <ArrowLeft size={16} />
-                <span className="text-[11px] font-bold">Back to library</span>
+                <span className="text-xs font-bold">Back to library</span>
               </Button>
            </div>
          )}
@@ -309,9 +310,6 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                    <span className="text-3xl md:text-4xl font-black relative z-10" style={{ color: tier.color }}>{tier.tier}</span>
                    <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>Tier</span>
                </div>
-               <span className="text-[10px] md:text-[11px] text-zinc-500 capitalize font-bold">
-                  Lvl {avgDifficulty.toFixed(1)}
-               </span>
             </div>
          </div>
          
@@ -326,23 +324,24 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      onPractice(song);
                    }
                  }}
-                 className="h-14 w-full sm:w-auto px-8 rounded-lg bg-white hover:bg-zinc-200 text-black font-black flex items-center justify-center gap-6 transition-all active:scale-95 shadow-xl border-none group"
+                 className="relative h-14 w-full sm:w-auto overflow-hidden px-8 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-xl border-none"
                >
-                 <div className="mr-4 p-2 rounded-md transition-colors">
-                    {status ? <Play className="h-5 w-5 fill-current" /> : <Music className="h-5 w-5" />}
-                 </div>
+                 <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
+                 {status
+                   ? <Play className="mr-3 h-5 w-5 fill-current" />
+                   : <Music className="mr-3 h-5 w-5" />}
                  <span className="text-sm">{status ? "Start practice" : "Add to library"}</span>
                </Button>
 
                {/* Steam-style Info Boxes */}
                <div className="flex items-center gap-6 sm:gap-10 pt-6 sm:pt-0 sm:pl-8 w-full sm:w-auto justify-around sm:justify-start">
                   <div className="flex flex-col items-center sm:items-start">
-                     <span className="text-[11px] font-black text-zinc-500 mb-1">Sessions</span>
+                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Sessions</span>
                      <span className="text-sm font-bold text-zinc-200">{progress?.sessionCount || 0}</span>
                   </div>
 
                   <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                     <span className="text-[11px] font-black text-zinc-500 mb-1">Last practiced</span>
+                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Last practiced</span>
                      <span className="text-sm font-bold text-zinc-200">
                         {progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString() : "Never"}
                      </span>
@@ -351,7 +350,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                   <div className="flex flex-col items-center sm:items-start">
                      <div className="flex items-center gap-2 mb-1">
                         <Clock size={12} className="text-zinc-500" />
-                        <span className="text-[11px] font-black text-zinc-500">Play time</span>
+                        <span className="text-xs font-medium tracking-wider text-zinc-400">Play time</span>
                      </div>
                      <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes}m</span>
                   </div>
@@ -366,7 +365,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                     const isActive = status === s;
                     
                     return (
-                      <TooltipProvider key={s}>
+                      <TooltipProvider key={s} delayDuration={150}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -375,8 +374,8 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                               size="icon"
                               className={cn(
                                 "h-11 w-11 rounded-lg transition-all",
-                                isActive 
-                                  ? "bg-zinc-800 text-white shadow-xl" 
+                                isActive
+                                  ? "bg-zinc-800 text-white shadow-xl"
                                   : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
                               )}
                             >
@@ -384,7 +383,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top">
-                            <p className="text-xs font-bold">{t(`status.${s}` as any)}</p>
+                            <p className="text-xs font-bold capitalize">{t(`status.${s}` as any)}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -414,7 +413,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          
          {/* Spotify Preview */}
          {song.spotifyId && (
-           <div className="animate-in fade-in slide-in-from-top-4 duration-500 mb-8">
+           <div className="animate-in fade-in slide-in-from-top-4 duration-500 mb-6 max-w-md">
              <div className="bg-zinc-800/40 rounded-lg p-1 backdrop-blur-sm shadow-sm">
                 <SpotifyPlayer trackId={song.spotifyId} height={80} />
              </div>
@@ -430,13 +429,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <TrendingUp size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-[11px] font-semibold text-zinc-400">Your progress</span>
+                  <span className="text-sm font-semibold text-zinc-300">Your progress</span>
                </div>
                
                <div className="space-y-8">
                   <div className="group/rate px-1">
                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-semibold text-zinc-400">My rating</p>
+                        <p className="text-xs font-semibold text-zinc-400">My rating</p>
                         {isRating ? (
                            <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-cyan-400">
                               <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
@@ -495,7 +494,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <Music size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-[11px] font-semibold text-zinc-400">Song data</span>
+                  <span className="text-sm font-semibold text-zinc-300">Song data</span>
                </div>
 
                <div className="space-y-5">
@@ -511,13 +510,16 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 flex flex-col gap-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <Star size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-[11px] font-semibold text-zinc-400">Community ratings</span>
+                  <span className="text-sm font-semibold text-zinc-300">Community ratings</span>
                </div>
 
                <div className="px-1">
-                  <p className="text-[10px] font-semibold text-zinc-400 mb-3">Avg. difficulty</p>
+                  <p className="text-xs font-semibold text-zinc-400 mb-3">Avg. difficulty</p>
                   <div className="flex items-center justify-between">
-                     <span className="text-4xl font-black text-white leading-none">{avgDifficulty.toFixed(1)}</span>
+                     <div className="flex items-center gap-3">
+                        <TierBadge song={song} className="h-8 w-8 rounded-md text-sm" />
+                        <span className="text-4xl font-black text-white leading-none">{avgDifficulty.toFixed(1)}</span>
+                     </div>
                      <StarRatingDisplay rating={avgDifficulty} color={tier.color} size={20} />
                   </div>
                </div>
@@ -584,12 +586,12 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                <div className="w-full space-y-4">
                   <div className="flex items-center justify-between">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-zinc-500">
+                        <span className="text-sm font-semibold text-zinc-300">
                            Song mastery
                         </span>
-                        <p className="text-[9px] font-bold text-zinc-600 mt-1">Practice progression</p>
+                        <p className="text-xs font-medium text-zinc-500 mt-1">Practice progression</p>
                      </div>
-                     <span className="text-[10px] font-black text-zinc-400 tabular-nums">
+                     <span className="text-xs font-semibold text-zinc-400 tabular-nums">
                         {masteryData.masteredCount} / {masteryData.totalSections} Sections ({masteryData.progressPct}%)
                      </span>
                   </div>
@@ -648,7 +650,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                 <div className="flex items-center justify-between">
                    <div className="flex items-center gap-2">
                       <MessageSquare size={18} className="transition-all duration-500 text-zinc-700" />
-                      <span className="text-[11px] font-semibold text-zinc-400">Practice notes</span>
+                      <span className="text-sm font-semibold text-zinc-300">Practice notes</span>
                    </div>
                    <div className="flex items-center gap-3">
                       {isSaving && (

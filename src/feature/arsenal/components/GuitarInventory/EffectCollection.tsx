@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
@@ -62,6 +62,10 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   }
   const items = Array.from(groupedMap.values()).sort((a, b) => b.item.acquiredAt - a.item.acquiredAt);
 
+  const uniqueOwnedCount = groupedMap.size;
+  const totalEffectsCount = EFFECT_DEFINITIONS.length;
+  const completionPct = Math.round((uniqueOwnedCount / totalEffectsCount) * 100);
+
   const handleSellClick = (inventoryItemId: string, effectId: number | string) => {
     setSelectedItemId(inventoryItemId);
     setSelectedEffectId(effectId);
@@ -86,6 +90,20 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
         <div className="flex flex-col gap-0.5">
           <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
           <p className="text-base font-black text-white capitalize tracking-wide">Pedals</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
+            <span className="text-sm font-bold text-zinc-500">/ {totalEffectsCount}</span>
+            <span className="ml-1 text-xs font-medium text-zinc-500">pedals collected</span>
+          </div>
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className="h-full rounded-full bg-cyan-400 transition-all"
+              style={{ width: `${completionPct}%` }}
+            />
+          </div>
+          <span className="text-xs font-bold text-cyan-400">{completionPct}%</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {items.map(({ item, sellItemId, count }) => (

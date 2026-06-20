@@ -17,11 +17,11 @@ export const mutingDisciplineDrillExercise: Exercise = {
     "Practice slowly to identify the exact source of any accidental string ring."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },
-  relatedSkills: ['hybrid_picking'],
+  relatedSkills: ["articulation"],
   tablature: [
     // M1: String-skip between strings 6 and 4 (E minor: E-G-B pattern)
     {

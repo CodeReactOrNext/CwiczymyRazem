@@ -24,6 +24,7 @@ const CATEGORIES: { value: ExerciseCategory; label: string }[] = [
 ];
 
 const DIFFICULTIES: { value: DifficultyLevel; label: string; color: string }[] = [
+  { value: "beginner", label: "Beginner", color: "text-sky-400" },
   { value: "easy", label: "Easy", color: "text-emerald-400" },
   { value: "medium", label: "Medium", color: "text-amber-400" },
   { value: "hard", label: "Hard", color: "text-rose-400" },

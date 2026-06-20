@@ -2,7 +2,7 @@
 
 export const hybridPickingIndependenceExercise: Exercise = {
   id: "hybrid_picking_independence",
-  title: "String Skipping",
+  title: "Hybrid Picking Independence",
   description: "Combine your pick and fingers to play wide-interval string-skipping lines.",
   whyItMatters: "Hybrid picking bridges the gap between pick control and fingerstyle agility. Using the pick for low strings and fingers for high strings allows you to cross wide string gaps effortlessly, which is essential for modern rock, country, and jazz fusion styles.",
   difficulty: "hard",
@@ -16,7 +16,7 @@ export const hybridPickingIndependenceExercise: Exercise = {
     "Keep your picking hand fingers close to the strings to minimize plucking lag.",
     "Anchor your fretting hand fingers firmly to prevent notes from bleeding together."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 80 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

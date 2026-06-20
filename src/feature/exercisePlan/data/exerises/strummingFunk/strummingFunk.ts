@@ -16,7 +16,7 @@ export const strummingFunkExercise: Exercise = {
     "Ensure your fretting hand completely dampens the strings during scratches.",
     "Focus on making the accented chords pop out clearly against the muted scratches."
   ],
-  metronomeSpeed: { min: 70, max: 115, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 115, recommended: 90 },
   relatedSkills: ["rhythm"],
   strummingPatterns: [
     {

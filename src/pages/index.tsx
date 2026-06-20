@@ -11,7 +11,7 @@ interface HomeProps {
   spotlightExercises: Array<{
     id: string;
     title: string;
-    difficulty: 'easy' | 'medium' | 'hard';
+    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
     category: string;
     description: string;
     timeInMinutes: number;
@@ -32,7 +32,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
     .map((ex) => ({
       id: ex.id,
       title: ex.title,
-      difficulty: ex.difficulty as 'easy' | 'medium' | 'hard',
+      difficulty: ex.difficulty as 'beginner' | 'easy' | 'medium' | 'hard',
       category: ex.category,
       description: ex.description,
       timeInMinutes: ex.timeInMinutes,

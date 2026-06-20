@@ -18,7 +18,7 @@ export const jazzChordMelodyExercise: Exercise = {
     "Allow your fingers to pluck upward slightly rather than clawing at the strings.",
     "Start with simple two-note voicings to master the hybrid hand coordination first.",
   ],
-  metronomeSpeed: { min: 70, max: 110, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 110, recommended: 90 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

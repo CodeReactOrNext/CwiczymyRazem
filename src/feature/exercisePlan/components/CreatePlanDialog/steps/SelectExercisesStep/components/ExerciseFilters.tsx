@@ -36,7 +36,7 @@ export const ExerciseFilters = ({
   const { t } = useTranslation(["common", "exercises", "skills"]);
   const [isSkillOpen, setIsSkillOpen] = useState(false);
 
-  const difficulties = ["all", "easy", "medium", "hard"];
+  const difficulties = ["all", "beginner", "easy", "medium", "hard"];
 
   return (
     <div className='flex flex-col gap-6 relative'>

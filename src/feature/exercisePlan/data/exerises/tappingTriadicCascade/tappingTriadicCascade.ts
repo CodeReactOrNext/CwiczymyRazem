@@ -17,7 +17,7 @@ export const tappingTriadicCascadeExercise: Exercise = {
     "Focus on rhythmic evenness—do not let the slides interrupt the flow."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 100,
     recommended: 80,
   },

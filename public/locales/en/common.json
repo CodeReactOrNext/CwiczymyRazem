@@ -155,7 +155,7 @@
     "music_theory": "Music Theory",
     "slide_guitar": "Slide Guitar",
     "audio_production": "Audio Production",
-    "hybrid_picking": "Hybrid Picking",
+    "hybrid_picking": "Picking Control",
     "transcription": "Transcription",
     "picking": "Picking",
     "finger_independence": "Finger Independence",
@@ -175,6 +175,7 @@
     "difficulty": "Difficulty"
   },
   "difficulty": {
+    "beginner": "Beginner",
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard"

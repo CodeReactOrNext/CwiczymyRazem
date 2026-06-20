@@ -17,7 +17,7 @@ export const legatoHammerPullRunExercise: Exercise = {
     "Keep your pick strokes minimal and synchronized with the initial notes."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },

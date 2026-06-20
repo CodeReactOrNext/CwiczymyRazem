@@ -19,7 +19,7 @@ export const stringSkippingTwoNotesExercise: Exercise = {
     "Keep your fretting hand relaxed and close to the fretboard to avoid extra string noise.",
   ],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
-  relatedSkills: ["hybrid_picking", "alternate_picking"],
+  relatedSkills: ["string_skipping", "alternate_picking"],
   examBacking: { url: "/static/sounds/exercise/string_skipping___2_notes_per_string_backing_track.mp3", sourceBpm: 50 },
   tablature: [
     {

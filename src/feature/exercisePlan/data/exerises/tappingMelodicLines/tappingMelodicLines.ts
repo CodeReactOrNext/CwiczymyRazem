@@ -16,7 +16,7 @@ export const tappingMelodicLinesExercise: Exercise = {
     "Keep your tapping hand relaxed to sustain long melodic phrases.",
     "Use a light fretting hand touch to avoid unwanted fret noise."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 75 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 75 },
   relatedSkills: ["tapping"],
   tablature: [
     // M1: Am melodic line â€” tapped melody on str 1, bass on str 2

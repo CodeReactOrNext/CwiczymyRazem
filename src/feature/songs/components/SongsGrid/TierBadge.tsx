@@ -15,9 +15,9 @@ export const TierBadge = ({ song, difficulty, className, style }: TierBadgeProps
 
     return (
         <div 
-            className={cn("flex h-8 w-8 items-center justify-center rounded-[4px] border text-xs font-black bg-zinc-900", className)}
+            className={cn("flex h-8 w-8 items-center justify-center rounded-[4px] text-xs font-black", className)}
             style={{
-                borderColor: `${tier.color}30`,
+                backgroundColor: `${tier.color}20`,
                 color: tier.color,
                 ...style
             }}

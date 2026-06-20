@@ -321,6 +321,14 @@ module.exports = {
           "from": { transform: "translate(15%, 10%)",  opacity: "0.15" },
           "to":   { transform: "translate(-15%, -10%)", opacity: "0.35" }
         },
+        "ripple": {
+          "from": { transform: "translate(-50%, -50%) scale(0)", opacity: "0.4" },
+          "to":   { transform: "translate(-50%, -50%) scale(1)", opacity: "0" }
+        },
+        "shine": {
+          "0%":         { transform: "translateX(-130%) skewX(-12deg)" },
+          "55%, 100%":  { transform: "translateX(230%) skewX(-12deg)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -330,6 +338,8 @@ module.exports = {
         "gradient": "gradient 6s linear infinite",
         "glow-float-1": "glow-float-1 8s ease-in-out infinite alternate",
         "glow-float-2": "glow-float-2 10s ease-in-out infinite alternate",
+        "ripple": "ripple 0.6s ease-out forwards",
+        "shine": "shine 4.5s ease-in-out infinite",
       },
     },
     fontFamily: {

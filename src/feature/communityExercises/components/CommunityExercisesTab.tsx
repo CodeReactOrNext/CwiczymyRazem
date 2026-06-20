@@ -18,7 +18,7 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
   description: ex.description,
   category: ex.category as any,
   requiredSkillId: ex.relatedSkills[0] || "general",
-  requiredLevel: ex.difficulty === "easy" ? 0 : ex.difficulty === "medium" ? 1 : 2,
+  requiredLevel: ex.difficulty === "hard" ? 2 : ex.difficulty === "medium" ? 1 : 0,
   rewardDescription: "Practice complete",
   exercises: [{
     id: ex.id,
@@ -53,6 +53,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const DIFFICULTY_COLORS: Record<string, string> = {
+  beginner: "bg-sky-500/15 text-sky-400 border-sky-500/20",
   easy: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
   medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
   hard: "bg-rose-500/15 text-rose-400 border-rose-500/20",

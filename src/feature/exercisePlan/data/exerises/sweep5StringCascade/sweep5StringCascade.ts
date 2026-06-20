@@ -18,7 +18,7 @@ export const sweep5StringCascadeExercise: Exercise = {
     "Coordinate the roll of your fretting fingers to ensure only one note sounds at any given moment.",
     "Slow down the sweep if your hands lose synchronization near the turnaround notes.",
   ],
-  metronomeSpeed: { min: 60, max: 120, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 120, recommended: 80 },
   relatedSkills: ["sweep_picking"],
   tablature: [
     // M1: Am 5-string sweep down and up

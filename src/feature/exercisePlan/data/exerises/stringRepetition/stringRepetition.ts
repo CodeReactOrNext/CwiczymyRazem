@@ -4,7 +4,7 @@ export const stringRepetitionExercise: Exercise = {
   id: "all_strings_open_repetition",
   title: "All Strings Open Repetition",
   description: "Rhythm exercise moving across all strings using open notes.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 1.5,
   instructions: [
@@ -21,7 +21,7 @@ export const stringRepetitionExercise: Exercise = {
   metronomeSpeed: {
     min: 40,
     max: 140,
-    recommended: 70
+    recommended: 60
   },
   relatedSkills: ["rhythm"],
   tablature: [

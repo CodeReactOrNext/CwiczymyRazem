@@ -21,7 +21,7 @@ export const chromaticAccentsExercise: Exercise = {
     "Ensure your timing remains perfectly even; do not rush the loud notes.",
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80
   },

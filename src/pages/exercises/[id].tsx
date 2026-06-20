@@ -41,6 +41,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const difficultyColors: Record<string, { label: string; color: string }> = {
+  beginner: { label: 'Beginner', color: 'bg-sky-500/10 text-sky-300' },
   easy: { label: 'Easy', color: 'bg-emerald-500/10 text-emerald-300' },
   medium: { label: 'Medium', color: 'bg-amber-500/10 text-amber-300' },
   hard: { label: 'Hard', color: 'bg-rose-500/10 text-rose-300' },

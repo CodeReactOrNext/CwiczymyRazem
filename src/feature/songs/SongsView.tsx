@@ -7,6 +7,7 @@ import {
 } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import { HeroBanner } from "components/UI/HeroBanner";
+import { Ripple } from "components/Ripple/Ripple";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
@@ -19,7 +20,7 @@ import { SongLearningStats } from "feature/songs/components/SongLearningStats/So
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
-import { useSongs } from "feature/songs/hooks/useSongs";
+import { ITEMS_PER_PAGE, useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
@@ -135,6 +136,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   const totalSongsCount = (userSongs?.wantToLearn?.length || 0) + (userSongs?.learning?.length || 0) + (userSongs?.learned?.length || 0);
   const learnedCount = userSongs?.learned?.length || 0;
   const completionRate = totalSongsCount > 0 ? Math.round((learnedCount / totalSongsCount) * 100) : 0;
+  const totalPracticeMs = Object.values(progressMap).reduce((sum, p) => sum + (p?.totalPracticeMs || 0), 0);
 
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -324,13 +326,13 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
       <div className="flex flex-col h-[calc(100dvh-6rem)] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
         {/* Mobile View Switcher */}
         {!detailsTarget && (
-          <div className="flex xl:hidden bg-zinc-900/80 border-b border-white/5 p-1.5 backdrop-blur-md">
+          <div className="flex xl:hidden bg-zinc-900/80 p-1.5 backdrop-blur-md">
             <button 
               onClick={() => setMobileTab('explore')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-black transition-all duration-300 rounded-lg",
                 mobileTab === 'explore' 
-                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)] border border-cyan-500/20" 
+                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                   : "text-zinc-500 hover:text-zinc-400"
               )}
             >
@@ -342,7 +344,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-black transition-all duration-300 rounded-lg",
                 mobileTab === 'collection' 
-                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)] border border-cyan-500/20" 
+                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                   : "text-zinc-500 hover:text-zinc-400"
               )}
             >
@@ -362,7 +364,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
         <div className="flex-1 flex overflow-hidden relative">
           {/* Sidebar (Left) - Desktop only */}
           <aside id="sidebar-root" className="hidden xl:flex w-[300px] shrink-0 bg-zinc-900/30 border-r border-white/5 flex-col overflow-hidden">
-             <div className="flex-1 overflow-y-auto no-scrollbar py-6 px-3">
+             <div className="flex-1 overflow-y-auto no-scrollbar py-3 px-3">
                 <SongLearningSection
 
                   isLanding={false}
@@ -408,23 +410,24 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
               </div>
             ) : view === 'board' ? (
               <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
-                <SkillPowerHero 
+                <SkillPowerHero
                   skillPower={skillPower}
                   playerTier={playerTier}
                   learnedCount={learnedCount}
                   totalCount={totalSongsCount}
+                  totalPracticeMs={totalPracticeMs}
                 />
                 
                 <div className="space-y-12">
                   {userSongs.learning.length > 0 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
                            <Play size={16} className="fill-current" />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Currently learning</h2>
+                        <h2 className="text-xl font-semibold text-white">Currently learning</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
                         {userSongs.learning.map((song) => (
                           <SongCard
                             key={song.id}
@@ -440,12 +443,12 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   {userSongs.wantToLearn.length > 0 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-zinc-500/10 flex items-center justify-center text-zinc-400">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
                            <Music size={16} />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Want to learn</h2>
+                        <h2 className="text-xl font-semibold text-white">Want to learn</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
                         {userSongs.wantToLearn.map((song) => (
                           <SongCard
                             key={song.id}
@@ -461,12 +464,12 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   {userSongs.learned.length > 0 && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
                            <Trophy size={16} />
                         </div>
-                        <h2 className="text-xl font-bold text-white">Mastered songs</h2>
+                        <h2 className="text-xl font-semibold text-white">Mastered songs</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
                         {userSongs.learned.map((song) => (
                           <SongCard
                             key={song.id}
@@ -519,7 +522,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 {/* Tier Selection Grid */}
                 <div className="space-y-4">
                   <div className="flex flex-col gap-1">
-                    <p className="text-xs font-bold text-zinc-500">Filter by Tier</p>
+                    <p className="text-xs font-bold text-zinc-400">Filter by Tier</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {getAllTiers().map((tier) => {
@@ -536,16 +539,17 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                             }
                           }}
                           className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
-                            isActive 
-                              ? "opacity-100 shadow-lg shadow-black/20" 
-                              : "bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
+                            "relative flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
+                            isActive
+                              ? "shadow-lg shadow-black/20"
+                              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
                           )}
                           style={{
                             backgroundColor: isActive ? `${tier.color}25` : "",
-                            color: isActive ? tier.color : "inherit",
+                            color: isActive ? tier.color : "",
                           }}
                         >
+                          <Ripple />
                           {tier.tier}
                         </button>
                       );
@@ -564,7 +568,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         placeholder={t("artist", "Artist...") as string}
                         value={artistQuery}
                         onChange={(e) => setArtistQuery(e.target.value)}
-                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                     </div>
 
@@ -576,17 +580,17 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         placeholder={t("title", "Title...") as string}
                         value={titleQuery}
                         onChange={(e) => setTitleQuery(e.target.value)}
-                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                     </div>
 
                     <div className="flex items-center gap-2">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => setIsFilterSheetOpen(true)}
                         className={cn(
-                          "relative h-12 flex-1 border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
-                          hasFilters && "border-cyan-500/30 bg-cyan-500/5 text-cyan-400"
+                          "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          hasFilters && "bg-cyan-500/5 text-cyan-400"
                         )}
                       >
                         <SlidersHorizontal className="mr-2.5 h-4 w-4" />
@@ -612,8 +616,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
                 {/* Grid Content */}
                 {isLoading ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {Array.from({ length: 12 }).map((_, i) => (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+                    {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                       <SongCardSkeleton key={i} />
                     ))}
                   </div>

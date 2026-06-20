@@ -5,7 +5,7 @@ export const randomNoteHuntExercise: Exercise = {
   isHiddenFromLanding: true,
   title: "Random Note Hunt",
   description: "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "theory",
   timeInMinutes: 2,
   instructions: [

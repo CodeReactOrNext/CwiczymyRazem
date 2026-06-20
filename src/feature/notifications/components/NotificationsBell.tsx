@@ -8,8 +8,9 @@ import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Clock, Gem, Heart, MessageSquare, Trophy, Zap } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const placeSuffix = (place: number) => {
@@ -58,14 +59,47 @@ export const NotificationsBell = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } =
     useAppNotifications(userId);
   const [isOpen, setIsOpen] = useState(false);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const rippleId = useRef(0);
+
+  const spawnRipple = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const id = rippleId.current++;
+    setRipples((prev) => [
+      ...prev,
+      { id, x: e.clientX - rect.left, y: e.clientY - rect.top },
+    ]);
+  };
+
+  const removeRipple = (id: number) =>
+    setRipples((prev) => prev.filter((r) => r.id !== id));
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-2.5 py-2 rounded-[8px] bg-white/5 hover:bg-white/10 transition-colors group">
+        <motion.button
+          onPointerDown={spawnRipple}
+          whileTap={{ scale: 0.88 }}
+          transition={{ type: "spring", stiffness: 500, damping: 25 }}
+          className="relative flex items-center gap-2 px-2.5 py-2 rounded-[8px] bg-white/5 hover:bg-white/10 transition-colors outline-none overflow-hidden focus-visible:ring-1 focus-visible:ring-white/20 data-[state=open]:bg-white/10 data-[state=open]:ring-1 data-[state=open]:ring-white/15 group">
+          <AnimatePresence>
+            {ripples.map((r) => (
+              <motion.span
+                key={r.id}
+                initial={{ scale: 0, opacity: 0.6 }}
+                animate={{ scale: 2.5, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+                onAnimationComplete={() => removeRipple(r.id)}
+                style={{ left: r.x, top: r.y }}
+                className="pointer-events-none absolute h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50"
+              />
+            ))}
+          </AnimatePresence>
           <Bell
             className={cn(
-              "h-4 w-4 text-zinc-400 group-hover:text-white transition-colors"
+              "h-4 w-4 text-zinc-400 group-hover:text-white transition-colors",
+              "group-data-[state=open]:text-white"
             )}
           />
           {unreadCount > 0 && (
@@ -73,21 +107,27 @@ export const NotificationsBell = () => {
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
-        </button>
+        </motion.button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-96 bg-zinc-900/95 backdrop-blur-xl border-white/10 text-white p-0 overflow-hidden shadow-2xl shadow-black/50"
-        align="end"
-        sideOffset={8}>
+        className="w-[380px] max-w-[calc(100vw-1.5rem)] rounded-2xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 text-white p-0 overflow-hidden shadow-2xl shadow-black/60"
+        align="start"
+        sideOffset={10}
+        collisionPadding={12}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <div>
-            <h3 className="text-sm font-bold text-white">Notifications</h3>
-            {unreadCount > 0 && (
-              <p className="text-xs text-zinc-500 mt-0.5">
-                {unreadCount} unread
-              </p>
-            )}
+        <div className="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-white/10 bg-white/[0.02]">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-zinc-300">
+              <Bell className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold leading-none text-white">Notifications</h3>
+              {unreadCount > 0 && (
+                <p className="mt-1.5 text-[11px] font-medium text-zinc-500">
+                  {unreadCount} unread
+                </p>
+              )}
+            </div>
           </div>
           {unreadCount > 0 && (
             <button
@@ -95,14 +135,14 @@ export const NotificationsBell = () => {
                 e.preventDefault();
                 markAllAsRead();
               }}
-              className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-500/10">
-              Mark all as read
+              className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-cyan-400 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300">
+              Mark all read
             </button>
           )}
         </div>
 
         {/* List */}
-        <div className="max-h-[420px] overflow-y-auto">
+        <div className="max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:bg-transparent">
           {isLoading ? (
             <div className="flex flex-col gap-3 p-4">
               {[1, 2, 3].map((i) => (
@@ -138,10 +178,10 @@ export const NotificationsBell = () => {
                   <button
                     key={n.id}
                     className={cn(
-                      "w-full flex gap-4 items-start px-5 py-4 text-left transition-colors border-b border-white/5 last:border-0",
+                      "relative w-full flex gap-3.5 items-start px-4 py-3.5 text-left transition-colors border-b border-white/5 last:border-0",
                       n.isRead
-                        ? "hover:bg-white/5"
-                        : "bg-red-500/5 hover:bg-red-500/8"
+                        ? "hover:bg-white/[0.04]"
+                        : "bg-cyan-500/[0.06] hover:bg-cyan-500/[0.1] before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-cyan-400"
                     )}
                     onClick={() => markAsRead(n.id)}>
                     {/* Avatar or system icon + type badge */}
@@ -160,13 +200,15 @@ export const NotificationsBell = () => {
                               size="sm"
                             />
                           </div>
-                          <div
-                            className={cn(
-                              "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-zinc-900/95 z-10",
-                              config.bg
-                            )}>
-                            {config.icon}
-                          </div>
+                          {n.type !== "reaction" && (
+                            <div
+                              className={cn(
+                                "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-zinc-900/95 z-10",
+                                config.bg
+                              )}>
+                              {config.icon}
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
@@ -206,7 +248,7 @@ export const NotificationsBell = () => {
 
                     {/* Unread indicator */}
                     {!n.isRead && (
-                      <div className="h-2 w-2 rounded-full bg-red-600 shrink-0 mt-2" />
+                      <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0 mt-2 shadow-[0_0_8px] shadow-cyan-400/50" />
                     )}
                   </button>
                 );

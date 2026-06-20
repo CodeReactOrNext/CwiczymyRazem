@@ -33,6 +33,7 @@ export const ExerciseInstructionsInline = ({
   const isPlayalong = !!exercise.isPlayalong;
 
   const displayAmount = rewardAmount || (
+    exercise.difficulty === "beginner" ? 1 :
     exercise.difficulty === "easy" ? 1 :
     exercise.difficulty === "medium" ? 2 :
     exercise.difficulty === "hard" ? 3 : 0
@@ -61,7 +62,7 @@ export const ExerciseInstructionsInline = ({
     <div className="space-y-3">
       <div className="flex items-center gap-2.5 text-red-400">
         <FaHeart size={14} className="animate-pulse" />
-        <h4 className="text-xs font-bold">Support Author</h4>
+        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Support Author</h4>
       </div>
       <div className="flex flex-col gap-2">
         {exercise.links!.map((link, idx) => {
@@ -98,7 +99,7 @@ export const ExerciseInstructionsInline = ({
       <div className="w-full px-6 py-3 flex items-center">
         <div className="flex items-center gap-2.5 text-zinc-400">
           <FaInfoCircle size={14} className="text-zinc-400" />
-          <span className="text-xs font-bold text-zinc-400">Exercise Instructions</span>
+          <span className="text-[11px] font-semibold capitalize tracking-wider text-zinc-300">Exercise Instructions</span>
         </div>
       </div>
 
@@ -107,11 +108,11 @@ export const ExerciseInstructionsInline = ({
                 <div className="space-y-8">
                   {exercise.whyItMatters && (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2.5 text-zinc-400 mb-2">
+                      <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                         <FaGraduationCap size={14} />
-                        <h4 className="text-xs font-bold">Why This Matters</h4>
+                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Why This Matters</h4>
                       </div>
-                      <p className="text-zinc-400 text-sm leading-relaxed font-medium">
+                      <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                         {exercise.whyItMatters}
                       </p>
                     </div>
@@ -119,13 +120,13 @@ export const ExerciseInstructionsInline = ({
 
                   {exercise.instructions && exercise.instructions.length > 0 && (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2.5 text-zinc-400 mb-2">
+                      <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                         <FaInfoCircle size={14} />
-                        <h4 className="text-xs font-bold">Instructions</h4>
+                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Instructions</h4>
                       </div>
                       <div className="space-y-3">
                         {exercise.instructions.map((instruction, idx) => (
-                          <p key={idx} className="text-zinc-400 text-sm leading-relaxed font-medium">
+                          <p key={idx} className="text-zinc-400 text-sm leading-relaxed font-normal">
                             {instruction}
                           </p>
                         ))}
@@ -142,7 +143,7 @@ export const ExerciseInstructionsInline = ({
                       <div className="p-3.5 bg-amber-500/10 rounded-lg flex items-start gap-3 text-amber-400 text-sm leading-relaxed font-semibold">
                         <FaInfoCircle size={16} className="shrink-0 text-amber-500 mt-0.5" />
                         <div>
-                          <div className="text-[11px] font-bold text-amber-500/80 mb-1">Backing track recommended</div>
+                          <div className="text-[11px] font-semibold capitalize tracking-wider text-amber-500/80 mb-1">Backing track recommended</div>
                           Use the backing track finder above to play along.
                         </div>
                       </div>
@@ -150,14 +151,14 @@ export const ExerciseInstructionsInline = ({
 
                     {exercise.tips && exercise.tips.length > 0 && (
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2.5 text-zinc-400 mb-2">
+                        <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                           <FaLightbulb size={14} />
-                          <h4 className="text-xs font-bold">Pro Tips</h4>
+                          <h4 className="text-[11px] font-semibold capitalize tracking-wider">Pro Tips</h4>
                         </div>
                         <div className="flex flex-col gap-3">
                           {exercise.tips.map((tip, idx) => (
-                            <div key={idx} className="flex gap-3 text-zinc-400 text-sm leading-relaxed font-medium">
-                              <span className="text-amber-500/50 font-bold shrink-0">#{idx + 1}</span>
+                            <div key={idx} className="flex gap-3 text-zinc-400 text-sm leading-relaxed font-normal">
+                              <span className="text-amber-500/60 font-semibold shrink-0">#{idx + 1}</span>
                               <p>{tip}</p>
                             </div>
                           ))}
@@ -173,16 +174,18 @@ export const ExerciseInstructionsInline = ({
                     <>
                     {/* Difficulty Section */}
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2.5 text-zinc-400">
+                      <div className="flex items-center gap-2.5 text-zinc-200">
                         <FaSignal size={14} className={cn(
-                          exercise.difficulty === 'easy' ? 'text-emerald-500/80' : 
+                          exercise.difficulty === 'beginner' ? 'text-sky-500/80' :
+                          exercise.difficulty === 'easy' ? 'text-emerald-500/80' :
                           exercise.difficulty === 'medium' ? 'text-amber-500/80' : 'text-rose-500/80'
                         )} />
-                        <h4 className="text-xs font-bold">Difficulty</h4>
+                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Difficulty</h4>
                       </div>
                       <p className={cn(
                         "text-sm font-semibold capitalize pl-6",
-                        exercise.difficulty === 'easy' ? 'text-emerald-400' : 
+                        exercise.difficulty === 'beginner' ? 'text-sky-400' :
+                        exercise.difficulty === 'easy' ? 'text-emerald-400' :
                         exercise.difficulty === 'medium' ? 'text-amber-400' : 'text-rose-400'
                       )}>
                         {exercise.difficulty}
@@ -190,19 +193,19 @@ export const ExerciseInstructionsInline = ({
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2.5 text-zinc-400">
+                      <div className="flex items-center gap-2.5 text-zinc-200">
                         <FaCheck size={14} className="text-emerald-500/80" />
-                        <h4 className="text-xs font-bold">Potential Reward</h4>
+                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Potential Reward</h4>
                       </div>
                       <div className="space-y-1.5 pl-6">
                         {displaySkillIds.map(skillId => {
                           const specificSkill = guitarSkills.find(s => s.id === skillId);
                           const Icon = ((specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck) as any;
                           return (
-                            <div key={skillId} className="flex items-center gap-2 text-zinc-400 text-sm font-medium">
+                            <div key={skillId} className="flex items-center gap-2 text-zinc-400 text-sm font-normal">
                               <Icon size={12} className="text-emerald-500/70 shrink-0" />
                               <span>
-                                Earn <strong className="text-emerald-400">+{displayAmount}</strong> in <strong className="text-emerald-400">{getTranslatedSkill(skillId)}</strong>
+                                Earn <strong className="text-emerald-400 font-semibold">+{displayAmount}</strong> in <strong className="text-emerald-400 font-semibold">{getTranslatedSkill(skillId)}</strong>
                               </span>
                             </div>
                           );

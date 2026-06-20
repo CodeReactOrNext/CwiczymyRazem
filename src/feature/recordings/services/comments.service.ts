@@ -36,7 +36,7 @@ export const addComment = async (recordingId: string, userId: string, content: s
     transaction.set(newCommentRef, {
       userId,
       userName: userData.displayName,
-      userAvatarUrl: userData.photoURL || null,
+      userAvatarUrl: userData.avatar || userData.photoURL || null,
       userAvatarFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
       content,
       createdAt: serverTimestamp(),
@@ -59,7 +59,7 @@ export const addComment = async (recordingId: string, userId: string, content: s
         userId: recipientId,
         senderId: userId,
         senderName: userData.displayName || "Someone",
-        senderAvatarUrl: userData.photoURL || null,
+        senderAvatarUrl: userData.avatar || userData.photoURL || null,
         senderFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
         type: "comment",
         recordingId: recordingId,

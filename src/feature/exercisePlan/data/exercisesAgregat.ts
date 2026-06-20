@@ -248,9 +248,11 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
+import { spiderQuarterNotesExercise } from "./exerises/spiderQuarterNotes/spiderQuarterNotes";
 
 
 const rawExercises: Exercise[] = [
+  spiderQuarterNotesExercise,
   spiderOneStringExercise,
   spiderStairsHardExercise,
   SpiderStringSkippingExercise,

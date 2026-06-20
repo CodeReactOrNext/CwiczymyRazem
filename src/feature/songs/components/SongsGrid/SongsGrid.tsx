@@ -83,7 +83,7 @@ export const SongsGrid = ({
           <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-in fade-in duration-500'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3 animate-in fade-in duration-500'>
           {songs.map((song) => {
             let userStatus: SongStatus | undefined;
             if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
@@ -143,7 +143,7 @@ export const SongsGrid = ({
       <div className='mt-auto pt-8'>
         {(currentPage > 1 || hasMore) && (
           <div className='flex justify-center'>
-            <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
+            <div className='rounded-2xl bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -151,12 +151,12 @@ export const SongsGrid = ({
                   onPageChange(currentPage - 1);
                 }}
                 disabled={currentPage <= 1}
-                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Previous
               </Button>
               
-              <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-2">
+              <div className="text-xs font-bold text-zinc-500 px-2">
                 Page {currentPage}
               </div>
 
@@ -167,7 +167,7 @@ export const SongsGrid = ({
                   onPageChange(currentPage + 1);
                 }}
                 disabled={!hasMore}
-                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Next
               </Button>

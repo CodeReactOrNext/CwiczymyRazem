@@ -18,7 +18,7 @@ export const earTrainingEasy: Exercise = {
     "Practice daily in short, focused bursts rather than long, fatiguing sessions."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 120,
     recommended: 80
   },
@@ -45,7 +45,7 @@ export const earTrainingMedium: Exercise = {
   ],
   tips: ["Focus on the starting note first."],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 120,
     recommended: 90
   },
@@ -72,7 +72,7 @@ export const earTrainingHard: Exercise = {
   ],
   tips: ["Write down the intervals if it helps."],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 100
   },

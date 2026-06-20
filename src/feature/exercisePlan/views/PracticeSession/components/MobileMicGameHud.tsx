@@ -22,7 +22,7 @@ export function MobileMicGameHud() {
 
         {/* Score */}
         <div className="flex-1">
-          <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
           <div className="flex items-baseline gap-1">
             <motion.span
               key={gameState.score}
@@ -41,7 +41,7 @@ export function MobileMicGameHud() {
 
         {/* Accuracy */}
         <div className="flex-1 text-center">
-          <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
           <div className="flex items-center justify-center gap-1.5">
             <span className="text-xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
             <AnimatePresence mode="wait">
@@ -69,7 +69,7 @@ export function MobileMicGameHud() {
 
         {/* Streak */}
         <div className="flex-1 text-right">
-          <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Streak</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Streak</span>
           <div className="flex items-center justify-end gap-1.5">
             <span className="text-2xl font-black text-cyan-400 tabular-nums">{gameState.combo}</span>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-main/20 border border-main/20">
@@ -95,7 +95,7 @@ export function MobileMicGameHud() {
                 initial={{ y: 20, opacity: 0, scale: 0.5 }}
                 animate={{ y: 0, opacity: 1, scale: style.scale }}
                 exit={{ y: -20, opacity: 0, scale: style.scale + 0.3 }}
-                className={cn("text-xl font-black uppercase italic tracking-tighter", style.color, style.dropShadow)}
+                className={cn("text-xl font-black capitalize italic tracking-tighter", style.color, style.dropShadow)}
               >
                 {gameState.lastFeedback}
               </motion.div>

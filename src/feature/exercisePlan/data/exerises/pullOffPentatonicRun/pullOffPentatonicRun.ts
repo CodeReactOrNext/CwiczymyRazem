@@ -18,7 +18,7 @@ export const pullOffPentatonicRunExercise: Exercise = {
     "Keep idle fingers hovering close to the fretboard to minimize unnecessary movement.",
     "Isolate and slow down the direction change at the bottom string (A→D) to keep timing even.",
   ],
-  metronomeSpeed: { min: 60, max: 160, recommended: 50 },
+  metronomeSpeed: { min: 40, max: 160, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pull-off.mp3", sourceBpm: 50 },
   relatedSkills: ["legato"],
   tablature: [

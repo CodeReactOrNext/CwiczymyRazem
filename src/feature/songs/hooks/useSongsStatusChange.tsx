@@ -97,11 +97,16 @@ export const useSongsStatusChange = ({
         await onTableStatusChange();
       }
 
-      const pointsMsg = result.pointsAdded !== 0
-        ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)`
-        : "";
+      if (result.insufficientPracticeTime) {
+        toast.success(t("status_updated"));
+        toast.info(t("learned_needs_practice_time"));
+      } else {
+        const pointsMsg = result.pointsAdded !== 0
+          ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)`
+          : "";
 
-      toast.success(`${t("status_updated")}${pointsMsg}`);
+        toast.success(`${t("status_updated")}${pointsMsg}`);
+      }
     } catch {
       // Roll back the optimistic move so the UI matches the server again.
       if (!options?.skipOptimisticUpdate) {

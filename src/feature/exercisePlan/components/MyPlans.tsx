@@ -225,11 +225,12 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   }
 
   const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
-    return (["easy", "medium", "hard"] as const).map((difficulty) => {
+    return (["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
       const difficultyPlans = sourcePlans.filter((p) => p.difficulty === difficulty);
       if (difficultyPlans.length === 0) return null;
 
       const difficultyLabel = {
+        beginner: { color: "text-sky-500" },
         easy: { color: "text-emerald-500" },
         medium: { color: "text-amber-500" },
         hard: { color: "text-red-500" }

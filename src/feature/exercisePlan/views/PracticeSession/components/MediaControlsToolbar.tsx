@@ -1,6 +1,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { RippleButton } from "hooks/useRipple";
 import { Check, ChevronDown, Snail, X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -9,6 +10,7 @@ import { GiGuitar } from "react-icons/gi";
 
 import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
+import { MicTroubleshooting } from "./MicTroubleshooting";
 import { useLiveTuner } from "../hooks/useLiveTuner";
 
 const SPEED_MODES: { value: number; label: string }[] = [
@@ -92,7 +94,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
         <div className="flex gap-1.5 flex-wrap">
           {showBacking && hasAudioTrack && (
-            <button
+            <RippleButton
               onClick={onAudioToggle}
               disabled={isRiddleMode}
               title={isAudioMuted ? "Backing track off" : "Backing track on"}
@@ -105,7 +107,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               )}
             >
               <GiGuitar className="text-sm" />
-            </button>
+            </RippleButton>
           )}
 
           {showBacking && hasAudioTrack && hasMicControls && (
@@ -114,7 +116,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
           {hasMicControls && (
             <>
-              <button
+              <RippleButton
                 onClick={examMode && isMicEnabled ? undefined : onMicToggle}
                 disabled={examMode && isMicEnabled}
                 title={examMode && isMicEnabled ? "Pitch Detect required during exam" : isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
@@ -127,23 +129,23 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}
               >
                 <FaMicrophone className="h-3 w-3" />
-              </button>
+              </RippleButton>
 
               {isMicEnabled && (
-                <button
+                <RippleButton
                   onClick={onRecalibrate}
                   title="Recalibrate"
                   className="flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90 bg-zinc-800 text-zinc-400 hover:text-white"
                 >
                   <FaSync className="h-3 w-3" />
-                </button>
+                </RippleButton>
               )}
 
               {/* Electron-only amp simulator (renders nothing on web) */}
               <AmpSimButton compact />
 
               {hasTuner && (
-                <button
+                <RippleButton
                   onClick={() => setIsTunerOpen(true)}
                   title="Tuner"
                   className={cn(
@@ -154,8 +156,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   )}
                 >
                   <TuningForkIcon className="h-3 w-3" />
-                </button>
+                </RippleButton>
               )}
+
+              <MicTroubleshooting compact />
             </>
           )}
           {trailing}
@@ -192,7 +196,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           {showBacking && hasAudioTrack && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <RippleButton
                   onClick={onAudioToggle}
                   disabled={isRiddleMode}
                   className={cn(
@@ -205,7 +209,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   )}
                 >
                   <GiGuitar className="text-lg" />
-                </button>
+                </RippleButton>
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 {isAudioMuted ? "Backing track off" : "Backing track on"}
@@ -225,7 +229,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
         <div className="flex items-center gap-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
+              <RippleButton
                 onClick={examMode && isMicEnabled ? undefined : onMicToggle}
                 disabled={examMode && isMicEnabled}
                 className={cn(
@@ -239,7 +243,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               >
                 <FaMicrophone className="h-4 w-4 shrink-0" />
                 <span className="text-[10px] font-semibold tracking-wide">Pitch Detect</span>
-              </button>
+              </RippleButton>
             </TooltipTrigger>
             <TooltipContent side="bottom">
               {examMode && isMicEnabled
@@ -253,7 +257,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           {isMicEnabled && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <RippleButton
                   onClick={onRecalibrate}
                   className={cn(
                     "flex items-center gap-2 px-4 rounded-lg transition-all bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 active:scale-95",
@@ -262,7 +266,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 >
                   <FaSync className="h-4 w-4 shrink-0" />
                   <span className="text-[10px] font-semibold tracking-wide">Recalibrate</span>
-                </button>
+                </RippleButton>
               </TooltipTrigger>
               <TooltipContent side="bottom">Recalibrate microphone</TooltipContent>
             </Tooltip>
@@ -274,7 +278,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           {hasTuner && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <RippleButton
                   onClick={() => setIsTunerOpen(true)}
                   className={cn(
                     "flex items-center gap-2 px-4 rounded-lg transition-all active:scale-95",
@@ -286,11 +290,13 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 >
                   <TuningForkIcon className="h-4 w-4 shrink-0" />
                   <span className="text-[10px] font-semibold tracking-wide">Tuner</span>
-                </button>
+                </RippleButton>
               </TooltipTrigger>
               <TooltipContent side="bottom">Chromatic tuner</TooltipContent>
             </Tooltip>
           )}
+
+          <MicTroubleshooting />
         </div>
       )}
 
@@ -329,7 +335,7 @@ function SpeedDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <RippleButton
           title="Playback speed — slow down to learn tricky passages"
           className={cn(
             "flex items-center rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
@@ -343,7 +349,7 @@ function SpeedDropdown({
           <Snail className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
           <span className={cn("font-mono font-bold", compact ? "text-[10px]" : "text-sm")}>{current.label}</span>
           <ChevronDown className={cn("opacity-60 shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
-        </button>
+        </RippleButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" className="min-w-[9rem] border border-white/10 bg-zinc-900 text-white">
         {SPEED_MODES.map(({ value, label }) => {
@@ -407,12 +413,12 @@ function TunerDialog({
         className="relative bg-zinc-900 rounded-lg shadow-2xl p-8 w-72"
         onClick={e => e.stopPropagation()}
       >
-        <button
+        <RippleButton
           onClick={onClose}
           className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
         >
           <X size={16} />
-        </button>
+        </RippleButton>
 
         <p className="text-[10px] font-semibold tracking-wide text-zinc-500 text-center mb-4">Tuner</p>
 

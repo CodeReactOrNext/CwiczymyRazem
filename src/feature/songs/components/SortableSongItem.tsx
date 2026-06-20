@@ -9,7 +9,6 @@ import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ChevronRight, Clock, FileMusic, GripVertical, MoreVertical, Music, Play, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -229,22 +228,22 @@ export const SortableSongItem = ({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex items-center gap-3 px-3 py-2.5 transition-colors select-none overflow-hidden",
+        "group relative flex items-center gap-3 px-3 py-2 rounded-lg transition-colors select-none overflow-hidden",
         isMobile ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         (!disableDnd && !isMobile) && "touch-none",
         isDragging ? "opacity-0" : "hover:bg-zinc-800/60 active:bg-zinc-800",
       )}
     >
-      {/* Tiny Cover Icon */}
-      <div 
-        className="relative h-6 w-6 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800 cursor-pointer"
+      {/* Cover */}
+      <div
+        className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md bg-zinc-800 cursor-pointer"
         onClick={(e) => { e.stopPropagation(); onOpenDetails?.(song); }}
       >
         {song.coverUrl ? (
           <img src={song.coverUrl} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-zinc-900/50">
-            <Music className={cn("h-3 w-3 opacity-40", config.color)} />
+            <Music className={cn("h-4 w-4 opacity-40", config.color)} />
           </div>
         )}
       </div>
@@ -257,8 +256,8 @@ export const SortableSongItem = ({
         <span 
           translate="no" 
           className={cn(
-            "truncate text-[14px] transition-colors",
-            isDragging ? "text-white font-medium" : "text-zinc-400 group-hover:text-white"
+            "truncate text-sm font-medium transition-colors",
+            isDragging ? "text-white" : "text-zinc-300 group-hover:text-white"
           )}
         >
           {song.title}
@@ -266,30 +265,20 @@ export const SortableSongItem = ({
       </div>
 
       {/* Tier & Actions (Subtle) */}
-      <div className="flex items-center gap-2 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
-        <div 
-          className="flex h-6 w-6 items-center justify-center rounded-[4px] text-[11px] font-black shadow-sm leading-none"
-          style={{ 
-            backgroundColor: `${getSongTier(song.tier || 0).color}15`,
-            color: getSongTier(song.tier || 0).color 
-          }}
-        >
-          {getSongTier(song.tier || 0).tier}
-        </div>
-        
+      <div className="flex items-center gap-2 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="p-1 hover:text-white text-zinc-500 transition-colors"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/10 hover:text-white active:scale-95"
               onClick={(e) => e.stopPropagation()}
             >
-              <MoreVertical className="h-3 w-3" />
+              <MoreVertical className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-zinc-950 backdrop-blur-xl p-1.5 shadow-2xl text-zinc-400 rounded-lg">
+          <DropdownMenuContent align="end" className="w-56 bg-zinc-950 backdrop-blur-xl p-2 shadow-2xl text-zinc-400 rounded-lg space-y-1">
              <DropdownMenuItem
                     onClick={() => onPracticeWithGp ? onPracticeWithGp(song) : router.push(`/timer/song/${song.id}`)}
-                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
                   >
                     <Play className="h-3 w-3 fill-current" />
                     Practice
@@ -304,11 +293,11 @@ export const SortableSongItem = ({
                         key={status}
                         onClick={() => onStatusChange(song.id, status, song.title, song.artist)}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 text-sm font-medium cursor-pointer rounded-lg transition-colors",
+                          "flex items-center gap-3 px-3 py-2.5 text-sm font-medium cursor-pointer rounded-lg transition-colors",
                           isActive ? "bg-zinc-800/50 text-white" : "hover:bg-zinc-800 hover:text-white"
                         )}
                       >
-                        <Icon className={cn("h-3 w-3", statusConfig.color)} />
+                        <Icon className="h-3 w-3 text-zinc-400" />
                         <span className="flex-1">
                           Move to {t(`status.${status}` as any)}
                         </span>
@@ -318,7 +307,7 @@ export const SortableSongItem = ({
                   <div className="h-px bg-white/5 my-1" />
                   <DropdownMenuItem
                     onClick={() => onSongRemove(song.id)}
-                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-500/70 hover:bg-red-500/10 hover:text-red-500 cursor-pointer rounded-lg"
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
                   >
                     <Trash2 className="h-3 w-3" />
                     Remove

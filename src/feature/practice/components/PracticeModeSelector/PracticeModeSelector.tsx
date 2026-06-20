@@ -15,6 +15,7 @@ import {
   Route,
   Sparkles,
 } from "lucide-react";
+import { useRipple } from "hooks/useRipple";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FaClock, FaGuitar } from "react-icons/fa";
@@ -35,6 +36,82 @@ const colorMap = {
 } as const;
 
 type ColorKey = keyof typeof colorMap;
+
+interface ModeCardProps {
+  Icon: React.ElementType;
+  title: string;
+  description: string;
+  ck: ColorKey;
+  loading: boolean;
+  locked?: boolean;
+  lockLabel?: string;
+  hero?: boolean;
+  onActivate: () => void;
+}
+
+const ModeCard = ({
+  Icon,
+  title,
+  description,
+  ck,
+  loading,
+  locked,
+  lockLabel,
+  hero,
+  onActivate,
+}: ModeCardProps) => {
+  const c = colorMap[ck];
+  const { createRipple, ripple } = useRipple("bg-white/15");
+  const interactive = lockLabel !== "Soon" && !locked;
+
+  return (
+    <div
+      className={`group relative flex items-center gap-3 overflow-hidden rounded-lg transition-all duration-300 ${
+        hero
+          ? "bg-white/[0.03] p-[18px] backdrop-blur-md border border-white/[0.02]"
+          : "bg-white/[0.02] p-3.5 backdrop-blur-sm"
+      } ${
+        lockLabel === "Soon"
+          ? "cursor-default grayscale opacity-50"
+          : locked
+            ? "opacity-60 cursor-default"
+            : `cursor-pointer ${hero ? "hover:bg-white/[0.08]" : "hover:bg-white/[0.06]"} hover:shadow-2xl hover:shadow-black/20`
+      }`}
+      onClick={(e) => {
+        if (lockLabel === "Soon") return;
+        if (interactive || locked) createRipple(e);
+        if (!loading) onActivate();
+      }}
+      tabIndex={0}
+      role="button"
+    >
+      {ripple}
+      <div className={`flex flex-shrink-0 items-center justify-center rounded-lg ${c.iconBg} ${c.iconBorder} ${hero ? "h-14 w-14 transition-all duration-500" : "h-12 w-12 transition-all duration-300"} group-hover:scale-105 shadow-lg`}>
+        {loading
+          ? <div className={`${hero ? "h-7 w-7" : "h-6 w-6"} animate-spin rounded-full border-[3px] border-white border-t-transparent`} />
+          : <Icon className={`${hero ? "h-7 w-7 drop-shadow-md" : "h-6 w-6"} ${c.iconText} transition-colors duration-300`} />
+        }
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <h3 className={hero ? "truncate text-[16px] font-black text-white tracking-wide" : "truncate text-[14px] font-bold text-zinc-100 group-hover:text-white transition-colors"}>{title}</h3>
+          {locked && (
+            <div className={`flex items-center gap-1 rounded-full bg-amber-500/10 ${hero ? "px-2.5" : "px-2"} py-0.5 ring-1 ring-amber-500/20`}>
+              <Lock className="h-2.5 w-2.5 text-amber-500/80" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80">{lockLabel}</span>
+            </div>
+          )}
+        </div>
+        <p className={hero ? "text-[13px] text-zinc-400 font-medium leading-relaxed" : "truncate text-[12px] text-zinc-500 group-hover:text-zinc-400 transition-colors"}>{description}</p>
+      </div>
+      {!locked && (
+        <div className={`flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300 ${hero ? "ml-2" : ""}`}>
+          <ArrowRight className="h-4 w-4 text-zinc-700 transition-all group-hover:translate-x-1 group-hover:text-zinc-200" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const PracticeModeSelector = () => {
   const userInfo = useAppSelector(selectUserInfo);
@@ -66,48 +143,17 @@ export const PracticeModeSelector = () => {
     locked?: boolean,
     lockLabel?: string,
   ) => {
-    const c = colorMap[ck];
-    const loading = loadingMode === id;
     return (
-      <div
-        className={`group relative flex items-center gap-3 rounded-lg bg-white/[0.02] p-3.5 backdrop-blur-sm transition-all duration-300 ${
-          lockLabel === "Soon" 
-            ? "cursor-default grayscale opacity-50" 
-            : locked 
-              ? "opacity-60 cursor-default" 
-              : "cursor-pointer hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-black/20"
-        }`}
-        onClick={() => {
-          if (lockLabel === "Soon") return;
-          if (!loading) nav(href, id, locked);
-        }}
-        tabIndex={0}
-        role="button"
-      >
-        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg ${c.iconBg} ${c.iconBorder} transition-all duration-300 group-hover:scale-105 shadow-lg`}>
-          {loading
-            ? <div className="h-6 w-6 animate-spin rounded-full border-[3px] border-white border-t-transparent" />
-            : <Icon className={`h-6 w-6 ${c.iconText} transition-colors duration-300`} />
-          }
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="truncate text-[14px] font-bold text-zinc-100 group-hover:text-white transition-colors">{title}</h3>
-            {locked && (
-              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/20">
-                <Lock className="h-2.5 w-2.5 text-amber-500/80" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80">{lockLabel}</span>
-              </div>
-            )}
-          </div>
-          <p className="truncate text-[12px] text-zinc-500 group-hover:text-zinc-400 transition-colors">{description}</p>
-        </div>
-        {!locked && (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300">
-            <ArrowRight className="h-4 w-4 text-zinc-700 transition-all group-hover:translate-x-1 group-hover:text-zinc-200" />
-          </div>
-        )}
-      </div>
+      <ModeCard
+        Icon={Icon}
+        title={title}
+        description={description}
+        ck={ck}
+        loading={loadingMode === id}
+        locked={locked}
+        lockLabel={lockLabel}
+        onActivate={() => nav(href, id, locked)}
+      />
     );
   };
 
@@ -121,48 +167,18 @@ export const PracticeModeSelector = () => {
     locked?: boolean,
     lockLabel?: string,
   ) => {
-    const c = colorMap[ck];
-    const loading = loadingMode === id;
     return (
-      <div
-        className={`group relative flex items-center gap-3 rounded-lg bg-white/[0.03] p-[18px] backdrop-blur-md transition-all duration-300 border border-white/[0.02] ${
-          lockLabel === "Soon" 
-            ? "cursor-default grayscale opacity-50" 
-            : locked 
-              ? "opacity-60 cursor-default" 
-              : "cursor-pointer hover:bg-white/[0.08] hover:shadow-2xl hover:shadow-black/20"
-        }`}
-        onClick={() => {
-          if (lockLabel === "Soon") return;
-          if (!loading) nav(href, id, locked);
-        }}
-        tabIndex={0}
-        role="button"
-      >
-        <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg ${c.iconBg} ${c.iconBorder} transition-all duration-500 group-hover:scale-105 shadow-lg`}>
-          {loading
-            ? <div className="h-7 w-7 animate-spin rounded-full border-[3px] border-white border-t-transparent" />
-            : <Icon className={`h-7 w-7 ${c.iconText} transition-colors duration-300 drop-shadow-md`} />
-          }
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="truncate text-[16px] font-black text-white tracking-wide">{title}</h3>
-            {locked && (
-              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 ring-1 ring-amber-500/20">
-                <Lock className="h-2.5 w-2.5 text-amber-500/80" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80">{lockLabel}</span>
-              </div>
-            )}
-          </div>
-          <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">{description}</p>
-        </div>
-        {!locked && (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300 ml-2">
-            <ArrowRight className="h-4 w-4 text-zinc-700 transition-all group-hover:translate-x-1 group-hover:text-zinc-200" />
-          </div>
-        )}
-      </div>
+      <ModeCard
+        hero
+        Icon={Icon}
+        title={title}
+        description={description}
+        ck={ck}
+        loading={loadingMode === id}
+        locked={locked}
+        lockLabel={lockLabel}
+        onActivate={() => nav(href, id, locked)}
+      />
     );
   };
 
@@ -172,7 +188,7 @@ export const PracticeModeSelector = () => {
         <div className="font-openSans container mx-auto max-w-6xl px-4 py-8 sm:px-6">
           <div className="flex flex-col gap-12">
             <div>
-              <h2 className="text-lg font-bold text-indigo-400 mb-4">Practice</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Practice</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {hasLastSession && heroListItem("resume", History, "Resume Last", "Continue playing where you left off", "/timer/practice", "indigo")}
                 {heroListItem("routine",  ListChecks,    "Daily Routine", "Follow daily guided routine",   "/timer/plans",   "indigo")}
@@ -182,7 +198,7 @@ export const PracticeModeSelector = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-rose-400 mb-4">Learn</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Learn</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("journey",  Route,      "Learning Path", "Step-by-step progress",   "/journey",       "rose")}
                 {listItem("roadmap", Map, "Roadmaps", "Structured learning paths", "/ai-coach", "rose", !isMaster, "Master")}
@@ -191,7 +207,7 @@ export const PracticeModeSelector = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-emerald-400 mb-4">Discover</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Discover</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("skills",    Brain,    "Skills", "Specific skill focus",         "/profile/skills",     "emerald")}
                 {listItem("exercises", Dumbbell, "Exercises",  "Full exercise library",             "/profile/skills?tab=browse",  "emerald")}
@@ -199,7 +215,7 @@ export const PracticeModeSelector = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-amber-400 mb-4">Tools</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Tools</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("smart", PiMagicWandDuotone, "Auto plan", "Automatically generated session", "/timer/auto", "amber", !isMaster, "Master")}
                 {listItem("timer",  LuTimer,  "Free Timer", "Practice with a timer", "/timer/practice", "amber")}

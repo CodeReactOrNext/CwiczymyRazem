@@ -15,14 +15,16 @@ import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import {motion } from "framer-motion";
-import { 
-  BookOpen, 
+import {
+  BookOpen,
   CheckCircle,
   HelpCircle,
   Loader2,
-  Music, 
+  Music,
+  Play,
   Star,
   Users} from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -206,7 +208,7 @@ const SongSheet = ({
             {/* Spotify Player */}
             {song.spotifyId && (
               <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                <p className="text-[10px] font-bold text-zinc-500 mb-3">Spotify playback</p>
+                <p className="text-xs font-bold text-zinc-400 mb-3">Spotify playback</p>
                 <div className="rounded-lg overflow-hidden">
                    <SpotifyPlayer trackId={song.spotifyId} height={80} />
                 </div>
@@ -216,16 +218,15 @@ const SongSheet = ({
             {/* Stats Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-white/[0.03] p-4">
-                <p className="text-[10px] font-bold text-zinc-600 mb-1">Popularity</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1">Popularity</p>
                 <div className="flex items-center gap-2 text-white">
-                  <Users className="h-4 w-4 text-cyan-500" />
                   <span className="text-lg font-black">{song.popularity || 0}</span>
                 </div>
               </div>
               <div className="rounded-lg bg-white/[0.03] p-4">
-                <p className="text-[10px] font-bold text-zinc-600 mb-1">Difficulty</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1">Difficulty</p>
                 <div className="flex items-center gap-2 text-white">
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500/20" />
+                  <TierBadge song={song} className="h-6 w-6 rounded-md text-[11px]" />
                   <span className="text-lg font-black">{avgDifficulty.toFixed(1)}</span>
                 </div>
               </div>
@@ -233,7 +234,7 @@ const SongSheet = ({
 
             {/* Status Options */}
             <div className="space-y-4 pt-4">
-              <h4 className="text-[10px] font-bold text-zinc-500">Music library status</h4>
+              <h4 className="text-xs font-bold text-zinc-400">Music library status</h4>
               <div className="grid gap-2">
                 {STATUS_OPTIONS.map((opt) => {
                   const Icon = opt.icon;
@@ -278,7 +279,7 @@ const SongSheet = ({
 
             {/* Practitioners Section */}
             <div className="space-y-4 pt-4">
-               <h4 className="text-[10px] font-bold text-zinc-500">Who's practicing</h4>
+               <h4 className="text-xs font-bold text-zinc-400">In libraries</h4>
                {isLoadingUsers ? (
                  <div className="flex gap-2">
                     {[...Array(3)].map((_, i) => (
@@ -304,7 +305,7 @@ const SongSheet = ({
                      </div>
                    ))}
                    {song.practicingUsers && song.practicingUsers.length > 10 && (
-                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-[10px] font-bold text-zinc-500">
+                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-xs font-bold text-zinc-400">
                         +{song.practicingUsers.length - 10}
                      </div>
                    )}
@@ -316,7 +317,7 @@ const SongSheet = ({
 
             {/* Rating Section */}
             <div className="space-y-4 pt-4">
-              <h4 className="flex items-center gap-2 text-[10px] font-bold text-zinc-500">
+              <h4 className="flex items-center gap-2 text-xs font-bold text-zinc-400">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -339,12 +340,21 @@ const SongSheet = ({
           </div>
         </div>
 
-        <div className="p-6 bg-zinc-950/80 backdrop-blur-xl">
-          <Button 
+        <div className="p-6 bg-zinc-950/80 backdrop-blur-xl flex gap-3">
+          <Link href={`/timer/song/${song.id}`} onClick={onClose} className="flex-1">
+            <Button
+                className="relative h-14 w-full overflow-hidden rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-2xl border-none"
+            >
+              <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
+              <Play className="mr-3 h-5 w-5 fill-current" />
+              <span className="text-sm">Practice</span>
+            </Button>
+          </Link>
+          <Button
               onClick={onClose}
-              className="h-14 w-full rounded-lg bg-zinc-900 font-bold text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800 transition-all shadow-2xl"
+              className="h-14 px-6 rounded-lg bg-zinc-900 font-bold text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800 transition-all shadow-2xl"
           >
-            Close details
+            Close
           </Button>
         </div>
       </SheetContent>

@@ -435,6 +435,7 @@ export const CreateCustomExerciseDialog = ({
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-900 border-zinc-800">
+                            <SelectItem value="beginner">{t("exercises:difficulty.beginner")}</SelectItem>
                             <SelectItem value="easy">{t("exercises:difficulty.easy")}</SelectItem>
                             <SelectItem value="medium">{t("exercises:difficulty.medium")}</SelectItem>
                             <SelectItem value="hard">{t("exercises:difficulty.hard")}</SelectItem>

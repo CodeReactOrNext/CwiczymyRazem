@@ -21,6 +21,8 @@ import {
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
+import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
+import { getReconciledStreak } from "utils/gameLogic";
 
 const StatsBox = ({
   Icon,
@@ -50,6 +52,7 @@ interface UserTooltipProps {
 
 export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipProps) => {
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
+  const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation("common");
 
@@ -57,12 +60,40 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
     if (!userId) {
       return;
     }
+    let cancelled = false;
     const fetchData = async () => {
       const data = await firebaseGetUserTooltipData(userId);
+      if (cancelled) return;
       setUserData(data);
       setLoading(false);
+
+      // The stored `actualDayWithoutBreak` counter can drift from the truth in
+      // either direction after a timezone slip; the activity log (local time) is
+      // authoritative once loaded, so reconcile against it exactly like the
+      // header StreakBox / profile do (see getReconciledStreak).
+      if (data) {
+        try {
+          const logs = await firebaseGetUserRaprotsLogs(userId, "all");
+          if (cancelled) return;
+          const { dayWithoutBreak } = getReconciledStreak({
+            actualDayWithoutBreak: data.statistics.actualDayWithoutBreak,
+            lastReportDate: data.statistics.lastReportDate,
+            reportDates: logs.map((log) =>
+              log?.reportDate?.seconds
+                ? new Date(log.reportDate.seconds * 1000)
+                : null
+            ),
+          });
+          setReconciledStreak(dayWithoutBreak);
+        } catch (error) {
+          console.error("Failed to reconcile tooltip streak:", error);
+        }
+      }
     };
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   if (!userId) return <>{children}</>;
@@ -148,7 +179,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                 <StatsBox
                   Icon={FaFire}
                   label={t("tooltip.actual_streak")}
-                  value={userData.statistics.actualDayWithoutBreak}
+                  value={reconciledStreak ?? userData.statistics.actualDayWithoutBreak}
                 />
                 <StatsBox
                   Icon={FaMusic}

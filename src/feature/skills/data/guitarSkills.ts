@@ -7,6 +7,7 @@ import {
   GiGuitarHead,
   GiHand,
   GiHeadphones,
+  GiJumpAcross,
   GiLightBulb,
   GiMetronome,
   GiMicrophone,
@@ -133,6 +134,11 @@ export const guitarSkills: GuitarSkill[] = [
     id: "hybrid_picking",
     category: "technique",
     icon: GiPickOfDestiny,
+  },
+  {
+    id: "string_skipping",
+    category: "technique",
+    icon: GiJumpAcross,
   },
 
 

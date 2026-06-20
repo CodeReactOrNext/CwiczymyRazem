@@ -20,7 +20,7 @@ export const economyPickingAngularExercise: Exercise = {
     "Keep your picking stroke compact and close to the strings to maximize efficiency.",
     "Practice slowly to coordinate the exact moment of pick crossing with your fretting hand.",
   ],
-  metronomeSpeed: { min: 60, max: 180, recommended: 60 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 60 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

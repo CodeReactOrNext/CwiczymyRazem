@@ -73,7 +73,8 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             }
 
             let points = 0;
-            if (exercise.difficulty === 'easy') points = 1;
+            if (exercise.difficulty === 'beginner') points = 1;
+            else if (exercise.difficulty === 'easy') points = 1;
             else if (exercise.difficulty === 'medium') points = 2;
             else if (exercise.difficulty === 'hard') points = 3;
 

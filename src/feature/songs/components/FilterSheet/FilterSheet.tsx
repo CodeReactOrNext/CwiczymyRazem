@@ -14,8 +14,9 @@ import {
   SheetTitle,
 } from "assets/components/ui/sheet";
 import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
-import { ArrowUpDown, Check, Filter, Music, X } from "lucide-react";
+import { ArrowUpDown, Check, Music, X } from "lucide-react";
 import React from "react";
 
 interface FilterSheetProps {
@@ -102,8 +103,7 @@ const FilterSheet = ({
         <div className="flex flex-col h-full">
           <SheetHeader className="p-6">
             <div className="flex items-center justify-between">
-              <SheetTitle className="text-2xl font-black text-white flex items-center gap-2">
-                <Filter className="h-5 w-5 text-cyan-500" />
+              <SheetTitle className="text-2xl font-semibold text-white">
                 Filter & Sort
               </SheetTitle>
               {hasFilters && (
@@ -129,7 +129,7 @@ const FilterSheet = ({
             {/* Tier Section (Multi-select) */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-[10px] font-black text-zinc-500">Skill tiers</h4>
+                <h4 className="text-sm font-semibold text-zinc-300">Skill tiers</h4>
                 <span className="text-[10px] text-zinc-600 font-bold">{localTiers.length} selected</span>
               </div>
               <div className="grid grid-cols-8 gap-2">
@@ -140,7 +140,7 @@ const FilterSheet = ({
                       key={t.tier}
                       onClick={() => toggleTier(t.tier)}
                       className={cn(
-                        "flex aspect-square items-center justify-center rounded-lg text-sm font-black transition-all active:scale-95",
+                        "relative flex aspect-square items-center justify-center rounded-lg text-sm font-black transition-all active:scale-95",
                         isActive ? "scale-105 shadow-lg brightness-110" : "opacity-30 grayscale-[0.8] hover:opacity-70 hover:grayscale-0"
                       )}
                       style={{
@@ -148,6 +148,7 @@ const FilterSheet = ({
                         color: t.color,
                       }}
                     >
+                      <Ripple />
                       {t.tier}
                     </button>
                   );
@@ -158,7 +159,7 @@ const FilterSheet = ({
             {/* Genre Section (Multi-select) */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-black text-zinc-500">Music genres</h4>
+                  <h4 className="text-sm font-semibold text-zinc-300">Music genres</h4>
                   {localGenres.length > 0 && (
                     <button 
                         onClick={() => setLocalGenres([])}
@@ -195,12 +196,13 @@ const FilterSheet = ({
                         key={g}
                         onClick={() => toggleGenre(g)}
                         className={cn(
-                          "flex h-10 items-center gap-2 rounded-lg px-3 text-xs font-bold transition-all text-left",
+                          "relative flex h-10 items-center gap-2 rounded-lg px-3 text-xs font-bold transition-all text-left",
                           isActive
                             ? "bg-cyan-500/10 text-cyan-400"
                             : "bg-white/[0.02] text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-300"
                         )}
                       >
+                        <Ripple />
                         <Music className={cn("h-3 w-3", isActive ? "text-cyan-400" : "opacity-30")} />
                         <span className="truncate capitalize">{g}</span>
                         {isActive && <Check className="ml-auto h-3 w-3" />}
@@ -212,7 +214,7 @@ const FilterSheet = ({
 
             {/* Sort Section */}
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-zinc-500">Display order</h4>
+              <h4 className="text-sm font-semibold text-zinc-300">Display order</h4>
               <Select 
                 value={localSortBy} 
                 onValueChange={(val) => {
@@ -236,9 +238,9 @@ const FilterSheet = ({
           </div>
 
           <div className="p-6 pb-40 sm:pb-6 bg-zinc-950/50 backdrop-blur-sm">
-            <Button 
+            <Button
                 onClick={handleApply}
-                className="h-14 w-full rounded-lg bg-cyan-600 font-black text-white shadow-xl shadow-cyan-900/20 hover:bg-cyan-500 transition-all active:scale-[0.98]"
+                className="h-14 w-full rounded-lg bg-white font-semibold text-black shadow-xl hover:bg-zinc-200 transition-all active:scale-[0.98]"
             >
               Apply changes
             </Button>

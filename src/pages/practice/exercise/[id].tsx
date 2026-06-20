@@ -12,7 +12,6 @@ export default function PracticeExercisePage() {
   const router = useRouter();
   const { id, mode, bpm, stepId, moduleId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -64,8 +63,8 @@ export default function PracticeExercisePage() {
 
   const isDataReady = router.isReady && !!plan;
 
-  if (!sessionReady) {
-    return <PracticeLoadingScreen isReady={isDataReady} onDone={() => setSessionReady(true)} />;
+  if (!isDataReady) {
+    return <PracticeLoadingScreen isReady={false} />;
   }
 
   return (

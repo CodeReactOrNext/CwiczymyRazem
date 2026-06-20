@@ -19,7 +19,7 @@ export const speedBurstChromaticBlitzExercise: Exercise = {
     "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
-    min: 100,
+    min: 40,
     max: 160,
     recommended: 120,
   },

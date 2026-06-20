@@ -233,19 +233,33 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
               />
             </TooltipTrigger>
             <TooltipContent className="p-0 border-0 bg-transparent shadow-2xl" side="top">
-              <div className="flex flex-col w-44 overflow-hidden rounded-xl" style={{ border: `1px solid ${specialGuitarColor}50`, background: "#111" }}>
-                <div className="px-3 pt-3 pb-1">
-                  <p className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${specialGuitarColor}cc` }}>{specialGuitarDef.brand}</p>
+              <div
+                className="flex flex-col w-44 overflow-hidden rounded-2xl"
+                style={{
+                  border: `1px solid ${specialGuitarColor}40`,
+                  background: "linear-gradient(160deg, #18181c 0%, #0b0b0d 100%)",
+                  boxShadow: `0 16px 40px -12px ${specialGuitarColor}55, 0 4px 12px rgba(0,0,0,0.5)`,
+                }}>
+                <div className="px-3.5 pt-3 pb-1">
+                  <p className="text-[9px] font-medium uppercase tracking-[0.18em]" style={{ color: `${specialGuitarColor}cc` }}>{specialGuitarDef.brand}</p>
                   <p className="text-sm font-bold text-white leading-tight">{specialGuitarDef.name}</p>
                   <span className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest" style={{ backgroundColor: `${specialGuitarColor}20`, color: specialGuitarColor, border: `1px solid ${specialGuitarColor}40` }}>
                     <FaGem size={7} />
                     {specialGuitarDef.rarity}
                   </span>
                 </div>
-                <div className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg" style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}18 0%, transparent 70%)` }}>
-                  <img src={`/static/images/rank/${imgPath}.webp`} alt={specialGuitarDef.name} className="object-contain drop-shadow-xl h-52 w-auto -rotate-90" />
+                <div className="relative flex items-center justify-center px-2 py-3 mx-2 my-1.5 rounded-xl overflow-hidden">
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}30 0%, ${specialGuitarColor}0d 50%, transparent 72%)` }}
+                  />
+                  <img
+                    src={`/static/images/rank/${imgPath}.webp`}
+                    alt={specialGuitarDef.name}
+                    className="relative object-contain h-64 w-auto -rotate-90 drop-shadow-[0_6px_16px_rgba(0,0,0,0.65)] brightness-110"
+                  />
                 </div>
-                <div className="flex items-center justify-between px-3 py-2 text-[10px] text-gray-400" style={{ borderTop: `1px solid ${specialGuitarColor}20`, background: `${specialGuitarColor}08` }}>
+                <div className="flex items-center justify-between px-3.5 py-2 text-[10px] text-gray-400" style={{ borderTop: `1px solid ${specialGuitarColor}20`, background: `${specialGuitarColor}08` }}>
                   <span className="font-semibold text-gray-300">{guitarYear ?? `${specialGuitarDef.yearFrom}–${specialGuitarDef.yearTo}`}</span>
                   <span className="text-gray-500 uppercase tracking-widest text-[9px]">{guitarCountry ?? specialGuitarDef.countries[0]}</span>
                 </div>

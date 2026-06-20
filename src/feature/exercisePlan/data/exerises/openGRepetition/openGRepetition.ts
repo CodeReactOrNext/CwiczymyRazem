@@ -4,7 +4,7 @@ export const openGRepetitionExercise: Exercise = {
   id: "open_g_repetition",
   title: "Open G String Repetition",
   description: "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 1.5,
   instructions: [

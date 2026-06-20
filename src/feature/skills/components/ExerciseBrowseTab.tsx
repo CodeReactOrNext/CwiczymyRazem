@@ -37,16 +37,17 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const DIFFICULTY_COLORS: Record<string, string> = {
+  beginner: "bg-sky-500/[0.12] text-sky-400 border-sky-500/30",
   easy: "bg-emerald-500/[0.12] text-emerald-400 border-emerald-500/30",
   medium: "bg-amber-500/[0.12] text-amber-400 border-amber-500/30",
   hard: "bg-rose-500/[0.12] text-rose-400 border-rose-500/30",
 };
 
 const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
-const DIFFICULTIES = ["all", "easy", "medium", "hard"] as const;
+const DIFFICULTIES = ["all", "beginner", "easy", "medium", "hard"] as const;
 
 type SortKey = "default" | "name" | "difficulty" | "time";
-const DIFFICULTY_RANK: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
+const DIFFICULTY_RANK: Record<string, number> = { beginner: 0, easy: 1, medium: 2, hard: 3 };
 const exTitle = (ex: { title: unknown; id: string }): string =>
   typeof ex.title === "string" ? ex.title : ((ex.title as any)?.en ?? ex.id);
 
@@ -180,7 +181,7 @@ export const ExerciseBrowseTab = ({
       description: exercise.description as any,
       category: category as any,
       requiredSkillId: skillId,
-      requiredLevel: exercise.difficulty === "easy" ? 0 : exercise.difficulty === "medium" ? 1 : 2,
+      requiredLevel: exercise.difficulty === "hard" ? 2 : exercise.difficulty === "medium" ? 1 : 0,
       rewardDescription: "Practice complete",
       exercises: [exercise],
       unlockDescription: "",
@@ -330,8 +331,7 @@ export const ExerciseBrowseTab = ({
                 {renderSortHead("difficulty", "Difficulty")}
                 <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
                 {renderSortHead("time", "Time", "right")}
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Rank</th>
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500 min-w-[160px]">Progress</th>
+                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500 min-w-[120px]">Result</th>
                 <th className="px-3 py-3 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
               </tr>
             </thead>
@@ -357,6 +357,16 @@ export const ExerciseBrowseTab = ({
                 const SkillIcon = skillData?.icon;
                 const bpmPct = hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0;
                 const hasLeaderboard = bpmStages.length > 0 || !!exercise.riddleConfig || (!!exercise.tablature && exercise.tablature.length > 0);
+                const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
+                const micAccuracy = progress?.micHighScoreAccuracy;
+                const rank = leaderboardRanks[exercise.id];
+                const resultText = hasBpmProgress
+                  ? `${maxBpm} BPM`
+                  : micScore != null && micScore > 0
+                    ? micAccuracy != null ? `${micAccuracy}%` : `${micScore} pts`
+                    : earScore != null && earScore > 0
+                      ? `${earScore} pts`
+                      : null;
 
                 return (
                   <tr
@@ -434,47 +444,48 @@ export const ExerciseBrowseTab = ({
                       }
                     </td>
 
-                    {/* Rank */}
+                    {/* Result (best score + leaderboard rank) */}
                     <td className="px-3 py-3.5">
-                      {isLoadingRanks && hasBeenAttempted && !leaderboardRanks[exercise.id] ? (
-                        <div className="h-6 w-6 rounded bg-zinc-800 animate-pulse ml-0.5" />
-                      ) : leaderboardRanks[exercise.id] ? (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
-                          className="flex items-center gap-2 group/rank cursor-pointer rounded hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-                          title="View Leaderboard"
-                        >
-                          <div className={cn(
-                            "flex items-center justify-center w-6 h-6 rounded font-bold text-[11px] transition-colors",
-                            leaderboardRanks[exercise.id] === 1 ? "bg-amber-500/20 text-amber-500" :
-                            leaderboardRanks[exercise.id] === 2 ? "bg-zinc-300/20 text-zinc-300" :
-                            leaderboardRanks[exercise.id] === 3 ? "bg-amber-700/20 text-amber-600" :
-                            "bg-zinc-800/40 text-zinc-400"
-                          )}>
-                            {leaderboardRanks[exercise.id]}
-                          </div>
-                        </button>
+                      {hasBeenAttempted && resultText != null ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); if (hasLeaderboard) onShowLeaderboard(exercise.id, title); }}
+                              className={cn(
+                                "flex items-center gap-2 rounded transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
+                                hasLeaderboard ? "cursor-pointer hover:opacity-80" : "cursor-default"
+                              )}
+                              title={hasLeaderboard ? "View Leaderboard" : undefined}
+                            >
+                              {rank ? (
+                                <span className={cn(
+                                  "flex items-center justify-center min-w-[24px] h-6 px-1 rounded font-bold text-[11px]",
+                                  rank === 1 ? "bg-amber-500/20 text-amber-500" :
+                                  rank === 2 ? "bg-zinc-300/20 text-zinc-300" :
+                                  rank === 3 ? "bg-amber-700/20 text-amber-600" :
+                                  "bg-zinc-800/40 text-zinc-400"
+                                )}>
+                                  #{rank}
+                                </span>
+                              ) : isLoadingRanks ? (
+                                <span className="h-6 w-6 rounded bg-zinc-800 animate-pulse" />
+                              ) : null}
+                              <span className="text-[11px] font-bold text-zinc-300 tabular-nums whitespace-nowrap">{resultText}</span>
+                            </button>
+                          </TooltipTrigger>
+                          {hasBpmProgress && (
+                            <TooltipContent side="top" className="font-normal text-xs">
+                              <div className="flex flex-col gap-1.5">
+                                <span className="text-zinc-200">{completedBpms.length} / {bpmStages.length} tempos · {bpmPct}%</span>
+                                <div className="h-1 w-32 rounded-full bg-zinc-700 overflow-hidden">
+                                  <div className="h-full rounded-full bg-cyan-400" style={{ width: `${bpmPct}%` }} />
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       ) : (
-                        <span className="text-zinc-800 text-[10px] ml-2">—</span>
-                      )}
-                    </td>
-
-                    {/* Progress */}
-                    <td className="px-3 py-3.5">
-                      {hasBpmProgress ? (
-                        <div className="flex items-center gap-2">
-                          <div className="h-1 w-20 rounded-full bg-zinc-800 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-zinc-500 transition-all"
-                              style={{ width: `${bpmPct}%` }}
-                            />
-                          </div>
-                          <span className="text-[11px] font-bold text-zinc-300 tabular-nums">{bpmPct}%</span>
-                        </div>
-                      ) : hasBeenAttempted ? (
-                        <span className="text-[11px] font-semibold text-zinc-400">Done</span>
-                      ) : (
-                        <span className="text-zinc-700 text-xs">—</span>
+                        <span className="text-zinc-700 text-xs ml-1">—</span>
                       )}
                     </td>
 
@@ -523,7 +534,7 @@ export const ExerciseBrowseTab = ({
 
               {filteredExercises.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-zinc-600 text-sm">
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 text-sm">
                     No exercises match the current filters.
                   </td>
                 </tr>

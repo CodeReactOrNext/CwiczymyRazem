@@ -1,79 +1,121 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { Guitar, Headphones, Music } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { TbGuitarPick } from "react-icons/tb";
 
 interface PracticeLoadingScreenProps {
+  /** When true, the doors part (after the minimum delay) to reveal what's behind. */
   isReady: boolean;
-  onDone: () => void;
+  /** Fired once the reveal animation has fully finished. */
+  onDone?: () => void;
 }
 
-const bars = [0.4, 0.7, 1, 0.6, 0.9, 0.5, 0.8, 0.45, 0.75, 0.6];
+const MIN_DELAY_MS = 1500;
 
-const MIN_DELAY_MS = 1200;
+// Door slide timing (must match the setTimeout that unmounts the overlay).
+const DOOR_DELAY_MS = 180;
+const DOOR_DURATION_MS = 700;
+
+// Game-style "doors part to reveal the level" easing.
+const DOOR_EASE = [0.76, 0, 0.24, 1] as const;
+
+// Same tiled icon pattern as the session's BackgroundAmbiance. Each panel holds
+// a full-viewport-width copy aligned to the same screen coordinates, so the
+// pattern is continuous across the seam and then parts with the doors.
+const PanelPattern = ({ align }: { align: "left" | "right" }) => (
+  <svg
+    className={`absolute inset-y-0 h-full w-screen text-cyan-400 opacity-[0.08] ${
+      align === "left" ? "left-0" : "right-0"
+    }`}
+  >
+    <defs>
+      <pattern
+        id={`practice-loader-pattern-${align}`}
+        x="0"
+        y="0"
+        width="160"
+        height="160"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(-15)"
+      >
+        {/* Slow, seamless diagonal drift (one full tile = 160px, loops cleanly) */}
+        <animateTransform
+          attributeName="patternTransform"
+          type="translate"
+          additive="sum"
+          from="0 0"
+          to="160 160"
+          dur="18s"
+          repeatCount="indefinite"
+        />
+        <g transform="translate(20, 20)"><Guitar size={32} strokeWidth={1.5} /></g>
+        <g transform="translate(100, 40)"><Music size={28} strokeWidth={1.5} /></g>
+        <g transform="translate(40, 100)"><TbGuitarPick size={30} strokeWidth={1.5} /></g>
+        <g transform="translate(110, 110)"><Headphones size={32} strokeWidth={1.5} /></g>
+      </pattern>
+    </defs>
+    <rect x="0" y="0" width="100%" height="100%" fill={`url(#practice-loader-pattern-${align})`} />
+  </svg>
+);
 
 export const PracticeLoadingScreen = ({ isReady, onDone }: PracticeLoadingScreenProps) => {
+  const [mounted, setMounted] = useState(false);
   const [minDelayDone, setMinDelayDone] = useState(false);
+  const [done, setDone] = useState(false);
+
+  // Portal target only exists on the client.
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const t = setTimeout(() => setMinDelayDone(true), MIN_DELAY_MS);
     return () => clearTimeout(t);
   }, []);
 
-  const shouldExit = isReady && minDelayDone;
+  const revealing = isReady && minDelayDone;
 
-  return (
-    <AnimatePresence onExitComplete={onDone}>
-      {!shouldExit && (
-        <motion.div
-          key="practice-loading"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.04, filter: "blur(8px)" }}
-          transition={{ duration: 0.55, ease: "easeInOut" }}
-          className="fixed inset-0 z-[999999] flex flex-col items-center justify-center bg-zinc-950 overflow-hidden"
-        >
-          {/* Background glow */}
-          <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[60vw] h-[60vw] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
+  // Once the reveal starts, keep the overlay mounted until the doors finish,
+  // then drop it and notify the parent.
+  useEffect(() => {
+    if (!revealing) return;
+    const t = setTimeout(() => {
+      setDone(true);
+      onDone?.();
+    }, DOOR_DELAY_MS + DOOR_DURATION_MS);
+    return () => clearTimeout(t);
+  }, [revealing, onDone]);
 
-          {/* Waveform */}
-          <div className="flex items-end gap-[5px] h-16 mb-10">
-            {bars.map((h, i) => (
-              <motion.div
-                key={i}
-                className="w-[5px] rounded-full bg-cyan-400"
-                animate={{
-                  height: ["20%", `${h * 100}%`, "20%"],
-                  opacity: [0.4, 1, 0.4],
-                }}
-                transition={{
-                  duration: 0.9,
-                  repeat: Infinity,
-                  delay: i * 0.08,
-                  ease: "easeInOut",
-                }}
-                style={{ height: "20%" }}
-              />
-            ))}
-          </div>
+  if (!mounted || done) return null;
 
-          {/* Text */}
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-[11px] font-bold uppercase tracking-[0.25em] text-zinc-400"
-          >
-            Preparing your session…
-          </motion.p>
+  // Rendered through a portal at <body> level with a max z-index, so it sits
+  // above the session content (which is itself portalled to <body> on mobile).
+  return createPortal(
+    <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 2147483647 }}>
+      {/* Left panel — slides off to the left on reveal, carrying the SVG bg */}
+      <motion.div
+        className="absolute inset-y-0 left-0 w-1/2 overflow-hidden bg-zinc-950"
+        animate={{ x: revealing ? "-100%" : "0%" }}
+        transition={{ duration: DOOR_DURATION_MS / 1000, delay: DOOR_DELAY_MS / 1000, ease: DOOR_EASE }}
+      >
+        <PanelPattern align="left" />
+      </motion.div>
+      {/* Right panel — slides off to the right on reveal, carrying the SVG bg */}
+      <motion.div
+        className="absolute inset-y-0 right-0 w-1/2 overflow-hidden bg-zinc-950"
+        animate={{ x: revealing ? "100%" : "0%" }}
+        transition={{ duration: DOOR_DURATION_MS / 1000, delay: DOOR_DELAY_MS / 1000, ease: DOOR_EASE }}
+      >
+        <PanelPattern align="right" />
+      </motion.div>
 
-          {/* Shimmer bar */}
-          <div className="mt-6 w-48 h-[2px] rounded-full bg-zinc-800 overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent"
-              animate={{ x: ["-100%", "200%"] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      {/* Seam glow that splits open with the panels */}
+      <motion.div
+        className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent"
+        animate={{ scaleY: revealing ? 0 : 1, opacity: revealing ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: "easeIn" }}
+      />
+
+    </div>,
+    document.body,
   );
 };

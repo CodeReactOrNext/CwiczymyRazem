@@ -15,6 +15,7 @@ interface AppLayoutProps {
   pageId: NavPagesTypes;
   subtitle?: string; // Kept for compatibility, unused
   variant?: "primary" | "secondary" | "landing" | "fullscreen";
+  wide?: boolean;
   isPublic?: boolean;
 }
 
@@ -22,6 +23,7 @@ const AppLayout = ({
   children,
   pageId,
   variant = "secondary",
+  wide = false,
   isPublic = false,
 }: AppLayoutProps) => {
   usePresence();
@@ -96,6 +98,7 @@ const AppLayout = ({
     <MainLoggedLayout
       pageId={pageId}
       variant={variant}
+      wide={wide}
       navigation={navigation}
       userStats={userStats}
       userName={userName}

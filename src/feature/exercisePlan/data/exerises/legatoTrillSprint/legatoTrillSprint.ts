@@ -17,7 +17,7 @@ export const legatoTrillSprintExercise: Exercise = {
     "Incorporate wrist stability to prevent the hand from shaking during the sprint."
   ],
   metronomeSpeed: {
-    min: 80,
+    min: 40,
     max: 160,
     recommended: 100,
   },

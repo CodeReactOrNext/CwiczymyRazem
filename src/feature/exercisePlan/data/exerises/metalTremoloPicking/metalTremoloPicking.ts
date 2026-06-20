@@ -18,7 +18,7 @@ export const metalTremoloPickingExercise: Exercise = {
     "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
     "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
-  metronomeSpeed: { min: 90, max: 200, recommended: 130 },
+  metronomeSpeed: { min: 40, max: 200, recommended: 130 },
   relatedSkills: ["alternate_picking"],
   tablature: [
     // M1: Czyste tremolo E (fret 0) — 16 × 16tka PM

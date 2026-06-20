@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const precisionBendingDrillExercise: Exercise = {
   id: "precision_bending_drill",
-  title: "First Bend – Whole Step",
+  title: "Precision Bend & Release",
   description: "Develop precise whole-step bending and control. Follow the reference notes to train your ears, and master slow, controlled releases back to the starting pitch.",
   whyItMatters: "This exercise gives you total control over string tension during sustained bends and releases. You will learn to hold bent notes perfectly in tune and guide them back down smoothly without any abrupt noise.",
   difficulty: "easy",
