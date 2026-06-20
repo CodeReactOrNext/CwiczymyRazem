@@ -1,6 +1,5 @@
 import { Button } from "assets/components/ui/button";
 import { Separator } from "assets/components/ui/separator";
-import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { FeedbackModal } from "components/FeedbackBubble";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
@@ -251,18 +250,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               <span className="truncate text-[15px] font-bold text-white tracking-wide">
                 {userName}
               </span>
-              <div className="mt-2 flex items-center gap-2">
-                <Link
-                  href="/settings"
-                  onClick={handleLinkClick}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-                  title={t("button.edit")}>
-                  <Settings size={14} />
-                </Link>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
-                  <CopyLinkProfile mode="icon" />
-                </div>
-              </div>
             </div>
           </div>
         </div>

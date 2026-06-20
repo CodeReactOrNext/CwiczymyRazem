@@ -68,7 +68,7 @@ const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
 
 const sharedHead = (
   <Head>
-    <meta name='viewport' content='initial-scale=1.0, width=device-width' />
+    <meta name='viewport' content='initial-scale=1.0, width=device-width, viewport-fit=cover' />
     <meta name='google-signin-client_id' content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH} />
     <title>Riff Quest</title>
     <meta name='description' content='Practice, track progress, compete! Guitar in hand! 🎸' />

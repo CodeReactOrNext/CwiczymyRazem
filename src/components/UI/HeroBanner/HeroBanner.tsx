@@ -107,7 +107,7 @@ export const HeroBanner = ({
               {eyebrow}
             </p>
           )}
-          <div className="md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 bg-second-600/60 backdrop-blur-md rounded-none md:rounded-lg px-3 py-2 inline-block !mb-4 md:!mb-6">
+          <div className="inline-block !mb-4 md:!mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
               {title}
             </h1>

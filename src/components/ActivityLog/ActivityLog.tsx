@@ -8,7 +8,7 @@ import {
 import { AnimatePresence,motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaSpinner } from "react-icons/fa";
 
@@ -17,7 +17,8 @@ import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import { useActivityLog } from "./hooks/useActivityLog";
 
-const CALENDAR_HEIGHT = 7 * 19;
+const CALENDAR_CELL_SIZE = 19;
+const CALENDAR_HEIGHT = 7 * CALENDAR_CELL_SIZE;
 
 const YearTabButton = ({
   yearValue,
@@ -66,6 +67,28 @@ export const ActivityLogView = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [selectedDay, setSelectedDay] = useState<DateWithReport | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // On mobile the calendar overflows horizontally and defaults to the start of
+  // the year. Scroll to today's column once data is ready so the most recent
+  // activity is visible without manual scrolling.
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoading) return;
+    if (typeof window === "undefined" || window.innerWidth >= 1024) return;
+    if (year !== new Date().getFullYear()) return;
+
+    const todayStr = new Date().toDateString();
+    const todayIndex = datasWithReports.findIndex(
+      (d) => d.date.toDateString() === todayStr
+    );
+    if (todayIndex === -1) return;
+
+    const todayCol = Math.floor(todayIndex / 7);
+    const todayX = todayCol * CALENDAR_CELL_SIZE;
+    const target = todayX - container.clientWidth + CALENDAR_CELL_SIZE * 2;
+    container.scrollLeft = Math.max(0, target);
+  }, [datasWithReports, isLoading, year]);
 
   const handleHover = useCallback(
     (item: DateWithReport | null, x: number, y: number) => {
@@ -144,6 +167,7 @@ export const ActivityLogView = ({
           </div>
 
           <div
+            ref={scrollContainerRef}
             className='flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20'
             style={{ height: CALENDAR_HEIGHT + 8 }}>
             {isLoading && datasWithReports.length === 0 ? (
