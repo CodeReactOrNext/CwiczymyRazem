@@ -24,7 +24,7 @@ const LogsBoxButton = ({
   return (
     <div className='relative'>
       <button
-        className={`transition-color relative flex flex-row items-center gap-1 overflow-hidden bg-opacity-80 p-1 duration-200 rounded-xl hover:bg-second-300 xs:p-2
+        className={`transition-color relative flex min-h-[44px] min-w-[44px] flex-row items-center justify-center gap-1 overflow-hidden bg-opacity-80 p-2 duration-200 rounded-xl hover:bg-second-300 sm:min-h-0 sm:min-w-0 sm:p-2
         ${active ? "bg-second-400 " : ""}`}
         onClick={(e) => {
           createRipple(e);

@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import Changelog, { hasRecentChanges, markChangelogAsViewed,useChangelogData } from "components/Changelog/Changelog";
 import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
@@ -6,16 +7,16 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
 import { FaGuitar, FaMedal } from "react-icons/fa";
-import { IoChatboxEllipses } from "react-icons/io5";
 import { FiBook } from "react-icons/fi";
+import { IoChatboxEllipses } from "react-icons/io5";
 
 import Chat from "../../feature/chat/Chat";
-import Changelog, { useChangelogData, hasRecentChanges, markChangelogAsViewed } from "components/Changelog/Changelog";
 import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
@@ -109,29 +110,50 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
           </>
         )}
       </div>
-      {showedCategory === "achievements" && (
-        <AchievementsMap userAchievements={userAchievements} />
-      )}
-      {showedCategory === "changelog" && (
-        <div className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent p-4'>
-          <Changelog month="2026-05" />
-        </div>
-      )}
-      {(showedCategory === "logs" || showedCategory === "chat") && (
-        <div className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
-          {showedCategory === "logs" && logs && (
-            <div onClick={markLogsAsRead}>
-              <Logs
-                logs={logs}
-                marksLogsAsRead={markLogsAsRead}
-                currentUserId={currentUserId}
-              />
-            </div>
-          )}
+      <AnimatePresence mode="wait" initial={false}>
+        {showedCategory === "achievements" && (
+          <m.div
+            key="achievements"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
+            <AchievementsMap userAchievements={userAchievements} />
+          </m.div>
+        )}
+        {showedCategory === "changelog" && (
+          <m.div
+            key="changelog"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent p-4'>
+            <Changelog month="2026-05" />
+          </m.div>
+        )}
+        {(showedCategory === "logs" || showedCategory === "chat") && (
+          <m.div
+            key={showedCategory}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
+            {showedCategory === "logs" && logs && (
+              <div onClick={markLogsAsRead}>
+                <Logs
+                  logs={logs}
+                  marksLogsAsRead={markLogsAsRead}
+                  currentUserId={currentUserId}
+                />
+              </div>
+            )}
 
-          {showedCategory === "chat" && <Chat />}
-        </div>
-      )}
+            {showedCategory === "chat" && <Chat />}
+          </m.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 };

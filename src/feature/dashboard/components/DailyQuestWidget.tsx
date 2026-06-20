@@ -33,6 +33,29 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
     practice_three_exercises: "/timer/plans",
 };
 
+const DailyQuestSkeleton = () => (
+    <Card className="flex-col justify-between p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+                <Swords size={18} className="text-zinc-700" />
+                <h3 className="text-[12px] font-semibold text-zinc-400 tracking-wide">Daily Quests</h3>
+            </div>
+            <div className="h-5 w-12 rounded bg-white/[0.06]" />
+        </div>
+        <div className="space-y-2 mb-4 animate-pulse">
+            {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                    key={i}
+                    className="flex min-h-[44px] items-center justify-between rounded-sm bg-zinc-800/60 p-3"
+                >
+                    <div className="h-3 w-40 rounded bg-white/[0.08]" />
+                    <div className="h-3 w-8 rounded bg-white/[0.08]" />
+                </div>
+            ))}
+        </div>
+    </Card>
+);
+
 export const DailyQuestWidget = () => {
     const dispatch = useAppDispatch();
     const dailyQuest = useAppSelector(selectDailyQuest);
@@ -41,7 +64,7 @@ export const DailyQuestWidget = () => {
         dispatch(initializeDailyQuestAction());
     }, [dispatch]);
 
-    if (!dailyQuest) return null;
+    if (!dailyQuest) return <DailyQuestSkeleton />;
 
     const allCompleted = dailyQuest.tasks.every(task => task.isCompleted);
     const isClaimed = dailyQuest.isRewardClaimed;
@@ -98,7 +121,7 @@ export const DailyQuestWidget = () => {
                             }
                         }}
                         className={cn(
-                            "flex items-center justify-between p-2.5 rounded-sm transition-all",
+                            "flex min-h-[44px] items-center justify-between p-3 rounded-sm transition-all",
                             task.isCompleted
                                 ? "bg-green-900/25 text-green-400/70"
                                 : "bg-zinc-800/80 text-zinc-300 cursor-pointer hover:bg-zinc-700/80 active:scale-[0.98]"

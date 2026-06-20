@@ -7,31 +7,15 @@ interface MobileBottomNavProps {
   onMenuClick: () => void;
 }
 
+const navItems = [
+  { label: "Home", href: "/dashboard", icon: Home },
+  { label: "Practice", href: "/timer", icon: Timer },
+  { label: "Songs", href: "/songs?view=management", icon: LayoutGrid },
+  { label: "Progress", href: "/profile/activity", icon: Activity },
+];
+
 export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
   const router = useRouter();
-
-  const navItems = [
-    {
-      label: "Home",
-      href: "/dashboard",
-      icon: Home,
-    },
-    {
-      label: "Practice",
-      href: "/timer",
-      icon: Timer,
-    },
-    {
-      label: "Songs",
-      href: "/songs?view=management",
-      icon: LayoutGrid,
-    },
-    {
-      label: "Progress",
-      href: "/profile/activity",
-      icon: Activity,
-    },
-  ];
 
   const isActive = (href: string) => {
     if (href.includes("?")) {
@@ -47,8 +31,8 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-2 px-2 backdrop-blur-xl lg:hidden transform-gpu">
-      <div className="flex items-center justify-around gap-1 max-w-md mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-1.5 px-2 backdrop-blur-xl lg:hidden transform-gpu">
+      <div className="mx-auto flex max-w-md items-stretch justify-around gap-1">
         {navItems.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;
@@ -56,37 +40,31 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all active:scale-95",
+                "flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 transition-colors duration-200 active:scale-90",
                 active ? "text-cyan-400" : "text-zinc-500"
               )}
             >
-              <div className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300",
-                active ? "bg-cyan-500/15 shadow-[0_0_15px_rgba(6,182,212,0.15)]" : "bg-transparent"
-              )}>
-                <Icon size={18} className={cn(
-                    "transition-transform",
-                    active && "scale-105"
-                )} />
-              </div>
-              <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-tight transition-opacity",
+              <Icon size={20} className="transition-transform" />
+              <span
+                className={cn(
+                  "text-[10px] font-bold uppercase tracking-tight",
                   active ? "opacity-100" : "opacity-60"
-              )}>
+                )}
+              >
                 {item.label}
               </span>
             </Link>
           );
         })}
-        
+
         <button
           onClick={onMenuClick}
-          className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 transition-all text-zinc-500 active:scale-95"
+          aria-label="Open menu"
+          className="flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-zinc-500 transition-colors duration-200 active:scale-90"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5">
-            <Menu size={18} />
-          </div>
+          <Menu size={20} />
           <span className="text-[10px] font-bold uppercase tracking-tight opacity-60">
             More
           </span>

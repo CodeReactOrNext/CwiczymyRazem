@@ -3,6 +3,7 @@ import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
 // ActiveChallengeWidget removed
+import { AnimatedNumber } from "components/UI/AnimatedNumber/AnimatedNumber";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
@@ -20,7 +21,6 @@ import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
-import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
@@ -148,7 +148,7 @@ const ProfileLandingLayout = ({
               >
                 <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
                 {/* Mobile: compact */}
-                <span className="md:hidden text-amber-300 font-bold">{(userStats.fame ?? 0).toLocaleString()}</span>
+                <AnimatedNumber value={userStats.fame ?? 0} className="md:hidden text-amber-300 font-bold" />
                 <span className="md:hidden text-amber-300/70 text-xs">pts</span>
                 <span className="md:hidden text-amber-300/40 text-xs">·</span>
                 <span className="md:hidden text-amber-300">Arsenal</span>
@@ -164,7 +164,7 @@ const ProfileLandingLayout = ({
           </div>
         }
       />
-      
+
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
             <DashboardSection compact>

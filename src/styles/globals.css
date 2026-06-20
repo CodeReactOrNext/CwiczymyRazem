@@ -3,6 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Respect the iOS home-indicator / Android gesture bar so fixed bottom UI
+     (e.g. the mobile bottom nav) isn't tucked under it. */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .h-safe-bottom {
+    height: env(safe-area-inset-bottom, 0px);
+  }
+}
+
 html,
 body {
   padding: 0;
