@@ -19,7 +19,7 @@ export const vibratoControlDrillExercise: Exercise = {
     "Maintain a relaxed thumb position behind the neck to avoid hand strain."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 90,
     recommended: 70,
   },

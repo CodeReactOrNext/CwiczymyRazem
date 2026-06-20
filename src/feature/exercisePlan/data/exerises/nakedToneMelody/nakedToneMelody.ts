@@ -6,7 +6,7 @@ export const nakedToneMelodyExercise: Exercise = {
   description:
     "Play a slow melody with a clean, plain sound to build a solid, even touch.",
   whyItMatters: "Use a plain, clean sound: an acoustic guitar as-is, or an electric on a clean setting with no added echo (reverb/delay) or distortion. A clean sound has nowhere to hide, so you can clearly hear how well each note sounds — its timing, its length, and how firmly you press the string.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 5,
   instructions: [

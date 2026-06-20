@@ -2,7 +2,7 @@ import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { StaticImageData } from "next/image";
 
 
-export type DifficultyLevel = "easy" | "medium" | "hard";
+export type DifficultyLevel = "beginner" | "easy" | "medium" | "hard";
 export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing" | "mixed";
 
 export type LocalizedContent = string;

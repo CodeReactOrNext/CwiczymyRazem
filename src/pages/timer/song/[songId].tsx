@@ -81,24 +81,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
         }
 
         setIsSubmitting(true);
-        
-        if (markAsLearned && userId) {
-            try {
-                 await updateSongStatus(
-                     userId,
-                     song.id,
-                     song.title,
-                     song.artist,
-                     "learned",
-                     userAvatar || "" 
-                 );
-                 toast.success("Song marked as learned!");
-            } catch (error) {
-                console.error("Failed to update song status", error);
-                toast.error("Failed to mark as learned");
-            }
-        }
-        
+
         // Calculate minutes independently of Redux, ensuring precision
         const totalMinutes = Math.round((techniqueTime + hearingTime) / 60000);
         const finalTotalMinutes = totalMinutes === 0 && (techniqueTime + hearingTime) > 30000 ? 1 : totalMinutes;
@@ -150,10 +133,29 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                dispatch(updateQuestProgress({ type: 'two_categories_min', amount: songCategoriesOverFive }));
             }
 
-            // Record session for the specific song progress
+            // Record session for the specific song progress first, so the time
+            // from this session counts towards the practice-time threshold that
+            // gates the "learned" points awarded below.
             if (userId) {
                 const { recordPracticeSession } = await import("feature/songs/services/userSongProgress.service");
                 await recordPracticeSession(userId, song.id, techniqueTime + hearingTime, null, null);
+            }
+
+            if (markAsLearned && userId) {
+                try {
+                    await updateSongStatus(
+                        userId,
+                        song.id,
+                        song.title,
+                        song.artist,
+                        "learned",
+                        userAvatar || ""
+                    );
+                    toast.success("Song marked as learned!");
+                } catch (error) {
+                    console.error("Failed to update song status", error);
+                    toast.error("Failed to mark as learned");
+                }
             }
 
             await dispatch(updateUserStats({ inputData })).unwrap();

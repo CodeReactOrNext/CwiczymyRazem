@@ -8,7 +8,7 @@ export function ExamModeBanner({ examMode }: ExamModeBannerProps) {
   return (
     <div className="sticky top-0 z-40 bg-gradient-to-r from-amber-900/80 to-amber-950/80 backdrop-blur border-b border-amber-700/30 px-6 py-4">
       <div className="max-w-4xl mx-auto">
-        <p className="text-xs font-semibold uppercase tracking-widest text-amber-200 mb-1">
+        <p className="text-xs font-semibold capitalize tracking-widest text-amber-200 mb-1">
           🎯 Exam Mode
         </p>
         <h3 className="text-lg font-bold text-amber-50">

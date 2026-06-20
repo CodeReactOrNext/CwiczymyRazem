@@ -135,7 +135,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               <div className="animate-in fade-in duration-700 slide-in-from-bottom-4">
                 <RatingPopUp
                   ratingData={p.reportResult} currentUserStats={p.currentUserStats}
-                  previousUserStats={p.previousUserStats} onClick={() => p.router.push("/dashboard")}
+                  previousUserStats={p.previousUserStats} onClick={p.onClose}
                   activityData={p.activityDataToUse} hideWrapper={true}
                   onRestart={p.handleRestartFullSession}
                 />

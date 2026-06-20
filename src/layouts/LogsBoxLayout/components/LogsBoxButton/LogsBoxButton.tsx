@@ -1,3 +1,4 @@
+import { useRipple } from "hooks/useRipple";
 import type { IconType } from "react-icons/lib";
 
 interface LogsBoxButtonProps {
@@ -19,12 +20,17 @@ const LogsBoxButton = ({
   hasNewMessages,
   hasNewDot,
 }: LogsBoxButtonProps) => {
+  const { createRipple, ripple } = useRipple();
   return (
     <div className='relative'>
       <button
-        className={`transition-color flex flex-row items-center gap-1 bg-opacity-80 p-1 duration-200 rounded-xl hover:bg-second-300 xs:p-2
+        className={`transition-color relative flex flex-row items-center gap-1 overflow-hidden bg-opacity-80 p-1 duration-200 rounded-xl hover:bg-second-300 xs:p-2
         ${active ? "bg-second-400 " : ""}`}
-        onClick={onClick}>
+        onClick={(e) => {
+          createRipple(e);
+          onClick();
+        }}>
+        {ripple}
         <Icon className='mx-1 text-base xs:text-2xl sm:text-base' />
         <span className='hidden font-normal sm:block'> {title}</span>
         {hasNewMessages && (

@@ -30,7 +30,6 @@ export default function SongPracticePage() {
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [pageState, setPageState] = useState<PageState>({ status: "loading" });
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
@@ -111,15 +110,6 @@ export default function SongPracticePage() {
     router.push("/songs?view=management");
   };
 
-  if (!sessionReady) {
-    return (
-      <PracticeLoadingScreen
-        isReady={pageState.status === "ready"}
-        onDone={() => setSessionReady(true)}
-      />
-    );
-  }
-
   if (pageState.status === "error") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#020202]">
@@ -140,7 +130,9 @@ export default function SongPracticePage() {
     );
   }
 
-  if (pageState.status !== "ready") return null;
+  if (pageState.status !== "ready") {
+    return <PracticeLoadingScreen isReady={false} />;
+  }
 
   return (
     <>

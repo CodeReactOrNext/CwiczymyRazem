@@ -29,6 +29,7 @@ import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
@@ -99,7 +100,7 @@ export const PracticeSession = ({
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
           <PremiumGate feature="gp-practice" children={<div />} />
-          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold uppercase tracking-widest text-[10px]">
+          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
             ← Return
           </button>
         </div>
@@ -305,6 +306,10 @@ export const PracticeSession = ({
     <BpmProgressProvider exercise={currentExercise}>
     <SessionUIProvider>
     <>
+      {/* Intro splash that always plays on session mount, then parts open
+          (door-reveal) to show the session beneath. */}
+      <PracticeLoadingScreen isReady />
+
       <SessionPageHead exerciseTitle={activeExercise.title} />
 
       <GeneratedExerciseDialogs
@@ -316,7 +321,7 @@ export const PracticeSession = ({
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
-            onClick={() => router.push("/dashboard")} activityData={activityDataToUse} onRestart={handleRestartFullSession}
+            onClick={onClose} activityData={activityDataToUse} onRestart={handleRestartFullSession}
           />
         </div>
       )}

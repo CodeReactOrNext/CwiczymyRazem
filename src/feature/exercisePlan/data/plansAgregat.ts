@@ -41,6 +41,7 @@ import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Min
 import type { ExercisePlan } from "../types/exercise.types";
 
 const difficultyOrder: Record<string, number> = {
+  beginner: 0,
   easy: 1,
   medium: 2,
   hard: 3,

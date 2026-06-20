@@ -15,7 +15,6 @@ export default function PracticeScalePage() {
   const router = useRouter();
   const { type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -109,13 +108,8 @@ export default function PracticeScalePage() {
 
   const backUrl = nodeId ? `/scale-tree?fromExam=true&nodeId=${nodeId}` : "/scale-tree?fromExam=true";
 
-  if (!sessionReady) {
-    return (
-      <PracticeLoadingScreen
-        isReady={isDataReady}
-        onDone={() => setSessionReady(true)}
-      />
-    );
+  if (!isDataReady) {
+    return <PracticeLoadingScreen isReady={false} />;
   }
 
   return (

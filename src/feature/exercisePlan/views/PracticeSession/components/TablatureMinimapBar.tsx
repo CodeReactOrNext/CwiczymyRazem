@@ -21,13 +21,14 @@ interface TablatureMinimapBarProps {
 
 type DragMode = "none" | "creating" | "resize-start" | "resize-end";
 
-// One solid colour per 8-measure section — on a black background these are clearly distinct
+// One solid colour per 8-measure section — brightened so the grouping reads
+// clearly at a glance while still keeping white labels legible on top.
 const SECTION_COLORS = [
-  { fill: "#1a2744", fillAlt: "#142038", accent: "#3b82f6" }, // blue
-  { fill: "#231a3a", fillAlt: "#1b142d", accent: "#a855f7" }, // purple
-  { fill: "#0f2e28", fillAlt: "#0b2320", accent: "#14b8a6" }, // teal
-  { fill: "#2e1a1a", fillAlt: "#231313", accent: "#ef4444" }, // red
-  { fill: "#2a2400", fillAlt: "#201b00", accent: "#eab308" }, // yellow
+  { fill: "#274064", fillAlt: "#1e3251", accent: "#60a5fa" }, // blue
+  { fill: "#352a5e", fillAlt: "#29204a", accent: "#c084fc" }, // purple
+  { fill: "#15473f", fillAlt: "#0f3832", accent: "#2dd4bf" }, // teal
+  { fill: "#4a2922", fillAlt: "#3a201b", accent: "#f87171" }, // red
+  { fill: "#413607", fillAlt: "#322a05", accent: "#facc15" }, // yellow
 ];
 
 export const TablatureMinimapBar = memo(function TablatureMinimapBar({
@@ -199,7 +200,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-1 px-0.5">
         <div className="flex items-center gap-2.5">
-          <span className="text-[10px] font-bold tracking-[0.18em] text-zinc-500 uppercase">
+          <span className="text-[10px] font-semibold tracking-[0.18em] text-zinc-300 capitalize">
             Navigator
           </span>
 
@@ -255,10 +256,10 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
         {/* ── Main bar ───────────────────────────────────────────────── */}
         <div
           ref={containerRef}
-          className="relative h-6 rounded-md overflow-hidden cursor-pointer"
+          className="relative h-7 rounded-md overflow-hidden cursor-pointer"
           style={{
-            background: "#0a0a0d",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(255,255,255,0.12)",
+            background: "#15151b",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(255,255,255,0.18)",
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -280,7 +281,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
                 style={{
                   left:        bp(m.startBeat),
                   width:       bp(m.endBeat - m.startBeat),
-                  background:  isHovered ? "rgba(255,255,255,0.14)" : i % 2 === 0 ? fill : fillAlt,
+                  background:  isHovered ? "rgba(255,255,255,0.22)" : i % 2 === 0 ? fill : fillAlt,
                   borderRight: "1px solid rgba(255,255,255,0.08)",
                   ...(isSectionStart ? { borderLeft: `3px solid ${accent}` } : {}),
                 }}
@@ -293,8 +294,8 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
             i === 0 || (i + 1) % 4 === 0 ? (
               <span
                 key={`n${i}`}
-                className="absolute top-[3px] text-[9px] font-semibold text-zinc-400 pointer-events-none tabular-nums z-10"
-                style={{ left: bp(m.startBeat), paddingLeft: "3px" }}
+                className="absolute top-[4px] text-[10px] font-semibold text-zinc-100 pointer-events-none tabular-nums z-10"
+                style={{ left: bp(m.startBeat), paddingLeft: "3px", textShadow: "0 1px 2px rgba(0,0,0,0.85)" }}
               >
                 {i + 1}
               </span>
@@ -308,7 +309,8 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
               style={{
                 left: 0,
                 width: `${playedPct}%`,
-                background: "linear-gradient(90deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%)",
+                background: "linear-gradient(90deg, rgba(34,211,238,0.10) 0%, rgba(34,211,238,0.22) 100%)",
+                borderRight: "1px solid rgba(34,211,238,0.35)",
               }}
             />
           )}
@@ -338,8 +340,8 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
               style={{
                 left:       bp(measures[currentMeasureIdx].startBeat),
                 width:      bp(measures[currentMeasureIdx].endBeat - measures[currentMeasureIdx].startBeat),
-                background: "rgba(255,255,255,0.15)",
-                borderTop:  "2px solid rgba(255,255,255,0.6)",
+                background: "rgba(255,255,255,0.2)",
+                borderTop:  "2px solid rgba(255,255,255,0.85)",
               }}
             />
           )}
@@ -359,9 +361,11 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
       </div>
 
       {/* ── Hints below bar ───────────────────────────────────────────── */}
-      {!hasLoop && !isPlaying && currentBeat === 0 && (
-        <p className="mt-0.5 px-0.5 text-[9px] text-zinc-700 pointer-events-none">
-          Click to jump · Drag to set loop
+      {!hasLoop && !isPlaying && (
+        <p className="mt-1 px-0.5 text-[9px] text-zinc-500 pointer-events-none">
+          <span className="text-zinc-400 font-medium">Click</span> to jump
+          <span className="text-zinc-700"> · </span>
+          <span className="text-zinc-400 font-medium">Drag</span> to set loop
         </p>
       )}
     </div>

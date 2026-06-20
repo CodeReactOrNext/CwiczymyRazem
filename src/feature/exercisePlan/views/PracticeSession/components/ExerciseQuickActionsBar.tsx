@@ -1,6 +1,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
+import { RippleButton } from "hooks/useRipple";
 import { Minus, Plus, Volume1, Volume2, VolumeX } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { GiMetronome } from "react-icons/gi";
@@ -74,14 +75,14 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
       )}>
         <GiMetronome className={cn("shrink-0 text-zinc-400", compact ? "h-4 w-4" : "h-5 w-5")} />
 
-        <button
+        <RippleButton
           className={stepBtn}
           onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
           disabled={bpm <= minBpm}
           title="Slower"
         >
           <Minus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
-        </button>
+        </RippleButton>
 
         {isEditing ? (
           <input
@@ -124,18 +125,18 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           className={cn("flex-1 cursor-pointer", sliderRange(bpm))}
         />
 
-        <button
+        <RippleButton
           className={stepBtn}
           onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
           disabled={bpm >= maxBpm}
           title="Faster"
         >
           <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
-        </button>
+        </RippleButton>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
+            <RippleButton
               title="Metronome volume"
               className={cn(
                 "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50",
@@ -146,7 +147,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               )}
             >
               <VolumeIcon className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
-            </button>
+            </RippleButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -154,7 +155,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             className="w-60 rounded-xl border border-white/10 bg-zinc-900/95 p-3.5 text-white shadow-xl shadow-black/40 backdrop-blur-md"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+              <span className="text-[10px] font-semibold capitalize tracking-[0.12em] text-zinc-400">
                 Metronome volume
               </span>
               <span

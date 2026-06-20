@@ -16,8 +16,8 @@ export const stringSkippingBasicExercise: Exercise = {
     "Rest your picking-hand palm on lower strings to prevent unwanted vibration.",
     "Visualize the pentatonic skeleton to locate the target notes instantly."
   ],
-  metronomeSpeed: { min: 60, max: 120, recommended: 80 },
-  relatedSkills: ["hybrid_picking"],
+  metronomeSpeed: { min: 40, max: 120, recommended: 80 },
+  relatedSkills: ["string_skipping"],
   tablature: [
     {
       timeSignature: [4, 4],

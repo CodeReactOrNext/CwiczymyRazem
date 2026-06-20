@@ -19,7 +19,7 @@ export const sweepPicking3StringExercise: Exercise = {
     "Start at a slow tempo to ensure synchronization is completely flawless before pushing speed.",
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 100,
     recommended: 70,
   },

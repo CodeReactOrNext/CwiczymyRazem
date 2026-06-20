@@ -17,7 +17,7 @@ export const metalGallopExercise: Exercise = {
     "Focus on locking the gallop into the metronome click—avoid letting the notes rush.",
     "Keep your pick angled slightly to slice through the strings with minimal resistance."
   ],
-  metronomeSpeed: { min: 80, max: 180, recommended: 120 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 120 },
   relatedSkills: ["rhythm", "articulation"],
   tablature: [
     // M1: Czyste E (fret 0) — 4 identyczne komórki gallopu, tylko str6

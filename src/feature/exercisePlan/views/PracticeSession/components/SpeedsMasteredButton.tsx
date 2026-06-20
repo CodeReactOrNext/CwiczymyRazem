@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { RippleButton } from "hooks/useRipple";
 import { X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -32,7 +33,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
   return (
     <>
       {!compact && <div className="h-7 w-px bg-white/10 self-center" aria-hidden />}
-      <button
+      <RippleButton
         onClick={() => setIsOpen(true)}
         className={cn(
           "flex items-center gap-2 rounded-lg font-bold transition-all active:scale-95",
@@ -55,7 +56,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
         >
           {completedBpms.length}/{bpmStages.length}
         </span>
-      </button>
+      </RippleButton>
 
       {isOpen && createPortal(
         <div

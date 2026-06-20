@@ -220,7 +220,7 @@ export const ExerciseSuccessView = ({
                   <FaTrophy className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">{t("practice.congratulations")}</p>
+                  <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest">{t("practice.congratulations")}</p>
                   <h2 className="text-lg font-bold text-white leading-tight">{planTitle}</h2>
                 </div>
               </motion.div>
@@ -237,13 +237,13 @@ export const ExerciseSuccessView = ({
               {isExam && (
                 <div className="flex items-end justify-between mb-5">
                   <div>
-                    <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-1">Total Score</p>
+                    <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest mb-1">Total Score</p>
                     <div className="text-5xl font-bold text-white tabular-nums tracking-tight">{displayScore.toLocaleString()}</div>
                   </div>
                   {/* Tier badge */}
                   <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl', tier.bg)}>
                     <span className={cn('text-3xl font-black leading-none', tier.color)}>{tierKey}</span>
-                    <span className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Grade</span>
+                    <span className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Grade</span>
                   </div>
                 </div>
               )}
@@ -256,7 +256,7 @@ export const ExerciseSuccessView = ({
                   </div>
                   <div>
                     <div className="text-white font-bold text-base leading-none">{(score ?? 0).toLocaleString()}</div>
-                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Score</div>
+                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Score</div>
                   </div>
                 </div>
                 <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
@@ -265,7 +265,7 @@ export const ExerciseSuccessView = ({
                   </div>
                   <div>
                     <div className="text-white font-bold text-base leading-none">{accuracy}%</div>
-                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Accuracy</div>
+                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Accuracy</div>
                   </div>
                 </div>
                 <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
@@ -274,7 +274,7 @@ export const ExerciseSuccessView = ({
                   </div>
                   <div>
                     <div className="text-white font-bold text-base leading-none">{displayStats.maxStreak ?? 0}</div>
-                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Max Combo</div>
+                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Max Combo</div>
                   </div>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export const ExerciseSuccessView = ({
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
               className="px-7 py-5">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">Performance</p>
+                <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest">Performance</p>
                 <span className="text-[10px] text-zinc-600">{timeline!.length} notes</span>
               </div>
 

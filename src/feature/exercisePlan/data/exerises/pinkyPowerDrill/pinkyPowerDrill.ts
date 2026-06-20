@@ -16,7 +16,7 @@ export const pinkyPowerDrillExercise: Exercise = {
     "Focus on equal volume between your index and pinky fingers.",
     "Keep your hand position balanced to prevent over-reaching with the pinky."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 80 },
   relatedSkills: ["finger_independence"],
   tablature: [
     {

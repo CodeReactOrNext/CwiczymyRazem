@@ -14,7 +14,7 @@ export const quarterNotesDrillExercise: Exercise = {
   description:
     "Develop strict timing and pick attack consistency using quarter-note pulses.",
   whyItMatters: "Perfect rhythmic timing is the separation between amateur and professional guitarists. This drill builds a solid internal clock, ensuring you land exactly on the beat without rushing or lagging behind.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 1.68,
   instructions: [

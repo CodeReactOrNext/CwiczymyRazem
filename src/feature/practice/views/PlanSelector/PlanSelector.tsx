@@ -12,10 +12,34 @@ import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
+import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, Flame, Globe, Music, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
+
+const RippleTabsTrigger = ({
+  value,
+  icon,
+  label,
+}: {
+  value: string;
+  icon: React.ReactNode;
+  label: string;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <TabsTrigger
+      value={value}
+      onClick={createRipple}
+      className="relative gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
+    >
+      {ripple}
+      {icon}
+      <span>{label}</span>
+    </TabsTrigger>
+  );
+};
 
 interface PlanSelectorProps {
   onBack?: () => void;
@@ -70,11 +94,12 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
 
   const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
-    return (["easy", "medium", "hard"] as const).map((difficulty) => {
+    return (["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
       const plans = sourcePlans.filter((p) => p.difficulty === difficulty);
       if (plans.length === 0) return null;
 
       const difficultyLabel = {
+        beginner: { color: "text-sky-500" },
         easy: { color: "text-emerald-500" },
         medium: { color: "text-amber-500" },
         hard: { color: "text-red-500" },
@@ -84,7 +109,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         <div key={difficulty} className="space-y-6">
           <div className="flex items-center gap-3">
             <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-            <h3 className={`text-xs font-black tracking-[0.2em] ${difficultyLabel.color}`}>
+            <h3 className="text-sm font-medium tracking-[0.2em] text-white">
               {t(`common:difficulty.${difficulty}`)}
             </h3>
           </div>
@@ -140,34 +165,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               )}
               <Tabs defaultValue="routines" className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
-                <TabsTrigger
-                  value="routines"
-                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
-                >
-                  <Music size={16} />
-                  <span>Routines</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="playalongs"
-                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
-                >
-                  <Zap size={16} />
-                  <span>Playalongs</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="my_plans"
-                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
-                >
-                  <Flame size={16} />
-                  <span>My Plans</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="community"
-                  className="gap-2 px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
-                >
-                  <Globe size={16} />
-                  <span>Community</span>
-                </TabsTrigger>
+                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" />
+                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" />
+                <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" />
+                <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" />
               </TabsList>
 
               <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-12">

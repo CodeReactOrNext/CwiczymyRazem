@@ -129,6 +129,16 @@ export function useStrummingMatcher({
           gameStateRef.current.combo      = 0;
           gameStateRef.current.multiplier = 1;
           needsFlushRef.current = true;
+        } else if (prevBeat) {
+          // Rest correctly observed (the cursor passed it without an onset
+          // landing on this absolute slot). Clear any stale "wrong" left over
+          // from a previous rep so the rest doesn't stay orange forever — the
+          // feedback map is keyed by slot-in-bar and shared across reps, and
+          // nothing else ever re-evaluates a rest slot.
+          if (slotFeedbackRefInternal.current.has(prevSlotInBar)) {
+            slotFeedbackRefInternal.current.delete(prevSlotInBar);
+            needsFlushRef.current = true;
+          }
         }
       }
 

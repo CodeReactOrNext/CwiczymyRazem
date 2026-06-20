@@ -19,7 +19,7 @@ export const hammerOnSequence579Exercise: Exercise = {
     "Keep your thumb anchored low behind the neck to support the wide finger stretch.",
     "Use the exact tip of your fingers to avoid accidentally muting adjacent strings."
   ],
-  metronomeSpeed: { min: 60, max: 180, recommended: 60 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 60 },
   relatedSkills: ["legato"],
   tablature: [
     {

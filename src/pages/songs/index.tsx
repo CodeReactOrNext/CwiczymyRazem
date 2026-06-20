@@ -23,7 +23,8 @@ SongsPage.getLayout = function getLayout(page: ReactElement) {
     <AppLayout
       pageId={"songs"}
       subtitle="Songs"
-      variant='primary'>
+      variant='primary'
+      wide>
       {page}
     </AppLayout>
   );

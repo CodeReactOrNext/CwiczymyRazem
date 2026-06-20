@@ -14,13 +14,13 @@ export const GpTrackSelector = memo(function GpTrackSelector({ tracks, selectedI
   if (tracks.length <= 1) return null;
   return (
     <div className="flex flex-wrap items-center gap-2 mb-2">
-      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Track:</span>
+      <span className="text-[10px] font-bold capitalize tracking-[0.2em] text-zinc-500">Track:</span>
       {tracks.map((track, idx) => (
         <button
           key={track.id}
           onClick={() => onChange(idx)}
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+            "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold capitalize tracking-wider transition-all",
             selectedIdx === idx
               ? "bg-cyan-500/10 text-cyan-400"
               : "bg-white/5 text-zinc-500 hover:text-zinc-300"

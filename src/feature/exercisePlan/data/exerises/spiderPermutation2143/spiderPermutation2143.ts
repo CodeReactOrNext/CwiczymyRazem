@@ -6,7 +6,7 @@ export const spiderPermutation2143Exercise: Exercise = {
   title: "Spider Exercise - 2-1-4-3 Permutation",
   description: "Fret notes on a single string using finger permutation 2-1-4-3 to isolate specific finger movements and develop deep coordination control.",
   whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 2-1-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
-  difficulty: "easy",
+  difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
@@ -20,7 +20,7 @@ export const spiderPermutation2143Exercise: Exercise = {
     "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 120,
     recommended: 80
   },

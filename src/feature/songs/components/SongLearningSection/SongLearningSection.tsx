@@ -18,6 +18,7 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
@@ -78,7 +79,7 @@ const FilterBar = ({
   t: any;
 }) => {
   return (
-    <div className="mb-6 px-4 shrink-0">
+    <div className="mb-7 px-3 shrink-0">
       <div className="relative group/search">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <Search className="h-3.5 w-3.5 text-zinc-600 group-focus-within/search:text-cyan-500 transition-colors" />
@@ -87,7 +88,7 @@ const FilterBar = ({
           placeholder="Search songs..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-9 w-full border-white/5 bg-zinc-950/40 pl-9 text-[12px] text-white placeholder:text-zinc-600 transition-all focus:border-cyan-500/30 focus:bg-zinc-950/60 focus:ring-4 focus:ring-cyan-500/5 rounded-lg"
+          className="h-9 w-full border-none bg-zinc-950/40 pl-9 text-[12px] text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-950/60 focus:ring-4 focus:ring-cyan-500/5 rounded-lg"
         />
       </div>
     </div>
@@ -198,43 +199,45 @@ export const SongLearningSection = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-3">
-        <div className="flex p-1 rounded-xl bg-zinc-900/50 border border-white/5">
+      <div className="px-3 pb-3">
+        <div className="flex p-1 rounded-xl bg-zinc-900/50">
           <button
             onClick={() => onExploreLibrary?.('board')}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
-              !isLibraryActive 
-                ? "bg-zinc-800 text-white shadow-lg border border-white/5" 
+              "relative flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
+              !isLibraryActive
+                ? "bg-zinc-800 text-white shadow-lg"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
-            <Music size={14} className={!isLibraryActive ? "text-cyan-500" : ""} />
+            <Ripple />
+            <Music size={14} className={!isLibraryActive ? "text-white" : ""} />
             My Board
           </button>
           <button
             onClick={() => onExploreLibrary?.('explore')}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
-              isLibraryActive 
-                ? "bg-zinc-800 text-white shadow-lg border border-white/5" 
+              "relative flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
+              isLibraryActive
+                ? "bg-zinc-800 text-white shadow-lg"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
-            <Search size={14} className={isLibraryActive ? "text-cyan-500" : ""} />
+            <Ripple />
+            <Search size={14} className={isLibraryActive ? "text-white" : ""} />
             Library
           </button>
         </div>
       </div>
 
-      <div className="px-5 py-4">
-         <h2 className="text-xs font-bold text-zinc-500">Your collection</h2>
+      <div className="px-3 pt-2 pb-3">
+         <h2 className="text-xs font-bold text-zinc-400">Your collection</h2>
       </div>
       <FilterBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} t={t} />
 
 
 
-      <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth">
+      <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-700/80">
         <SongStatusCard
           id="wantToLearn"
           title={t("want_to_learn", "Want to Learn") as string}

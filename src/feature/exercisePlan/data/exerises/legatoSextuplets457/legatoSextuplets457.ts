@@ -19,7 +19,7 @@ export const legatoSextuplets457Exercise: Exercise = {
     "Condition your pinky finger to hammer down with the same authority as your index.",
     "Keep your fretting wrist straight to ensure optimal tendon alignment."
   ],
-  metronomeSpeed: { min: 60, max: 180, recommended: 60 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 60 },
   relatedSkills: ["legato"],
   tablature: [
     {

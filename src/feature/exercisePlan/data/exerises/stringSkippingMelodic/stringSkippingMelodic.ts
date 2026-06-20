@@ -16,7 +16,7 @@ export const stringSkippingMelodicExercise: Exercise = {
     "Keep your picking wrist loose and flexible to navigate wide intervals smoothly.",
     "Use the exact tip of your fretting fingers to avoid accidental string muting."
   ],
-  metronomeSpeed: { min: 70, max: 130, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 130, recommended: 90 },
   relatedSkills: ["string_skipping"],
   tablature: [
     {

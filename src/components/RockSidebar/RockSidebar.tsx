@@ -14,6 +14,7 @@ import {
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
+import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
@@ -54,6 +55,97 @@ export interface SidebarLinkInterface {
 interface RockSidebarProps {
   pageId: NavPagesTypes;
 }
+
+const SidebarNavLink = ({
+  href,
+  name,
+  icon,
+  isActive,
+  onClick,
+}: {
+  href: string;
+  name: string;
+  icon: React.ReactNode;
+  isActive: boolean;
+  onClick?: () => void;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <Link
+      href={href}
+      onClick={(e) => {
+        createRipple(e);
+        onClick?.();
+      }}
+      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 active:scale-[0.98] ${
+        isActive
+          ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
+          : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+      }`}>
+      {ripple}
+      <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+      <span className="flex-1">{name}</span>
+      {isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />}
+    </Link>
+  );
+};
+
+const SidebarActionButton = ({
+  icon,
+  iconClass = "text-zinc-500",
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  iconClass?: string;
+  label: string;
+  onClick: () => void;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <button
+      onClick={(e) => {
+        createRipple(e);
+        onClick();
+      }}
+      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      {ripple}
+      <span className={iconClass}>{icon}</span>
+      <span>{label}</span>
+    </button>
+  );
+};
+
+const SidebarExternalLink = ({
+  href,
+  icon,
+  iconClass = "text-zinc-500",
+  label,
+  onClick,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  iconClass?: string;
+  label: string;
+  onClick?: () => void;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => {
+        createRipple(e);
+        onClick?.();
+      }}
+      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      {ripple}
+      <span className={iconClass}>{icon}</span>
+      <span>{label}</span>
+    </a>
+  );
+};
 
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
@@ -128,24 +220,16 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     items: { id: string; name: string; href: string; icon: React.ReactNode }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon }) => {
-      const isActive = isLinkActive(id, href);
-      return (
-        <Link
-          key={id}
-          href={href}
-          onClick={onClick}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 active:scale-[0.98] ${
-            isActive
-              ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
-              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-          }`}>
-          <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
-          <span className="flex-1">{name}</span>
-          {isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />}
-        </Link>
-      );
-    });
+    items.map(({ id, name, href, icon }) => (
+      <SidebarNavLink
+        key={id}
+        href={href}
+        name={name}
+        icon={icon}
+        isActive={isLinkActive(id, href)}
+        onClick={onClick}
+      />
+    ));
 
   const userProfileSection = (mobile?: boolean) => {
     if (!userStats || !userName) return null;
@@ -228,41 +312,31 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         <div className="space-y-1">
           {renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}
 
-          <button
+          <SidebarActionButton
+            icon={<MessageSquarePlus size={16} />}
+            label="Send Feedback"
             onClick={() => {
               if (mobile) handleLinkClick();
               setIsFeedbackOpen(true);
             }}
-            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
-            <span className="text-zinc-500">
-              <MessageSquarePlus size={16} />
-            </span>
-            <span>Send Feedback</span>
-          </button>
+          />
 
-          <a
+          <SidebarExternalLink
             href="https://discord.gg/6yJmsZW2Ne"
-            target="_blank"
-            rel="noopener noreferrer"
+            icon={<FaDiscord size={16} />}
+            label={t("nav.discord")}
             onClick={mobile ? handleLinkClick : undefined}
-            className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
-            <span className="text-zinc-500">
-              <FaDiscord size={16} />
-            </span>
-            <span>{t("nav.discord")}</span>
-          </a>
+          />
 
-          <button
+          <SidebarActionButton
+            icon={<Heart size={16} fill="currentColor" />}
+            iconClass="text-rose-500"
+            label="Grow Riff Quest"
             onClick={() => {
               if (mobile) handleLinkClick();
               setIsCommunityModalOpen(true);
             }}
-            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
-            <span className="text-rose-500">
-              <Heart size={16} fill="currentColor" />
-            </span>
-            <span>Grow Riff Quest</span>
-          </button>
+          />
         </div>
       </div>
 

@@ -79,20 +79,21 @@ export const SongStatusCard = ({
     <div className="flex flex-col overflow-hidden bg-transparent">
       {/* Header (Steam Style) */}
       {(!isMobile || !hideHeaderOnMobile) && (
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-2 px-3 py-1.5 text-zinc-500 group/header cursor-pointer select-none w-full bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors rounded-lg mb-1"
+          className="flex items-center gap-2.5 px-3 py-2 text-zinc-200 group/header cursor-pointer select-none w-full bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors rounded-lg mb-1.5"
         >
-            <ChevronDown 
-              size={10} 
+            <ChevronDown
+              size={12}
               className={cn(
-                "transition-transform duration-300 opacity-40",
+                "shrink-0 text-zinc-500 transition-transform duration-300",
                 isCollapsed ? "-rotate-90" : "rotate-0"
-              )} 
+              )}
             />
-            <h3 className="text-xs font-bold transition-colors group-hover/header:text-zinc-300">{title}</h3>
-            <span className="text-xs font-medium opacity-60">
-              ({songs?.length || 0})
+            <StatusIcon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+            <h3 className="flex-1 text-left text-[13px] font-bold">{title}</h3>
+            <span className="rounded-full bg-zinc-700/60 px-2 py-0.5 text-[10px] font-bold text-zinc-300">
+              {songs?.length || 0}
             </span>
         </button>
       )}

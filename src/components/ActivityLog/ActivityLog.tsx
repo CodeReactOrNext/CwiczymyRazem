@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { AnimatePresence,motion } from "framer-motion";
+import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
@@ -17,6 +18,34 @@ import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import { useActivityLog } from "./hooks/useActivityLog";
 
 const CALENDAR_HEIGHT = 7 * 19;
+
+const YearTabButton = ({
+  yearValue,
+  active,
+  onSelect,
+}: {
+  yearValue: number;
+  active: boolean;
+  onSelect: () => void;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <button
+      role='tab'
+      onClick={(e) => {
+        createRipple(e);
+        onSelect();
+      }}
+      className={`relative overflow-hidden rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+        active
+          ? "bg-white/20 text-white"
+          : "text-white/60 hover:bg-white/15 hover:text-white"
+      }`}>
+      {ripple}
+      {yearValue}
+    </button>
+  );
+};
 
 interface ActivityLogViewProps {
   year: number;
@@ -95,17 +124,12 @@ export const ActivityLogView = ({
 
           <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
             {yearButtons.map((yearValue) => (
-              <button
+              <YearTabButton
                 key={`year-btn-${yearValue}`}
-                role='tab'
-                onClick={() => setYear(yearValue)}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  year === yearValue
-                    ? "bg-white/20 text-white"
-                    : "text-white/60 hover:bg-white/15 hover:text-white"
-                }`}>
-                {yearValue}
-              </button>
+                yearValue={yearValue}
+                active={year === yearValue}
+                onSelect={() => setYear(yearValue)}
+              />
             ))}
           </div>
         </div>

@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
+import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpRight, Globe, Lock } from "lucide-react";
 import Image from "next/image";
@@ -103,6 +104,7 @@ export const PlanCard = ({
   isLocked = false,
 }: PlanCardProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const { createRipple, ripple } = useRipple("bg-white/15");
 
   const getLocalizedString = (value: string | { en?: string; pl?: string } | undefined): string => {
     if (!value) return '';
@@ -148,7 +150,13 @@ export const PlanCard = ({
         !isLocked && "click-behavior",
         isInteractive && "cursor-pointer"
       )}
-      onClick={isLocked ? onUpgrade : onSelect}>
+      onClick={(e) => {
+        const handler = isLocked ? onUpgrade : onSelect;
+        if (!handler) return;
+        createRipple(e);
+        handler();
+      }}>
+      {ripple}
 
       {/* Decorative accent glow — intensifies on hover */}
       <div

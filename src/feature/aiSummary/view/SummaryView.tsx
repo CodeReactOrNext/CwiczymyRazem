@@ -826,14 +826,15 @@ function LevelGoalCard({
         const GREEN      = "#4ade80";
         const CYAN       = "rgb(6,182,212)";
         return (
-          <div className="relative">
+          <div>
+            <div className="relative">
             {/* 15-min goal line */}
             <div
-              className="pointer-events-none absolute left-0 right-0 z-10 flex items-center"
+              className="pointer-events-none absolute left-0 right-0 z-10 flex items-end"
               style={{ bottom: `${LABEL_AREA + GOAL_PX}px` }}
             >
               <div className="flex-1 border-t border-dashed border-white/25" />
-              <span className="ml-2 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[11px] font-semibold text-white/45">
+              <span className="-mb-2 ml-2 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[11px] font-semibold text-white/45">
                 {dayGoalMin} min goal
               </span>
             </div>
@@ -913,6 +914,7 @@ function LevelGoalCard({
                   </button>
                 );
               })}
+            </div>
             </div>
             <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-zinc-500">
               <CheckCircle2 size={12} style={{ color: GREEN }} className="shrink-0" />

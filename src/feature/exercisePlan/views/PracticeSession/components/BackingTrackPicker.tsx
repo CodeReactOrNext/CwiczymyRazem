@@ -1,6 +1,21 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaYoutube, FaPlay, FaSearch, FaMusic } from "react-icons/fa";
 import { useSessionUI } from "../contexts/SessionUIContext";
+
+// Slight phrasing variety so each search surfaces different tracks instead of
+// the same cached 3. Each variant is its own cache key on the API side.
+const SEARCH_PHRASES = [
+  "Guitar Backing Track",
+  "Blues Guitar Backing Track",
+  "Rock Guitar Backing Track",
+  "Jam Backing Track Guitar",
+  "Slow Blues Backing Track Guitar",
+  "Funk Guitar Backing Track",
+  "Smooth Jazz Backing Track Guitar",
+  "Pop Rock Guitar Backing Track",
+  "Acoustic Guitar Backing Track",
+  "Groove Backing Track Guitar",
+];
 
 type PickerState = "idle" | "loading" | "results";
 
@@ -19,11 +34,23 @@ export function BackingTrackPicker({ exerciseTitle }: BackingTrackPickerProps) {
   const { setBackingVideoId } = useSessionUI();
   const [state, setState] = useState<PickerState>("idle");
   const [videos, setVideos] = useState<VideoResult[]>([]);
+  const lastPhraseRef = useRef<string | null>(null);
+
+  function nextPhrase() {
+    // Pick a random phrase, but never the same one twice in a row so
+    // "Search again" always changes what comes up.
+    let phrase = lastPhraseRef.current;
+    while (phrase === lastPhraseRef.current) {
+      phrase = SEARCH_PHRASES[Math.floor(Math.random() * SEARCH_PHRASES.length)];
+    }
+    lastPhraseRef.current = phrase;
+    return phrase!;
+  }
 
   async function search() {
     setState("loading");
     try {
-      const q = encodeURIComponent("Guitar Backing Track");
+      const q = encodeURIComponent(nextPhrase());
       const res = await fetch(`/api/songs/search-youtube?q=${q}`);
       const data = await res.json();
       setVideos(data.videos ?? []);

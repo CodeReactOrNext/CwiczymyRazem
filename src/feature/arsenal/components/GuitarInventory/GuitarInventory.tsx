@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -49,6 +49,10 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   const sorted = [...data.inventory].sort((a, b) => b.acquiredAt - a.acquiredAt);
 
+  const uniqueOwnedCount = new Set(data.inventory.map((item) => item.guitarId)).size;
+  const totalGuitarsCount = GUITAR_DEFINITIONS.length;
+  const completionPct = Math.round((uniqueOwnedCount / totalGuitarsCount) * 100);
+
   const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {
     setSelectedItemId(inventoryItemId);
     setSelectedGuitarId(guitarId);
@@ -69,6 +73,21 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   return (
     <>
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
+          <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
+          <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
+        </div>
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+          <div
+            className="h-full rounded-full bg-cyan-400 transition-all"
+            style={{ width: `${completionPct}%` }}
+          />
+        </div>
+        <span className="text-xs font-bold text-cyan-400">{completionPct}%</span>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {sorted.map((item) => (
           <GuitarCard

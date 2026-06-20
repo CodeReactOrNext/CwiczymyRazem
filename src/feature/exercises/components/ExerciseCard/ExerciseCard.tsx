@@ -5,7 +5,7 @@ interface ExerciseCardProps {
   exercise: {
     id: string;
     title: string;
-    difficulty: 'easy' | 'medium' | 'hard';
+    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
     category: string;
     description: string;
     timeInMinutes: number;
@@ -23,6 +23,7 @@ const categoryColors: Record<string, { label: string; color: string; badge: stri
 };
 
 const difficultyColors: Record<string, string> = {
+  beginner: 'bg-sky-500/10 text-sky-300',
   easy: 'bg-emerald-500/10 text-emerald-300',
   medium: 'bg-amber-500/10 text-amber-300',
   hard: 'bg-rose-500/10 text-rose-300',

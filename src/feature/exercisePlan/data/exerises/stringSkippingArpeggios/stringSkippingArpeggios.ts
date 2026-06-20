@@ -16,7 +16,7 @@ export const stringSkippingArpeggiosExercise: Exercise = {
     "Dampen the skipped strings with your picking-hand palm.",
     "Ensure each note of the triad is fully articulated and clearly separated."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 75 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 75 },
   relatedSkills: ["string_skipping"],
   tablature: [
     {

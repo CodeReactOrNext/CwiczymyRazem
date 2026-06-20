@@ -16,7 +16,7 @@ export const chickenPickinExercise: Exercise = {
     "Pull the string slightly upward away from the fretboard so it snaps back against the frets.",
     "Relax your picking hand between snaps to maintain fluid rhythmic movement."
   ],
-  metronomeSpeed: { min: 60, max: 140, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 140, recommended: 80 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

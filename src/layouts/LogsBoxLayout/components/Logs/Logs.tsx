@@ -538,12 +538,12 @@ const FirebaseLogsItem = ({
                 onClick={() => onPreviewPlan(plan)}
                 title="Click to preview and start this plan"
                 className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="tracking-wide mr-1.5 opacity-80">Plan</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
                 <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
               </button>
             ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="tracking-wide mr-1.5 opacity-80">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
                     Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>
@@ -558,12 +558,12 @@ const FirebaseLogsItem = ({
                 onClick={() => onPreviewExercise(matchedExercise)}
                 title="Click to preview and start this exercise"
                 className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">Exercise</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
                 <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{exerciseTitle}</span>
               </button>
             ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
                     Exercise
                 </span>
                 <span className="font-medium">{exerciseTitle}</span>
@@ -574,11 +574,11 @@ const FirebaseLogsItem = ({
           {micPerformance && !(micPerformance.score === 0 && micPerformance.accuracy === 100) && (
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
                 <span className="flex items-center gap-1">
-                    <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest mr-0.5">Score:</span>
-                    <span className="font-bold text-main">{micPerformance.score}</span>
+                    <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider mr-0.5">Score:</span>
+                    <span className="font-bold tabular-nums text-main">{micPerformance.score}</span>
                 </span>
                 <span className="w-px h-2.5 bg-blue-500/30" />
-                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold">
+                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold tabular-nums">
                     {micPerformance.accuracy}%
                 </span>
               </span>
@@ -586,8 +586,8 @@ const FirebaseLogsItem = ({
 
           {earTrainingPerformance && (
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-                <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
-                <span className="font-bold">{earTrainingPerformance.score}</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider">Score:</span>
+                <span className="font-bold tabular-nums">{earTrainingPerformance.score}</span>
               </span>
           )}
 
@@ -597,13 +597,13 @@ const FirebaseLogsItem = ({
                 href={`/songs?view=management&songId=${songId}`}
                 title="Click to open this song"
                 className="group inline-flex items-center text-left text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
                 <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
                 <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
               </Link>
             ) : (
               <span className="inline-block text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
                 <span className="font-medium">{songArtist} - {songTitle}</span>
               </span>
             )
@@ -831,10 +831,12 @@ const FirebaseLogsDailyQuestItem = ({
 
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] ">
-              <FaTrophy className="h-2.5 w-2.5" />
-              Claimed +{points}
-              <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-yellow-400 bg-yellow-950/30 border-yellow-500/20">
+              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">Claimed</span>
+              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+                +{points}
+                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+              </span>
             </span>
           </div>
           {log.id && (

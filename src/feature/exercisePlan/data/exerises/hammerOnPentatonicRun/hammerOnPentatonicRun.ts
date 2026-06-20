@@ -18,7 +18,7 @@ export const hammerOnPentatonicRunExercise: Exercise = {
     "Minimize the height of your fingers above the frets to maintain speed and control.",
     "Practice the transition at the top turnaround slowly before increasing speed.",
   ],
-  metronomeSpeed: { min: 60, max: 160, recommended: 60 },
+  metronomeSpeed: { min: 40, max: 160, recommended: 60 },
   examBacking: { url: "/static/sounds/exercise/hammer_on_pentatonic_run___3_strings_backing_track (1).mp3", sourceBpm: 60 },
   relatedSkills: ["legato"],
   tablature: [

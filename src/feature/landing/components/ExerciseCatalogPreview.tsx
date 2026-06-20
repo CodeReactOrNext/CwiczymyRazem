@@ -9,7 +9,7 @@ interface ExerciseCatalogPreviewProps {
   exercises: Array<{
     id: string;
     title: string;
-    difficulty: 'easy' | 'medium' | 'hard';
+    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
     category: string;
     description: string;
     timeInMinutes: number;

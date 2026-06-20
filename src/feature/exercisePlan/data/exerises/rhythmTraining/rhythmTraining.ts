@@ -127,7 +127,7 @@ export const rhythmTrainingMedium: Exercise = {
     "Keep your foot tapping strictly on the quarter-note downbeats, even during heavily syncopated phrases.",
     "Treat rests as active musical elements—your hand should still swing silently through the air.",
   ],
-  metronomeSpeed: { min: 65, max: 115, recommended: 85 },
+  metronomeSpeed: { min: 40, max: 115, recommended: 85 },
   relatedSkills: ["rhythm"],
   get tablature() {
     return mediumTablature;
@@ -153,7 +153,7 @@ export const rhythmTrainingHard: Exercise = {
     "For triplets, mentally divide the beat into three equal parts ('1 & a, 2 & a').",
     "If you drift off the grid during the polyrhythm, stop, reset your internal pulse with the metronome, and start the measure over.",
   ],
-  metronomeSpeed: { min: 75, max: 135, recommended: 95 },
+  metronomeSpeed: { min: 40, max: 135, recommended: 95 },
   relatedSkills: ["rhythm"],
   get tablature() {
     return hardTablature;

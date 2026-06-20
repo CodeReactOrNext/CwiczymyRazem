@@ -1,11 +1,13 @@
 import {
   collection,
+  doc,
+  getDoc,
   limit,
   onSnapshot,
   orderBy,
   query,
   where} from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import type { AppNotification } from "../services/notification.service";
@@ -15,6 +17,8 @@ export const useAppNotifications = (userId: string | null) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  // Caches sender avatars so we don't refetch the same user on every snapshot.
+  const avatarCache = useRef<Record<string, string | null>>({});
 
   useEffect(() => {
     if (!userId) {
@@ -23,6 +27,50 @@ export const useAppNotifications = (userId: string | null) => {
       setIsLoading(false);
       return;
     }
+
+    // Backfill senderAvatarUrl for notifications that were stored without it
+    // (legacy data) by pulling the sender's current avatar from their user doc.
+    const enrichWithAvatars = async (
+      list: AppNotification[]
+    ): Promise<AppNotification[]> => {
+      const missing = Array.from(
+        new Set(
+          list
+            .filter(
+              (n) =>
+                !n.senderAvatarUrl &&
+                n.senderId &&
+                !(n.senderId in avatarCache.current)
+            )
+            .map((n) => n.senderId as string)
+        )
+      );
+
+      await Promise.all(
+        missing.map(async (uid) => {
+          try {
+            const snap = await getDoc(doc(db, "users", uid));
+            avatarCache.current[uid] = snap.exists()
+              ? (snap.data().avatar ?? null)
+              : null;
+          } catch {
+            avatarCache.current[uid] = null;
+          }
+        })
+      );
+
+      return list.map((n) =>
+        !n.senderAvatarUrl && n.senderId && avatarCache.current[n.senderId]
+          ? { ...n, senderAvatarUrl: avatarCache.current[n.senderId] }
+          : n
+      );
+    };
+
+    const applySnapshot = (list: AppNotification[]) => {
+      setUnreadCount(list.filter((n) => !n.isRead).length);
+      setIsLoading(false);
+      enrichWithAvatars(list).then(setNotifications);
+    };
 
     const q = query(
       collection(db, "notifications"),
@@ -37,9 +85,7 @@ export const useAppNotifications = (userId: string | null) => {
         ...doc.data()
       })) as AppNotification[];
 
-      setNotifications(fetchedNotifications);
-      setUnreadCount(fetchedNotifications.filter(n => !n.isRead).length);
-      setIsLoading(false);
+      applySnapshot(fetchedNotifications);
     }, (error) => {
       console.error("Notifications listener failed:", error);
 
@@ -65,9 +111,7 @@ export const useAppNotifications = (userId: string | null) => {
             return getMillis(b.timestamp) - getMillis(a.timestamp);
           });
 
-          setNotifications(fetched);
-          setUnreadCount(fetched.filter(n => !n.isRead).length);
-          setIsLoading(false);
+          applySnapshot(fetched);
         });
       } else {
         setIsLoading(false);

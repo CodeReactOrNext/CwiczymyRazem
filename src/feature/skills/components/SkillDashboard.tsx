@@ -48,7 +48,7 @@ interface SkillDashboardProps {
 }
 
 const CATEGORIES: CategoryKeys[] = ["technique", "theory", "hearing", "creativity"];
-const DIFFICULTY_ORDER = ["easy", "medium", "hard"];
+const DIFFICULTY_ORDER = ["beginner", "easy", "medium", "hard"];
 
 export const SkillDashboard = ({
   userSkills,
@@ -89,7 +89,7 @@ export const SkillDashboard = ({
             description: exercise.description as any,
             category: category as any,
             requiredSkillId: skillId,
-            requiredLevel: exercise.difficulty === 'easy' ? 0 : exercise.difficulty === 'medium' ? 1 : 2,
+            requiredLevel: exercise.difficulty === 'hard' ? 2 : exercise.difficulty === 'medium' ? 1 : 0,
             rewardDescription: 'Practice complete',
             exercises: [exercise],
             unlockDescription: "",
@@ -123,7 +123,7 @@ export const SkillDashboard = ({
           description: exercise.description as any,
           category: category as any,
           requiredSkillId: skillId,
-          requiredLevel: exercise.difficulty === 'easy' ? 0 : exercise.difficulty === 'medium' ? 1 : 2,
+          requiredLevel: exercise.difficulty === 'hard' ? 2 : exercise.difficulty === 'medium' ? 1 : 0,
           rewardDescription: 'Practice complete',
           exercises: [exercise],
           unlockDescription: "",
