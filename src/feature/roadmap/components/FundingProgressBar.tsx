@@ -200,6 +200,7 @@ export const FundingProgressBar = ({
           {/* Tier markers + boxes */}
           {ROADMAP_TIERS.map((tier, i) => {
             const reached = totalRaised >= tier.goal;
+            const done = tier.done === true;
             const isNext = nextIndex === i;
             const isFeature = tier.kind === "feature";
             const TierIcon = tier.icon;
@@ -211,7 +212,9 @@ export const FundingProgressBar = ({
                   className={cn(
                     "absolute z-10 flex -translate-x-1/2 items-center justify-center rounded-full ring-4 ring-zinc-900/50",
                     isFeature ? "h-9 w-9" : "h-8 w-8",
-                    reached
+                    done
+                      ? "bg-emerald-500 text-zinc-950"
+                      : reached
                       ? "bg-cyan-500 text-zinc-950"
                       : isNext
                       ? "bg-zinc-900 ring-cyan-500/50"
@@ -237,6 +240,7 @@ export const FundingProgressBar = ({
                   className={cn(
                     "absolute -translate-x-1/2 rounded-lg p-3.5 text-left transition-background",
                     isFeature ? "bg-zinc-800 ring-1 ring-amber-500/30" : "bg-zinc-800/60",
+                    done && "ring-1 ring-emerald-500/50",
                     isNext && "ring-1 ring-cyan-500/50",
                     !reached && !isNext && !isFeature && "opacity-70"
                   )}
@@ -271,13 +275,17 @@ export const FundingProgressBar = ({
                     <span
                       className={cn(
                         "text-[11px] font-medium",
-                        reached
+                        done
+                          ? "text-emerald-400"
+                          : reached
                           ? "text-zinc-500"
                           : isNext
                           ? "text-cyan-400"
                           : "text-zinc-600"
                       )}>
-                      {reached
+                      {done
+                        ? "Done"
+                        : reached
                         ? "Funded"
                         : isNext
                         ? `+$${tier.goal - totalRaised}`
