@@ -249,6 +249,24 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
                   </span>
                 </div>
                 <div className="relative flex items-center justify-center px-2 py-3 mx-2 my-1.5 rounded-xl overflow-hidden">
+                  {/* Subtle structural grid */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      backgroundImage: [
+                        `linear-gradient(${specialGuitarColor} 1px, transparent 1px)`,
+                        `linear-gradient(90deg, ${specialGuitarColor} 1px, transparent 1px)`,
+                      ].join(","),
+                      backgroundSize: "22px 22px",
+                      opacity: 0.04,
+                    }}
+                  />
+                  {/* Neutral spotlight */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+                  />
+                  {/* Rarity glow */}
                   <div
                     className="absolute inset-0"
                     style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}30 0%, ${specialGuitarColor}0d 50%, transparent 72%)` }}

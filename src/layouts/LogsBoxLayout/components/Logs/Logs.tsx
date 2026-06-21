@@ -121,14 +121,33 @@ const ItemTooltipCard = ({
       </div>
 
       {/* Image */}
-      <div
-        className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg"
-        style={{ background: `radial-gradient(ellipse at center, ${color}18 0%, transparent 70%)` }}
-      >
+      <div className="relative flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg overflow-hidden">
+        {/* Subtle structural grid */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: [
+              `linear-gradient(${color} 1px, transparent 1px)`,
+              `linear-gradient(90deg, ${color} 1px, transparent 1px)`,
+            ].join(","),
+            backgroundSize: "22px 22px",
+            opacity: 0.04,
+          }}
+        />
+        {/* Neutral spotlight so dark items separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+        {/* Rarity glow */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at center, ${color}18 0%, transparent 70%)` }}
+        />
         <img
           src={imgSrc}
           alt={itemName}
-          className={`object-contain drop-shadow-xl ${itemType === "guitar" ? "h-36 w-auto -rotate-90" : "h-24 w-24"}`}
+          className={`relative z-10 object-contain drop-shadow-xl ${itemType === "guitar" ? "h-36 w-auto -rotate-90" : "h-24 w-24"}`}
         />
       </div>
 

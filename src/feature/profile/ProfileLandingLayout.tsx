@@ -8,6 +8,7 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { SupportBanner } from "feature/dashboard/components/SupportBanner";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { getTrendData } from "feature/profile/utils/getTrendData";
@@ -186,6 +187,10 @@ const ProfileLandingLayout = ({
               datasWithReports={datasWithReports}
               isLoading={isLoading}
             />
+
+          <div className="mt-6 mb-6">
+            <SupportBanner />
+          </div>
 
           {featSlot && featSlot}
         </div>

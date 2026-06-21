@@ -43,6 +43,19 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         style={{ backgroundImage: NOISE_BG, backgroundSize: "180px 180px", opacity: 0.035, mixBlendMode: "overlay" }}
       />
 
+      {/* Subtle structural grid across the whole card */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: [
+            `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
+            `linear-gradient(90deg, ${rs.baseColor} 1px, transparent 1px)`,
+          ].join(","),
+          backgroundSize: "22px 22px",
+          opacity: 0.04,
+        }}
+      />
+
       {/* Rarity top stripe */}
       <div
         className="h-[2px] w-full flex-shrink-0"
@@ -73,6 +86,19 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         className="relative flex items-center justify-center flex-1 overflow-hidden py-4"
         style={{ minHeight: 200 }}
       >
+        {/* Neutral spotlight so dark guitars separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+
+        {/* Rarity glow backdrop */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none translate-y-[60px] opacity-50">
+          <div
+            className="absolute w-[170px] h-[170px] rounded-full blur-[34px]"
+            style={{ background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)` }}
+          />
+        </div>
 
         {item.isNew && (
           <div
@@ -167,7 +193,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           onClick={() => onEquip(guitar.id, item.year, item.country)}
           disabled={isEquipped || isEquipping}
           className={cn(
-            "flex-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
+            "flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
             isEquipped
               ? "cursor-default text-amber-400"
               : "text-zinc-500 hover:text-white disabled:opacity-30"
@@ -190,7 +216,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         <button
           onClick={() => onSellClick(item.id, guitar.id)}
           disabled={isSelling || isEquipped}
-          className="flex-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
+          className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
           title={isEquipped ? "Cannot sell equipped guitar" : undefined}
         >
           <Trash2 size={9} strokeWidth={2.5} />

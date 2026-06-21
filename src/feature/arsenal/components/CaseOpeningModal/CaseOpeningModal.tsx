@@ -14,7 +14,7 @@ import { createPortal } from "react-dom";
 import type { CaseDefinition, EffectDefinition, GuitarDefinition, GuitarRarity,OpenCaseResult } from "../../types/arsenal.types";
 import { RARITY_GLOW_CLASS,RARITY_STYLES, RarityBadge } from "../RarityBadge";
 
-const ITEM_WIDTH = 180;
+const ITEM_WIDTH = 250;
 const VISIBLE_ITEMS = 60;
 const WIN_INDEX = 45;
 
@@ -196,36 +196,23 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       style={{ width: ITEM_WIDTH }}
                     >
                       <div
-                        className={cn(
-                          "relative flex items-center justify-center rounded-md w-[160px] h-[120px] overflow-hidden transition-all duration-500",
-                          isWinner ? "bg-zinc-800 scale-105 ring-1 ring-white/10" : "bg-zinc-900/60"
-                        )}
+                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60"
                         style={{
-                          boxShadow: isWinner ? `0 0 45px ${rs.baseColor}55` : undefined,
+                          border: `1px solid ${rs.baseColor}55`,
+                          background: `radial-gradient(circle at center, ${rs.baseColor}26 0%, ${rs.baseColor}0d 45%, rgba(24,24,27,0.85) 85%)`,
                         }}
                       >
-                        <div
-                          className="absolute inset-x-0 bottom-0 h-[3px]"
-                          style={{ backgroundColor: rs.baseColor, opacity: isWinner ? 1 : 0.45 }}
-                        />
-                        <div
-                          className="absolute inset-0 transition-opacity duration-500"
-                          style={{
-                            background: `linear-gradient(180deg, ${rs.baseColor}1f 0%, transparent 55%)`,
-                            opacity: isWinner ? 1 : 0.4,
-                          }}
-                        />
                         {item.kind === "guitar" ? (
                           <img
                             src={`/static/images/rank/${item.def.imageId}.webp`}
                             alt={item.def.name}
-                            className="relative z-10 h-24 w-24 -rotate-45 object-contain drop-shadow-2xl"
+                            className="relative z-10 h-[440px] w-[440px] -rotate-45 object-contain"
                           />
                         ) : (
                           <img
                             src={`/static/images/effects/${item.def.imageId}.png`}
                             alt={item.def.name}
-                            className="relative z-10 h-20 w-20 object-contain drop-shadow-2xl"
+                            className="relative z-10 h-32 w-32 object-contain"
                           />
                         )}
                       </div>
@@ -262,7 +249,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     />
                     <div
                       className={cn(
-                        "relative flex h-52 w-52 sm:h-80 sm:w-80 items-center justify-center rounded-lg bg-zinc-950/90 border-b-8",
+                        "relative flex h-72 w-72 sm:h-[28rem] sm:w-[28rem] items-center justify-center overflow-hidden rounded-lg bg-zinc-950/90 border-b-8",
                         RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{
@@ -270,12 +257,23 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                         boxShadow: `0 0 30px ${rarityStyles.baseColor}33`,
                       }}
                     >
-                      <div className="absolute inset-0 rounded opacity-30" style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)` }} />
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}55 0%, ${rarityStyles.baseColor}22 35%, #0a0a0b 80%)` }}
+                      />
+                      <div
+                        className="absolute inset-[-70%]"
+                        style={{
+                          background: `repeating-conic-gradient(from 0deg at 50% 50%, ${rarityStyles.baseColor}26 0deg 9deg, transparent 9deg 18deg)`,
+                          maskImage: "radial-gradient(circle at center, black 25%, transparent 95%)",
+                          WebkitMaskImage: "radial-gradient(circle at center, black 25%, transparent 95%)",
+                        }}
+                      />
                       {winDef.kind === "guitar" ? (
                         <img
                           src={`/static/images/rank/${winDef.def.imageId}.webp`}
                           alt={winDef.def.name}
-                          className="relative z-10 h-44 w-44 sm:h-64 sm:w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                          className="relative z-10 h-64 w-64 sm:h-[26rem] sm:w-[26rem] -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
                         />
                       ) : (
                         <img

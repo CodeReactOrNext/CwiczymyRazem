@@ -16,7 +16,8 @@
       "Skill(update-config)",
       "Skill(update-config:*)",
       "Read(//c/Users/Krokon/.claude/**)",
-      "Bash(node tmp_parse.js; rm -f tmp_parse.js /tmp/parse.js /tmp/parse2.js)"
+      "Bash(node tmp_parse.js; rm -f tmp_parse.js /tmp/parse.js /tmp/parse2.js)",
+      "Bash(echo \"EXIT_GREP=$?\")"
     ],
     "additionalDirectories": [
       "\\tmp"

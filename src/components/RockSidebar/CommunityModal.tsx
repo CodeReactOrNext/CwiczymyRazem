@@ -1,7 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import { ExternalLink, Heart, Share2, Users } from "lucide-react";
+import { ExternalLink, Heart, Map, Share2, Users } from "lucide-react";
+import Link from "next/link";
 import { FaDiscord } from "react-icons/fa";
 
 interface CommunityModalProps {
@@ -21,6 +22,27 @@ export const CommunityModal = ({ isOpen, onClose }: CommunityModalProps) => {
         </DialogHeader>
 
         <div className="mt-6 space-y-6">
+          {/* Roadmap */}
+          <Link
+            href="/roadmap"
+            onClick={onClose}
+            className="group relative block overflow-hidden rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5 transition-all hover:bg-amber-500/15">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400">
+                <Map size={26} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-white">Support the Roadmap</h3>
+                <p className="mt-1 text-sm text-zinc-400">
+                  See what your support unlocks next — and help build it.
+                </p>
+                <span className="mt-4 flex items-center gap-2 text-sm font-bold text-amber-300 group-hover:underline">
+                  View the Roadmap <ExternalLink size={14} />
+                </span>
+              </div>
+            </div>
+          </Link>
+
           {/* Join Discord */}
           <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-800/50 p-5 transition-all hover:bg-zinc-800">
             <div className="flex items-start gap-4">
