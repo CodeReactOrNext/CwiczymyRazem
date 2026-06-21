@@ -102,27 +102,26 @@ const FilterSheet = ({
       <SheetContent side="right" className="w-full sm:max-w-md bg-zinc-950 p-0 shadow-2xl">
         <div className="flex flex-col h-full">
           <SheetHeader className="p-6">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="text-2xl font-semibold text-white">
-                Filter & Sort
-              </SheetTitle>
+            <SheetTitle className="pr-10 text-2xl font-semibold text-white">
+              Filter & Sort
+            </SheetTitle>
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <SheetDescription className="text-zinc-500">
+                Refine your song discovery experience
+              </SheetDescription>
               {hasFilters && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     onClearFilters();
                     onClose();
                   }}
-                  className="text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  className="h-9 shrink-0 rounded-md border border-red-400/30 px-3 text-sm font-bold text-red-400 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-300"
                 >
                   Reset
                 </Button>
               )}
             </div>
-            <SheetDescription className="text-zinc-500 mt-1">
-              Refine your song discovery experience
-            </SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-9 no-scrollbar">
@@ -161,9 +160,9 @@ const FilterSheet = ({
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-semibold text-zinc-300">Music genres</h4>
                   {localGenres.length > 0 && (
-                    <button 
+                    <button
                         onClick={() => setLocalGenres([])}
-                        className="text-[10px] font-black text-cyan-500 hover:text-cyan-400"
+                        className="rounded-md px-2 py-1 text-xs font-bold text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
                     >
                         Clear
                     </button>

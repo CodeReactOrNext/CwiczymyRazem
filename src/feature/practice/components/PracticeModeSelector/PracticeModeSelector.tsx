@@ -1,3 +1,4 @@
+import { Ripple } from "components/Ripple/Ripple";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import {
@@ -14,6 +15,7 @@ import {
   Music,
   Route,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { useRipple } from "hooks/useRipple";
 import { useRouter } from "next/router";
@@ -37,6 +39,11 @@ const colorMap = {
 
 type ColorKey = keyof typeof colorMap;
 
+interface ModeLink {
+  label: string;
+  onClick: () => void;
+}
+
 interface ModeCardProps {
   Icon: React.ElementType;
   title: string;
@@ -46,6 +53,7 @@ interface ModeCardProps {
   locked?: boolean;
   lockLabel?: string;
   hero?: boolean;
+  links?: ModeLink[];
   onActivate: () => void;
 }
 
@@ -58,6 +66,7 @@ const ModeCard = ({
   locked,
   lockLabel,
   hero,
+  links,
   onActivate,
 }: ModeCardProps) => {
   const c = colorMap[ck];
@@ -66,7 +75,9 @@ const ModeCard = ({
 
   return (
     <div
-      className={`group relative flex items-center gap-3 overflow-hidden rounded-lg transition-all duration-300 ${
+      className={`group relative flex gap-3 overflow-hidden rounded-lg transition-all duration-300 ${
+        hero || (links && links.length > 0) ? "items-start" : "items-center"
+      } ${
         hero
           ? "bg-white/[0.03] p-[18px] backdrop-blur-md border border-white/[0.02]"
           : "bg-white/[0.02] p-3.5 backdrop-blur-sm"
@@ -103,6 +114,25 @@ const ModeCard = ({
           )}
         </div>
         <p className={hero ? "text-[13px] text-zinc-400 font-medium leading-relaxed" : "truncate text-[12px] text-zinc-500 group-hover:text-zinc-400 transition-colors"}>{description}</p>
+        {links && links.length > 0 && (
+          <div className="relative z-10 mt-3 flex flex-col border-t border-white/[0.05] pt-1.5">
+            {links.map((link) => (
+              <button
+                key={link.label}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  link.onClick();
+                }}
+                className="group/link relative flex items-center justify-between overflow-hidden rounded-md px-2 py-1.5 text-left text-[12px] font-semibold text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-white active:scale-[0.98] active:bg-white/[0.1]"
+              >
+                <Ripple className="bg-white/20" />
+                <span>{link.label}</span>
+                <ArrowRight className="h-3.5 w-3.5 -translate-x-1 text-zinc-600 opacity-0 transition-all group-hover/link:translate-x-0 group-hover/link:text-zinc-300 group-hover/link:opacity-100" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {!locked && (
         <div className={`flex h-7 w-7 items-center justify-center rounded-full bg-white/0 transition-all duration-300 ${hero ? "ml-2" : ""}`}>
@@ -166,6 +196,7 @@ export const PracticeModeSelector = () => {
     ck: ColorKey,
     locked?: boolean,
     lockLabel?: string,
+    links?: { label: string; href: string }[],
   ) => {
     return (
       <ModeCard
@@ -177,6 +208,10 @@ export const PracticeModeSelector = () => {
         loading={loadingMode === id}
         locked={locked}
         lockLabel={lockLabel}
+        links={links?.map((link) => ({
+          label: link.label,
+          onClick: () => nav(link.href, `${id}:${link.label}`, locked),
+        }))}
         onActivate={() => nav(href, id, locked)}
       />
     );
@@ -191,8 +226,16 @@ export const PracticeModeSelector = () => {
               <h2 className="text-lg font-bold text-white mb-4">Practice</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {hasLastSession && heroListItem("resume", History, "Resume Last", "Continue playing where you left off", "/timer/practice", "indigo")}
-                {heroListItem("routine",  ListChecks,    "Daily Routine", "Follow daily guided routine",   "/timer/plans",   "indigo")}
-                {heroListItem("song",      PiCassetteTapeLight,    "Songs",      "Track practice time for your repertoire", "/timer/song-select",  "indigo")}
+                {heroListItem("routine",  ListChecks,    "Practice Routines", "Follow daily guided routine",   "/timer/plans",   "indigo", false, undefined, [
+                  { label: "Routines",   href: "/timer/plans?tab=routines" },
+                  { label: "Playalongs", href: "/timer/plans?tab=playalongs" },
+                  { label: "My Plans",   href: "/timer/plans?tab=my_plans" },
+                  { label: "Community",  href: "/timer/plans?tab=community" },
+                ])}
+                {heroListItem("song",      PiCassetteTapeLight,    "Songs",      "Track practice time for your repertoire", "/timer/song-select",  "indigo", false, undefined, [
+                  { label: "Practice", href: "/timer/song-select" },
+                  { label: "My Board", href: "/songs?view=board" },
+                ])}
                 {heroListItem("log",     ClipboardList, "Log Practice", "Manually log a custom practice session",  "/report",         "indigo")}
               </div>
             </div>
@@ -211,6 +254,7 @@ export const PracticeModeSelector = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("skills",    Brain,    "Skills", "Specific skill focus",         "/profile/skills",     "emerald")}
                 {listItem("exercises", Dumbbell, "Exercises",  "Full exercise library",             "/profile/skills?tab=browse",  "emerald")}
+                {listItem("community-exercises", Users, "Community Exercises", "Exercises shared by the community", "/profile/skills?tab=community", "emerald")}
               </div>
             </div>
 

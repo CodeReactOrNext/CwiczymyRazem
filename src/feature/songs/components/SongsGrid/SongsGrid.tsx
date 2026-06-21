@@ -1,7 +1,9 @@
 import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
+import { ITEMS_PER_PAGE } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import posthog from "posthog-js";
@@ -9,6 +11,7 @@ import { useState } from "react";
 
 interface SongsGridProps {
   songs: Song[];
+  isLoading?: boolean;
   hasFilters: boolean;
   currentPage: number;
   hasMore: boolean;
@@ -30,6 +33,7 @@ interface SongsGridProps {
 
 export const SongsGrid = ({
   songs,
+  isLoading,
   currentPage,
   hasMore,
   onPageChange,
@@ -78,12 +82,18 @@ export const SongsGrid = ({
 
   return (
     <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
-      {songs.length === 0 ? (
+      {isLoading ? (
+        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
+          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+            <SongCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : songs.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3 animate-in fade-in duration-500'>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 animate-in fade-in duration-500'>
           {songs.map((song) => {
             let userStatus: SongStatus | undefined;
             if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
@@ -103,6 +113,8 @@ export const SongsGrid = ({
                 onStatusChange={(status) => {
                   if (status) {
                     handleAddOrMove(song, status);
+                  } else {
+                    handleSongRemoval(song.id);
                   }
                 }}
                 onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}

@@ -15,8 +15,11 @@ import { motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, Flame, Globe, Music, Zap } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
+
+const PLAN_TABS = ["routines", "playalongs", "my_plans", "community"] as const;
 
 const RippleTabsTrigger = ({
   value,
@@ -49,10 +52,20 @@ interface PlanSelectorProps {
 
 export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelectorProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+
+  const [activeTab, setActiveTab] = useState<(typeof PLAN_TABS)[number]>("routines");
+
+  useEffect(() => {
+    const queryTab = router.query.tab;
+    if (typeof queryTab === "string" && (PLAN_TABS as readonly string[]).includes(queryTab)) {
+      setActiveTab(queryTab as (typeof PLAN_TABS)[number]);
+    }
+  }, [router.query.tab]);
 
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
   const [communityPlans, setCommunityPlans] = useState<ExercisePlan[]>([]);
@@ -163,7 +176,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                   <span className="text-sm font-medium">Back</span>
                 </button>
               )}
-              <Tabs defaultValue="routines" className="w-full">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as (typeof PLAN_TABS)[number])} className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
                 <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" />
                 <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" />

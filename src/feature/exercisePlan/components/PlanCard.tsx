@@ -1,5 +1,10 @@
-import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useRipple } from "hooks/useRipple";
@@ -208,39 +213,62 @@ export const PlanCard = ({
         </div>
         <div className="flex items-center gap-2">
             {(onEdit || onDelete || onTogglePublic) && (
-                <div className="flex items-center gap-1 mr-2">
-                    {onTogglePublic && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn("h-7 w-7 transition-colors", plan.isPublic ? "text-cyan-400 hover:text-cyan-300" : "text-zinc-500 hover:text-zinc-300")}
-                            title={plan.isPublic ? "Published — click to unpublish" : "Unpublished — click to publish"}
-                            onClick={(e) => { e.stopPropagation(); onTogglePublic(); }}
-                        >
-                            <Globe className="h-3.5 w-3.5" />
-                        </Button>
-                    )}
-                    {onEdit && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-zinc-400"
-                            onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                        >
-                            <FaEdit className="h-3 w-3" />
-                        </Button>
-                    )}
-                    {onDelete && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-zinc-400"
-                            onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                        >
-                            <FaTrashAlt className="h-3 w-3" />
-                        </Button>
-                    )}
-                </div>
+                <TooltipProvider delayDuration={200}>
+                    <div className="mr-1 flex items-center gap-0.5 rounded-[4px] border border-white/10 bg-zinc-950/50 p-1 shadow-lg backdrop-blur-sm">
+                        {onTogglePublic && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        type="button"
+                                        aria-label={plan.isPublic ? "Unpublish plan" : "Publish plan"}
+                                        className={cn(
+                                            "flex h-9 w-9 items-center justify-center rounded-[4px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+                                            plan.isPublic
+                                                ? "bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 hover:text-cyan-300"
+                                                : "text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
+                                        )}
+                                        onClick={(e) => { e.stopPropagation(); onTogglePublic(); }}
+                                    >
+                                        <Globe className="h-4 w-4" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {plan.isPublic ? "Published — click to unpublish" : "Click to publish"}
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
+                        {onEdit && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        type="button"
+                                        aria-label="Edit plan"
+                                        className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+                                        onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                                    >
+                                        <FaEdit className="h-3.5 w-3.5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Edit</TooltipContent>
+                            </Tooltip>
+                        )}
+                        {onDelete && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        type="button"
+                                        aria-label="Delete plan"
+                                        className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-red-500/15 hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500/50"
+                                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                                    >
+                                        <FaTrashAlt className="h-3.5 w-3.5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Delete</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
+                </TooltipProvider>
             )}
             {isLocked && (
               <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">

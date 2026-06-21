@@ -8,6 +8,7 @@ import {
 } from "assets/components/ui/tabs";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getSongs } from "feature/songs/services/getSongs";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
@@ -27,6 +28,8 @@ const SongSelectPage: NextPageWithLayout = () => {
     const router = useRouter();
     const userId = useAppSelector(selectUserAuth);
     const userInfo = useAppSelector(selectUserInfo);
+    const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+    const { progressMap } = useUserSongProgress(userId ?? null, isPremium);
     const [allSongs, setAllSongs] = useState<Song[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -151,7 +154,7 @@ const SongSelectPage: NextPageWithLayout = () => {
     return (
         <div className="flex flex-col min-h-screen rounded-lg bg-zinc-900/40 lg:mt-16">
             <HeroBanner
-              title="Practice Session"
+              title="Practice Song"
               subtitle="Select a song to start practicing"
               eyebrow="Song Select"
               className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
@@ -275,6 +278,8 @@ const SongSelectPage: NextPageWithLayout = () => {
                                                 song={song}
                                                 onOpenDetails={() => handleSongSelect(song)}
                                                 isPracticeMode={true}
+                                                showPracticeStatus
+                                                practiceMs={progressMap[song.id]?.totalPracticeMs}
                                                 footerAction={{ label: "Practice", icon: <Play className="h-3.5 w-3.5 fill-current opacity-60" /> }}
                                             />
                                         </div>
@@ -375,6 +380,8 @@ const SongSelectPage: NextPageWithLayout = () => {
                                                         song={song}
                                                         onOpenDetails={() => handleSongSelect(song)}
                                                         isPracticeMode={true}
+                                                        showPracticeStatus
+                                                        practiceMs={progressMap[song.id]?.totalPracticeMs}
                                                         footerAction={{ label: "Practice", icon: <Play className="h-3.5 w-3.5 fill-current opacity-60" /> }}
                                                     />
                                                 </div>

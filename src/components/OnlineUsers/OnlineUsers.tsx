@@ -15,7 +15,7 @@ export const OnlineUsers = () => {
     const remainingCount = uniqueUsers.length - 8;
 
     return (
-        <div className="flex flex-col gap-3 p-3 mt-4">
+        <div className="flex flex-col gap-3">
              <div className="flex items-center gap-2 mb-1 px-1">
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[12px] font-bold  tracking-[0.1em] text-zinc-500">

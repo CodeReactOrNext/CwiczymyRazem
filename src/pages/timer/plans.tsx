@@ -81,7 +81,7 @@ const TimerPlans: NextPageWithLayout = () => {
   ) : (
     <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none min-h-screen ">
       <HeroBanner
-        title="Exercises"
+        title="Practice Routines"
         subtitle="Build your skills with focused practice exercises"
         eyebrow="Exercise Hub"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
