@@ -10,6 +10,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ROADMAP_TIERS } from "../data/roadmap.data";
+import { ServerCostMeter } from "./ServerCostMeter";
 
 const BMC_URL = "https://buymeacoffee.com/riffquest";
 
@@ -26,9 +27,11 @@ const CONTAINER_H = 400;
 export const FundingProgressBar = ({
   totalRaised,
   supporters,
+  raisedThisMonth,
 }: {
   totalRaised: number;
   supporters: number;
+  raisedThisMonth: number;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const goals = ROADMAP_TIERS.map((t) => t.goal);
@@ -36,9 +39,6 @@ export const FundingProgressBar = ({
   const stops = [0, ...goals];
   const gaps = stops.length - 1;
   const nextIndex = ROADMAP_TIERS.findIndex((t) => totalRaised < t.goal);
-  const nextTier = nextIndex >= 0 ? ROADMAP_TIERS[nextIndex] : null;
-  const toGo = nextTier ? nextTier.goal - totalRaised : 0;
-  const NextIcon = nextTier?.icon;
 
   // Stretch the segments to fill the full width, but never below MIN_SEGMENT
   // (in which case the bar scrolls).
@@ -92,9 +92,11 @@ export const FundingProgressBar = ({
   const fillX = xForAmount(totalRaised);
 
   return (
-    <section className='w-full rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-      {/* Headline + primary CTA */}
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
+    <div className='w-full space-y-4'>
+      {/* Card 1 — where things stand right now */}
+      <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+        {/* Headline + primary CTA */}
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
           <p className='text-xs font-medium tracking-wide text-zinc-500'>
             Raised so far
@@ -119,42 +121,22 @@ export const FundingProgressBar = ({
         </a>
       </div>
 
-      <p className='mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400'>
-        Riff Quest is built in the open and paid for by the people who use it.
-        Every coffee adds to the running total below. When that total reaches one
-        of the goals on the bar, that feature or batch of content gets built and
-        unlocked for everyone.
-      </p>
+      {/* Running cost coverage for the current month — a quiet status line */}
+      <ServerCostMeter raisedThisMonth={raisedThisMonth} />
+      </section>
 
-      {/* What your support unlocks next */}
-      {nextTier && (
-        <div className='mt-5 flex flex-col gap-3 rounded-lg bg-cyan-500/10 p-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div className='flex items-center gap-3'>
-            {NextIcon && <NextIcon size={22} className='shrink-0 text-cyan-400' />}
-            <div>
-              <p className='text-xs font-medium text-cyan-400'>Next unlock</p>
-              <p className='text-sm font-semibold text-zinc-100'>
-                ${nextTier.goal} · {nextTier.label}
-              </p>
-            </div>
-          </div>
-          <div className='flex items-center gap-3'>
-            <span className='whitespace-nowrap text-sm font-semibold text-cyan-300'>
-              ${toGo} to go
-            </span>
-            <a
-              href={BMC_URL}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='whitespace-nowrap rounded-lg bg-cyan-500/20 px-3 py-2 text-sm font-medium text-cyan-200 transition-background hover:bg-cyan-500/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50'>
-              Help unlock →
-            </a>
-          </div>
-        </div>
-      )}
+      {/* Card 2 — the full roadmap of funding goals */}
+      <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+        <header className='mb-2'>
+          <h2 className='text-sm font-semibold text-zinc-200'>The roadmap</h2>
+          <p className='mt-0.5 text-xs text-zinc-500'>
+            Every goal the running total reaches gets built and unlocked for
+            everyone.
+          </p>
+        </header>
 
       {/* The bar */}
-      <div className='relative -mx-5 mt-6 sm:-mx-6'>
+      <div className='relative -mx-5 mt-4 sm:-mx-6'>
         {/* Left fade + chevron */}
         {canLeft && (
           <>
@@ -190,13 +172,14 @@ export const FundingProgressBar = ({
         <div
           className='relative'
           style={{ width: trackWidth + PAD_X * 2, height: CONTAINER_H }}>
-          {/* "You are here" bubble */}
+          {/* "You are here" bubble with a caret pointing down to the track */}
           <div
-            className='absolute top-3 z-20 -translate-x-1/2 whitespace-nowrap'
+            className='absolute top-3 z-20 flex -translate-x-1/2 flex-col items-center'
             style={{ left: PAD_X + fillX }}>
-            <span className='rounded bg-cyan-500/15 px-2.5 py-1 text-base font-semibold text-cyan-300'>
+            <span className='whitespace-nowrap rounded bg-cyan-500/15 px-2.5 py-1 text-base font-semibold text-cyan-300'>
               ${totalRaised}
             </span>
+            <span className='h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-cyan-500/15' />
           </div>
 
           {/* Track */}
@@ -332,6 +315,7 @@ export const FundingProgressBar = ({
         </div>
         </div>
       </div>
-    </section>
+      </section>
+    </div>
   );
 };

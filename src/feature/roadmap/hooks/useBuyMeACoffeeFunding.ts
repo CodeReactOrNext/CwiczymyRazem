@@ -5,6 +5,8 @@ export interface BuyMeACoffeeFunding {
   totalRaised: number;
   /** Number of supporters. */
   supporters: number;
+  /** Raised since the start of the current month (USD) — covers running costs. */
+  raisedThisMonth: number;
   isLoading: boolean;
 }
 
@@ -19,6 +21,7 @@ export interface BuyMeACoffeeFunding {
 const FUNDING_SNAPSHOT: Omit<BuyMeACoffeeFunding, "isLoading"> = {
   totalRaised: 0,
   supporters: 0,
+  raisedThisMonth: 0,
 };
 
 export const useBuyMeACoffeeFunding = (): BuyMeACoffeeFunding => {
@@ -34,14 +37,21 @@ export const useBuyMeACoffeeFunding = (): BuyMeACoffeeFunding => {
         if (!res.ok) throw new Error(`funding responded ${res.status}`);
         return res.json();
       })
-      .then((data: { totalRaised: number; supporters: number }) => {
-        if (!active) return;
-        setFunding({
-          totalRaised: data.totalRaised,
-          supporters: data.supporters,
-          isLoading: false,
-        });
-      })
+      .then(
+        (data: {
+          totalRaised: number;
+          supporters: number;
+          raisedThisMonth?: number;
+        }) => {
+          if (!active) return;
+          setFunding({
+            totalRaised: data.totalRaised,
+            supporters: data.supporters,
+            raisedThisMonth: data.raisedThisMonth ?? 0,
+            isLoading: false,
+          });
+        }
+      )
       .catch(() => {
         if (active) setFunding({ ...FUNDING_SNAPSHOT, isLoading: false });
       });

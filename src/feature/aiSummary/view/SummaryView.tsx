@@ -245,6 +245,7 @@ const LEVEL_COLORS = [
 interface LevelDef {
   id: number;
   name: string;
+  short?: string;    // compact label for the icon row (defaults to first word of name)
   req: string;
   Icon: LucideIcon;
   cost: number;      // 0 = free
@@ -299,7 +300,7 @@ const LEVELS: LevelDef[] = [
     getProgress: d => ({ value: Math.min(d.daysIn7AllCats, 3), max: 3 }),
   },
   {
-    id: 7, name: "Locked In",        Icon: Shield,
+    id: 7, name: "In the Zone",      short: "Zone", Icon: Shield,
     req: "3-day streak with all 4 categories at 15+ min",
     cost: 280, reward: 160,
     isMet: d => d.streakAllCats >= 3,
@@ -529,7 +530,7 @@ function PracticeProgressTracker({
               style={{ color: showLock ? "#a1a1aa" : level.met ? GREEN : isNext ? "#fafafa" : "#d4d4d8" }}
               title={level.name}
             >
-              {level.name.split(" ")[0]}
+              {level.short ?? level.name.split(" ")[0]}
             </span>
           </div>
         );
