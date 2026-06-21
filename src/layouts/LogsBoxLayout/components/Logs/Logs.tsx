@@ -26,6 +26,7 @@ import type {
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { SupportPulse } from "feature/roadmap/components/SupportPulse";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
@@ -909,8 +910,9 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
 
   return (
     <>
-      <div className="mb-2">
+      <div className="mt-4 mb-2 flex flex-wrap items-start gap-x-4 gap-y-2 px-3">
         <OnlineUsers />
+        <SupportPulse className="ml-auto" />
       </div>
       <div ref={spanRef} className='h-1' />
       {logs.map((log) => (

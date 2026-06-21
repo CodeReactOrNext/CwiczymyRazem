@@ -124,7 +124,7 @@ export const SessionBottomBar = memo(({
                   </>
                 ) : (
                   <>
-                    <span className="flex items-center gap-2">{t("skip") || "Skip"}</span> <FaStepForward />
+                    <span className="flex items-center gap-2">{t("next") || "Next"}</span> <FaStepForward />
                   </>
                 )}
               </Button>

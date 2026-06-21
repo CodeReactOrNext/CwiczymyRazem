@@ -18,9 +18,8 @@ import { SongBoard } from "feature/songs/components/SongBoard/SongBoard";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
-import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
-import { ITEMS_PER_PAGE, useSongs } from "feature/songs/hooks/useSongs";
+import { useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
@@ -427,13 +426,15 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         </div>
                         <h2 className="text-xl font-semibold text-white">Currently learning</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
                         {userSongs.learning.map((song) => (
                           <SongCard
                             key={song.id}
                             song={song}
                             onOpenDetails={() => setDetailsTarget(song)}
                             onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
                           />
                         ))}
                       </div>
@@ -448,13 +449,15 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         </div>
                         <h2 className="text-xl font-semibold text-white">Want to learn</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
                         {userSongs.wantToLearn.map((song) => (
                           <SongCard
                             key={song.id}
                             song={song}
                             onOpenDetails={() => setDetailsTarget(song)}
                             onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
                           />
                         ))}
                       </div>
@@ -469,13 +472,15 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                         </div>
                         <h2 className="text-xl font-semibold text-white">Mastered songs</h2>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
                         {userSongs.learned.map((song) => (
                           <SongCard
                             key={song.id}
                             song={song}
                             onOpenDetails={() => setDetailsTarget(song)}
                             onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
                           />
                         ))}
                       </div>
@@ -560,9 +565,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 {/* Search & Filter Bar */}
                 <div className="relative z-30 py-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                    <div className="relative flex-1">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                        <Music className="h-4 w-4 text-zinc-500" />
+                    <div className="group relative flex-1">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
+                        <Music className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
                       </div>
                       <Input
                         placeholder={t("artist", "Artist...") as string}
@@ -572,9 +577,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                       />
                     </div>
 
-                    <div className="relative flex-[1.2]">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                        <Search className="h-4 w-4 text-zinc-500" />
+                    <div className="group relative flex-[1.2]">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
+                        <Search className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
                       </div>
                       <Input
                         placeholder={t("title", "Title...") as string}
@@ -615,26 +620,19 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 />
 
                 {/* Grid Content */}
-                {isLoading ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-                    {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                      <SongCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : (
-                  <SongsGrid
-                    songs={filteredSongs}
-                    currentPage={page}
-                    hasMore={hasMore}
-                    onPageChange={handlePageChange}
-                    onAddSong={() => setIsModalOpen(true)}
-                    hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
-                    onStatusChange={refreshSongs}
-                    onPractice={(song) => setPracticeTarget(song)}
-                    userSongs={userSongs}
-                    updateUserSongsCache={updateUserSongsCache}
-                  />
-                )}
+                <SongsGrid
+                  songs={filteredSongs}
+                  isLoading={isLoading}
+                  currentPage={page}
+                  hasMore={hasMore}
+                  onPageChange={handlePageChange}
+                  onAddSong={() => setIsModalOpen(true)}
+                  hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
+                  onStatusChange={refreshSongs}
+                  onPractice={(song) => setPracticeTarget(song)}
+                  userSongs={userSongs}
+                  updateUserSongsCache={updateUserSongsCache}
+                />
               </div>
             )}
           </main>

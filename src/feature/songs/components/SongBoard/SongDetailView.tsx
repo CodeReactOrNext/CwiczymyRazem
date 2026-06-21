@@ -63,7 +63,7 @@ const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: numbe
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   return (
-    <div className="flex items-center gap-0.5 group/stars">
+    <div className="flex flex-wrap items-center justify-end gap-0.5 group/stars">
       {[...Array(10)].map((_, i) => {
         const starValue = i + 1;
         const isActive = hoverRating !== null ? starValue <= hoverRating : starValue <= Math.round(rating);
@@ -423,7 +423,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
 
          {/* Second Row: Detailed Info & Progress */}
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             
             {/* Column 1: Your Progress */}
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
@@ -455,9 +455,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      <TooltipProvider>
                         <Tooltip>
                            <TooltipTrigger asChild>
-                              <div className="flex items-center justify-between cursor-pointer rounded-lg -mx-1 px-1 py-1 transition-colors hover:bg-white/5">
+                              <div className="flex flex-wrap items-center justify-between gap-y-2 cursor-pointer rounded-lg -mx-1 px-1 py-1 transition-colors hover:bg-white/5">
                                  <span className={cn(
-                                    "text-4xl font-black transition-colors leading-none",
+                                    "text-4xl font-black transition-colors leading-none shrink-0",
                                     userRating !== undefined ? "text-white" : "text-zinc-700"
                                  )}>
                                     {userRating !== undefined ? userRating : "--"}
@@ -515,8 +515,8 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
                <div className="px-1">
                   <p className="text-xs font-semibold text-zinc-400 mb-3">Avg. difficulty</p>
-                  <div className="flex items-center justify-between">
-                     <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-y-2">
+                     <div className="flex items-center gap-3 shrink-0">
                         <TierBadge song={song} className="h-8 w-8 rounded-md text-sm" />
                         <span className="text-4xl font-black text-white leading-none">{avgDifficulty.toFixed(1)}</span>
                      </div>
