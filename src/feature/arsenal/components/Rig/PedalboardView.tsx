@@ -6,16 +6,30 @@ import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.t
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
 
-const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;
 
+// The board surface renders at this aspect ratio (see aspectRatio below). We use
+// it to convert a pedal's image aspect ratio into a width-in-board-% so that all
+// pedals share the same on-board height but keep their natural proportions —
+// wide (dual) pedals end up genuinely wider instead of being squished.
+const BOARD_W = 16;
+const BOARD_H = 7;
+/** Aspect used before an image has reported its natural size (a typical pedal). */
+const DEFAULT_ASPECT = 480 / 515;
+
+const widthPctForAspect = (aspect: number) =>
+  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
+
+/** Fallback width for collision math before an image has loaded. */
+const PEDAL_W_PCT = widthPctForAspect(DEFAULT_ASPECT);
+
 const DEFAULT_POSITIONS = [
-  { xPct: 5,  yPct: 8  },
-  { xPct: 28, yPct: 8  },
-  { xPct: 51, yPct: 8  },
-  { xPct: 5,  yPct: 52 },
-  { xPct: 28, yPct: 52 },
-  { xPct: 51, yPct: 52 },
+  { xPct: 3,  yPct: 8  },
+  { xPct: 35, yPct: 8  },
+  { xPct: 67, yPct: 8  },
+  { xPct: 3,  yPct: 52 },
+  { xPct: 35, yPct: 52 },
+  { xPct: 67, yPct: 52 },
 ];
 
 
@@ -35,6 +49,8 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDragging] = useState<DragState | null>(null);
   const [isColliding, setIsColliding] = useState(false);
+  // Natural aspect ratio (w/h) per image, measured once the image loads.
+  const [aspectById, setAspectById] = useState<Record<number | string, number>>({});
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingSaveRef = useRef(false);
   const onUpdateItemsRef = useRef(onUpdateItems);
@@ -70,12 +86,28 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
     }
   }, [data.rig.pedalboardItems, dragging]);
 
-  const checkCollision = (xPct: number, yPct: number, excludeId: string): boolean => {
+  // Resolve a placed pedal's effect → its image aspect → its width in board %.
+  const aspectForItemId = (itemId: string): number => {
+    const invItem = data.effectInventory.find((e) => e.id === itemId);
+    const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+    return effect ? aspectById[effect.imageId] ?? DEFAULT_ASPECT : DEFAULT_ASPECT;
+  };
+
+  // Width-in-board-% for each placed pedal, kept in a ref so the drag handlers
+  // (which read it during mousemove) always see the current values.
+  const itemWidthsRef = useRef<Record<string, number>>({});
+  itemWidthsRef.current = Object.fromEntries(
+    localItems.map((p) => [p.itemId, widthPctForAspect(aspectForItemId(p.itemId))])
+  );
+  const widthOf = (itemId: string) => itemWidthsRef.current[itemId] ?? PEDAL_W_PCT;
+
+  const checkCollision = (xPct: number, yPct: number, excludeId: string, w: number): boolean => {
     return localItemsRef.current.some(item => {
       if (item.itemId === excludeId) return false;
+      const iw = widthOf(item.itemId);
       return (
-        xPct < item.xPct + PEDAL_W_PCT &&
-        xPct + PEDAL_W_PCT > item.xPct &&
+        xPct < item.xPct + iw &&
+        xPct + w > item.xPct &&
         yPct < item.yPct + PEDAL_H_PCT &&
         yPct + PEDAL_H_PCT > item.yPct
       );
@@ -85,7 +117,8 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragging || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
-    const rawX = Math.max(0, Math.min(100 - PEDAL_W_PCT, ((e.clientX - rect.left) / rect.width) * 100 - dragging.offXPct));
+    const w = widthOf(dragging.itemId);
+    const rawX = Math.max(0, Math.min(100 - w, ((e.clientX - rect.left) / rect.width) * 100 - dragging.offXPct));
     const rawY = Math.max(0, Math.min(100 - PEDAL_H_PCT, ((e.clientY - rect.top) / rect.height) * 100 - dragging.offYPct));
 
     const current = localItemsRef.current.find(i => i.itemId === dragging.itemId);
@@ -95,13 +128,13 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
     let finalX = rawX;
     let finalY = rawY;
 
-    if (checkCollision(rawX, rawY, dragging.itemId)) {
+    if (checkCollision(rawX, rawY, dragging.itemId, w)) {
       // Try sliding on X axis only
-      if (!checkCollision(rawX, prevY, dragging.itemId)) {
+      if (!checkCollision(rawX, prevY, dragging.itemId, w)) {
         finalX = rawX;
         finalY = prevY;
       // Try sliding on Y axis only
-      } else if (!checkCollision(prevX, rawY, dragging.itemId)) {
+      } else if (!checkCollision(prevX, rawY, dragging.itemId, w)) {
         finalX = prevX;
         finalY = rawY;
       // Full block — keep previous position
@@ -233,6 +266,9 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
             if (!effect || !rs) return null;
             const isDragging = dragging?.itemId === placement.itemId;
             const showCollision = isDragging && isColliding;
+            const wPct = widthPctForAspect(
+              aspectById[effect.imageId] ?? DEFAULT_ASPECT
+            );
 
             return (
               <div
@@ -242,7 +278,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                 style={{
                   left: `${placement.xPct}%`,
                   top: `${placement.yPct}%`,
-                  width: `${PEDAL_W_PCT}%`,
+                  width: `${wPct}%`,
                   height: `${PEDAL_H_PCT}%`,
                   zIndex: isDragging ? 50 : 2,
                   cursor: isDragging ? "grabbing" : "grab",
@@ -260,6 +296,16 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                   alt={effect.name}
                   className="w-full h-full object-contain"
                   draggable={false}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.naturalWidth || !img.naturalHeight) return;
+                    const ar = img.naturalWidth / img.naturalHeight;
+                    setAspectById((prev) =>
+                      prev[effect.imageId] === ar
+                        ? prev
+                        : { ...prev, [effect.imageId]: ar }
+                    );
+                  }}
                 />
                 {/* LED indicator */}
                 <div

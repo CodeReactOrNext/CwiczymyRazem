@@ -79,6 +79,12 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
     id: 40, imageId: "special/41", name: "SH Epic", brand: "RPS", rarity: "Epic", yearFrom: 2000, yearTo: 2023, countries: ['USA', 'Canada'
     ]
   },
+  // New (41-45)
+  { id: 41, imageId: "special/42", name: "Monarch SE Black", brand: "RPS", rarity: "Rare", yearFrom: 2010, yearTo: 2026, countries: ["Korea", "Indonesia"] },
+  { id: 42, imageId: "special/43", name: "Eclipse Custom", brand: "Louis Carver", rarity: "Legendary", yearFrom: 1958, yearTo: 1990, countries: ["USA"] },
+  { id: 43, imageId: "special/44", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Mythic", yearFrom: 1960, yearTo: 1965, countries: ["USA"] },
+  { id: 44, imageId: "special/45", name: "Stratocaster Custom", brand: "Fairmont", rarity: "Legendary", yearFrom: 1959, yearTo: 1980, countries: ["USA"] },
+  { id: 45, imageId: "special/46", name: "Monarch SE Black Special", brand: "RPS", rarity: "Epic", yearFrom: 2010, yearTo: 2026, countries: ["Korea", "USA"] },
 
 
 ];
