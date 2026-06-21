@@ -910,7 +910,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
 
   return (
     <>
-      <div className="mt-4 mb-2 flex flex-wrap items-start gap-x-4 gap-y-2 px-3">
+      <div className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
         <OnlineUsers />
         <SupportPulse className="ml-auto" />
       </div>
