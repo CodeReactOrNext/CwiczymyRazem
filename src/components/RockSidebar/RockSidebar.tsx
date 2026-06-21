@@ -21,6 +21,7 @@ import {
   Home,
   ListChecks,
   LogOut,
+  Map,
   Medal,
   MessageSquarePlus,
   Milestone,
@@ -32,7 +33,6 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -41,7 +41,6 @@ import { FaDiscord } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
-import { CommunityModal } from "./CommunityModal";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -149,7 +148,6 @@ const SidebarExternalLink = ({
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
   const router = useRouter();
@@ -178,6 +176,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/scoring")) return "scoring";
     if (pathname.startsWith("/my-exercises")) return "my-exercises";
     if (pathname.startsWith("/tab-editor")) return "my-exercises";
+    if (pathname.startsWith("/roadmap")) return "roadmap";
     return null;
   };
 
@@ -314,43 +313,25 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             label={t("nav.discord")}
             onClick={mobile ? handleLinkClick : undefined}
           />
-
-          <SidebarActionButton
-            icon={<Heart size={16} fill="currentColor" />}
-            iconClass="text-rose-500"
-            label="Grow Riff Quest"
-            onClick={() => {
-              if (mobile) handleLinkClick();
-              setIsCommunityModalOpen(true);
-            }}
-          />
         </div>
       </div>
 
       <div className="hidden lg:block lg:flex-1" />
 
-      <a
-        href="https://buymeacoffee.com/riffquest"
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href="/roadmap"
         onClick={mobile ? handleLinkClick : undefined}
         className="mt-10 flex items-start gap-3 rounded-xl bg-amber-500/10 p-3 transition-all duration-200 active:scale-[0.98] hover:bg-amber-500/15">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
-            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
-            <line x1="6" x2="6" y1="2" y2="4"/>
-            <line x1="10" x2="10" y1="2" y2="4"/>
-            <line x1="14" x2="14" y1="2" y2="4"/>
-          </svg>
+          <Map size={18} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-300">Buy me a coffee</p>
+          <p className="text-sm font-semibold text-amber-300">Help build Riff Quest</p>
           <p className="mt-0.5 text-xs leading-snug text-amber-400/60">
-            Support Riff Quest&apos;s development
+            See what your support unlocks
           </p>
         </div>
-      </a>
+      </Link>
 
       {mobile && (
         <>
@@ -441,7 +422,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         )}
       </AnimatePresence>
 
-      <CommunityModal isOpen={isCommunityModalOpen} onClose={() => setIsCommunityModalOpen(false)} />
       <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
       <FeedbackModal
         variant="prompt"

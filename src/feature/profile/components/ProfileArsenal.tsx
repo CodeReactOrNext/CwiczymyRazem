@@ -121,17 +121,36 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
       </div>
 
       {/* Image */}
-      <div
-        className="relative flex items-center justify-center flex-1 overflow-hidden"
-        style={{
-          background: `radial-gradient(ellipse at 50% 60%, ${rs.baseColor}20 0%, transparent 70%)`,
-        }}
-      >
+      <div className="relative flex items-center justify-center flex-1 overflow-hidden">
+        {/* Subtle structural grid */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: [
+              `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
+              `linear-gradient(90deg, ${rs.baseColor} 1px, transparent 1px)`,
+            ].join(","),
+            backgroundSize: "22px 22px",
+            opacity: 0.04,
+          }}
+        />
+        {/* Neutral spotlight so dark guitars separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+        {/* Rarity glow backdrop */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none translate-y-[60px] opacity-50">
+          <div
+            className="absolute w-[170px] h-[170px] rounded-full blur-[34px]"
+            style={{ background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)` }}
+          />
+        </div>
         <img
           src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
-          className="object-contain -rotate-90"
-          style={{ height: "85%", width: "85%", maxHeight: 110 }}
+          className="relative z-10 object-contain -rotate-45"
+          style={{ height: 240, width: 240 }}
         />
       </div>
     </div>

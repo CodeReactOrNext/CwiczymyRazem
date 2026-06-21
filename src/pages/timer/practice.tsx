@@ -5,7 +5,7 @@ import AppLayout from "layouts/AppLayout";
 import TimerLayout from "layouts/TimerLayout/TimerLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useCallback,useState } from "react";
+import { useCallback,useRef,useState } from "react";
 import { useEffect } from "react";
 import { useAppDispatch,useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
@@ -15,6 +15,9 @@ import { withAuth } from "utils/auth/serverAuth";
 const TimerPractice: NextPageWithLayout = () => {
   const dispatch = useAppDispatch();
   const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
+  // Synchronicznie aktualny skill — subskrybent timera musi go czytać z refa,
+  // bo `notify()` jest wołane zanim React przerenderuje i przepnie subskrypcję.
+  const chosenSkillRef = useRef<SkillsType | null>(null);
   const [isFinishing] = useState(false);
   
   const timer = useTimer();
@@ -22,10 +25,15 @@ const TimerPractice: NextPageWithLayout = () => {
   const router = useRouter();
 
   const choseSkillHandler = (newSkill: SkillsType) => {
-    if (chosenSkill) {
+    if (chosenSkillRef.current) {
       timer.stopTimer();
-      dispatch(updateTimerTime({ type: chosenSkill, time: timer.getTime() }));
+      dispatch(
+        updateTimerTime({ type: chosenSkillRef.current, time: timer.getTime() })
+      );
     }
+    // Ustawiamy ref PRZED seedem, żeby notify() z setInitialStartTime trafił
+    // na nowy skill, a nie na poprzedni.
+    chosenSkillRef.current = newSkill;
     setChosenSkill(newSkill);
     timer.setInitialStartTime(timerData[newSkill]);
   };
@@ -38,8 +46,10 @@ const TimerPractice: NextPageWithLayout = () => {
     if (!timer.timerEnabled || !chosenSkill) return;
 
     return timer.subscribe((time) => {
-      if (time === 0 && timerData[chosenSkill] > 0) return;
-      dispatch(updateTimerTime({ type: chosenSkill, time }));
+      const activeSkill = chosenSkillRef.current;
+      if (!activeSkill) return;
+      if (time === 0 && timerData[activeSkill] > 0) return;
+      dispatch(updateTimerTime({ type: activeSkill, time }));
     });
   }, [chosenSkill, dispatch, timer.timerEnabled, timer, timerData]);
 
@@ -56,6 +66,7 @@ const TimerPractice: NextPageWithLayout = () => {
 
   const resetTimerHandler = useCallback(() => {
     timer.restartTime();
+    chosenSkillRef.current = null;
     setChosenSkill(null);
     dispatch(updateLocalTimer({ creativity: 0, hearing: 0, technique: 0, theory: 0 }));
   }, [timer, dispatch]);

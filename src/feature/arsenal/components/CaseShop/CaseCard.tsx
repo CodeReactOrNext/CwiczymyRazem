@@ -1,24 +1,34 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { Crown } from "lucide-react";
+import { Info } from "lucide-react";
 
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 
-const CASE_ACCENT: Record<string, { cardBg: string; button: string; header: string }> = {
+const CASE_ACCENT: Record<
+  string,
+  { color: string; gradient: string; button: string; header: string; image: string }
+> = {
   standard: {
-    cardBg: "bg-zinc-900/40",
+    color: "#a1a1aa",
+    gradient: "linear-gradient(160deg, #1a1a1f 0%, #101013 45%, #0b0b0d 100%)",
     button: "bg-zinc-200 hover:bg-white text-zinc-900",
     header: "text-zinc-100",
+    image: "/images/case-2.png",
   },
   premium: {
-    cardBg: "bg-blue-950/20",
-    button: "bg-blue-600 hover:bg-blue-500 text-white",
-    header: "text-blue-100",
+    color: "#818cf8",
+    gradient: "linear-gradient(160deg, #161425 0%, #0e0d1a 45%, #08070d 100%)",
+    button: "bg-indigo-600 hover:bg-indigo-500 text-white",
+    header: "text-indigo-100",
+    image: "/images/case-3.png",
   },
   elite: {
-    cardBg: "",
+    color: "#fbbf24",
+    gradient: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)",
     button: "",
     header: "text-amber-100",
+    image: "/images/case-1.png",
   },
 };
 
@@ -37,128 +47,71 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
   const probs = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
 
   return (
-    <>
-      {isElite && (
-        <style>{`
-          @keyframes elite-shimmer {
-            0% { transform: translateX(-150%) skewX(-20deg); }
-            100% { transform: translateX(400%) skewX(-20deg); }
-          }
-          @keyframes elite-pulse {
-            0%, 100% { opacity: 0.55; }
-            50% { opacity: 1; }
-          }
-        `}</style>
-      )}
-
       <div
-        className={cn(
-          "relative flex flex-col gap-6 rounded-lg p-6 overflow-hidden",
-          !isElite && accent.cardBg
-        )}
-        style={
-          isElite
-            ? { background: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)" }
-            : undefined
-        }
+        className="relative flex flex-col gap-6 rounded-xl p-6 overflow-hidden"
+        style={{ background: accent.gradient }}
       >
-        {/* Elite shimmer sweep */}
-        {isElite && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg" style={{ zIndex: 0 }}>
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: "-100%",
-                width: "45%",
-                height: "100%",
-                background: "linear-gradient(90deg, transparent, rgba(251,191,36,0.07), transparent)",
-                animation: "elite-shimmer 4.5s ease-in-out infinite",
-              }}
-            />
-          </div>
-        )}
+        {/* Package image */}
+        <div className="relative flex items-center justify-center py-4 z-10">
+          <img
+            src={accent.image}
+            alt={caseDef.name}
+            className="h-52 object-contain relative z-10"
+          />
+        </div>
 
-        {/* Elite corner glows */}
-        {isElite && (
-          <>
-            <div
-              className="absolute top-0 left-0 w-28 h-28 pointer-events-none"
-              style={{ background: "radial-gradient(circle at 0% 0%, rgba(251,191,36,0.14) 0%, transparent 70%)" }}
-            />
-            <div
-              className="absolute bottom-0 right-0 w-28 h-28 pointer-events-none"
-              style={{ background: "radial-gradient(circle at 100% 100%, rgba(251,191,36,0.09) 0%, transparent 70%)" }}
-            />
-          </>
-        )}
-
-        {/* Header */}
-        <div className="relative flex flex-col gap-1 items-center text-center z-10">
-          {isElite && (
-            <div
-              className="flex items-center gap-1.5 mb-1"
-              style={{ animation: "elite-pulse 2.8s ease-in-out infinite" }}
-            >
-              <Crown size={11} strokeWidth={2} style={{ color: "#fbbf24" }} />
-              <span className="text-[8px] font-black tracking-[0.35em]" style={{ color: "#fbbf24" }}>
-                Premium
-              </span>
-              <Crown size={11} strokeWidth={2} style={{ color: "#fbbf24" }} />
-            </div>
-          )}
-          <h3 className={cn("text-base font-bold tracking-widest capitalize", accent.header)}>
+        {/* Case name */}
+        <div className="relative z-10 -mt-2 text-center">
+          <h3 className={cn("text-lg font-bold tracking-wide capitalize", accent.header)}>
             {caseDef.name}
           </h3>
         </div>
 
-        {/* Package image */}
-        <div className="relative flex items-center justify-center py-4 z-10">
-          {isElite && (
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(ellipse 85% 85% at 50% 50%, rgba(251,191,36,0.1) 0%, transparent 70%)",
-              }}
-            />
-          )}
-          <img
-            src={`/static/images/package/${caseDef.id}.png`}
-            alt={caseDef.name}
-            className="h-32 object-contain opacity-90 relative z-10"
-            style={isElite ? { filter: "drop-shadow(0 0 18px rgba(251,191,36,0.35))" } : undefined}
-          />
-        </div>
-
-        {/* Probabilities — log scale so every rarity is visible */}
-        <div className="relative space-y-1.5 mt-2 z-10">
-          {probs.map(([rarity, prob]) => {
-            const rs = RARITY_STYLES[rarity];
-            const logWidth = (Math.log10(prob * 100 + 1) / Math.log10(101)) * 100;
-            return (
-              <div key={rarity} className="flex items-center gap-2">
-                <span
-                  className="text-[10px] font-semibold capitalize tracking-wider w-16 flex-shrink-0"
-                  style={{ color: rs.baseColor }}
+        {/* Drop rates — hidden behind a tooltip */}
+        <div className="relative z-10 flex justify-center">
+          <TooltipProvider>
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-400 hover:text-zinc-200 transition-colors"
                 >
-                  {rarity}
-                </span>
-                <div className="h-1 flex-1 rounded bg-black/40 overflow-hidden">
-                  <div
-                    className="h-full rounded"
-                    style={{ width: `${logWidth}%`, backgroundColor: rs.baseColor, opacity: 0.85 }}
-                  />
+                  <Info size={12} />
+                  Drop Rates
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="w-60 p-3 border border-zinc-700 bg-zinc-950">
+                <div className="space-y-1.5">
+                  {probs.map(([rarity, prob]) => {
+                    const rs = RARITY_STYLES[rarity];
+                    const logWidth = (Math.log10(prob * 100 + 1) / Math.log10(101)) * 100;
+                    return (
+                      <div key={rarity} className="flex items-center gap-2">
+                        <span
+                          className="text-[10px] font-semibold capitalize tracking-wider w-16 flex-shrink-0"
+                          style={{ color: rs.baseColor }}
+                        >
+                          {rarity}
+                        </span>
+                        <div className="h-1 flex-1 rounded bg-black/40 overflow-hidden">
+                          <div
+                            className="h-full rounded"
+                            style={{ width: `${logWidth}%`, backgroundColor: rs.baseColor, opacity: 0.85 }}
+                          />
+                        </div>
+                        <span
+                          className="text-[11px] font-bold w-12 text-right flex-shrink-0"
+                          style={{ color: rs.baseColor }}
+                        >
+                          {(prob * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <span
-                  className="text-[11px] font-bold w-12 text-right flex-shrink-0"
-                  style={{ color: rs.baseColor }}
-                >
-                  {(prob * 100).toFixed(1)}%
-                </span>
-              </div>
-            );
-          })}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Cost & Open */}
@@ -202,6 +155,5 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
           </button>
         </div>
       </div>
-    </>
   );
 };

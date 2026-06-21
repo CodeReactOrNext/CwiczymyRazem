@@ -90,17 +90,36 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       </div>
 
       {/* Image */}
-      <div
-        className="flex flex-1 items-center justify-center overflow-hidden"
-        style={{
-          background: `radial-gradient(ellipse at 50% 100%, ${rs.baseColor}25 0%, ${rs.baseColor}06 45%, transparent 70%)`,
-        }}
-      >
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+        {/* Subtle structural grid */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: [
+              `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
+              `linear-gradient(90deg, ${rs.baseColor} 1px, transparent 1px)`,
+            ].join(","),
+            backgroundSize: "22px 22px",
+            opacity: 0.04,
+          }}
+        />
+        {/* Neutral spotlight so dark guitars separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+        {/* Rarity glow backdrop */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none translate-y-[60px] opacity-50">
+          <div
+            className="absolute w-[170px] h-[170px] rounded-full blur-[34px]"
+            style={{ background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)` }}
+          />
+        </div>
         <img
           src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
-          className="-rotate-90 object-contain"
-          style={{ height: 170, width: 170 }}
+          className="relative z-10 -rotate-45 object-contain"
+          style={{ height: 260, width: 260 }}
         />
       </div>
 

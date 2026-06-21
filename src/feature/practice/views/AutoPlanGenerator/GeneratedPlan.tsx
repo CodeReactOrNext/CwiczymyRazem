@@ -1,10 +1,13 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import type {
+  Exercise,
   ExercisePlan,
   LocalizedContent,
 } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
+import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 
 import { ExerciseCard } from "./ExerciseCard";
@@ -33,6 +36,7 @@ export const GeneratedPlan = ({
   isStarting
 }: GeneratedPlanProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
 
   const getLocalizedText = (content: LocalizedContent | string): string => {
     return content;
@@ -93,6 +97,7 @@ export const GeneratedPlan = ({
               onMoveDown={onMoveExerciseDown}
               onReplace={onReplaceExercise}
               onRemove={onRemoveExercise}
+              onPreview={setPreviewExercise}
             />
           ))}
         </div>
@@ -121,6 +126,11 @@ export const GeneratedPlan = ({
           </Button>
         </div>
       </Card>
+
+      <ExercisePreviewDialog
+        exercise={previewExercise}
+        onClose={() => setPreviewExercise(null)}
+      />
     </div>
   );
 };
