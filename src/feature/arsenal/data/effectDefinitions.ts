@@ -10,6 +10,11 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   { id: 7, name: "Red Forge Mini",    brand: "Forge",    type: "Overdrive", imageId: 7, rarity: "Common"   },
   { id: 8, name: "Forest Drive",      brand: "Forge",    type: "Overdrive", imageId: 8, rarity: "Uncommon" },
   { id: 9, name: "Orange Forge",      brand: "Forge",    type: "Phaser",    imageId: 9, rarity: "Epic"     },
+  { id: 10, name: "Cosmic Resonance",   brand: "Astra-Path",  type: "Chorus",    imageId: 10, rarity: "Epic"      },
+  { id: 11, name: "Stereo Fuzz Lab",    brand: "VelcroLab",   type: "Fuzz",      imageId: 11, rarity: "Legendary" },
+  { id: 12, name: "Stereo Delay Lab",   brand: "ChronosEcho", type: "Delay",     imageId: 12, rarity: "Epic"      },
+  { id: 13, name: "Overdrive Pro",      brand: "AstraTone",   type: "Overdrive", imageId: 13, rarity: "Mythic"    },
+  { id: 14, name: "Astral Reverberator", brand: "Gravinix",   type: "Reverb",    imageId: 15, rarity: "Legendary" },
 ];
 
 export const EFFECTS_BY_ID = new Map<number | string, EffectDefinition>(
