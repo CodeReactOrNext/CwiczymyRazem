@@ -125,6 +125,53 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const hasMetronome  = !!p.currentExercise.metronomeSpeed;
+  const hasAudioTrack =
+    !!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) &&
+    !p.currentExercise.disableBackingTrack;
+  const hasMicControls =
+    (p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableMic;
+  const hasPlaybackControls = hasMetronome || hasAudioTrack || hasMicControls;
+
+  const playbackControls = hasPlaybackControls ? (
+    <>
+      <MediaControlsToolbar
+        hasMetronome={hasMetronome}
+        hasAudioTrack={hasAudioTrack}
+        hasMicControls={hasMicControls}
+        speedMultiplier={p.speedMultiplier} onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
+        isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
+        onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
+        onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
+        frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
+        disableTuner={p.currentExercise.disableTuner}
+        baseBpm={p.metronome?.bpm}
+        examMode={p.isExamMode}
+        showBackingInExam={p.isScaleExam}
+        trailing={
+          <>
+            {p.effectiveRawGpFile && (
+              <NotationToggleButton
+                showAlphaTabScore={p.showAlphaTabScore}
+                onToggle={p.handleToggleAlphaTabScore}
+              />
+            )}
+            <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
+          </>
+        }
+      />
+      <div className="w-[360px] max-w-full [&>*]:!mb-0">
+        <ExerciseQuickActionsBar
+          exercise={p.currentExercise}
+          metronome={p.metronome}
+          isMetronomeMuted={p.isMetronomeMuted}
+          setIsMetronomeMuted={p.setIsMetronomeMuted}
+          examMode={p.isExamMode}
+        />
+      </div>
+    </>
+  ) : undefined;
+
   return (
     <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
@@ -142,57 +189,38 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               </div>
             ) : (
               <>
-                <div className="mb-8">
-                  <ExerciseProgress
-                    plan={p.plan} currentExerciseIndex={p.currentExerciseIndex}
-                    completedExercises={p.completedExercises} onExerciseSelect={p.handleExerciseSelect}
-                  />
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+                  <div className="min-w-0 flex-1">
+                    <ExerciseHeroHeader
+                      variant="header"
+                      exercise={p.currentExercise}
+                      activeExercise={p.activeExercise}
+                      plan={p.plan}
+                    />
+                  </div>
+                  <div className="w-full sm:max-w-sm">
+                    <ExerciseProgress
+                      plan={p.plan} currentExerciseIndex={p.currentExerciseIndex}
+                      completedExercises={p.completedExercises} onExerciseSelect={p.handleExerciseSelect}
+                    />
+                  </div>
                 </div>
 
-                <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-8")}>
-                  <ExerciseHeroHeader 
-                    exercise={p.currentExercise} 
-                    activeExercise={p.activeExercise} 
-                    plan={p.plan} 
-                    rewardSkillId={p.skillRewardSkillId}
-                    rewardAmount={p.skillRewardAmount}
+                <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-4")}>
+                  <ExerciseHeroHeader
+                    variant="goals"
+                    exercise={p.currentExercise}
+                    activeExercise={p.activeExercise}
+                    plan={p.plan}
                   />
-                  {p.isMicEnabled && <MicHud />}
+                  {hasMicControls && (
+                    <div className="mt-4 mb-10 w-full max-w-2xl min-h-[64px]">
+                      {p.isMicEnabled && <MicHud />}
+                    </div>
+                  )}
                   {p.allGpTracks && !p.showAlphaTabScore && (
                     <GpTrackSelector tracks={p.allGpTracks} selectedIdx={p.selectedGpTrackIdx} onChange={p.setSelectedGpTrackIdx} />
                   )}
-                  <MediaControlsToolbar
-                    hasMetronome={!!p.currentExercise.metronomeSpeed}
-                    hasAudioTrack={!!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableBackingTrack}
-                    hasMicControls={(p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableMic}
-                    speedMultiplier={p.speedMultiplier} onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
-                    isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
-                    onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
-                    onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
-                    frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
-                    disableTuner={p.currentExercise.disableTuner}
-                    baseBpm={p.metronome?.bpm}
-                    examMode={p.isExamMode}
-                    showBackingInExam={p.isScaleExam}
-                    trailing={
-                      <>
-                        {p.effectiveRawGpFile && (
-                          <NotationToggleButton
-                            showAlphaTabScore={p.showAlphaTabScore}
-                            onToggle={p.handleToggleAlphaTabScore}
-                          />
-                        )}
-                        <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
-                      </>
-                    }
-                  />
-                  <ExerciseQuickActionsBar
-                    exercise={p.currentExercise}
-                    metronome={p.metronome}
-                    isMetronomeMuted={p.isMetronomeMuted}
-                    setIsMetronomeMuted={p.setIsMetronomeMuted}
-                    examMode={p.isExamMode}
-                  />
                   <ExerciseContentArea
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
                     activeExercise={p.activeExercise} rawGpFile={p.effectiveRawGpFile}
@@ -218,6 +246,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     isExamMode={p.isExamMode}
                     rewardSkillId={p.skillRewardSkillId}
                     rewardAmount={p.skillRewardAmount}
+                    controlsSlot={playbackControls}
                   />
                 </div>
 

@@ -2,8 +2,9 @@ import { cn } from 'assets/lib/utils';
 import { useTablatureAudio } from 'feature/exercisePlan/hooks/useTablatureAudio';
 import type { TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
 import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
+import { ImportTablature } from 'feature/songs/components/ImportTablature/ImportTablature';
 import { AnimatePresence,motion } from 'framer-motion';
-import { LucideChevronLeft, LucideCopy, LucideEraser, LucideMonitor, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
+import { LucideChevronLeft, LucideCopy, LucideEraser, LucideFileMusic, LucideMonitor, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useCallback,useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ export default function TabEditor() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [selectedCell, setSelectedCell] = useState<{ measureIdx: number; beatIdx: number; stringIdx: number } | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isGpModalOpen, setIsGpModalOpen] = useState(false);
   const [importText, setImportText] = useState("");
   const selectionStartRef = React.useRef<{ mIdx: number; bIdx: number; sIdx: number; x: number; y: number } | null>(null);
   const [activeSelection, setActiveSelection] = useState<{ measureIdx: number; startBeat: number; endBeat: number; startString: number; endString: number } | null>(null);
@@ -198,6 +200,24 @@ export default function TabEditor() {
         showToast("Invalid code format.", "error");
     }
   };
+
+  const handleGpImported = useCallback((
+    importedMeasures: TablatureMeasure[],
+    fileName: string,
+    tempo: number,
+    trackName: string,
+  ) => {
+    if (!importedMeasures || importedMeasures.length === 0) {
+      showToast("This track has no tablature notes.", "error");
+      return;
+    }
+    setMeasures(importedMeasures);
+    saveHistory(importedMeasures);
+    if (tempo > 0) setBpm(Math.round(tempo));
+    setSelectedCell(null);
+    setActiveSelection(null);
+    showToast(`Loaded "${trackName}" from ${fileName}`, "success");
+  }, [saveHistory, showToast]);
 
   const stopPlayback = () => {
     setIsPlaying(false);
@@ -483,7 +503,7 @@ export default function TabEditor() {
   }, [activeSelection, measures, saveHistory, showToast, setMeasures, setContextMenu]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (isImportModalOpen) return;
+    if (isImportModalOpen || isGpModalOpen) return;
 
     if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -594,10 +614,10 @@ export default function TabEditor() {
     } else if (e.key.toLowerCase() === 'v' && (e.ctrlKey || e.metaKey)) {
         handlePasteAtCursor();
     }
-  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isImportModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
+  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isImportModalOpen, isGpModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
 
   const handlePaste = useCallback((e: ClipboardEvent) => {
-    if (isImportModalOpen) return;
+    if (isImportModalOpen || isGpModalOpen) return;
     const text = e.clipboardData?.getData('text');
     if (text) {
         const processed = processImportText(text);
@@ -632,7 +652,7 @@ export default function TabEditor() {
             }
         }
     }
-  }, [isImportModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
+  }, [isImportModalOpen, isGpModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -773,6 +793,13 @@ export default function TabEditor() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 bg-white/5 p-1.5 rounded-lg border border-white/10">
+              <button
+                onClick={() => setIsGpModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-black text-cyan-400 group"
+              >
+                <LucideFileMusic size={12} />
+                <span>Import GP</span>
+              </button>
               <button
                 onClick={() => setIsImportModalOpen(true)}
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-[10px] font-black group"
@@ -916,6 +943,46 @@ export default function TabEditor() {
                       Import & Load
                     </button>
                   </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* GP Import Modal */}
+          <AnimatePresence>
+            {isGpModalOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Guitar Pro</h3>
+                      <p className="text-sm text-white/40 font-medium">
+                        Drop a GP3/GP4/GP5/GPX/GP file, then pick a track to load it into the editor.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setIsGpModalOpen(false)}
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-black tracking-widest transition-all shrink-0"
+                    >
+                      Done
+                    </button>
+                  </div>
+
+                  <ImportTablature
+                    onImported={(importedMeasures, fileName, tempo, trackName) =>
+                      handleGpImported(importedMeasures, fileName, tempo, trackName)
+                    }
+                  />
                 </motion.div>
               </motion.div>
             )}

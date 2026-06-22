@@ -32,6 +32,8 @@ interface TablatureViewerProps {
   seekWorkerRef?: React.MutableRefObject<((beat: number) => void) | null>;
   /** Populated with the CSS pixel width of the canvas container so parent can derive viewport beats */
   viewerWidthRef?: React.MutableRefObject<number>;
+  /** Horizontal zoom multiplier for the score (1 = default). */
+  zoom?: number;
 }
 
 const TablatureViewerInner = ({
@@ -55,6 +57,7 @@ const TablatureViewerInner = ({
   loopEndBeat,
   seekWorkerRef,
   viewerWidthRef,
+  zoom = 1,
 }: TablatureViewerProps) => {
   const canvasRef      = useRef<HTMLCanvasElement>(null);
   const containerRef   = useRef<HTMLDivElement>(null);
@@ -76,7 +79,7 @@ const TablatureViewerInner = ({
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek: handleSeekWithTracking,
-    loopStartBeat, loopEndBeat,
+    loopStartBeat, loopEndBeat, zoom,
   });
 
   // Expose seekWorker so parent (TablatureSection minimap) can drive the canvas cursor
@@ -190,5 +193,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.missedNotes      === next.missedNotes        &&
   prev.hideDynamicsLane === next.hideDynamicsLane   &&
   prev.loopStartBeat    === next.loopStartBeat      &&
-  prev.loopEndBeat      === next.loopEndBeat
+  prev.loopEndBeat      === next.loopEndBeat         &&
+  prev.zoom             === next.zoom
 );

@@ -11,7 +11,7 @@ import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 export const MicHud = () => {
   const { gameState, maxPossibleScore, sessionAccuracy } = useNoteMatchingContext();
   return (
-  <div className="w-full max-w-2xl mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
+  <div className="w-full animate-in fade-in slide-in-from-top-6 duration-700">
     <div className="flex items-end justify-between gap-4">
 
       {/* Left: Accuracy */}

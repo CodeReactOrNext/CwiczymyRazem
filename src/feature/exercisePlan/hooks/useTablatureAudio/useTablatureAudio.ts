@@ -223,8 +223,16 @@ export const useTablatureAudio = ({
     if (!ctx || !isPlayingRef.current) return;
 
     if (startAudioTimeRef.current === null) {
-      const anchor = audioStartTimePropRef.current;
-      if (anchor == null) { timeoutRef.current = window.setTimeout(scheduler, 10); return; }
+      let anchor = audioStartTimePropRef.current;
+      if (anchor == null) {
+        // Standalone usage (e.g. Tab Editor) owns its AudioContext and gets no
+        // external anchor — seed one from our own clock instead of waiting forever.
+        // When an external context is supplied (PracticeSession), keep waiting for
+        // the shared anchor so all tracks stay in sync with the metronome.
+        const ownsContext = audioContextRef.current === ownAudioContextRef.current;
+        if (!ownsContext) { timeoutRef.current = window.setTimeout(scheduler, 10); return; }
+        anchor = ctx.currentTime + 0.1;
+      }
       startAudioTimeRef.current = anchor;
       const spb = 60 / (bpmRef.current || 120);
       const newStates: Record<string, { beatIdx: number }> = {};

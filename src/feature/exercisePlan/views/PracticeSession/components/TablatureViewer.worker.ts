@@ -92,6 +92,10 @@ let cachedLoopSeconds = 0; // recomputed when bpm or tempoMap changes
 let W = 0;
 let H = 256;
 
+// Horizontal zoom multiplier applied to the base beat-width (1 = default).
+// <1 compresses the score so more of it fits on screen; >1 enlarges it.
+let zoom = 1;
+
 // Playback
 let isPlaying = false;
 let startWallMs: number | null = null;
@@ -327,7 +331,7 @@ function render() {
   }
   needsRedraw = false;
 
-  const dynBW = Math.max(120, Math.min(200, W / 4));
+  const dynBW = Math.max(120, Math.min(200, W / 4)) * zoom;
   let cursorPos = pausedCursorPos;
   let scrollX = pausedScrollX;
   let beatsElapsed = 0;
@@ -1232,6 +1236,18 @@ self.onmessage = (e: MessageEvent) => {
     case 'SCROLL': {
       pausedScrollX = msg.scrollX;
       pausedCursorPos = msg.cursorPos;
+      break;
+    }
+    case 'ZOOM': {
+      const next = msg.zoom ?? 1;
+      if (next !== zoom && zoom > 0) {
+        // pausedCursorPos/pausedScrollX are in pixel-space — rescale so the
+        // paused view stays anchored on the same beat after the zoom change.
+        const ratio = next / zoom;
+        pausedCursorPos *= ratio;
+        pausedScrollX *= ratio;
+      }
+      zoom = next;
       break;
     }
     case 'SHOW_REST_WARNING': {
