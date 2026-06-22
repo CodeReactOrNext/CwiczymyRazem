@@ -52,7 +52,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
 
         <div className="flex flex-col items-center gap-1.5">
           <p className="text-[11px] font-semibold capitalize tracking-widest text-cyan-500/70">
-            Roadmap is thinking
+            Coach is thinking
           </p>
           <p
             className="text-sm text-zinc-400 transition-opacity duration-300"

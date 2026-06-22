@@ -67,7 +67,7 @@ export const RoadmapSection = () => {
           {/* Left — content */}
           <div className="flex flex-col lg:sticky lg:top-24">
             <span className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400 mb-6">
-              Guided Roadmap
+              Mastery Roadmaps
             </span>
 
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
@@ -77,7 +77,7 @@ export const RoadmapSection = () => {
 
             <p className="text-zinc-400 text-lg leading-relaxed mb-8 max-w-md">
               Tell the app what you want to achieve. It builds a week-by-week
-              exercise roadmap with the right drills in the right order — each
+              mastery roadmap with the right drills in the right order — each
               one linked to a curated YouTube lesson so you know exactly how
               to execute it.
             </p>

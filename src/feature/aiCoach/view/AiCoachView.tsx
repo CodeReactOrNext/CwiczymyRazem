@@ -102,7 +102,7 @@ const AiCoachView = () => {
         <HeroBanner
           title={mergedRoadmap.title}
           subtitle={`Goal: ${mergedRoadmap.goal}`}
-          eyebrow="Roadmap"
+          eyebrow="Mastery Roadmap"
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
           rightContent={
             <button
@@ -129,8 +129,8 @@ const AiCoachView = () => {
   return (
     <div className="flex w-full flex-col">
       <HeroBanner
-        title="Roadmap"
-        subtitle="Your personalized guitar learning plans."
+        title="Mastery Roadmaps"
+        subtitle="Your personalized guitar mastery roadmaps."
         eyebrow="AI Coach"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
@@ -142,7 +142,7 @@ const AiCoachView = () => {
         ) : roadmaps.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-20 text-zinc-500">
             <Map className="h-10 w-10 opacity-30" />
-            <span className="text-sm">No roadmaps available yet.</span>
+            <span className="text-sm">No mastery roadmaps available yet.</span>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
