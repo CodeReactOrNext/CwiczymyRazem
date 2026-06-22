@@ -366,7 +366,9 @@ function computeProgressData(logs: FirebaseUserExceriseLog[], today: Date): Prog
     return !!d && d.tech >= MS_15 && d.theory >= MS_15 && d.hearing >= MS_15 && d.creat >= MS_15;
   };
 
-  const thisWeek = currentWeekDates(today).map(d => localDateStr(d));
+  const weekDates = currentWeekDates(today);
+  const weekStart = weekDates[0];                 // Monday 00:00 of the current week
+  const thisWeek  = weekDates.map(d => localDateStr(d));
 
   const daysIn7With15  = thisWeek.filter(has15).length;
   const daysIn7With20  = thisWeek.filter(has20).length;
@@ -376,17 +378,19 @@ function computeProgressData(logs: FirebaseUserExceriseLog[], today: Date): Prog
     thisWeek.some(k => (byDate.get(k)?.[cat] ?? 0) > 0)
   ).length;
 
-  // streak starting from today; if today not logged, start from yesterday
+  // streak starting from today; if today not logged, start from yesterday.
+  // Clamped to the current week — the streak resets every Monday, just like the
+  // weekly claims, so last week's days never pre-complete this week's goal.
   const computeStreak = (pred: (k: string) => boolean): number => {
     let n = 0;
     const d = new Date(today);
     d.setHours(0, 0, 0, 0);
     if (!pred(localDateStr(d))) d.setDate(d.getDate() - 1);
     for (;;) {
+      if (d < weekStart) break;
       if (!pred(localDateStr(d))) break;
       n++;
       d.setDate(d.getDate() - 1);
-      if (n > 365) break;
     }
     return n;
   };
@@ -627,10 +631,12 @@ function LevelGoalCard({
         ? d.tech >= MS_15 && d.theory >= MS_15 && d.hearing >= MS_15 && d.creat >= MS_15
         : d.sumTime >= MS_15;
     };
+    const weekStart = weekDays[0];   // Monday 00:00 — streak resets each week
     const cursor = new Date(today);
     cursor.setHours(0, 0, 0, 0);
     if (!pred(localDateStr(cursor))) cursor.setDate(cursor.getDate() - 1);
     for (let i = 0; i < 30; i++) {
+      if (cursor < weekStart) break;
       const key = localDateStr(cursor);
       if (!pred(key)) break;
       keys.add(key);

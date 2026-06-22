@@ -32,7 +32,7 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({ roadmap, onOpen }) => {
   const { accentRgb } = theme;
 
   const tag = roadmap.level;
-  const ctaLabel = done > 0 ? "Continue Learning" : "Start Roadmap";
+  const ctaLabel = done > 0 ? "Continue Learning" : "Start Learning";
   const progressLabel =
     done === total && total > 0
       ? "✓ Roadmap complete!"

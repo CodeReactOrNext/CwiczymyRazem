@@ -80,6 +80,9 @@ export const SongCard = ({
   const [isTitleTruncated, setIsTitleTruncated] = useState(false);
   const [isTitleHovered, setIsTitleHovered] = useState(false);
 
+  // Right-click anywhere on the card opens the same actions menu.
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   useEffect(() => {
     const el = titleRef.current;
     if (!el) return;
@@ -93,6 +96,10 @@ export const SongCard = ({
   return (
     <div
       onClick={onOpenDetails}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setIsMenuOpen(true);
+      }}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-md p-3 transition-all duration-300 ease-out click-behavior cursor-pointer",
         "hover:bg-zinc-800/40"
@@ -148,7 +155,10 @@ export const SongCard = ({
 
         {/* Actions (bottom-right of cover) — shown on hover (always visible on touch) */}
         <div
-          className="absolute bottom-2 right-2 z-20 flex translate-y-1 items-center gap-1.5 opacity-0 transition-all duration-200 ease-out focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100"
+          className={cn(
+            "absolute bottom-2 right-2 z-20 flex translate-y-1 items-center gap-1.5 opacity-0 transition-all duration-200 ease-out focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100",
+            isMenuOpen && "translate-y-0 opacity-100"
+          )}
           onClick={(e) => e.stopPropagation()}
         >
           {onPlay && (
@@ -162,7 +172,7 @@ export const SongCard = ({
             </button>
           )}
 
-          <DropdownMenu>
+          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DropdownMenuTrigger asChild>
               <button
                 aria-label="Song actions"
@@ -177,11 +187,11 @@ export const SongCard = ({
               className="w-56 space-y-1 rounded-lg bg-zinc-950 p-2 text-zinc-400 shadow-2xl backdrop-blur-xl"
             >
               <DropdownMenuItem
-                onClick={onOpenDetails}
+                onClick={() => router.push(`/songs?view=board&songId=${song.id}`)}
                 className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
               >
                 <Eye className="h-3.5 w-3.5" />
-                Details
+                Open in board
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => (onPlay ? onPlay() : router.push(`/timer/song/${song.id}`))}
