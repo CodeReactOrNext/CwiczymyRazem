@@ -62,6 +62,8 @@ interface ExerciseContentAreaProps {
   isPlaying: boolean;
   rewardSkillId?: string;
   rewardAmount?: number;
+  /** Playback controls (media toolbar + metronome) docked under the player, above the instructions. */
+  controlsSlot?: React.ReactNode;
 }
 
 export const ExerciseContentArea = memo(function ExerciseContentArea({
@@ -105,6 +107,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isExamMode,
   rewardSkillId,
   rewardAmount,
+  controlsSlot,
 }: ExerciseContentAreaProps) {
   const { backingVideoId, setBackingVideoId } = useSessionUI();
 
@@ -208,9 +211,18 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         />
       )}
       
-      <ExerciseInstructionsInline 
-        exercise={activeExercise} 
-        isPlaying={isPlaying} 
+      {controlsSlot && (
+        <div
+          style={{ zoom: 0.9 }}
+          className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-white/5 px-4 py-3.5 [&>*]:!mb-0"
+        >
+          {controlsSlot}
+        </div>
+      )}
+
+      <ExerciseInstructionsInline
+        exercise={activeExercise}
+        isPlaying={isPlaying}
         rewardSkillId={rewardSkillId}
         rewardAmount={rewardAmount}
       />

@@ -11,28 +11,37 @@ interface ExerciseHeroHeaderProps {
   plan: ExercisePlan;
   rewardSkillId?: string;
   rewardAmount?: number;
+  /**
+   * "header" → just the compact, left-aligned title (sits in the top bar).
+   * "goals"  → the custom-goal / streak-challenge blocks (sit above the player).
+   */
+  variant?: "header" | "goals";
 }
 
-export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({ 
-  exercise, activeExercise, plan, rewardSkillId, rewardAmount 
+export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
+  exercise, activeExercise, plan, variant = "header"
 }: ExerciseHeroHeaderProps) {
   const streakPlan = plan as any;
 
-  return (
-    <>
+  if (variant === "header") {
+    return (
       <h2 className={cn(
-        "font-bold text-white tracking-tight flex flex-wrap items-center justify-center gap-3 mb-8",
-        exercise.isPlayalong ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
+        "font-bold text-white tracking-tight flex flex-wrap items-center gap-2.5 min-w-0",
+        exercise.isPlayalong ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
       )}>
         {exercise.isPlayalong && (
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 shrink-0">
             <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
             <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
           </div>
         )}
-        {activeExercise.title}
+        <span className="truncate">{activeExercise.title}</span>
       </h2>
+    );
+  }
 
+  return (
+    <>
       {activeExercise.customGoal && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

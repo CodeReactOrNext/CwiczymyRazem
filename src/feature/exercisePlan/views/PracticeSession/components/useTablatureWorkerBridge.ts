@@ -27,6 +27,7 @@ interface WorkerBridgeOptions {
   onSeek?:         (beatPosition: number) => void;
   loopStartBeat?:  number | null;
   loopEndBeat?:    number | null;
+  zoom?:           number;
 }
 
 export function useTablatureWorkerBridge({
@@ -34,7 +35,7 @@ export function useTablatureWorkerBridge({
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
   hitNotes, missedNotes, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
-  loopStartBeat, loopEndBeat,
+  loopStartBeat, loopEndBeat, zoom = 1,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -46,6 +47,7 @@ export function useTablatureWorkerBridge({
   const initScrollXRef      = useRef(0);
   const pausedScrollRef     = useRef({ scrollX: 0, cursorPos: 0 });
   const lastHoverMeasureRef = useRef<number>(-1);
+  const prevZoomRef         = useRef(zoom);
 
   const [isRestActive,    setIsRestActive]    = useState(false);
   const [showRestWarning, setShowRestWarning] = useState(false);
@@ -145,6 +147,20 @@ export function useTablatureWorkerBridge({
       endBeat:   loopEndBeat   ?? null,
     });
   }, [loopStartBeat, loopEndBeat]);
+  useEffect(() => {
+    const prev = prevZoomRef.current;
+    prevZoomRef.current = zoom;
+    // Keep the main-thread scrub anchor (base for drag/seek) aligned with the
+    // worker's rescaled pixel-space position after a zoom change.
+    if (prev > 0 && prev !== zoom) {
+      const ratio = zoom / prev;
+      pausedScrollRef.current = {
+        scrollX:   pausedScrollRef.current.scrollX   * ratio,
+        cursorPos: pausedScrollRef.current.cursorPos * ratio,
+      };
+    }
+    workerRef.current?.postMessage({ type: 'ZOOM', zoom });
+  }, [zoom]);
 
   // Reset cursor when measures or resetKey changes
   useEffect(() => {
@@ -193,7 +209,7 @@ export function useTablatureWorkerBridge({
       Date.now() - mouseDownTimeRef.current < 400
     ) {
       const containerLeft = containerRef.current.getBoundingClientRect().left;
-      const dynBW = Math.max(120, Math.min(200, containerSize.width / 4));
+      const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
       const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
       let beatPos = Math.max(0, worldX / dynBW);
 
@@ -223,7 +239,7 @@ export function useTablatureWorkerBridge({
   const handleHover = (clientX: number) => {
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
     const containerLeft = containerRef.current.getBoundingClientRect().left;
-    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4));
+    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
     const beatPos = Math.max(0, worldX / dynBW);
 
@@ -258,7 +274,7 @@ export function useTablatureWorkerBridge({
   // Seek the worker canvas position without going through the canvas click handler.
   // Called by TablatureSection when the minimap is clicked (to keep both in sync).
   const seekWorker = (beat: number) => {
-    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4));
+    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const newCursorPos = beat * dynBW;
     const newScrollX   = Math.max(0, newCursorPos - containerSize.width / 4);
     pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
