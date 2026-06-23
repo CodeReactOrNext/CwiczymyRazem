@@ -247,7 +247,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   bpm={80}
                   isPlaying={false}
                   startTime={null}
-                  className="h-40"
+                  className="h-[280px]"
                 />
               </div>
               <p className="text-xs text-zinc-600">

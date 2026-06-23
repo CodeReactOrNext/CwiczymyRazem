@@ -76,6 +76,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   const handleCreate = () => {
+    localStorage.removeItem("tab-editor-draft");
     router.push("/tab-editor");
   };
 

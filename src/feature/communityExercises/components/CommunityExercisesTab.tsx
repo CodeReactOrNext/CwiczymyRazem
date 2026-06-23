@@ -200,7 +200,7 @@ const ExerciseRow = ({ exercise, userRating, onRate, isRatingLoading, onExpand, 
                     bpm={exercise.metronomeSpeed?.recommended ?? 80}
                     isPlaying={false}
                     startTime={null}
-                    className="h-36"
+                    className="h-[280px]"
                   />
                 </div>
               )}

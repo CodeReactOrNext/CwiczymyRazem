@@ -83,28 +83,44 @@ export default function TabEditor() {
     }
   }, [history, historyIdx, setMeasures, setHistoryIdx]);
 
+  const editId = typeof router.query.edit === "string" ? router.query.edit : null;
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+
+  // On mount, restore any saved draft so navigating away and back (e.g. a
+  // round-trip to the publish page) doesn't wipe the editor. Works for both
+  // edit mode (draft holds the exercise's tablature) and create mode.
   useEffect(() => {
-    if (history.length === 0) {
+    let restored = false;
+    try {
+      const raw = localStorage.getItem("tab-editor-draft");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMeasures(parsed);
+          setHistory([JSON.stringify(parsed)]);
+          setHistoryIdx(0);
+          restored = true;
+        }
+      }
+    } catch {}
+    if (!restored) {
       setHistory([JSON.stringify(measures)]);
       setHistoryIdx(0);
     }
+    setIsDraftLoaded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When arriving in edit mode, load the exercise's tablature draft into the editor.
-  const editId = typeof router.query.edit === "string" ? router.query.edit : null;
+  // Keep the draft in sync so a round-trip to the publish page (or a refresh)
+  // preserves the user's work. Gated on isDraftLoaded (state, not a ref) so the
+  // initial render's run is skipped — otherwise it would overwrite the saved
+  // draft with the default measures before the restore above is committed.
   useEffect(() => {
-    if (!editId) return;
-    const raw = localStorage.getItem("tab-editor-draft");
-    if (!raw) return;
+    if (!isDraftLoaded) return;
     try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setMeasures(parsed);
-        saveHistory(parsed);
-      }
+      localStorage.setItem("tab-editor-draft", JSON.stringify(measures));
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editId]);
+  }, [isDraftLoaded, measures]);
 
   useTablatureAudio({
     measures,
@@ -1109,7 +1125,7 @@ export default function TabEditor() {
                       bpm={bpm}
                       isPlaying={isPlaying}
                       startTime={startTime}
-                      className="h-56 relative z-10 backdrop-blur-3xl"
+                      className="h-[280px] relative z-10 backdrop-blur-3xl"
                   />
               </div>
           </section>
