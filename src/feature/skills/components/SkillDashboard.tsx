@@ -328,9 +328,11 @@ export const SkillDashboard = ({
                   <div className="flex gap-1 bg-zinc-900 rounded p-1">
                     {uniqueDifficulties.map((d) => {
                       const isActive = currentDifficulty === d;
-                      const label = d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
+                      const label = d === 'beginner' ? 'Beginner' : d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
                       const count = filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === d).length ?? 0;
-                      const activeClass = d === 'easy'
+                      const activeClass = d === 'beginner'
+                        ? 'bg-sky-500/15 text-sky-400'
+                        : d === 'easy'
                         ? 'bg-emerald-500/15 text-emerald-400'
                         : d === 'medium'
                         ? 'bg-amber-500/15 text-amber-400'
@@ -365,13 +367,15 @@ export const SkillDashboard = ({
                     const micAccuracy = progress?.micHighScoreAccuracy;
                     const earTrainingHighScore = progress?.earTrainingHighScore;
                     const hasLeaderboard = bpmStages.length > 0 || !!exerciseDef?.riddleConfig || (exerciseDef?.tablature && exerciseDef.tablature.length > 0);
-                    const sp = currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 2 : 3;
+                    const sp = currentDifficulty === 'beginner' ? 0 : currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 2 : 3;
                     const hasBeenAttempted = !!progress && (
                       completedBpms.length > 0 ||
                       (micHighScore != null && micHighScore > 0) ||
                       (earTrainingHighScore != null && earTrainingHighScore > 0)
                     );
-                    const diffColor = currentDifficulty === 'easy'
+                    const diffColor = currentDifficulty === 'beginner'
+                      ? { bar: "bg-sky-500", text: "text-sky-400", badge: "bg-sky-500/10 border-sky-500/20 text-sky-400" }
+                      : currentDifficulty === 'easy'
                       ? { bar: "bg-emerald-500", text: "text-emerald-400", badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" }
                       : currentDifficulty === 'medium'
                       ? { bar: "bg-amber-500", text: "text-amber-400", badge: "bg-amber-500/10 border-amber-500/20 text-amber-400" }

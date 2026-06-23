@@ -54,9 +54,9 @@ const ExerciseControls = ({
             className={cn(
               variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : "h-12 px-6 w-auto") : "w-full",
               "rounded-lg font-black transition-background click-behavior   relative",
-              isPlaying 
-                ? "bg-white  hover:bg-zinc-200 shadow-2xl shadow-white/20" 
-                : "bg-cyan-500 hover:bg-cyan-400 shadow-2xl shadow-cyan-500/30 animate-pulse"
+              isPlaying
+                ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20"
+                : "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20 animate-pulse"
             )}>
             {!isPlaying && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">

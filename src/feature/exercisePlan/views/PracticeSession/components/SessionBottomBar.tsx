@@ -109,7 +109,7 @@ export const SessionBottomBar = memo(({
                 className={cn(
                   "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior",
                   isLastExercise
-                    ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
+                    ? "h-12 px-6 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
                     : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                   isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
                 )}
@@ -158,7 +158,7 @@ export const SessionBottomBar = memo(({
             Exit without saving
           </Button>
           <Button
-            className="flex-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-lg shadow-cyan-500/20"
+            className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
             loading={isFinishing || isSubmittingReport}
             disabled={!canFinishSession}
             onClick={async () => { setShowExitDialog(false); await onFinishSession(); }}

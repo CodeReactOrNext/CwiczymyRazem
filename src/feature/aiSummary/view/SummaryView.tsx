@@ -42,6 +42,14 @@ function fmtMs(ms: number) {
   return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
 }
 
+// Compact hours format ("98m" → "1h38m") matching the activity widget.
+function fmtMin(m: number) {
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  const rem = m % 60;
+  return rem > 0 ? `${h}h${rem}m` : `${h}h`;
+}
+
 // ─── Category theme (single source of truth) ───────────────────────────────────
 // One place that defines every practice category's key, label, colour and the
 // matching field on the log. Used by the session chips, the day grids and every
@@ -883,7 +891,7 @@ function LevelGoalCard({
                       className="text-xs sm:text-sm font-bold tabular-nums leading-none"
                       style={{ height: VALUE_H, color: valueColor }}
                     >
-                      {entry.minutes > 0 ? `${entry.minutes}m` : ""}
+                      {entry.minutes > 0 ? fmtMin(entry.minutes) : ""}
                     </span>
                     {/* bar + track */}
                     <div
@@ -965,11 +973,11 @@ function LevelGoalCard({
                       <>
                         <CheckCircle2 size={28} style={{ color: inStreak ? color : "#71717a" }} />
                         <span className="text-sm font-bold tabular-nums" style={{ color: inStreak ? color : "#a1a1aa" }}>
-                          {minutes}m
+                          {fmtMin(minutes)}
                         </span>
                       </>
                     ) : minutes > 0 ? (
-                      <span className="text-base font-bold tabular-nums text-zinc-300">{minutes}m</span>
+                      <span className="text-base font-bold tabular-nums text-zinc-300">{fmtMin(minutes)}</span>
                     ) : isFuture ? (
                       <span className="text-zinc-700 text-xl leading-none">·</span>
                     ) : (

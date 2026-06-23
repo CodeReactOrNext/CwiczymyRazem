@@ -70,7 +70,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   return (
     <div className={cn("flex w-full justify-center", compact ? "" : "mb-4")}>
       <div className={cn(
-        "flex w-full items-center gap-3 rounded-xl bg-zinc-800 shadow-lg shadow-black/30",
+        "flex w-full items-center gap-3 rounded-xl bg-zinc-800",
         compact ? "h-10 max-w-[320px] px-3" : "h-12 max-w-md px-4"
       )}>
         <GiMetronome className={cn("shrink-0 text-zinc-400", compact ? "h-4 w-4" : "h-5 w-5")} />
@@ -98,7 +98,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               if (e.key === "Escape") setIsEditing(false);
             }}
             className={cn(
-              "w-14 shrink-0 rounded-md bg-zinc-900/60 px-1 text-center font-mono font-black tabular-nums text-cyan-400 outline-none ring-2 ring-cyan-500",
+              "w-14 shrink-0 rounded-md bg-zinc-900/60 px-1 text-center font-mono font-black tabular-nums text-white outline-none ring-2 ring-white/40",
               compact ? "text-lg" : "text-2xl"
             )}
           />
@@ -139,11 +139,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             <RippleButton
               title="Metronome volume"
               className={cn(
-                "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50",
+                "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/40",
                 compact ? "h-7 w-7" : "h-8 w-8",
                 isMetronomeMuted
                   ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
-                  : "text-cyan-400 hover:bg-cyan-500/10"
+                  : "text-white hover:bg-white/10"
               )}
             >
               <VolumeIcon className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
@@ -161,7 +161,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               <span
                 className={cn(
                   "min-w-[2.75rem] rounded-md px-1.5 py-0.5 text-center font-mono text-[11px] font-bold tabular-nums",
-                  isMetronomeMuted ? "bg-zinc-800 text-zinc-500" : "bg-cyan-500/10 text-cyan-300"
+                  isMetronomeMuted ? "bg-zinc-800 text-zinc-500" : "bg-white/10 text-white"
                 )}
               >
                 {isMetronomeMuted ? "Muted" : `${Math.round(volume * 100)}%`}
@@ -175,7 +175,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors active:scale-95",
                   isMetronomeMuted
                     ? "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
-                    : "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
+                    : "bg-white/10 text-white hover:bg-white/20"
                 )}
               >
                 <VolumeIcon className="h-4 w-4" strokeWidth={2.5} />
@@ -191,8 +191,8 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                 }}
                 className={cn(
                   "flex-1 cursor-pointer",
-                  "[&>span:first-child]:bg-cyan-500/15 [&>span:first-child>span]:bg-cyan-500",
-                  "[&_[role=slider]]:border-cyan-400 [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-[0_0_8px_rgba(34,211,238,0.5)]"
+                  "[&>span:first-child]:bg-white/15 [&>span:first-child>span]:bg-white",
+                  "[&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-[0_0_8px_rgba(255,255,255,0.4)]"
                 )}
               />
             </div>

@@ -102,7 +102,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                 isAudioMuted
                   ? "bg-zinc-800 text-zinc-400 hover:text-white"
-                  : "bg-cyan-950 text-cyan-400 hover:bg-cyan-900",
+                  : "bg-white/15 text-white hover:bg-white/25",
                 isRiddleMode && "opacity-50 cursor-not-allowed"
               )}
             >
@@ -204,7 +204,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                     h,
                     isAudioMuted
                       ? "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
-                      : "bg-cyan-950 text-cyan-400 hover:bg-cyan-900",
+                      : "bg-white/15 text-white hover:bg-white/25",
                     isRiddleMode && "opacity-50 cursor-not-allowed"
                   )}
                 >
@@ -342,7 +342,7 @@ function SpeedDropdown({
             h,
             compact ? "gap-1.5 px-2" : "gap-2 px-3",
             isSlowed
-              ? "bg-cyan-950 text-cyan-300 hover:bg-cyan-900"
+              ? "bg-white/15 text-white hover:bg-white/25"
               : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700"
           )}
         >
