@@ -5,7 +5,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
@@ -41,6 +41,7 @@ const ProfileActivityPage = () => {
         title="Your Activity"
         subtitle="Track your practice history and progress over time"
         eyebrow="Practice stats"
+        backgroundContent={<HeroPattern />}
         rightContent={
           <div className="w-full h-full flex items-center md:justify-end">
             <LevelProgressHero 

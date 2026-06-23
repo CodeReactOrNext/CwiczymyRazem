@@ -1,4 +1,4 @@
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { ScoringGuideView } from "feature/scoring/ScoringGuideView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
@@ -12,6 +12,7 @@ const ScoringPage: NextPageWithLayout = () => {
         title='How Points Work'
         subtitle='Every way to earn points, multipliers included'
         eyebrow='Game Rules'
+        backgroundContent={<HeroPattern />}
         compact
         className='w-full !rounded-none !shadow-none'
       />

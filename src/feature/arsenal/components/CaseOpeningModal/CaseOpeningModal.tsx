@@ -146,13 +146,13 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="absolute inset-0 bg-black/95"
+            className="fixed inset-0 bg-black/95"
             onClick={phase === "done" ? onClose : undefined}
           />
 
           {(phase === "reveal" || phase === "done") && rarityStyles && (
             <motion.div
-              className="absolute inset-0 pointer-events-none"
+              className="fixed inset-0 pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}

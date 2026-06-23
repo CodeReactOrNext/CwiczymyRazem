@@ -1,7 +1,7 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import MainContainer from "components/MainContainer";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Guitar,PackageOpen, Swords } from "lucide-react";
 import { useState } from "react";
@@ -42,6 +42,7 @@ export const ArsenalView = () => {
         subtitle="Spend your Fame Points to unlock rare guitars"
         eyebrow="Collect & equip"
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+        backgroundContent={<HeroPattern />}
         rightContent={
           <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
             <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />

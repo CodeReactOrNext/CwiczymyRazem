@@ -199,7 +199,7 @@ export const SongLearningSection = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="px-3 pb-3">
+      <div className="hidden px-3 pb-3 xl:block">
         <div className="flex p-1 rounded-xl bg-zinc-900/50">
           <button
             onClick={() => onExploreLibrary?.('board')}

@@ -1,4 +1,4 @@
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { MyPlans } from "feature/exercisePlan/components/MyPlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
@@ -63,6 +63,7 @@ const MyPlansPage: NextPageWithLayout = () => {
           title="My Plans"
           subtitle="Your custom practice routines"
           eyebrow="Practice Plans"
+          backgroundContent={<HeroPattern />}
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
           buttonText="Create Plan"
           onClick={() => router.push('/plans/create')}
