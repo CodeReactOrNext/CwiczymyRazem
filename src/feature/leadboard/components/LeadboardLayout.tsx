@@ -1,6 +1,6 @@
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import { Skeleton } from "assets/components/ui/skeleton";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import { useTranslation } from "hooks/useTranslation";
@@ -62,6 +62,7 @@ export const LeadboardLayout = ({
           subtitle={currentSeason ? `${formatDate(currentSeason.startDate)} – ${formatDate(currentSeason.endDate)}` : "Practice to climb the leaderboard."}
           eyebrow="Seasonal ranking"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+          backgroundContent={<HeroPattern />}
           rightContent={
             <div className='flex flex-col sm:flex-row items-end sm:items-center gap-6'>
               {isRankLoading ? (
@@ -87,6 +88,7 @@ export const LeadboardLayout = ({
           subtitle="See how you rank against other players"
           eyebrow="All-time ranking"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+          backgroundContent={<HeroPattern />}
           rightContent={
             isRankLoading ? (
               <Skeleton className="h-20 w-40" />

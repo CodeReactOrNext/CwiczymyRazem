@@ -17,20 +17,22 @@ const navItems = [
 ];
 
 const itemClass =
-  "relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-lg py-1 active:scale-95 transition-transform duration-150";
+  "relative flex min-h-[52px] flex-1 flex-col items-center justify-center py-1 active:scale-95 transition-transform duration-150";
 
-// Material-3 style: a pill highlight sits behind the icon of the active item
-// instead of tinting the whole cell.
+// A pill highlight wraps both the icon and the label of the active item.
 const pillClass = (active: boolean) =>
   cn(
-    "relative flex h-7 w-14 items-center justify-center overflow-hidden rounded-lg transition-colors duration-300",
-    active ? "bg-cyan-500/15 text-cyan-300" : "text-zinc-400"
+    "relative flex w-16 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-2 py-1.5 transition-colors duration-300",
+    active ? "bg-white/10" : "bg-transparent"
   );
+
+const iconClass = (active: boolean) =>
+  cn("transition-colors duration-300", active ? "text-white" : "text-zinc-400");
 
 const labelClass = (active: boolean) =>
   cn(
     "text-[10px] capitalize tracking-tight transition-colors duration-200",
-    active ? "font-medium text-cyan-300" : "font-normal text-zinc-500"
+    active ? "font-medium text-white" : "font-normal text-zinc-500"
   );
 
 const BottomNavItem = ({
@@ -54,9 +56,12 @@ const BottomNavItem = ({
     >
       <span className={pillClass(active)}>
         {ripple}
-        <Icon size={20} className={cn("transition-transform duration-300", active && "scale-110")} />
+        <Icon
+          size={20}
+          className={cn(iconClass(active), "transition-transform duration-300", active && "scale-110")}
+        />
+        <span className={labelClass(active)}>{label}</span>
       </span>
-      <span className={labelClass(active)}>{label}</span>
     </Link>
   );
 };
@@ -101,9 +106,9 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
         >
           <span className={pillClass(false)}>
             {ripple}
-            <Menu size={20} />
+            <Menu size={20} className={iconClass(false)} />
+            <span className={labelClass(false)}>More</span>
           </span>
-          <span className={labelClass(false)}>More</span>
         </button>
       </div>
     </nav>

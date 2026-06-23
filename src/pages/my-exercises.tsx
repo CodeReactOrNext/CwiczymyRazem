@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { deleteCommunityExercise, getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -127,6 +127,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
         title="My Exercises"
         subtitle="Create and share your own guitar exercises with the community"
         eyebrow="Custom Exercises"
+        backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText="Create Exercise"
         onClick={handleCreate}

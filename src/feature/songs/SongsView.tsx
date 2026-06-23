@@ -329,9 +329,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
             <button 
               onClick={() => setMobileTab('explore')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-black transition-all duration-300 rounded-lg",
-                mobileTab === 'explore' 
-                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'explore'
+                  ? "text-white bg-white/10"
                   : "text-zinc-500 hover:text-zinc-400"
               )}
             >
@@ -341,9 +341,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
             <button 
               onClick={() => setMobileTab('collection')}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-black transition-all duration-300 rounded-lg",
-                mobileTab === 'collection' 
-                  ? "text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'collection'
+                  ? "text-white bg-white/10"
                   : "text-zinc-500 hover:text-zinc-400"
               )}
             >

@@ -24,7 +24,6 @@ import { FaClock, FaGuitar } from "react-icons/fa";
 import { SiGuitarpro } from "react-icons/si";
 import { GiAudioCassette } from "react-icons/gi";
 import { PiCassetteTapeLight, PiTreeView, PiMagicWandDuotone } from "react-icons/pi";
-import { LuTimer } from "react-icons/lu";
 import { useAppSelector } from "store/hooks";
 
 const colorMap = {
@@ -115,7 +114,7 @@ const ModeCard = ({
         </div>
         <p className={hero ? "text-[13px] text-zinc-400 font-medium leading-relaxed" : "truncate text-[12px] text-zinc-500 group-hover:text-zinc-400 transition-colors"}>{description}</p>
         {links && links.length > 0 && (
-          <div className="relative z-10 mt-3 flex flex-col border-t border-white/[0.05] pt-1.5">
+          <div className="relative z-10 mt-3 flex flex-col gap-0.5">
             {links.map((link) => (
               <button
                 key={link.label}
@@ -124,11 +123,11 @@ const ModeCard = ({
                   e.stopPropagation();
                   link.onClick();
                 }}
-                className="group/link relative flex items-center justify-between overflow-hidden rounded-md px-2 py-1.5 text-left text-[12px] font-semibold text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-white active:scale-[0.98] active:bg-white/[0.1]"
+                className="group/link relative flex min-h-[40px] items-center justify-between overflow-hidden rounded-lg px-3 py-2.5 text-left text-[12px] font-semibold text-zinc-400 transition-all duration-200 hover:bg-white/[0.06] hover:text-white active:scale-[0.98] active:bg-white/[0.1]"
               >
                 <Ripple className="bg-white/20" />
                 <span>{link.label}</span>
-                <ArrowRight className="h-3.5 w-3.5 -translate-x-1 text-zinc-600 opacity-0 transition-all group-hover/link:translate-x-0 group-hover/link:text-zinc-300 group-hover/link:opacity-100" />
+                <ArrowRight className="h-3.5 w-3.5 text-zinc-600 transition-all group-hover/link:translate-x-0.5 group-hover/link:text-zinc-300" />
               </button>
             ))}
           </div>
@@ -236,7 +235,10 @@ export const PracticeModeSelector = () => {
                   { label: "Practice", href: "/timer/song-select" },
                   { label: "My Board", href: "/songs?view=board" },
                 ])}
-                {heroListItem("log",     ClipboardList, "Log Practice", "Manually log a custom practice session",  "/report",         "indigo")}
+                {heroListItem("log",     ClipboardList, "Log Practice", "Manually log a custom practice session",  "/report",         "indigo", false, undefined, [
+                  { label: "Manual Log", href: "/report" },
+                  { label: "Free Timer", href: "/timer/practice" },
+                ])}
               </div>
             </div>
 
@@ -262,7 +264,6 @@ export const PracticeModeSelector = () => {
               <h2 className="text-lg font-bold text-white mb-4">Tools</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {listItem("smart", PiMagicWandDuotone, "Auto plan", "Automatically generated session", "/timer/auto", "amber", !isMaster, "Master")}
-                {listItem("timer",  LuTimer,  "Free Timer", "Practice with a timer", "/timer/practice", "amber")}
                 {listItem("gp",     SiGuitarpro, "GP file", "Practice GP files", "/gp-tabs", "amber", !isPremium, "Premium")}
               </div>
             </div>

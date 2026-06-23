@@ -1,4 +1,4 @@
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import {
@@ -1421,6 +1421,7 @@ export const SummaryView = () => {
         title="Milestones"
         subtitle={subtitleDate}
         eyebrow="Practice"
+        backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
 
