@@ -42,7 +42,7 @@ export const MONTHLY_RUNNING_COST = 20;
  */
 export const ROADMAP_TIERS: RoadmapTier[] = [
   { id: "t5", goal: 5, icon: Guitar, label: "+10 New Guitars & Pedals", kind: "content", done: true },
-  { id: "t15", goal: 15, icon: Target, label: "+5 New Exercises", kind: "content" },
+  { id: "t15", goal: 15, icon: Target, label: "+5 New Exercises", kind: "content", done: true },
   { id: "t25", goal: 25, icon: ClipboardList, label: "+2 New Practice Plans", kind: "content" },
   { id: "t35", goal: 35, icon: Guitar, label: "+10 New Guitars & Pedals", kind: "content" },
   {
