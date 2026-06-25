@@ -22,7 +22,7 @@ export const createExercisePlan = async (
       ) {
         const newObj: any = {};
         Object.keys(obj).forEach((key) => {
-          if (obj[key] !== undefined) {
+          if (obj[key] !== undefined && typeof obj[key] !== "function") {
             newObj[key] = sanitize(obj[key]);
           }
         });
