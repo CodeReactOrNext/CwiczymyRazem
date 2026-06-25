@@ -211,6 +211,11 @@ import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pink
 import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
 import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
 import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
+import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
+import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
+import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
+import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
+import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
 import { rhythmTrainingEasy, rhythmTrainingHard,rhythmTrainingMedium } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
@@ -284,6 +289,11 @@ const rawExercises: Exercise[] = [
   openGRepetitionExercise,
   stringRepetitionExercise,
   randomNoteHuntExercise,
+  chromaticNoteHuntExercise,
+  fretboardRegionHuntExercise,
+  intervalHuntExercise,
+  buildTheChordExercise,
+  fingerstyleArpeggiosExercise,
 
 
   spiderPermutation1234Exercise,

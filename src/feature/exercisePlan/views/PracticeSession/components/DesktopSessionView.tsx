@@ -130,7 +130,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
     !!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) &&
     !p.currentExercise.disableBackingTrack;
   const hasMicControls =
-    (p.planHasTablature || p.planHasGpFile || p.planHasStrumming) && !p.currentExercise.disableMic;
+    (p.planHasTablature || p.planHasGpFile || p.planHasStrumming || !!p.currentExercise.customGoal) && !p.currentExercise.disableMic;
   const hasPlaybackControls = hasMetronome || hasAudioTrack || hasMicControls;
 
   const playbackControls = hasPlaybackControls ? (

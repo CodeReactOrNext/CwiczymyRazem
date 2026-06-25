@@ -1,16 +1,18 @@
 import { cn } from "assets/lib/utils";
 import React, { memo, useEffect } from "react";
-import { useSessionUI } from "../contexts/SessionUIContext";
-import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
-import { ExerciseImage } from "./ExerciseImage";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
+import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
+import { ExerciseImage } from "./ExerciseImage";
+import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { NoteHuntDetector } from "./NoteHuntDetector";
 import { StrummingSection } from "./StrummingSection";
 import { TablatureSection } from "./TablatureSection";
 import { VideoSection } from "./VideoSection";
-import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 
 interface ExerciseContentAreaProps {
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -152,8 +154,26 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       )}
 
-      {/* Content: tablature / video / strumming / image */}
-      {hasTablature ? (
+      {/* Content: note hunt / chord hunt / tablature / video / strumming / image */}
+      {currentExercise.customGoal ? (
+        <div className="flex w-full justify-center py-10">
+          {currentExercise.noteHuntConfig?.mode === "chord" ? (
+            <ChordHuntPanel
+              chordName={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          ) : (
+            <NoteHuntDetector
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          )}
+        </div>
+      ) : hasTablature ? (
         <TablatureSection
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}

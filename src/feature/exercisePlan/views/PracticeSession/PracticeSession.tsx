@@ -13,28 +13,29 @@ import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import type { ExercisePlan } from "../../types/exercise.types";
-import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
+import { DesktopSessionView } from "./components/DesktopSessionView";
+import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
+import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
+import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
+import { SessionDialogs } from "./components/SessionDialogs";
+import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
 import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
+import { SessionUIProvider } from "./contexts/SessionUIContext";
+import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
+import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
+import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
+import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
-import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
-import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
-import { DesktopSessionView } from "./components/DesktopSessionView";
-import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
-import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
-import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
-import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
-import { SessionUIProvider } from "./contexts/SessionUIContext";
-import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import SessionModal from "./modals/SessionModal";
-import { SessionDialogs } from "./components/SessionDialogs";
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -243,6 +244,10 @@ export const PracticeSession = ({
   // ── Note matching ─────────────────────────────────────────────────────────
 
   const activeStrumPattern = currentExercise.strummingPatterns?.[0];
+  // Rotating hunts: the provider flips this to true once the whole goal is solved,
+  // so the rotation hook can fast-forward to the next target.
+  const huntSolvedRef = useRef(false);
+  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef);
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
@@ -299,7 +304,14 @@ export const PracticeSession = ({
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
-      customGoal={currentExercise.customGoal}
+      customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
+      customGoalRegion={huntTarget ? huntTarget.region : currentExercise.customGoalRegion}
+      customGoalPrompt={huntTarget ? huntTarget.prompt : currentExercise.customGoalPrompt}
+      noteHuntMode={currentExercise.noteHuntConfig?.mode}
+      noteHuntSecondsLeft={noteHuntSecondsLeft}
+      solvedRef={huntSolvedRef}
+      onAdvanceHunt={advanceHunt}
+      onEnableMic={handleMicToggle}
       onReset={handleNoteMatchingReset}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>

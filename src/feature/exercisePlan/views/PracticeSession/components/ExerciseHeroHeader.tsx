@@ -42,29 +42,8 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
 
   return (
     <>
-      {activeExercise.customGoal && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          key={exercise.customGoal}
-          className="mb-12 flex flex-col items-center gap-4"
-        >
-          <div className="relative group">
-            <div className="absolute -inset-8 bg-cyan-500/20 blur-[40px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-            <div className="relative w-32 h-32 rounded-3xl bg-zinc-900 flex items-center justify-center shadow-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-              <span className="text-6xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-                {exercise.customGoal}
-              </span>
-            </div>
-          </div>
-          {exercise.customGoalDescription && (
-            <p className="text-xs text-zinc-500 font-semibold tracking-wide mt-2">
-              {exercise.customGoalDescription}
-            </p>
-          )}
-        </motion.div>
-      )}
+      {/* The custom-goal card lives inside the detector (NoteHuntDetector /
+          ChordHuntPanel) so it isn't duplicated here. */}
 
       {!!streakPlan.streakDays && (
         <motion.div
