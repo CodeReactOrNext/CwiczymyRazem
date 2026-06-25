@@ -11,8 +11,19 @@ import { Guitar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
-const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;
+
+// Mirror of the pedalboard editor (PedalboardView): pedals share the same
+// on-board height but keep their natural image proportions, so widths must be
+// derived from each image's aspect ratio rather than fixed. This keeps the
+// readonly profile view pixel-consistent with the editable arsenal view.
+const BOARD_W = 16;
+const BOARD_H = 7;
+/** Aspect used before an image has reported its natural size (a typical pedal). */
+const DEFAULT_ASPECT = 480 / 515;
+
+const widthPctForAspect = (aspect: number) =>
+  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
 
 interface TooltipData {
   x: number;
@@ -164,10 +175,13 @@ interface PedalReadonlyProps {
 }
 
 const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyProps) => {
+  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
   const invItem = effectInventory.find((e) => e.id === placement.itemId);
   const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
   const rs = effect ? RARITY_STYLES[effect.rarity] : null;
   if (!effect || !rs) return null;
+
+  const wPct = widthPctForAspect(aspect);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     onHover(e, {
@@ -201,7 +215,7 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
       style={{
         left: `${placement.xPct}%`,
         top: `${placement.yPct}%`,
-        width: `${PEDAL_W_PCT}%`,
+        width: `${wPct}%`,
         height: `${PEDAL_H_PCT}%`,
         filter: `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
       }}
@@ -213,6 +227,11 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
         alt={effect.name}
         className="w-full h-full object-contain"
         draggable={false}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (!img.naturalWidth || !img.naturalHeight) return;
+          setAspect(img.naturalWidth / img.naturalHeight);
+        }}
       />
       <div
         className="absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full"

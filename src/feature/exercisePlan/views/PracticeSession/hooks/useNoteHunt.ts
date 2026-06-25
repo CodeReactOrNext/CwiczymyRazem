@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { getNotePositionsInRange } from "feature/exercisePlan/scales/fretboardMapper";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoteFromFrequency, NOTES } from "utils/audio/noteUtils";
 
 import { type GameState,getFeedbackForCombo } from "./noteMatchingFeedback";
@@ -46,6 +47,18 @@ export function playableOctaves(note: string): number[] {
   return octaves;
 }
 
+/**
+ * Octaves of `note` the player should hunt: the whole neck normally, or — in
+ * region mode — only those reachable inside the `[startFret, endFret]` window.
+ */
+function targetOctaves(note: string, fretRange?: [number, number]): number[] {
+  if (!fretRange) return playableOctaves(note);
+  const idx = NOTES.indexOf(note);
+  if (idx < 0) return [];
+  const positions = getNotePositionsInRange(idx, fretRange[0], fretRange[1]);
+  return Array.from(new Set(positions.map(p => p.octave))).sort((a, b) => a - b);
+}
+
 /** Escalating score for finding `n` octaves — same curve as note-matching. */
 function scoreForCount(n: number): number {
   let total = 0;
@@ -76,6 +89,7 @@ function buildState(
   isMatch: boolean,
   hitId: number,
   feedback: { text: string; id: number },
+  scoreOffset = 0,
 ): NoteHuntState {
   const foundInRange = octaves.filter(o => found.has(o)).length;
   const multiplier = Math.min(8, Math.floor(foundInRange / 5) + 1);
@@ -83,7 +97,8 @@ function buildState(
     detectedNote, detectedOctave, cents, isMatch, hitId, octaves,
     foundOctaves: Array.from(found).sort((a, b) => a - b),
     gameState: {
-      score: scoreForCount(foundInRange),
+      // Cumulative across the session: banked total + the current target's score.
+      score: scoreOffset + scoreForCount(foundInRange),
       combo: foundInRange,
       multiplier,
       lastFeedback: feedback.text,
@@ -104,15 +119,26 @@ function buildState(
  * and clears progress in place when `targetNote` changes, rather than relying on
  * remounting.
  */
+export interface NoteHuntControls {
+  state: NoteHuntState;
+  /** Manually toggle an octave as found — used in no-mic (self-check) practice. */
+  markOctave: (octave: number) => void;
+}
+
 export function useNoteHunt(
   targetNote: string,
   frequencyRef: FreqRef,
   volumeRef: FreqRef,
   active: boolean,
-): NoteHuntState {
+  fretRange?: [number, number],
+): NoteHuntControls {
   const [state, setState] = useState<NoteHuntState>(() =>
-    buildState(playableOctaves(targetNote), new Set(), null, null, 0, false, 0, { text: "", id: 0 }),
+    buildState(targetOctaves(targetNote, fretRange), new Set(), null, null, 0, false, 0, { text: "", id: 0 }),
   );
+
+  // Re-roll progress when EITHER the note or the region window changes. Derived as
+  // a primitive key so a fresh fretRange array each render doesn't reset us.
+  const targetKey = `${targetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}`;
 
   const rafRef         = useRef(0);
   const lastSampleRef  = useRef(0);
@@ -123,20 +149,30 @@ export function useNoteHunt(
   const hitIdRef       = useRef(0);
   const feedbackRef    = useRef<{ text: string; id: number }>({ text: "", id: 0 });
   const targetRef      = useRef(targetNote);
-  const octavesRef     = useRef<number[]>(playableOctaves(targetNote));
+  const octavesRef     = useRef<number[]>(targetOctaves(targetNote, fretRange));
+  // Score banked from previous targets — keeps the total accumulating across rotations.
+  const sessionScoreRef = useRef(0);
+  const firstTargetRef  = useRef(true);
 
-  // Retarget in place when the goal note changes (no remount). Refs only — the
-  // RAF loop pushes the cleared state on its next tick.
+  // Retarget in place when the goal note or region changes (no remount). Refs
+  // only — the RAF loop pushes the cleared state on its next tick.
   useEffect(() => {
+    // Bank the finishing target's score before clearing (skip the initial mount).
+    if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
+    firstTargetRef.current = false;
     targetRef.current     = targetNote;
-    octavesRef.current    = playableOctaves(targetNote);
+    octavesRef.current    = targetOctaves(targetNote, fretRange);
     foundRef.current      = new Set();
     stableRef.current     = null;
     wasMatchingRef.current = false;
     prevFoundRef.current  = 0;
     hitIdRef.current      = 0;
     feedbackRef.current   = { text: "", id: 0 };
-  }, [targetNote]);
+    // Push the cleared state now — the RAF loop is idle when the mic is off, so
+    // without this the previous note's found octaves would linger after a rotate.
+    setState(buildState(octavesRef.current, foundRef.current, null, null, 0, false, 0, feedbackRef.current, sessionScoreRef.current));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetKey]);
 
   useEffect(() => {
     if (!active) return () => { /* nothing to clean up */ };
@@ -192,7 +228,7 @@ export function useNoteHunt(
 
             const next = buildState(
               octaves, foundRef.current, data.note, data.octave, data.cents,
-              isMatch, hitIdRef.current, feedbackRef.current,
+              isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -214,5 +250,27 @@ export function useNoteHunt(
     return () => cancelAnimationFrame(rafRef.current);
   }, [active, frequencyRef, volumeRef]);
 
-  return state;
+  // Self-check for players without a mic: tap to toggle an octave as found. Feeds
+  // the same found-set/scoring path as live detection.
+  const markOctave = useCallback((octave: number) => {
+    const found = foundRef.current;
+    if (found.has(octave)) {
+      found.delete(octave);
+    } else {
+      found.add(octave);
+      hitIdRef.current++;
+    }
+    const foundInRange = octavesRef.current.filter(o => found.has(o)).length;
+    if (foundInRange > prevFoundRef.current) {
+      const tier = getFeedbackForCombo(foundInRange);
+      if (tier) feedbackRef.current = { text: tier.text, id: feedbackRef.current.id + 1 };
+    }
+    prevFoundRef.current = foundInRange;
+    setState(prev => buildState(
+      octavesRef.current, found, prev.detectedNote, prev.detectedOctave, prev.cents,
+      prev.isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
+    ));
+  }, []);
+
+  return { state, markOctave };
 }

@@ -159,6 +159,30 @@ export interface Exercise {
    *  once when the exercise is entered or restarted, so the goal stays stable
    *  during a session (e.g. across pauses). See randomNoteHunt. */
   rerollCustomGoal?: () => void;
+  /** Marks a rotating note-hunt: the target note is re-rolled every
+   *  `rotateSeconds` (via rerollCustomGoal) while the session is playing, with a
+   *  visible countdown. `mode` selects the variant:
+   *   - "octaves" (default): find the note across the whole neck.
+   *   - "region": also rotates a fretboard window (customGoalRegion) + renders the neck.
+   *   - "interval": customGoal is the (hidden) answer; show customGoalPrompt instead.
+   *   - "chord": customGoal is a chord name; track its tones via useChordHunt.
+   *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
+  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" };
+  /** Rotating hunts: returns a fresh target each call. A plain function (not a
+   *  getter) so it survives object spreads/clones — the rotation hook holds the
+   *  result in React state. See randomNoteHunt / intervalHunt / buildTheChord. */
+  rollHuntTarget?: () => {
+    goal: string;
+    prompt?: { title: string; subtitle?: string };
+    region?: { startFret: number; endFret: number };
+  };
+  /** For region-mode note hunts: the fret window the target must be found in.
+   *  Re-rolled alongside customGoal. */
+  customGoalRegion?: { startFret: number; endFret: number };
+  /** Prompt to show on the goal card when the answer must stay hidden (interval
+   *  mode): e.g. { title: "A", subtitle: "Perfect 5th ↑" }. The real target stays
+   *  in customGoal for detection. Re-rolled alongside customGoal. */
+  customGoalPrompt?: { title: string; subtitle?: string };
   riddleConfig?: ExerciseRiddleConfig;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;

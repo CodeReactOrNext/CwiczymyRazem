@@ -1,8 +1,11 @@
 import { cn } from "assets/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import { FaMicrophoneSlash } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FaArrowRight } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { DetectionWave } from "./DetectionWave";
+import { HuntSuccessBurst } from "./HuntSuccessBurst";
+import { NoteHuntFretboard } from "./NoteHuntFretboard";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -16,133 +19,196 @@ const toSuperscript = (n: number) =>
   String(n).split("").map(d => SUPERSCRIPT[Number(d)] ?? d).join("");
 
 export function NoteHuntDetector({
-  targetNote,
+  targetNote: targetNoteProp,
   description,
   isMicEnabled,
   isListening,
 }: NoteHuntDetectorProps) {
-  const { noteHunt } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, customGoalPrompt, huntTarget, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
-  const detectedNote   = noteHunt?.detectedNote ?? null;
+  // Read the live target from context (not the prop) so it updates through the
+  // memoized desktop content wrapper when the target rotates. Falls back to the
+  // prop on first paint.
+  const targetNote = huntTarget ?? targetNoteProp;
+
   const detectedOctave = noteHunt?.detectedOctave ?? null;
-  const cents          = noteHunt?.cents ?? 0;
   const isMatch        = noteHunt?.isMatch ?? false;
   const foundOctaves   = noteHunt?.foundOctaves ?? [];
-  const hitId          = noteHunt?.hitId ?? 0;
   const octaves        = noteHunt?.octaves ?? [];
+  const score          = noteHunt?.gameState.score ?? 0;
 
   const foundInRange = octaves.filter(o => foundOctaves.includes(o)).length;
   const allFound = octaves.length > 0 && foundInRange === octaves.length;
 
+  // Prompt mode (Interval Hunt): the card shows a question (root + interval) and
+  // the answer note stays hidden until the player plays it.
+  const isPrompt = !!customGoalPrompt;
+  const solved = foundOctaves.length >= 1;
+  const isRotating = noteHuntSecondsLeft !== null;
+
+  // Unit of progress for the success bursts: octaves normally, or "solved once"
+  // in interval mode; "complete" is the whole goal.
+  const foundUnits = isPrompt ? (solved ? 1 : 0) : foundInRange;
+  const complete = isPrompt ? solved : allFound;
+
   return (
-    <div className="flex w-full max-w-xs flex-col items-center gap-3">
-      {/* Target note card */}
+    <div className={cn("flex w-full flex-col items-center gap-4", noteHuntRegion ? "max-w-xl" : "max-w-sm")}>
+      {/* Score (mic only) + countdown */}
+      <div className="flex items-center justify-center gap-3">
+        {isMicEnabled && (
+          <span className="rounded bg-amber-500/15 px-3.5 py-1.5 text-base font-extrabold tracking-wide text-amber-300">
+            ★ {score} pts
+          </span>
+        )}
+        {isRotating && (
+          <span
+            className={cn(
+              "rounded px-3.5 py-1.5 text-base font-extrabold tabular-nums transition-colors",
+              complete
+                ? "bg-emerald-500/20 text-emerald-300"
+                : noteHuntSecondsLeft! <= 5
+                ? "animate-pulse bg-red-500/25 text-red-300"
+                : "bg-white/10 text-zinc-200",
+            )}
+          >
+            {noteHuntSecondsLeft}s
+          </span>
+        )}
+      </div>
+
+      {/* Target card */}
       <div className="relative group">
         <div
           className={cn(
-            "absolute -inset-6 blur-[30px] rounded-lg transition-opacity",
-            isMatch
-              ? "bg-emerald-500/40 opacity-90"
-              : "bg-cyan-500/20 opacity-50 group-hover:opacity-80 animate-pulse",
+            "absolute -inset-2 blur-[16px] rounded-lg transition-opacity duration-500",
+            complete ? "bg-emerald-500/50 opacity-100" : "bg-cyan-500/15 opacity-50",
           )}
         />
+        <HuntSuccessBurst foundCount={foundUnits} complete={complete} />
         <motion.div
-          animate={isMatch ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-          transition={{ duration: 0.25 }}
+          animate={complete ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+          transition={{ duration: 0.4 }}
           className={cn(
-            "relative w-24 h-24 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors",
-            isMatch ? "bg-emerald-900/80 ring-2 ring-emerald-400/70" : "bg-zinc-900/80",
+            "relative w-32 h-32 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors duration-500",
+            complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
           )}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-          <span className="text-5xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-            {targetNote}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+          <span className="text-7xl font-black text-white tracking-tighter drop-shadow-[0_0_18px_rgba(255,255,255,0.5)]">
+            {isPrompt && !solved ? customGoalPrompt!.title : targetNote}
           </span>
         </motion.div>
       </div>
 
-      {description && (
-        <p className="text-[10px] text-zinc-500 font-bold tracking-widest text-center">
-          {description}
-        </p>
+      {/* Prompt subtitle / description */}
+      {isPrompt ? (
+        <div className="flex flex-col items-center gap-1.5">
+          {customGoalPrompt!.subtitle && (
+            <span className="rounded bg-cyan-500/20 px-4 py-1.5 text-base font-bold tracking-wide text-cyan-200">
+              {customGoalPrompt!.subtitle}
+            </span>
+          )}
+          {solved && (
+            <span className="text-base font-bold tracking-wide text-emerald-300">✓ it was {targetNote}</span>
+          )}
+        </div>
+      ) : (
+        description && (
+          <p className="text-center text-sm font-semibold tracking-wide text-zinc-200">{description}</p>
+        )
       )}
 
-      {/* Pitch-detection feedback */}
+      {/* Detection status */}
       {!isMicEnabled ? (
-        <div className="flex items-center gap-2 text-[11px] text-zinc-500">
-          <FaMicrophoneSlash className="h-3 w-3" />
-          <span>Enable <span className="text-emerald-400 font-semibold">Pitch Detect</span> to track your hits</span>
-        </div>
+        <p className="text-center text-xs text-zinc-400">
+          Enable the <span className="font-bold text-emerald-300">mic</span> in the controls below to auto-score, or check off octaves by hand.
+        </p>
       ) : !isListening ? (
-        <p className="text-[11px] text-zinc-500">Starting microphone…</p>
+        <p className="text-sm font-semibold text-zinc-200">Starting microphone…</p>
       ) : (
-        <div className="flex w-full flex-col items-center gap-2.5">
-          {/* Live readout */}
-          <div className="relative h-6 flex items-center justify-center">
-            <AnimatePresence mode="popLayout">
-              {isMatch ? (
-                <motion.span
-                  key={`hit-${hitId}`}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-sm font-black tracking-widest text-emerald-400 capitalize"
-                >
-                  ✓ {targetNote} found!
-                </motion.span>
-              ) : detectedNote ? (
-                <span className="text-[11px] font-mono text-zinc-400">
-                  Heard{" "}
-                  <span className="font-bold text-zinc-200">
-                    {detectedNote}{detectedOctave !== null ? toSuperscript(detectedOctave) : ""}
-                  </span>{" "}
-                  <span className="text-zinc-600">
-                    {cents > 0 ? `+${Math.round(cents)}` : Math.round(cents)}¢
-                  </span>
-                </span>
-              ) : (
-                <span className="text-[11px] text-zinc-600">Play the note anywhere on the neck…</span>
-              )}
-            </AnimatePresence>
-          </div>
+        <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
+      )}
 
-          {/* Octave chips */}
-          {octaves.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              {octaves.map(o => {
-                const found = foundOctaves.includes(o);
-                const isCurrent = isMatch && detectedOctave === o;
-                return (
-                  <span
-                    key={o}
-                    className={cn(
-                      "flex h-7 min-w-[2rem] items-center justify-center rounded-md border px-1.5 text-xs font-bold transition-all",
-                      isCurrent
-                        ? "border-emerald-400 bg-emerald-500/30 text-emerald-200 scale-110"
-                        : found
-                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                        : "border-white/10 bg-zinc-800/60 text-zinc-500",
-                    )}
-                  >
-                    {targetNote}{toSuperscript(o)}
-                  </span>
-                );
-              })}
-            </div>
+      {/* Region neck — shows WHERE to search, never the answer positions. */}
+      {noteHuntRegion && (
+        <NoteHuntFretboard
+          targetNote={targetNote}
+          startFret={noteHuntRegion.startFret}
+          endFret={noteHuntRegion.endFret}
+          foundOctaves={foundOctaves}
+          isMatch={isMatch}
+        />
+      )}
+
+      {/* Octave chips — reference + (no-mic) tap-to-mark. Hidden in interval mode
+          so they don't reveal the answer. */}
+      {!isPrompt && octaves.length > 0 && (
+        <div className="flex flex-col items-center gap-1.5">
+          {!isMicEnabled && (
+            <span className="text-xs font-semibold tracking-wide text-zinc-400">
+              Tap each octave you find{noteHuntRegion ? " in the region" : ""}
+            </span>
           )}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {octaves.map(o => {
+              const found = foundOctaves.includes(o);
+              const isCurrent = isMatch && detectedOctave === o && !found;
+              const chipClass = cn(
+                "flex h-9 min-w-[2.75rem] items-center justify-center rounded px-2 text-base font-extrabold transition-all",
+                isCurrent
+                  ? "bg-emerald-500/30 text-emerald-100 scale-110"
+                  : found
+                  ? "bg-emerald-500/15 text-emerald-300"
+                  : "bg-zinc-800/80 text-zinc-300",
+              );
+              const label = `${targetNote}${toSuperscript(o)}`;
+              return !isMicEnabled ? (
+                <button key={o} type="button" onClick={() => markNoteHuntOctave(o)} className={cn(chipClass, "cursor-pointer hover:brightness-125 active:scale-95")}>
+                  {label}
+                </button>
+              ) : (
+                <span key={o} className={chipClass}>{label}</span>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-          {/* Progress */}
-          {octaves.length > 0 && (
-            <p
-              className={cn(
-                "text-[10px] font-bold tracking-widest transition-colors",
-                allFound ? "text-emerald-400" : "text-zinc-500",
-              )}
+      {/* Progress */}
+      {isPrompt ? (
+        <div className="flex flex-col items-center gap-2">
+          <p className={cn("text-sm font-extrabold tracking-widest transition-colors", solved ? "text-emerald-300" : "text-zinc-300")}>
+            {solved ? "★ CORRECT" : "FIND THE TARGET NOTE"}
+          </p>
+          {!isMicEnabled && !solved && octaves.length > 0 && (
+            <button
+              type="button"
+              onClick={() => markNoteHuntOctave(octaves[0])}
+              className="rounded bg-emerald-500/20 px-4 py-1.5 text-sm font-bold tracking-wide text-emerald-200 transition-colors hover:bg-emerald-500/30 active:scale-95"
             >
-              {allFound ? "★ ALL OCTAVES FOUND" : `${foundInRange} / ${octaves.length} OCTAVES FOUND`}
-            </p>
+              Reveal answer
+            </button>
           )}
         </div>
+      ) : (
+        octaves.length > 0 && (
+          <p className={cn("text-sm font-extrabold tracking-widest transition-colors", allFound ? "text-emerald-300" : "text-zinc-300")}>
+            {allFound
+              ? (noteHuntRegion ? "★ ALL POSITIONS FOUND" : "★ ALL OCTAVES FOUND")
+              : `${foundInRange} / ${octaves.length} ${noteHuntRegion ? "FOUND IN REGION" : "OCTAVES FOUND"}`}
+          </p>
+        )
+      )}
+
+      {/* Manual advance — works with or without the mic */}
+      {isRotating && (
+        <button
+          type="button"
+          onClick={advanceHunt}
+          className="mt-1 inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
+        >
+          Next <FaArrowRight className="h-3.5 w-3.5" />
+        </button>
       )}
     </div>
   );

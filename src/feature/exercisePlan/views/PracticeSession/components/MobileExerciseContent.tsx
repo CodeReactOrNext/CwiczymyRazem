@@ -3,6 +3,7 @@ import React from "react";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
@@ -67,12 +68,21 @@ export function MobileExerciseContent({
     <>
       {currentExercise.customGoal && (
         <div className="flex w-full justify-center py-2" key={currentExercise.customGoal}>
-          <NoteHuntDetector
-            targetNote={currentExercise.customGoal}
-            description={currentExercise.customGoalDescription}
-            isMicEnabled={!!isMicEnabled}
-            isListening={isListening}
-          />
+          {currentExercise.noteHuntConfig?.mode === "chord" ? (
+            <ChordHuntPanel
+              chordName={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          ) : (
+            <NoteHuntDetector
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          )}
         </div>
       )}
       {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
