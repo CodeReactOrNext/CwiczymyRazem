@@ -108,10 +108,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
         dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: plan.id }));
 
-        const hasSongs = plan.exercises.some((ex) => ex.isPlayalong || (ex.tablature && ex.tablature.length > 0));
-        if (hasSongs) {
-          dispatch(updateQuestProgress({ type: 'practice_any_song' }));
-        }
+        // "Practice any Song" is completed only via the song timer (/timer/song,
+        // route songs). Practice-plan sessions — including auto plans and playalong
+        // exercises — must not complete it, so there is no practice_any_song dispatch here.
 
         const totalMin = techMin + theoryMin + hearMin + creatMin;
         if (totalMin > 0) {

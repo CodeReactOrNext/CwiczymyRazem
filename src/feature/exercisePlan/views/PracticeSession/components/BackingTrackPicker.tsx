@@ -130,11 +130,13 @@ interface BackingVideoPlayerProps {
 
 export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlayerProps) {
   return (
-    <div className="w-full relative group p-4 flex flex-col items-center">
+    <div className="w-full relative group p-4 flex flex-col items-center gap-2">
       <div className="aspect-video w-full max-w-sm rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-amber-500/30 relative ring-2 ring-amber-500/10 transition-all duration-300 hover:border-amber-500/50 hover:ring-amber-500/20">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none z-10" />
+        {/* loop=1 + playlist=<id> makes a single video repeat, so a backing track
+            shorter than the exercise keeps playing for the whole session. */}
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}`}
           className="h-full w-full relative z-0"
           allow="autoplay; encrypted-media; fullscreen"
           allowFullScreen
@@ -142,9 +144,10 @@ export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlaye
       </div>
       <button
         onClick={onChangeClick}
-        className="absolute top-6 right-6 z-20 px-2.5 py-1 rounded bg-black/60 hover:bg-black/80 text-zinc-300 hover:text-white text-[11px] font-bold transition-all opacity-0 group-hover:opacity-100"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 text-xs font-semibold transition-all"
       >
-        Change
+        <FaYoutube size={14} className="text-amber-500" />
+        Change backing track
       </button>
     </div>
   );

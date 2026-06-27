@@ -12,6 +12,7 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 import { BookOpen, Flame, Music, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserAvatar, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
@@ -336,7 +337,11 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               </Button>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {plans.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -348,7 +353,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
                   onTogglePublic={() => handleTogglePublic(plan.id)}
                 />
               ))}
-            </div>
+            </motion.div>
           )}
         </TabsContent>
       </Tabs>

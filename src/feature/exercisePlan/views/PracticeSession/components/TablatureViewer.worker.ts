@@ -111,6 +111,19 @@ let hitNotes: Record<string, boolean | number> = {};
 let missedNotes: Record<string, boolean> = {};
 let hideNotes = false;
 
+// Frozen snapshot of the finishing repetition's hit/miss state. When the full
+// exercise loops, useNoteMatching clears hitNotes/missedNotes at the wrap; we keep
+// the previous pass's state so the outgoing tail (the repetition scrolling off to
+// the left) stays painted as played instead of "restarting" to raw.
+let frozenHitNotes: Record<string, boolean | number> = {};
+let frozenMissedNotes: Record<string, boolean> = {};
+let hasFrozen = false;
+// Tile index the frozen snapshot belongs to, captured from the visual cursor at
+// freeze time. Matching resets ~one input-latency before the visual wrap, so we
+// pin the tile at reset time to keep the tail painted through that gap.
+let frozenTile = -1;
+let lastActiveTile = 0;
+
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
 const HIT_ANIM_MS = 320;
 let hitTimestamps: Record<string, number> = {};
@@ -332,9 +345,12 @@ function render() {
   needsRedraw = false;
 
   const dynBW = Math.max(120, Math.min(200, W / 4)) * zoom;
-  let cursorPos = pausedCursorPos;
+  const totalW = totalBeats * dynBW;
+  let dispCursor = pausedCursorPos;     // display cursor world-x (monotonic while seamless looping)
   let scrollX = pausedScrollX;
   let beatsElapsed = 0;
+  let wrappedCursor = pausedCursorPos;  // cursor within a single repetition (tile-0 space)
+  let seamless = false;                 // full-exercise seamless wrap active this frame
 
   if (isPlaying && countInRemaining === 0) {
     // Interpolate audio time between infrequent TICK messages using wall clock
@@ -345,35 +361,46 @@ function render() {
       ? (audioNow - audioStartSec)
       : startWallMs !== null ? (Date.now() - startWallMs) / 1000 : 0;
     beatsElapsed = computeBeatsElapsed(elapsed);
-    let loopBeat: number;
+
     if (loopStartBeat !== null && loopEndBeat !== null && loopEndBeat > loopStartBeat
         && beatsElapsed >= loopStartBeat) {
+      // Sub-loop: keep the existing jump-back behavior within the selected range
       const loopDur = loopEndBeat - loopStartBeat;
       const relBeat = beatsElapsed - loopStartBeat;
-      loopBeat = loopStartBeat + (relBeat % loopDur);
+      const loopBeat = loopStartBeat + (relBeat % loopDur);
+      dispCursor = loopBeat * dynBW;
+      wrappedCursor = dispCursor;
     } else {
-      loopBeat = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
+      // Full-exercise loop: monotonic cursor + tiled score so the ribbon scrolls
+      // continuously into the next repetition with no snap-back.
+      seamless = totalBeats > 0;
+      dispCursor = beatsElapsed * dynBW;
+      wrappedCursor = (totalBeats > 0 ? beatsElapsed % totalBeats : 0) * dynBW;
     }
-    cursorPos = loopBeat * dynBW;
-    scrollX = Math.max(0, cursorPos - W / 4);
-    // Update paused pos so dragging starts from current position
-    pausedCursorPos = cursorPos;
-    pausedScrollX = scrollX;
+    scrollX = Math.max(0, dispCursor - W / 4);
+    // Pause/seek anchor stays within a single repetition (tile-0 space)
+    pausedCursorPos = wrappedCursor;
+    pausedScrollX = Math.max(0, wrappedCursor - W / 4);
   }
 
-  const totalW = totalBeats * dynBW;
-  const visL = scrollX - 50;
-  const visR = scrollX + W + 50;
+  const viewL = scrollX - 50;
+  const viewR = scrollX + W + 50;
+  const tileStart = seamless && totalW > 0 ? Math.max(0, Math.floor(viewL / totalW)) : 0;
+  const tileEnd   = seamless && totalW > 0 ? Math.floor(viewR / totalW) : 0;
+  // Repetition the cursor is currently in — the one just before it is the
+  // outgoing tail that should keep the previous pass's frozen hit/miss state.
+  const activeTile = seamless && totalW > 0 ? Math.floor(dispCursor / totalW) : 0;
+  lastActiveTile = activeTile;
 
   // ── Clear & translate ────────────────────────────────────────────────────
   ctx.clearRect(0, 0, W, H);
   ctx.save();
   ctx.translate(-scrollX, 0);
 
-  // ── Staff lines — 3 batched groups ──────────────────────────────────────
+  // ── Staff lines — 3 batched groups (drawn once across the viewport) ──────
   if (!hideNotes) {
     const lineL = Math.max(0, scrollX);
-    const lineR = Math.min(totalW, scrollX + W + 10);
+    const lineR = seamless ? scrollX + W + 10 : Math.min(totalW, scrollX + W + 10);
     ctx.lineWidth = 1;
     for (const grp of STAFF_LINE_GROUPS) {
       ctx.strokeStyle = `rgba(255,255,255,${grp.alpha})`;
@@ -385,6 +412,23 @@ function render() {
       ctx.stroke();
     }
   }
+
+  // ── Per-tile score content — one tile per visible repetition ─────────────
+  // In seamless full-loop mode the score is tiled so the viewport can straddle
+  // a repetition boundary; tileStart..tileEnd is 0..0 in every other case.
+  for (let tile = tileStart; tile <= tileEnd; tile++) {
+    const tileOff = tile * totalW;
+    // Local (tile-space) viewport + cursor — shadow the outer world-space values
+    const visL = viewL - tileOff;
+    const visR = viewR - tileOff;
+    const cursorPos = dispCursor - tileOff;
+    // Outgoing tail (the repetition just behind the cursor) renders the frozen
+    // previous-pass state so it stays painted instead of resetting to raw.
+    const isOutgoing = seamless && hasFrozen && tile === frozenTile;
+    const tileHit = isOutgoing ? frozenHitNotes : hitNotes;
+    const tileMissed = isOutgoing ? frozenMissedNotes : missedNotes;
+    ctx.save();
+    ctx.translate(tileOff, 0);
 
   // ── Measure lines — single batched path ─────────────────────────────────
   ctx.strokeStyle = "rgba(255,255,255,0.25)";
@@ -432,6 +476,12 @@ function render() {
 
     const inView = beatEndPx >= visL && beatPx <= visR;
     const isActive = isPlaying && startWallMs !== null && cursorPos >= beatPx && cursorPos < beatEndPx;
+    // Pitch-detection visuals (hit / miss / progressive fill) only render once the
+    // cursor has reached this beat in the current pass. Note keys carry no
+    // repetition index, so without this gate a not-yet-played upcoming tile would
+    // inherit the current pass's hit state. cursorPos is tile-local, so a future
+    // tile has a negative local cursor and is suppressed until the cursor enters it.
+    const reached = cursorPos >= beatPx;
 
     // Rhythm notation
     if (inView) {
@@ -516,7 +566,7 @@ function render() {
       const bendBadgeY = beat.topNoteY - BLOCK_H / 2 - 28;
 
       for (const note of beat.notes) {
-        const hitVal = hitNotes[note.noteKey];
+        const hitVal = reached ? tileHit[note.noteKey] : undefined;
         const isHit = !!hitVal;
         const isDead = note.isDead;
         const isHarm = !!(note.harmonicType && note.harmonicType > 0);
@@ -524,7 +574,7 @@ function render() {
         const ghostAlpha = 1.0; // Disabled transparency for ghost notes
         const accentDim = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
         const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
-        const missedDim = !hitNotes[note.noteKey] && missedNotes[note.noteKey] ? 0.2 : 1.0;
+        const missedDim = reached && !tileHit[note.noteKey] && tileMissed[note.noteKey] ? 0.2 : 1.0;
         const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
 
         const blockY = note.noteY - BLOCK_H / 2;
@@ -586,7 +636,13 @@ function render() {
         }
 
         let fillW = 0;
-        if (isHit) {
+        if (isHit && isOutgoing && tile < activeTile) {
+          // Frozen tail strictly behind the cursor: keep notes fully filled and
+          // never touch the live cache (its note key is shared with other tiles).
+          // The gap frame where the frozen tile is still the active tile falls
+          // through to the progressive path so the active note keeps filling.
+          fillW = blockW;
+        } else if (isHit) {
           const currentVisualFill = noteVisualFill.get(note.noteKey) || 0;
           // ~250ms slack covers typical latency + 50ms React state interval
           const slackX = (250 / 60000) * (bpm || 120) * dynBW;
@@ -603,7 +659,9 @@ function render() {
           
           fillW = Math.max(0, Math.min(blockW, Math.max(currentVisualFill, optimisticTarget)));
           noteVisualFill.set(note.noteKey, fillW);
-        } else {
+        } else if (reached && !isOutgoing) {
+          // Only the real (reached) live pass clears the cache; the frozen tail and
+          // upcoming tiles share the same note key and must not wipe stored fill.
           noteVisualFill.delete(note.noteKey);
         }
 
@@ -1010,8 +1068,8 @@ function render() {
     ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(Math.max(0, scrollX), DYN_BASE);
-    ctx.lineTo(Math.min(totalW, scrollX + W), DYN_BASE);
+    ctx.moveTo(Math.max(0, visL), DYN_BASE);
+    ctx.lineTo(Math.min(totalW, visR), DYN_BASE);
     ctx.stroke();
 
     for (const beat of renderBeats) {
@@ -1029,10 +1087,15 @@ function render() {
     }
   }
 
-  // ── Progress overlay — simple fill, no per-frame gradient allocation ─────
-  if (cursorPos > 0) {
+    ctx.restore();
+  } // end per-tile loop
+
+  // ── Progress overlay — dim everything left of the cursor ─────────────────
+  // Fill only the visible span (viewL..dispCursor) so the rect can't grow
+  // unbounded as the monotonic cursor advances across repetitions.
+  if (dispCursor > 0) {
     ctx.fillStyle = "rgba(0,0,0,0.35)";
-    ctx.fillRect(0, 0, cursorPos, H);
+    ctx.fillRect(viewL, 0, dispCursor - viewL, H);
   }
 
   // ── Loop range overlay ────────────────────────────────────────────────────
@@ -1097,11 +1160,11 @@ function render() {
   }
 
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
-  if (cursorPos > 0 || isPlaying) {
+  if (dispCursor > 0 || isPlaying) {
     ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(cursorPos, 0); ctx.lineTo(cursorPos, H);
+    ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, H);
     ctx.stroke();
 
     if (isPlaying && beatsElapsed > 0) {
@@ -1112,7 +1175,7 @@ function render() {
         ctx.strokeStyle = `rgba(6,182,212,${opacity})`;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(cursorPos, H / 2, ripple, 0, Math.PI * 2);
+        ctx.arc(dispCursor, H / 2, ripple, 0, Math.PI * 2);
         ctx.stroke();
       }
     }
@@ -1123,7 +1186,7 @@ function render() {
   // ── Notify main thread when cursor enters/leaves a rest beat ────────────
   if (isPlaying && countInRemaining === 0) {
     const restActive = renderBeats.some(b =>
-      b.isRest && cursorPos >= b.offsetX * dynBW && cursorPos < (b.offsetX + b.duration) * dynBW
+      b.isRest && wrappedCursor >= b.offsetX * dynBW && wrappedCursor < (b.offsetX + b.duration) * dynBW
     );
     if (restActive !== lastRestActive) {
       lastRestActive = restActive;
@@ -1179,6 +1242,9 @@ self.onmessage = (e: MessageEvent) => {
       pausedScrollX = 0;
       loopStartBeat = null;
       loopEndBeat   = null;
+      frozenHitNotes = {};
+      frozenMissedNotes = {};
+      hasFrozen = false;
       recomputeLoopSeconds();
       break;
     }
@@ -1210,6 +1276,13 @@ self.onmessage = (e: MessageEvent) => {
     case 'HIT_NOTES': {
       const newHits = msg.hitNotes as Record<string, boolean>;
       const now = Date.now();
+      // Hits only ever grow within a pass; a shrink means the loop wrapped and
+      // matching reset. Freeze the finishing pass so the outgoing tail stays painted.
+      if (Object.keys(newHits).length < Object.keys(hitNotes).length) {
+        frozenHitNotes = hitNotes;
+        frozenTile = lastActiveTile;
+        hasFrozen = true;
+      }
       // Record timestamp for notes that are newly hit this frame
       for (const key of Object.keys(newHits)) {
         if (newHits[key] && !hitNotes[key]) {
@@ -1225,7 +1298,14 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'MISSED_NOTES': {
-      missedNotes = msg.missedNotes as Record<string, boolean>;
+      const newMissed = msg.missedNotes as Record<string, boolean>;
+      // Same shrink-detect as hits — freeze the finishing pass's misses for the tail.
+      if (Object.keys(newMissed).length < Object.keys(missedNotes).length) {
+        frozenMissedNotes = missedNotes;
+        frozenTile = lastActiveTile;
+        hasFrozen = true;
+      }
+      missedNotes = newMissed;
       needsRedraw = true;
       break;
     }
@@ -1259,6 +1339,9 @@ self.onmessage = (e: MessageEvent) => {
       pausedCursorPos = 0;
       missedNotes = {};
       showRestWarning = false;
+      frozenHitNotes = {};
+      frozenMissedNotes = {};
+      hasFrozen = false;
       // loop range is intentionally NOT cleared here so it survives loop restarts
       break;
     }
