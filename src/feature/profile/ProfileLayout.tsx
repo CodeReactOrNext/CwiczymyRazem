@@ -288,7 +288,7 @@ const ProfileLayout = ({
         <SongSkillShowcase userSongs={songs} profileUserId={userAuth} />
 
         {/* Skills Section */}
-        {userSkills && (
+        {userSkills && Object.keys(userSkills.unlockedSkills ?? {}).length > 0 && (
           <div className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'>
             <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
@@ -302,15 +302,17 @@ const ProfileLayout = ({
         <div className='space-y-8'>
           <SeasonalAchievements userId={userAuth} hideWhenEmpty />
 
-          <div className='space-y-4 px-2'>
-            <div className='flex items-center gap-2'>
-              <h2 className='text-xl font-bold text-white capitalize tracking-wider'>Achievements</h2>
-              <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
-                {achievements?.length || 0}
-              </span>
+          {(achievements?.length ?? 0) > 0 && (
+            <div className='space-y-4 px-2'>
+              <div className='flex items-center gap-2'>
+                <h2 className='text-xl font-bold text-white capitalize tracking-wider'>Achievements</h2>
+                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
+                  {achievements?.length || 0}
+                </span>
+              </div>
+              <AchievementWrapper userAchievements={achievements ?? []} />
             </div>
-            <AchievementWrapper userAchievements={achievements ?? []} />
-          </div>
+          )}
         </div>
       </div>
     </div>

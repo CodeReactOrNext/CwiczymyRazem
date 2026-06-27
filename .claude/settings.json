@@ -22,7 +22,8 @@
       "PowerShell(npx tsc --noEmit; \"EXIT=$LASTEXITCODE\")",
       "PowerShell(npx eslint \"src/feature/exercisePlan/chords/chordTones.ts\" \"src/feature/exercisePlan/chords/rootProgressionGenerator.ts\" \"src/feature/exercisePlan/data/exerises/intervalHunt/intervalHunt.ts\" \"src/feature/exercisePlan/data/exerises/buildTheChord/buildTheChord.ts\" \"src/feature/exercisePlan/data/exerises/hitTheRoot/hitTheRoot.ts\" \"src/feature/exercisePlan/views/PracticeSession/hooks/useChordHunt.ts\" \"src/feature/exercisePlan/views/PracticeSession/components/ChordHuntPanel.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/NoteHuntDetector.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/MobileExerciseContent.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/ExerciseContentArea.tsx\" 2>&1 | Select-String -NotMatch \"Browserslist|caniuse|update-browserslist|npx update|FullyQualified|CategoryInfo|node.exe|At line|\\\\+ \" | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")",
       "PowerShell(npx eslint --fix \"src/feature/exercisePlan/views/PracticeSession/components/ExerciseContentArea.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/MobileExerciseContent.tsx\" 2>&1 | Select-String -NotMatch \"Browserslist|caniuse|update-browserslist|npx update|FullyQualified|CategoryInfo|node.exe|At line|\\\\+ \" | Select-Object -First 40; \"EXIT=$LASTEXITCODE\")",
-      "PowerShell(npx tsc --noEmit; \"TSC=$LASTEXITCODE\")"
+      "PowerShell(npx tsc --noEmit; \"TSC=$LASTEXITCODE\")",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "\\tmp"
