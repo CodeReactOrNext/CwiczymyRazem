@@ -6,12 +6,14 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpRight, Globe, Lock } from "lucide-react";
 import Image from "next/image";
-import type { ComponentType } from "react";
+import Link from "next/link";
+import type { ComponentType, ReactNode } from "react";
 import {
   FaBrain,
   FaClock,
@@ -145,6 +147,27 @@ export const PlanCard = ({
   // community plan (string avatar URL + authorUsername).
   const authorName = plan.author?.name ?? plan.authorUsername;
   const authorAvatar = plan.author?.avatar ?? plan.authorAvatar;
+
+  // Only published community plans link to a real user profile (built-in plans
+  // use a static `author` with no backing account).
+  const authorProfileId = plan.authorUsername && plan.userId ? plan.userId : null;
+
+  // Wraps the author avatar / name in a profile link + hover tooltip when the
+  // plan is community-published; otherwise renders the children untouched.
+  const withAuthorProfile = (children: ReactNode, className?: string) =>
+    authorProfileId ? (
+      <UserTooltip userId={authorProfileId}>
+        <Link
+          href={`/user/${authorProfileId}`}
+          onClick={(e) => e.stopPropagation()}
+          className={className}
+        >
+          {children}
+        </Link>
+      </UserTooltip>
+    ) : (
+      <>{children}</>
+    );
 
   return (
     <Card
@@ -281,10 +304,11 @@ export const PlanCard = ({
 
       {/* Main Content with Avatar */}
       <div className="relative flex gap-4">
-        {authorAvatar && (
+        {authorAvatar && withAuthorProfile(
             <div className={cn(
-              "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg",
-              isLocked && "grayscale opacity-50"
+              "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg transition-all",
+              isLocked && "grayscale opacity-50",
+              authorProfileId && "ring-1 ring-transparent hover:ring-cyan-500/60"
             )}>
                 {typeof authorAvatar === "string" ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -302,16 +326,19 @@ export const PlanCard = ({
                         className="object-cover"
                     />
                 )}
-            </div>
+            </div>,
+            "shrink-0"
         )}
         <div className="flex-1 space-y-1">
-            {authorName && (
+            {authorName && withAuthorProfile(
                 <span className={cn(
-                  "text-[11px] font-medium leading-none",
-                  isLocked ? "text-zinc-400" : "text-primary/80"
+                  "inline-block text-[11px] font-medium leading-none transition-colors",
+                  isLocked ? "text-zinc-400" : "text-primary/80",
+                  authorProfileId && "hover:text-cyan-400"
                 )}>
                     {authorName}
-                </span>
+                </span>,
+                "w-fit"
             )}
             <h3 className={cn(
               "font-display text-[17px] font-bold leading-tight tracking-tight",

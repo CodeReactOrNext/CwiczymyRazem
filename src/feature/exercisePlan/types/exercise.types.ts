@@ -125,6 +125,10 @@ export interface BackingTrack {
 export interface Exercise {
   id: string;
   premium?: boolean;
+  /** ISO date (YYYY-MM-DD) the exercise was added to the library. Used to show a
+   *  "New" badge and surface recent exercises at the top of the browse table.
+   *  See feature/exercisePlan/utils/isExerciseNew. */
+  addedAt?: string;
   title: LocalizedContent;
   description: LocalizedContent;
   difficulty: DifficultyLevel;

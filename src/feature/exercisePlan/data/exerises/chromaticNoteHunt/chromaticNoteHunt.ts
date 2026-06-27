@@ -15,6 +15,7 @@ let currentTarget = pickNote();
 
 export const chromaticNoteHuntExercise: Exercise = {
   id: "chromatic_note_hunt",
+  addedAt: "2026-06-25",
   isHiddenFromLanding: true,
   title: "Chromatic Note Hunt",
   description: "Find every occurrence of a note across the neck — now with sharps and flats, on a faster clock.",

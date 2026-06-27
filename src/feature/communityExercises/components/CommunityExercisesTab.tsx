@@ -8,7 +8,10 @@ import {
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { ChevronLeft, ChevronRight, ChevronRight as StartIcon, Search, Star, User } from "lucide-react";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
+import { ChevronLeft, ChevronRight, ChevronRight as StartIcon, Search, Star } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -109,6 +112,7 @@ const StarRating = ({ exerciseId, currentAverage, ratingCount, userRating, onRat
 
 interface ExerciseRowProps {
   exercise: CommunityExercise;
+  authorAvatar?: string | null;
   userRating: number | null;
   onRate: (exerciseId: string, rating: number) => void;
   isRatingLoading: boolean;
@@ -117,7 +121,8 @@ interface ExerciseRowProps {
   onStart: (exercise: CommunityExercise) => void;
 }
 
-const ExerciseRow = ({ exercise, userRating, onRate, isRatingLoading, onExpand, isExpanded, onStart }: ExerciseRowProps) => {
+const ExerciseRow = ({ exercise, authorAvatar, userRating, onRate, isRatingLoading, onExpand, isExpanded, onStart }: ExerciseRowProps) => {
+  const authorInitial = exercise.authorUsername?.[0]?.toUpperCase() ?? "?";
   return (
     <>
       <tr
@@ -126,12 +131,40 @@ const ExerciseRow = ({ exercise, userRating, onRate, isRatingLoading, onExpand, 
       >
         {/* Title + author */}
         <td className="px-4 py-3.5">
-          <div className="flex flex-col gap-0.5 max-w-[220px]">
-            <span className="font-semibold text-white leading-snug truncate">{exercise.title}</span>
-            <span className="text-[10px] text-zinc-600 flex items-center gap-1">
-              <User size={9} />
-              {exercise.authorUsername}
-            </span>
+          <div className="flex items-center gap-3 max-w-[260px]">
+            <UserTooltip userId={exercise.authorId}>
+              <Link
+                href={`/user/${exercise.authorId}`}
+                onClick={e => e.stopPropagation()}
+                className="shrink-0"
+                aria-label={`View ${exercise.authorUsername}'s profile`}
+              >
+                {authorAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={authorAvatar}
+                    alt={exercise.authorUsername}
+                    className="h-8 w-8 rounded-full object-cover ring-1 ring-zinc-700 transition-all hover:ring-cyan-500/60"
+                  />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-300 ring-1 ring-zinc-700 transition-all hover:ring-cyan-500/60">
+                    {authorInitial}
+                  </span>
+                )}
+              </Link>
+            </UserTooltip>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span className="font-semibold text-white leading-snug truncate">{exercise.title}</span>
+              <UserTooltip userId={exercise.authorId}>
+                <Link
+                  href={`/user/${exercise.authorId}`}
+                  onClick={e => e.stopPropagation()}
+                  className="w-fit text-[11px] font-medium text-zinc-400 hover:text-cyan-400 transition-colors truncate max-w-full"
+                >
+                  {exercise.authorUsername}
+                </Link>
+              </UserTooltip>
+            </div>
           </div>
         </td>
 
@@ -261,6 +294,7 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
   const [exercises, setExercises] = useState<CommunityExercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userRatings, setUserRatings] = useState<Record<string, number | null>>({});
+  const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});
   const [ratingLoading, setRatingLoading] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -306,6 +340,27 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
   const pageExercises = filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   useEffect(() => { setPage(1); }, [searchQuery, selectedDifficulty, selectedCategory]);
+
+  // Fetch author avatars for the visible page (deduped, cached across pages).
+  useEffect(() => {
+    const missingIds = Array.from(
+      new Set(pageExercises.map(ex => ex.authorId).filter(Boolean))
+    ).filter(id => !(id in authorAvatars));
+    if (missingIds.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      missingIds.map(async id => ({ id, data: await firebaseGetUserTooltipData(id) }))
+    ).then(results => {
+      if (cancelled) return;
+      setAuthorAvatars(prev => {
+        const next = { ...prev };
+        results.forEach(({ id, data }) => { next[id] = data?.avatar ?? null; });
+        return next;
+      });
+    });
+    return () => { cancelled = true; };
+  }, [pageExercises, authorAvatars]);
 
   const handleRate = async (exerciseId: string, rating: number) => {
     if (!userAuth) return;
@@ -413,6 +468,7 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
                   <ExerciseRow
                     key={ex.id}
                     exercise={ex}
+                    authorAvatar={authorAvatars[ex.authorId]}
                     userRating={userRatings[ex.id] ?? null}
                     onRate={handleRate}
                     isRatingLoading={!!ratingLoading[ex.id]}
