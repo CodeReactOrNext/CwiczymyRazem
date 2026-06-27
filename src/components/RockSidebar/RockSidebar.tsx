@@ -3,6 +3,7 @@ import { Separator } from "assets/components/ui/separator";
 import { FeedbackModal } from "components/FeedbackBubble";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
+import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import {
   selectCurrentUserStats,
@@ -60,12 +61,14 @@ const SidebarNavLink = ({
   icon,
   isActive,
   onClick,
+  showBadge = false,
 }: {
   href: string;
   name: string;
   icon: React.ReactNode;
   isActive: boolean;
   onClick?: () => void;
+  showBadge?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   return (
@@ -83,7 +86,14 @@ const SidebarNavLink = ({
       {ripple}
       <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
       <span className="flex-1">{name}</span>
-      {isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />}
+      {showBadge ? (
+        <span
+          aria-label="Unclaimed reward"
+          className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
+        />
+      ) : (
+        isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />
+      )}
     </Link>
   );
 };
@@ -157,6 +167,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
   const userInfo = useAppSelector(selectUserInfo);
+  const hasUnclaimedMilestone = useHasUnclaimedMilestone();
 
   const getActiveProfileSection = () => {
     const { pathname } = router;
@@ -226,6 +237,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         icon={icon}
         isActive={isLinkActive(id, href)}
         onClick={onClick}
+        showBadge={id === "summary" && hasUnclaimedMilestone}
       />
     ));
 
