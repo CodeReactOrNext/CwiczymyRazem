@@ -7,7 +7,8 @@ import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { PackageOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 
-import type { ArsenalUserData } from "../../types/arsenal.types";
+import type { ArsenalUserData, GuitarRarity } from "../../types/arsenal.types";
+import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
 import { SellConfirmDialog } from "./SellConfirmDialog";
 import { GuitarCard } from "./GuitarCard";
 
@@ -47,11 +48,31 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     );
   }
 
-  const sorted = [...data.inventory].sort((a, b) => b.acquiredAt - a.acquiredAt);
-
-  const uniqueOwnedCount = new Set(data.inventory.map((item) => item.guitarId)).size;
+  const uniqueOwnedIds = new Set(data.inventory.map((item) => item.guitarId));
+  const uniqueOwnedCount = uniqueOwnedIds.size;
   const totalGuitarsCount = GUITAR_DEFINITIONS.length;
-  const completionPct = Math.round((uniqueOwnedCount / totalGuitarsCount) * 100);
+
+  // Group inventory items per rarity (newest first within a group),
+  // and count how many of each rarity exist / are owned.
+  const itemsByRarity = {} as Record<GuitarRarity, typeof data.inventory>;
+  const totalByRarity = {} as Record<GuitarRarity, number>;
+  const ownedByRarity = {} as Record<GuitarRarity, number>;
+  for (const rarity of RARITY_ORDER) {
+    itemsByRarity[rarity] = [];
+    totalByRarity[rarity] = 0;
+    ownedByRarity[rarity] = 0;
+  }
+  for (const guitar of GUITAR_DEFINITIONS) {
+    totalByRarity[guitar.rarity]++;
+    if (uniqueOwnedIds.has(guitar.id)) ownedByRarity[guitar.rarity]++;
+  }
+  for (const item of data.inventory) {
+    const rarity = GUITARS_BY_ID.get(item.guitarId)?.rarity ?? "Common";
+    itemsByRarity[rarity].push(item);
+  }
+  for (const rarity of RARITY_ORDER) {
+    itemsByRarity[rarity].sort((a, b) => b.acquiredAt - a.acquiredAt);
+  }
 
   const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {
     setSelectedItemId(inventoryItemId);
@@ -73,33 +94,39 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   return (
     <>
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
-          <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
-          <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
-        </div>
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-          <div
-            className="h-full rounded-full bg-cyan-400 transition-all"
-            style={{ width: `${completionPct}%` }}
-          />
-        </div>
-        <span className="text-xs font-bold text-cyan-400">{completionPct}%</span>
+      <div className="mb-6 flex items-baseline gap-1.5">
+        <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
+        <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
+        <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {sorted.map((item) => (
-          <GuitarCard
-            key={item.id}
-            item={item}
-            isEquipped={data.equippedItemId === item.id}
-            onEquip={(guitarId, year, country) => equip({ guitarId, itemId: item.id, year, country })}
-            isEquipping={isEquipping}
-            onSellClick={handleSellClick}
-            isSelling={isSelling}
-          />
-        ))}
+      <div className="flex flex-col gap-12">
+        {RARITY_ORDER.map((rarity) => {
+          const items = itemsByRarity[rarity];
+          if (items.length === 0) return null;
+          return (
+            <section key={rarity}>
+              <RaritySectionHeader
+                rarity={rarity}
+                owned={ownedByRarity[rarity]}
+                total={totalByRarity[rarity]}
+              />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {items.map((item) => (
+                  <GuitarCard
+                    key={item.id}
+                    item={item}
+                    isEquipped={data.equippedItemId === item.id}
+                    onEquip={(guitarId, year, country) => equip({ guitarId, itemId: item.id, year, country })}
+                    isEquipping={isEquipping}
+                    onSellClick={handleSellClick}
+                    isSelling={isSelling}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {(() => {

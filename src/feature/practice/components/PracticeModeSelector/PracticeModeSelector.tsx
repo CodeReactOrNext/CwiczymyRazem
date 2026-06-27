@@ -1,4 +1,5 @@
 import { Ripple } from "components/Ripple/Ripple";
+import { HeroPattern } from "components/UI/HeroBanner";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import {
@@ -218,8 +219,12 @@ export const PracticeModeSelector = () => {
 
   return (
     <>
-      <div className="mb-8 w-full">
-        <div className="font-openSans container mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="relative mb-8 w-full">
+        <HeroPattern
+          className="opacity-[0.04]"
+          maskImage="linear-gradient(to bottom, black 0%, black 20%, transparent 80%)"
+        />
+        <div className="font-openSans container relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6">
           <div className="flex flex-col gap-12">
             <div>
               <h2 className="text-lg font-bold text-white mb-4">Practice</h2>
