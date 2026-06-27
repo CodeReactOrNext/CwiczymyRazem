@@ -407,6 +407,9 @@ const ReportView = () => {
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
           activityData={activityDataToUse}
+          sessionTitle={submittedValues?.reportTitle}
+          songTitle={submittedValues?.songTitle}
+          songArtist={submittedValues?.songArtist}
         />
       ) : (
         <Formik
