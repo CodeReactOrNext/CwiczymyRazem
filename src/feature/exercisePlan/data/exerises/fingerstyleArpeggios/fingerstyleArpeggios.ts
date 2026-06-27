@@ -33,6 +33,7 @@ const fingerstyleTablature: TablatureMeasure[] = PATTERN.map((measure) => ({
 
 export const fingerstyleArpeggiosExercise: Exercise = {
   id: "fingerstyle_descending_arpeggios",
+  addedAt: "2026-06-25",
   title: "Fingerstyle: Descending Arpeggios",
   description: "A relaxed fingerpicking pattern with a descending bass line under ringing open strings — a perfect first step into fingerstyle.",
   difficulty: "beginner",

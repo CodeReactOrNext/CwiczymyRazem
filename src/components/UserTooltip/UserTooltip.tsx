@@ -145,11 +145,8 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   </div>
                 )}
                 <div>
-                  <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
+                  <h3 className='text-base font-bold text-gray-900'>
                     {userData.displayName}
-                    <Link href={`/user/${userId}`} className="cursor-pointer hover:text-cyan-500 transition-colors">
-                      <FaExternalLinkAlt className='text-xs text-gray-400 hover:text-cyan-500' />
-                    </Link>
                   </h3>
                 </div>
               </div>
@@ -192,6 +189,14 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   value={userData.statistics.habitCount}
                 />
               </div>
+
+              <Link
+                href={`/user/${userId}`}
+                className='relative z-10 flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-700'
+              >
+                {t("tooltip.viewProfile")}
+                <FaExternalLinkAlt className='text-[10px]' />
+              </Link>
 
               {/* Guitar Absolute */}
               {(() => {

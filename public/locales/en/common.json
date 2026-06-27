@@ -108,7 +108,8 @@
     "habits": "Habits",
     "userNotFound": "User not found",
     "actual_streak": "Streak",
-    "fame_description": "Fame points are awarded for likes received and community activity."
+    "fame_description": "Fame points are awarded for likes received and community activity.",
+    "viewProfile": "View profile"
   },
   "song_status": {
     "move_to": "Move to",

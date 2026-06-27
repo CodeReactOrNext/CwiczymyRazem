@@ -16,6 +16,7 @@ let current = pickChord();
 
 export const buildTheChordExercise: Exercise = {
   id: "build_the_chord",
+  addedAt: "2026-06-25",
   isHiddenFromLanding: true,
   title: "Build the Chord",
   description: "Spell a chord by ear: play each of its tones and watch them light up one by one.",

@@ -36,6 +36,7 @@ let current = rollTarget();
 
 export const fretboardRegionHuntExercise: Exercise = {
   id: "fretboard_region_hunt",
+  addedAt: "2026-06-25",
   isHiddenFromLanding: true,
   title: "Fretboard Region Hunt",
   description: "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",

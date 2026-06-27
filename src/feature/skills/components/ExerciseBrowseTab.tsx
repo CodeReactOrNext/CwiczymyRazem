@@ -3,12 +3,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
+import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock } from "lucide-react";
+import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock, Sparkles } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 
@@ -123,7 +124,14 @@ export const ExerciseBrowseTab = ({
           return ((DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99)) * dir;
         if (sortKey === "time")
           return ((a.timeInMinutes ?? 0) - (b.timeInMinutes ?? 0)) * dir;
-        // default: attempted first, then alphabetical
+        // default: newest exercises first, then attempted, then alphabetical
+        const aNew = isExerciseNew(a);
+        const bNew = isExerciseNew(b);
+        if (aNew !== bNew) return aNew ? -1 : 1;
+        if (aNew && bNew) {
+          const diff = new Date(b.addedAt!).getTime() - new Date(a.addedAt!).getTime();
+          if (diff !== 0) return diff;
+        }
         const aAttempted = !!progressMap.get(a.id);
         const bAttempted = !!progressMap.get(b.id);
         if (aAttempted !== bAttempted) return aAttempted ? -1 : 1;
@@ -352,6 +360,7 @@ export const ExerciseBrowseTab = ({
                 const title = typeof exercise.title === "string"
                   ? exercise.title
                   : (exercise.title as any)?.en ?? exercise.id;
+                const isNew = isExerciseNew(exercise);
                 const skillId = exercise.relatedSkills[0];
                 const skillData = skillId ? guitarSkills.find(s => s.id === skillId) : null;
                 const SkillIcon = skillData?.icon;
@@ -392,6 +401,12 @@ export const ExerciseBrowseTab = ({
                             <span className={cn("font-semibold leading-snug", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
                               {title}
                             </span>
+                            {isNew && (
+                              <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-cyan-400/20 to-sky-500/20 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-cyan-300 ring-1 ring-inset ring-cyan-400/40 shadow-[0_0_10px_-2px_rgba(34,211,238,0.5)]">
+                                <Sparkles className="h-2.5 w-2.5" strokeWidth={2.5} />
+                                New
+                              </span>
+                            )}
                             {isLocked && (
                               <span className="flex-shrink-0 flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/25">
                                 <Lock className="h-2.5 w-2.5 text-amber-500" />
