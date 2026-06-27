@@ -104,7 +104,18 @@ export const useAudioAnalyzer = () => {
       streamRef.current = stream;
 
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioContextClass();
+      // Pin the analysis sample rate to 48 kHz. External interfaces (e.g. Arturia
+      // Minifuse) may run the device at 96/176.4/192 kHz; at those rates aubio's
+      // fixed 2048-sample yinfft window covers <2 periods of low guitar notes, so
+      // pitch detection silently returns 0 even though volume/onset still work.
+      // Browsers resample the device input to the requested rate. Fall back to the
+      // device default if the constructor rejects the option (rare/old engines).
+      let audioContext: AudioContext;
+      try {
+        audioContext = new AudioContextClass({ sampleRate: 48000 });
+      } catch {
+        audioContext = new AudioContextClass();
+      }
       audioContextRef.current = audioContext;
 
       // After `await getUserMedia` the browser often considers the user gesture
