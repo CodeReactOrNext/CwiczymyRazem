@@ -14,21 +14,21 @@ const CASE_ACCENT: Record<
     gradient: "linear-gradient(160deg, #1a1a1f 0%, #101013 45%, #0b0b0d 100%)",
     button: "bg-zinc-200 hover:bg-white text-zinc-900",
     header: "text-zinc-100",
-    image: "/images/case-2.png",
+    image: "/images/case-2.webp",
   },
   premium: {
     color: "#818cf8",
     gradient: "linear-gradient(160deg, #161425 0%, #0e0d1a 45%, #08070d 100%)",
     button: "bg-indigo-600 hover:bg-indigo-500 text-white",
     header: "text-indigo-100",
-    image: "/images/case-3.png",
+    image: "/images/case-3.webp",
   },
   elite: {
     color: "#fbbf24",
     gradient: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)",
     button: "",
     header: "text-amber-100",
-    image: "/images/case-1.png",
+    image: "/images/case-1.webp",
   },
 };
 
