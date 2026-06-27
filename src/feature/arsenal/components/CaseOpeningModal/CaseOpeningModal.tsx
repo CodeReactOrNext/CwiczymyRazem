@@ -140,7 +140,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
     <AnimatePresence>
       {isOpen && strip.length > 0 && (
         <motion.div
-          className="fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-6"
+          className="fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-4 sm:py-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -160,7 +160,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             />
           )}
 
-          <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-4xl px-4 my-auto">
+          <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-6 w-full max-w-4xl px-4 my-auto">
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -249,7 +249,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     />
                     <div
                       className={cn(
-                        "relative flex h-72 w-72 sm:h-[28rem] sm:w-[28rem] items-center justify-center overflow-hidden rounded-lg bg-zinc-950/90 border-b-8",
+                        "relative flex h-64 w-64 sm:h-96 sm:w-96 items-center justify-center overflow-hidden rounded-lg bg-zinc-950/90 border-b-8",
                         RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{
@@ -273,7 +273,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                         <img
                           src={`/static/images/rank/${winDef.def.imageId}.webp`}
                           alt={winDef.def.name}
-                          className="relative z-10 h-64 w-64 sm:h-[26rem] sm:w-[26rem] -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                          className="relative z-10 h-56 w-56 sm:h-80 sm:w-80 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
                         />
                       ) : (
                         <img
@@ -291,14 +291,16 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     transition={{ delay: 0.4 }}
                     className="flex flex-col items-center gap-2"
                   >
-                    <RarityBadge rarity={winDef.def.rarity} size="lg" />
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-sm font-bold text-zinc-400 capitalize tracking-[0.3em] leading-none">
-                        {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
-                      </span>
-                      <h3 className="text-2xl sm:text-4xl md:text-5xl font-black capitalize tracking-wider text-white drop-shadow-lg text-center leading-tight">
+                    <span className="text-sm font-bold text-zinc-400 capitalize tracking-[0.3em] leading-none">
+                      {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
+                    </span>
+                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-black capitalize tracking-wider text-white drop-shadow-lg text-center leading-tight">
                         {winDef.def.name}
                       </h3>
+                      <RarityBadge rarity={winDef.def.rarity} size="lg" />
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
                       {winDef.kind === "guitar" && result?.newItem?.year && result?.newItem?.country && (
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-xs font-bold text-zinc-500 capitalize tracking-widest">{result.newItem.year}</span>
