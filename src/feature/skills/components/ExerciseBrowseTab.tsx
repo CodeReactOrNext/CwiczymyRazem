@@ -9,7 +9,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock, Sparkles } from "lucide-react";
+import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 
@@ -402,9 +402,9 @@ export const ExerciseBrowseTab = ({
                               {title}
                             </span>
                             {isNew && (
-                              <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-cyan-400/20 to-sky-500/20 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-cyan-300 ring-1 ring-inset ring-cyan-400/40 shadow-[0_0_10px_-2px_rgba(34,211,238,0.5)]">
-                                <Sparkles className="h-2.5 w-2.5" strokeWidth={2.5} />
-                                New
+                              <span className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-2 py-0.5 ring-1 ring-inset ring-sky-500/20">
+                                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                                <span className="text-[9px] font-semibold uppercase tracking-wider text-sky-300">New</span>
                               </span>
                             )}
                             {isLocked && (
