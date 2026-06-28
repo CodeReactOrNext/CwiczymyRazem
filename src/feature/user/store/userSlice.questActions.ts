@@ -1,12 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, increment, updateDoc } from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuestTaskType } from "types/api.types";
 import { auth, db } from "utils/firebase/client/firebase.utils";
 
 import { claimQuestReward, completeQuestTask, generateDailyQuest } from "./userSlice";
+
+/** Fame Points awarded for completing the full daily quest set. */
+export const DAILY_QUEST_FAME_REWARD = 40;
 
 const saveDailyQuestAction = createAsyncThunk(
   "user/saveDailyQuest",
@@ -90,6 +93,7 @@ export const claimQuestRewardAction = createAsyncThunk(
         await updateDoc(userRef, {
           "statistics.points": state.user.currentUserStats.points,
           "statistics.lvl": state.user.currentUserStats.lvl,
+          "statistics.fame": increment(DAILY_QUEST_FAME_REWARD),
         });
 
         const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");

@@ -254,6 +254,9 @@ const userSlice = createSlice({
 
         const newLvl = levelUpUser(state.currentUserStats.lvl || 1, newPoints);
         state.currentUserStats.lvl = newLvl;
+
+        // Mirror the Fame increment written to Firestore in claimQuestRewardAction.
+        state.currentUserStats.fame = (state.currentUserStats.fame || 0) + 40;
       }
     },
     setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
