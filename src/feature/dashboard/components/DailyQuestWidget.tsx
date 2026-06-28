@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { selectDailyQuest } from "feature/user/store/userSlice";
-import { claimQuestRewardAction, initializeDailyQuestAction } from "feature/user/store/userSlice.questActions";
+import { claimQuestRewardAction, DAILY_QUEST_FAME_REWARD, initializeDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { ArrowRight, CheckCircle2, Gift, Swords } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -86,11 +86,19 @@ export const DailyQuestWidget = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
-                        <div className="flex items-center gap-1.5 mr-1">
-                            <span className="text-xs font-medium text-cyan-400 tracking-tight">
-                                +10
-                            </span>
-                            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
+                        <div className="flex items-center gap-2.5 mr-1">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-medium text-cyan-400 tracking-tight">
+                                    +10
+                                </span>
+                                <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-medium text-amber-400 tracking-tight">
+                                    +{DAILY_QUEST_FAME_REWARD}
+                                </span>
+                                <img src="/images/coin.png" alt="fame" className="h-5 w-5 object-contain" />
+                            </div>
                         </div>
                     )}
                 </div>
@@ -154,8 +162,9 @@ export const DailyQuestWidget = () => {
                     className="w-full h-10 rounded-sm text-xs font-bold tracking-wide transition-all bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20 hover:scale-105"
                 >
                     <span className="flex items-center gap-2">
-                        <Gift size={14} className="animate-bounce" /> 
+                        <Gift size={14} className="animate-bounce" />
                         Claim 10 <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
+                        + {DAILY_QUEST_FAME_REWARD} <img src="/images/coin.png" alt="fame" className="h-5 w-5 object-contain" />
                     </span>
                 </Button>
             )}
