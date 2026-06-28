@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
 import { Check, Trash2 } from "lucide-react";
 
 // SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
@@ -8,20 +9,38 @@ const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 import type { InventoryItem } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 
+export type EquipTarget = "profile" | 0 | 1 | 2;
+
 interface GuitarCardProps {
   item: InventoryItem;
-  isEquipped: boolean;
-  onEquip: (guitarId: number | string, year?: number, country?: string) => void;
-  isEquipping: boolean;
-  onSellClick: (inventoryItemId: string, guitarId: number | string) => void;
-  isSelling: boolean;
+  isEquipped?: boolean;
+  /** Opens the equip-target modal (Profile / Rig slot 1-3). */
+  onEquipClick?: () => void;
+  isEquipping?: boolean;
+  onSellClick?: (inventoryItemId: string, guitarId: number | string) => void;
+  isSelling?: boolean;
+  /** Rig slot index (0-2) this item occupies, or null/undefined if not in the rig. */
+  rigSlot?: number | null;
+  /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
+  readOnly?: boolean;
 }
 
-export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick, isSelling }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, rigSlot, readOnly = false }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
   const rs = RARITY_STYLES[guitar.rarity];
+
+  const condition = getItemCondition(item);
+  const grade = getConditionGrade(condition);
+  const conditionTier = getConditionTier(condition);
+  const level = getItemLevel(item, guitar);
+  const features = getItemFeatures(item);
+
+  // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
+  const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
+  const signature = sortedFeatures[0] && sortedFeatures[0].points >= 3 ? sortedFeatures[0] : null;
+  const affixes = signature ? sortedFeatures.slice(1) : sortedFeatures;
 
   return (
     <div
@@ -31,7 +50,8 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
       )}
       style={{
         borderRadius: 10,
-        background: `linear-gradient(160deg, ${rs.baseColor}35 0%, #111116 55%)`,
+        backgroundColor: "#111116",
+        backgroundImage: `linear-gradient(160deg, ${rs.baseColor}35 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
         boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
         contain: "layout style paint",
@@ -62,24 +82,60 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
         style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}, transparent)` }}
       />
 
-      {/* Brand + Name + Rarity */}
-      <div className="px-3 pt-3 pb-1.5 flex-shrink-0">
-        <p
-          className="text-[10px] font-semibold tracking-wider uppercase leading-none"
-          style={{ color: rs.baseColor }}
-        >
-          {guitar.brand}
-        </p>
-        <p className="text-[16px] font-extrabold text-white leading-tight truncate mt-1">
-          {guitar.name}
-        </p>
-        <p
-          className="text-[9px] font-medium tracking-[0.15em] mt-0.5 capitalize"
-          style={{ color: rs.baseColor, opacity: 0.7 }}
-        >
-          {guitar.rarity}
-        </p>
+      {/* Brand + Name + Rarity / Serial */}
+      <div className="px-3 pt-3 pb-1.5 flex-shrink-0 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p
+            className="text-[10px] font-semibold tracking-wider uppercase leading-none"
+            style={{ color: rs.baseColor }}
+          >
+            {guitar.brand}
+          </p>
+          <p className="text-[16px] font-extrabold text-white leading-tight truncate mt-1">
+            {guitar.name}
+          </p>
+          <p
+            className="text-[9px] font-medium tracking-[0.15em] mt-0.5 capitalize"
+            style={{ color: rs.baseColor, opacity: 0.7 }}
+          >
+            {guitar.rarity}
+          </p>
+        </div>
+
+        {item.serial != null && (
+          <span className="text-[9px] font-mono text-zinc-500 tracking-tight flex-shrink-0">
+            #{String(item.serial).padStart(4, "0")}
+          </span>
+        )}
       </div>
+
+      {/* Condition — labelled segmented bar */}
+      <div className="px-3 pb-2.5 flex-shrink-0" title={`Condition: ${grade.label}`}>
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[8px] font-medium uppercase tracking-widest text-zinc-500">
+            Condition
+          </span>
+          <span
+            className="text-[10px] font-bold uppercase tracking-wider"
+            style={{ color: grade.color, textShadow: `0 0 8px ${grade.color}55` }}
+          >
+            {grade.label}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: CONDITION_TIERS }).map((_, i) => (
+            <span
+              key={i}
+              className="h-1.5 flex-1 rounded-full transition-colors"
+              style={{
+                background: i < conditionTier ? grade.color : "#27272a",
+                boxShadow: i < conditionTier ? `0 0 6px ${grade.color}70` : undefined,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
 
       {/* Guitar image */}
       <div
@@ -100,14 +156,32 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           />
         </div>
 
-        {item.isNew && (
+        {/* Level emblem (every guitar has a level) + New flag */}
+        <div className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1.5">
+          {level > 0 && (
           <div
-            className="absolute top-2 left-2 z-20 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
-            style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}
+            className="flex flex-col items-center justify-center rounded-full"
+            style={{
+              width: 38,
+              height: 38,
+              background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
+              border: `1.5px solid ${rs.baseColor}`,
+              boxShadow: `0 0 10px ${rs.baseColor}55, inset 0 0 6px rgba(0,0,0,0.6)`,
+            }}
+            title="Guitar level"
           >
-            New
+            <span className="text-[15px] font-black leading-none text-white">{level}</span>
           </div>
-        )}
+          )}
+          {item.isNew && (
+            <div
+              className="px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
+              style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}
+            >
+              New
+            </div>
+          )}
+        </div>
 
         {/* Tags on the right */}
         {(item.year || item.country) && (
@@ -172,49 +246,78 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           }}
         />
 
-        {isEquipped && (
-          <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1.5">
-            <div
-              className="w-1.5 h-1.5 rounded-full bg-amber-400"
-              style={{ boxShadow: "0 0 8px rgba(251,191,36,1)" }}
-            />
-            <span className="text-[8px] text-amber-400/70 font-medium tracking-wide">equipped</span>
+        {(isEquipped || rigSlot != null) && (
+          <div className="absolute bottom-2 left-3 z-20 flex items-center gap-3">
+            {isEquipped && (
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                  style={{ boxShadow: "0 0 8px rgba(251,191,36,1)" }}
+                />
+                <span className="text-[8px] text-amber-400/70 font-medium tracking-wide">equipped</span>
+              </div>
+            )}
+            {rigSlot != null && (
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-1.5 h-1.5 rounded-full bg-cyan-400"
+                  style={{ boxShadow: "0 0 8px rgba(34,211,238,0.9)" }}
+                />
+                <span className="text-[8px] text-cyan-400/70 font-medium tracking-wide">rig slot {rigSlot + 1}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
 
+      {/* RPG-style affixes under the guitar */}
+      {features.length > 0 && (
+        <div
+          className="relative z-10 flex flex-col gap-1 px-3 py-3 border-t flex-shrink-0"
+          style={{ borderColor: `${rs.baseColor}1a`, background: "rgba(0,0,0,0.28)" }}
+        >
+          {affixes.map((f) => (
+            <div key={f.id} className="flex items-baseline gap-2 leading-snug">
+              <span className="text-[11px] text-zinc-600 flex-shrink-0">◆</span>
+              <span className="text-[12px] text-zinc-300">
+                <span className="font-bold" style={{ color: "#7dd3fc" }}>+{f.points}</span>{" "}
+                {f.label}
+              </span>
+            </div>
+          ))}
+          {signature && (
+            <div className="flex items-baseline gap-2 leading-snug">
+              <span className="text-[11px] flex-shrink-0" style={{ color: "#f59e0b" }}>★</span>
+              <span className="text-[12px] font-medium" style={{ color: "#f5a524" }}>
+                <span className="font-bold" style={{ color: "#fbbf24" }}>+{signature.points}</span>{" "}
+                {signature.label}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Equip / Sell */}
+      {!readOnly && (
       <div
         className="flex border-t flex-shrink-0"
         style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
       >
         <button
-          onClick={() => onEquip(guitar.id, item.year, item.country)}
-          disabled={isEquipped || isEquipping}
+          onClick={() => onEquipClick?.()}
+          disabled={isEquipping}
           className={cn(
             "flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
-            isEquipped
-              ? "cursor-default text-amber-400"
-              : "text-zinc-500 hover:text-white disabled:opacity-30"
+            isEquipped ? "text-amber-400" : "text-zinc-500 hover:text-white disabled:opacity-30"
           )}
-          style={{
-            borderColor: `${rs.baseColor}15`,
-            background: isEquipped ? "rgba(251,191,36,0.06)" : undefined,
-          }}
+          style={{ borderColor: `${rs.baseColor}15`, background: isEquipped ? "rgba(251,191,36,0.06)" : undefined }}
         >
-          {isEquipped ? (
-            <>
-              <Check size={9} strokeWidth={3} />
-              Equipped
-            </>
-          ) : (
-            "Equip"
-          )}
+          {isEquipped && <Check size={9} strokeWidth={3} />}
+          Equip
         </button>
 
         <button
-          onClick={() => onSellClick(item.id, guitar.id)}
+          onClick={() => onSellClick?.(item.id, guitar.id)}
           disabled={isSelling || isEquipped}
           className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
           title={isEquipped ? "Cannot sell equipped guitar" : undefined}
@@ -223,6 +326,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping, onSellClick
           Sell
         </button>
       </div>
+      )}
     </div>
   );
 };

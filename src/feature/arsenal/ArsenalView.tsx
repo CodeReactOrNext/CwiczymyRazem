@@ -13,6 +13,7 @@ import { EffectCollection } from "./components/GuitarInventory/EffectCollection"
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
 import { RigView } from "./components/Rig/RigView";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
+import { getRigLevel } from "./data/rigLevel";
 import { useArsenalData } from "./hooks/useArsenalData";
 import { useOpenCase } from "./hooks/useOpenCase";
 import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
@@ -21,6 +22,7 @@ export const ArsenalView = () => {
   const { data, isLoading } = useArsenalData();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
+  const rigLevel = getRigLevel(data);
 
   const [openResult, setOpenResult] = useState<OpenCaseResult | null>(null);
   const [openedCaseType, setOpenedCaseType] = useState<CaseType | null>(null);
@@ -44,10 +46,17 @@ export const ArsenalView = () => {
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         backgroundContent={<HeroPattern />}
         rightContent={
-          <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
-            <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
-            <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
-            <span className="text-xs text-zinc-400">Fame Points</span>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
+              <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
+              <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
+              <span className="text-xs text-zinc-400">Fame Points</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-4 py-2">
+              <Swords size={16} className="text-cyan-400" />
+              <span className="text-lg font-black text-cyan-300 tabular-nums">{rigLevel}</span>
+              <span className="text-xs text-zinc-400">Rig Level</span>
+            </div>
           </div>
         }
       />

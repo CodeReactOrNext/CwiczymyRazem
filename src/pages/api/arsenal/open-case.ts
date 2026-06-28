@@ -1,6 +1,8 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
+import { rollEffectCountry, rollEffectFeatures, rollEffectYear } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { rollCondition, rollItemFeatures, rollVintageYear } from "feature/arsenal/data/itemStats";
 import type {
   CaseType,
   EffectInventoryItem,
@@ -13,6 +15,9 @@ import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 // 60% guitar, 40% effect
 const GUITAR_CHANCE = 0.6;
+
+// Flip to false to silence the public activity feed (e.g. while testing).
+const LOG_CASE_OPENS = true;
 
 function drawRarity(probabilities: Record<GuitarRarity, number>): GuitarRarity {
   const roll = Math.random();
@@ -70,8 +75,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const rarity = drawRarity(caseDef.probabilities);
         const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
         const guitar = pool[Math.floor(Math.random() * pool.length)];
-        const year = Math.floor(Math.random() * (guitar.yearTo - guitar.yearFrom + 1)) + guitar.yearFrom;
+        const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
+        const condition = rollCondition();
+        const rolled = rollItemFeatures(guitar.rarity);
+
+        // Mint a global, sequential serial number for this guitar model.
+        // Read happens before any write, so it's transaction-safe.
+        const serialRef = firestore
+          .collection("arsenalSerials")
+          .doc(`guitar-${guitar.id}`) as DocumentReference;
+        const serialDoc = await t.get(serialRef);
+        const serial = (serialDoc.data()?.count || 0) + 1;
 
         const newItem: InventoryItem = {
           id: generateId(),
@@ -80,6 +95,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           isNew: true,
           year,
           country,
+          condition,
+          serial,
+          ...(rolled ? { stats: rolled.stats, features: rolled.features } : {}),
         };
 
         const newInventory = [...(data.arsenal?.inventory || []), newItem];
@@ -89,6 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "arsenal.inventory": newInventory,
           "arsenal.equippedGuitarId": existingEquipped,
         });
+        t.set(serialRef, { count: serial }, { merge: true });
 
         return { type: "guitar", guitar, newItem, newInventory, newFame };
       } else {
@@ -96,12 +115,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const rarity = drawRarity(caseDef.probabilities);
         const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
         const effect = pool[Math.floor(Math.random() * pool.length)];
+        const effectCondition = rollCondition();
+        const effectYear = rollEffectYear(effect);
+        const effectCountry = rollEffectCountry(effect);
+        const effectRolled = rollEffectFeatures(effect.rarity, effect.type);
+
+        const effectSerialRef = firestore
+          .collection("arsenalSerials")
+          .doc(`effect-${effect.id}`) as DocumentReference;
+        const effectSerialDoc = await t.get(effectSerialRef);
+        const effectSerial = (effectSerialDoc.data()?.count || 0) + 1;
 
         const effectItem: EffectInventoryItem = {
           id: generateId(),
           effectId: effect.id,
           acquiredAt: Date.now(),
           isNew: true,
+          year: effectYear,
+          country: effectCountry,
+          condition: effectCondition,
+          serial: effectSerial,
+          ...(effectRolled ? { stats: effectRolled.stats, features: effectRolled.features } : {}),
         };
 
         const newEffectInventory = [...(data.arsenal?.effectInventory || []), effectItem];
@@ -110,13 +144,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "statistics.fame": newFame,
           "arsenal.effectInventory": newEffectInventory,
         });
+        t.set(effectSerialRef, { count: effectSerial }, { merge: true });
 
         return { type: "effect", effect, effectItem, newFame };
       }
     });
 
     // Write activity log (panel only, no Discord)
-    try {
+    if (LOG_CASE_OPENS) try {
       const item = result.type === "guitar" ? result.guitar : result.effect;
       await firestore.collection("logs").add({
         type: "case_open",
@@ -133,6 +168,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         itemBrand: item.brand,
         itemRarity: item.rarity,
         itemImageId: item.imageId,
+        // Full rolled instance (condition/year/country/serial/stats/features) for the feed card + level.
+        rolledItem: result.type === "guitar" ? result.newItem : result.effectItem,
       });
     } catch (logError) {
       console.error("[open-case] log write failed:", logError);

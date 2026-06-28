@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
-import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
+import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { useEffect, useState } from "react";
 
 import type { ArsenalUserData, EffectInventoryItem, GuitarRarity } from "../../types/arsenal.types";
 import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
-
-type GroupedEffect = { item: EffectInventoryItem; sellItemId: string | null; count: number };
 
 const EFFECT_FAME_VALUES: Record<string, number> = {
   Common: 8, Uncommon: 15, Rare: 40, Epic: 75, Legendary: 150, Mythic: 375,
@@ -41,34 +39,14 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   const pedalboardItemIds = new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []);
 
-  // Group by effectId; display = newest copy, sell target = oldest non-pedalboard copy
-  const groupedMap = new Map<number | string, { item: typeof data.effectInventory[0]; sellItemId: string | null; count: number }>();
-  for (const item of data.effectInventory) {
-    const existing = groupedMap.get(item.effectId);
-    const onBoard = pedalboardItemIds.has(item.id);
-
-    if (!existing) {
-      groupedMap.set(item.effectId, { item, sellItemId: onBoard ? null : item.id, count: 1 });
-    } else {
-      const displayItem = item.acquiredAt > existing.item.acquiredAt ? item : existing.item;
-      let sellItemId = existing.sellItemId;
-      if (!onBoard) {
-        if (sellItemId === null) {
-          sellItemId = item.id;
-        } else {
-          const prevSellItem = data.effectInventory.find(i => i.id === sellItemId)!;
-          if (item.acquiredAt < prevSellItem.acquiredAt) sellItemId = item.id;
-        }
-      }
-      groupedMap.set(item.effectId, { item: displayItem, sellItemId, count: existing.count + 1 });
-    }
-  }
-  const uniqueOwnedCount = groupedMap.size;
+  // Each owned copy is its own card (distinct rolls). "Collected" still counts unique models.
+  const ownedEffectIds = new Set(data.effectInventory.map((i) => i.effectId));
+  const uniqueOwnedCount = ownedEffectIds.size;
   const totalEffectsCount = EFFECT_DEFINITIONS.length;
 
-  // Group owned effects per rarity (newest first within a group),
-  // and count how many of each rarity exist / are owned.
-  const itemsByRarity = {} as Record<GuitarRarity, GroupedEffect[]>;
+  // Bucket every owned copy per rarity (newest first),
+  // and count how many models of each rarity exist / are owned.
+  const itemsByRarity = {} as Record<GuitarRarity, EffectInventoryItem[]>;
   const totalByRarity = {} as Record<GuitarRarity, number>;
   const ownedByRarity = {} as Record<GuitarRarity, number>;
   for (const rarity of RARITY_ORDER) {
@@ -78,14 +56,14 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   }
   for (const effect of EFFECT_DEFINITIONS) {
     totalByRarity[effect.rarity]++;
-    if (groupedMap.has(effect.id)) ownedByRarity[effect.rarity]++;
+    if (ownedEffectIds.has(effect.id)) ownedByRarity[effect.rarity]++;
   }
-  for (const grouped of groupedMap.values()) {
-    const rarity = EFFECTS_BY_ID.get(grouped.item.effectId)?.rarity ?? "Common";
-    itemsByRarity[rarity].push(grouped);
+  for (const item of data.effectInventory) {
+    const rarity = EFFECTS_BY_ID.get(item.effectId)?.rarity ?? "Common";
+    itemsByRarity[rarity].push(item);
   }
   for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity].sort((a, b) => b.item.acquiredAt - a.item.acquiredAt);
+    itemsByRarity[rarity].sort((a, b) => b.acquiredAt - a.acquiredAt);
   }
 
   const handleSellClick = (inventoryItemId: string, effectId: number | string) => {
@@ -120,8 +98,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
         </div>
         <div className="flex flex-col gap-12">
           {RARITY_ORDER.map((rarity) => {
-            const grouped = itemsByRarity[rarity];
-            if (grouped.length === 0) return null;
+            const items = itemsByRarity[rarity];
+            if (items.length === 0) return null;
             return (
               <section key={rarity}>
                 <RaritySectionHeader
@@ -130,12 +108,10 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
                   total={totalByRarity[rarity]}
                 />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {grouped.map(({ item, sellItemId, count }) => (
+                  {items.map((item) => (
                     <EffectCard
                       key={item.id}
                       item={item}
-                      sellItemId={sellItemId}
-                      count={count}
                       isOnPedalboard={pedalboardItemIds.has(item.id)}
                       onSellClick={handleSellClick}
                       isSelling={isSelling}

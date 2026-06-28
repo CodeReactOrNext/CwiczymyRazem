@@ -3,6 +3,7 @@ import { Plus, X } from "lucide-react";
 import { useCallback, useEffect,useRef, useState } from "react";
 
 import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
+import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
 
@@ -42,9 +43,10 @@ interface DragState {
 interface PedalboardViewProps {
   data: ArsenalUserData;
   onUpdateItems: (items: PedalboardPlacement[]) => void;
+  onHover?: (e: React.MouseEvent | null, content: React.ReactNode | null) => void;
 }
 
-export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => {
+export const PedalboardView = ({ data, onUpdateItems, onHover }: PedalboardViewProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDragging] = useState<DragState | null>(null);
@@ -175,6 +177,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
 
   const handlePedalMouseDown = (e: React.MouseEvent, item: PedalboardPlacement) => {
     e.preventDefault();
+    onHover?.(null, null);
     if (!boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
     const curXPct = ((e.clientX - rect.left) / rect.width) * 100;
@@ -274,6 +277,8 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
               <div
                 key={placement.itemId}
                 onMouseDown={(e) => handlePedalMouseDown(e, placement)}
+                onMouseMove={(e) => { if (!dragging && invItem) onHover?.(e, <EffectCard item={invItem} readOnly />); }}
+                onMouseLeave={() => onHover?.(null, null)}
                 className="absolute group"
                 style={{
                   left: `${placement.xPct}%`,

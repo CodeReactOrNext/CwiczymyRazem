@@ -1,6 +1,9 @@
+import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
+import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type {
   ArsenalUserData,
   InventoryItem,
@@ -34,20 +37,9 @@ interface TooltipData {
 const RpgTooltip = ({ tooltip }: { tooltip: TooltipData }) => (
   <div
     className="pointer-events-none fixed z-[9999]"
-    style={{ left: tooltip.x + 14, top: tooltip.y - 8 }}
+    style={{ left: tooltip.x + 14, top: tooltip.y - 8, width: 250 }}
   >
-    <div
-      style={{
-        background: "linear-gradient(160deg, #1a1a2e 0%, #0f0f1a 100%)",
-        borderRadius: 8,
-        padding: "10px 14px",
-        minWidth: 160,
-        maxWidth: 220,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04)",
-      }}
-    >
-      {tooltip.content}
-    </div>
+    {tooltip.content}
   </div>
 );
 
@@ -66,36 +58,7 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
     onHover(e, {
       x: e.clientX,
       y: e.clientY,
-      content: (
-        <div style={{ minWidth: 240 }}>
-          {/* Rarity bar */}
-          <div className="h-1 w-full mb-3 rounded-full" style={{ background: `linear-gradient(90deg, ${rs.baseColor}, transparent)` }} />
-          {/* Name block */}
-          <div className="mb-3">
-            <div className="text-[11px] font-semibold tracking-widest mb-1" style={{ color: rs.baseColor }}>
-              {guitar.rarity} · {guitar.brand}
-            </div>
-            <div className="text-2xl font-bold text-white leading-tight">
-              {guitar.name}
-            </div>
-          </div>
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 pt-4">
-            {item.year && (
-              <div>
-                <div className="text-[10px] tracking-widest text-zinc-500">Year</div>
-                <div className="text-base font-semibold text-zinc-100">{item.year}</div>
-              </div>
-            )}
-            {item.country && (
-              <div>
-                <div className="text-[10px] tracking-widest text-zinc-500">Origin</div>
-                <div className="text-base font-semibold text-zinc-100">{item.country}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      ),
+      content: <GuitarCard item={item} readOnly />,
     });
   };
 
@@ -187,25 +150,7 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
     onHover(e, {
       x: e.clientX,
       y: e.clientY,
-      content: (
-        <div className="space-y-1.5">
-          <div className="text-[9px] font-bold tracking-[0.2em]" style={{ color: rs.baseColor }}>
-            {effect.rarity}
-          </div>
-          <div>
-            <div className="text-[10px] font-bold tracking-[0.15em]" style={{ color: rs.baseColor }}>
-              {effect.brand}
-            </div>
-            <div className="text-sm font-bold text-white tracking-wide leading-tight">
-              {effect.name}
-            </div>
-          </div>
-          <div className="pt-2">
-            <div className="text-[8px] tracking-widest text-zinc-500">Type</div>
-            <div className="text-[10px] font-bold text-zinc-300">{effect.type}</div>
-          </div>
-        </div>
-      ),
+      content: <EffectCard item={invItem!} readOnly />,
     });
   };
 
@@ -281,7 +226,15 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
 
   return (
     <div className="rounded-lg bg-zinc-900/30 p-4 sm:p-6" onMouseMove={handleMouseMove}>
-      <h2 className="mb-6 text-2xl font-bold text-white">Rig</h2>
+      <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
+        Rig
+        <span
+          className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-sm font-black tabular-nums text-cyan-300"
+          title="Total rig level (equipped guitars + pedalboard)"
+        >
+          Lv {getRigLevel(arsenal)}
+        </span>
+      </h2>
 
       {/* Guitar Slots */}
       {hasGuitars && (

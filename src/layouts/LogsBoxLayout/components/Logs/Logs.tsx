@@ -8,8 +8,12 @@ import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
-import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
+import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
+import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { getEffectLevel } from "feature/arsenal/data/effectStats";
+import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
 // challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -27,10 +31,10 @@ import type {
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { SupportPulse } from "feature/roadmap/components/SupportPulse";
-import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { Video, ExternalLink, Star } from "lucide-react";
+import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import { ExternalLink, Star,Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
@@ -193,6 +197,19 @@ const FirebaseLogsCaseOpenItem = ({
     ? `/static/images/rank/${itemImageId}.webp`
     : `/static/images/effects/${itemImageId}.png`;
 
+  // Full rolled instance (newer logs) → proper card tooltip + computed level.
+  const rolled = log.rolledItem;
+  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+  let level: number | null = null;
+  if (rolledGuitar) {
+    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+    if (def) level = getItemLevel(rolledGuitar, def);
+  } else if (rolledEffect) {
+    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+    if (def) level = getEffectLevel(rolledEffect, def);
+  }
+
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
@@ -218,6 +235,15 @@ const FirebaseLogsCaseOpenItem = ({
                     >
                       {itemRarity}
                     </span>
+                    {level !== null && (
+                      <span
+                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
+                        style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+                        title="Item level"
+                      >
+                        Lv {level}
+                      </span>
+                    )}
                     <span className="font-bold text-sm" style={{ color }}>
                       {itemBrand} {itemName}
                     </span>
@@ -232,13 +258,23 @@ const FirebaseLogsCaseOpenItem = ({
                   className="p-0 border-0 bg-transparent shadow-2xl"
                   side="top"
                 >
-                  <ItemTooltipCard
-                    itemType={itemType}
-                    itemName={itemName}
-                    itemBrand={itemBrand}
-                    itemRarity={itemRarity}
-                    itemImageId={itemImageId}
-                  />
+                  {rolledGuitar ? (
+                    <div style={{ width: 250 }}>
+                      <GuitarCard item={rolledGuitar} readOnly />
+                    </div>
+                  ) : rolledEffect ? (
+                    <div style={{ width: 250 }}>
+                      <EffectCard item={rolledEffect} readOnly />
+                    </div>
+                  ) : (
+                    <ItemTooltipCard
+                      itemType={itemType}
+                      itemName={itemName}
+                      itemBrand={itemBrand}
+                      itemRarity={itemRarity}
+                      itemImageId={itemImageId}
+                    />
+                  )}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

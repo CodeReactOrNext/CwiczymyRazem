@@ -1,4 +1,5 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
@@ -76,7 +77,18 @@ export const GuitarPickerModal = ({
                   outline: isSelected ? `2px solid ${rs.baseColor}` : undefined,
                 }}
               >
-                <div className="flex items-center justify-center w-full" style={{ height: 90 }}>
+                <div className="relative flex items-center justify-center w-full" style={{ height: 90 }}>
+                  <span
+                    className="absolute top-1 left-1 z-10 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black text-white"
+                    style={{
+                      background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
+                      border: `1.5px solid ${rs.baseColor}`,
+                      boxShadow: `0 0 8px ${rs.baseColor}55`,
+                    }}
+                    title="Item level"
+                  >
+                    {getItemLevel(item, guitar)}
+                  </span>
                   <img
                     src={`/static/images/rank/${guitar.imageId}.webp`}
                     alt={guitar.name}
