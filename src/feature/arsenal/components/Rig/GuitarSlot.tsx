@@ -1,8 +1,10 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { Guitar, Plus, X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
+import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarSlotProps {
@@ -11,9 +13,10 @@ interface GuitarSlotProps {
   inventory: InventoryItem[];
   onOpenPicker: (slotIndex: number) => void;
   onRemove: (slotIndex: number) => void;
+  onHover?: (e: React.MouseEvent | null, content: React.ReactNode | null) => void;
 }
 
-export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemove }: GuitarSlotProps) => {
+export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemove, onHover }: GuitarSlotProps) => {
   const item = itemId ? inventory.find((i) => i.id === itemId) : null;
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const rs = guitar ? RARITY_STYLES[guitar.rarity] : null;
@@ -50,6 +53,8 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       style={{
         background: `linear-gradient(160deg, ${rs.baseColor}22 0%, #0f0f12 42%, #0f0f12 100%)`,
       }}
+      onMouseMove={(e) => onHover?.(e, <GuitarCard item={item} readOnly />)}
+      onMouseLeave={() => onHover?.(null, null)}
     >
       {/* Remove button */}
       <button
@@ -73,6 +78,9 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
           {guitar.name}
         </p>
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+          <span className="rounded border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tabular-nums text-amber-300" title="Item level">
+            Lv {getItemLevel(item, guitar)}
+          </span>
           <span className="rounded bg-zinc-800/60 px-2 py-0.5 text-[10px] font-semibold capitalize" style={{ color: `${rs.baseColor}dd` }}>
             {guitar.rarity}
           </span>

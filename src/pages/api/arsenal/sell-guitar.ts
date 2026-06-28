@@ -1,15 +1,7 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemValue } from "feature/arsenal/data/itemStats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-
-const RARITY_FAME_VALUES: Record<string, number> = {
-  Common: 15,
-  Uncommon: 30,
-  Rare: 75,
-  Epic: 150,
-  Legendary: 300,
-  Mythic: 750,
-};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -55,8 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: "Guitar definition not found" });
     }
 
-    // Calculate fame reward
-    const fameReward = RARITY_FAME_VALUES[guitarDef.rarity] || 0;
+    // Calculate fame reward from the instance's rolled stats (condition × vintage)
+    const fameReward = getItemValue(item, guitarDef);
 
     // Remove item from inventory
     const newInventory = inventory.filter((_: any, i: number) => i !== itemIndex);

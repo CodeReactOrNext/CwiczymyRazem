@@ -1,4 +1,5 @@
 import type { AchievementList } from "feature/achievements/types";
+import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 
 export type FirebaseLogsSongsStatuses =
@@ -170,6 +171,8 @@ export interface FirebaseLogsCaseOpenInterface {
   itemBrand: string;
   itemRarity: string;
   itemImageId: number | string;
+  /** Full rolled instance — drives the proper card tooltip + level. Optional on legacy logs. */
+  rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
 }

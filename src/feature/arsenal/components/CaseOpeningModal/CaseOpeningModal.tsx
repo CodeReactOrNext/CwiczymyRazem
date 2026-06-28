@@ -12,7 +12,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import type { CaseDefinition, EffectDefinition, GuitarDefinition, GuitarRarity,OpenCaseResult } from "../../types/arsenal.types";
-import { RARITY_GLOW_CLASS,RARITY_STYLES, RarityBadge } from "../RarityBadge";
+import { EffectCard } from "../GuitarInventory/EffectCard";
+import { GuitarCard } from "../GuitarInventory/GuitarCard";
+import { RARITY_STYLES } from "../RarityBadge";
 
 const ITEM_WIDTH = 250;
 const VISIBLE_ITEMS = 60;
@@ -247,69 +249,14 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       animate={{ scale: 1, opacity: [0.3, 0.5, 0.3] }}
                       transition={{ scale: { duration: 0.8 }, opacity: { duration: 2.4, repeat: Infinity } }}
                     />
-                    <div
-                      className={cn(
-                        "relative flex h-64 w-64 sm:h-96 sm:w-96 items-center justify-center overflow-hidden rounded-lg bg-zinc-950/90 border-b-8",
-                        RARITY_GLOW_CLASS[winDef.def.rarity]
-                      )}
-                      style={{
-                        borderBottomColor: rarityStyles.baseColor,
-                        boxShadow: `0 0 30px ${rarityStyles.baseColor}33`,
-                      }}
-                    >
-                      <div
-                        className="absolute inset-0"
-                        style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}55 0%, ${rarityStyles.baseColor}22 35%, #0a0a0b 80%)` }}
-                      />
-                      <div
-                        className="absolute inset-[-70%]"
-                        style={{
-                          background: `repeating-conic-gradient(from 0deg at 50% 50%, ${rarityStyles.baseColor}26 0deg 9deg, transparent 9deg 18deg)`,
-                          maskImage: "radial-gradient(circle at center, black 25%, transparent 95%)",
-                          WebkitMaskImage: "radial-gradient(circle at center, black 25%, transparent 95%)",
-                        }}
-                      />
-                      {winDef.kind === "guitar" ? (
-                        <img
-                          src={`/static/images/rank/${winDef.def.imageId}.webp`}
-                          alt={winDef.def.name}
-                          className="relative z-10 h-56 w-56 sm:h-80 sm:w-80 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
-                        />
-                      ) : (
-                        <img
-                          src={`/static/images/effects/${winDef.def.imageId}.png`}
-                          alt={winDef.def.name}
-                          className="relative z-10 h-40 w-40 sm:h-60 sm:w-60 object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
-                        />
-                      )}
+                    <div className="relative z-10" style={{ width: 280 }}>
+                      {winDef.kind === "guitar" && result?.newItem ? (
+                        <GuitarCard item={result.newItem} readOnly />
+                      ) : winDef.kind === "effect" && result?.effectItem ? (
+                        <EffectCard item={result.effectItem} readOnly />
+                      ) : null}
                     </div>
                   </div>
-
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <span className="text-sm font-bold text-zinc-400 capitalize tracking-[0.3em] leading-none">
-                      {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
-                    </span>
-                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                      <h3 className="text-xl sm:text-2xl md:text-3xl font-black capitalize tracking-wider text-white drop-shadow-lg text-center leading-tight">
-                        {winDef.def.name}
-                      </h3>
-                      <RarityBadge rarity={winDef.def.rarity} size="lg" />
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      {winDef.kind === "guitar" && result?.newItem?.year && result?.newItem?.country && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs font-bold text-zinc-500 capitalize tracking-widest">{result.newItem.year}</span>
-                          <span className="text-zinc-600 text-xs">·</span>
-                          <span className="text-xs font-bold text-zinc-500 capitalize tracking-widest">{result.newItem.country}</span>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

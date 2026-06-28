@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 import { GUITARS_BY_ID } from "../../data/guitarDefinitions";
 import { useUpdatePedalboard } from "../../hooks/useUpdatePedalboard";
@@ -12,10 +13,22 @@ interface RigViewProps {
   data: ArsenalUserData;
 }
 
+export interface RigHoverState {
+  x: number;
+  y: number;
+  content: React.ReactNode;
+}
+
 export const RigView = ({ data }: RigViewProps) => {
   const { mutate: saveRig } = useUpdateRig();
   const { mutate: savePedalboard } = useUpdatePedalboard();
   const [pickerSlot, setPickerSlot] = useState<number | null>(null);
+  const [hover, setHover] = useState<RigHoverState | null>(null);
+
+  const handleHover = (e: React.MouseEvent | null, content: React.ReactNode | null) => {
+    if (!e || !content) return setHover(null);
+    setHover({ x: e.clientX, y: e.clientY, content });
+  };
 
   const rig = data.rig;
 
@@ -34,7 +47,8 @@ export const RigView = ({ data }: RigViewProps) => {
 
   const handleGuitarSelect = (itemId: string | null) => {
     if (pickerSlot === null) return;
-    const newSlots = [...rig.guitarSlots] as RigSetup["guitarSlots"];
+    // A guitar instance can occupy only one slot — clear it from any other slot first.
+    const newSlots = rig.guitarSlots.map((id) => (itemId && id === itemId ? null : id)) as RigSetup["guitarSlots"];
     newSlots[pickerSlot] = itemId;
     const meta = getSelectedGuitarMeta(newSlots);
     saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: meta.imageId, selectedGuitarYear: meta.year, selectedGuitarCountry: meta.country });
@@ -64,6 +78,7 @@ export const RigView = ({ data }: RigViewProps) => {
               inventory={data.inventory}
               onOpenPicker={setPickerSlot}
               onRemove={handleGuitarRemove}
+              onHover={handleHover}
             />
           ))}
         </div>
@@ -75,7 +90,7 @@ export const RigView = ({ data }: RigViewProps) => {
           <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
           <p className="text-base font-black text-white capitalize tracking-wide">Pedalboard</p>
         </div>
-        <PedalboardView data={data} onUpdateItems={savePedalboard} />
+        <PedalboardView data={data} onUpdateItems={savePedalboard} onHover={handleHover} />
       </div>
 
       {pickerSlot !== null && (
@@ -88,6 +103,17 @@ export const RigView = ({ data }: RigViewProps) => {
           onClose={() => setPickerSlot(null)}
         />
       )}
+
+      {hover && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="pointer-events-none fixed z-[9999]"
+            style={{ left: hover.x + 16, top: hover.y - 8, width: 250 }}
+          >
+            {hover.content}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

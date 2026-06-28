@@ -1,16 +1,21 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemValue } from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { PackageOpen } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
 
-import type { ArsenalUserData, GuitarRarity } from "../../types/arsenal.types";
+import type { ArsenalUserData, GuitarRarity, InventoryItem, RigSetup } from "../../types/arsenal.types";
+import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
-import { SellConfirmDialog } from "./SellConfirmDialog";
+import { EquipTargetDialog } from "./EquipTargetDialog";
+import type { EquipTarget } from "./GuitarCard";
 import { GuitarCard } from "./GuitarCard";
+import { SellConfirmDialog } from "./SellConfirmDialog";
 
 const GUITAR_FAME_VALUES: Record<string, number> = {
   Common: 15, Uncommon: 30, Rare: 75, Epic: 150, Legendary: 300, Mythic: 750,
@@ -23,11 +28,27 @@ interface GuitarInventoryProps {
 export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
+  const { mutate: saveRig } = useUpdateRig();
   const queryClient = useQueryClient();
+
+  const rig: RigSetup = data.rig ?? DEFAULT_RIG;
+
+  const handleEquipTo = (item: InventoryItem, target: EquipTarget) => {
+    if (target === "profile") {
+      equip({ guitarId: item.guitarId, itemId: item.id, year: item.year, country: item.country });
+      return;
+    }
+    // Place into a rig slot without touching the avatar/profile guitar.
+    // A guitar instance can occupy only one slot — clear it from any other slot first.
+    const newSlots = rig.guitarSlots.map((id) => (id === item.id ? null : id)) as RigSetup["guitarSlots"];
+    newSlots[target] = item.id;
+    saveRig({ rig: { ...rig, guitarSlots: newSlots } });
+  };
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedGuitarId, setSelectedGuitarId] = useState<number | string | null>(null);
+  const [equipItem, setEquipItem] = useState<InventoryItem | null>(null);
 
   // Clear "new" flags when user opens collection tab
   useEffect(() => {
@@ -117,7 +138,8 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
                     key={item.id}
                     item={item}
                     isEquipped={data.equippedItemId === item.id}
-                    onEquip={(guitarId, year, country) => equip({ guitarId, itemId: item.id, year, country })}
+                    rigSlot={(() => { const i = rig.guitarSlots.indexOf(item.id); return i >= 0 ? i : null; })()}
+                    onEquipClick={() => setEquipItem(item)}
                     isEquipping={isEquipping}
                     onSellClick={handleSellClick}
                     isSelling={isSelling}
@@ -131,12 +153,15 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
       {(() => {
         const guitar = selectedGuitarId != null ? GUITARS_BY_ID.get(selectedGuitarId) : null;
+        const selectedItem = selectedItemId
+          ? data.inventory.find((i) => i.id === selectedItemId)
+          : null;
         return guitar ? (
           <SellConfirmDialog
             isOpen={isDialogOpen}
             itemType="Guitar"
             itemName={`${guitar.brand} ${guitar.name}`}
-            fameReward={GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
+            fameReward={selectedItem ? getItemValue(selectedItem, guitar) : GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
             onConfirm={handleConfirmSell}
             onCancel={() => {
               setIsDialogOpen(false);
@@ -147,6 +172,19 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
           />
         ) : null;
       })()}
+
+      <EquipTargetDialog
+        isOpen={equipItem !== null}
+        itemName={equipItem ? `${GUITARS_BY_ID.get(equipItem.guitarId)?.brand ?? ""} ${GUITARS_BY_ID.get(equipItem.guitarId)?.name ?? ""}` : ""}
+        itemId={equipItem?.id ?? ""}
+        isEquipped={data.equippedItemId === equipItem?.id}
+        rigSlots={rig.guitarSlots}
+        onSelect={(target) => {
+          if (equipItem) handleEquipTo(equipItem, target);
+          setEquipItem(null);
+        }}
+        onClose={() => setEquipItem(null)}
+      />
     </>
   );
 };
