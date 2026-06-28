@@ -13,7 +13,7 @@ import {
   Area, AreaChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { getDailyStreakMultiplier } from "utils/gameLogic";
+import { getDailyStreakMultiplier, getReconciledStreak } from "utils/gameLogic";
 
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
 
@@ -99,7 +99,6 @@ const RatingPopUpLayout = ({
     newAchievements,
     prevProgressPercent,
     currProgressPercent,
-    avgTime,
     sessionBreakdown,
   } = useRatingPopUp({ ratingData, currentUserStats, previousUserStats, activityData });
 
@@ -109,21 +108,24 @@ const RatingPopUpLayout = ({
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
 
   // ── derived data ──
-  const streak = currentUserStats.actualDayWithoutBreak ?? 0;
+  // Same source of truth as the header / user tooltip: reconcile the stored
+  // counter against the local-time activity log (getReconciledStreak).
+  const { dayWithoutBreak: streak, didPracticeToday } = getReconciledStreak({
+    actualDayWithoutBreak: currentUserStats.actualDayWithoutBreak ?? 0,
+    lastReportDate: currentUserStats.lastReportDate ?? "",
+    reportDates: activityData.map((d) => d.date),
+  });
   const streakBonusPct = Math.round(getDailyStreakMultiplier(streak) * 100);
 
   const skillGains = Object.entries(ratingData.skillPointsGained ?? {}).filter(([, v]) => v > 0);
 
   const sessionTimeMs = ratingData.bonusPoints?.time ?? 0;
-  const todayTotalTime = useMemo(() => {
-    const today = new Date().toDateString();
-    return activityData
-      .filter((d) => new Date(d.date).toDateString() === today)
-      .reduce((acc, d) => acc + d.techniqueTime + d.theoryTime + d.hearingTime + d.creativityTime, 0);
-  }, [activityData]);
-  const performanceDiff = avgTime > 0 ? ((todayTotalTime - avgTime) / avgTime) * 100 : 0;
 
-  // weekly chart — last 7 calendar days
+  // weekly chart — last 7 calendar days.
+  // Timezone-safe: every report instant is bucketed by its *local* calendar day
+  // (dayStr → getFullYear/Month/Date), the exact basis used by the activity
+  // heatmap and getReconciledStreak — so a session never drifts to a neighbour
+  // day when viewed from another timezone.
   const weekData = useMemo(() => {
     const byDay = new Map<string, number>();
     for (const d of activityData) {
@@ -131,14 +133,16 @@ const RatingPopUpLayout = ({
       const mins = (d.techniqueTime + d.theoryTime + d.hearingTime + d.creativityTime) / MIN;
       byDay.set(key, (byDay.get(key) ?? 0) + mins);
     }
+    const todayKey = dayStr(new Date());
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setHours(0, 0, 0, 0);
       d.setDate(d.getDate() - (6 - i));
+      const key = dayStr(d);
       return {
         label: d.toLocaleDateString("en-US", { weekday: "short" }),
-        minutes: Math.round(byDay.get(dayStr(d)) ?? 0),
-        isToday: i === 6,
+        minutes: Math.round(byDay.get(key) ?? 0),
+        isToday: key === todayKey,
       };
     });
   }, [activityData]);
@@ -366,16 +370,6 @@ const RatingPopUpLayout = ({
             <Card className="h-full">
               <CardHeading>Session time</CardHeading>
               <p className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(Math.round(sessionTimeMs / MIN))}</p>
-              {avgTime > 0 && (
-                <p
-                  className={cn(
-                    "mt-2 text-xs font-medium",
-                    performanceDiff >= 0 ? "text-emerald-400" : "text-zinc-500"
-                  )}
-                >
-                  {performanceDiff >= 0 ? "+" : ""}{Math.round(performanceDiff)}% vs average
-                </p>
-              )}
 
               <div className="mt-8 space-y-5">
                 {CATS.map((c) => ({ ...c, ms: sessionBreakdown[c.key] || 0 }))
@@ -419,7 +413,7 @@ const RatingPopUpLayout = ({
 
               <div className="mt-8 flex justify-between gap-2">
                 {weekData.map((d, i) => {
-                  const active = d.minutes > 0;
+                  const active = d.minutes > 0 || (d.isToday && didPracticeToday);
                   return (
                     <div key={i} className="flex flex-1 flex-col items-center gap-2">
                       <div
