@@ -86,6 +86,16 @@ service cloud.firestore {
       }
     }
 
+    // ─── Arsenal marketplace ──────────────────────────────────────────────────
+    // Player-to-player listings. Every mutation (list / buy / cancel, the escrow
+    // move, fame transfer and status change) runs server-side via the Firebase
+    // Admin SDK, which bypasses these rules. Clients are read-only so a buyer
+    // can browse, but can never forge a listing, change a price or mark one sold.
+    match /marketplace/{listingId} {
+      allow read:  if request.auth != null;
+      allow write: if false; // Admin SDK only
+    }
+
     // ─── Default: deny everything else ────────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;

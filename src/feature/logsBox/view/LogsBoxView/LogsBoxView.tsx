@@ -2,6 +2,7 @@ import { Card } from "assets/components/ui/card";
 import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
 import type {
   FirebaseLogsInterface,
+  FirebaseLogsMarketplaceInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
@@ -57,7 +58,7 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
 
 const LogsBoxView = ({ className }: { className?: string }) => {
   const [logs, setLogs] = useState<
-    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[] | null
+    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[] | null
   >(null);
 
   const userStats = useAppSelector(selectCurrentUserStats);

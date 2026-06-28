@@ -9,7 +9,8 @@ import { formatDistanceToNow } from "date-fns";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Clock, Gem, Heart, MessageSquare, Trophy, Zap } from "lucide-react";
+import { ArrowRight,Bell, Clock, Gem, Heart, MessageSquare, Store,Trophy, Zap } from "lucide-react";
+import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -52,13 +53,37 @@ const typeConfig = {
     bg: "bg-green-500",
     label: (_n: any) => "A new season has started!",
   },
+  marketplace_sold: {
+    icon: <Store className="h-3 w-3 text-white" />,
+    bg: "bg-amber-500",
+    label: (n: any) => (
+      <span className="inline-flex items-center gap-1 flex-wrap">
+        Your {n.itemName ? <span className="font-semibold text-white">{n.itemName}</span> : "item"} sold for +{n.fameAwarded}
+        <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+      </span>
+    ),
+  },
 };
 
 export const NotificationsBell = () => {
   const userId = useAppSelector(selectUserAuth);
   const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } =
     useAppNotifications(userId);
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Where (if anywhere) a notification deep-links when clicked.
+  const notificationHref = (n: any): string | null =>
+    n.type === "marketplace_sold" ? "/arsenal?tab=market" : null;
+
+  const handleNotificationClick = (n: any) => {
+    markAsRead(n.id);
+    const href = notificationHref(n);
+    if (href) {
+      setIsOpen(false);
+      router.push(href);
+    }
+  };
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const rippleId = useRef(0);
 
@@ -173,7 +198,10 @@ export const NotificationsBell = () => {
             <div>
               {notifications.map((n) => {
                 const config = typeConfig[n.type as keyof typeof typeConfig] ?? typeConfig.reaction;
-                const isSystemNotif = n.type === "season_reward" || n.type === "season_start";
+                const isSystemNotif =
+                  n.type === "season_reward" ||
+                  n.type === "season_start" ||
+                  n.type === "marketplace_sold";
                 return (
                   <button
                     key={n.id}
@@ -183,7 +211,7 @@ export const NotificationsBell = () => {
                         ? "hover:bg-white/[0.04]"
                         : "bg-cyan-500/[0.06] hover:bg-cyan-500/[0.1] before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-cyan-400"
                     )}
-                    onClick={() => markAsRead(n.id)}>
+                    onClick={() => handleNotificationClick(n)}>
                     {/* Avatar or system icon + type badge */}
                     <div className="relative w-10 h-10 shrink-0 mt-0.5">
                       {isSystemNotif ? (
@@ -232,6 +260,12 @@ export const NotificationsBell = () => {
                         <p className="text-xs text-amber-400/70 flex items-center gap-1 mt-1">
                           <Gem className="h-3 w-3" />
                           Season {n.seasonId}
+                        </p>
+                      )}
+                      {n.type === "marketplace_sold" && (
+                        <p className="text-xs text-amber-400/80 flex items-center gap-1 mt-1 font-medium">
+                          Open Market
+                          <ArrowRight className="h-3 w-3" />
                         </p>
                       )}
                       <div className="flex items-center gap-1.5 mt-1.5">

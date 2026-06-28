@@ -1,15 +1,7 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { getEffectValue } from "feature/arsenal/data/effectStats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-
-const RARITY_FAME_VALUES: Record<string, number> = {
-  Common: 8,
-  Uncommon: 15,
-  Rare: 40,
-  Epic: 75,
-  Legendary: 150,
-  Mythic: 375,
-};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -62,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Calculate fame reward
-    const fameReward = RARITY_FAME_VALUES[effectDef.rarity] || 0;
+    const fameReward = getEffectValue(effectDef);
 
     // Remove item from inventory
     const newEffectInventory = effectInventory.filter((_: any, i: number) => i !== itemIndex);

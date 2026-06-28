@@ -156,6 +156,26 @@ export interface FirebaseLogsDailyQuestInterface {
   reactions?: string[];
 }
 
+export interface FirebaseLogsMarketplaceInterface {
+  type: "marketplace_listing";
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  price: number;
+  /** Full rolled instance — drives the card tooltip + level. */
+  rolledItem?: InventoryItem | EffectInventoryItem;
+  id?: string;
+  reactions?: string[];
+}
+
 export interface FirebaseLogsCaseOpenInterface {
   type: "case_open";
   uid: string;

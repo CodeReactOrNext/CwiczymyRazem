@@ -3,14 +3,18 @@ import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDe
 import { getItemValue } from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
+import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { PackageOpen } from "lucide-react";
 import { useEffect,useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 import type { ArsenalUserData, GuitarRarity, InventoryItem, RigSetup } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
+import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
 import { EquipTargetDialog } from "./EquipTargetDialog";
 import type { EquipTarget } from "./GuitarCard";
@@ -28,8 +32,11 @@ interface GuitarInventoryProps {
 export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
+  const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: saveRig } = useUpdateRig();
   const queryClient = useQueryClient();
+  const userStats = useAppSelector(selectCurrentUserStats);
+  const currentFame = userStats?.fame || 0;
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
 
@@ -49,6 +56,9 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedGuitarId, setSelectedGuitarId] = useState<number | string | null>(null);
   const [equipItem, setEquipItem] = useState<InventoryItem | null>(null);
+  const [isListDialogOpen, setIsListDialogOpen] = useState(false);
+  const [listItemId, setListItemId] = useState<string | null>(null);
+  const [listGuitarId, setListGuitarId] = useState<number | string | null>(null);
 
   // Clear "new" flags when user opens collection tab
   useEffect(() => {
@@ -113,6 +123,27 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     }
   };
 
+  const handleListClick = (inventoryItemId: string, guitarId: number | string) => {
+    setListItemId(inventoryItemId);
+    setListGuitarId(guitarId);
+    setIsListDialogOpen(true);
+  };
+
+  const closeListDialog = () => {
+    setIsListDialogOpen(false);
+    setListItemId(null);
+    setListGuitarId(null);
+  };
+
+  const handleConfirmList = (price: number) => {
+    if (listItemId) {
+      listOnMarket(
+        { itemType: "guitar", inventoryItemId: listItemId, price },
+        { onSuccess: closeListDialog }
+      );
+    }
+  };
+
   return (
     <>
       <div className="mb-6 flex items-baseline gap-1.5">
@@ -143,6 +174,8 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
                     isEquipping={isEquipping}
                     onSellClick={handleSellClick}
                     isSelling={isSelling}
+                    onListClick={handleListClick}
+                    isListing={isListing}
                   />
                 ))}
               </div>
@@ -169,6 +202,23 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
               setSelectedGuitarId(null);
             }}
             isLoading={isSelling}
+          />
+        ) : null;
+      })()}
+
+      {(() => {
+        const guitar = listGuitarId != null ? GUITARS_BY_ID.get(listGuitarId) : null;
+        const listItem = listItemId ? data.inventory.find((i) => i.id === listItemId) : null;
+        return guitar ? (
+          <ListItemDialog
+            isOpen={isListDialogOpen}
+            itemType="Guitar"
+            itemName={`${guitar.brand} ${guitar.name}`}
+            minPrice={listItem ? getItemValue(listItem, guitar) : GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
+            currentFame={currentFame}
+            onConfirm={handleConfirmList}
+            onCancel={closeListDialog}
+            isLoading={isListing}
           />
         ) : null;
       })()}

@@ -74,6 +74,20 @@ export const EFFECT_FEATURES: EffectFeatureDef[] = [
 
 const EFFECT_FEATURES_BY_ID = new Map(EFFECT_FEATURES.map((f) => [f.id, f]));
 
+/** System sell value per rarity for effects (no condition/vintage multipliers). */
+export const RARITY_EFFECT_VALUE: Record<GuitarRarity, number> = {
+  Common: 8,
+  Uncommon: 15,
+  Rare: 40,
+  Epic: 75,
+  Legendary: 150,
+  Mythic: 375,
+};
+
+/** Instance sell value for an effect — purely rarity-based. */
+export const getEffectValue = (effect: Pick<EffectDefinition, "rarity">): number =>
+  RARITY_EFFECT_VALUE[effect.rarity] ?? 0;
+
 export interface ResolvedEffectFeature extends EffectFeatureDef {
   points: number;
 }
