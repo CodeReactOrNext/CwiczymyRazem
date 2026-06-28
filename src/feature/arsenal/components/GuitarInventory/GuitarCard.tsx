@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Store,Trash2 } from "lucide-react";
 
 // SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -19,13 +19,15 @@ interface GuitarCardProps {
   isEquipping?: boolean;
   onSellClick?: (inventoryItemId: string, guitarId: number | string) => void;
   isSelling?: boolean;
+  onListClick?: (inventoryItemId: string, guitarId: number | string) => void;
+  isListing?: boolean;
   /** Rig slot index (0-2) this item occupies, or null/undefined if not in the rig. */
   rigSlot?: number | null;
   /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
   readOnly?: boolean;
 }
 
-export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, rigSlot, readOnly = false }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, onListClick, isListing, rigSlot, readOnly = false }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -315,6 +317,19 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
           {isEquipped && <Check size={9} strokeWidth={3} />}
           Equip
         </button>
+
+        {onListClick && (
+          <button
+            onClick={() => onListClick(item.id, guitar.id)}
+            disabled={isListing || isEquipped || rigSlot != null}
+            className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
+            style={{ borderColor: `${rs.baseColor}15` }}
+            title={isEquipped || rigSlot != null ? "Unequip before listing" : "List on the market"}
+          >
+            <Store size={9} strokeWidth={2.5} />
+            Market
+          </button>
+        )}
 
         <button
           onClick={() => onSellClick?.(item.id, guitar.id)}

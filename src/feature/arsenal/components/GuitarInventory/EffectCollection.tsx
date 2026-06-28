@@ -1,11 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
+import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 import type { ArsenalUserData, EffectInventoryItem, GuitarRarity } from "../../types/arsenal.types";
+import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
@@ -20,10 +24,16 @@ interface EffectCollectionProps {
 
 export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const { mutate: sellEffect, isPending: isSelling } = useSellEffect();
+  const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const queryClient = useQueryClient();
+  const userStats = useAppSelector(selectCurrentUserStats);
+  const currentFame = userStats?.fame || 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedEffectId, setSelectedEffectId] = useState<number | string | null>(null);
+  const [isListDialogOpen, setIsListDialogOpen] = useState(false);
+  const [listItemId, setListItemId] = useState<string | null>(null);
+  const [listEffectId, setListEffectId] = useState<number | string | null>(null);
 
   // Clear "new" flags when user opens collection tab
   useEffect(() => {
@@ -84,6 +94,27 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
     }
   };
 
+  const handleListClick = (inventoryItemId: string, effectId: number | string) => {
+    setListItemId(inventoryItemId);
+    setListEffectId(effectId);
+    setIsListDialogOpen(true);
+  };
+
+  const closeListDialog = () => {
+    setIsListDialogOpen(false);
+    setListItemId(null);
+    setListEffectId(null);
+  };
+
+  const handleConfirmList = (price: number) => {
+    if (listItemId) {
+      listOnMarket(
+        { itemType: "effect", inventoryItemId: listItemId, price },
+        { onSuccess: closeListDialog }
+      );
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col gap-3 mt-8">
@@ -115,6 +146,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
                       isOnPedalboard={pedalboardItemIds.has(item.id)}
                       onSellClick={handleSellClick}
                       isSelling={isSelling}
+                      onListClick={handleListClick}
+                      isListing={isListing}
                     />
                   ))}
                 </div>
@@ -139,6 +172,22 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
               setSelectedEffectId(null);
             }}
             isLoading={isSelling}
+          />
+        ) : null;
+      })()}
+
+      {(() => {
+        const effect = listEffectId != null ? EFFECTS_BY_ID.get(listEffectId) : null;
+        return effect ? (
+          <ListItemDialog
+            isOpen={isListDialogOpen}
+            itemType="Effect"
+            itemName={`${effect.brand} ${effect.name}`}
+            minPrice={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
+            currentFame={currentFame}
+            onConfirm={handleConfirmList}
+            onCancel={closeListDialog}
+            isLoading={isListing}
           />
         ) : null;
       })()}

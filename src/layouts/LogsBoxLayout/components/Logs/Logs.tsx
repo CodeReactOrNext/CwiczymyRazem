@@ -25,6 +25,7 @@ import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsInterface,
+  FirebaseLogsMarketplaceInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
@@ -72,6 +73,12 @@ const isFirebaseLogsCaseOpen = (
   log: any
 ): log is FirebaseLogsCaseOpenInterface => {
   return (log as FirebaseLogsCaseOpenInterface).type === "case_open";
+};
+
+const isFirebaseLogsMarketplace = (
+  log: any
+): log is FirebaseLogsMarketplaceInterface => {
+  return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
 };
 
 const RARITY_COLORS: Record<string, string> = {
@@ -295,6 +302,125 @@ const FirebaseLogsCaseOpenItem = ({
   );
 };
 
+const FirebaseLogsMarketplaceItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsMarketplaceInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, itemType, itemName, itemBrand, itemRarity, itemImageId, price } = log;
+  const date = new Date(timestamp);
+  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const imgSrc = itemType === "guitar"
+    ? `/static/images/rank/${itemImageId}.webp`
+    : `/static/images/effects/${itemImageId}.png`;
+
+  const rolled = log.rolledItem;
+  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+  let level: number | null = null;
+  if (rolledGuitar) {
+    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+    if (def) level = getItemLevel(rolledGuitar, def);
+  } else if (rolledEffect) {
+    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+    if (def) level = getEffectLevel(rolledEffect, def);
+  }
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <span className="text-secondText text-sm">listed</span>
+        </div>
+
+        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:flex-initial min-w-0">
+            <TooltipProvider>
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
+                    <span
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
+                      style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                    >
+                      {itemRarity}
+                    </span>
+                    {level !== null && (
+                      <span
+                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
+                        style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+                        title="Item level"
+                      >
+                        Lv {level}
+                      </span>
+                    )}
+                    <span className="font-bold text-sm" style={{ color }}>
+                      {itemBrand} {itemName}
+                    </span>
+                    <img
+                      src={imgSrc}
+                      alt={itemName}
+                      className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="p-0 border-0 bg-transparent shadow-2xl"
+                  side="top"
+                >
+                  {rolledGuitar ? (
+                    <div style={{ width: 250 }}>
+                      <GuitarCard item={rolledGuitar} readOnly />
+                    </div>
+                  ) : rolledEffect ? (
+                    <div style={{ width: 250 }}>
+                      <EffectCard item={rolledEffect} readOnly />
+                    </div>
+                  ) : (
+                    <ItemTooltipCard
+                      itemType={itemType}
+                      itemName={itemName}
+                      itemBrand={itemBrand}
+                      itemRarity={itemRarity}
+                      itemImageId={itemImageId}
+                    />
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>
+              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+                {price}
+                <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+              </span>
+            </span>
+          </div>
+          {log.id && (
+            <div className="shrink-0">
+              <LogReaction
+                logId={log.id}
+                reactions={log.reactions}
+                currentUserId={currentUserId}
+                disabled={log.uid === currentUserId}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </LogItem>
+  );
+};
+
 interface LogsBoxLayoutProps {
   logs: (
     | FirebaseLogsSongsInterface
@@ -303,6 +429,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsRecordingsInterface
     | FirebaseLogsDailyQuestInterface
     | FirebaseLogsCaseOpenInterface
+    | FirebaseLogsMarketplaceInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -981,6 +1108,12 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
             />
           ) : isFirebaseLogsCaseOpen(log) ? (
             <FirebaseLogsCaseOpenItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+            />
+          ) : isFirebaseLogsMarketplace(log) ? (
+            <FirebaseLogsMarketplaceItem
               log={log}
               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}

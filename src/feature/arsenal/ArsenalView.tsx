@@ -3,14 +3,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { Guitar,PackageOpen, Swords } from "lucide-react";
+import { Guitar,PackageOpen, Store,Swords } from "lucide-react";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
+
+const ARSENAL_TABS = ["cases", "collection", "rig", "market"] as const;
+type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
+import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
 import { RigView } from "./components/Rig/RigView";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
 import { getRigLevel } from "./data/rigLevel";
@@ -23,6 +28,18 @@ export const ArsenalView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
   const rigLevel = getRigLevel(data);
+
+  // Tab is URL-driven (?tab=market) so notifications/links can deep-link to it.
+  const router = useRouter();
+  const tabParam = router.query.tab;
+  const activeTab: ArsenalTab =
+    typeof tabParam === "string" && ARSENAL_TABS.includes(tabParam as ArsenalTab)
+      ? (tabParam as ArsenalTab)
+      : "cases";
+
+  const handleTabChange = (tab: string) => {
+    router.replace({ query: { ...router.query, tab } }, undefined, { shallow: true });
+  };
 
   const [openResult, setOpenResult] = useState<OpenCaseResult | null>(null);
   const [openedCaseType, setOpenedCaseType] = useState<CaseType | null>(null);
@@ -63,7 +80,7 @@ export const ArsenalView = () => {
 
       <div className="p-4">
         <div className="flex flex-col gap-6">
-          <Tabs defaultValue="cases" className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
               <TabsTrigger 
                 value="cases" 
@@ -82,12 +99,19 @@ export const ArsenalView = () => {
                   <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
               </TabsTrigger>
-              <TabsTrigger 
-                value="rig" 
+              <TabsTrigger
+                value="rig"
                 className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Guitar size={16} />
                 Rig
+              </TabsTrigger>
+              <TabsTrigger
+                value="market"
+                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
+                <Store size={16} />
+                Market
               </TabsTrigger>
             </TabsList>
 
@@ -117,6 +141,10 @@ export const ArsenalView = () => {
 
             <TabsContent value="rig" className="mt-4">
               {data ? <RigView data={data} /> : null}
+            </TabsContent>
+
+            <TabsContent value="market" className="mt-4">
+              <MarketplaceView />
             </TabsContent>
           </Tabs>
         </div>

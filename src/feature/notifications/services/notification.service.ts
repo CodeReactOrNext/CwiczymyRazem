@@ -11,7 +11,13 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-type NotificationType = "like" | "comment" | "reaction" | "season_reward" | "season_start";
+type NotificationType =
+  | "like"
+  | "comment"
+  | "reaction"
+  | "season_reward"
+  | "season_start"
+  | "marketplace_sold";
 
 export interface AppNotification {
   id: string;
@@ -27,6 +33,11 @@ export interface AppNotification {
   fameAwarded?: number;
   place?: number;
   seasonId?: string;
+  // Marketplace sale fields
+  itemName?: string;
+  itemImageId?: number | string;
+  itemType?: "guitar" | "effect";
+  itemRarity?: string;
   timestamp: any;
   isRead: boolean;
 }

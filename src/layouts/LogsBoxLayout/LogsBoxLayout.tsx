@@ -4,6 +4,7 @@ import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
+  FirebaseLogsMarketplaceInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
@@ -24,6 +25,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsSongsInterface
     | FirebaseLogsInterface
     | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsMarketplaceInterface
   )[];
   userAchievements: AchievementList[];
   currentUserId: string;
