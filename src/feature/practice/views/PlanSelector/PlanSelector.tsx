@@ -11,13 +11,14 @@ import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExerc
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoritePlan } from "feature/user/store/userSlice.favoriteActions";
 import { motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, Flame, Globe, Music, Zap } from "lucide-react";
+import { ArrowLeft, Flame, Globe, Heart, Music, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const PLAN_TABS = ["routines", "playalongs", "my_plans", "community"] as const;
 
@@ -53,8 +54,10 @@ interface PlanSelectorProps {
 export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelectorProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
+  const favoritePlanIds = userInfo?.favoritePlanIds ?? [];
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
@@ -105,52 +108,87 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
     }
   };
 
+  const handleToggleFavorite = (planId: string) => {
+    if (!userAuth) return;
+    dispatch(toggleFavoritePlan({ planId, isFavorite: !favoritePlanIds.includes(planId) }));
+  };
+
+  const renderPlanCard = (plan: ExercisePlan) => {
+    const locked = !!plan.premium && !isPremium;
+    return (
+      <PlanCard
+        key={plan.id}
+        plan={plan}
+        isLocked={locked}
+        onSelect={locked ? undefined : () => handleStartPlan(plan.id)}
+        onStart={locked ? undefined : () => handleStartPlan(plan.id)}
+        onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
+        onToggleFavorite={userAuth ? () => handleToggleFavorite(plan.id) : undefined}
+        isFavorite={favoritePlanIds.includes(plan.id)}
+        startButtonText={t("common:start")}
+        isLoading={loadingPlanId === plan.id}
+      />
+    );
+  };
 
   const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
-    return (["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
-      const plans = sourcePlans.filter((p) => p.difficulty === difficulty);
-      if (plans.length === 0) return null;
+    const favoritePlans = sourcePlans.filter((p) => favoritePlanIds.includes(p.id));
 
-      const difficultyLabel = {
-        beginner: { color: "text-sky-500" },
-        easy: { color: "text-emerald-500" },
-        medium: { color: "text-amber-500" },
-        hard: { color: "text-red-500" },
-      }[difficulty];
+    return (
+      <>
+        {favoritePlans.length > 0 && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
+              <h3 className="text-sm font-medium tracking-[0.2em] text-white">
+                {t("common:favorites", "FAVORITES")}
+              </h3>
+            </div>
 
-      return (
-        <div key={difficulty} className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-            <h3 className="text-sm font-medium tracking-[0.2em] text-white">
-              {t(`common:difficulty.${difficulty}`)}
-            </h3>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
+            >
+              {favoritePlans.map(renderPlanCard)}
+            </motion.div>
           </div>
+        )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
-          >
-            {plans.map((plan) => {
-              const locked = !!plan.premium && !isPremium;
-              return (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  isLocked={locked}
-                  onSelect={locked ? undefined : () => handleStartPlan(plan.id)}
-                  onStart={locked ? undefined : () => handleStartPlan(plan.id)}
-                  onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
-                  startButtonText={t("common:start")}
-                  isLoading={loadingPlanId === plan.id}
-                />
-              );
-            })}
-          </motion.div>
-        </div>
-      );
-    });
+        {(["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
+          const plans = sourcePlans.filter(
+            (p) => p.difficulty === difficulty && !favoritePlanIds.includes(p.id)
+          );
+          if (plans.length === 0) return null;
+
+          const difficultyLabel = {
+            beginner: { color: "text-sky-500" },
+            easy: { color: "text-emerald-500" },
+            medium: { color: "text-amber-500" },
+            hard: { color: "text-red-500" },
+          }[difficulty];
+
+          return (
+            <div key={difficulty} className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
+                <h3 className="text-sm font-medium tracking-[0.2em] text-white">
+                  {t(`common:difficulty.${difficulty}`)}
+                </h3>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
+              >
+                {plans.map(renderPlanCard)}
+              </motion.div>
+            </div>
+          );
+        })}
+      </>
+    );
   };
 
   return (

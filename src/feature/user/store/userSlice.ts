@@ -274,6 +274,28 @@ const userSlice = createSlice({
         state.userInfo.selectedGuitarCountry = payload.country;
       }
     },
+    setFavoritePlan: (state, { payload }: PayloadAction<{ planId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoritePlanIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.planId)) {
+          state.userInfo.favoritePlanIds = [...current, payload.planId];
+        }
+      } else {
+        state.userInfo.favoritePlanIds = current.filter((id) => id !== payload.planId);
+      }
+    },
+    setFavoriteExercise: (state, { payload }: PayloadAction<{ exerciseId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoriteExerciseIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.exerciseId)) {
+          state.userInfo.favoriteExerciseIds = [...current, payload.exerciseId];
+        }
+      } else {
+        state.userInfo.favoriteExerciseIds = current.filter((id) => id !== payload.exerciseId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -495,6 +517,8 @@ export const {
   deductFame,
   addFame,
   setSelectedGuitar,
+  setFavoritePlan,
+  setFavoriteExercise,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;

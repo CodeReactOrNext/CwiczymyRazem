@@ -6,6 +6,8 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {
+  arrayRemove,
+  arrayUnion,
   doc,
   updateDoc,
 } from "firebase/firestore";
@@ -81,6 +83,26 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
 ) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { emailNotifications: preferences });
+};
+
+export const firebaseToggleFavoritePlan = async (
+  planId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoritePlanIds: isFavorite ? arrayUnion(planId) : arrayRemove(planId),
+  });
+};
+
+export const firebaseToggleFavoriteExercise = async (
+  exerciseId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoriteExerciseIds: isFavorite ? arrayUnion(exerciseId) : arrayRemove(exerciseId),
+  });
 };
 
 export const firebaseUpdateProfileCustomization = async (

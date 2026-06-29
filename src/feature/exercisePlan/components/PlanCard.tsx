@@ -10,7 +10,7 @@ import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpRight, Globe, Lock } from "lucide-react";
+import { ArrowUpRight, Globe, Heart, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -36,6 +36,8 @@ interface PlanCardProps {
   onEdit?: () => void;
   onUpgrade?: () => void;
   onTogglePublic?: () => void;
+  onToggleFavorite?: () => void;
+  isFavorite?: boolean;
   startButtonText?: string;
   isLoading?: boolean;
   isLocked?: boolean;
@@ -106,6 +108,8 @@ export const PlanCard = ({
   onEdit,
   onUpgrade,
   onTogglePublic,
+  onToggleFavorite,
+  isFavorite = false,
   startButtonText,
   isLoading,
   isLocked = false,
@@ -235,6 +239,33 @@ export const PlanCard = ({
             )}
         </div>
         <div className="flex items-center gap-2">
+            {onToggleFavorite && !isLocked && (
+                <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type="button"
+                                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                aria-pressed={isFavorite}
+                                className={cn(
+                                    "flex h-9 w-9 items-center justify-center rounded-[4px] border shadow-lg backdrop-blur-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50 focus-visible:opacity-100",
+                                    isFavorite
+                                        // Already favorited — always visible so the state is recognizable at a glance.
+                                        ? "border-rose-500/30 bg-rose-500/15 text-rose-400 opacity-100 hover:bg-rose-500/25 hover:text-rose-300"
+                                        // Not favorited — fades in on card hover, with a tinted background so it reads as a button.
+                                        : "border-white/10 bg-zinc-950/50 text-zinc-300 opacity-0 hover:bg-white/10 hover:text-rose-300 group-hover:opacity-100"
+                                )}
+                                onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+                            >
+                                <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )}
             {(onEdit || onDelete || onTogglePublic) && (
                 <TooltipProvider delayDuration={200}>
                     <div className="mr-1 flex items-center gap-0.5 rounded-[4px] border border-white/10 bg-zinc-950/50 p-1 shadow-lg backdrop-blur-sm">

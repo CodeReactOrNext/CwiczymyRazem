@@ -85,6 +85,8 @@ export default async function handler(
           feedbackAskedAt: userData?.feedbackAskedAt ?? null,
           feedbackDismissCount: userData?.feedbackDismissCount ?? 0,
           feedbackLastDismissedAt: userData?.feedbackLastDismissedAt ?? null,
+          favoritePlanIds: userData?.favoritePlanIds ?? [],
+          favoriteExerciseIds: userData?.favoriteExerciseIds ?? [],
           emailNotifications: {
             streakReminders:
               userData?.emailNotifications?.streakReminders ?? true,

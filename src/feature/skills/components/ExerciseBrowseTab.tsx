@@ -1,21 +1,21 @@
-import { cn } from "assets/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
+import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
-import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { Trophy, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, Info, Search, Lock } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Heart, Info, Lock,Search, Trophy } from "lucide-react";
+import { useEffect,useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
-
-import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import type { DashboardExercise } from "./SkillDashboard";
 
@@ -68,6 +68,12 @@ export const ExerciseBrowseTab = ({
   onShowLeaderboard,
 }: ExerciseBrowseTabProps) => {
   const { t } = useTranslation(["common", "skills"]);
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(selectUserInfo);
+  const favoriteExerciseIds = useMemo(
+    () => userInfo?.favoriteExerciseIds ?? [],
+    [userInfo?.favoriteExerciseIds]
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
@@ -124,7 +130,10 @@ export const ExerciseBrowseTab = ({
           return ((DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99)) * dir;
         if (sortKey === "time")
           return ((a.timeInMinutes ?? 0) - (b.timeInMinutes ?? 0)) * dir;
-        // default: newest exercises first, then attempted, then alphabetical
+        // default: favorites pinned to the very top, then newest, attempted, alphabetical
+        const aFav = favoriteExerciseIds.includes(a.id);
+        const bFav = favoriteExerciseIds.includes(b.id);
+        if (aFav !== bFav) return aFav ? -1 : 1;
         const aNew = isExerciseNew(a);
         const bNew = isExerciseNew(b);
         if (aNew !== bNew) return aNew ? -1 : 1;
@@ -137,7 +146,7 @@ export const ExerciseBrowseTab = ({
         if (aAttempted !== bAttempted) return aAttempted ? -1 : 1;
         return exTitle(a).localeCompare(exTitle(b));
       });
-  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, progressMap, sortKey, sortDir]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, progressMap, sortKey, sortDir, favoriteExerciseIds]);
 
   const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -200,6 +209,11 @@ export const ExerciseBrowseTab = ({
       difficulty: exercise.difficulty,
       tablature: exercise.tablature,
     };
+  };
+
+  const handleToggleFavorite = (exerciseId: string) => {
+    if (!userAuth) return;
+    dispatch(toggleFavoriteExercise({ exerciseId, isFavorite: !favoriteExerciseIds.includes(exerciseId) }));
   };
 
   const renderSortHead = (
@@ -369,6 +383,7 @@ export const ExerciseBrowseTab = ({
                 const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
                 const micAccuracy = progress?.micHighScoreAccuracy;
                 const rank = leaderboardRanks[exercise.id];
+                const isFavorite = favoriteExerciseIds.includes(exercise.id);
                 const resultText = hasBpmProgress
                   ? `${maxBpm} BPM`
                   : micScore != null && micScore > 0
@@ -507,6 +522,22 @@ export const ExerciseBrowseTab = ({
                     {/* Actions */}
                     <td className="px-3 py-3.5">
                       <div className="flex items-center justify-end gap-1.5">
+                        {userAuth && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleToggleFavorite(exercise.id); }}
+                            className={cn(
+                              "flex items-center justify-center h-7 w-7 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50",
+                              isFavorite
+                                ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
+                                : "bg-zinc-800/40 text-zinc-400 hover:text-rose-300 hover:bg-rose-500/10"
+                            )}
+                            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                            aria-pressed={isFavorite}
+                          >
+                            <Heart size={13} className={cn(isFavorite && "fill-current")} />
+                          </button>
+                        )}
                         <button
                           onClick={(e) => { e.stopPropagation(); setPreviewExercise(exercise as Exercise); }}
                           className="flex items-center justify-center h-7 w-7 rounded bg-zinc-800/40 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
