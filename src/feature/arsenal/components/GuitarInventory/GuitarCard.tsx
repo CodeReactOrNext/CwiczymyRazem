@@ -1,3 +1,4 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
@@ -38,6 +39,16 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
   const conditionTier = getConditionTier(condition);
   const level = getItemLevel(item, guitar);
   const features = getItemFeatures(item);
+
+  // Reasons the Market / Sell actions are blocked — surfaced in a tooltip.
+  const marketTooltip = isEquipped
+    ? "Unequip from your profile before listing on the market"
+    : rigSlot != null
+    ? `Remove from rig slot ${rigSlot + 1} before listing on the market`
+    : "List on the market";
+  const sellTooltip = isEquipped
+    ? "Unequip from your profile before selling"
+    : "Sell for fame";
 
   // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
   const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
@@ -309,37 +320,57 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
           onClick={() => onEquipClick?.()}
           disabled={isEquipping}
           className={cn(
-            "flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
+            "flex-1 py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
             isEquipped ? "text-amber-400" : "text-zinc-500 hover:text-white disabled:opacity-30"
           )}
           style={{ borderColor: `${rs.baseColor}15`, background: isEquipped ? "rgba(251,191,36,0.06)" : undefined }}
         >
-          {isEquipped && <Check size={9} strokeWidth={3} />}
+          {isEquipped && <Check size={11} strokeWidth={3} />}
           Equip
         </button>
 
-        {onListClick && (
-          <button
-            onClick={() => onListClick(item.id, guitar.id)}
-            disabled={isListing || isEquipped || rigSlot != null}
-            className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
-            style={{ borderColor: `${rs.baseColor}15` }}
-            title={isEquipped || rigSlot != null ? "Unequip before listing" : "List on the market"}
-          >
-            <Store size={9} strokeWidth={2.5} />
-            Market
-          </button>
-        )}
+        <TooltipProvider>
+          {onListClick && (
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                <span className="flex flex-1">
+                  <button
+                    onClick={() => onListClick(item.id, guitar.id)}
+                    disabled={isListing || isEquipped || rigSlot != null}
+                    className="w-full py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
+                    style={{ borderColor: `${rs.baseColor}15` }}
+                  >
+                    <Store size={11} strokeWidth={2.5} />
+                    Market
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-xs text-white">
+                {marketTooltip}
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-        <button
-          onClick={() => onSellClick?.(item.id, guitar.id)}
-          disabled={isSelling || isEquipped}
-          className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
-          title={isEquipped ? "Cannot sell equipped guitar" : undefined}
-        >
-          <Trash2 size={9} strokeWidth={2.5} />
-          Sell
-        </button>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+              <span className="flex flex-1">
+                <button
+                  onClick={() => onSellClick?.(item.id, guitar.id)}
+                  disabled={isSelling || isEquipped}
+                  className="w-full py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <Trash2 size={11} strokeWidth={2.5} />
+                  Sell
+                </button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-xs text-white">
+              {sellTooltip}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       )}
     </div>

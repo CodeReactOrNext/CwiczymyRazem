@@ -5,6 +5,7 @@ import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
@@ -31,6 +32,7 @@ interface GuitarInventoryProps {
 
 export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
+  const { mutate: unequip } = useUnequipGuitar();
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: saveRig } = useUpdateRig();
@@ -49,6 +51,17 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     // A guitar instance can occupy only one slot — clear it from any other slot first.
     const newSlots = rig.guitarSlots.map((id) => (id === item.id ? null : id)) as RigSetup["guitarSlots"];
     newSlots[target] = item.id;
+    saveRig({ rig: { ...rig, guitarSlots: newSlots } });
+  };
+
+  const handleRemoveFrom = (item: InventoryItem, target: EquipTarget) => {
+    if (target === "profile") {
+      unequip();
+      return;
+    }
+    // Clear the guitar from the given rig slot, leaving the rest untouched.
+    const newSlots = [...rig.guitarSlots] as RigSetup["guitarSlots"];
+    if (newSlots[target] === item.id) newSlots[target] = null;
     saveRig({ rig: { ...rig, guitarSlots: newSlots } });
   };
 
@@ -231,6 +244,10 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
         rigSlots={rig.guitarSlots}
         onSelect={(target) => {
           if (equipItem) handleEquipTo(equipItem, target);
+          setEquipItem(null);
+        }}
+        onRemove={(target) => {
+          if (equipItem) handleRemoveFrom(equipItem, target);
           setEquipItem(null);
         }}
         onClose={() => setEquipItem(null)}

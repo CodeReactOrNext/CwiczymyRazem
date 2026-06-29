@@ -1,4 +1,4 @@
-import { Check, Guitar, User } from "lucide-react";
+import { Check, Guitar, User, X } from "lucide-react";
 
 import type { EquipTarget } from "./GuitarCard";
 
@@ -9,6 +9,7 @@ interface EquipTargetDialogProps {
   isEquipped: boolean;
   rigSlots: (string | null)[];
   onSelect: (target: EquipTarget) => void;
+  onRemove: (target: EquipTarget) => void;
   onClose: () => void;
 }
 
@@ -19,6 +20,7 @@ export const EquipTargetDialog = ({
   isEquipped,
   rigSlots,
   onSelect,
+  onRemove,
   onClose,
 }: EquipTargetDialogProps) => {
   if (!isOpen) return null;
@@ -44,22 +46,36 @@ export const EquipTargetDialog = ({
 
         <div className="flex flex-col gap-2">
           {options.map((o) => (
-            <button
+            <div
               key={String(o.target)}
-              onClick={() => onSelect(o.target)}
-              className="flex items-center justify-between gap-3 rounded-md border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-left transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+              className="flex items-stretch gap-2"
             >
-              <span className="flex items-center gap-3">
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-zinc-700/60 text-zinc-300">
-                  {o.target === "profile" ? <User size={15} /> : <Guitar size={15} />}
+              <button
+                onClick={() => onSelect(o.target)}
+                className="flex flex-1 items-center justify-between gap-3 rounded-md border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-left transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-zinc-700/60 text-zinc-300">
+                    {o.target === "profile" ? <User size={15} /> : <Guitar size={15} />}
+                  </span>
+                  <span className="flex flex-col">
+                    <span className="text-sm font-semibold text-white">{o.label}</span>
+                    <span className="text-[11px] text-zinc-500">{o.taken ? "Occupied — will replace" : o.desc}</span>
+                  </span>
                 </span>
-                <span className="flex flex-col">
-                  <span className="text-sm font-semibold text-white">{o.label}</span>
-                  <span className="text-[11px] text-zinc-500">{o.taken ? "Occupied — will replace" : o.desc}</span>
-                </span>
-              </span>
-              {o.active && <Check size={16} strokeWidth={3} className="text-amber-400" />}
-            </button>
+                {o.active && <Check size={16} strokeWidth={3} className="text-amber-400" />}
+              </button>
+              {o.active && (
+                <button
+                  onClick={() => onRemove(o.target)}
+                  aria-label={`Remove from ${o.label}`}
+                  title={`Remove from ${o.label}`}
+                  className="flex w-11 flex-shrink-0 items-center justify-center rounded-md border border-zinc-700 bg-zinc-800/50 text-zinc-400 transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
+                >
+                  <X size={16} strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
