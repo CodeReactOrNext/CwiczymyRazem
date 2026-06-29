@@ -31,6 +31,11 @@ export const equipGuitar = async (guitarId: number | string, itemId?: string): P
   await axios.post("/api/arsenal/equip-guitar", { idToken, guitarId, itemId });
 };
 
+export const unequipGuitar = async (): Promise<void> => {
+  const idToken = await getIdToken();
+  await axios.post("/api/arsenal/unequip-guitar", { idToken });
+};
+
 export const clearNewFlags = async (): Promise<void> => {
   const idToken = await getIdToken();
   await axios.post("/api/arsenal/clear-new-flags", { idToken });
