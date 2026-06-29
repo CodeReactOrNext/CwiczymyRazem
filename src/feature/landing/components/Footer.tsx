@@ -48,6 +48,9 @@ export const Footer = () => {
                         <p className="text-zinc-500 text-lg font-medium leading-relaxed max-w-sm">
                             The intelligent practice assistant designed for guitarists who value measurable progress over guesswork.
                         </p>
+                        <p className="text-zinc-500 text-sm font-medium leading-relaxed max-w-sm">
+                            Riff Quest is <span className="text-zinc-300 font-bold">100% free</span> — no subscriptions, no paywalls. It stays free thanks to the community, funded entirely through <span className="text-amber-400 font-bold">Buy Me a Coffee</span>. If it helps your playing, you can chip in to keep it growing. 🎸
+                        </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">

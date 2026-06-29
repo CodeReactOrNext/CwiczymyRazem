@@ -1,6 +1,6 @@
-# Ćwiczymy Razem (Riff Quest)
+# Riff Quest (Ćwiczymy Razem)
 
-> A comprehensive guitar exercise tracker and community platform designed to help musicians build consistent practice habits, track progress, and compete in a gamified environment.
+> A comprehensive guitar exercise tracker and community platform designed to help musicians build consistent practice habits, track progress, and compete in a gamified environment. Riff Quest is 100% free — no subscriptions and no paywalls — and is funded entirely by the community through Buy Me a Coffee.
 
 ## Key Features
 
@@ -8,21 +8,28 @@
 - **Gamification**: Earn XP, level up, and unlock achievements as you practice.
 - **Leaderboards**: Compare your progress with the community and stay motivated.
 - **Activity Calendar**: Visual GitHub-style representation of your practice consistency.
-- **Songs & Exercises**: Access a library of songs and exercises to work on.
+- **Songs & Exercises**: Access a library of songs and exercises to work on, with community-rated difficulty.
+- **Practice Plans**: Follow ready-made training plans or build your own structured routine.
 - **Personalized Stats**: Detailed breakdown of your practice history across different categories.
 
 ## Main Content
 
 - [Home](https://riff.quest/) - The landing page and entry point to the platform.
-- [Guitar Practice Builder](https://riff.quest/guitar-practice-builder) - Interactive tool to create specialized, printable guitar practice routines.
-- [Song Recommender](https://riff.quest/what-guitar-song-to-learn) - Find the perfect song to learn based on your skill level and genre.
+- [How It Works](https://riff.quest/how-it-works) - A step-by-step overview of how to get started with Riff Quest.
+- [Exercises](https://riff.quest/exercises) - Browse the catalog of guitar exercises across technique, theory, ear training, and creativity.
+- [Song Library](https://riff.quest/song-library) - Community song library with difficulty ratings rated by real guitarists.
 - [Blog](https://riff.quest/blog) - Knowledge hub for guitarists, featuring technique tips and practice psychology.
-- [Guide](https://riff.quest/guide) - A step-by-step guide for new users to get started with Riff Quest.
 - [Practice Habits](https://riff.quest/blog/practice-habits) - Comprehensive guide on building effective guitar practice habits.
 - [Guitar Practice Routine](https://riff.quest/blog/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
 - [Guitar Practice Tracker](https://riff.quest/blog/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
+- [FAQ](https://riff.quest/faq) - Answers to common questions about the platform.
 - [About](https://riff.quest/about) - Learn about the mission and vision behind Riff Quest.
 - [Privacy Policy](https://riff.quest/privacy-policy) - Information on how we handle and protect your data.
+
+## Pricing
+
+- Riff Quest is **free forever**. There are no premium tiers, subscriptions, or paywalls.
+- The project is sustained voluntarily by the community via [Buy Me a Coffee](https://buymeacoffee.com/riffquest).
 
 ## Technical Details
 
