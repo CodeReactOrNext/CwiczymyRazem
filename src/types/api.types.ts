@@ -72,6 +72,8 @@ export interface UserDataInterface {
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
     emailNotifications?: EmailNotificationPreferences;
+    favoritePlanIds?: string[];
+    favoriteExerciseIds?: string[];
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -174,6 +176,8 @@ export interface userSliceInitialState {
     feedbackDismissCount?: number;
     feedbackLastDismissedAt?: Timestamp | null;
     emailNotifications?: EmailNotificationPreferences;
+    favoritePlanIds?: string[];
+    favoriteExerciseIds?: string[];
   } | null;
   timer: TimerInterface;
   currentActivity: {
