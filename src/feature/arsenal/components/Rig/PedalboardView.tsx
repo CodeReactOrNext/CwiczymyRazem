@@ -44,9 +44,11 @@ interface PedalboardViewProps {
   data: ArsenalUserData;
   onUpdateItems: (items: PedalboardPlacement[]) => void;
   onHover?: (e: React.MouseEvent | null, content: React.ReactNode | null) => void;
+  /** Touch-only: tapping a pedal opens its card in a modal (drag is disabled when set). */
+  onShowCard?: (content: React.ReactNode) => void;
 }
 
-export const PedalboardView = ({ data, onUpdateItems, onHover }: PedalboardViewProps) => {
+export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: PedalboardViewProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDragging] = useState<DragState | null>(null);
@@ -176,6 +178,8 @@ export const PedalboardView = ({ data, onUpdateItems, onHover }: PedalboardViewP
   }, [dragging, handleMouseMove, handleMouseUp]);
 
   const handlePedalMouseDown = (e: React.MouseEvent, item: PedalboardPlacement) => {
+    // On touch devices we open the card on tap instead of dragging.
+    if (onShowCard) return;
     e.preventDefault();
     onHover?.(null, null);
     if (!boardRef.current) return;
@@ -279,6 +283,7 @@ export const PedalboardView = ({ data, onUpdateItems, onHover }: PedalboardViewP
                 onMouseDown={(e) => handlePedalMouseDown(e, placement)}
                 onMouseMove={(e) => { if (!dragging && invItem) onHover?.(e, <EffectCard item={invItem} readOnly />); }}
                 onMouseLeave={() => onHover?.(null, null)}
+                onClick={() => { if (onShowCard && invItem) onShowCard(<EffectCard item={invItem} readOnly />); }}
                 className="absolute group"
                 style={{
                   left: `${placement.xPct}%`,

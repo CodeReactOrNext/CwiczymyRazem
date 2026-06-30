@@ -58,7 +58,7 @@ const typeConfig = {
     bg: "bg-amber-500",
     label: (n: any) => (
       <span className="inline-flex items-center gap-1 flex-wrap">
-        Your {n.itemName ? <span className="font-semibold text-white">{n.itemName}</span> : "item"} sold for +{n.fameAwarded}
+        bought your {n.itemName ? <span className="font-semibold text-white">{n.itemName}</span> : "item"} for +{n.fameAwarded}
         <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
       </span>
     ),
@@ -201,7 +201,9 @@ export const NotificationsBell = () => {
                 const isSystemNotif =
                   n.type === "season_reward" ||
                   n.type === "season_start" ||
-                  n.type === "marketplace_sold";
+                  // Legacy marketplace sales stored without a buyer fall back to
+                  // the system (Store) icon; new ones show the buyer's avatar.
+                  (n.type === "marketplace_sold" && !n.senderName);
                 return (
                   <button
                     key={n.id}

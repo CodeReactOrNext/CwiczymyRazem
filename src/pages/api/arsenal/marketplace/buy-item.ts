@@ -77,14 +77,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         itemBrand: listing.itemBrand,
         itemImageId: listing.itemImageId,
         itemRarity: listing.itemRarity,
+        buyerName: buyerData.displayName || "Someone",
+        buyerAvatarUrl: buyerData.avatar || buyerData.photoURL || null,
+        buyerFrame: buyerData.selectedFrame ?? buyerData.statistics?.lvl ?? 0,
       };
     });
 
-    // Notify the seller (system notification — no sender).
+    // Notify the seller — include the buyer's identity so the seller can see
+    // who purchased the item they listed on the marketplace.
     try {
       await firestore.collection("notifications").add({
         userId: result.sellerId,
         type: "marketplace_sold",
+        senderId: buyerId,
+        senderName: result.buyerName,
+        senderAvatarUrl: result.buyerAvatarUrl,
+        senderFrame: result.buyerFrame,
         fameAwarded: result.price,
         itemType: result.itemType,
         itemName: `${result.itemBrand} ${result.itemName}`,

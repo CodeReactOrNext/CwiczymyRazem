@@ -52,7 +52,7 @@ export function NoteHuntDetector({
   const complete = isPrompt ? solved : allFound;
 
   return (
-    <div className={cn("flex w-full flex-col items-center gap-4", noteHuntRegion ? "max-w-xl" : "max-w-sm")}>
+    <div className={cn("flex w-full flex-col items-center gap-2.5 sm:gap-4", noteHuntRegion ? "max-w-xl" : "max-w-sm")}>
       {/* Score (mic only) + countdown */}
       <div className="flex items-center justify-center gap-3">
         {isMicEnabled && (
@@ -89,12 +89,12 @@ export function NoteHuntDetector({
           animate={complete ? { scale: [1, 1.18, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "relative w-32 h-32 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors duration-500",
+            "relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors duration-500",
             complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
           )}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-          <span className="text-7xl font-black text-white tracking-tighter drop-shadow-[0_0_18px_rgba(255,255,255,0.5)]">
+          <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_0_18px_rgba(255,255,255,0.5)]">
             {isPrompt && !solved ? customGoalPrompt!.title : targetNote}
           </span>
         </motion.div>
@@ -140,6 +140,10 @@ export function NoteHuntDetector({
         />
       )}
 
+      {/* Answer panel — chips, progress and Next grouped together so they read as
+          one block (and stay compact) on small screens instead of drifting apart. */}
+      {(isPrompt || octaves.length > 0 || isRotating) && (
+      <div className="flex w-full flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl bg-black/20 p-3 sm:bg-transparent sm:p-0">
       {/* Octave chips — reference + (no-mic) tap-to-mark. Hidden in interval mode
           so they don't reveal the answer. */}
       {!isPrompt && octaves.length > 0 && (
@@ -192,10 +196,10 @@ export function NoteHuntDetector({
         </div>
       ) : (
         octaves.length > 0 && (
-          <p className={cn("text-sm font-extrabold tracking-widest transition-colors", allFound ? "text-emerald-300" : "text-zinc-300")}>
+          <p className={cn("text-sm font-extrabold tracking-wide transition-colors", allFound ? "text-emerald-300" : "text-zinc-300")}>
             {allFound
-              ? (noteHuntRegion ? "★ ALL POSITIONS FOUND" : "★ ALL OCTAVES FOUND")
-              : `${foundInRange} / ${octaves.length} ${noteHuntRegion ? "FOUND IN REGION" : "OCTAVES FOUND"}`}
+              ? (noteHuntRegion ? "★ all positions found" : "★ all octaves found")
+              : `${foundInRange} / ${octaves.length} ${noteHuntRegion ? "found in region" : "octaves found"}`}
           </p>
         )
       )}
@@ -205,10 +209,12 @@ export function NoteHuntDetector({
         <button
           type="button"
           onClick={advanceHunt}
-          className="mt-1 inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
+          className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
         >
           Next <FaArrowRight className="h-3.5 w-3.5" />
         </button>
+      )}
+      </div>
       )}
     </div>
   );

@@ -652,6 +652,19 @@ function LevelGoalCard({
         </div>
       </div>
 
+      {/* Goal + reward surfaced right under the header so the claim is impossible
+          to miss — the chart below is supporting detail, not the call-to-action. */}
+      {!isLocked && (
+        <div className="space-y-2.5">
+          {goalBox}
+          {actionButton && (
+            <div className="[&>*]:w-full">
+              {actionButton}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── week-bars (levels 1,2,4) ── */}
       {!isLocked && levelType === "week-bars" && (() => {
         const maxMin     = Math.max(dayGoalMin * 2, ...dayBars.map(d => d.minutes));
@@ -991,16 +1004,7 @@ function LevelGoalCard({
           })()}
           {actionButton}
         </div>
-      ) : (
-        <>
-          {goalBox}
-          {actionButton && (
-            <div className="flex items-center justify-center sm:justify-end pt-1 border-t border-zinc-800/60 -mx-4 -mb-4 px-4 sm:-mx-5 sm:-mb-5 sm:px-5 py-3.5 mt-1">
-              {actionButton}
-            </div>
-          )}
-        </>
-      )}
+      ) : null}
     </div>
   );
 }

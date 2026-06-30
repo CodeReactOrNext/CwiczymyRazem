@@ -14,9 +14,11 @@ interface GuitarSlotProps {
   onOpenPicker: (slotIndex: number) => void;
   onRemove: (slotIndex: number) => void;
   onHover?: (e: React.MouseEvent | null, content: React.ReactNode | null) => void;
+  /** Touch-only: tapping the slot opens its card in a modal. */
+  onShowCard?: (content: React.ReactNode) => void;
 }
 
-export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemove, onHover }: GuitarSlotProps) => {
+export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemove, onHover, onShowCard }: GuitarSlotProps) => {
   const item = itemId ? inventory.find((i) => i.id === itemId) : null;
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const rs = guitar ? RARITY_STYLES[guitar.rarity] : null;
@@ -55,10 +57,11 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
       }}
       onMouseMove={(e) => onHover?.(e, <GuitarCard item={item} readOnly />)}
       onMouseLeave={() => onHover?.(null, null)}
+      onClick={() => onShowCard?.(<GuitarCard item={item} readOnly />)}
     >
       {/* Remove button */}
       <button
-        onClick={() => onRemove(slotIndex)}
+        onClick={(e) => { e.stopPropagation(); onRemove(slotIndex); }}
         aria-label="Remove guitar from slot"
         className={cn(
           "absolute right-2 top-2 z-20 rounded bg-zinc-900/70 p-1 text-zinc-400",
@@ -133,7 +136,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
 
       {/* Change button */}
       <button
-        onClick={() => onOpenPicker(slotIndex)}
+        onClick={(e) => { e.stopPropagation(); onOpenPicker(slotIndex); }}
         className={cn(
           "w-full py-2 text-xs font-bold capitalize tracking-wide text-zinc-400",
           "transition-background hover:bg-zinc-800/40 hover:text-zinc-100",

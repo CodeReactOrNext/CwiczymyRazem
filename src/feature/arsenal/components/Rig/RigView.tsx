@@ -1,5 +1,7 @@
+import { X } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useResponsiveStore } from "store/useResponsiveStore";
 
 import { GUITARS_BY_ID } from "../../data/guitarDefinitions";
 import { useUpdatePedalboard } from "../../hooks/useUpdatePedalboard";
@@ -22,13 +24,19 @@ export interface RigHoverState {
 export const RigView = ({ data }: RigViewProps) => {
   const { mutate: saveRig } = useUpdateRig();
   const { mutate: savePedalboard } = useUpdatePedalboard();
+  const isMobile = useResponsiveStore((state) => state.isMobile);
   const [pickerSlot, setPickerSlot] = useState<number | null>(null);
   const [hover, setHover] = useState<RigHoverState | null>(null);
+  // On touch devices there is no hover — tapping an item opens its card in a centered modal instead.
+  const [pinnedCard, setPinnedCard] = useState<React.ReactNode | null>(null);
 
   const handleHover = (e: React.MouseEvent | null, content: React.ReactNode | null) => {
+    if (isMobile) return;
     if (!e || !content) return setHover(null);
     setHover({ x: e.clientX, y: e.clientY, content });
   };
+
+  const handleShowCard = isMobile ? (content: React.ReactNode) => setPinnedCard(content) : undefined;
 
   const rig = data.rig;
 
@@ -79,6 +87,7 @@ export const RigView = ({ data }: RigViewProps) => {
               onOpenPicker={setPickerSlot}
               onRemove={handleGuitarRemove}
               onHover={handleHover}
+              onShowCard={handleShowCard}
             />
           ))}
         </div>
@@ -90,7 +99,7 @@ export const RigView = ({ data }: RigViewProps) => {
           <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
           <p className="text-base font-black text-white capitalize tracking-wide">Pedalboard</p>
         </div>
-        <PedalboardView data={data} onUpdateItems={savePedalboard} onHover={handleHover} />
+        <PedalboardView data={data} onUpdateItems={savePedalboard} onHover={handleHover} onShowCard={handleShowCard} />
       </div>
 
       {pickerSlot !== null && (
@@ -111,6 +120,29 @@ export const RigView = ({ data }: RigViewProps) => {
             style={{ left: hover.x + 16, top: hover.y - 8, width: 250 }}
           >
             {hover.content}
+          </div>,
+          document.body
+        )}
+
+      {pinnedCard && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={() => setPinnedCard(null)}
+          >
+            <div
+              className="relative w-full max-w-[320px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setPinnedCard(null)}
+                aria-label="Close"
+                className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
+              >
+                <X size={15} />
+              </button>
+              {pinnedCard}
+            </div>
           </div>,
           document.body
         )}
