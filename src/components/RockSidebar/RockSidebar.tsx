@@ -19,6 +19,7 @@ import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   Calendar,
+  Heart,
   Home,
   ListChecks,
   LogOut,
@@ -182,6 +183,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/plans")) return "plans";
+    if (pathname.startsWith("/favorites")) return "favorites";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/recordings")) return "recordings";
     if (pathname.startsWith("/scoring")) return "scoring";
@@ -216,6 +218,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const toolsNavigation = [
     { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
     { id: "my-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
+    { id: "favorites", name: "Favorites", href: "/favorites", icon: <Heart size={16} /> },
     { id: "arsenal", name: "Guitar Arsenal", href: "/arsenal", icon: <Swords size={16} /> },
     { id: "summary", name: "Milestones", href: "/summary", icon: <Milestone size={16} /> },
   ];
