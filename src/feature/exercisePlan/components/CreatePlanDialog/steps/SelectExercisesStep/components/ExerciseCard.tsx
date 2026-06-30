@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Info,Lock, Plus, Video, X } from "lucide-react";
+import { Check, Heart, Info,Lock, Plus, Video, X } from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
 
 import { TablaturePreview } from "./TablaturePreview";
@@ -15,6 +15,8 @@ interface ExerciseCardProps {
   isLocked?: boolean;
   onUpgrade?: () => void;
   onPreview?: (exercise: Exercise) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export const ExerciseCard = ({
@@ -24,6 +26,8 @@ export const ExerciseCard = ({
   isLocked = false,
   onUpgrade,
   onPreview,
+  isFavorite = false,
+  onToggleFavorite,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -155,6 +159,23 @@ export const ExerciseCard = ({
             </div>
           ) : (
             <div className="flex items-center gap-1.5 shrink-0">
+              {onToggleFavorite && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+                  aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  aria-pressed={isFavorite}
+                  className={cn(
+                    "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",
+                    isFavorite
+                      ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
+                      : "bg-white/5 text-zinc-400 ring-white/10 hover:text-rose-300 hover:bg-rose-500/10"
+                  )}
+                  title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
@@ -194,6 +215,22 @@ export const ExerciseCard = ({
              </div>
            ) : (
              <div className="flex flex-row items-center gap-2">
+               {onToggleFavorite && (
+                 <button
+                   type="button"
+                   onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+                   aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                   aria-pressed={isFavorite}
+                   className={cn(
+                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",
+                     isFavorite
+                       ? "bg-rose-500/15 text-rose-400 ring-rose-500/30"
+                       : "bg-white/5 text-zinc-400 ring-white/10"
+                   )}
+                 >
+                   <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
+                 </button>
+               )}
                <button
                  type="button"
                  onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}

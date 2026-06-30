@@ -8,8 +8,10 @@ import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { useTranslation } from "hooks/useTranslation";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FaClock,
   FaExternalLinkAlt,
@@ -18,6 +20,7 @@ import {
   FaMusic,
   FaTrophy,
 } from "react-icons/fa";
+import { useResponsiveStore } from "store/useResponsiveStore";
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
@@ -55,6 +58,8 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
   const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation("common");
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -98,12 +103,9 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
 
   if (!userId) return <>{children}</>;
 
-  return (
-    <TooltipProvider>
-      <Tooltip delayDuration={200}>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
-          {loading ? (
+  const panel = (
+    <>
+      {loading ? (
             <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
           ) : userData ? (
             <div className='relative flex flex-col gap-5 text-gray-900'>
@@ -233,6 +235,56 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
               <p>{t("tooltip.userNotFound")}</p>
             </div>
           )}
+    </>
+  );
+
+  // Touch devices: tap opens the stats card in a centered modal instead of
+  // navigating straight to the profile (hover tooltips don't fire on touch).
+  if (isMobile) {
+    return (
+      <>
+        <span
+          className="contents"
+          onClickCapture={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
+        >
+          {children}
+        </span>
+        {open && typeof document !== "undefined" &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+              onClick={() => setOpen(false)}
+            >
+              <div
+                className="relative w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-100 bg-white/95 p-4 shadow-2xl backdrop-blur-md"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Close"
+                  className="absolute right-2 top-2 z-30 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900/80 text-gray-200 shadow-lg hover:text-white"
+                >
+                  <X size={15} />
+                </button>
+                {panel}
+              </div>
+            </div>,
+            document.body
+          )}
+      </>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
+          {panel}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,10 +1,11 @@
 import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-import { selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect,useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { ExerciseCard } from "./ExerciseCard";
 
@@ -22,8 +23,11 @@ export const ExerciseGrid = ({
   onPreviewExercise,
 }: ExerciseGridProps) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const dispatch = useAppDispatch();
+  const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+  const favoriteExerciseIds = userInfo?.favoriteExerciseIds ?? [];
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -59,6 +63,7 @@ export const ExerciseGrid = ({
         {paginatedExercises.map((exercise) => {
           const isSelected = selectedExercises.some((e) => e.id === exercise.id);
           const locked = !!exercise.premium && !isPremium;
+          const isFavorite = favoriteExerciseIds.includes(exercise.id);
 
           return (
             <ExerciseCard
@@ -69,6 +74,18 @@ export const ExerciseGrid = ({
               onPreview={onPreviewExercise}
               isLocked={locked}
               onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
+              isFavorite={isFavorite}
+              onToggleFavorite={
+                userAuth
+                  ? () =>
+                      dispatch(
+                        toggleFavoriteExercise({
+                          exerciseId: exercise.id,
+                          isFavorite: !isFavorite,
+                        })
+                      )
+                  : undefined
+              }
             />
           );
         })}

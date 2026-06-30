@@ -35,14 +35,16 @@ import { SupportPulse } from "feature/roadmap/components/SupportPulse";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
-import { ExternalLink, Star,Video } from "lucide-react";
+import { ExternalLink, Star,Video, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FaTrophy,
 } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
+import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 
 const isFirebaseLogsSongs = (
@@ -188,6 +190,133 @@ const ItemTooltipCard = ({
   );
 };
 
+/** Centered, tap-to-dismiss modal used on touch devices where hover tooltips don't fire. */
+const CardModal = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => {
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div className="relative w-full max-w-[320px]" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
+        >
+          <X size={15} />
+        </button>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+const ItemPill = ({
+  itemType,
+  itemName,
+  itemBrand,
+  itemRarity,
+  itemImageId,
+  level,
+  rolledGuitar,
+  rolledEffect,
+}: {
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  level: number | null;
+  rolledGuitar: any;
+  rolledEffect: any;
+}) => {
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const [open, setOpen] = useState(false);
+  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const imgSrc = itemType === "guitar"
+    ? `/static/images/rank/${itemImageId}.webp`
+    : `/static/images/effects/${itemImageId}.png`;
+
+  const cardContent = rolledGuitar ? (
+    <div style={{ width: 250 }}>
+      <GuitarCard item={rolledGuitar} readOnly />
+    </div>
+  ) : rolledEffect ? (
+    <div style={{ width: 250 }}>
+      <EffectCard item={rolledEffect} readOnly />
+    </div>
+  ) : (
+    <ItemTooltipCard
+      itemType={itemType}
+      itemName={itemName}
+      itemBrand={itemBrand}
+      itemRarity={itemRarity}
+      itemImageId={itemImageId}
+    />
+  );
+
+  const pill = (
+    <span className="inline-flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-white/5 p-2 sm:w-auto sm:gap-1.5 sm:rounded-none sm:bg-transparent sm:p-0">
+            {/* Guitar/effect art — fixed size, never shrinks. Leads on mobile, trails on desktop. */}
+            <img
+              src={imgSrc}
+              alt={itemName}
+              className={`h-10 w-10 shrink-0 object-contain opacity-80 sm:order-last sm:h-7 sm:w-7 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+            />
+            {/* Name + badges: stacked on mobile, inline on desktop */}
+            <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-initial sm:flex-row sm:items-center sm:gap-1.5">
+              <span className="order-1 min-w-0 break-words text-sm font-bold sm:order-2" style={{ color }}>
+                {itemBrand} {itemName}
+              </span>
+              {/* Badges stay on one line and keep together */}
+              <span className="order-2 flex shrink-0 items-center gap-1.5 sm:order-1">
+                <span
+                  className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide"
+                  style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                >
+                  {itemRarity}
+                </span>
+                {level !== null && (
+                  <span
+                    className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
+                    style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+                    title="Item level"
+                  >
+                    Lv {level}
+                  </span>
+                )}
+              </span>
+            </span>
+          </span>
+  );
+
+  // Touch devices: tap opens the card in a centered modal (hover tooltips don't fire).
+  if (isMobile) {
+    return (
+      <>
+        <span onClick={() => setOpen(true)}>{pill}</span>
+        {open && <CardModal onClose={() => setOpen(false)}>{cardContent}</CardModal>}
+      </>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={150}>
+        <TooltipTrigger asChild>{pill}</TooltipTrigger>
+        <TooltipContent
+          className="p-0 border-0 bg-transparent shadow-2xl"
+          side="top"
+        >
+          {cardContent}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const FirebaseLogsCaseOpenItem = ({
   log,
   isNew,
@@ -199,10 +328,6 @@ const FirebaseLogsCaseOpenItem = ({
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, caseName, itemType, itemName, itemBrand, itemRarity, itemImageId } = log;
   const date = new Date(timestamp);
-  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
-  const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.webp`
-    : `/static/images/effects/${itemImageId}.png`;
 
   // Full rolled instance (newer logs) → proper card tooltip + computed level.
   const rolled = log.rolledItem;
@@ -232,59 +357,16 @@ const FirebaseLogsCaseOpenItem = ({
         
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <TooltipProvider>
-              <Tooltip delayDuration={150}>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
-                    <span
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
-                      style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
-                    >
-                      {itemRarity}
-                    </span>
-                    {level !== null && (
-                      <span
-                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
-                        style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
-                        title="Item level"
-                      >
-                        Lv {level}
-                      </span>
-                    )}
-                    <span className="font-bold text-sm" style={{ color }}>
-                      {itemBrand} {itemName}
-                    </span>
-                    <img
-                      src={imgSrc}
-                      alt={itemName}
-                      className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
-                    />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="p-0 border-0 bg-transparent shadow-2xl"
-                  side="top"
-                >
-                  {rolledGuitar ? (
-                    <div style={{ width: 250 }}>
-                      <GuitarCard item={rolledGuitar} readOnly />
-                    </div>
-                  ) : rolledEffect ? (
-                    <div style={{ width: 250 }}>
-                      <EffectCard item={rolledEffect} readOnly />
-                    </div>
-                  ) : (
-                    <ItemTooltipCard
-                      itemType={itemType}
-                      itemName={itemName}
-                      itemBrand={itemBrand}
-                      itemRarity={itemRarity}
-                      itemImageId={itemImageId}
-                    />
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ItemPill
+              itemType={itemType}
+              itemName={itemName}
+              itemBrand={itemBrand}
+              itemRarity={itemRarity}
+              itemImageId={itemImageId}
+              level={level}
+              rolledGuitar={rolledGuitar}
+              rolledEffect={rolledEffect}
+            />
           </div>
           {log.id && (
             <div className="shrink-0">
@@ -313,10 +395,6 @@ const FirebaseLogsMarketplaceItem = ({
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, itemType, itemName, itemBrand, itemRarity, itemImageId, price } = log;
   const date = new Date(timestamp);
-  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
-  const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.webp`
-    : `/static/images/effects/${itemImageId}.png`;
 
   const rolled = log.rolledItem;
   const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
@@ -343,59 +421,16 @@ const FirebaseLogsMarketplaceItem = ({
 
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:flex-initial min-w-0">
-            <TooltipProvider>
-              <Tooltip delayDuration={150}>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
-                    <span
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
-                      style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
-                    >
-                      {itemRarity}
-                    </span>
-                    {level !== null && (
-                      <span
-                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
-                        style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
-                        title="Item level"
-                      >
-                        Lv {level}
-                      </span>
-                    )}
-                    <span className="font-bold text-sm" style={{ color }}>
-                      {itemBrand} {itemName}
-                    </span>
-                    <img
-                      src={imgSrc}
-                      alt={itemName}
-                      className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
-                    />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="p-0 border-0 bg-transparent shadow-2xl"
-                  side="top"
-                >
-                  {rolledGuitar ? (
-                    <div style={{ width: 250 }}>
-                      <GuitarCard item={rolledGuitar} readOnly />
-                    </div>
-                  ) : rolledEffect ? (
-                    <div style={{ width: 250 }}>
-                      <EffectCard item={rolledEffect} readOnly />
-                    </div>
-                  ) : (
-                    <ItemTooltipCard
-                      itemType={itemType}
-                      itemName={itemName}
-                      itemBrand={itemBrand}
-                      itemRarity={itemRarity}
-                      itemImageId={itemImageId}
-                    />
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ItemPill
+              itemType={itemType}
+              itemName={itemName}
+              itemBrand={itemBrand}
+              itemRarity={itemRarity}
+              itemImageId={itemImageId}
+              level={level}
+              rolledGuitar={rolledGuitar}
+              rolledEffect={rolledEffect}
+            />
 
             <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
               <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>

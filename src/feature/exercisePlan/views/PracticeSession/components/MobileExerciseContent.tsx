@@ -8,7 +8,9 @@ import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { NoteHuntDetector } from "./NoteHuntDetector";
+import { OpenExercisePanel } from "./OpenExercisePanel";
 import { TablatureViewer } from "./TablatureViewer";
+import { isOpenExercise } from "../../../utils/isOpenExercise";
 
 interface MobileExerciseContentProps {
   currentExercise: any;
@@ -161,6 +163,8 @@ export function MobileExerciseContent({
           title={currentExercise.title}
           isMobileView={true}
         />
+      ) : isOpenExercise(currentExercise) ? (
+        <OpenExercisePanel compact />
       ) : null}
     </>
   );

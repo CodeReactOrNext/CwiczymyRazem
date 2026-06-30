@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import React, { memo, useEffect } from "react";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
+import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
@@ -10,6 +11,7 @@ import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { NoteHuntDetector } from "./NoteHuntDetector";
+import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
 import { TablatureSection } from "./TablatureSection";
 import { VideoSection } from "./VideoSection";
@@ -223,6 +225,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMicEnabled={isMicEnabled}
           audioContext={audioContext}
         />
+      ) : isOpenExercise(currentExercise) ? (
+        <div className="p-4">
+          <OpenExercisePanel />
+        </div>
       ) : (
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}
