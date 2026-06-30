@@ -25,5 +25,6 @@ export type NavPagesTypes =
   | "scale-tree"
   | "scoring"
   | "my-exercises"
+  | "favorites"
   | "roadmap"
   | null;
