@@ -4,20 +4,23 @@ import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
+import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import {
   toggleFavoriteExercise,
   toggleFavoritePlan,
-  toggleFavoriteSong,
 } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
-import { Clock, Heart, Music } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
@@ -68,31 +71,62 @@ const FavoritesPage: NextPageWithLayout = () => {
     .filter((e): e is (typeof exercisesAgregat)[number] => Boolean(e));
 
   // Songs live in the user's Firestore library (not a static bundle), so we load
-  // them once and keep only the ones that are both in the library and favorited.
-  const [librarySongs, setLibrarySongs] = useState<Song[]>([]);
+  // them and keep only the ones that are both in the library and favorited.
+  const [songLists, setSongLists] = useState<{
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  }>({ wantToLearn: [], learning: [], learned: [] });
+
+  const loadSongs = useCallback(() => {
+    if (!userAuth) return Promise.resolve();
+    return getUserSongs(userAuth)
+      .then((lists) => {
+        setSongLists({
+          wantToLearn: lists.wantToLearn,
+          learning: lists.learning,
+          learned: lists.learned,
+        });
+      })
+      .catch((error) => console.error("Failed to load songs:", error));
+  }, [userAuth]);
 
   useEffect(() => {
-    let active = true;
-    if (userAuth) {
-      getUserSongs(userAuth)
-        .then((lists) => {
-          if (!active) return;
-          setLibrarySongs([
-            ...lists.wantToLearn,
-            ...lists.learning,
-            ...lists.learned,
-          ]);
-        })
-        .catch((error) => console.error("Failed to load songs:", error));
-    }
-    return () => {
-      active = false;
+    loadSongs();
+  }, [loadSongs]);
+
+  // Flatten the library and remember which list each song lives in, so the card
+  // can show its status badge and offer the same "move to…" actions as /songs.
+  const { librarySongs, statusById } = useMemo(() => {
+    const status: Record<string, SongStatus> = {};
+    songLists.wantToLearn.forEach((s) => (status[s.id] = "wantToLearn"));
+    songLists.learning.forEach((s) => (status[s.id] = "learning"));
+    songLists.learned.forEach((s) => (status[s.id] = "learned"));
+    return {
+      librarySongs: [
+        ...songLists.wantToLearn,
+        ...songLists.learning,
+        ...songLists.learned,
+      ],
+      statusById: status,
     };
-  }, [userAuth]);
+  }, [songLists]);
 
   const favoriteSongs = favoriteSongIds
     .map((id) => librarySongs.find((s) => s.id === id))
     .filter((s): s is Song => Boolean(s));
+
+  // Practice/GP picker — same chooser you get when clicking a song on /songs.
+  const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
+  const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
+    userAuth ?? null,
+    isPremium
+  );
+  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
+    userSongs: songLists,
+    onChange: setSongLists,
+    onTableStatusChange: loadSongs,
+  });
 
   const isEmpty =
     favoritePlans.length === 0 &&
@@ -296,71 +330,25 @@ const FavoritesPage: NextPageWithLayout = () => {
                   </span>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
                   {favoriteSongs.map((song) => (
-                    <button
+                    <SongCard
                       key={song.id}
-                      type="button"
-                      onClick={() => router.push(`/timer/song/${song.id}`)}
-                      className="group relative flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 text-left transition-colors hover:border-zinc-700 hover:bg-zinc-900/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40"
-                    >
-                      <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-zinc-800">
-                        {song.coverUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={song.coverUrl}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="flex h-full w-full items-center justify-center text-zinc-500">
-                            <Music className="h-5 w-5" />
-                          </span>
-                        )}
-                      </span>
-
-                      <span className="flex min-w-0 flex-1 flex-col">
-                        <span
-                          translate="no"
-                          className="truncate font-semibold text-zinc-100"
-                        >
-                          {song.title}
-                        </span>
-                        <span className="truncate text-xs text-zinc-500">
-                          {song.artist}
-                        </span>
-                      </span>
-
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Remove from favorites"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch(
-                            toggleFavoriteSong({
-                              songId: song.id,
-                              isFavorite: false,
-                            })
-                          );
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            dispatch(
-                              toggleFavoriteSong({
-                                songId: song.id,
-                                isFavorite: false,
-                              })
-                            );
-                          }
-                        }}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-rose-500/15 text-rose-400 transition-colors hover:bg-rose-500/25 hover:text-rose-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50"
-                      >
-                        <Heart className="h-4 w-4 fill-current" />
-                      </span>
-                    </button>
+                      song={song}
+                      userStatus={statusById[song.id]}
+                      onOpenDetails={() => setPracticeTarget(song)}
+                      onPlay={() => setPracticeTarget(song)}
+                      onStatusChange={(status) =>
+                        status
+                          ? handleStatusChange(
+                              song.id,
+                              status,
+                              song.title,
+                              song.artist
+                            )
+                          : handleSongRemoval(song.id)
+                      }
+                    />
                   ))}
                 </div>
               </section>
@@ -368,6 +356,18 @@ const FavoritesPage: NextPageWithLayout = () => {
           </>
         )}
       </div>
+
+      {practiceTarget && userAuth && (
+        <SongPracticePickerModal
+          song={practiceTarget}
+          userId={userAuth}
+          isPremium={isPremium}
+          progress={progressMap[practiceTarget.id] ?? null}
+          onAttachGpFile={attachGpFile}
+          onDetachGpFile={detachGpFile}
+          onClose={() => setPracticeTarget(null)}
+        />
+      )}
     </div>
   );
 };

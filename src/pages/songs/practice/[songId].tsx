@@ -107,7 +107,13 @@ export default function SongPracticePage() {
   };
 
   const handleClose = () => {
-    router.push("/songs?view=management");
+    // Return to wherever the user came from (favorites, songs board, …);
+    // only fall back to the songs page when there's no history to go back to.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/songs?view=management");
+    }
   };
 
   if (pageState.status === "error") {
