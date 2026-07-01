@@ -26,21 +26,25 @@ const RippleTabsTrigger = ({
   value,
   icon,
   label,
+  isActive,
 }: {
   value: string;
   icon: React.ReactNode;
   label: string;
+  isActive: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   return (
     <TabsTrigger
       value={value}
       onClick={createRipple}
-      className="relative gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
+      className="relative shrink-0 gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
     >
       {ripple}
       {icon}
-      <span>{label}</span>
+      {/* On mobile only the active tab shows its label, so all four tabs stay
+          visible at once; from sm up every label is shown. */}
+      <span className={isActive ? "inline" : "hidden sm:inline"}>{label}</span>
     </TabsTrigger>
   );
 };
@@ -215,11 +219,11 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 </button>
               )}
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as (typeof PLAN_TABS)[number])} className="w-full">
-              <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
-                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" />
-                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" />
-                <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" />
-                <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" />
+              <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
+                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" isActive={activeTab === "routines"} />
+                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} />
+                <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" isActive={activeTab === "my_plans"} />
+                <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" isActive={activeTab === "community"} />
               </TabsList>
 
               <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-12">

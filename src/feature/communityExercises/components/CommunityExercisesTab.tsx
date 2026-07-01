@@ -384,24 +384,24 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
 
   const filterPill = (active: boolean) =>
     cn(
-      "px-3 py-1 rounded text-[11px] font-semibold border transition-all capitalize whitespace-nowrap",
+      "px-3 py-1 rounded text-[11px] font-semibold transition-colors capitalize whitespace-nowrap",
       active
-        ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
+        ? "bg-cyan-500/15 text-cyan-300"
+        : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
     );
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-6 pb-24 flex flex-col gap-5">
 
       {/* Filters */}
-      <div className="flex flex-col gap-3 bg-zinc-900/60 border border-zinc-800 rounded px-5 py-4">
+      <div className="flex flex-col gap-3 bg-zinc-900/60 rounded-lg px-5 py-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
           <input
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search community exercises…"
-            className="w-full pl-9 pr-4 h-9 rounded bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 transition-all"
+            className="w-full pl-9 pr-4 h-9 rounded-lg bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-colors"
           />
         </div>
 
@@ -431,7 +431,7 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
           {totalPages > 1 && <span className="ml-1 text-zinc-600">— page {safePage} / {totalPages}</span>}
         </p>
 
-        <div className="overflow-x-auto rounded border border-zinc-800">
+        <div className="overflow-x-auto rounded-lg border border-zinc-800">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900/80">

@@ -1,22 +1,25 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemValue } from "feature/arsenal/data/itemStats";
+import { getItemLevel, getItemValue } from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { useSellGuitarsBulk } from "feature/arsenal/hooks/useSellGuitarsBulk";
 import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { PackageOpen } from "lucide-react";
-import { useEffect,useState } from "react";
+import { Layers,PackageOpen } from "lucide-react";
+import { useEffect,useMemo,useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import type { ArsenalUserData, GuitarRarity, InventoryItem, RigSetup } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
+import type { BulkSellItem } from "./BulkSellConfirmDialog";
+import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
 import { EquipTargetDialog } from "./EquipTargetDialog";
 import type { EquipTarget } from "./GuitarCard";
 import { GuitarCard } from "./GuitarCard";
@@ -34,6 +37,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: unequip } = useUnequipGuitar();
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
+  const { mutate: sellBulk, isPending: isSellingBulk } = useSellGuitarsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: saveRig } = useUpdateRig();
   const queryClient = useQueryClient();
@@ -41,6 +45,51 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const currentFame = userStats?.fame || 0;
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
+
+  // Sellable duplicates: for every guitar owned more than once, keep the
+  // highest-level instance and mark the lower-level copies for bulk selling.
+  // The equipped guitar and any rig-slotted guitar are never sold.
+  const { duplicateIds, duplicateItems, duplicateFame } = useMemo(() => {
+    const byGuitar = new Map<number | string, InventoryItem[]>();
+    for (const item of data.inventory) {
+      const arr = byGuitar.get(item.guitarId);
+      if (arr) arr.push(item);
+      else byGuitar.set(item.guitarId, [item]);
+    }
+
+    const ids: string[] = [];
+    const items: BulkSellItem[] = [];
+    let fame = 0;
+    for (const [guitarId, group] of byGuitar) {
+      if (group.length < 2) continue;
+      const guitar = GUITARS_BY_ID.get(guitarId);
+      if (!guitar) continue;
+      // Best copy first (level desc, value as tie-break); keep it, sell the rest.
+      const sorted = [...group].sort(
+        (a, b) =>
+          getItemLevel(b, guitar) - getItemLevel(a, guitar) ||
+          getItemValue(b, guitar) - getItemValue(a, guitar)
+      );
+      for (let i = 1; i < sorted.length; i++) {
+        const it = sorted[i];
+        if (it.id === data.equippedItemId) continue;
+        if (rig.guitarSlots.includes(it.id)) continue;
+        const value = getItemValue(it, guitar);
+        ids.push(it.id);
+        items.push({
+          id: it.id,
+          name: `${guitar.brand} ${guitar.name}`,
+          rarity: guitar.rarity,
+          level: getItemLevel(it, guitar),
+          value,
+        });
+        fame += value;
+      }
+    }
+    // Highest-level (most valuable) first so the biggest losses are visible up top.
+    items.sort((a, b) => b.level - a.level || b.value - a.value);
+    return { duplicateIds: ids, duplicateItems: items, duplicateFame: fame };
+  }, [data.inventory, data.equippedItemId, rig.guitarSlots]);
 
   const handleEquipTo = (item: InventoryItem, target: EquipTarget) => {
     if (target === "profile") {
@@ -72,6 +121,14 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const [isListDialogOpen, setIsListDialogOpen] = useState(false);
   const [listItemId, setListItemId] = useState<string | null>(null);
   const [listGuitarId, setListGuitarId] = useState<number | string | null>(null);
+  const [isBulkSellOpen, setIsBulkSellOpen] = useState(false);
+
+  const handleConfirmBulkSell = () => {
+    if (duplicateIds.length === 0) return;
+    sellBulk(duplicateIds, {
+      onSuccess: () => setIsBulkSellOpen(false),
+    });
+  };
 
   // Clear "new" flags when user opens collection tab
   useEffect(() => {
@@ -159,10 +216,24 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   return (
     <>
-      <div className="mb-6 flex items-baseline gap-1.5">
-        <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
-        <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
-        <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
+          <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
+          <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
+        </div>
+
+        {duplicateIds.length > 0 && (
+          <button
+            onClick={() => setIsBulkSellOpen(true)}
+            disabled={isSellingBulk}
+            className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+            title="Sell every lower-level duplicate, keeping the best copy of each guitar"
+          >
+            <Layers size={14} />
+            Sell duplicates ({duplicateIds.length})
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-12">
@@ -176,7 +247,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
                 owned={ownedByRarity[rarity]}
                 total={totalByRarity[rarity]}
               />
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {items.map((item) => (
                   <GuitarCard
                     key={item.id}
@@ -235,6 +306,15 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
           />
         ) : null;
       })()}
+
+      <BulkSellConfirmDialog
+        isOpen={isBulkSellOpen}
+        items={duplicateItems}
+        fameReward={duplicateFame}
+        onConfirm={handleConfirmBulkSell}
+        onCancel={() => setIsBulkSellOpen(false)}
+        isLoading={isSellingBulk}
+      />
 
       <EquipTargetDialog
         isOpen={equipItem !== null}

@@ -3,6 +3,7 @@ import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCar
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type {
   ArsenalUserData,
@@ -10,8 +11,9 @@ import type {
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
 import { doc, getDoc } from "firebase/firestore";
-import { Guitar } from "lucide-react";
+import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { db } from "utils/firebase/client/firebase.utils";
 
 const PEDAL_H_PCT = 42;
@@ -47,11 +49,13 @@ interface GuitarSlotReadonlyProps {
   item: InventoryItem | null;
   slotIndex: number;
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
+  onSelect: (content: React.ReactNode) => void;
 }
 
-const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProps) => {
+const GuitarSlotReadonly = ({ item, slotIndex, onHover, onSelect }: GuitarSlotReadonlyProps) => {
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const rs = guitar ? RARITY_STYLES[guitar.rarity] : null;
+  const level = item && guitar ? getItemLevel(item, guitar) : 0;
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!guitar || !item || !rs) return;
@@ -60,6 +64,12 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
       y: e.clientY,
       content: <GuitarCard item={item} readOnly />,
     });
+  };
+
+  const handleClick = () => {
+    if (!guitar || !item || !rs) return;
+    onHover(null as any, null);
+    onSelect(<GuitarCard item={item} readOnly />);
   };
 
   if (!guitar || !rs) {
@@ -76,13 +86,14 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
 
   return (
     <div
-      className="relative flex flex-col overflow-hidden rounded-lg cursor-default select-none"
+      className="relative flex flex-col overflow-hidden rounded-lg cursor-pointer select-none"
       style={{
         height: 320,
         background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
+      onClick={handleClick}
     >
       {/* Header */}
       <div className="px-3 pt-4 pb-0 flex flex-col gap-0.5">
@@ -96,6 +107,23 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
 
       {/* Image */}
       <div className="relative flex items-center justify-center flex-1 overflow-hidden">
+        {/* Level emblem (every guitar has a level) */}
+        {level > 0 && (
+          <div
+            className="absolute top-2 left-2 z-20 flex flex-col items-center justify-center rounded-full"
+            style={{
+              width: 38,
+              height: 38,
+              background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
+              border: `1.5px solid ${rs.baseColor}`,
+              boxShadow: `0 0 10px ${rs.baseColor}55, inset 0 0 6px rgba(0,0,0,0.6)`,
+            }}
+            title="Guitar level"
+          >
+            <span className="text-[15px] font-black leading-none text-white">{level}</span>
+          </div>
+        )}
+
         {/* Subtle structural grid */}
         <div
           className="absolute inset-0 pointer-events-none z-0"
@@ -135,9 +163,10 @@ interface PedalReadonlyProps {
   placement: PedalboardPlacement;
   effectInventory: ArsenalUserData["effectInventory"];
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
+  onSelect: (content: React.ReactNode) => void;
 }
 
-const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyProps) => {
+const PedalReadonly = ({ placement, effectInventory, onHover, onSelect }: PedalReadonlyProps) => {
   const [aspect, setAspect] = useState(DEFAULT_ASPECT);
   const invItem = effectInventory.find((e) => e.id === placement.itemId);
   const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
@@ -154,9 +183,14 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
     });
   };
 
+  const handleClick = () => {
+    onHover(null as any, null);
+    onSelect(<EffectCard item={invItem!} readOnly />);
+  };
+
   return (
     <div
-      className="absolute"
+      className="absolute cursor-pointer"
       style={{
         left: `${placement.xPct}%`,
         top: `${placement.yPct}%`,
@@ -166,6 +200,7 @@ const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyPro
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
+      onClick={handleClick}
     >
       <img
         src={`/static/images/effects/${effect.imageId}.png`}
@@ -193,6 +228,9 @@ interface ProfileArsenalProps {
 export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   const [arsenal, setArsenal] = useState<ArsenalUserData | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  // Clicking/tapping an item opens its card in a centered modal, matching the
+  // arsenal editor and the activity view.
+  const [pinnedCard, setPinnedCard] = useState<React.ReactNode | null>(null);
 
   useEffect(() => {
     getDoc(doc(db, "users", userAuth)).then((snap) => {
@@ -242,7 +280,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
           <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Guitars</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {guitarItems.map((item, i) => (
-              <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} />
+              <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} onSelect={setPinnedCard} />
             ))}
           </div>
         </div>
@@ -311,6 +349,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   placement={placement}
                   effectInventory={effectInventory ?? []}
                   onHover={handleTooltip}
+                  onSelect={setPinnedCard}
                 />
               ))}
             </div>
@@ -329,7 +368,30 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
         </div>
       )}
 
-      {tooltip && <RpgTooltip tooltip={tooltip} />}
+      {tooltip && !pinnedCard && <RpgTooltip tooltip={tooltip} />}
+
+      {pinnedCard && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={() => setPinnedCard(null)}
+          >
+            <div
+              className="relative w-full max-w-[320px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setPinnedCard(null)}
+                aria-label="Close"
+                className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
+              >
+                <X size={15} />
+              </button>
+              {pinnedCard}
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
