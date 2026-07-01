@@ -66,6 +66,17 @@ export const sellGuitar = async (inventoryItemId: string): Promise<{ fameReward:
   return data;
 };
 
+export const sellGuitarsBulk = async (
+  inventoryItemIds: string[]
+): Promise<{ fameReward: number; soldCount: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number; soldCount: number }>(
+    "/api/arsenal/sell-guitars-bulk",
+    { idToken, inventoryItemIds }
+  );
+  return data;
+};
+
 export const sellEffect = async (inventoryItemId: string): Promise<{ fameReward: number }> => {
   const idToken = await getIdToken();
   const { data } = await axios.post<{ fameReward: number }>("/api/arsenal/sell-effect", {

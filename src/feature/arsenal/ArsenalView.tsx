@@ -81,37 +81,39 @@ export const ArsenalView = () => {
       <div className="p-4">
         <div className="flex flex-col gap-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit h-auto">
-              <TabsTrigger 
-                value="cases" 
-                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+            <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
+              <TabsTrigger
+                value="cases"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <PackageOpen size={16} />
-                Cases
+                {/* On mobile only the active tab shows its label, so all tabs
+                    stay visible at once; from sm up every label is shown. */}
+                <span className={activeTab === "cases" ? "inline" : "hidden sm:inline"}>Cases</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="collection" 
-                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              <TabsTrigger
+                value="collection"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Swords size={16} />
-                Collection
+                <span className={activeTab === "collection" ? "inline" : "hidden sm:inline"}>Collection</span>
                 {data && data.inventory.some((i) => i.isNew) && (
                   <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
               </TabsTrigger>
               <TabsTrigger
                 value="rig"
-                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Guitar size={16} />
-                Rig
+                <span className={activeTab === "rig" ? "inline" : "hidden sm:inline"}>Rig</span>
               </TabsTrigger>
               <TabsTrigger
                 value="market"
-                className="gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
                 <Store size={16} />
-                Market
+                <span className={activeTab === "market" ? "inline" : "hidden sm:inline"}>Market</span>
               </TabsTrigger>
             </TabsList>
 
@@ -126,7 +128,7 @@ export const ArsenalView = () => {
 
             <TabsContent value="collection" className="mt-4">
               {isLoading ? (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {Array.from({ length: 10 }).map((_, i) => (
                     <Skeleton key={i} className="h-36 rounded-lg bg-zinc-800/50" />
                   ))}
