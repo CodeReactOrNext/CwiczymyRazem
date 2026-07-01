@@ -74,6 +74,7 @@ export interface UserDataInterface {
     emailNotifications?: EmailNotificationPreferences;
     favoritePlanIds?: string[];
     favoriteExerciseIds?: string[];
+    favoriteSongIds?: string[];
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -178,6 +179,7 @@ export interface userSliceInitialState {
     emailNotifications?: EmailNotificationPreferences;
     favoritePlanIds?: string[];
     favoriteExerciseIds?: string[];
+    favoriteSongIds?: string[];
   } | null;
   timer: TimerInterface;
   currentActivity: {

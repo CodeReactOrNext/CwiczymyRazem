@@ -105,6 +105,16 @@ export const firebaseToggleFavoriteExercise = async (
   });
 };
 
+export const firebaseToggleFavoriteSong = async (
+  songId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoriteSongIds: isFavorite ? arrayUnion(songId) : arrayRemove(songId),
+  });
+};
+
 export const firebaseUpdateProfileCustomization = async (
   selectedFrame?: number,
   selectedGuitar?: number | string

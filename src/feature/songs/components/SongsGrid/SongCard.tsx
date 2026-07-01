@@ -14,12 +14,14 @@ import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoriteSong } from "feature/user/store/userSlice.favoriteActions";
 import {
   BookOpen,
   CheckCircle2,
   Clock,
   Eye,
+  Heart,
   ListMusic,
   MoreVertical,
   Music,
@@ -30,7 +32,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const STATUS_META = {
   wantToLearn: { label: "Want to Learn", icon: ListMusic, color: "text-zinc-300", ring: "ring-zinc-400/40" },
@@ -70,7 +72,10 @@ export const SongCard = ({
   practiceMs,
 }: SongCardProps) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isFavorite = (userInfo?.favoriteSongIds ?? []).includes(song.id);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
   const isRated = song.difficulties?.some(d => d.userId === userId);
@@ -199,6 +204,18 @@ export const SongCard = ({
               >
                 <Play className="h-3 w-3 fill-current" />
                 Practice
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  dispatch(toggleFavoriteSong({ songId: song.id, isFavorite: !isFavorite }))
+                }
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  isFavorite ? "text-rose-400 hover:bg-zinc-800" : "hover:bg-zinc-800 hover:text-white"
+                )}
+              >
+                <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
+                {isFavorite ? "Remove from favorites" : "Add to favorites"}
               </DropdownMenuItem>
 
               <div className="my-1 h-px bg-white/5" />

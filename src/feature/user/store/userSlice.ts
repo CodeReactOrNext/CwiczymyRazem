@@ -296,6 +296,17 @@ const userSlice = createSlice({
         state.userInfo.favoriteExerciseIds = current.filter((id) => id !== payload.exerciseId);
       }
     },
+    setFavoriteSong: (state, { payload }: PayloadAction<{ songId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoriteSongIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.songId)) {
+          state.userInfo.favoriteSongIds = [...current, payload.songId];
+        }
+      } else {
+        state.userInfo.favoriteSongIds = current.filter((id) => id !== payload.songId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -519,6 +530,7 @@ export const {
   setSelectedGuitar,
   setFavoritePlan,
   setFavoriteExercise,
+  setFavoriteSong,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
