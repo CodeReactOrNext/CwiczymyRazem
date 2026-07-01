@@ -6,6 +6,7 @@ import {
   Coffee,
   Lock,
   Sparkles,
+  Unlock,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -34,11 +35,27 @@ export const FundingProgressBar = ({
   raisedThisMonth: number;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const didAutoScroll = useRef(false);
   const goals = ROADMAP_TIERS.map((t) => t.goal);
   // Stops along the track: $0 start, then every tier.
   const stops = [0, ...goals];
   const gaps = stops.length - 1;
   const nextIndex = ROADMAP_TIERS.findIndex((t) => totalRaised < t.goal);
+  const nextTier = nextIndex >= 0 ? ROADMAP_TIERS[nextIndex] : null;
+  const fundedCount = ROADMAP_TIERS.filter((t) => totalRaised >= t.goal).length;
+
+  // Map a dollar amount to an x position using equal-width segments, so the
+  // small early tiers stay readable instead of bunching up.
+  const xForAmount = (amount: number, seg: number) => {
+    for (let i = 0; i < stops.length - 1; i++) {
+      if (amount <= stops[i + 1]) {
+        const span = stops[i + 1] - stops[i] || 1;
+        const f = (amount - stops[i]) / span;
+        return (i + f) * seg;
+      }
+    }
+    return gaps * seg;
+  };
 
   // Stretch the segments to fill the full width, but never below MIN_SEGMENT
   // (in which case the bar scrolls).
@@ -58,14 +75,24 @@ export const FundingProgressBar = ({
     if (!el) return;
     const measure = () => {
       const avail = el.clientWidth - PAD_X * 2;
-      setSegment(Math.max(MIN_SEGMENT, avail / gaps));
+      const seg = Math.max(MIN_SEGMENT, avail / gaps);
+      setSegment(seg);
+      // On first measure, jump the bar so the current funding position is
+      // centred — otherwise players land on the already-funded early tiers
+      // with the live "you are here" marker scrolled off the right edge.
+      if (!didAutoScroll.current) {
+        const fx = xForAmount(totalRaised, seg);
+        el.scrollLeft = Math.max(0, PAD_X + fx - el.clientWidth / 2);
+        didAutoScroll.current = true;
+      }
       updateScroll();
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [gaps, updateScroll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gaps, totalRaised, updateScroll]);
 
   // Re-check after the width changes (segment affects scrollWidth).
   useEffect(updateScroll, [segment, updateScroll]);
@@ -76,20 +103,7 @@ export const FundingProgressBar = ({
   const trackWidth = gaps * segment;
   const boxWidth = segment - BOX_GAP;
 
-  // Map a dollar amount to an x position using equal-width segments, so the
-  // small early tiers stay readable instead of bunching up.
-  const xForAmount = (amount: number) => {
-    for (let i = 0; i < stops.length - 1; i++) {
-      if (amount <= stops[i + 1]) {
-        const span = stops[i + 1] - stops[i] || 1;
-        const f = (amount - stops[i]) / span;
-        return (i + f) * segment;
-      }
-    }
-    return trackWidth;
-  };
-
-  const fillX = xForAmount(totalRaised);
+  const fillX = xForAmount(totalRaised, segment);
 
   return (
     <div className='w-full space-y-4'>
@@ -109,6 +123,19 @@ export const FundingProgressBar = ({
               ? `from ${supporters} supporter${supporters === 1 ? "" : "s"}`
               : "Be the first to chip in"}
           </p>
+
+          {nextTier && (
+            <div className='mt-4 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-cyan-500/10 px-3 py-2 text-sm'>
+              <Unlock size={14} className='shrink-0 text-cyan-300' />
+              <span className='font-semibold text-cyan-200'>
+                ${nextTier.goal - totalRaised} to go
+              </span>
+              <span className='text-zinc-400'>unlocks</span>
+              <span className='font-medium text-zinc-200'>
+                {nextTier.label}
+              </span>
+            </div>
+          )}
         </div>
 
         <a
@@ -120,19 +147,29 @@ export const FundingProgressBar = ({
           Support Riff Quest
         </a>
       </div>
-
-      {/* Running cost coverage for the current month — a quiet status line */}
-      <ServerCostMeter raisedThisMonth={raisedThisMonth} />
       </section>
+
+      {/* Server cost — its own card so the running bill reads as a clear,
+          separate fact, not a footnote tucked under the headline. */}
+      <ServerCostMeter raisedThisMonth={raisedThisMonth} />
 
       {/* Card 2 — the full roadmap of funding goals */}
       <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-        <header className='mb-2'>
-          <h2 className='text-sm font-semibold text-zinc-200'>The roadmap</h2>
-          <p className='mt-0.5 text-xs text-zinc-500'>
-            Every goal the running total reaches gets built and unlocked for
-            everyone.
-          </p>
+        <header className='mb-2 flex items-start justify-between gap-4'>
+          <div>
+            <h2 className='text-sm font-semibold text-zinc-200'>The roadmap</h2>
+            <p className='mt-0.5 text-xs text-zinc-500'>
+              Every goal the running total reaches gets built and unlocked for
+              everyone.
+            </p>
+          </div>
+          <div className='shrink-0 text-right'>
+            <p className='text-sm font-semibold text-zinc-200'>
+              {fundedCount}
+              <span className='text-zinc-500'> / {ROADMAP_TIERS.length}</span>
+            </p>
+            <p className='text-[11px] text-zinc-500'>goals funded</p>
+          </div>
         </header>
 
       {/* The bar */}

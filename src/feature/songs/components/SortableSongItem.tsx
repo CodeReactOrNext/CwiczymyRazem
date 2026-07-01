@@ -1,17 +1,19 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { motion } from "framer-motion";
 import { Button } from "assets/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
-import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoriteSong } from "feature/user/store/userSlice.favoriteActions";
+import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight, Clock, FileMusic, GripVertical, MoreVertical, Music, Play, Target, Trash2 } from "lucide-react";
+import { Clock, Heart, MoreVertical, Music, Play, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 interface SortableSongItemProps {
   song: Song;
@@ -184,6 +186,9 @@ export const SortableSongItem = ({
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(selectUserInfo);
+  const isFavorite = (userInfo?.favoriteSongIds ?? []).includes(song.id);
   const _StatusIcon = config.icon;
 
   const {
@@ -282,6 +287,18 @@ export const SortableSongItem = ({
                   >
                     <Play className="h-3 w-3 fill-current" />
                     Practice
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      dispatch(toggleFavoriteSong({ songId: song.id, isFavorite: !isFavorite }))
+                    }
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 text-sm font-medium cursor-pointer rounded-lg transition-colors",
+                      isFavorite ? "text-rose-400 hover:bg-zinc-800" : "hover:bg-zinc-800 hover:text-white"
+                    )}
+                  >
+                    <Heart className={cn("h-3 w-3", isFavorite && "fill-current")} />
+                    {isFavorite ? "Remove from favorites" : "Add to favorites"}
                   </DropdownMenuItem>
                   <div className="h-px bg-white/5 my-1" />
                   {(["wantToLearn", "learning", "learned"] as const).map((status) => {

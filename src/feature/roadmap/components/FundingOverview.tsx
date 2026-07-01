@@ -38,8 +38,8 @@ export const FundingOverview = () => {
         href={BMC_URL}
         target='_blank'
         rel='noopener noreferrer'
-        className='mt-5 inline-flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-100 transition-background hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-        <Coffee size={16} className='text-zinc-400' />
+        className='mt-5 inline-flex items-center gap-2 text-sm font-medium text-amber-400 transition-colors hover:text-amber-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/50'>
+        <Coffee size={16} />
         Buy me a coffee
       </a>
     </section>

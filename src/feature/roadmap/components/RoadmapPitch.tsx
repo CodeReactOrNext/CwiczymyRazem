@@ -50,21 +50,23 @@ export const RoadmapPitch = () => {
         ))}
       </div>
 
-      <div className='mt-6 flex flex-wrap gap-3'>
+      {/* The primary amber CTA lives once at the top of the page, so here we
+          keep only quiet text links to avoid competing calls to action. */}
+      <div className='mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm'>
         <a
           href={BMC_URL}
           target='_blank'
           rel='noopener noreferrer'
-          className='inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-5 py-3 text-sm font-semibold text-zinc-950 transition-background hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50'>
-          <Coffee size={18} />
+          className='inline-flex items-center gap-2 font-medium text-amber-400 transition-colors hover:text-amber-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/50'>
+          <Coffee size={16} />
           Support Riff Quest
         </a>
         <a
           href={DISCORD_URL}
           target='_blank'
           rel='noopener noreferrer'
-          className='inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-800 px-5 py-3 text-sm font-medium text-zinc-200 transition-background hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-          <MessagesSquare size={18} className='text-zinc-400' />
+          className='inline-flex items-center gap-2 font-medium text-zinc-300 transition-colors hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+          <MessagesSquare size={16} className='text-zinc-400' />
           Join the community
         </a>
       </div>

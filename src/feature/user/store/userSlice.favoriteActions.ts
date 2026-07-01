@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { firebaseToggleFavoriteExercise, firebaseToggleFavoritePlan } from "feature/settings/services/settings.service";
+import { firebaseToggleFavoriteExercise, firebaseToggleFavoritePlan, firebaseToggleFavoriteSong } from "feature/settings/services/settings.service";
 
-import { setFavoriteExercise, setFavoritePlan } from "./userSlice";
+import { setFavoriteExercise, setFavoritePlan, setFavoriteSong } from "./userSlice";
 
 /**
  * Toggles a plan/routine as favorite. Updates Redux immediately for a snappy
@@ -39,6 +39,26 @@ export const toggleFavoriteExercise = createAsyncThunk(
       await firebaseToggleFavoriteExercise(exerciseId, isFavorite);
     } catch (error) {
       dispatch(setFavoriteExercise({ exerciseId, isFavorite: !isFavorite }));
+      throw error;
+    }
+  }
+);
+
+/**
+ * Toggles a song as favorite — same optimistic-with-revert flow, persisted to
+ * `favoriteSongIds`.
+ */
+export const toggleFavoriteSong = createAsyncThunk(
+  "user/toggleFavoriteSong",
+  async (
+    { songId, isFavorite }: { songId: string; isFavorite: boolean },
+    { dispatch }
+  ) => {
+    dispatch(setFavoriteSong({ songId, isFavorite }));
+    try {
+      await firebaseToggleFavoriteSong(songId, isFavorite);
+    } catch (error) {
+      dispatch(setFavoriteSong({ songId, isFavorite: !isFavorite }));
       throw error;
     }
   }
