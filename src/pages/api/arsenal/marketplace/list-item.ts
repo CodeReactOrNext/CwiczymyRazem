@@ -2,6 +2,8 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { MarketplaceItemType } from "feature/arsenal/types/marketplace.types";
 import { MARKETPLACE_LISTING_FEE } from "feature/arsenal/types/marketplace.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
@@ -99,6 +101,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           userUpdate["arsenal.equippedItemId"] = null;
         }
       }
+
+      // Escrow may remove a rig-slotted guitar: clear its slot and refresh the rig level
+      const rig = data.arsenal?.rig ?? DEFAULT_RIG;
+      let postEscrowRig = rig;
+      if (itemType === "guitar") {
+        const guitarSlots = (rig.guitarSlots ?? DEFAULT_RIG.guitarSlots).map(
+          (slotId: string | null) => (slotId === item.id ? null : slotId)
+        );
+        postEscrowRig = { ...rig, guitarSlots };
+        userUpdate["arsenal.rig.guitarSlots"] = guitarSlots;
+      }
+      userUpdate.rigLevel = getRigLevel({
+        inventory: itemType === "guitar" ? newInventory : data.arsenal?.inventory ?? [],
+        effectInventory: itemType === "effect" ? newInventory : data.arsenal?.effectInventory ?? [],
+        rig: postEscrowRig,
+      });
 
       t.update(userRef, userUpdate);
       t.set(listingRef, {

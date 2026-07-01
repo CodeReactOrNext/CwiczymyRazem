@@ -85,3 +85,14 @@ export const sellEffect = async (inventoryItemId: string): Promise<{ fameReward:
   });
   return data;
 };
+
+export const sellEffectsBulk = async (
+  inventoryItemIds: string[]
+): Promise<{ fameReward: number; soldCount: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number; soldCount: number }>(
+    "/api/arsenal/sell-effects-bulk",
+    { idToken, inventoryItemIds }
+  );
+  return data;
+};

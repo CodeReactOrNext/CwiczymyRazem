@@ -25,7 +25,8 @@
       "PowerShell(npx tsc --noEmit; \"TSC=$LASTEXITCODE\")",
       "Bash(node -e ' *)",
       "Bash(npx eslint *)",
-      "Bash(grep -viE \"browserslist|no-img-element|exhaustive-deps|^\\\\s*$\")"
+      "Bash(grep -viE \"browserslist|no-img-element|exhaustive-deps|^\\\\s*$\")",
+      "PowerShell(npx tsc --noEmit)"
     ],
     "additionalDirectories": [
       "\\tmp"

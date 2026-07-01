@@ -6,13 +6,16 @@ import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.t
 
 import { getAvailableSeasons } from "../services/getAvailableSeasons";
 import { getCurrentSeason } from "../services/getCurrentSeason";
+import { getGearLeaderboard } from "../services/getGearLeaderboard";
 import { getGlobalLeaderboard } from "../services/getGlobalLeaderboard";
 import { getSeasonalLeaderboard } from "../services/getSeasonalLeaderboard";
+
+export type LeaderboardViewType = "all-time" | "seasonal" | "gear";
 
 interface UseLeaderboardProps {
   initialSortBy?: SortByType;
   itemsPerPage: number;
-  defaultView?: "all-time" | "seasonal";
+  defaultView?: LeaderboardViewType;
 }
 
 interface UseLeaderboardReturn {
@@ -20,11 +23,11 @@ interface UseLeaderboardReturn {
   isLoading: boolean;
   totalUsers: number;
   currentPage: number;
-  isSeasonalView: boolean;
+  view: LeaderboardViewType;
   seasons: SeasonDataInterface[];
   selectedSeason: string;
   handlePageChange: (page: number) => void;
-  handleViewChange: (isSeasonalView: boolean) => void;
+  handleViewChange: (view: LeaderboardViewType) => void;
   handleSeasonChange: (seasonId: string) => void;
   lastAccessiblePage: number;
 }
@@ -35,7 +38,7 @@ export const useLeaderboard = ({
   defaultView = "all-time",
 }: UseLeaderboardProps): UseLeaderboardReturn => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [isSeasonalView, setIsSeasonalView] = useState(defaultView === "seasonal");
+  const [view, setView] = useState<LeaderboardViewType>(defaultView);
   const [selectedSeason, setSelectedSeason] = useState<string>("");
   const [pageCursors, setPageCursors] = useState<{ [key: number]: any }>({ 1: null });
 
@@ -62,16 +65,19 @@ export const useLeaderboard = ({
 
   // 2. Fetch Leaderboard Data
   const { data: leaderboardData, isLoading: isLeaderboardLoading } = useQuery({
-    queryKey: ["leaderboard", isSeasonalView ? "seasonal" : "global", selectedSeason, initialSortBy, currentPage],
+    queryKey: ["leaderboard", view, selectedSeason, initialSortBy, currentPage],
     queryFn: async () => {
       const cursor = pageCursors[currentPage];
-      if (isSeasonalView) {
+      if (view === "seasonal") {
         if (!selectedSeason) return null;
         return getSeasonalLeaderboard(selectedSeason, initialSortBy, itemsPerPage, cursor);
       }
+      if (view === "gear") {
+        return getGearLeaderboard(itemsPerPage, cursor);
+      }
       return getGlobalLeaderboard(initialSortBy, itemsPerPage, cursor);
     },
-    enabled: !isSeasonalView || !!selectedSeason,
+    enabled: view !== "seasonal" || !!selectedSeason,
   });
 
   // Track next page cursor
@@ -86,7 +92,7 @@ export const useLeaderboard = ({
 
   const usersData = useMemo(() => {
     if (!leaderboardData?.users) return [];
-    if (isSeasonalView) {
+    if (view === "seasonal") {
       return leaderboardData.users.map((user: any) => ({
         ...user,
         createdAt: new Date(),
@@ -94,15 +100,15 @@ export const useLeaderboard = ({
       }));
     }
     return leaderboardData.users;
-  }, [leaderboardData, isSeasonalView]);
+  }, [leaderboardData, view]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleViewChange = (newIsSeasonalView: boolean) => {
-    setIsSeasonalView(newIsSeasonalView);
+  const handleViewChange = (newView: LeaderboardViewType) => {
+    setView(newView);
     setCurrentPage(1);
     setPageCursors({ 1: null });
   };
@@ -120,7 +126,7 @@ export const useLeaderboard = ({
     isLoading: isLeaderboardLoading,
     totalUsers: leaderboardData?.totalUsers || 0,
     currentPage,
-    isSeasonalView,
+    view,
     seasons,
     selectedSeason,
     handlePageChange,

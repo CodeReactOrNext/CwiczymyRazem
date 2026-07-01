@@ -18,6 +18,7 @@
     "coverage": "vitest run --coverage",
     "postinstall": "node patch-aubio.js",
     "export-exercises": "vitest run scripts/exportExercises.test.ts",
+    "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
     "knip": "knip",
     "email": "email dev --dir src/lib/email/templates --port 3001"
   },

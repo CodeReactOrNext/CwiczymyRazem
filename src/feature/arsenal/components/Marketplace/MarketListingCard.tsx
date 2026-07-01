@@ -1,5 +1,5 @@
 import Avatar from "components/UI/Avatar";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart, Tag, X } from "lucide-react";
 import Link from "next/link";
 
 import type { EffectInventoryItem, InventoryItem } from "../../types/arsenal.types";
@@ -10,6 +10,8 @@ import { GuitarCard } from "../GuitarInventory/GuitarCard";
 interface MarketListingCardProps {
   listing: MarketplaceListing;
   isOwn: boolean;
+  /** True when the player doesn't own this guitar/effect model yet. */
+  notInCollection?: boolean;
   currentFame: number;
   onBuy: () => void;
   onCancel: () => void;
@@ -20,6 +22,7 @@ interface MarketListingCardProps {
 export const MarketListingCard = ({
   listing,
   isOwn,
+  notInCollection = false,
   currentFame,
   onBuy,
   onCancel,
@@ -27,9 +30,10 @@ export const MarketListingCard = ({
   isCancelling,
 }: MarketListingCardProps) => {
   const canAfford = currentFame >= listing.price;
+  const showMissingBadge = notInCollection && !isOwn;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex h-full flex-col gap-2">
       <div className="rounded-[10px] overflow-hidden">
         {listing.itemType === "guitar" ? (
           <GuitarCard item={listing.item as InventoryItem} readOnly />
@@ -38,8 +42,9 @@ export const MarketListingCard = ({
         )}
       </div>
 
-      {/* Seller + price + action */}
-      <div className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
+      {/* Seller + price + action — pinned to the bottom so every card's
+          action button lines up across a row regardless of card height. */}
+      <div className="mt-auto flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
         <div className="flex items-center justify-between gap-2">
           <Link
             href={`/user/${listing.sellerId}`}
@@ -60,6 +65,13 @@ export const MarketListingCard = ({
             {listing.price.toLocaleString()}
           </span>
         </div>
+
+        {showMissingBadge && (
+          <div className="flex items-center gap-1.5 rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-300">
+            <Tag size={11} strokeWidth={2.5} className="shrink-0" />
+            <span>New for your collection</span>
+          </div>
+        )}
 
         {isOwn ? (
           <button

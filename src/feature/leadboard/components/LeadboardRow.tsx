@@ -1,7 +1,9 @@
 import { cn } from "assets/lib/utils";
 import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
+import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
+import { RigGuitarsPreview } from "feature/leadboard/components/RigGuitarsPreview";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -19,6 +21,11 @@ interface LeadboardColumnProps {
   selectedGuitar?: number | string;
   selectedGuitarYear?: number;
   selectedGuitarCountry?: string;
+  variant?: "default" | "gear";
+  rigLevel?: number;
+  guitarsOwned?: number;
+  effectsOwned?: number;
+  arsenal?: Partial<ArsenalUserData>;
 }
 
 export const LeadboardRow = ({
@@ -32,6 +39,11 @@ export const LeadboardRow = ({
   selectedGuitar,
   selectedGuitarYear,
   selectedGuitarCountry,
+  variant = "default",
+  rigLevel = 0,
+  guitarsOwned = 0,
+  effectsOwned = 0,
+  arsenal,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -120,6 +132,45 @@ export const LeadboardRow = ({
            </div>
 
            {/* Stats Grid - Card within a Card */}
+           {variant === "gear" ? (
+             <div className="grid grid-cols-3 divide-x divide-white/5 rounded-xl bg-black/20">
+                <div className="flex flex-col items-center justify-center py-3">
+                   <span className={cn(
+                      "text-lg font-black tracking-tight",
+                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-100"
+                   )}>
+                      {rigLevel.toLocaleString()}
+                   </span>
+                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
+                      {t("rig_level")}
+                   </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center py-3">
+                   <span className={cn(
+                      "text-lg font-bold",
+                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-300"
+                   )}>
+                      {guitarsOwned}
+                   </span>
+                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
+                      {t("guitars")}
+                   </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center py-3">
+                   <span className={cn(
+                      "text-lg font-bold",
+                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-300"
+                   )}>
+                      {effectsOwned}
+                   </span>
+                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
+                      {t("effects")}
+                   </span>
+                </div>
+             </div>
+           ) : (
            <div className="grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-black/20">
               <div className="flex flex-col items-center justify-center py-3">
                  <span className={cn(
@@ -132,7 +183,7 @@ export const LeadboardRow = ({
                     {t("points")}
                  </span>
               </div>
-              
+
               <div className="flex flex-col items-center justify-center py-3">
                  <span className={cn(
                     "font-mono text-lg font-bold",
@@ -145,9 +196,16 @@ export const LeadboardRow = ({
                  </span>
               </div>
            </div>
+           )}
 
-           {/* Achievements Footer */}
-           {statistics.achievements && statistics.achievements.length > 0 && (
+           {/* Rig Guitars / Achievements Footer */}
+           {variant === "gear" ? (
+              <div className="flex items-center justify-center pt-3">
+                 <div className="scale-90 opacity-90">
+                    <RigGuitarsPreview arsenal={arsenal} />
+                 </div>
+              </div>
+           ) : statistics.achievements && statistics.achievements.length > 0 && (
               <div className="flex items-center justify-center  pt-3">
                  <div className="scale-90 opacity-80">
                     <AchievementsCarousel achievements={statistics.achievements} />
@@ -214,6 +272,51 @@ export const LeadboardRow = ({
           </div>
 
           {/* Stats */}
+          {variant === "gear" ? (
+            <div className='flex items-center gap-8 lg:gap-12'>
+              <div className='text-center'>
+                <div
+                  className={`text-xl font-black tracking-tight lg:text-2xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-white group-hover:scale-105 transition-transform duration-300"
+                  }`}>
+                  {rigLevel.toLocaleString()}
+                </div>
+                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                  {t("rig_level")}
+                </div>
+              </div>
+
+              <div className='text-center'>
+                <div
+                  className={`text-xl font-bold lg:text-2xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-zinc-300 group-hover:text-white"
+                  }`}>
+                  {guitarsOwned}
+                </div>
+                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                  {t("guitars")}
+                </div>
+              </div>
+
+              <div className='text-center'>
+                <div
+                  className={`text-xl font-bold lg:text-2xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-zinc-300 group-hover:text-white"
+                  }`}>
+                  {effectsOwned}
+                </div>
+                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                  {t("effects")}
+                </div>
+              </div>
+            </div>
+          ) : (
           <div className='flex items-center gap-8 lg:gap-12'>
             <div className='text-center'>
               <div
@@ -245,11 +348,18 @@ export const LeadboardRow = ({
               </div>
             </div>
           </div>
+          )}
 
-          {/* Achievements - Desktop */}
-          <div className='flex-shrink-0 hidden lg:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
-            <AchievementsCarousel achievements={statistics.achievements} />
-          </div>
+          {/* Rig Guitars / Achievements - Desktop */}
+          {variant === "gear" ? (
+            <div className='flex-shrink-0 hidden lg:block opacity-90 transition-opacity duration-300 group-hover:opacity-100'>
+              <RigGuitarsPreview arsenal={arsenal} />
+            </div>
+          ) : (
+            <div className='flex-shrink-0 hidden lg:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
+              <AchievementsCarousel achievements={statistics.achievements} />
+            </div>
+          )}
         </div>
       </div>
     </li>

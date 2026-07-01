@@ -1,3 +1,4 @@
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -38,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         rig: DEFAULT_RIG,
         effectInventory: [],
       };
-      await userRef.update({ arsenal });
+      await userRef.update({ arsenal, rigLevel: 0 });
       return res.status(200).json({ ...arsenal, fame });
     }
 
@@ -66,6 +67,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       effectInventory: data.arsenal.effectInventory || [],
     };
+
+    // Reconcile the denormalized rig level (backfills old accounts, self-heals
+    // after gear-balance changes in itemStats/effectStats).
+    const computedRigLevel = getRigLevel(arsenal);
+    if (data.rigLevel !== computedRigLevel) {
+      await userRef.update({ rigLevel: computedRigLevel });
+    }
 
     return res.status(200).json({ ...arsenal, fame });
   } catch (error) {

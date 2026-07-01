@@ -153,8 +153,8 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const uniqueOwnedCount = uniqueOwnedIds.size;
   const totalGuitarsCount = GUITAR_DEFINITIONS.length;
 
-  // Group inventory items per rarity (newest first within a group),
-  // and count how many of each rarity exist / are owned.
+  // Group inventory items per rarity (by guitar type, then highest level first
+  // within a type), and count how many of each rarity exist / are owned.
   const itemsByRarity = {} as Record<GuitarRarity, typeof data.inventory>;
   const totalByRarity = {} as Record<GuitarRarity, number>;
   const ownedByRarity = {} as Record<GuitarRarity, number>;
@@ -172,7 +172,17 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     itemsByRarity[rarity].push(item);
   }
   for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity].sort((a, b) => b.acquiredAt - a.acquiredAt);
+    itemsByRarity[rarity].sort((a, b) => {
+      // Keep every copy of the same guitar model together...
+      if (a.guitarId !== b.guitarId) {
+        return String(a.guitarId).localeCompare(String(b.guitarId), undefined, { numeric: true });
+      }
+      // ...then highest level first within that model.
+      const guitar = GUITARS_BY_ID.get(a.guitarId);
+      const levelDiff = guitar ? getItemLevel(b, guitar) - getItemLevel(a, guitar) : 0;
+      if (levelDiff !== 0) return levelDiff;
+      return b.acquiredAt - a.acquiredAt;
+    });
   }
 
   const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {

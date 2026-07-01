@@ -1,3 +1,4 @@
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { RigSetup } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -22,7 +23,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const userRef = firestore.collection("users").doc(userId);
-    const updates: Record<string, unknown> = { "arsenal.rig": rig };
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+
+    const arsenal = userDoc.data()!.arsenal;
+    const updates: Record<string, unknown> = {
+      "arsenal.rig": rig,
+      rigLevel: getRigLevel({
+        inventory: arsenal?.inventory ?? [],
+        effectInventory: arsenal?.effectInventory ?? [],
+        rig,
+      }),
+    };
     if (selectedGuitar !== undefined) {
       updates.selectedGuitar = selectedGuitar ?? null;
       updates.selectedGuitarYear = selectedGuitarYear ?? null;

@@ -1,5 +1,13 @@
 [
   {
+    "id": "spider_quarter_notes",
+    "title": "Spider — One Note Per Beat",
+    "description": "The classic 1-2-3-4 spider pattern slowed right down: one struck note on every metronome click, so you can focus purely on clean finger placement.",
+    "difficulty": "beginner",
+    "category": "technique",
+    "whyItMatters": "Before you play the spider fast, your fingers need to learn exactly where to land. Playing one note per metronome click removes all time pressure — you press one finger, pick once, listen for a clean note, and move on with the next click. This builds correct hand shape and finger independence from the very first day."
+  },
+  {
     "id": "spider_one_string",
     "title": "Single String Spider Exercise",
     "description": "Fret notes chromatic sequence on a single string to develop basic finger coordination and clean fretting hand accuracy.",
@@ -186,7 +194,7 @@
   {
     "id": "fretboard_mastery",
     "title": "Fretboard Mastery",
-    "description": "Instantly locate and memorize natural and accidental notes across all strings.",
+    "description": "Take a short melodic phrase you know and play it in multiple positions across the neck, navigating by note names instead of shapes.",
     "difficulty": "hard",
     "category": "theory",
     "whyItMatters": "Complete fretboard visualization removes the guesswork from your playing. Knowing note names instantly allows you to transpose keys, construct chords, and find scale shapes on the fly without relying on fixed geometric patterns."
@@ -219,32 +227,76 @@
     "id": "open_g_repetition",
     "title": "Open G String Repetition",
     "description": "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
-    "difficulty": "easy",
+    "difficulty": "beginner",
     "category": "technique",
     "whyItMatters": "This exercise improves timing consistency and alternate picking control by training you to play evenly with the metronome. It helps build the precision and stability needed for clean rhythm guitar playing."
   },
   {
     "id": "all_strings_open_repetition",
     "title": "All Strings Open Repetition",
-    "description": "Advanced rhythm exercise moving across all strings using open notes.",
-    "difficulty": "easy",
+    "description": "Rhythm exercise moving across all strings using open notes.",
+    "difficulty": "beginner",
     "category": "technique",
     "whyItMatters": "This exercise trains clean string switching while keeping a steady rhythm. It helps improve picking accuracy and control between strings."
   },
   {
     "id": "random_note_hunt",
-    "title": "Random Note Hunt: E",
-    "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
-    "difficulty": "easy",
+    "title": "Random Note Hunt",
+    "description": "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
+    "difficulty": "beginner",
     "category": "theory",
-    "customGoal": "E",
+    "customGoal": "C",
     "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
+  },
+  {
+    "id": "chromatic_note_hunt",
+    "title": "Chromatic Note Hunt",
+    "description": "Find every occurrence of a note across the neck — now with sharps and flats, on a faster clock.",
+    "difficulty": "medium",
+    "category": "theory",
+    "customGoal": "B",
+    "whyItMatters": "Adding accidentals forces full chromatic command of the neck, not just the natural notes. The faster rotation builds quick recall under mild time pressure — the bridge from knowing the fretboard to using it in real time."
+  },
+  {
+    "id": "fretboard_region_hunt",
+    "title": "Fretboard Region Hunt",
+    "description": "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",
+    "difficulty": "hard",
+    "category": "theory",
+    "customGoal": "A#",
+    "whyItMatters": "Locating a note inside an arbitrary position box — rather than sliding to the open-string area — is exactly what real playing demands. The rotating region trains positional fretboard recall across the whole neck under time pressure."
+  },
+  {
+    "id": "interval_hunt",
+    "title": "Interval Hunt",
+    "description": "Read a root note and an interval, then find and play the target note anywhere on the neck.",
+    "difficulty": "medium",
+    "category": "theory",
+    "customGoal": "C",
+    "whyItMatters": "Intervals are the building blocks of melody and harmony. Translating an interval into a note and finding it instantly on the neck trains the ear-to-hands link that underpins improvising and playing by ear."
+  },
+  {
+    "id": "build_the_chord",
+    "title": "Build the Chord",
+    "description": "Spell a chord by ear: play each of its tones and watch them light up one by one.",
+    "difficulty": "medium",
+    "category": "theory",
+    "customGoal": "C",
+    "whyItMatters": "Knowing the notes inside a chord — not just its shape — unlocks arpeggios, target notes for soloing, and chord substitutions. Spelling chords by ear cements the link between theory and the fretboard."
+  },
+  {
+    "id": "fingerstyle_descending_arpeggios",
+    "title": "Fingerstyle: Descending Arpeggios",
+    "description": "A relaxed fingerpicking pattern with a descending bass line under ringing open strings — a perfect first step into fingerstyle.",
+    "difficulty": "beginner",
+    "category": "technique",
+    "whyItMatters": "This pattern builds the core fingerstyle skill of independent thumb-and-finger motion while training a smooth, connected (let-ring) sound. The simple moving bass line also gently introduces how a melody can live in the lowest voice."
   },
   {
     "id": "spider_permutation_1234",
     "title": "Spider Exercise - 1-2-3-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-2-3-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-2-3-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -252,7 +304,7 @@
     "id": "spider_permutation_1243",
     "title": "Spider Exercise - 1-2-4-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-2-4-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-2-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -260,7 +312,7 @@
     "id": "spider_permutation_1324",
     "title": "Spider Exercise - 1-3-2-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-3-2-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-3-2-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -268,7 +320,7 @@
     "id": "spider_permutation_1342",
     "title": "Spider Exercise - 1-3-4-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-3-4-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-3-4-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -276,7 +328,7 @@
     "id": "spider_permutation_1423",
     "title": "Spider Exercise - 1-4-2-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-4-2-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-4-2-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -284,7 +336,7 @@
     "id": "spider_permutation_1432",
     "title": "Spider Exercise - 1-4-3-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 1-4-3-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 1-4-3-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -292,7 +344,7 @@
     "id": "spider_permutation_2134",
     "title": "Spider Exercise - 2-1-3-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-1-3-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-1-3-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -300,7 +352,7 @@
     "id": "spider_permutation_2143",
     "title": "Spider Exercise - 2-1-4-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-1-4-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-1-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -308,7 +360,7 @@
     "id": "spider_permutation_2314",
     "title": "Spider Exercise - 2-3-1-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-3-1-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-3-1-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -316,7 +368,7 @@
     "id": "spider_permutation_2341",
     "title": "Spider Exercise - 2-3-4-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-3-4-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-3-4-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -324,7 +376,7 @@
     "id": "spider_permutation_2413",
     "title": "Spider Exercise - 2-4-1-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-4-1-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-4-1-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -332,7 +384,7 @@
     "id": "spider_permutation_2431",
     "title": "Spider Exercise - 2-4-3-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 2-4-3-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 2-4-3-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -340,7 +392,7 @@
     "id": "spider_permutation_3124",
     "title": "Spider Exercise - 3-1-2-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-1-2-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-1-2-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -348,7 +400,7 @@
     "id": "spider_permutation_3142",
     "title": "Spider Exercise - 3-1-4-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-1-4-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-1-4-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -356,7 +408,7 @@
     "id": "spider_permutation_3214",
     "title": "Spider Exercise - 3-2-1-4 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-2-1-4 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-2-1-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -364,7 +416,7 @@
     "id": "spider_permutation_3241",
     "title": "Spider Exercise - 3-2-4-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-2-4-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-2-4-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -372,7 +424,7 @@
     "id": "spider_permutation_3412",
     "title": "Spider Exercise - 3-4-1-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-4-1-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-4-1-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -380,7 +432,7 @@
     "id": "spider_permutation_3421",
     "title": "Spider Exercise - 3-4-2-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 3-4-2-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 3-4-2-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -388,7 +440,7 @@
     "id": "spider_permutation_4123",
     "title": "Spider Exercise - 4-1-2-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-1-2-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-1-2-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -396,7 +448,7 @@
     "id": "spider_permutation_4132",
     "title": "Spider Exercise - 4-1-3-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-1-3-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-1-3-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -404,7 +456,7 @@
     "id": "spider_permutation_4213",
     "title": "Spider Exercise - 4-2-1-3 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-2-1-3 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-2-1-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -412,7 +464,7 @@
     "id": "spider_permutation_4231",
     "title": "Spider Exercise - 4-2-3-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-2-3-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-2-3-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -420,7 +472,7 @@
     "id": "spider_permutation_4312",
     "title": "Spider Exercise - 4-3-1-2 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-3-1-2 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-3-1-2 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -428,7 +480,7 @@
     "id": "spider_permutation_4321",
     "title": "Spider Exercise - 4-3-2-1 Permutation",
     "description": "Fret notes on a single string using finger permutation 4-3-2-1 to isolate specific finger movements and develop deep coordination control.",
-    "difficulty": "easy",
+    "difficulty": "medium",
     "category": "technique",
     "whyItMatters": "This permutation isolates the muscle movements of fingers in the specific 4-3-2-1 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination."
   },
@@ -478,7 +530,7 @@
     "description": "Eliminate unwanted string noise using systematic dual-hand muting.",
     "difficulty": "medium",
     "category": "technique",
-    "whyItMatters": "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in professional, clear, and professional-grade performances."
+    "whyItMatters": "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in clear, professional-grade performances."
   },
   {
     "id": "speed_burst_chromatic_blitz",
@@ -568,7 +620,7 @@
   },
   {
     "id": "precision_bending_drill",
-    "title": "First Bend – Whole Step",
+    "title": "Precision Bend & Release",
     "description": "Develop precise whole-step bending and control. Follow the reference notes to train your ears, and master slow, controlled releases back to the starting pitch.",
     "difficulty": "easy",
     "category": "technique",
@@ -696,7 +748,7 @@
   },
   {
     "id": "hybrid_picking_independence",
-    "title": "String Skipping",
+    "title": "Hybrid Picking Independence",
     "description": "Combine your pick and fingers to play wide-interval string-skipping lines.",
     "difficulty": "hard",
     "category": "technique",
@@ -850,7 +902,7 @@
     "id": "chord_practice_configurable",
     "title": "Chord Practice (Configurable)",
     "description": "Practice clean transitions and finger placement across a customizable selection of chords.",
-    "difficulty": "medium",
+    "difficulty": "easy",
     "category": "technique",
     "whyItMatters": "Mastering transitions between diverse chord families is essential for smooth rhythm playing. This exercise builds muscle memory and hand independence, ensuring all strings ring clearly without unintended muting."
   },
@@ -888,11 +940,11 @@
   },
   {
     "id": "naked_tone_melody",
-    "title": "Naked Tone — Half Note Melody",
-    "description": "Play slow, long melodies with zero effects to improve fundamental touch.",
-    "difficulty": "easy",
+    "title": "Clean Tone — Slow Melody",
+    "description": "Play a slow melody with a clean, plain sound to build a solid, even touch.",
+    "difficulty": "beginner",
     "category": "technique",
-    "whyItMatters": "Effects like delay, reverb, and distortion can hide dynamic inconsistencies and weak fret connection. Playing with a 'naked' clean tone forces you to focus on the exact moment of finger contact, note duration, and articulation."
+    "whyItMatters": "Use a plain, clean sound: an acoustic guitar as-is, or an electric on a clean setting with no added echo (reverb/delay) or distortion. A clean sound has nowhere to hide, so you can clearly hear how well each note sounds — its timing, its length, and how firmly you press the string."
   },
   {
     "id": "muting_spotlight_drill",
@@ -951,6 +1003,14 @@
     "whyItMatters": "This exercise programs accurate spatial awareness into your picking hand. By jumping over intermediate strings, you train your hand to find strings instantly by feel, vastly improving your control, speed, and accuracy."
   },
   {
+    "id": "quarter_notes_drill",
+    "title": "Quarter Notes Drill",
+    "description": "Develop strict timing and pick attack consistency using quarter-note pulses.",
+    "difficulty": "beginner",
+    "category": "technique",
+    "whyItMatters": "Perfect rhythmic timing is the separation between amateur and professional guitarists. This drill builds a solid internal clock, ensuring you land exactly on the beat without rushing or lagging behind."
+  },
+  {
     "id": "pentatonic_string_crossing_3",
     "title": "Pentatonic String Crossing — 3 Strings",
     "description": "Master the transitions between strings inside the pentatonic box. Focus on minimal pick travel to eliminate speed bottlenecks.",
@@ -977,16 +1037,16 @@
   {
     "id": "strumming_basic",
     "title": "Basic Down Strumming",
-    "description": "Execute steady downward strumming strokes on every beat to build fundamental rhythm and timing control.",
-    "difficulty": "easy",
+    "description": "Strum steady downward strokes on every beat over an Em chord to build basic rhythm and timing.",
+    "difficulty": "beginner",
     "category": "technique",
-    "whyItMatters": "This exercise establishes the basic pendulum arm movement necessary for all rhythm guitar playing. Strumming steady downbeats locks your internal timing with the metronome, trains your wrist to remain relaxed, and ensures even string contact across the entire chord shape."
+    "whyItMatters": "This is the basic up-and-down arm movement used in all rhythm playing. Strumming steady downbeats locks your timing to the metronome, keeps your wrist relaxed, and helps you hit all the strings of the chord evenly."
   },
   {
     "id": "strumming_down_up",
     "title": "Down-Up Strumming",
     "description": "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
-    "difficulty": "easy",
+    "difficulty": "beginner",
     "category": "technique",
     "whyItMatters": "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly."
   },
@@ -994,7 +1054,7 @@
     "id": "strumming_rock",
     "title": "Rock Strumming Patterns",
     "description": "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
-    "difficulty": "easy",
+    "difficulty": "beginner",
     "category": "technique",
     "whyItMatters": "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence."
   },

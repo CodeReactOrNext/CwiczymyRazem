@@ -1,8 +1,9 @@
-import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
+import type { LeaderboardViewType } from "feature/leadboard/hooks/useLeaderboard";
 import { useTranslation } from "hooks/useTranslation";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
@@ -20,7 +21,7 @@ interface LeaderboardProps {
   currentPage: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
-  isSeasonalView: boolean;
+  view: LeaderboardViewType;
   seasons: SeasonDataInterface[];
   selectedSeason: string;
   setSelectedSeason: (value: string) => void;
@@ -37,7 +38,7 @@ export const LeadboardLayout = ({
   currentPage,
   itemsPerPage,
   onPageChange,
-  isSeasonalView,
+  view,
   seasons,
   selectedSeason,
   setSelectedSeason,
@@ -47,12 +48,28 @@ export const LeadboardLayout = ({
 }: LeaderboardProps) => {
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
+  const isSeasonalView = view === "seasonal";
+  const isGearView = view === "gear";
 
   const currentSeason = seasons.find(s => s.seasonId === selectedSeason) as SeasonDataInterface | undefined;
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString();
   };
+
+  const rankContent = isRankLoading ? (
+    <Skeleton className="h-20 w-40" />
+  ) : userRank ? (
+    <div className="flex flex-col items-end gap-2">
+      <span className="text-xs uppercase tracking-widest text-zinc-400">Your position</span>
+      <div className="flex items-baseline gap-1">
+        <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
+      </div>
+      {totalUsers > 0 && (
+        <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
+      )}
+    </div>
+  ) : null;
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -65,22 +82,19 @@ export const LeadboardLayout = ({
           backgroundContent={<HeroPattern />}
           rightContent={
             <div className='flex flex-col sm:flex-row items-end sm:items-center gap-6'>
-              {isRankLoading ? (
-                <Skeleton className="h-20 w-40" />
-              ) : userRank ? (
-                <div className="flex flex-col items-end gap-2">
-                  <span className="text-xs uppercase tracking-widest text-zinc-400">Your Position</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
-                  </div>
-                  {totalUsers > 0 && (
-                    <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
-                  )}
-                </div>
-              ) : null}
+              {rankContent}
               <SeasonRewards />
             </div>
           }
+        />
+      ) : isGearView ? (
+        <HeroBanner
+          title={t("gear_title")}
+          subtitle={t("gear_subtitle")}
+          eyebrow="Rig ranking"
+          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+          backgroundContent={<HeroPattern />}
+          rightContent={rankContent}
         />
       ) : (
         <HeroBanner
@@ -89,21 +103,7 @@ export const LeadboardLayout = ({
           eyebrow="All-time ranking"
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           backgroundContent={<HeroPattern />}
-          rightContent={
-            isRankLoading ? (
-              <Skeleton className="h-20 w-40" />
-            ) : userRank ? (
-              <div className="flex flex-col items-end gap-2">
-                <span className="text-xs uppercase tracking-widest text-zinc-400">Your position</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
-                </div>
-                {totalUsers > 0 && (
-                  <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
-                )}
-              </div>
-            ) : null
-          }
+          rightContent={rankContent}
         />
       )}
 
@@ -142,6 +142,8 @@ export const LeadboardLayout = ({
                 <p className='text-sm text-zinc-500'>
                   {isSeasonalView
                     ? t("no_seasonal_data_found")
+                    : isGearView
+                    ? t("no_gear_data_found")
                     : t("no_users_found")}
                 </p>
               </div>
@@ -162,6 +164,11 @@ export const LeadboardLayout = ({
                     selectedGuitar={user.selectedGuitar}
                     selectedGuitarYear={user.selectedGuitarYear}
                     selectedGuitarCountry={user.selectedGuitarCountry}
+                    variant={isGearView ? "gear" : "default"}
+                    rigLevel={user.rigLevel ?? 0}
+                    guitarsOwned={user.arsenal?.inventory?.length ?? 0}
+                    effectsOwned={user.arsenal?.effectInventory?.length ?? 0}
+                    arsenal={user.arsenal}
                   />
                 ))}
               </ul>

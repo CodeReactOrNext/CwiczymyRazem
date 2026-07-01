@@ -16,6 +16,8 @@ interface BulkSellConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   isLoading: boolean;
+  /** Which owned copies are excluded from the sweep (shown in the warning line). */
+  protectedNote?: string;
 }
 
 export const BulkSellConfirmDialog = ({
@@ -25,6 +27,7 @@ export const BulkSellConfirmDialog = ({
   onConfirm,
   onCancel,
   isLoading,
+  protectedNote = "Equipped and rig guitars are never sold.",
 }: BulkSellConfirmDialogProps) => {
   if (!isOpen) return null;
 
@@ -36,8 +39,8 @@ export const BulkSellConfirmDialog = ({
         <h2 className="text-lg font-bold text-white mb-2">Sell duplicates?</h2>
         <p className="text-sm text-zinc-400 mb-4">
           This sells <span className="font-semibold text-white">{count}</span> lower-level duplicate
-          {count === 1 ? "" : "s"}, keeping the best copy of each guitar. Equipped and rig guitars are
-          never sold. This can&apos;t be undone.
+          {count === 1 ? "" : "s"}, keeping the best copy of each. {protectedNote} This can&apos;t be
+          undone.
         </p>
 
         <div className="max-h-[45vh] overflow-y-auto -mx-1 px-1 mb-4">

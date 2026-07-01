@@ -1,3 +1,4 @@
+import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import type { UserSongLists } from "feature/songs/types/songs.type";
 import type { Timestamp } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -18,6 +19,9 @@ export interface FirebaseUserDataInterface {
   selectedGuitarCountry?: string;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
+  /** Denormalized total level of the equipped rig (gear leaderboard sort key). */
+  rigLevel?: number;
+  arsenal?: Partial<ArsenalUserData>;
   fcmData?: {
     tokens: string[];
     notificationsEnabled: boolean;

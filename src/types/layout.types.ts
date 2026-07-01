@@ -4,6 +4,7 @@ export type NavPagesTypes =
   | "report"
   | "leadboard"
   | "leaderboard"
+  | "gear-leaderboard"
   | "faq"
   | "songs"
   | "library"
