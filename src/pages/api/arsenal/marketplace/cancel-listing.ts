@@ -1,3 +1,5 @@
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -41,7 +43,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Return the escrowed instance to the seller (5 Fame fee is not refunded).
       const restored = [...inventory, listing.item];
 
-      t.update(userRef, { [`arsenal.${invKey}`]: restored });
+      // A rig slot may still reference the restored instance (pre-slot-cleanup listings)
+      const rigLevel = getRigLevel({
+        inventory: listing.itemType === "guitar" ? restored : data.arsenal?.inventory ?? [],
+        effectInventory:
+          listing.itemType === "effect" ? restored : data.arsenal?.effectInventory ?? [],
+        rig: data.arsenal?.rig ?? DEFAULT_RIG,
+      });
+
+      t.update(userRef, { [`arsenal.${invKey}`]: restored, rigLevel });
       t.update(listingRef, { status: "cancelled" });
     });
 

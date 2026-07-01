@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setSelectedGuitar } from "feature/user/store/userSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+import { memoryCache } from "utils/cache/memoryCache";
 
 import { updateRig } from "../services/arsenal.service";
 import type { RigSetup } from "../types/arsenal.types";
@@ -23,6 +24,10 @@ export const useUpdateRig = () => {
       updateRig(rig, selectedGuitar, selectedGuitarYear, selectedGuitarCountry),
     onSuccess: (_, { selectedGuitar, selectedGuitarYear, selectedGuitarCountry }) => {
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+      // Rig changed → gear leaderboard caches are stale
+      memoryCache.clear("leaderboard:gear");
+      memoryCache.clear("userRank:gear");
+      queryClient.invalidateQueries({ queryKey: ["userGearLevel"] });
       if (selectedGuitar !== undefined) {
         dispatch(setSelectedGuitar({ imageId: selectedGuitar ?? null, year: selectedGuitarYear, country: selectedGuitarCountry }));
       }

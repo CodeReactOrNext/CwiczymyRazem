@@ -47,6 +47,7 @@ export default async function handler(
           createdAt: new Date(),
           email: user.email ?? null,
           statistics: statisticsInitial,
+          rigLevel: 0,
         });
 
         if (user.email) {

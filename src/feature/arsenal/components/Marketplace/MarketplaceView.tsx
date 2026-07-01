@@ -1,16 +1,28 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { Store } from "lucide-react";
+import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
+import { useArsenalData } from "../../hooks/useArsenalData";
 import { useBuyItem, useCancelListing, useMarketplace } from "../../hooks/useMarketplace";
 import { MarketListingCard } from "./MarketListingCard";
 
 export const MarketplaceView = () => {
   const { data: listings, isLoading } = useMarketplace();
+  const { data: arsenal } = useArsenalData();
   const userId = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
+
+  // Definition ids the player already owns — used to flag listings for items
+  // that are still missing from their collection.
+  const ownedDefIds = useMemo(() => {
+    const set = new Set<number | string>();
+    for (const item of arsenal?.inventory ?? []) set.add(item.guitarId);
+    for (const item of arsenal?.effectInventory ?? []) set.add(item.effectId);
+    return set;
+  }, [arsenal?.inventory, arsenal?.effectInventory]);
 
   const { mutate: buy, isPending: isBuying, variables: buyVars } = useBuyItem();
   const { mutate: cancel, isPending: isCancelling, variables: cancelVars } = useCancelListing();
@@ -43,6 +55,7 @@ export const MarketplaceView = () => {
           key={listing.id}
           listing={listing}
           isOwn={listing.sellerId === userId}
+          notInCollection={!ownedDefIds.has(listing.defId)}
           currentFame={fame}
           onBuy={() => buy({ listingId: listing.id, price: listing.price })}
           onCancel={() => cancel({ listingId: listing.id })}

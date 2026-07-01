@@ -1,5 +1,7 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -64,12 +66,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       equippedItemId = null;
     }
 
+    // Clear the rig slot if selling a slotted guitar, and refresh the denormalized rig level
+    const rig = data.arsenal?.rig ?? DEFAULT_RIG;
+    const guitarSlots = (rig.guitarSlots ?? DEFAULT_RIG.guitarSlots).map(
+      (slotId: string | null) => (slotId === item.id ? null : slotId)
+    );
+    const rigLevel = getRigLevel({
+      inventory: newInventory,
+      effectInventory: data.arsenal?.effectInventory ?? [],
+      rig: { ...rig, guitarSlots },
+    });
+
     // Update user data
     await userRef.update({
       "arsenal.inventory": newInventory,
       "arsenal.equippedGuitarId": equippedGuitarId,
       "arsenal.equippedItemId": equippedItemId,
+      "arsenal.rig.guitarSlots": guitarSlots,
       "statistics.fame": (data.statistics?.fame || 0) + fameReward,
+      rigLevel,
     });
 
     return res.status(200).json({ success: true, fameReward });

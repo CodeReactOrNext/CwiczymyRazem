@@ -19,6 +19,7 @@ import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   Calendar,
+  Guitar,
   Heart,
   Home,
   ListChecks,
@@ -180,6 +181,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     
     // Secondary matches
     if (pathname === "/summary") return "summary";
+    if (pathname.startsWith("/leaderboard/gear")) return "gear-leaderboard";
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/plans")) return "plans";
@@ -213,6 +215,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     { id: "seasons", name: "Seasons", href: "/seasons", icon: <Calendar size={18} /> },
     { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={18} /> },
+    { id: "gear-leaderboard", name: "Gear Ranking", href: "/leaderboard/gear", icon: <Guitar size={18} /> },
   ];
 
   const toolsNavigation = [
