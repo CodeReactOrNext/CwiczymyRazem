@@ -171,10 +171,19 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     };
 
     const handleBack = () => {
-        if (timer.getTime() > 0 && confirm("Abandon this session?")) {
-            router.push("/timer/song-select");
-        } else if (timer.getTime() === 0) {
-            router.push("/timer/song-select");
+        // Return to wherever the user came from (favorites, songs board, …);
+        // only fall back to song-select when there's no history to go back to.
+        const leave = () => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+                router.back();
+            } else {
+                router.push("/timer/song-select");
+            }
+        };
+        if (timer.getTime() > 0) {
+            if (confirm("Abandon this session?")) leave();
+        } else {
+            leave();
         }
     };
 
