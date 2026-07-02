@@ -340,7 +340,7 @@ const SongSheet = ({
           </div>
         </div>
 
-        <div className="p-6 bg-zinc-950/80 backdrop-blur-xl flex gap-3">
+        <div className="px-6 pt-6 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] bg-zinc-950/80 backdrop-blur-xl flex gap-3">
           <Link href={`/timer/song/${song.id}`} onClick={onClose} className="flex-1">
             <Button
                 className="relative h-14 w-full overflow-hidden rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-2xl border-none"
