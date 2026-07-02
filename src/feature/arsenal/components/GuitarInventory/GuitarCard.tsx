@@ -3,6 +3,7 @@ import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
 import { Check, Store,Trash2 } from "lucide-react";
+import type { ReactNode } from "react";
 
 // SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -26,9 +27,12 @@ interface GuitarCardProps {
   rigSlot?: number | null;
   /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
   readOnly?: boolean;
+  /** Custom footer rendered inside the card frame in place of the Equip/Sell row
+      (e.g. the marketplace seller/price/buy panel). Takes precedence over readOnly. */
+  footer?: ReactNode;
 }
 
-export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, onListClick, isListing, rigSlot, readOnly = false }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, onListClick, isListing, rigSlot, readOnly = false, footer }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -310,8 +314,18 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
         </div>
       )}
 
+      {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
+      {footer ? (
+        <div
+          className="relative z-10 border-t flex-shrink-0"
+          style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
+        >
+          {footer}
+        </div>
+      ) : null}
+
       {/* Equip / Sell */}
-      {!readOnly && (
+      {!readOnly && !footer && (
       <div
         className="flex border-t flex-shrink-0"
         style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
