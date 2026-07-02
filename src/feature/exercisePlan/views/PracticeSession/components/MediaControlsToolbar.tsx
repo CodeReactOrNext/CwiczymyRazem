@@ -35,6 +35,8 @@ interface MediaControlsToolbarProps {
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
+  /** Full-width stacked layout for narrow (portrait phone) screens. */
+  mobile?: boolean;
   disableTuner?: boolean;
   baseBpm?: number;
   trailing?: React.ReactNode;
@@ -58,6 +60,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   frequencyRef,
   volumeRef,
   compact = false,
+  mobile = false,
   disableTuner = false,
   baseBpm,
   trailing,
@@ -77,6 +80,109 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const isSlowed = speedMultiplier < 1;
   const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
   const h = compact ? "h-8" : "h-12";
+
+  if (mobile) {
+    const gridBtn = "flex h-11 w-full items-center justify-center gap-2 rounded-lg transition-all active:scale-95";
+
+    return (
+      <div className="flex flex-col gap-2">
+        {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
+          <div className="flex gap-2">
+            {showSpeed && hasMetronome && (
+              <SpeedDropdown
+                speedMultiplier={speedMultiplier}
+                onSpeedMultiplierChange={onSpeedMultiplierChange}
+                baseBpm={baseBpm}
+                isSlowed={isSlowed}
+                h="h-11"
+                className="flex-1 justify-center"
+              />
+            )}
+
+            {showBacking && hasAudioTrack && (
+              <RippleButton
+                onClick={onAudioToggle}
+                disabled={isRiddleMode}
+                title={isAudioMuted ? "Backing track off" : "Backing track on"}
+                className={cn(
+                  gridBtn, "flex-1",
+                  isAudioMuted
+                    ? "bg-zinc-800 text-zinc-400"
+                    : "bg-white/15 text-white",
+                  isRiddleMode && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <GiGuitar className="text-lg shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Backing</span>
+              </RippleButton>
+            )}
+          </div>
+        )}
+
+        {hasMicControls && (
+          <div className="grid grid-cols-2 gap-2">
+            <RippleButton
+              onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+              disabled={examMode && isMicEnabled}
+              title={examMode && isMicEnabled ? "Pitch Detect required during exam" : isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
+              className={cn(
+                gridBtn,
+                isMicEnabled
+                  ? "bg-emerald-950 text-emerald-400"
+                  : "bg-zinc-800 text-zinc-400",
+                examMode && isMicEnabled && "cursor-not-allowed active:scale-100"
+              )}
+            >
+              <FaMicrophone className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-[10px] font-semibold tracking-wide">Pitch Detect</span>
+            </RippleButton>
+
+            {hasTuner && (
+              <RippleButton
+                onClick={() => setIsTunerOpen(true)}
+                title="Tuner"
+                className={cn(
+                  gridBtn,
+                  isTunerOpen ? "bg-violet-950 text-violet-400" : "bg-zinc-800 text-zinc-400"
+                )}
+              >
+                <TuningForkIcon className="h-4 w-4 shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Tuner</span>
+              </RippleButton>
+            )}
+
+            {isMicEnabled && (
+              <RippleButton
+                onClick={onRecalibrate}
+                title="Recalibrate"
+                className={cn(gridBtn, "bg-zinc-800 text-zinc-400")}
+              >
+                <FaSync className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Recalibrate</span>
+              </RippleButton>
+            )}
+
+            {/* Electron-only amp simulator (renders nothing on web) */}
+            <AmpSimButton h="h-11" />
+          </div>
+        )}
+
+        {hasMicControls && <MicTroubleshooting className="self-center py-1" />}
+
+        {trailing}
+
+        {isTunerOpen && hasTuner && createPortal(
+          <TunerDialog
+            frequencyRef={frequencyRef!}
+            volumeRef={volumeRef!}
+            isMicEnabled={isMicEnabled}
+            onClose={() => setIsTunerOpen(false)}
+          />,
+          document.body
+        )}
+      </div>
+    );
+  }
 
   if (compact) {
     return (
@@ -322,6 +428,7 @@ function SpeedDropdown({
   isSlowed,
   h,
   compact = false,
+  className,
 }: {
   speedMultiplier: number;
   onSpeedMultiplierChange: (value: number) => void;
@@ -329,6 +436,7 @@ function SpeedDropdown({
   isSlowed: boolean;
   h: string;
   compact?: boolean;
+  className?: string;
 }) {
   const current = SPEED_MODES.find((m) => m.value === speedMultiplier) ?? SPEED_MODES[0];
 
@@ -343,7 +451,8 @@ function SpeedDropdown({
             compact ? "gap-1.5 px-2" : "gap-2 px-3",
             isSlowed
               ? "bg-white/15 text-white hover:bg-white/25"
-              : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700"
+              : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700",
+            className
           )}
         >
           <Snail className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />

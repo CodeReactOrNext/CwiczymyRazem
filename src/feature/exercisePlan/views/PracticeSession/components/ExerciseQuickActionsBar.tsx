@@ -70,10 +70,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   return (
     <div className={cn("flex w-full justify-center", compact ? "" : "mb-4")}>
       <div className={cn(
-        "flex w-full items-center gap-3 rounded-xl bg-zinc-800",
-        compact ? "h-10 max-w-[320px] px-3" : "h-12 max-w-md px-4"
+        "flex w-full items-center rounded-xl bg-zinc-800",
+        // Compact fits a ~180px side panel: no icon, no slider, tighter gaps.
+        compact ? "h-10 max-w-[320px] justify-between gap-2 px-2.5" : "h-12 max-w-md gap-3 px-4"
       )}>
-        <GiMetronome className={cn("shrink-0 text-zinc-400", compact ? "h-4 w-4" : "h-5 w-5")} />
+        {!compact && <GiMetronome className="h-5 w-5 shrink-0 text-zinc-400" />}
 
         <RippleButton
           className={stepBtn}
@@ -116,14 +117,16 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           </button>
         )}
 
-        <Slider
-          value={[bpm]}
-          min={minBpm}
-          max={maxBpm}
-          step={1}
-          onValueChange={(v) => setBpm(v[0])}
-          className={cn("flex-1 cursor-pointer", sliderRange(bpm))}
-        />
+        {!compact && (
+          <Slider
+            value={[bpm]}
+            min={minBpm}
+            max={maxBpm}
+            step={1}
+            onValueChange={(v) => setBpm(v[0])}
+            className={cn("flex-1 cursor-pointer", sliderRange(bpm))}
+          />
+        )}
 
         <RippleButton
           className={stepBtn}

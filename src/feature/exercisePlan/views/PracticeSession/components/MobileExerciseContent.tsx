@@ -1,6 +1,7 @@
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 import React from "react";
 
+import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { ChordHuntPanel } from "./ChordHuntPanel";
@@ -9,8 +10,8 @@ import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
+import { StrummingSection } from "./StrummingSection";
 import { TablatureViewer } from "./TablatureViewer";
-import { isOpenExercise } from "../../../utils/isOpenExercise";
 
 interface MobileExerciseContentProps {
   currentExercise: any;
@@ -107,20 +108,22 @@ export function MobileExerciseContent({
         <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
       )}
       {activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
-        <TablatureViewer
-          measures={activeTablature}
-          bpm={effectiveBpm || metronome.bpm}
-          isPlaying={metronome.isPlaying}
-          startTime={metronome.startTime || null}
-          countInRemaining={(metronome as any).countInRemaining}
-          className="w-full"
-          frequencyRef={frequencyRef}
-          isListening={isListening}
-          hitNotes={hitNotes}
-          missedNotes={missedNotes}
-          currentBeatsElapsed={0}
-          resetKey={tabResetKey}
-        />
+        <div className="w-full overflow-hidden rounded-2xl border border-white/5 bg-[#09090b] shadow-lg">
+          <TablatureViewer
+            measures={activeTablature}
+            bpm={effectiveBpm || metronome.bpm}
+            isPlaying={metronome.isPlaying}
+            startTime={metronome.startTime || null}
+            countInRemaining={(metronome as any).countInRemaining}
+            className="w-full"
+            frequencyRef={frequencyRef}
+            isListening={isListening}
+            hitNotes={hitNotes}
+            missedNotes={missedNotes}
+            currentBeatsElapsed={0}
+            resetKey={tabResetKey}
+          />
+        </div>
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
           <YouTubePlayalong
@@ -156,6 +159,18 @@ export function MobileExerciseContent({
               return <div className='flex h-full items-center justify-center text-xs text-zinc-500'>Invalid YouTube URL</div>;
             })()}
           </div>
+        </div>
+      ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
+        <div className="w-full overflow-hidden rounded-2xl border border-white/5 shadow-lg">
+          <StrummingSection
+            patterns={currentExercise.strummingPatterns}
+            bpm={effectiveBpm || metronome.bpm}
+            isPlaying={metronome.isPlaying}
+            startTime={metronome.startTime || null}
+            countInRemaining={(metronome as any).countInRemaining}
+            isMicEnabled={isMicEnabled}
+            audioContext={metronome.audioContext}
+          />
         </div>
       ) : (currentExercise.imageUrl || currentExercise.image) ? (
         <ExerciseImage

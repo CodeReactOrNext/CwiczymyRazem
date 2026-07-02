@@ -10,6 +10,12 @@ import type { Exercise } from "../types/exercise.types";
  * instead. This predicate mirrors the fallback branch in ExerciseContentArea.
  */
 export const isOpenExercise = (exercise: Exercise): boolean =>
+  // Configurable generator exercises are not "open": they have no tablature
+  // only until the user picks chords/scale in the setup dialog, after which a
+  // generated tab renders. Showing the "no tab for this one" panel behind that
+  // dialog would be misleading.
+  exercise.id !== "chord_practice_configurable" &&
+  exercise.id !== "scale_practice_configurable" &&
   !exercise.riddleConfig &&
   !exercise.customGoal &&
   !exercise.rerollCustomGoal &&

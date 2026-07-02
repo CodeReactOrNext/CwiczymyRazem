@@ -15,11 +15,13 @@ import { Activity, CheckCircle2, Clock, Lightbulb, Play } from 'lucide-react';
 interface ExercisePreviewDialogProps {
   exercise: Exercise | null;
   onClose: () => void;
+  onStart?: () => void;
 }
 
 export function ExercisePreviewDialog({
   exercise,
   onClose,
+  onStart,
 }: ExercisePreviewDialogProps) {
   const { t } = useTranslation(['common', 'exercises']);
 
@@ -170,6 +172,15 @@ export function ExercisePreviewDialog({
            <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[11px] rounded-[8px]">
              Close
            </Button>
+           {onStart && (
+             <Button
+               onClick={onStart}
+               className="bg-zinc-100 hover:bg-white text-zinc-950 font-bold uppercase tracking-widest text-[11px] rounded-[8px] gap-1.5"
+             >
+               <Play className="w-3.5 h-3.5 fill-current" />
+               Start
+             </Button>
+           )}
         </div>
         </div>
       </DialogContent>
