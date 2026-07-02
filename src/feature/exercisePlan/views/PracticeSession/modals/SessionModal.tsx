@@ -7,8 +7,10 @@ import { categoryGradients } from "../../../constants/categoryStyles";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
+import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
+import { RotateDeviceHint } from "../components/RotateDeviceHint";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
@@ -107,8 +109,10 @@ const SessionModal = ({
   const category = currentExercise.category || "mixed";
   const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
 
-  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal) && !currentExercise.disableMic;
-  const hasAudioTrack  = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
+  // activeTablature (not currentExercise.tablature) so generated exercises
+  // (configurable chord/scale practice) get mic + backing controls too.
+  const hasMicControls = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic;
+  const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
 
   if (isLandscape) {
@@ -147,6 +151,7 @@ const SessionModal = ({
     <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950", gradientClasses)}>
       <SessionModalHeader
         exerciseTitle={currentExercise.title}
+        exerciseId={currentExercise.id}
         currentExerciseIndex={currentExerciseIndex}
         totalExercises={totalExercises}
         onClose={onClose}
@@ -181,6 +186,8 @@ const SessionModal = ({
             onPlayRiddle={handleToggleTimer}
           />
 
+          {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}
+
           {currentExercise.spotifyId && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
               <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
@@ -207,6 +214,7 @@ const SessionModal = ({
             frequencyRef={frequencyRef}
             volumeRef={volumeRef}
             disableTuner={currentExercise.disableTuner}
+            mobile
           />
 
           <ExerciseQuickActionsBar
@@ -216,6 +224,8 @@ const SessionModal = ({
             setIsMetronomeMuted={setIsMetronomeMuted}
             examMode={examMode}
           />
+
+          <MobileInstructionsCard exercise={currentExercise} />
 
           {currentExercise.links && currentExercise.links.length > 0 && (
             <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4 mb-20">

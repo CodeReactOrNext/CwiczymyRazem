@@ -95,8 +95,14 @@ export function ChordSelectionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] bg-zinc-950 border-white/10 shadow-2xl">
-        <DialogHeader>
+      {/* z-index must beat the mobile session modal (z-[9999999]) or the setup
+          dialog is invisible on phones. Flex column + capped height keeps the
+          header/footer on screen (middle scrolls) even on short landscape phones. */}
+      <DialogContent
+        overlayClassName="z-[99999998]"
+        className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[550px] bg-zinc-950 border-white/10 shadow-2xl"
+      >
+        <DialogHeader className="shrink-0">
           <DialogTitle className="text-2xl font-black italic tracking-tighter text-white capitalize">
             Chord Practice Setup
           </DialogTitle>
@@ -105,7 +111,7 @@ export function ChordSelectionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto py-4 pr-1">
           <div className="space-y-3">
             <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">
                 Active Sequence ({selectedChords.length}/8)
@@ -193,7 +199,7 @@ export function ChordSelectionDialog({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+        <div className="flex shrink-0 justify-end gap-3 pt-4 border-t border-white/5">
           <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold capitalize tracking-widest text-[11px]">
             Cancel
           </Button>

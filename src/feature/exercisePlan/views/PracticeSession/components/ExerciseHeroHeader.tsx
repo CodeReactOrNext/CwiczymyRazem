@@ -4,6 +4,7 @@ import { Timer } from "lucide-react";
 import { memo } from "react";
 
 import type { Exercise, ExercisePlan } from "../../../types/exercise.types";
+import { FavoriteExerciseButton } from "./FavoriteExerciseButton";
 
 interface ExerciseHeroHeaderProps {
   exercise: Exercise;
@@ -36,6 +37,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
           </div>
         )}
         <span className="truncate">{activeExercise.title}</span>
+        <FavoriteExerciseButton exerciseId={exercise.id} />
       </h2>
     );
   }

@@ -216,6 +216,17 @@ export const ExerciseBrowseTab = ({
     dispatch(toggleFavoriteExercise({ exerciseId, isFavorite: !favoriteExerciseIds.includes(exerciseId) }));
   };
 
+  const handleStartPreview = () => {
+    if (!previewExercise) return;
+    const exercise = previewExercise;
+    setPreviewExercise(null);
+    if (exercise.premium && !isPremium) {
+      onShowUpgrade();
+      return;
+    }
+    onStartExercise(buildChallenge(exercise as typeof exercisesAgregat[0]));
+  };
+
   const renderSortHead = (
     col: Exclude<SortKey, "default">,
     label: string,
@@ -643,6 +654,7 @@ export const ExerciseBrowseTab = ({
       <ExercisePreviewDialog
         exercise={previewExercise}
         onClose={() => setPreviewExercise(null)}
+        onStart={handleStartPreview}
       />
     </div>
     </TooltipProvider>

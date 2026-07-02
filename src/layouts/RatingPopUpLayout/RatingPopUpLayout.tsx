@@ -471,7 +471,9 @@ const RatingPopUpLayout = ({
 
               <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData} outerRadius="80%">
+                  {/* 70% leaves margin so edge labels (Creativity/Theory) aren't
+                      clipped on narrow mobile cards */}
+                  <RadarChart data={radarData} outerRadius="70%">
                     <PolarGrid stroke="#3f3f46" />
                     <PolarAngleAxis dataKey="cat" tick={{ fontSize: 11, fill: "#a1a1aa" }} />
                     <Radar dataKey="prev" stroke="#52525b" fill="#52525b" fillOpacity={0.12} />
@@ -489,14 +491,14 @@ const RatingPopUpLayout = ({
                 </span>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
+              <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
                 {radarRows.map((c) => (
-                  <div key={c.key} className="flex items-center gap-2.5">
+                  <div key={c.key} className="flex min-w-0 items-center gap-2.5">
                     <c.Icon size={14} className="shrink-0 text-zinc-400" />
-                    <span className="flex-1 text-xs text-zinc-300">{c.label}</span>
-                    <span className="text-xs font-semibold tabular-nums text-zinc-200">{fmtMin(c.curMin)}</span>
+                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-300">{c.label}</span>
+                    <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-zinc-200">{fmtMin(c.curMin)}</span>
                     {c.deltaMin !== 0 && (
-                      <span className={cn("text-[10px] font-bold tabular-nums", c.deltaMin > 0 ? "text-emerald-400" : "text-zinc-500")}>
+                      <span className={cn("whitespace-nowrap text-[10px] font-bold tabular-nums", c.deltaMin > 0 ? "text-emerald-400" : "text-zinc-500")}>
                         {c.deltaMin > 0 ? "+" : ""}{c.deltaMin}min
                       </span>
                     )}
