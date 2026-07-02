@@ -2,6 +2,7 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectFeatures, getEffectLevel } from "feature/arsenal/data/effectStats";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition } from "feature/arsenal/data/itemStats";
 import { Store,Trash2 } from "lucide-react";
+import type { ReactNode } from "react";
 
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
@@ -17,9 +18,12 @@ interface EffectCardProps {
   isListing?: boolean;
   /** Hide the Sell footer — for tooltips, reveals and read-only previews. */
   readOnly?: boolean;
+  /** Custom footer rendered inside the card frame in place of the Sell row
+      (e.g. the marketplace seller/price/buy panel). Takes precedence over readOnly. */
+  footer?: ReactNode;
 }
 
-export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSelling, onListClick, isListing, readOnly = false }: EffectCardProps) => {
+export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSelling, onListClick, isListing, readOnly = false, footer }: EffectCardProps) => {
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
 
@@ -256,8 +260,18 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
         </div>
       )}
 
+      {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
+      {footer ? (
+        <div
+          className="relative z-10 border-t flex-shrink-0"
+          style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
+        >
+          {footer}
+        </div>
+      ) : null}
+
       {/* Sell */}
-      {!readOnly && (
+      {!readOnly && !footer && (
       <div
         className="flex border-t flex-shrink-0"
         style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
