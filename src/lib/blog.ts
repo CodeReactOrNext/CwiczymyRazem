@@ -56,6 +56,9 @@ export interface BlogFrontmatter {
   cluster?: string;
   /** Marks the canonical "pillar" post of its cluster (linked first from every spoke). */
   pillar?: boolean;
+  /** Ranked items for listicle posts, in display order. When present the blog template
+   *  emits an ItemList JSON-LD block (eligible for list rich results). */
+  listItems?: string[];
 }
 
 export const getAllBlogs = (): BlogFrontmatter[] => {
