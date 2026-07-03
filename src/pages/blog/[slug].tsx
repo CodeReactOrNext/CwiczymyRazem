@@ -82,6 +82,11 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
     return () => observer.disconnect();
   }, [headings]);
 
+  // Frontmatter images are either site-relative paths or already-absolute CDN URLs.
+  const absoluteImage = frontmatter.image?.startsWith('http')
+    ? frontmatter.image
+    : `https://riff.quest${frontmatter.image}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -89,7 +94,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         "@type": "BlogPosting",
         "headline": frontmatter.title,
         "description": frontmatter.description,
-        "image": `https://riff.quest${frontmatter.image}`,
+        "image": absoluteImage,
         "author": {
           "@type": "Person",
           "name": frontmatter.author || "Riff Quest",
@@ -133,6 +138,15 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
           }
         ]
       },
+      frontmatter.listItems && frontmatter.listItems.length > 0 ? {
+        "@type": "ItemList",
+        "name": frontmatter.title,
+        "itemListElement": frontmatter.listItems.map((name, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": name,
+        })),
+      } : null,
       faqs.length > 0 ? {
         "@type": "FAQPage",
         "mainEntity": faqs.map(faq => ({
@@ -159,7 +173,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         <meta name="description" content={frontmatter.description} />
         <meta property="og:title" content={frontmatter.title} />
         <meta property="og:description" content={frontmatter.description} />
-        <meta property="og:image" content={`https://riff.quest${frontmatter.image}`} />
+        <meta property="og:image" content={absoluteImage} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://riff.quest/blog/${frontmatter.slug}`} />
         <meta property="article:published_time" content={frontmatter.date} />
