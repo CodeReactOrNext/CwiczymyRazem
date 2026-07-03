@@ -54,7 +54,7 @@ export const Footer = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
-                        <Link href='https://discord.gg/6yJmsZW2Ne' target='_blank'>
+                        <Link href='https://discord.gg/6yJmsZW2Ne' target='_blank' rel='noopener noreferrer'>
                             <div className="relative p-[1px] overflow-hidden rounded-lg group">
                                 <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#5865F2_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className='relative flex items-center gap-3 px-5 py-2.5 rounded-[7px] bg-zinc-900 border border-white/5 group-hover:bg-zinc-950 transition-all font-black uppercase tracking-widest text-xs text-[#5865F2] group-hover:text-white'>
@@ -66,7 +66,7 @@ export const Footer = () => {
                             </div>
                         </Link>
 
-                        <Link href='https://buymeacoffee.com/riffquest' target='_blank'>
+                        <Link href='https://buymeacoffee.com/riffquest' target='_blank' rel='noopener noreferrer'>
                             <div className="relative p-[1px] overflow-hidden rounded-lg group">
                                 <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#FFDD00_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className='relative flex items-center gap-3 px-5 py-2.5 rounded-[7px] bg-zinc-900 border border-white/5 group-hover:bg-zinc-950 transition-all font-black uppercase tracking-widest text-xs text-amber-400 group-hover:text-amber-300'>
@@ -99,8 +99,8 @@ export const Footer = () => {
                       <div className="space-y-6">
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Social</h4>
                         <ul className="space-y-4">
-                            <li><Link href="https://discord.gg/6yJmsZW2Ne" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Discord</Link></li>
-                            <li><Link href="https://buymeacoffee.com/riffquest" target="_blank" className="text-sm font-bold text-amber-600/70 hover:text-amber-400 transition-colors flex items-center group">Buy me a coffee <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="https://discord.gg/6yJmsZW2Ne" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Discord</Link></li>
+                            <li><Link href="https://buymeacoffee.com/riffquest" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-amber-600/70 hover:text-amber-400 transition-colors flex items-center group">Buy me a coffee <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/contact" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Contact <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Privacy Policy <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/terms-of-service" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Terms of Service <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>

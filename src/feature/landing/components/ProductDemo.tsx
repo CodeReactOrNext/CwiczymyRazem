@@ -17,6 +17,8 @@ export const ProductDemo = () => {
                     loop
                     playsInline
                     preload="none"
+                    poster="/images/video-poster.png"
+                    aria-label="Riff Quest product demo showing practice tracking in action"
                 >
                     <source src="/demo.webm" type="video/webm" />
                     Your browser does not support the video tag.

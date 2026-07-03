@@ -3,7 +3,7 @@
   <!-- Home Page / Landing Page -->
   <url>
     <loc>https://riff.quest/</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,42 +11,42 @@
   <!-- Info Pages -->
   <url>
     <loc>https://riff.quest/about</loc>
-    <lastmod>2026-01-27</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/faq</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/how-it-works</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/contact</loc>
-    <lastmod>2026-03-29</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/privacy-policy</loc>
-    <lastmod>2026-01-27</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/terms-of-service</loc>
-    <lastmod>2026-03-29</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -54,7 +54,7 @@
   <!-- Exercise Pages -->
   <url>
     <loc>https://riff.quest/exercises</loc>
-    <lastmod>2026-05-15</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -62,28 +62,28 @@
   <!-- Exercise Categories -->
   <url>
     <loc>https://riff.quest/exercises/category/technique</loc>
-    <lastmod>2026-05-15</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/exercises/category/theory</loc>
-    <lastmod>2026-05-15</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/exercises/category/hearing</loc>
-    <lastmod>2026-05-15</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/exercises/category/creativity</loc>
-    <lastmod>2026-05-15</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

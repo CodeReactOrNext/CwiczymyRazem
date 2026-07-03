@@ -19,6 +19,10 @@ export const BlogCard = ({ blog }: BlogCardProps) => {
           <img
             src={blog.image}
             alt={blog.title}
+            width={1280}
+            height={720}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-black/20 transition-opacity group-hover:opacity-0" />
@@ -30,9 +34,9 @@ export const BlogCard = ({ blog }: BlogCardProps) => {
             <span>{format(new Date(blog.date), 'MMM dd, yyyy')}</span>
           </div>
           
-          <h3 className="mb-2 text-xl font-bold leading-tight group-hover:text-primary tracking-wide">
+          <h2 className="mb-2 text-xl font-bold leading-tight group-hover:text-primary tracking-wide">
             {blog.title}
-          </h3>
+          </h2>
           
           <p className="line-clamp-2 text-sm text-muted-foreground">
             {blog.description}
