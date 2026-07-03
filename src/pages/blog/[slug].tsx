@@ -36,11 +36,20 @@ const components = {
   PracticeTable,
   // Mapping h2 to include IDs for ToC
   h2: (props: any) => (
-    <h2 
-      id={props.children?.toString().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')} 
-      {...props} 
+    <h2
+      id={props.children?.toString().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}
+      {...props}
     />
   ),
+  // Content images live below the fold; lazy-load them to cut initial page weight
+  img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
+  // GFM task-list checkboxes render as bare inputs; give them an accessible name
+  input: (props: any) =>
+    props.type === 'checkbox' ? (
+      <input aria-label='Checklist item' {...props} />
+    ) : (
+      <input {...props} />
+    ),
 };
 
 const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], faqs = [] }: BlogPostProps) => {
@@ -157,6 +166,9 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         <meta property="article:modified_time" content={frontmatter.updatedAt || frontmatter.date} />
         <meta property="article:author" content={frontmatter.author || "Riff Quest"} />
         <link rel='canonical' href={`https://riff.quest/blog/${frontmatter.slug}`} />
+        {frontmatter.image && (
+          <link rel='preload' as='image' href={frontmatter.image} fetchPriority='high' />
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -311,8 +323,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         .sort((a, b) => Number(b.pillar ?? false) - Number(a.pillar ?? false))
     : [];
 
+  // Rotate the fill deterministically per slug so incoming links spread across
+  // the whole catalog instead of always pointing at the newest posts.
   const fill = others.filter((blog) => !sameCluster.includes(blog));
-  const relatedBlogs = [...sameCluster, ...fill].slice(0, 3);
+  const offset = fill.length
+    ? [...slug].reduce((sum, char) => sum + char.charCodeAt(0), 0) % fill.length
+    : 0;
+  const rotatedFill = [...fill.slice(offset), ...fill.slice(0, offset)];
+  const relatedBlogs = [...sameCluster, ...rotatedFill].slice(0, 3);
 
   return {
     props: {

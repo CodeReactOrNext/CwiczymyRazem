@@ -245,7 +245,7 @@
     "description": "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
     "difficulty": "beginner",
     "category": "theory",
-    "customGoal": "C",
+    "customGoal": "E",
     "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
   },
   {
@@ -263,7 +263,7 @@
     "description": "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",
     "difficulty": "hard",
     "category": "theory",
-    "customGoal": "A#",
+    "customGoal": "F#",
     "whyItMatters": "Locating a note inside an arbitrary position box — rather than sliding to the open-string area — is exactly what real playing demands. The rotating region trains positional fretboard recall across the whole neck under time pressure."
   },
   {
@@ -272,7 +272,7 @@
     "description": "Read a root note and an interval, then find and play the target note anywhere on the neck.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "C",
+    "customGoal": "B",
     "whyItMatters": "Intervals are the building blocks of melody and harmony. Translating an interval into a note and finding it instantly on the neck trains the ear-to-hands link that underpins improvising and playing by ear."
   },
   {
@@ -281,7 +281,7 @@
     "description": "Spell a chord by ear: play each of its tones and watch them light up one by one.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "C",
+    "customGoal": "E",
     "whyItMatters": "Knowing the notes inside a chord — not just its shape — unlocks arpeggios, target notes for soloing, and chord substitutions. Spelling chords by ear cements the link between theory and the fretboard."
   },
   {

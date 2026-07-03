@@ -11,7 +11,7 @@ interface LandingSEOProps {
 export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
   const { t } = useTranslation(["common"]);
   const siteUrl = "https://riff.quest";
-  const ogImageUrl = `${siteUrl}/promo.png`;
+  const ogImageUrl = `${siteUrl}/images/og-image.png`;
 
   const title = t("common:seo.title") as string;
   const description = t("common:seo.description") as string;
@@ -29,8 +29,8 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
       <meta property='og:title' content={title} />
       <meta property='og:description' content={description} />
       <meta property='og:image' content={ogImageUrl} />
-      <meta property='og:image:width' content='872' />
-      <meta property='og:image:height' content='796' />
+      <meta property='og:image:width' content='1200' />
+      <meta property='og:image:height' content='630' />
       <meta property='og:image:alt' content='Riff Quest guitar practice tracker dashboard' />
 
       {/* Twitter */}

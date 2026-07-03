@@ -70,9 +70,8 @@ const sharedHead = (
   <Head>
     <meta name='viewport' content='initial-scale=1.0, width=device-width, viewport-fit=cover' />
     <meta name='google-signin-client_id' content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH} />
-    <title>Riff Quest</title>
-    <meta name='description' content='Practice, track progress, compete! Guitar in hand! 🎸' />
-    <meta name='keywords' content='practice, guitar' />
+    <title>Riff Quest — Guitar Practice Tracker</title>
+    <meta name='description' content='Riff Quest is a guitar practice app that tracks your sessions, builds smart practice plans, and lets you compete with other guitarists. Practice, track progress, level up.' />
   </Head>
 );
 

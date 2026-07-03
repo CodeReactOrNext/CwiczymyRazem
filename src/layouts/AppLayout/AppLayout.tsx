@@ -74,6 +74,12 @@ const AppLayout = ({
     ],
   };
 
+  // Public pages must render their content (and <Head> tags) during SSR/SSG,
+  // where session status is always "loading" — otherwise crawlers get an empty page.
+  if (isPublic && !isAuthenticated) {
+    return <>{children}</>;
+  }
+
   if (status === "loading") {
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -83,10 +89,7 @@ const AppLayout = ({
   }
 
   if (!isAuthenticated) {
-    if (isPublic) {
-      return <>{children}</>;
-    }
-    
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-950">
              <PageLoadingLayout />
