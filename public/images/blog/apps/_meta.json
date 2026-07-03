@@ -1,0 +1,60 @@
+{
+  "justinguitar": {
+    "name": "Justin Guitar Lessons & Songs",
+    "rating": "4.8",
+    "ratingCount": 25132,
+    "price": "Free",
+    "shots": []
+  },
+  "yousician": {
+    "name": "Yousician: Learn & Play Guitar",
+    "rating": "4.6",
+    "ratingCount": 136751,
+    "price": "Free",
+    "shots": []
+  },
+  "simply-guitar": {
+    "name": "Simply Guitar - Learn Guitar",
+    "rating": "4.7",
+    "ratingCount": 385932,
+    "price": "Free",
+    "shots": [
+      "simply-guitar-shot-1.webp",
+      "simply-guitar-shot-2.webp"
+    ]
+  },
+  "ultimate-guitar": {
+    "name": "Ultimate Guitar: Chords & Tabs",
+    "rating": "4.7",
+    "ratingCount": 463328,
+    "price": "Free",
+    "shots": [
+      "ultimate-guitar-shot-1.webp",
+      "ultimate-guitar-shot-2.webp"
+    ]
+  },
+  "songsterr": {
+    "name": "Songsterr Tabs & Chords",
+    "rating": "4.7",
+    "ratingCount": 43124,
+    "price": "Free",
+    "shots": []
+  },
+  "guitartuna": {
+    "name": "GuitarTuna: Tune & Play Guitar",
+    "rating": "4.8",
+    "ratingCount": 144520,
+    "price": "Free",
+    "shots": [
+      "guitartuna-shot-1.webp",
+      "guitartuna-shot-2.webp"
+    ]
+  },
+  "gibson": {
+    "name": "Gibson: Learn to Play Guitar",
+    "rating": "4.8",
+    "ratingCount": 11916,
+    "price": "Free",
+    "shots": []
+  }
+}

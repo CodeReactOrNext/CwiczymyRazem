@@ -4,6 +4,7 @@ import React from "react";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
@@ -36,6 +37,7 @@ interface MobileExerciseContentProps {
   handleRevealRiddle?: () => void;
   handleNextRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   onPlayRiddle: () => void;
 }
 
@@ -62,6 +64,7 @@ export function MobileExerciseContent({
   handleRevealRiddle,
   handleNextRiddle,
   onEarTrainingGuessed,
+  riddleProgress,
   onPlayRiddle,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
@@ -101,6 +104,8 @@ export function MobileExerciseContent({
           score={earTrainingScore || 0}
           highScore={earTrainingHighScore}
           canGuess={hasPlayedRiddleOnce || false}
+          isMicEnabled={!!isMicEnabled}
+          riddleProgress={riddleProgress}
           onRecordsClick={openLeaderboard}
         />
       )}

@@ -32,6 +32,7 @@ import { useGpFileLoader } from "./hooks/useGpFileLoader";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
 import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
+import { useRiddleSequenceMatcher } from "./hooks/useRiddleSequenceMatcher";
 import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
@@ -275,6 +276,26 @@ export const PracticeSession = ({
     tabRestartKey, setTabRestartKey,
   });
 
+  // ── Ear training: mic answer matching ─────────────────────────────────────
+
+  // Armed only while playback is fully stopped — otherwise the mic would hear
+  // the riddle itself coming from the speakers and solve it on its own.
+  const riddleProgress = useRiddleSequenceMatcher({
+    measures: riddleMeasures,
+    active: isMicEnabled && isListening && hasPlayedRiddleOnce && !isRiddleRevealed && !isPlaying && !metronome.isPlaying,
+    frequencyRef: audioRefs.frequencyRef,
+    volumeRef: audioRefs.volumeRef,
+    onComplete: handleEarTrainingGuessed,
+  });
+
+  // Next riddle auto-plays its melody; if the player answered while stopped
+  // (mic flow), restart the timer too so the Play/Stop button and the answer
+  // matcher stay consistent with the audible playback.
+  const handleNextRiddleClick = useCallback(() => {
+    if (!isPlaying) startTimer();
+    handleNextRiddle();
+  }, [isPlaying, startTimer, handleNextRiddle]);
+
   // ── Misc effects ──────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -391,9 +412,10 @@ export const PracticeSession = ({
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
           isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-          handleNextRiddle={handleNextRiddle} handleRevealRiddle={handleRevealRiddle}
+          handleNextRiddle={handleNextRiddleClick} handleRevealRiddle={handleRevealRiddle}
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
           onEarTrainingGuessed={handleEarTrainingGuessed}
+          riddleProgress={riddleProgress}
         />,
         document.body,
       )}
@@ -422,8 +444,9 @@ export const PracticeSession = ({
         isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce} earTrainingScore={earTrainingScore}
         earTrainingHighScore={earTrainingHighScore}
-        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
+        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddleClick}
         handleEarTrainingGuessed={handleEarTrainingGuessed}
+        riddleProgress={riddleProgress}
         isPlaying={isPlaying} handleToggleTimer={handleToggleTimer}
         startTimer={startTimer} stopTimer={stopTimer}
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}

@@ -47,6 +47,7 @@ export function useEarTraining({
   // Reset riddle state when exercise changes
   useEffect(() => {
     setIsRiddleRevealed(false);
+    setIsRiddleGuessed(false);
     setHasPlayedRiddleOnce(false);
     if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
       setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
