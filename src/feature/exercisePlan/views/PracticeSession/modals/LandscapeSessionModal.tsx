@@ -14,6 +14,7 @@ import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 
 interface LandscapeSessionModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ interface LandscapeSessionModalProps {
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
   isListening: boolean;
   frequencyRef?: React.RefObject<number>;
@@ -92,6 +94,7 @@ export function LandscapeSessionModal({
   earTrainingScore,
   earTrainingHighScore,
   onEarTrainingGuessed,
+  riddleProgress,
   examMode,
   isListening,
   frequencyRef,
@@ -155,6 +158,7 @@ export function LandscapeSessionModal({
                   handleRevealRiddle={handleRevealRiddle}
                   handleNextRiddle={handleNextRiddle}
                   onEarTrainingGuessed={onEarTrainingGuessed}
+                  riddleProgress={riddleProgress}
                   onPlayRiddle={handleToggleTimer}
                 />
               </div>

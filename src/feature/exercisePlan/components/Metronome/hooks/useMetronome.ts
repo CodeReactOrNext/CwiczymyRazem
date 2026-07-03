@@ -63,6 +63,11 @@ export const useMetronome = ({
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
   // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
   const [volume, setVolume] = useState(0.5);
+  // Playback anchor mirrored into React state. The refs are set on the audio
+  // thread's first scheduled beat, which on a skipCountIn start (loop restart,
+  // live seek) changes no state at all — without this mirror the memoized
+  // return value would keep exposing startTime/audioStartTime = null forever.
+  const [playbackAnchor, setPlaybackAnchor] = useState<{ wall: number | null; audio: number | null }>({ wall: null, audio: null });
 
   const audioContextRef      = useRef<AudioContext | null>(null);
   const nextNoteTimeRef      = useRef<number>(0);
@@ -192,7 +197,12 @@ export const useMetronome = ({
           // Continue the accent grid from the resumed beat so downbeats stay aligned.
           beatCounterRef.current = beatsPaused;
           onPlayStartRef.current?.();
-          setTimeout(() => setCountInRemaining(0), 0);
+          const wall  = startTimeRef.current;
+          const audio = audioStartTimeRef.current;
+          setTimeout(() => {
+            setCountInRemaining(0);
+            setPlaybackAnchor({ wall, audio });
+          }, 0);
         }
         playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
         beatCounterRef.current += 1;
@@ -241,6 +251,7 @@ export const useMetronome = ({
     audioStartTimeRef.current = null;
     beatCounterRef.current    = 0;
     setCountInRemaining(useCountIn ? 4 : 0);
+    setPlaybackAnchor({ wall: null, audio: null });
 
     const node = ensureWorkletNode();
     if (node) {
@@ -266,6 +277,7 @@ export const useMetronome = ({
     audioStartTimeRef.current = null;
     countInTargetRef.current  = 0;
     setCountInRemaining(0);
+    setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
   }, []);
 
@@ -320,12 +332,13 @@ export const useMetronome = ({
     seekToBeats,
     handleSetRecommendedBpm,
     recommendedBpm,
-    startTime: startTimeRef.current,
+    startTime: playbackAnchor.wall,
     audioContext: audioContextRef.current,
-    audioStartTime: audioStartTimeRef.current,
+    audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm,
     setBpm, volume, setVolume, toggleMetronome, startMetronome, stopMetronome,
-    restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm
+    restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm,
+    playbackAnchor,
   ]);
 };

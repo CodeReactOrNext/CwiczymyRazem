@@ -140,8 +140,10 @@ export const TablatureSection = memo(function TablatureSection({
     }
     let rafId: number;
     const tick = () => {
+      // The metronome back-dates startTime by the seeked position, so elapsed
+      // already measures from beat 0 — adding seekedBeatRef here would double-count.
       const elapsed  = (Date.now() - startTime!) / 1000;
-      const rawBeats = seekedBeatRef.current + elapsed * (effectiveBpm / 60);
+      const rawBeats = elapsed * (effectiveBpm / 60);
 
       // Loop restart: fire once when cursor crosses loopEnd
       if (
@@ -164,6 +166,9 @@ export const TablatureSection = memo(function TablatureSection({
       } else {
         beat = totalBeats > 0 ? rawBeats % totalBeats : 0;
       }
+      // Track the displayed position so pausing / count-in / restart bridging
+      // (the early-return branch above) resumes from where the cursor actually is.
+      seekedBeatRef.current = beat;
       setCurrentBeat(beat);
       rafId = requestAnimationFrame(tick);
     };

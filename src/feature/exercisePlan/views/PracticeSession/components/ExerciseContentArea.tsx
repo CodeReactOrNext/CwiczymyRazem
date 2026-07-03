@@ -4,6 +4,7 @@ import React, { memo, useEffect } from "react";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
@@ -48,6 +49,7 @@ interface ExerciseContentAreaProps {
   onNextRiddle: () => void;
   onEarTrainingGuessed: () => void;
   onLeaderboardClick: () => void;
+  riddleProgress?: RiddleProgress | null;
 
 
   // Rhythm detection
@@ -98,6 +100,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   onNextRiddle,
   onEarTrainingGuessed,
   onLeaderboardClick,
+  riddleProgress,
   startTimer,
   stopTimer,
   setVideoDuration,
@@ -144,6 +147,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
             score={earTrainingScore}
             highScore={earTrainingHighScore}
             canGuess={hasPlayedRiddleOnce}
+            isMicEnabled={!!isMicEnabled}
+            riddleProgress={riddleProgress}
             onRecordsClick={onLeaderboardClick}
           />
         </div>

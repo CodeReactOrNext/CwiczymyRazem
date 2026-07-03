@@ -48,10 +48,12 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
       setIsSubmittingReport(true);
       try {
-        const techMin = Math.floor(timerData.technique / 60000);
-        const theoryMin = Math.floor(timerData.theory / 60000);
-        const hearMin = Math.floor(timerData.hearing / 60000);
-        const creatMin = Math.floor(timerData.creativity / 60000);
+        // Round to the nearest minute — the tracked time runs a hair short of the
+        // exercise timer (sub-second ticks), so flooring turned 5:00 into 4 min.
+        const techMin = Math.round(timerData.technique / 60000);
+        const theoryMin = Math.round(timerData.theory / 60000);
+        const hearMin = Math.round(timerData.hearing / 60000);
+        const creatMin = Math.round(timerData.creativity / 60000);
 
         const reportData: ReportFormikInterface = {
           techniqueHours: Math.floor(techMin / 60).toString(),

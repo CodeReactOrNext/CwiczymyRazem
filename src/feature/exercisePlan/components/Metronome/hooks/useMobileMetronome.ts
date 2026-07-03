@@ -39,6 +39,11 @@ export const useMobileMetronome = ({
   const [audioInitialized, setAudioInitialized] = useState(false);
   // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
   const [volume, setVolume] = useState(0.5);
+  // Playback anchor mirrored into React state. The refs are set by the scheduler
+  // on the first scheduled beat, which on a skipCountIn start (loop restart,
+  // live seek) changes no state at all — without this mirror the memoized
+  // return value would keep exposing startTime/audioStartTime = null forever.
+  const [playbackAnchor, setPlaybackAnchor] = useState<{ wall: number | null; audio: number | null }>({ wall: null, audio: null });
 
   const audioContextRef    = useRef<AudioContext | null>(null);
   const ownsAudioContextRef= useRef(true);
@@ -183,6 +188,7 @@ export const useMobileMetronome = ({
           beatCounterRef.current = 0;
           onPlayStartRef.current?.();
           setCountInRemaining(0);
+          setPlaybackAnchor({ wall: startTimeRef.current, audio: audioStartTimeRef.current });
         }
         scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
         beatCounterRef.current += 1;
@@ -223,6 +229,7 @@ export const useMobileMetronome = ({
       startTimeRef.current      = null;
       audioStartTimeRef.current = null;
       beatCounterRef.current    = 0;
+      setPlaybackAnchor({ wall: null, audio: null });
       scheduler();
     }
 
@@ -246,6 +253,7 @@ export const useMobileMetronome = ({
     audioStartTimeRef.current = null;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
+    setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
   }, []);
 
@@ -342,12 +350,13 @@ export const useMobileMetronome = ({
     recommendedBpm,
     initializeAudio,
     audioInitialized,
-    startTime: startTimeRef.current,
+    startTime: playbackAnchor.wall,
     audioContext: audioContextRef.current,
-    audioStartTime: audioStartTimeRef.current,
+    audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
     toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
-    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized
+    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
+    playbackAnchor,
   ]);
 }; 

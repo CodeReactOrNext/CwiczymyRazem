@@ -13,6 +13,7 @@ import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { RotateDeviceHint } from "../components/RotateDeviceHint";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
@@ -56,6 +57,7 @@ interface SessionModalProps {
   earTrainingHighScore?: number | null;
   handleRevealRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
 }
 
@@ -77,6 +79,7 @@ const SessionModal = ({
   isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
   handleNextRiddle, handleRevealRiddle,
   earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
+  riddleProgress,
   examMode,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
@@ -134,6 +137,7 @@ const SessionModal = ({
         handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
         earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
         onEarTrainingGuessed={onEarTrainingGuessed}
+        riddleProgress={riddleProgress}
         examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
         volumeRef={volumeRef} onRecalibrate={onRecalibrate}
         gradientClasses={gradientClasses} tabResetKey={tabResetKey}
@@ -183,6 +187,7 @@ const SessionModal = ({
             handleRevealRiddle={handleRevealRiddle}
             handleNextRiddle={handleNextRiddle}
             onEarTrainingGuessed={onEarTrainingGuessed}
+            riddleProgress={riddleProgress}
             onPlayRiddle={handleToggleTimer}
           />
 

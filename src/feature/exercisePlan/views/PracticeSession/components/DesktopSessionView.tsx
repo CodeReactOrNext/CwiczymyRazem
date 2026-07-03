@@ -1,12 +1,15 @@
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import type { ExercisePlan, Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise,ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import type { NextRouter } from "next/router";
-import React, { Dispatch, RefObject, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import React from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.types";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
 import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
@@ -17,10 +20,9 @@ import { GpTrackSelector } from "./GpTrackSelector";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
 import { NotationToggleButton } from "./NotationToggleButton";
-import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SessionSidebar } from "./SessionSidebar";
-import { useSessionUI } from "../contexts/SessionUIContext";
+import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 
 interface DesktopSessionViewProps {
   reportResult:             any;
@@ -63,6 +65,7 @@ interface DesktopSessionViewProps {
   handleRevealRiddle:       () => void;
   handleNextRiddle:         () => void;
   handleEarTrainingGuessed: () => void;
+  riddleProgress:           RiddleProgress | null;
   isPlaying:                boolean;
   handleToggleTimer:        () => void;
   startTimer:               () => void;
@@ -109,8 +112,14 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   const handleTablatureSeek = React.useCallback((beatPosition: number) => {
     if (!p.metronome.isPlaying) {
       p.metronome.seekToBeats?.(beatPosition);
+    } else if (!p.isExamMode) {
+      // Live seek during playback: restart at the new position (same pattern as loop restart).
+      // Ignoring the seek while the visuals still jump desyncs the playhead from the audio.
+      p.metronome.stopMetronome();
+      p.metronome.seekToBeats(beatPosition);
+      setTimeout(() => p.metronome.startMetronome({ skipCountIn: true }), 0);
     }
-  }, [p.metronome]);
+  }, [p.metronome, p.isExamMode]);
 
   const handleLoopRestart = React.useCallback((loopStartBeat: number) => {
     p.metronome.stopMetronome();
@@ -236,6 +245,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     earTrainingHighScore={p.earTrainingHighScore} onPlayRiddle={p.handleToggleTimer}
                     onRevealRiddle={p.handleRevealRiddle} onNextRiddle={p.handleNextRiddle}
                     onEarTrainingGuessed={p.handleEarTrainingGuessed}
+                    riddleProgress={p.riddleProgress}
                     onLeaderboardClick={() => openLeaderboard()}
                     startTimer={p.startTimer} stopTimer={p.stopTimer}
                     setVideoDuration={p.setVideoDuration} setTimerTime={p.setTimerTime}
