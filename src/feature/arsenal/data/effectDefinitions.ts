@@ -15,6 +15,12 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   { id: 12, name: "Stereo Delay Lab",   brand: "ChronosEcho", type: "Delay",     imageId: 12, rarity: "Epic"      },
   { id: 13, name: "Overdrive Pro",      brand: "AstraTone",   type: "Overdrive", imageId: 13, rarity: "Mythic"    },
   { id: 14, name: "Astral Reverberator", brand: "Gravinix",   type: "Reverb",    imageId: 15, rarity: "Legendary" },
+  // New batch (15-19) — marki są placeholderami, do poprawki
+  { id: 15, name: "Cymatic Current",    brand: "Gravinix",   type: "Vibrato",   imageId: 16, rarity: "Rare"     },
+  { id: 16, name: "Deep Echo",          brand: "Gravinix",   type: "Reverb",    imageId: 17, rarity: "Epic"     },
+  { id: 17, name: "Professional Overdrive OD-5", brand: "Ronin", type: "Overdrive", imageId: 18, rarity: "Uncommon" },
+  { id: 18, name: "Chromatic Tuner AT-10", brand: "Ronin",   type: "Tuner",     imageId: 19, rarity: "Common"   },
+  { id: 19, name: "Graphic EQ GE-10",   brand: "Ronin",      type: "EQ",        imageId: 20, rarity: "Uncommon" },
 ];
 
 export const EFFECTS_BY_ID = new Map<number | string, EffectDefinition>(

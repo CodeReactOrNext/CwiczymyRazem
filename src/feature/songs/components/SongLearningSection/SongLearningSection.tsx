@@ -239,22 +239,6 @@ export const SongLearningSection = ({
 
       <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-700/80">
         <SongStatusCard
-          id="wantToLearn"
-          title={t("want_to_learn", "Want to Learn") as string}
-          songs={filteredSongs.wantToLearn}
-          onStatusChange={handleStatusChange}
-          progressMap={progressMap}
-          isPremium={isPremium}
-          onPracticeWithGp={onPracticeWithGp}
-          onOpenDetails={onOpenDetails}
-          activeOverContainer={activeOverContainer}
-          isCollapsedInitially={false}
-          disableDnd={disableDnd}
-          isMobile={isMobile}
-          onSongRemove={handleSongRemoval}
-          activeId={activeId}
-        />
-        <SongStatusCard
           id="learning"
           title={t("learning", "In Progress") as string}
           songs={filteredSongs.learning}
@@ -268,6 +252,22 @@ export const SongLearningSection = ({
           isCollapsedInitially={false}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          activeId={activeId}
+        />
+        <SongStatusCard
+          id="wantToLearn"
+          title={t("want_to_learn", "Want to Learn") as string}
+          songs={filteredSongs.wantToLearn}
+          onStatusChange={handleStatusChange}
+          progressMap={progressMap}
+          isPremium={isPremium}
+          onPracticeWithGp={onPracticeWithGp}
+          onOpenDetails={onOpenDetails}
+          activeOverContainer={activeOverContainer}
+          isCollapsedInitially={false}
+          disableDnd={disableDnd}
+          isMobile={isMobile}
+          onSongRemove={handleSongRemoval}
           activeId={activeId}
         />
         <SongStatusCard
