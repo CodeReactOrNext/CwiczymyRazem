@@ -85,6 +85,12 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   { id: 43, imageId: "special/44", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Mythic", yearFrom: 1960, yearTo: 1965, countries: ["USA"] },
   { id: 44, imageId: "special/45", name: "Stratocaster Custom", brand: "Fairmont", rarity: "Legendary", yearFrom: 1959, yearTo: 1980, countries: ["USA"] },
   { id: 45, imageId: "special/46", name: "Monarch SE Black Special", brand: "RPS", rarity: "Epic", yearFrom: 2010, yearTo: 2026, countries: ["Korea", "USA"] },
+  // Fairmont batch (46-50) — do poprawki
+  { id: 46, imageId: "special/47", name: "Jazzcaster", brand: "Fairmont", rarity: "Epic", yearFrom: 1960, yearTo: 2020, countries: ["USA", "Japan"] },
+  { id: 47, imageId: "special/48", name: "Stratocaster Natural", brand: "Fairmont", rarity: "Rare", yearFrom: 1970, yearTo: 2020, countries: ["USA", "Japan"] },
+  { id: 48, imageId: "special/49", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
+  { id: 49, imageId: "special/50", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
+  { id: 50, imageId: "special/51", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
 
 
 ];

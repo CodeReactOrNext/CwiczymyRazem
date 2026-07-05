@@ -10,7 +10,9 @@ export type EffectType =
   | "Fuzz"
   | "Phaser"
   | "Flanger"
-  | "Boost";
+  | "Boost"
+  | "Vibrato"
+  | "Tuner";
 
 export interface EffectDefinition {
   id: number | string;
