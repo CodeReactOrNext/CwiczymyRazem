@@ -8,8 +8,6 @@ interface UseAlphaTabApiOptions {
   mode: "score" | "tab";
   /** Ref — always current value of volume, safe to read inside async callbacks */
   volumeRef: React.MutableRefObject<number>;
-  /** Ref kept in sync by the caller — read inside AT callbacks */
-  isPlayingRef: React.MutableRefObject<boolean>;
   bpmRef: React.MutableRefObject<number>;
   origBpmRef: React.MutableRefObject<number>;
   speedMultiplierRef: React.MutableRefObject<number>;
@@ -36,7 +34,6 @@ export function useAlphaTabApi({
   rawGpFile,
   mode,
   volumeRef,
-  isPlayingRef,
   bpmRef,
   origBpmRef,
   speedMultiplierRef,
@@ -72,9 +69,16 @@ export function useAlphaTabApi({
       core: {
         scriptFile:    `${origin}/alphatab/alphaTab.min.js`,
         fontDirectory: `${origin}/alphatab/font/`,
+        // Populate per-note bounds so we can overlay hit/miss colour on each
+        // fret number (see useNoteHeadFeedback).
+        includeNoteBounds: true,
       },
       display: {
-        staves: [{ id: mode }],
+        // `staves` is a runtime property, not a setting — it was ignored, so the
+        // profile fell back to Default (notation + tab). Use staveProfile: with
+        // mode="tab" we render tablature ONLY, so note-head bounds land on the
+        // fret numbers (see useNoteHeadFeedback) instead of the notation heads.
+        staveProfile: mode === "tab" ? "Tab" : "ScoreTab",
       },
       player: {
         enablePlayer:  true,
@@ -112,9 +116,10 @@ export function useAlphaTabApi({
       // BUG-FIX: apply combined speed (session BPM × user multiplier) at startup
       api.playbackSpeed   = (bpmRef.current / (origBpmRef.current || 120)) * speedMultiplierRef.current;
 
+      // Single play path: the caller's isPlaying effect starts playback (with a
+      // seek to the current session position). Auto-playing here too caused a
+      // double play()/stop() on the fresh synth → AudioBufferSourceNode errors.
       setUiReady(true);
-
-      if (isPlayingRef.current) api.play();
     });
 
     api.playerStateChanged.on((args: any) => {

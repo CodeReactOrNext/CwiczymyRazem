@@ -52,6 +52,10 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   let prevTickRms = 0;
   let lastTickFire = 0;
   let lastStateUpdate = 0;
+  let silentWindows = 0;
+  // Reused across calls — windows have a fixed size, so allocating per call
+  // (~23×/s) only produced GC churn on the main thread.
+  let normalizedBuf: Float32Array | null = null;
 
   const HOP = 512;
   const VOLUME_THRESHOLD = 0.001; // catches low E on mics with high-pass filters
@@ -59,7 +63,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   return function process(inputBuffer: Float32Array) {
     const len = inputBuffer.length;
     const gain = getGain();
-    const normalizedBuf = new Float32Array(len);
+    if (!normalizedBuf || normalizedBuf.length !== len) normalizedBuf = new Float32Array(len);
 
     // 1. Apply gain and calculate RMS volume + peak from gained signal
     let sum = 0;
@@ -75,6 +79,31 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     // Raw RMS without gain — gain-independent signal presence indicator
     const rawRms = gain > 0 ? rms / gain : rms;
     targets.rawVolumeRef.current = Math.max(0, Math.min(1, rawRms * 10));
+
+    const nowMs = Date.now();
+
+    // 1b. Silence gate — with no signal there is nothing to detect. Skipping the
+    // aubio calls (yinfft pitch + 2 onset detectors, 4 hops each ≈ 12 WASM FFT
+    // passes per window) keeps the main thread idle-cheap while the mic is on
+    // but the user isn't playing. The first silent window still runs the full
+    // DSP so decaying signals finish cleanly; when sound returns the detectors
+    // see the fresh transient and fire normally.
+    if (rms <= VOLUME_THRESHOLD) {
+      if (++silentWindows >= 2) {
+        lastFrequencies = [];
+        prevTickRms = rms;
+        targets.frequencyRef.current  = 0;
+        targets.volumeRef.current     = volume;
+        targets.confidenceRef.current = 0;
+        if (onActive && nowMs - lastStateUpdate >= 100) {
+          lastStateUpdate = nowMs;
+          onActive();
+        }
+        return;
+      }
+    } else {
+      silentWindows = 0;
+    }
 
     // 2. Normalize gained buffer for aubio — scale to peak=0.9 so the pitch
     //    detector always receives a strong signal regardless of input level.
@@ -95,8 +124,6 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
       frequency = pitchDetector.do(chunk);
       pitchConfidence = pitchDetector.getConfidence();
     }
-
-    const nowMs = Date.now();
 
     if (isOnset) {
       targets.lastOnsetTimeRef.current = nowMs;

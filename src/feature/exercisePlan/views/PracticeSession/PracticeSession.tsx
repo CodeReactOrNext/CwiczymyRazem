@@ -124,9 +124,9 @@ export const PracticeSession = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, show3dHighway, selectedGpTrackIdx,
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
-    toggleAlphaTabScore, resetForExercise
+    toggleAlphaTabScore, toggle3dHighway, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
@@ -223,6 +223,7 @@ export const PracticeSession = ({
     stopMetronome: metronome.stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
     tabRestartKey,
+    pendingSeekBeatRef: metronome.pendingSeekBeatRef,
   });
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
@@ -430,6 +431,7 @@ export const PracticeSession = ({
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
+        show3dHighway={show3dHighway} handleToggle3dHighway={toggle3dHighway}
         selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
         handleToggleAlphaTabScore={toggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}

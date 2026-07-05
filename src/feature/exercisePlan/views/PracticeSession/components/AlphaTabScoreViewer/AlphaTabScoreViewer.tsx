@@ -5,6 +5,7 @@ import { ScoreControls, SPEEDS } from "./ScoreControls";
 import { TrackSelector } from "./TrackSelector";
 import type { AlphaTabScoreViewerProps } from "./types";
 import { useAlphaTabApi } from "./useAlphaTabApi";
+import { useNoteHeadFeedback } from "./useNoteHeadFeedback";
 
 /**
  * Interactive AlphaTab score/tab viewer.
@@ -15,21 +16,25 @@ import { useAlphaTabApi } from "./useAlphaTabApi";
  */
 export const AlphaTabScoreViewer = ({
   rawGpFile,
+  measures,
   mode = "score",
   isPlaying,
   startTime,
   bpm,
   volume = 1,
   className,
+  hitNotes,
+  missedNotes,
 }: AlphaTabScoreViewerProps) => {
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
   const origBpmRef         = useRef(120);
-  const isPlayingRef       = useRef(isPlaying);
   const bpmRef             = useRef(bpm);
   const speedMultiplierRef = useRef(1);
   const volumeRef          = useRef(volume);
+  // Guards api.stop() — AlphaSynth throws if stopped before it has ever played.
+  const hasStartedRef      = useRef(false);
 
-  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { bpmRef.current = bpm; },             [bpm]);
   useEffect(() => { volumeRef.current = volume; },       [volume]);
 
@@ -52,11 +57,13 @@ export const AlphaTabScoreViewer = ({
     rawGpFile,
     mode,
     volumeRef,
-    isPlayingRef,
     bpmRef,
     origBpmRef,
     speedMultiplierRef,
   });
+
+  // Colour the actual fret numbers green on a hit / red on a miss.
+  useNoteHeadFeedback({ apiRef, overlayRef, uiReady, measures, hitNotes, missedNotes, selectedTrackIdx });
 
   // ── Playback: driven by session controls ─────────────────────────────────
   // startTime changing = new session → always restart from the beginning.
@@ -66,10 +73,21 @@ export const AlphaTabScoreViewer = ({
     if (!api || !uiReady) return;
 
     if (isPlaying) {
-      api.stop();
-      api.play();
-    } else {
-      api.stop();
+      // Only stop once it has actually played — stopping a fresh AlphaSynth throws.
+      if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
+      // Toggling the view mid-playback remounts this AlphaTab instance; without a
+      // seek it would restart the audio at the top. startTime is the metronome's
+      // back-dated master clock, so this continues from the session's position.
+      if (startTime) {
+        const beats = ((Date.now() - startTime) / 1000) * (bpmRef.current / 60);
+        if (beats > 0.1) {
+          try { api.tickPosition = Math.max(0, Math.round(beats * 960)); } catch { /* ignore */ }
+        }
+      }
+      try { api.play(); } catch { /* ignore */ }
+      hasStartedRef.current = true;
+    } else if (hasStartedRef.current) {
+      try { api.stop(); } catch { /* ignore */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, startTime, uiReady]);
@@ -126,7 +144,12 @@ export const AlphaTabScoreViewer = ({
         className="w-full overflow-auto bg-white"
         style={{ minHeight: 300, maxHeight: 500 }}
       >
-        <div ref={containerRef} />
+        {/* position:relative wrapper so the overlay shares AlphaTab's coordinate
+            space and scrolls together with the rendered score. */}
+        <div className="relative">
+          <div ref={containerRef} />
+          <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20" />
+        </div>
       </div>
 
       {/* Controls bar */}

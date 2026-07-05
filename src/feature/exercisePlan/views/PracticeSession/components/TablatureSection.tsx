@@ -1,4 +1,5 @@
 import { ZoomIn, ZoomOut } from "lucide-react";
+import dynamic from "next/dynamic";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
@@ -7,6 +8,13 @@ import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
 import { TablatureViewer } from "./TablatureViewer";
 import { useTablatureRenderData } from "./useTablatureRenderData";
+
+// three.js is only pulled in when the user actually switches to the 3D highway,
+// keeping it out of the main bundle. ssr:false — the scene touches `window`.
+const RocksmithHighway3D = dynamic(
+  () => import("./RocksmithHighway3D").then((m) => m.RocksmithHighway3D),
+  { ssr: false },
+);
 
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 1.75;
@@ -27,6 +35,7 @@ interface TablatureSectionProps {
   activeTablature: TablatureMeasure[];
   rawGpFile?: File;
   showAlphaTabScore: boolean;
+  show3dHighway?: boolean;
   isAudioPlaying: boolean;
   onSeek?: (beatPosition: number) => void;
   onLoopRestart?: (loopStartBeat: number) => void;
@@ -50,6 +59,7 @@ export const TablatureSection = memo(function TablatureSection({
   activeTablature,
   rawGpFile,
   showAlphaTabScore,
+  show3dHighway = false,
   isAudioPlaying,
   onSeek,
   onLoopRestart,
@@ -191,12 +201,15 @@ export const TablatureSection = memo(function TablatureSection({
       {showAlphaTabScore && rawGpFile ? (
         <AlphaTabScoreViewer
           rawGpFile={rawGpFile}
+          measures={activeTablature}
           mode="score"
           isPlaying={isAudioPlaying}
           startTime={startTime}
           bpm={effectiveBpm}
           volume={isAudioMuted ? 0 : 1}
           className="w-full"
+          hitNotes={hitNotes}
+          missedNotes={missedNotes}
         />
       ) : (
         <div className="px-2 pt-0">
@@ -215,34 +228,43 @@ export const TablatureSection = memo(function TablatureSection({
               viewportEnd={viewportEnd}
             />
           )}
-          <div className="relative">
-            <TablatureViewer
+          {show3dHighway ? (
+            <RocksmithHighway3D
               measures={activeTablature}
-              bpm={effectiveBpm}
-              isPlaying={isMetronomePlaying}
-              startTime={startTime}
-              countInRemaining={countInRemaining}
-              className="w-full"
-              frequencyRef={frequencyRef}
-              isListening={isListening}
-              hitNotes={hitNotes}
-              missedNotes={missedNotes}
-              currentBeatsElapsed={0}
-              hideNotes={hideNotes}
-              audioContext={audioContext}
-              audioStartTime={audioStartTime}
               resetKey={tabResetKey}
-              hideDynamicsLane={hideDynamicsLane}
-              volumeRef={volumeRef}
-              onSeek={handleSeek}
-              loopStartBeat={loopStart}
-              loopEndBeat={loopEnd}
-              seekWorkerRef={seekWorkerRef}
-              viewerWidthRef={viewerWidthRef}
-              zoom={zoom}
+              hideNotes={hideNotes}
+              className="w-full rounded-lg overflow-hidden"
             />
-            <TablatureZoomControl zoom={zoom} onChange={handleZoomChange} />
-          </div>
+          ) : (
+            <div className="relative">
+              <TablatureViewer
+                measures={activeTablature}
+                bpm={effectiveBpm}
+                isPlaying={isMetronomePlaying}
+                startTime={startTime}
+                countInRemaining={countInRemaining}
+                className="w-full"
+                frequencyRef={frequencyRef}
+                isListening={isListening}
+                hitNotes={hitNotes}
+                missedNotes={missedNotes}
+                currentBeatsElapsed={0}
+                hideNotes={hideNotes}
+                audioContext={audioContext}
+                audioStartTime={audioStartTime}
+                resetKey={tabResetKey}
+                hideDynamicsLane={hideDynamicsLane}
+                volumeRef={volumeRef}
+                onSeek={handleSeek}
+                loopStartBeat={loopStart}
+                loopEndBeat={loopEnd}
+                seekWorkerRef={seekWorkerRef}
+                viewerWidthRef={viewerWidthRef}
+                zoom={zoom}
+              />
+              <TablatureZoomControl zoom={zoom} onChange={handleZoomChange} />
+            </div>
+          )}
         </div>
       )}
     </div>

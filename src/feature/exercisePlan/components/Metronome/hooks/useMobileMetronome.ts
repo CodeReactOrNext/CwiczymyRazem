@@ -65,6 +65,11 @@ export const useMobileMetronome = ({
   useEffect(() => { onTickRef.current = onTick; },         [onTick]);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef = useRef<number>(0);
+  // Beat position the next GP playback (AlphaTab) should seek to, or null to
+  // start/resume normally. Set by seekToBeats, cleared on restart, consumed once
+  // by the AlphaTab player before it calls play() — keeps GP audio aligned with
+  // bar-click seeks.
+  const pendingSeekBeatRef = useRef<number | null>(null);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
@@ -263,6 +268,7 @@ export const useMobileMetronome = ({
     pausedElapsedTimeRef.current = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current = 0;
+    pendingSeekBeatRef.current = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -329,6 +335,7 @@ export const useMobileMetronome = ({
     const elapsedMs = beats * secondsPerBeat * 1000;
     pausedElapsedTimeRef.current  = elapsedMs;
     pausedAudioElapsedRef.current = elapsedMs;
+    pendingSeekBeatRef.current    = beats; // GP audio jumps here on the next play()
   }, [bpm, speedMultiplier]);
 
   // Expose the same interface as the original hook
@@ -346,6 +353,7 @@ export const useMobileMetronome = ({
     stopMetronome,
     restartMetronome,
     seekToBeats,
+    pendingSeekBeatRef,
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,

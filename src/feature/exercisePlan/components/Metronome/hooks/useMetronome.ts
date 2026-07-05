@@ -81,6 +81,11 @@ export const useMetronome = ({
   const volumeRef            = useRef(volume);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef= useRef<number>(0);
+  // Beat position the next GP playback (AlphaTab) should seek to, or null to
+  // start/resume normally. Set by seekToBeats, cleared on restart, consumed once
+  // by the AlphaTab player before it calls play(). Without this the GP audio
+  // ignores bar-click seeks (visual cursor jumps, audio does not).
+  const pendingSeekBeatRef   = useRef<number | null>(null);
 
   useEffect(() => {
     volumeRef.current = volume;
@@ -286,6 +291,7 @@ export const useMetronome = ({
     pausedElapsedTimeRef.current  = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current        = 0;
+    pendingSeekBeatRef.current    = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -314,6 +320,7 @@ export const useMetronome = ({
     const elapsedMs = beats * secondsPerBeat * 1000;
     pausedElapsedTimeRef.current  = elapsedMs;
     pausedAudioElapsedRef.current = elapsedMs;
+    pendingSeekBeatRef.current    = beats; // GP audio jumps here on the next play()
   }, [bpm, speedMultiplier]);
 
   return useMemo(() => ({
@@ -330,6 +337,7 @@ export const useMetronome = ({
     stopMetronome,
     restartMetronome,
     seekToBeats,
+    pendingSeekBeatRef,
     handleSetRecommendedBpm,
     recommendedBpm,
     startTime: playbackAnchor.wall,
