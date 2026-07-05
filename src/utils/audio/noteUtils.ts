@@ -102,6 +102,13 @@ export function computeChromagram(analyser: AnalyserNode): Float32Array | null {
   return chroma;
 }
 
+/**
+ * Converts a MIDI note number to its frequency in Hz.
+ * Frequency = A4 * 2^((midi - 69) / 12)
+ */
+export const midiToFrequency = (midi: number): number =>
+  A4 * Math.pow(2, (midi - 69) / 12);
+
 export const getFrequencyFromTab = (string: number, fret: number): number => {
   // Standard Tuning Open String MIDI notes
   // 1: E4 (64)

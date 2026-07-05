@@ -222,6 +222,19 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
                   midiNote = rawVal;
                 }
               }
+            } else {
+              // Guitar / bass — real sounding pitch from the track's actual tuning.
+              // Without this, scoring falls back to standard tuning and expects the
+              // wrong pitch on Drop C/D, 7-string, capo, etc. (tab shows fret 5 but
+              // the scorer wants the standard-tuning pitch of fret 5).
+              // stringTuning is AlphaTab's open-string MIDI for this note's string;
+              // fall back to the staff tuning array (top line = highest string).
+              const openMidi = typeof altNote.stringTuning === 'number'
+                ? altNote.stringTuning
+                : staff.tuning?.[stringCount - altNote.string];
+              if (typeof openMidi === 'number' && typeof altNote.fret === 'number') {
+                midiNote = openMidi + altNote.fret;
+              }
             }
 
             // Map AlphaTab dynamic enum (1=ppp … 8=fff) to 0.0–1.0

@@ -24,6 +24,7 @@ interface ExerciseContentAreaProps {
   rawGpFile?: File;
   showAlphaTabScore: boolean;
   onToggleAlphaTabScore: () => void;
+  show3dHighway?: boolean;
   isAudioPlaying: boolean;
   startTime: number | null;
   effectiveBpm: number;
@@ -79,6 +80,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rawGpFile,
   showAlphaTabScore,
   onToggleAlphaTabScore,
+  show3dHighway,
   isAudioPlaying,
   startTime,
   effectiveBpm,
@@ -185,6 +187,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           showAlphaTabScore={showAlphaTabScore}
+          show3dHighway={show3dHighway}
           onSeek={onSeek}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}

@@ -17,6 +17,7 @@ import { ExerciseInfoGrid } from "./ExerciseInfoGrid";
 import { ExerciseProgress } from "./ExerciseProgress";
 import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
+import { Highway3DToggleButton } from "./Highway3DToggleButton";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
 import { NotationToggleButton } from "./NotationToggleButton";
@@ -41,6 +42,8 @@ interface DesktopSessionViewProps {
   isMicEnabled:             boolean;
   allGpTracks:              BackingTrack[] | null;
   showAlphaTabScore:        boolean;
+  show3dHighway:            boolean;
+  handleToggle3dHighway:    () => void;
   selectedGpTrackIdx:       number;
   setSelectedGpTrackIdx:    (idx: number) => void;
   handleToggleAlphaTabScore:() => void;
@@ -165,6 +168,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                 onToggle={p.handleToggleAlphaTabScore}
               />
             )}
+            {/* WIP — hidden from users for now. Flip to `!!p.activeTablature?.length` to re-enable. */}
+            {false && (
+              <Highway3DToggleButton
+                show3dHighway={p.show3dHighway}
+                onToggle={p.handleToggle3dHighway}
+              />
+            )}
             <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
           </>
         }
@@ -234,6 +244,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
                     activeExercise={p.activeExercise} rawGpFile={p.effectiveRawGpFile}
                     showAlphaTabScore={p.showAlphaTabScore} onToggleAlphaTabScore={p.handleToggleAlphaTabScore}
+                    show3dHighway={p.show3dHighway}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
                     isMetronomePlaying={p.metronome.isPlaying}

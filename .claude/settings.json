@@ -28,7 +28,8 @@
       "Bash(grep -viE \"browserslist|no-img-element|exhaustive-deps|^\\\\s*$\")",
       "PowerShell(npx tsc --noEmit)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://assets.seobotai.com/undefined/698bcc98676cd2891cb2b8fb-1770780007178.jpg\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://assets.seobotai.com/undefined/69c7f1c01b352ff267cc69a0-1774713073785.jpg\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://assets.seobotai.com/undefined/69c7f1c01b352ff267cc69a0-1774713073785.jpg\")",
+      "WebFetch(domain:www.siccasguitars.com)"
     ],
     "additionalDirectories": [
       "\\tmp"

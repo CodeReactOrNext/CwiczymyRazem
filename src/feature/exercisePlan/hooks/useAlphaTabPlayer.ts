@@ -1,5 +1,11 @@
 import * as alphaTabLib from '@coderline/alphatab';
-import { useEffect, useRef } from 'react';
+import type { MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+
+// AlphaTab measures playback position in MIDI ticks; 960 ticks = one quarter note.
+// Our tablature beat grid is also in quarter notes (parser uses displayDuration / 960),
+// so a RQ beat position maps to an AlphaTab tick with beat * 960.
+const TICKS_PER_QUARTER = 960;
 
 interface AlphaTabTrackConfig {
   isMuted: boolean;
@@ -36,6 +42,13 @@ interface UseAlphaTabPlayerProps {
    * resuming from the last paused position.
    */
   resetKey?: number;
+  /**
+   * One-shot seek target (in tablature beats = quarter notes) owned by the metronome.
+   * When the user clicks a bar the metronome back-dates its own clock; this ref carries
+   * the same position so the GP audio seeks to it right before the next play().
+   * Consumed (reset to null) once applied. Null → start/resume normally.
+   */
+  pendingSeekBeatRef?: MutableRefObject<number | null>;
 }
 
 /**
@@ -60,6 +73,7 @@ export const useAlphaTabPlayer = ({
   trackConfigs = {},
   backingTrackIds = [],
   resetKey,
+  pendingSeekBeatRef,
 }: UseAlphaTabPlayerProps) => {
   const apiRef             = useRef<any>(null);
   const playRef            = useRef<AlphaTabPlayerHandle['play'] | null>(null);
@@ -85,6 +99,18 @@ export const useAlphaTabPlayer = ({
   useEffect(() => { onLoopCompleteRef.current        = onLoopComplete;       }, [onLoopComplete]);
   useEffect(() => { onLoopRestartRef.current         = onLoopRestart;        }, [onLoopRestart]);
   useEffect(() => { onAudioContextReadyRef.current   = onAudioContextReady;  }, [onAudioContextReady]);
+
+  // Seek the GP audio to the metronome's pending beat, then consume it (once).
+  // Must be called AFTER any api.stop() (stop resets tickPosition to 0) and
+  // immediately BEFORE api.play() so playback begins at the clicked bar.
+  const applyPendingSeek = useCallback(() => {
+    const api = apiRef.current;
+    if (!api || !pendingSeekBeatRef) return;
+    const beat = pendingSeekBeatRef.current;
+    if (beat === null || beat === undefined) return;
+    try { api.tickPosition = Math.max(0, Math.round(beat * TICKS_PER_QUARTER)); } catch { /* ignore */ }
+    pendingSeekBeatRef.current = null;
+  }, [pendingSeekBeatRef]);
 
   // Create AlphaTabApi — only when rawGpFile first arrives.
   // Guard: apiRef.current !== null prevents re-creation if rawGpFile object changes
@@ -136,6 +162,7 @@ export const useAlphaTabPlayer = ({
       playRef.current = () => {
         api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
         if (hasStartedRef.current) api.stop();
+        applyPendingSeek();
         api.play();
         hasStartedRef.current = true;
       };
@@ -149,6 +176,7 @@ export const useAlphaTabPlayer = ({
       onLoopCompleteRef.current?.();
       if (isPlayingRef.current) {
         api.stop();
+        applyPendingSeek();
         api.play();
         // Notify caller immediately after play() so it can re-anchor the cursor clock.
         // Each loop restart introduces a small scheduling offset; re-anchoring prevents
@@ -172,8 +200,8 @@ export const useAlphaTabPlayer = ({
     };
   // rawGpFile in deps: effect re-evaluates when file arrives (null→File transition).
   // The apiRef.current guard prevents double-creation if deps fire again with same state.
-
-  }, [rawGpFile]);
+  // applyPendingSeek is stable (memoized on the stable seek ref) so it never re-creates the API.
+  }, [rawGpFile, applyPendingSeek]);
 
   // Load file into existing API.
   useEffect(() => {
@@ -229,6 +257,17 @@ export const useAlphaTabPlayer = ({
         api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
         if (isReadyRef.current) {
           if (!wasPausedRef.current && hasStartedRef.current) api.stop();
+          // Continue from the metronome's current position. When the notation view
+          // is toggled off mid-playback this player resumes from a stale paused
+          // position while the metronome kept running — seek to where the session
+          // actually is. An explicit bar-click seek (applyPendingSeek) still wins.
+          if (startTime && pendingSeekBeatRef?.current == null) {
+            const beats = ((Date.now() - startTime) / 1000) * (bpmRef.current / 60);
+            if (beats > 0.1) {
+              try { api.tickPosition = Math.max(0, Math.round(beats * TICKS_PER_QUARTER)); } catch { /* ignore */ }
+            }
+          }
+          applyPendingSeek();
           api.play();
           hasStartedRef.current = true;
           wasPausedRef.current  = false;
@@ -249,7 +288,7 @@ export const useAlphaTabPlayer = ({
       }
       // startTime changed while already stopped — no-op.
     }
-  }, [isPlaying, startTime]);
+  }, [isPlaying, startTime, applyPendingSeek]);
 
   // Explicit restart (e.g. restart button, speed change).
   // Clears the paused state and stops AlphaTab so the next play() starts from beat 0.
@@ -261,7 +300,7 @@ export const useAlphaTabPlayer = ({
     if (hasStartedRef.current && apiRef.current) {
       try { apiRef.current.stop(); } catch { /* ignore */ }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [resetKey]);
 
   // Per-track mute / volume.

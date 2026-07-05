@@ -29,7 +29,10 @@ export interface TablatureNote {
   isVibrato?: boolean;
   isTap?: boolean;
   dynamics?: number; // 0.0 (pp) to 1.0 (ff) — expected volume level
-  midiNote?: number; // GM MIDI note number — for drums (35=kick, 38=snare, 42=hi-hat, etc.)
+  // Real sounding MIDI pitch. Drums: GM note (35=kick, 38=snare, …). Vocals: notated pitch.
+  // Guitar/bass: open-string tuning + fret, so alternate tunings (Drop C/D, 7-string, capo)
+  // score against the actual pitch instead of assuming standard tuning.
+  midiNote?: number;
   // Extended techniques
   isDead?: boolean;       // muted/dead note — shown as X, percussive thud sound
   isGhost?: boolean;      // ghost note — softer, shown semi-transparent
