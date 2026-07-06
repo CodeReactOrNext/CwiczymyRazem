@@ -8,6 +8,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const speedBuildingProgressivePlan: ExercisePlan = {
   id: "speed_building_progressive",
+  icon: "rocket",
+  color: "red",
   title: "Speed Building Progressive",
   description: "A step-by-step speed development program. Builds picking speed and coordination progressively — from basic chromatic patterns through cross-string alternate picking to economy picking efficiency.",
   difficulty: "hard",

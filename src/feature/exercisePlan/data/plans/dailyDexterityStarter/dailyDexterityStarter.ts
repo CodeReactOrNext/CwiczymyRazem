@@ -7,6 +7,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const dailyDexterityStarterPlan: ExercisePlan = {
   id: "daily_dexterity_starter",
+  icon: "hand",
+  color: "cyan",
   title: "Daily Dexterity Starter",
   description: "Build fundamental coordination between left and right hand without overstraining.",
   difficulty: "easy",

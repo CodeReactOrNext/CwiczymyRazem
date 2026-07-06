@@ -19,4 +19,6 @@ export const handHealthStrengthPlan: ExercisePlan = {
   ],
   userId: "system",
   image: null,
+  icon: "heart",
+  color: "rose",
 };

@@ -6,6 +6,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const soloingExplorerPlan: ExercisePlan = {
   id: "soloing_explorer",
+  icon: "compass",
+  color: "indigo",
   title: "Soloing Explorer",
   description: "First steps in improvisation and playing by ear in a very accessible, one-string format.",
   difficulty: "easy",

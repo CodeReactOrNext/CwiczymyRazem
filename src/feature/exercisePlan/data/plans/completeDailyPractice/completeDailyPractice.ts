@@ -12,6 +12,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const completeDailyPracticePlan: ExercisePlan = {
   id: "complete_daily_practice",
+  icon: "star",
+  color: "teal",
   title: "Complete Daily Practice",
   description: "A balanced full-session daily routine covering all key areas: warm-up, technique, ear training, rhythm, expression, and creativity. A well-rounded practice that builds every fundamental aspect of guitar playing.",
   difficulty: "medium",

@@ -5,6 +5,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const musicianFitnessLvl1S6Plan: ExercisePlan = {
   id: "musician_fitness_lvl1_s6",
+  icon: "dumbbell",
+  color: "red",
   title: "Level #1 Session #6 - MusicianFitness",
   description: "Riffs, Chord Changes, Spider Crawls, and MORE!",
   difficulty: "easy",
