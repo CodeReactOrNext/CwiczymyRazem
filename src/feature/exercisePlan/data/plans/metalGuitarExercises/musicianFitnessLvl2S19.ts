@@ -5,6 +5,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const musicianFitnessLvl2S19Plan: ExercisePlan = {
   id: "musician_fitness_lvl2_s19",
+  icon: "dumbbell",
+  color: "orange",
   title: "20 min Guitar Workout - Week 19 - MusicianFitness",
   description: "Master Fundamentals in 20 weeks!",
   difficulty: "easy",

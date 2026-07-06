@@ -9,6 +9,8 @@ import warmUpImage from "./image.webp";
 
 export const warmUp15MinutesPlan: ExercisePlan = {
   id: "warm_up_15_minutes",
+  icon: "timer",
+  color: "amber",
   title: "Warm-up - 15 Minutes",
   description: "Basic 15-minute warm-up before your main practice session",
   difficulty: "medium",

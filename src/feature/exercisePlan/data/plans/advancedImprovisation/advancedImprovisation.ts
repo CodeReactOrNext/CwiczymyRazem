@@ -5,6 +5,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const advancedImprovisationPlan: ExercisePlan = {
   id: "advanced_improvisation",
+  icon: "sparkles",
+  color: "pink",
   title: "Advanced Improvisation",
   description: "Targeted practice for harmonic precision using chord tones and triad-based improvisation.",
   difficulty: "hard",

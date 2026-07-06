@@ -29,6 +29,8 @@ import spiderPermutationImage from "./image.webp";
 
 export const spiderPermutationPlan: ExercisePlan = {
   id: "spider_permutation_complete",
+  icon: "hexagon",
+  color: "cyan",
   title: "Complete Spider Exercises - Finger Permutations",
   description: "Advanced training plan containing all spider permutations for improving finger independence and playing technique.",
   difficulty: "medium",

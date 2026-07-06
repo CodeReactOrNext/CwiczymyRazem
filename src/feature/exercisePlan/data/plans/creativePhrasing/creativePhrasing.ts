@@ -6,6 +6,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const creativePhrasingPlan: ExercisePlan = {
   id: "creative_phrasing",
+  icon: "music2",
+  color: "rose",
   title: "Creative Phrasing",
   description: "Improve space, rhythmic placement, and musical dialogue in your solos.",
   difficulty: "medium",

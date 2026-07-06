@@ -19,4 +19,6 @@ export const earRhythmFundamentalsPlan: ExercisePlan = {
   ],
   userId: "system",
   image: null,
+  icon: "headphones",
+  color: "teal",
 };

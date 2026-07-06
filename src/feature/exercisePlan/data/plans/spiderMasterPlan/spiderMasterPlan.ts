@@ -9,6 +9,8 @@ import spiderImage from "../spiderPermutationPlan/image.webp";
 
 export const spiderMasterPlan: ExercisePlan = {
   id: "spider_master_plan",
+  icon: "hexagon",
+  color: "teal",
   title: "Master Spider Training",
   description: "The ultimate chromatic technical development program. Covers basic permutations, stairs, skips, X-patterns, and rhythmic variations.",
   difficulty: "medium",

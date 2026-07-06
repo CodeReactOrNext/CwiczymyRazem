@@ -9,6 +9,8 @@ import basicImprovisationPracticeImage from "./image.webp";
 
 export const basicImprovisationPractice: ExercisePlan = {
   id: "basic_improvisation_practice",
+  icon: "compass",
+  color: "purple",
   title: "Basic Improvisation Development Exercise",
   description: "A set of basic exercises developing improvisation skills",
   difficulty: "medium",

@@ -5,6 +5,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const musicianFitnessLvl2S11Plan: ExercisePlan = {
   id: "musician_fitness_lvl2_s11",
+  icon: "dumbbell",
+  color: "orange",
   title: "[Level 2] Beginner Guitar Workout #11 - MusicianFitness",
   description: "Chord Progressions, Pentatonic Scale",
   difficulty: "easy",

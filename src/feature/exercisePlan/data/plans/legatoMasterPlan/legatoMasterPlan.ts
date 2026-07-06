@@ -8,6 +8,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const legatoMasterPlan: ExercisePlan = {
   id: "legato_master_plan",
+  icon: "waves",
+  color: "cyan",
   title: "Legato Master Plan",
   description: "Complete legato technique training. Develops smooth hammer-on and pull-off execution, trill endurance, continuous legato flow, and advanced sextuplet patterns across the fretboard.",
   difficulty: "hard",

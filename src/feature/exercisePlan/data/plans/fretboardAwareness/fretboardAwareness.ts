@@ -8,6 +8,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const fretboardAwarenessPlan: ExercisePlan = {
   id: "fretboard_awareness",
+  icon: "target",
+  color: "emerald",
   title: "Fretboard Awareness",
   description: "Systematic mapping and mastery of the guitar neck using natural notes and melodic phrases.",
   difficulty: "medium",

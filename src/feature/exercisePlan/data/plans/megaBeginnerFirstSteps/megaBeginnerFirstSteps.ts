@@ -11,6 +11,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const beginnerDailyExercisesPlan: ExercisePlan = {
   id: "beginner_daily_exercises",
+  icon: "graduation",
+  color: "lime",
   title: "Beginner: Daily Exercises",
   description: "Perfect starting point for someone who just picked up the guitar. Focuses on basic string awareness and coordination.",
   difficulty: "beginner",
@@ -27,6 +29,8 @@ export const beginnerDailyExercisesPlan: ExercisePlan = {
 
 export const megaBeginnerFirstStepsPlan: ExercisePlan = {
   id: "mega_beginner_first_steps",
+  icon: "star",
+  color: "emerald",
   title: "Mega Beginner: First Steps",
   description: "Super simple exercises perfect for absolute beginners just starting their guitar journey. Focuses on melody, strumming, and basic chords.",
   difficulty: "beginner",
