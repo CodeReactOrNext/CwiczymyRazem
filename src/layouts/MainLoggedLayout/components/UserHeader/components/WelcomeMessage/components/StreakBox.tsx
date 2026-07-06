@@ -3,11 +3,13 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { useRouter } from "next/router";
 import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import { getReconciledStreak } from "utils/gameLogic";
 
 export const StreakBox = () => {
+  const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const { reportList } = useActivityLog(userAuth || "");
@@ -27,7 +29,9 @@ export const StreakBox = () => {
 
   return (
     <ScoreBreakdownTooltip streak={dayWithoutBreak}>
-    <div className='flex h-10 cursor-help items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
+    <div
+      onClick={() => router.push("/practice-log")}
+      className='flex h-10 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <FaFire className={cn(
           "text-xl transition-all duration-500",

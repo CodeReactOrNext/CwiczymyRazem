@@ -10,6 +10,9 @@ import type { Exercise } from "../types/exercise.types";
  * instead. This predicate mirrors the fallback branch in ExerciseContentArea.
  */
 export const isOpenExercise = (exercise: Exercise): boolean =>
+  // The gap test has its own interactive panel (MetronomeGapTest), so it's not
+  // an "open" exercise even though it carries no tablature/video/etc.
+  exercise.id !== "metronome_gap_test" &&
   // Configurable generator exercises are not "open": they have no tablature
   // only until the user picks chords/scale in the setup dialog, after which a
   // generated tab renders. Showing the "no tab for this one" panel behind that

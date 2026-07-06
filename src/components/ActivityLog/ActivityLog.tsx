@@ -8,9 +8,12 @@ import {
 import { AnimatePresence,motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaSpinner } from "react-icons/fa";
+import { getLocalDateKey } from "utils/converter";
 
 import type { DateWithReport } from "./activityLog.types";
 import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
@@ -220,11 +223,20 @@ export const ActivityLogView = ({
               <DialogTitle className="text-zinc-900">Activity Details</DialogTitle>
             </DialogHeader>
             {selectedDay?.report && (
-              <ExerciseShortInfo
-                date={selectedDay.date}
-                report={selectedDay.report}
-                isModal={true}
-              />
+              <>
+                <ExerciseShortInfo
+                  date={selectedDay.date}
+                  report={selectedDay.report}
+                  isModal={true}
+                />
+                <Link
+                  href={`/practice-log?date=${getLocalDateKey(selectedDay.date)}`}
+                  className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#e8e4db] bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-black/[0.06] hover:text-stone-900"
+                >
+                  Open in Practice Log
+                  <ArrowRight size={14} />
+                </Link>
+              </>
             )}
           </div>
         </DialogContent>

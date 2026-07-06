@@ -11,6 +11,7 @@ import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { MetronomeGapTest } from "./MetronomeGapTest";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
@@ -164,7 +165,11 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       )}
 
       {/* Content: note hunt / chord hunt / tablature / video / strumming / image */}
-      {currentExercise.customGoal ? (
+      {currentExercise.id === "metronome_gap_test" ? (
+        <div className="p-4">
+          <MetronomeGapTest />
+        </div>
+      ) : currentExercise.customGoal ? (
         <div className="flex w-full justify-center py-10">
           {currentExercise.noteHuntConfig?.mode === "chord" ? (
             <ChordHuntPanel

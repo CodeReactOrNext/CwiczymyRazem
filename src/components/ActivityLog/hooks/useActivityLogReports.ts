@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import { processRawReports } from "../activityLog.utils";
 
-export const useActivityLogReports = (userAuth: string, year: number | "all") => {
+export const useActivityLogReports = (
+  userAuth: string,
+  year: number | "all",
+  refreshNonce = 0
+) => {
   const [reportList, setReportList] = useState<
     ReportListInterfaceWithTimeSumary[] | null
   >(null);
@@ -43,7 +47,7 @@ export const useActivityLogReports = (userAuth: string, year: number | "all") =>
     return () => {
       cancelled = true;
     };
-  }, [userAuth, year]);
+  }, [userAuth, year, refreshNonce]);
 
   return { reportList, isLoading };
 };

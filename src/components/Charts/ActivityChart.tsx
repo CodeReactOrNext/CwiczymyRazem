@@ -32,9 +32,11 @@ interface ActivityChartProps {
     hearingTime: number;
     creativityTime: number;
   }[];
+  /** Hide the built-in range select when the caller already filters the data. */
+  showRangeSelect?: boolean;
 }
 
-export function ActivityChart({ data }: ActivityChartProps) {
+export function ActivityChart({ data, showRangeSelect = true }: ActivityChartProps) {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = React.useState("all");
 
@@ -111,6 +113,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {t("chart.activity_overview")}
           </CardTitle>
         </div>
+        {showRangeSelect && (
         <div className='flex items-center'>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
@@ -142,6 +145,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             </SelectContent>
           </Select>
         </div>
+        )}
       </CardHeader>
       <CardContent className='px-2 pt-4 sm:px-6 sm:pt-6'>
         <ChartContainer
