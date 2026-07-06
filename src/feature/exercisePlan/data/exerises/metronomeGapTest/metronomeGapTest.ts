@@ -3,25 +3,25 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const metronomeGapTestExercise: Exercise = {
   id: "metronome_gap_test",
   title: "Metronome Gap Test",
-  description: "Maintain a steady rhythmic pulse while the metronome is muted for several measures.",
-  whyItMatters: "This exercise exposes whether you are genuinely internalizing the tempo or just blindly following an external click. By forcing you to maintain the grid during silence, it develops the deep internal timing required to lead a band, lock in with a drummer, and prevent rushing or dragging.",
+  description: "Lock onto the click for two bars, then keep the pulse through the silence and tap the very next downbeat — the app measures how far off you land.",
+  whyItMatters: "It reveals whether you've truly internalised the tempo or are just riding an external click. Holding the grid through silence builds the deep internal timing you need to lock in with a drummer, lead a band, and stop rushing or dragging.",
   difficulty: "medium",
   category: "theory",
   timeInMinutes: 5,
   instructions: [
-    "Lock in with the metronome for the first few bars until the tempo feels steady.",
-    "When the click goes silent, keep playing in exactly the same tempo — don't speed up or slow down.",
-    "When the metronome comes back, check whether you're still in time with it."
+    "Press Start — the metronome plays 2 bars (1·2·3·4) so you can lock onto the tempo.",
+    "The click then goes silent for a few bars; keep counting the pulse in your head.",
+    "Tap the very next downbeat — the “1” — with the Spacebar or a mouse click. Just one tap.",
+    "Check your deviation in milliseconds; land a PERFECT and the silent gap grows by one bar."
   ],
   tips: [
-    "Count out loud or tap your foot during the silent bars to hold the pulse.",
-    "Rushing usually means you're tense — relax your hands and breathe steadily.",
-    "If you drift off, start the metronome again and shorten the silent gap until it feels easy."
+    "Count “1-2-3-4” through the silence and keep breathing steadily — tension makes you rush.",
+    "Judge yourself by consistency over a few tries, not one tap — the input adds a little jitter.",
+    "A steady “+” (late) or “−” (early) reading means you're dragging or rushing; aim to centre it on 0."
   ],
-  metronomeSpeed: {
-    min: 40,
-    max: 120,
-    recommended: 80,
-  },
+  // No app metronome: the interactive MetronomeGapTest panel provides its own
+  // click track (audible bars → silence → target). A non-null metronomeSpeed
+  // would make the session auto-start its continuous metronome on top of ours.
+  metronomeSpeed: null,
   relatedSkills: ["rhythm"],
 };

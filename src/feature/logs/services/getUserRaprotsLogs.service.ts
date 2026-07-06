@@ -61,7 +61,7 @@ export const firebaseGetUserRaprotsLogs = async (
 
   exerciseDocRef.forEach((exercise) => {
     const log = exercise.data() as FirebaseUserExceriseLog;
-    exerciseArr.push(log);
+    exerciseArr.push({ ...log, id: exercise.id });
   });
 
   memoryCache.set(cacheKey, exerciseArr, TWO_DAYS_MS);

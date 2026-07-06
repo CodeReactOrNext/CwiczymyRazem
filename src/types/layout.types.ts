@@ -28,4 +28,5 @@ export type NavPagesTypes =
   | "my-exercises"
   | "favorites"
   | "roadmap"
+  | "practice-log"
   | null;

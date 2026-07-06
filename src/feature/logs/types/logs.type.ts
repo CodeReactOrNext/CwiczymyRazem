@@ -26,6 +26,9 @@ export interface FirebaseLogsSongsInterface {
 }
 
 export interface FirebaseUserExceriseLog {
+  /** Firestore doc id (reportDate ISO string) — needed to edit/delete a report. */
+  id?: string;
+  description?: string;
   reportDate: any;
   bonusPoints: {
     additionalPoints: number;

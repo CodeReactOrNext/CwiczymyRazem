@@ -21,6 +21,7 @@ import {
   Calendar,
   Guitar,
   Heart,
+  History,
   Home,
   ListChecks,
   LogOut,
@@ -192,6 +193,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/my-exercises")) return "my-exercises";
     if (pathname.startsWith("/tab-editor")) return "my-exercises";
     if (pathname.startsWith("/roadmap")) return "roadmap";
+    if (pathname.startsWith("/practice-log")) return "practice-log";
     return null;
   };
 
@@ -219,6 +221,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const toolsNavigation = [
+    { id: "practice-log", name: "Practice Log", href: "/practice-log", icon: <History size={16} /> },
     { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
     { id: "my-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
     { id: "favorites", name: "Favorites", href: "/favorites", icon: <Heart size={16} /> },

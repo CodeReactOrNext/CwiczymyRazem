@@ -11,6 +11,7 @@ import footer from '../../public/locales/en/footer.json';
 import leadboard from '../../public/locales/en/leadboard.json';
 import login from '../../public/locales/en/login.json';
 import practice from '../../public/locales/en/practice.json';
+import practice_log from '../../public/locales/en/practice_log.json';
 import profile from '../../public/locales/en/profile.json';
 import report from '../../public/locales/en/report.json';
 import settings from '../../public/locales/en/settings.json';
@@ -32,6 +33,7 @@ type TranslationNamespace =
   | 'leadboard'
   | 'login'
   | 'practice'
+  | 'practice_log'
   | 'profile'
   | 'report'
   | 'settings'
@@ -53,6 +55,7 @@ const translations: Record<TranslationNamespace, any> = {
   leadboard,
   login,
   practice,
+  practice_log,
   profile,
   report,
   settings,

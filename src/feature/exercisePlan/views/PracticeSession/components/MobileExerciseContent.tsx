@@ -9,6 +9,7 @@ import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { MetronomeGapTest } from "./MetronomeGapTest";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
@@ -112,7 +113,9 @@ export function MobileExerciseContent({
       {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
         <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
       )}
-      {activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
+      {currentExercise.id === "metronome_gap_test" ? (
+        <MetronomeGapTest compact />
+      ) : activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
         <div className="w-full overflow-hidden rounded-2xl border border-white/5 bg-[#09090b] shadow-lg">
           <TablatureViewer
             measures={activeTablature}
