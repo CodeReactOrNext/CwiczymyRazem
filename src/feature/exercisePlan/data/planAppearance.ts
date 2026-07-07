@@ -3,6 +3,7 @@ import {
   AudioLines,
   BookOpen,
   Brain,
+  Bug,
   Compass,
   Crown,
   Drum,
@@ -186,6 +187,17 @@ export const PLAN_COLORS: PlanColor[] = [
     glow: "bg-indigo-500/25",
     cta: "group-hover:bg-indigo-500 group-hover:text-zinc-950",
   },
+  {
+    id: "fuchsia",
+    label: "Fuchsia",
+    swatch: "bg-fuchsia-500",
+    gradient: "from-fuchsia-500/15 via-zinc-900/60 to-zinc-950",
+    iconTile: "bg-fuchsia-500/10 text-fuchsia-400",
+    text: "text-fuchsia-400",
+    badge: "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20",
+    glow: "bg-fuchsia-500/25",
+    cta: "group-hover:bg-fuchsia-500 group-hover:text-zinc-950",
+  },
 ];
 
 export interface PlanIcon {
@@ -224,6 +236,7 @@ export const PLAN_ICONS: PlanIcon[] = [
   { id: "crown", label: "Pro", Icon: Crown },
   { id: "heart", label: "Heart", Icon: Heart },
   { id: "hexagon", label: "Hexagon", Icon: Hexagon },
+  { id: "spider", label: "Spider", Icon: Bug },
 ];
 
 export const getPlanColor = (id?: string | null): PlanColor | undefined =>

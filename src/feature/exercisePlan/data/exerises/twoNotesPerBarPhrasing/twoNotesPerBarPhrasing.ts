@@ -6,6 +6,7 @@ export const twoNotesPerBarPhrasingExercise: Exercise = {
   description:
     "Create expressive phrases restricted to exactly two notes per measure.",
   whyItMatters: "When notes are extremely limited, you must focus entirely on timing, tone, vibrato, and silence. This drill builds incredible phrasing discipline, making every note you choose count.",
+  requiresBackingTrack: true,
   difficulty: "easy",
   category: "creativity",
   timeInMinutes: 10,

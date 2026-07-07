@@ -106,18 +106,6 @@ export const ExerciseInstructionsInline = ({
       <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                 <div className="space-y-8">
-                  {exercise.whyItMatters && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
-                        <FaGraduationCap size={14} />
-                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Why This Matters</h4>
-                      </div>
-                      <p className="text-zinc-400 text-sm leading-relaxed font-normal">
-                        {exercise.whyItMatters}
-                      </p>
-                    </div>
-                  )}
-
                   {exercise.instructions && exercise.instructions.length > 0 && (
                     <div className="space-y-4">
                       <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
@@ -131,6 +119,18 @@ export const ExerciseInstructionsInline = ({
                           </p>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {exercise.whyItMatters && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
+                        <FaGraduationCap size={14} />
+                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">Why This Matters</h4>
+                      </div>
+                      <p className="text-zinc-400 text-sm leading-relaxed font-normal">
+                        {exercise.whyItMatters}
+                      </p>
                     </div>
                   )}
                 </div>
