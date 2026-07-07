@@ -286,7 +286,7 @@ const TimeInputBox = ({
                 )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Min
+                Minutes
               </span>
             </div>
           </div>

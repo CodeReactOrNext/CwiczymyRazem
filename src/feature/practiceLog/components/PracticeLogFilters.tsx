@@ -7,7 +7,7 @@ import {
 } from "assets/components/ui/select";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpDown, CalendarRange, SlidersHorizontal, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import type {
   DateRangeKey,
@@ -26,10 +26,10 @@ interface PracticeLogFiltersProps {
 }
 
 const selectTriggerClass =
-  "h-9 w-full sm:w-[150px] rounded-lg border-white/10 bg-white/5 text-xs font-semibold text-white";
-const selectContentClass =
-  "rounded-xl border-white/10 bg-zinc-900/90 backdrop-blur-xl";
-const selectItemClass = "rounded-lg text-white hover:bg-white/10";
+  "h-8 w-auto gap-1.5 rounded-lg border-none bg-white/5 px-3 py-0 text-xs font-medium text-zinc-300 shadow-none transition-colors hover:bg-white/10 focus:ring-0 ring-offset-0";
+const selectContentClass = "rounded-xl border-none bg-zinc-900 shadow-dark-lg";
+const selectItemClass =
+  "rounded-lg text-xs text-zinc-300 focus:bg-white/10 focus:text-zinc-50";
 
 export const PracticeLogFilters = ({
   filters,
@@ -39,78 +39,28 @@ export const PracticeLogFilters = ({
   const { t } = useTranslation("practice_log");
 
   return (
-    <section className="flex flex-col gap-3 rounded-2xl bg-zinc-800/30 p-4 ring-1 ring-white/5">
-      <header className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={15} className="text-cyan-400" />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
-            {t("filters.heading")}
-          </h2>
-        </div>
-        {isFiltered && (
-          <button
-            onClick={() =>
-              setFilters({
-                range: "all",
-                date: null,
-                type: "all",
-                duration: "all",
-              })
-            }
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
-          >
-            <X size={12} />
-            {t("filters.clear_all")}
-          </button>
-        )}
-      </header>
-
-      {/* Date row */}
-      <div className="flex flex-wrap items-center gap-2">
-        <CalendarRange size={14} className="text-zinc-500" />
-        <div className="flex gap-1 rounded-lg bg-white/5 p-1">
-          {RANGE_OPTIONS.map((range) => (
+    <section className="flex flex-wrap items-center gap-x-3 gap-y-3">
+      <div className="flex items-center gap-0.5">
+        {RANGE_OPTIONS.map((range) => {
+          const active = !filters.date && filters.range === range;
+          return (
             <button
               key={range}
               onClick={() => setFilters({ range, date: null })}
               className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-bold transition-colors",
-                !filters.date && filters.range === range
-                  ? "bg-cyan-500 text-zinc-950"
-                  : "text-zinc-400 hover:text-zinc-100"
+                "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+                active
+                  ? "bg-white/10 text-zinc-50"
+                  : "text-zinc-500 hover:text-zinc-200"
               )}
             >
               {t(`filters.range_${range}`)}
             </button>
-          ))}
-        </div>
-
-        {filters.date ? (
-          <span className="flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-400">
-            {filters.date}
-            <button
-              onClick={() => setFilters({ date: null })}
-              className="hover:text-cyan-200"
-              aria-label={t("filters.clear_date")}
-            >
-              <X size={12} />
-            </button>
-          </span>
-        ) : (
-          <input
-            type="date"
-            value=""
-            onChange={(event) =>
-              event.target.value && setFilters({ date: event.target.value })
-            }
-            className="h-9 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-semibold text-zinc-400 [color-scheme:dark] focus:outline-none focus:ring-1 focus:ring-cyan-500"
-            aria-label={t("filters.pick_day")}
-          />
-        )}
+          );
+        })}
       </div>
 
-      {/* Selects row */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="ml-auto flex flex-wrap items-center gap-1.5">
         <Select
           value={filters.type}
           onValueChange={(value) =>
@@ -167,34 +117,48 @@ export const PracticeLogFilters = ({
           </SelectContent>
         </Select>
 
-        <div className="ml-auto flex items-center gap-1.5">
-          <ArrowUpDown size={14} className="text-zinc-500" />
-          <Select
-            value={filters.sort}
-            onValueChange={(value) => setFilters({ sort: value as SortKey })}
+        <Select
+          value={filters.sort}
+          onValueChange={(value) => setFilters({ sort: value as SortKey })}
+        >
+          <SelectTrigger
+            className={selectTriggerClass}
+            aria-label={t("filters.sort_label")}
           >
-            <SelectTrigger
-              className={selectTriggerClass}
-              aria-label={t("filters.sort_label")}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className={selectContentClass}>
-              <SelectItem value="date_desc" className={selectItemClass}>
-                {t("filters.sort_date_desc")}
-              </SelectItem>
-              <SelectItem value="date_asc" className={selectItemClass}>
-                {t("filters.sort_date_asc")}
-              </SelectItem>
-              <SelectItem value="time_desc" className={selectItemClass}>
-                {t("filters.sort_time_desc")}
-              </SelectItem>
-              <SelectItem value="points_desc" className={selectItemClass}>
-                {t("filters.sort_points_desc")}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className={selectContentClass}>
+            <SelectItem value="date_desc" className={selectItemClass}>
+              {t("filters.sort_date_desc")}
+            </SelectItem>
+            <SelectItem value="date_asc" className={selectItemClass}>
+              {t("filters.sort_date_asc")}
+            </SelectItem>
+            <SelectItem value="time_desc" className={selectItemClass}>
+              {t("filters.sort_time_desc")}
+            </SelectItem>
+            <SelectItem value="points_desc" className={selectItemClass}>
+              {t("filters.sort_points_desc")}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+
+        {isFiltered && (
+          <button
+            onClick={() =>
+              setFilters({
+                range: "all",
+                date: null,
+                type: "all",
+                duration: "all",
+              })
+            }
+            className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-200"
+          >
+            <X size={12} />
+            {t("filters.clear_all")}
+          </button>
+        )}
       </div>
     </section>
   );

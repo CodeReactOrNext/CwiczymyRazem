@@ -6,7 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Clock, History, Lock, Pencil, Star, Trash2 } from "lucide-react";
+import { Clock, Lock, Pencil, Trash2 } from "lucide-react";
 import { convertMsToHM } from "utils/converter";
 
 import { CATEGORY_META, SESSION_TYPE_CONFIG } from "../config/sessionType";
@@ -17,6 +17,8 @@ interface SessionCardProps {
   onEdit: (session: PracticeLogSession) => void;
   onDelete: (session: PracticeLogSession) => void;
   compact?: boolean;
+  /** 1-based order badge shown when a single day is selected (matches the timeline). */
+  index?: number;
 }
 
 export const SessionCard = ({
@@ -24,6 +26,7 @@ export const SessionCard = ({
   onEdit,
   onDelete,
   compact = false,
+  index,
 }: SessionCardProps) => {
   const { t } = useTranslation(["practice_log", "common"]);
   const config = SESSION_TYPE_CONFIG[session.type];
@@ -32,148 +35,162 @@ export const SessionCard = ({
   const isBackdated =
     !!session.isDateBackReport && session.isDateBackReport !== "0";
 
-  const categorySplit = session.timeSumary
-    ? CATEGORY_META.filter(({ key }) => session.timeSumary![key] > 0)
-    : [];
+  const categorySplit =
+    !compact && session.timeSumary
+      ? CATEGORY_META.filter(({ key }) => session.timeSumary![key] > 0)
+      : [];
 
   return (
-    <div className="group relative flex items-stretch gap-0 overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/5 transition-all hover:bg-zinc-900/70 hover:ring-white/10">
-      {/* Type accent bar */}
-      <div className={cn("w-1 shrink-0", config.accentBar)} />
-
+    <div
+      className={cn(
+        "group flex items-center gap-3 rounded-lg transition-colors hover:bg-white/[0.05]",
+        compact ? "px-2.5 py-2" : "px-3 py-2.5"
+      )}
+    >
       <div
         className={cn(
-          "flex flex-1 items-center gap-3 min-w-0",
-          compact ? "px-3 py-2.5" : "px-4 py-3.5"
+          "relative flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-300 group-hover:scale-105",
+          config.iconBg,
+          config.iconBorder,
+          compact ? "h-10 w-10" : "h-12 w-12"
         )}
       >
-        {/* Type icon tile */}
-        <div
+        <TypeIcon
           className={cn(
-            "flex shrink-0 items-center justify-center rounded-lg border",
-            config.iconTile,
-            compact ? "h-9 w-9" : "h-11 w-11"
+            config.iconText,
+            "transition-colors duration-300",
+            compact ? "h-5 w-5" : "h-6 w-6"
+          )}
+          aria-label={t(config.labelKey)}
+        />
+        {index !== undefined && (
+          <span
+            className={cn(
+              "absolute -left-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold tabular-nums shadow-md ring-2 ring-zinc-900",
+              config.accentSolid,
+              config.accentText
+            )}
+          >
+            {index}
+          </span>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p
+          className={cn(
+            "truncate font-medium text-zinc-100",
+            compact ? "text-[13px]" : "text-sm"
           )}
         >
-          <TypeIcon size={compact ? 16 : 18} />
-        </div>
+          {session.title}
+        </p>
 
-        {/* Title + meta */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="truncate font-semibold text-zinc-100">
-              {session.title}
-            </p>
-            <span
-              className={cn(
-                "hidden xs:inline-flex shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border",
-                config.badge
-              )}
-            >
-              {t(config.labelKey)}
-            </span>
-            {isBackdated && (
-              <span className="hidden sm:inline-flex shrink-0 items-center gap-1 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-                <History size={9} />
-                {t("card.backdated")}
-              </span>
-            )}
-          </div>
+        {!compact && session.description && (
+          <p className="mt-0.5 truncate text-xs text-zinc-500">
+            {session.description}
+          </p>
+        )}
 
-          {session.description && (
-            <p className="mt-0.5 truncate text-xs text-zinc-500">
-              {session.description}
-            </p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-zinc-500">
+          <span className="tabular-nums">
+            {session.date.toLocaleTimeString("en", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+          {isBackdated && (
+            <span className="text-zinc-600">{t("card.backdated")}</span>
           )}
-
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-500">
-            <span className="flex items-center gap-1 font-mono">
-              <Clock size={10} />
-              {session.date.toLocaleTimeString("en", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-            {!compact &&
-              categorySplit.map(({ key, labelKey, text, dot }) => (
-                <span key={key} className="flex items-center gap-1">
-                  <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
-                  <span className={cn("font-semibold", text)}>
-                    {convertMsToHM(session.timeSumary![key])}
-                  </span>
-                  <span className="hidden sm:inline">{t(labelKey)}</span>
-                </span>
-              ))}
-          </div>
-        </div>
-
-        {/* Metrics */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <div className="flex flex-col items-center rounded-lg bg-white/[0.03] px-2.5 py-1.5">
-            <div className="flex items-center gap-1">
-              <Clock size={11} className="text-zinc-500" />
-              <span className="text-sm font-bold tabular-nums text-zinc-200">
-                {convertMsToHM(session.timeMs)}
+          {categorySplit.map(({ key, labelKey, dot }) => (
+            <span key={key} className="hidden items-center gap-1.5 sm:flex">
+              <span className={cn("h-1 w-1 rounded-full", dot)} />
+              <span className="tabular-nums">
+                {convertMsToHM(session.timeSumary![key])}
               </span>
-            </div>
-            <span className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-              {t("card.duration")}
+              <span>{t(labelKey)}</span>
             </span>
-          </div>
-          <div className="flex flex-col items-center rounded-lg bg-amber-500/[0.06] px-2.5 py-1.5">
-            <div className="flex items-center gap-1">
-              <Star size={11} className="text-amber-400" fill="currentColor" />
-              <span className="text-sm font-bold tabular-nums text-amber-300">
-                {session.points}
-              </span>
-            </div>
-            <span className="text-[9px] font-medium uppercase tracking-wider text-amber-500/50">
-              {t("card.points")}
-            </span>
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Actions */}
-        {isManual ? (
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              onClick={() => onEdit(session)}
-              className="rounded-lg bg-zinc-800/60 p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              title={t("card.edit")}
-              aria-label={t("card.edit")}
-            >
-              <Pencil size={14} />
-            </button>
-            <button
-              onClick={() => onDelete(session)}
-              className="rounded-lg bg-zinc-800/60 p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              title={t("card.delete")}
-              aria-label={t("card.delete")}
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ) : (
-          <TooltipProvider delayDuration={200}>
+      <div className="flex shrink-0 items-center gap-2.5 sm:gap-3.5">
+        <span
+          title={t("card.duration")}
+          className={cn(
+            "flex items-center justify-end gap-1.5 tabular-nums",
+            compact ? "min-w-[54px]" : "min-w-[62px]"
+          )}
+        >
+          <Clock size={13} className="shrink-0 text-zinc-500" aria-hidden />
+          <span
+            className={cn(
+              "font-bold text-zinc-100",
+              compact ? "text-sm" : "text-[15px]"
+            )}
+          >
+            {convertMsToHM(session.timeMs)}
+          </span>
+        </span>
+        <span
+          title={t("card.points")}
+          className="flex min-w-[52px] items-center justify-end gap-1.5 tabular-nums"
+        >
+          <img
+            src="/images/points.png"
+            alt=""
+            aria-hidden
+            className="h-4 w-4 shrink-0 object-contain"
+          />
+          <span
+            className={cn(
+              "font-bold text-amber-300",
+              compact ? "text-sm" : "text-[15px]"
+            )}
+          >
+            {session.points}
+          </span>
+        </span>
+      </div>
+
+      {isManual ? (
+        <div className="flex shrink-0 items-center sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+          <button
+            onClick={() => onEdit(session)}
+            className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+            title={t("card.edit")}
+            aria-label={t("card.edit")}
+          >
+            <Pencil size={14} />
+          </button>
+          <button
+            onClick={() => onDelete(session)}
+            className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-white/5 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+            title={t("card.delete")}
+            aria-label={t("card.delete")}
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex w-[60px] shrink-0 items-center justify-center">
+          <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="shrink-0">
-                  <button
-                    disabled
-                    className="cursor-not-allowed rounded-lg bg-zinc-800/40 p-2 text-zinc-600"
-                    aria-label={t("card.recorded_tooltip")}
-                  >
-                    <Lock size={14} />
-                  </button>
+                <span
+                  className="cursor-help rounded-lg p-2 text-zinc-600 transition-colors hover:text-zinc-400"
+                  aria-label={t("card.recorded_tooltip")}
+                >
+                  <Lock size={14} />
                 </span>
               </TooltipTrigger>
-              <TooltipContent side="left" className="max-w-[200px] text-center">
+              <TooltipContent className="max-w-[220px] text-center">
                 {t("card.recorded_tooltip")}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

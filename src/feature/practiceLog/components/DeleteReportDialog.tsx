@@ -47,17 +47,22 @@ export const DeleteReportDialog = ({
 
   return (
     <AlertDialog open={!!session} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="border-white/10 bg-zinc-950 text-zinc-100">
+      <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("delete_dialog.title")}</AlertDialogTitle>
-          <AlertDialogDescription className="text-zinc-400">
+          <AlertDialogTitle className="font-display text-zinc-50">
+            {t("delete_dialog.title")}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="leading-relaxed text-zinc-400">
             {t("delete_dialog.description", {
               title: session?.title ?? "",
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100"
+          >
             {t("delete_dialog.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
