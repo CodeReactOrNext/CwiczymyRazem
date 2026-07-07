@@ -1,4 +1,3 @@
-import { cn } from "assets/lib/utils";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import {
   firebaseClaimLevel,
@@ -19,8 +18,8 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import {
-  Check, CheckCircle2, ChevronLeft, ChevronRight, Guitar, Info,
-  ListMusic, Lock, Sparkles, Target, TrendingUp, Trophy, X,
+  Check, CheckCircle2, ChevronLeft, ChevronRight, Info,
+  Lock, Sparkles, TrendingUp, Trophy, X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -28,14 +27,6 @@ import { useAppDispatch } from "store/hooks";
 import { useAppSelector } from "store/hooks";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-function fmtMs(ms: number) {
-  const m = Math.round(ms / 60000);
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  const rem = m % 60;
-  return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
-}
 
 // Compact hours format ("98m" → "1h38m") matching the activity widget.
 function fmtMin(m: number) {
@@ -47,8 +38,8 @@ function fmtMin(m: number) {
 
 // ─── Category theme (single source of truth) ───────────────────────────────────
 // One place that defines every practice category's key, label, colour and the
-// matching field on the log. Used by the session chips, the day grids and every
-// legend so colours never drift apart again.
+// matching field on the log. Used by the goal-card day grids and every legend so
+// colours never drift apart again.
 
 type CatKey = "tech" | "theory" | "hearing" | "creat";
 
@@ -64,161 +55,13 @@ const CATEGORIES: {
   { k: "creat",   label: "Creativity", color: "#f59e0b", logField: "creativityTime" },
 ];
 
-// ─── DayTimeline ─────────────────────────────────────────────────────────────
-
-const SESSION_PALETTE = ["#10b981", "#0891B2", "#e5626b", "#f59e0b", "#f97316", "#ec4899"];
-
-function DayTimeline({ logs }: { logs: FirebaseUserExceriseLog[] }) {
-  if (!logs.length) return null;
-
-  const sessions = logs.map((log, i) => {
-    const endMs   = log.reportDate.seconds * 1000;
-    const durMs   = log.timeSumary?.sumTime || 0;
-    const pinMin  = new Date(endMs).getHours() * 60 + new Date(endMs).getMinutes();
-    const color   = SESSION_PALETTE[i % SESSION_PALETTE.length];
-    const chips = CATEGORIES
-      .map(cat => ({ label: cat.label, color: cat.color, val: log.timeSumary?.[cat.logField] || 0 }))
-      .filter(c => c.val > 0);
-    return { log, endMs, pinMin, durMs, color, chips };
-  });
-
-  const fmt = (ms: number) =>
-    new Date(ms).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-
-  const allMins    = sessions.map(s => s.pinMin);
-  const rangeStart = Math.max(0,    Math.floor((Math.min(...allMins) - 60) / 60) * 60);
-  const rangeEnd   = Math.min(1440, Math.ceil ((Math.max(...allMins) + 60) / 60) * 60);
-  const rangeDur   = Math.max(rangeEnd - rangeStart, 1);
-
-  const VW     = 1000;
-  const AXIS_Y = 90;
-  const TALL   = 65;
-  const SHORT  = 38;
-  const R      = 12;
-  const LABEL_Y = AXIS_Y + 20;
-  const VH     = LABEL_Y + 8;
-  const toX    = (min: number) => ((min - rangeStart) / rangeDur) * VW;
-
-  const hourMarks = Array.from(
-    { length: Math.floor(rangeDur / 60) + 1 },
-    (_, i) => rangeStart + i * 60
-  );
-
-  return (
-    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm overflow-hidden">
-      <div className="px-5 pt-6 pb-3">
-        <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full overflow-visible" style={{ height: VH }}>
-          <defs>
-            {sessions.map((s, i) => (
-              <linearGradient key={i} id={`pin-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor={s.color} stopOpacity="1" />
-                <stop offset="100%" stopColor={s.color} stopOpacity="0.5" />
-              </linearGradient>
-            ))}
-          </defs>
-
-          <line x1={0} y1={AXIS_Y} x2={VW} y2={AXIS_Y} stroke="#3f3f46" strokeWidth="1.5" />
-
-          {hourMarks.map(m => (
-            <g key={m}>
-              <line x1={toX(m)} y1={AXIS_Y - 4} x2={toX(m)} y2={AXIS_Y + 4} stroke="#52525b" strokeWidth="1.5" />
-              <text x={toX(m)} y={LABEL_Y} textAnchor="middle" fontSize="10" fill="#52525b">
-                {`${String(Math.floor(m / 60)).padStart(2, "0")}:00`}
-              </text>
-            </g>
-          ))}
-
-          {sessions.map((s, i) => {
-            const x      = toX(s.pinMin);
-            const pinH   = i % 2 === 0 ? TALL : SHORT;
-            const pinTop = AXIS_Y - pinH;
-            const cx     = x;
-            const cy     = pinTop;
-            return (
-              <g key={i}>
-                <circle cx={cx} cy={cy} r={R + 4} fill={s.color} opacity="0.15" />
-                <line x1={cx} y1={cy + R} x2={cx} y2={AXIS_Y} stroke={s.color} strokeWidth="2" strokeDasharray="3,2" opacity="0.6" />
-                <circle cx={cx} cy={AXIS_Y} r="3.5" fill={s.color} />
-                <circle cx={cx} cy={cy} r={R} fill={`url(#pin-grad-${i})`} />
-                <circle cx={cx} cy={cy} r={R} fill="none" stroke={s.color} strokeWidth="1.5" opacity="0.5" />
-                <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fontWeight="800" fill="#fff">
-                  {i + 1}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800/40">
-        {sessions.map((s, i) => (
-          <div key={i} className="flex items-center gap-3 px-4 py-3.5 bg-zinc-900/40">
-            <div
-              className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-black"
-              style={{ backgroundColor: `${s.color}22`, color: s.color, boxShadow: `0 0 0 1.5px ${s.color}40` }}
-            >
-              {i + 1}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-zinc-200 truncate leading-snug">
-                {s.log.exceriseTitle || "Practice session"}
-              </p>
-              {s.log.songTitle && (
-                <p className="text-xs text-zinc-600 truncate">
-                  {s.log.songArtist ? `${s.log.songArtist} — ` : ""}{s.log.songTitle}
-                </p>
-              )}
-              <p className="text-xs tabular-nums mt-0.5" style={{ color: `${s.color}aa` }}>
-                {fmt(s.endMs)}{s.durMs > 0 && ` · ${fmtMs(s.durMs)}`}
-              </p>
-              {s.chips.length > 0 && (
-                <div className="mt-1.5 flex flex-wrap gap-1">
-                  {s.chips.map(c => (
-                    <span
-                      key={c.label}
-                      className="text-[10px] font-medium px-1.5 py-0.5 rounded"
-                      style={{ color: c.color, backgroundColor: `${c.color}1a` }}
-                    >
-                      {c.label}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <p className="text-xs font-semibold text-amber-400/80 tabular-nums shrink-0">+{s.log.totalPoints}pts</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── SectionHeading ───────────────────────────────────────────────────────────
-
-function SectionHeading({ children, count, icon }: { children: React.ReactNode; count?: number; icon?: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between mb-3">
-      <div className="flex items-center gap-2">
-        {icon && <span className="text-zinc-700 shrink-0">{icon}</span>}
-        <h2 className="text-[11px] font-semibold text-zinc-400 tracking-tight">{children}</h2>
-      </div>
-      {count !== undefined && (
-        <span className="text-xs font-bold text-zinc-400 tabular-nums">{count}</span>
-      )}
-    </div>
-  );
-}
-
 // ─── Progress Level System ────────────────────────────────────────────────────
 // Level defs + progress maths live in feature/aiSummary/utils/milestoneLogic so
 // the sidebar "unclaimed reward" indicator shares the exact same rules.
 
 // ─── PracticeProgressTracker ──────────────────────────────────────────────────
-
-const R_NORMAL = 24;
-const R_ACTIVE = 30;
+// The milestone map: one node per level joined by a trail that fills green as
+// levels are reached. Tapping a node loads its goal into the card below.
 
 function PracticeProgressTracker({
   logs, today, previewIdx, onPreviewChange, ownedSet, claimedSet,
@@ -240,10 +83,11 @@ function PracticeProgressTracker({
 
   const realNextIdx = levelStatuses.findIndex(s => !s.met);
   const activeIdx   = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
-  const nextLevel   = levelStatuses[activeIdx];
+  const metCount    = levelStatuses.filter(s => s.met).length;
+  const activeColor = LEVEL_COLORS[levelStatuses[activeIdx].id - 1];
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef<HTMLButtonElement>(null);
 
   // keep the focused level centered in the horizontal scroll strip
   useEffect(() => {
@@ -254,120 +98,171 @@ function PracticeProgressTracker({
     container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }, [activeIdx]);
 
+  const GREEN = "#22c55e";     // "reached" colour, shared by discs, trail and labels
+  const NODE = 56;             // node diameter
+  const CENTER = NODE / 2;     // vertical centre → trail height
+
   return (
-    <div className="flex w-full flex-col gap-2 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 py-5">
-      <div className="flex items-center justify-between mb-1">
+    <div className="flex w-full flex-col gap-6 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 py-6 sm:px-6 sm:py-7">
+      {/* arrows flank the strip like a carousel, aligned to the node centres */}
+      <div className="flex items-start gap-1 sm:gap-2">
         <button
           onClick={() => onPreviewChange(Math.max(0, activeIdx - 1))}
           disabled={activeIdx === 0}
           aria-label="Previous level"
-          className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 text-zinc-200 transition-colors hover:bg-zinc-700 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
-          <ChevronLeft size={26} strokeWidth={2.5} />
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
-        <span className="text-sm font-semibold text-zinc-300 tabular-nums">{activeIdx + 1} / {LEVELS.length}</span>
+
+        {/* milestone nodes */}
+        <div
+          ref={scrollRef}
+          className="flex flex-1 items-start overflow-x-auto no-scrollbar snap-x snap-mandatory pt-1 sm:snap-none sm:overflow-x-visible"
+        >
+        {levelStatuses.map((level, idx) => {
+          const isOwned     = ownedSet.has(level.id);
+          const isClaimed   = claimedSet.has(level.id);
+          const isClaimable = level.met && isOwned && !isClaimed;   // reward waiting to collect
+          const isCurrent   = idx === activeIdx;
+          const showLock    = !isOwned && level.cost > 0;
+          const baseColor   = LEVEL_COLORS[level.id - 1];
+          const ringColor   = level.met ? GREEN : baseColor;   // reached rings turn green
+          const prevMet     = idx > 0 && levelStatuses[idx - 1].met;
+
+          const R      = 23;   // ring radius inside the 56px node
+          const CIRC   = 2 * Math.PI * R;
+          const pct    = level.progress.max > 0 ? level.progress.value / level.progress.max : 0;
+          const offset = CIRC - (level.met ? 1 : pct) * CIRC;
+          const stroke = isCurrent ? 4 : 3;
+
+          return (
+            <button
+              key={level.id}
+              ref={isCurrent ? activeRef : undefined}
+              type="button"
+              onClick={() => onPreviewChange(idx)}
+              aria-label={`${level.name} — ${level.met ? "reached" : showLock ? "locked" : "in progress"}`}
+              className="group relative flex w-[80px] shrink-0 snap-center flex-col items-center gap-3 outline-none sm:w-auto sm:flex-1 sm:min-w-0"
+            >
+              {/* trail segment linking this node to the previous one */}
+              {idx > 0 && (
+                <span
+                  aria-hidden
+                  className="absolute left-[-50%] right-1/2 h-[3px] rounded-full transition-colors"
+                  style={{ top: CENTER - 1.5, backgroundColor: prevMet ? GREEN : "#3f3f46" }}
+                />
+              )}
+
+              {/* node — solid disc, never transparent */}
+              <div
+                className="relative z-10 flex items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105 group-active:scale-95"
+                style={{ width: NODE, height: NODE }}
+              >
+                {isCurrent && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-[-4px] rounded-full"
+                    style={{ boxShadow: `0 0 0 2px ${ringColor}, 0 0 16px ${ringColor}55` }}
+                  />
+                )}
+                <span
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    backgroundColor: level.met ? GREEN : showLock ? "#1e1e22" : "#2e2e34",
+                    boxShadow: level.met ? `0 2px 10px ${GREEN}40` : undefined,
+                  }}
+                />
+                {!level.met && (
+                  <svg viewBox={`0 0 ${NODE} ${NODE}`} className="absolute inset-0 h-full w-full -rotate-90">
+                    <circle
+                      cx={CENTER} cy={CENTER} r={R}
+                      fill="none"
+                      stroke={showLock ? "#45454d" : "#52525b"}
+                      strokeWidth={stroke}
+                      strokeDasharray={showLock ? "3 4" : undefined}
+                    />
+                    {!showLock && pct > 0 && (
+                      <circle
+                        cx={CENTER} cy={CENTER} r={R}
+                        fill="none"
+                        stroke={baseColor}
+                        strokeWidth={stroke}
+                        strokeLinecap="round"
+                        strokeDasharray={CIRC}
+                        strokeDashoffset={offset}
+                        className="transition-[stroke-dashoffset] duration-700 ease-out"
+                      />
+                    )}
+                  </svg>
+                )}
+                <span className="relative">
+                  {showLock ? (
+                    <Lock className="h-5 w-5 text-zinc-500" />
+                  ) : level.met ? (
+                    <Check className="h-6 w-6 text-emerald-950" strokeWidth={3} />
+                  ) : (
+                    <level.Icon className="h-5 w-5" style={{ color: isCurrent ? baseColor : "#8e8e98" }} />
+                  )}
+                </span>
+
+                {/* reward status: amber pulse = uncollected reward, emerald = claimed */}
+                {isClaimable && (
+                  <span
+                    aria-label="Reward ready to claim"
+                    className="absolute -right-0.5 -top-0.5 z-20 h-3.5 w-3.5 rounded-full bg-amber-500 animate-pulse ring-2 ring-zinc-900"
+                  />
+                )}
+                {isClaimed && (
+                  <span
+                    aria-label="Reward claimed"
+                    className="absolute -right-0.5 -top-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-zinc-900"
+                  >
+                    <Check size={9} strokeWidth={3.5} className="text-zinc-950" />
+                  </span>
+                )}
+              </div>
+
+              {/* label */}
+              <span
+                className="w-full max-w-[72px] truncate px-0.5 text-center text-[11px] font-semibold leading-none"
+                style={{ color: isCurrent ? "#fafafa" : level.met ? "#d4d4d8" : "#8e8e98" }}
+                title={level.name}
+              >
+                {level.short ?? level.name.split(" ")[0]}
+              </span>
+            </button>
+          );
+        })}
+        </div>
+
         <button
           onClick={() => onPreviewChange(Math.min(LEVELS.length - 1, activeIdx + 1))}
           disabled={activeIdx === LEVELS.length - 1}
           aria-label="Next level"
-          className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 text-zinc-200 transition-colors hover:bg-zinc-700 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
-          <ChevronRight size={26} strokeWidth={2.5} />
+          <ChevronRight size={20} strokeWidth={2.5} />
         </button>
       </div>
-      <div
-        ref={scrollRef}
-        className="flex w-full items-center overflow-x-auto no-scrollbar snap-x snap-mandatory sm:snap-none sm:overflow-x-visible"
-      >
-      {levelStatuses.map((level, idx) => {
-        const isOwned     = ownedSet.has(level.id);
-        const isClaimed   = claimedSet.has(level.id);
-        const isClaimable = level.met && isOwned && !isClaimed;   // reward waiting to collect
-        const isNext      = level.id === nextLevel?.id;
-        const isDim     = !level.met && !isNext;
-        const baseColor = LEVEL_COLORS[level.id - 1];
-        const GREEN     = "#22c55e";
-        const ringColor = level.met ? GREEN : baseColor;   // completed rings turn green
-        const R         = isNext ? R_ACTIVE : R_NORMAL;
-        const SIZE      = R * 2 + 12;
-        const CX        = SIZE / 2;
-        const CY        = SIZE / 2;
-        const CIRC      = 2 * Math.PI * R;
-        const pct       = level.progress.max > 0 ? level.progress.value / level.progress.max : 0;
-        const offset    = CIRC - (level.met ? 1 : pct) * CIRC;
-        const strokeW   = isNext ? 5 : 4;
-        const showLock  = !isOwned && level.cost > 0;
-        const ringClass = isNext
-          ? "w-[58px] h-[58px] sm:w-[68px] sm:h-[68px]"
-          : "w-12 h-12 sm:w-14 sm:h-14";
-        const iconClass = isNext ? "w-6 h-6 sm:w-7 sm:h-7" : "w-5 h-5 sm:w-6 sm:h-6";
 
-        return (
-          <div
-            key={level.id}
-            ref={idx === activeIdx ? activeRef : undefined}
-            className="flex shrink-0 w-[68px] flex-col items-center gap-2 snap-center cursor-pointer sm:w-auto sm:flex-1 sm:min-w-0"
-            style={{ opacity: showLock ? 0.6 : isDim ? 0.7 : 1 }}
-            onClick={() => onPreviewChange(idx)}
-          >
-            <div className={`relative flex shrink-0 items-center justify-center ${ringClass}`}>
-              <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="absolute inset-0 w-full h-full -rotate-90">
-                <circle
-                  cx={CX} cy={CY} r={R}
-                  fill="none"
-                  stroke={showLock ? "#3f3f46" : "#52525b"}
-                  strokeWidth={strokeW}
-                  strokeDasharray={showLock ? "3 3" : undefined}
-                />
-                {!showLock && (level.met || pct > 0) && (
-                  <circle
-                    cx={CX} cy={CY} r={R}
-                    fill="none"
-                    stroke={ringColor}
-                    strokeWidth={strokeW}
-                    strokeLinecap="round"
-                    strokeDasharray={CIRC}
-                    strokeDashoffset={offset}
-                  />
-                )}
-              </svg>
-              <div className="relative flex items-center justify-center">
-                {showLock ? (
-                  <Lock className={`${iconClass} text-zinc-400`} />
-                ) : level.met ? (
-                  <CheckCircle2 className={iconClass} style={{ color: GREEN }} />
-                ) : (
-                  <level.Icon className={iconClass} style={{ color: isNext ? baseColor : "#a1a1aa" }} />
-                )}
-              </div>
-
-              {/* reward status: amber pulse = uncollected reward, emerald = claimed */}
-              {isClaimable && (
-                <span
-                  aria-label="Reward ready to claim"
-                  className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full bg-amber-500 animate-pulse ring-2 ring-zinc-800/40"
-                />
-              )}
-              {isClaimed && (
-                <span
-                  aria-label="Reward claimed"
-                  className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-zinc-800/40"
-                >
-                  <Check size={9} strokeWidth={3.5} className="text-zinc-950" />
-                </span>
-              )}
-            </div>
-
-            <span
-              className="w-full px-0.5 text-center text-[11px] font-semibold leading-tight truncate"
-              style={{ color: showLock ? "#a1a1aa" : level.met ? GREEN : isNext ? "#fafafa" : "#d4d4d8" }}
-              title={level.name}
-            >
-              {level.short ?? level.name.split(" ")[0]}
-            </span>
-          </div>
-        );
-      })}
+      {/* legend */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-800 pt-4">
+        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
+          Reached
+        </span>
+        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full border-2 bg-transparent" style={{ borderColor: activeColor }} />
+          Current goal
+        </span>
+        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+          <Lock size={11} className="text-zinc-500" />
+          Locked
+        </span>
+        <span className="ml-auto text-[11px] font-semibold tabular-nums text-zinc-500">
+          {metCount}/{LEVELS.length} reached
+        </span>
       </div>
     </div>
   );
@@ -395,12 +290,11 @@ function buildByDate(logs: FirebaseUserExceriseLog[]) {
 }
 
 function LevelGoalCard({
-  logs, today, selectedDate, displayDate, onSelectDay, onPeekDay, previewIdx,
+  logs, today, displayDate, onSelectDay, onPeekDay, previewIdx,
   isOwned, isClaimedThisWeek, fame, busy, onPurchase, onClaim,
 }: {
   logs: FirebaseUserExceriseLog[];
   today: Date;
-  selectedDate: Date;
   displayDate: Date;
   onSelectDay: (d: Date) => void;
   onPeekDay: (d: Date | null) => void;
@@ -441,13 +335,6 @@ function LevelGoalCard({
     "week-bars" as const;
 
   const weekDays = currentWeekDates(today);
-
-  const last14Days = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (13 - i));
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
 
   const streakKeys = (() => {
     const keys = new Set<string>();
@@ -490,12 +377,6 @@ function LevelGoalCard({
       isSelected: isSameDay(day, displayDate),
     };
   });
-
-  // categories only (level 5)
-  const catBars = CATS.map(cat => ({
-    ...cat,
-    active: weekDays.some(d => (byDate.get(localDateStr(d))?.[cat.k] ?? 0) > 0),
-  }));
 
   const isMet         = nextLevel.met;
   const isLocked      = !isOwned && nextLevel.cost > 0;
@@ -546,62 +427,52 @@ function LevelGoalCard({
       </button>
     );
   } else if (isOwned && isClaimedThisWeek) {
+    // nothing left to do this week — a quiet status line, not a fake button
     actionButton = (
-      <div
-        className={`${btnBase} cursor-default`}
-        style={{ backgroundColor: "#18181b", color: "#71717a", border: "2px solid #27272a" }}
-      >
-        <CheckCircle2 size={18} className="text-emerald-500/70" />
-        <span>Claimed this week</span>
-      </div>
+      <p className="flex items-center gap-2 text-[13px] text-zinc-500">
+        <CheckCircle2 size={15} className="shrink-0 text-emerald-500" />
+        <span>
+          <span className="font-semibold text-zinc-300">+{nextLevel.reward} Fame</span> claimed — this level pays again next week.
+        </span>
+      </p>
     );
   } else if (isOwned && !isMet) {
-    // reward is always visible as a button — locked until the goal is met
+    // reward preview stays plain text; it only becomes a button once claimable
     actionButton = (
-      <button
-        disabled
-        className={`${btnBase} cursor-not-allowed`}
-        style={{ backgroundColor: "#27272a", color: "#a1a1aa", border: "2px solid #3f3f46" }}
-      >
-        <Lock size={18} />
-        <span>Claim</span>
-        <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain opacity-70" />
-        <span className="tabular-nums">+{nextLevel.reward}</span>
-        <span className="text-xs font-medium text-zinc-500">— reach your goal</span>
-      </button>
+      <p className="flex items-center gap-2 text-[13px] text-zinc-500">
+        <img src="/images/coin.png" alt="Fame" className="h-4 w-4 shrink-0 object-contain" />
+        <span>
+          Reward: <span className="font-semibold text-amber-400">+{nextLevel.reward} Fame</span> — claim it once the goal is done.
+        </span>
+      </p>
     );
   }
 
-  // Highlighted objective + completion checkbox (reused for locked & unlocked)
+  // Goal statement — plain typography, deliberately not a box so it can't be
+  // mistaken for a button. The claim button is the only button-shaped thing here.
   const goalAccent = isMet ? "#22c55e" : color;
   const goalBox = (
-    <div
-      className="flex w-full items-center gap-3 rounded-lg px-3.5 py-3 transition-colors"
-      style={{ backgroundColor: `${goalAccent}14`, border: `1px solid ${goalAccent}40` }}
-    >
-      {/* checkbox */}
+    <div className="flex w-full items-start gap-3 text-left">
       <div
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-all"
+        className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
         style={{
           backgroundColor: isMet ? goalAccent : "transparent",
-          border: `2px solid ${isMet ? goalAccent : "#52525b"}`,
-          boxShadow: isMet ? `0 0 8px ${goalAccent}66` : undefined,
+          border: isMet ? undefined : "2px solid #52525b",
         }}
       >
-        {isMet && <Check size={18} strokeWidth={3} className="text-zinc-950" />}
+        {isMet && <Check size={15} strokeWidth={3.5} className="text-zinc-950" />}
       </div>
-      <div className="min-w-0 flex-1 text-left leading-tight">
-        <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `${goalAccent}dd` }}>
-          {isMet ? "Goal complete" : "Your goal"}
+      <div className="min-w-0 flex-1 leading-tight">
+        <p className="text-xs font-medium" style={{ color: isMet ? goalAccent : "#a1a1aa" }}>
+          {isMet ? "Goal complete" : "Your goal this week"}
         </p>
-        <p className="text-sm font-semibold text-zinc-100">{nextLevel.req}</p>
+        <p className="mt-0.5 text-lg font-bold leading-snug text-zinc-50">{nextLevel.req}</p>
       </div>
-      {isMet && <Target size={18} className="shrink-0" style={{ color: goalAccent }} />}
     </div>
   );
 
   return (
-    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm p-4 sm:p-5 space-y-5">
+    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm p-5 sm:p-7 space-y-6">
       <div className="flex items-center gap-3">
         <div
           className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
@@ -655,10 +526,10 @@ function LevelGoalCard({
       {/* Goal + reward surfaced right under the header so the claim is impossible
           to miss — the chart below is supporting detail, not the call-to-action. */}
       {!isLocked && (
-        <div className="space-y-2.5">
+        <div className="space-y-4">
           {goalBox}
           {actionButton && (
-            <div className="[&>*]:w-full">
+            <div className="[&>button]:w-full [&>p]:pl-10">
               {actionButton}
             </div>
           )}
@@ -675,7 +546,7 @@ function LevelGoalCard({
         const GREEN      = "#4ade80";
         const CYAN       = "rgb(6,182,212)";
         return (
-          <div>
+          <div className="border-t border-zinc-800/70 pt-6">
             <div className="relative">
             {/* 15-min goal line */}
             <div
@@ -687,7 +558,7 @@ function LevelGoalCard({
                 {dayGoalMin} min goal
               </span>
             </div>
-            <div className="flex items-end gap-1 sm:gap-2">
+            <div className="flex items-end gap-1.5 sm:gap-2.5">
               {dayBars.map((entry, i) => {
                 const day      = weekDays[i];
                 const isMissed = !entry.ok && !entry.isFuture && !entry.isToday;
@@ -765,7 +636,7 @@ function LevelGoalCard({
               })}
             </div>
             </div>
-            <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-zinc-500">
+            <p className="mt-5 flex items-center gap-1.5 text-[11px] leading-snug text-zinc-500">
               <CheckCircle2 size={12} style={{ color: GREEN }} className="shrink-0" />
               <span>Each day with <span className="font-semibold text-zinc-300">{dayGoalMin}+ min</span> of practice counts — green bars are days you completed.</span>
             </p>
@@ -775,8 +646,8 @@ function LevelGoalCard({
 
       {/* ── streak-simple (levels 3,5) ── */}
       {!isLocked && levelType === "streak-simple" && (
-        <div className="space-y-4">
-          <div className="flex gap-1 sm:gap-1.5">
+        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+          <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -834,8 +705,8 @@ function LevelGoalCard({
 
       {/* ── week-cats (level 6) ── */}
       {!isLocked && levelType === "week-cats" && (
-        <div className="space-y-4">
-          <div className="flex gap-1 sm:gap-1.5">
+        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+          <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -903,8 +774,8 @@ function LevelGoalCard({
 
       {/* ── streak-cats (levels 7,8,9) ── */}
       {!isLocked && levelType === "streak-cats" && (
-        <div className="space-y-4">
-          <div className="flex gap-1 sm:gap-1.5">
+        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+          <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
               const stats    = byDate.get(key);
@@ -987,7 +858,7 @@ function LevelGoalCard({
 
       {isLocked ? (
         /* Locked level: no charts — just the goal, the investment explainer and a centered unlock button */
-        <div className="flex flex-col items-center gap-5 py-4">
+        <div className="flex flex-col items-center gap-6 py-6">
           {goalBox}
           {(() => {
             const weeks = Math.max(1, Math.ceil(nextLevel.cost / nextLevel.reward));
@@ -1013,19 +884,10 @@ function LevelGoalCard({
 
 const RULES_DISMISSED_KEY = "practiceLevels.rulesDismissed";
 
-// One worked example (the Groove level from the Discord thread): pay 40 once,
-// earn +30 every week — turns positive in week 2 and keeps growing.
-const EXAMPLE_STEPS: { label: string; net: string; positive?: boolean; note?: string }[] = [
-  { label: "Unlock",  net: "−40" },
-  { label: "Week 1",  net: "−10" },
-  { label: "Week 2",  net: "+20", positive: true, note: "Paid back" },
-  { label: "Week 3",  net: "+50", positive: true },
-  { label: "…onward", net: "+30/wk", positive: true },
-];
-
+// Quiet, manual-style instructions — plain numbered text, not a callout that
+// competes with the milestones themselves.
 function RulesAlert() {
   const [dismissed, setDismissed] = useState(true);
-  const [replayKey, setReplayKey] = useState(0);
 
   useEffect(() => {
     setDismissed(localStorage.getItem(RULES_DISMISSED_KEY) === "1");
@@ -1038,99 +900,41 @@ function RulesAlert() {
     setDismissed(true);
   };
 
-  const steps = [
-    {
-      Icon: Lock,
-      title: "Unlock once",
-      desc: <>Pay Fame once to keep a level for good.<span className="text-zinc-500"> First one is free.</span></>,
-    },
-    {
-      Icon: CheckCircle2,
-      title: "Practice",
-      desc: <>Hit that level&apos;s weekly goal.</>,
-    },
-    {
-      Icon: Sparkles,
-      title: "Claim weekly",
-      desc: <>Collect the Fame reward — again every week.</>,
-    },
+  const steps: { title: string; desc: React.ReactNode }[] = [
+    { title: "Unlock a level once", desc: <>pay Fame once and it&apos;s yours for good. The first one is free.</> },
+    { title: "Practice",            desc: <>hit that level&apos;s weekly goal.</> },
+    { title: "Claim",               desc: <>collect the Fame reward — again every week you hit the goal.</> },
   ];
 
   return (
-    <div className="relative rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 pr-10">
+    <div className="relative rounded-lg border border-zinc-800 bg-zinc-900/50 px-6 py-5 pr-14 sm:px-7 sm:py-6">
       <button
         onClick={dismiss}
-        className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-300 transition-colors"
+        className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors"
         aria-label="Dismiss"
       >
         <X size={16} />
       </button>
 
-      <p className="mb-4 flex items-center gap-2 text-base font-bold text-amber-200">
-        <Info size={18} className="text-amber-400" />
+      <p className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+        <Info size={15} className="text-zinc-400" />
         How it works
       </p>
 
-      {/* 3 simple steps */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <ol className="mt-4 space-y-2.5 text-[13px] leading-relaxed text-zinc-400">
         {steps.map((s, i) => (
-          <div key={s.title} className="flex items-start gap-3">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-400">
-              <s.Icon size={19} />
-              <span className="absolute -left-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[11px] font-black text-zinc-950">
-                {i + 1}
-              </span>
-            </div>
-            <div className="min-w-0 leading-snug">
-              <p className="text-sm font-bold text-zinc-100">{s.title}</p>
-              <p className="text-[13px] text-zinc-300">{s.desc}</p>
-            </div>
-          </div>
+          <li key={s.title} className="flex gap-2.5">
+            <span className="shrink-0 font-semibold tabular-nums text-zinc-500">{i + 1}.</span>
+            <span>
+              <span className="font-semibold text-zinc-200">{s.title}</span> — {s.desc}
+            </span>
+          </li>
         ))}
-      </div>
+      </ol>
 
-      {/* Worked example — watch the balance flip positive in week 2 */}
-      <div className="mt-5">
-        <button
-          type="button"
-          onClick={() => setReplayKey(k => k + 1)}
-          className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-amber-200/80 transition-colors hover:text-amber-200"
-          aria-label="Replay example"
-        >
-          Example: unlock 40, earn +30 / week
-          <Sparkles size={12} className="text-amber-400" />
-        </button>
-        <div key={replayKey} className="flex items-stretch gap-1.5">
-          {EXAMPLE_STEPS.map((s, i) => (
-            <div
-              key={i}
-              className={cn(
-                "flex min-w-0 flex-1 animate-in fade-in-0 slide-in-from-bottom-2 flex-col items-center justify-center gap-0.5 rounded px-1 py-2 text-center",
-                s.positive ? "bg-emerald-500/10" : "bg-zinc-800/40"
-              )}
-              style={{
-                animationDelay: `${i * 240}ms`,
-                animationDuration: "450ms",
-                animationFillMode: "both",
-              }}
-            >
-              <span className="truncate text-[10px] font-semibold text-zinc-400">{s.label}</span>
-              <span className={cn("text-sm font-black tabular-nums", s.positive ? "text-emerald-400" : "text-zinc-200")}>
-                {s.net}
-              </span>
-              {s.note && (
-                <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400">
-                  <Check size={10} strokeWidth={3} />{s.note}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <p className="mt-5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[13px] text-zinc-400">
-        <img src="/images/coin.png" alt="Fame" className="h-4 w-4 object-contain" />
-        <span>Everything resets every weekend — your goals and claims start fresh each new week. One claim per level a week; higher levels pay more.</span>
+      <p className="mt-5 border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-500">
+        Example: Groove costs 40 Fame once and pays +30 a week, so it pays for itself in week two.
+        Goals and claims reset every week — one claim per level a week, higher levels pay more.
       </p>
     </div>
   );
@@ -1144,8 +948,7 @@ export const SummaryView = () => {
   const dispatch  = useAppDispatch();
   const fame      = userStats?.fame ?? 0;
 
-  const [logs, setLogs]               = useState<FirebaseUserExceriseLog[]>([]);
-  const [logsLoading, setLogsLoading] = useState(true);
+  const [logs, setLogs] = useState<FirebaseUserExceriseLog[]>([]);
 
   const [today] = useState(() => {
     const d = new Date();
@@ -1167,9 +970,7 @@ export const SummaryView = () => {
 
   useEffect(() => {
     if (!userAuth) return;
-    firebaseGetUserRaprotsLogs(userAuth, new Date().getFullYear())
-      .then(setLogs)
-      .finally(() => setLogsLoading(false));
+    firebaseGetUserRaprotsLogs(userAuth, new Date().getFullYear()).then(setLogs);
     firebaseGetPracticeLevels(userAuth).then(setLevelsState);
   }, [userAuth]);
 
@@ -1240,8 +1041,6 @@ export const SummaryView = () => {
     }
   };
 
-  const displayLogs = logs.filter(l => isSameDay(new Date(l.reportDate.seconds * 1000), displayDate));
-
   const subtitleDate = displayDate.toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
@@ -1256,7 +1055,7 @@ export const SummaryView = () => {
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 p-4 pb-14 md:gap-10 md:p-8 md:pb-20 lg:p-10 lg:pb-24">
 
         <RulesAlert />
 
@@ -1274,7 +1073,6 @@ export const SummaryView = () => {
         <LevelGoalCard
           logs={logs}
           today={today}
-          selectedDate={selectedDate}
           displayDate={displayDate}
           onSelectDay={setSelectedDate}
           onPeekDay={setPeekDate}
@@ -1286,31 +1084,6 @@ export const SummaryView = () => {
           onPurchase={handlePurchase}
           onClaim={handleClaim}
         />
-
-        {/* Sessions — fixed min height so hovering days never collapses the box */}
-        <div>
-          <SectionHeading icon={<ListMusic size={16} />} count={displayLogs.length}>
-            Sessions
-          </SectionHeading>
-          <div className="min-h-[320px]">
-            {/* keyed on the shown day so the content fades/slides in on every change */}
-            <div
-              key={localDateStr(displayDate)}
-              className="animate-in fade-in-0 slide-in-from-bottom-1 duration-300"
-            >
-              {displayLogs.length > 0 ? (
-                <DayTimeline logs={displayLogs} />
-              ) : !logsLoading ? (
-                <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-zinc-800">
-                  <Guitar className="h-10 w-10 text-zinc-700 opacity-40" />
-                  <p className="text-sm font-medium text-zinc-500">
-                    {isSameDay(displayDate, today) ? "No practice logged today" : "No sessions on this day"}
-                  </p>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
 
       </div>
     </div>
