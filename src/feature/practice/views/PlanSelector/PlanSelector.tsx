@@ -4,6 +4,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
@@ -21,6 +22,10 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const PLAN_TABS = ["routines", "playalongs", "my_plans", "community"] as const;
+
+// Plan-level categories used by the built-in routines, in display order. The
+// filter only renders chips for the categories actually present in a tab.
+const CATEGORY_ORDER = ["technique", "theory", "creativity", "hearing", "mixed"] as const;
 
 const RippleTabsTrigger = ({
   value,
@@ -66,6 +71,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [activeTab, setActiveTab] = useState<(typeof PLAN_TABS)[number]>("routines");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
   useEffect(() => {
     const queryTab = router.query.tab;
@@ -136,10 +142,47 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
   };
 
   const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
-    const favoritePlans = sourcePlans.filter((p) => favoritePlanIds.includes(p.id));
+    const availableCategories = CATEGORY_ORDER.filter((cat) =>
+      sourcePlans.some((p) => p.category === cat)
+    );
+
+    const filteredPlans =
+      categoryFilter === "all"
+        ? sourcePlans
+        : sourcePlans.filter((p) => p.category === categoryFilter);
+
+    const favoritePlans = filteredPlans.filter((p) => favoritePlanIds.includes(p.id));
+
+    const chipClass = (active: boolean) =>
+      cn(
+        "text-xs font-medium tracking-wide transition-colors",
+        active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+      );
 
     return (
       <>
+        {availableCategories.length > 1 && (
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <button
+              type="button"
+              onClick={() => setCategoryFilter("all")}
+              className={chipClass(categoryFilter === "all")}
+            >
+              {t("common:filters.all", "All")}
+            </button>
+            {availableCategories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategoryFilter(cat)}
+                className={chipClass(categoryFilter === cat)}
+              >
+                {t(`exercises:categories.${cat}` as any)}
+              </button>
+            ))}
+          </div>
+        )}
+
         {favoritePlans.length > 0 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -160,7 +203,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         )}
 
         {(["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
-          const plans = sourcePlans.filter(
+          const plans = filteredPlans.filter(
             (p) => p.difficulty === difficulty && !favoritePlanIds.includes(p.id)
           );
           if (plans.length === 0) return null;
@@ -218,7 +261,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                   <span className="text-sm font-medium">Back</span>
                 </button>
               )}
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as (typeof PLAN_TABS)[number])} className="w-full">
+              <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
                 <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" isActive={activeTab === "routines"} />
                 <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} />
