@@ -7,6 +7,23 @@
     "sessions_heading": "Sessions",
     "day_sessions": "{{count}} session(s)"
   },
+  "pagination": {
+    "label": "Sessions pages",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page_of": "Page {{page}} of {{total}}"
+  },
+  "timeline": {
+    "heading": "Day timeline"
+  },
+  "calendar": {
+    "prev_month": "Previous month",
+    "next_month": "Next month",
+    "clear_day": "Clear selected day",
+    "hint": "Tap a highlighted day",
+    "less": "Less",
+    "more": "More"
+  },
   "filters": {
     "heading": "Filters",
     "range_7d": "7 days",

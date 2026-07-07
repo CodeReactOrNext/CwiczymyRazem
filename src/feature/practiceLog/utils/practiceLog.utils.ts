@@ -137,6 +137,36 @@ export const groupSessionsByDay = (
   return groups;
 };
 
+/**
+ * Splits day groups into balanced pages without ever splitting a single day
+ * across pages. A page closes once it reaches `targetPerPage` sessions, so pages
+ * stay a similar height even when days hold wildly different session counts.
+ */
+export const paginateDayGroups = (
+  dayGroups: DayGroup[],
+  targetPerPage: number
+): DayGroup[][] => {
+  if (dayGroups.length === 0) return [];
+
+  const pages: DayGroup[][] = [];
+  let current: DayGroup[] = [];
+  let count = 0;
+
+  dayGroups.forEach((group) => {
+    current.push(group);
+    count += group.sessions.length;
+    if (count >= targetPerPage) {
+      pages.push(current);
+      current = [];
+      count = 0;
+    }
+  });
+
+  if (current.length > 0) pages.push(current);
+
+  return pages;
+};
+
 export const summarize = (
   sessions: PracticeLogSession[]
 ): PracticeLogSummaryData => {

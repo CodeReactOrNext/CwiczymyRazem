@@ -6,7 +6,6 @@ import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { RecentSessionsWidget } from "feature/practiceLog/components/RecentSessionsWidget";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
@@ -27,7 +26,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey] = useState(0);
   const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth as string, refreshKey);
 
   const { data: songs, refetch: refreshSongs } = useQuery({
@@ -92,13 +91,7 @@ const ProfileActivityPage = () => {
             </div>
           </div>
 
-          {/* 3. Recent sessions with quick edit + link to the full practice log */}
-          <RecentSessionsWidget
-            userAuth={userAuth as string}
-            onMutated={() => setRefreshKey((key) => key + 1)}
-          />
-
-          {/* 4. Song Learning Stats */}
+          {/* 3. Song Learning Stats */}
           <SongLearningSection userSongs={songs} />
 
           {/* 5. Activity Log calendar */}

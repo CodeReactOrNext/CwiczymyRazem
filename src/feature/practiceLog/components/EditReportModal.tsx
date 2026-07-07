@@ -8,11 +8,13 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { convertMsToHM } from "utils/converter";
 
+import { CATEGORY_META } from "../config/sessionType";
 import { updatePracticeReport } from "../services/practiceLogMutations.service";
 import type { PracticeLogSession } from "../types/practiceLog.types";
 
@@ -25,13 +27,6 @@ type CategoryKey =
   | "theoryTime"
   | "hearingTime"
   | "creativityTime";
-
-const CATEGORIES: { key: CategoryKey; labelKey: string }[] = [
-  { key: "techniqueTime", labelKey: "common:calendar.technique" },
-  { key: "theoryTime", labelKey: "common:calendar.theory" },
-  { key: "hearingTime", labelKey: "common:calendar.hearing" },
-  { key: "creativityTime", labelKey: "common:calendar.creativity" },
-];
 
 type TimeFields = Record<CategoryKey, { hours: string; minutes: string }>;
 
@@ -48,6 +43,39 @@ const fieldsToMs = (field: { hours: string; minutes: string }) => {
   const minutes = Number(field.minutes) || 0;
   return hours * 3600000 + minutes * 60000;
 };
+
+const fieldLabelClass =
+  "text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500";
+const inputClass =
+  "border-none bg-white/5 text-sm text-zinc-100 shadow-none placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0";
+
+const TimeUnitInput = ({
+  value,
+  max,
+  unit,
+  label,
+  onChange,
+}: {
+  value: string;
+  max: number;
+  unit: string;
+  label: string;
+  onChange: (value: string) => void;
+}) => (
+  <div className="flex items-center rounded-lg bg-white/5 transition-shadow focus-within:ring-1 focus-within:ring-cyan-500/50">
+    <input
+      type="number"
+      min={0}
+      max={max}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      onFocus={(event) => event.target.select()}
+      aria-label={label}
+      className="w-12 bg-transparent py-2 pl-2.5 text-right text-sm tabular-nums text-zinc-100 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+    />
+    <span className="py-2 pl-1 pr-2.5 text-xs text-zinc-500">{unit}</span>
+  </div>
+);
 
 interface EditReportModalProps {
   session: PracticeLogSession | null;
@@ -77,7 +105,10 @@ const EditReportForm = ({
 
   const totalMs = useMemo(
     () =>
-      CATEGORIES.reduce((sum, { key }) => sum + fieldsToMs(timeFields[key]), 0),
+      CATEGORY_META.reduce(
+        (sum, { key }) => sum + fieldsToMs(timeFields[key]),
+        0
+      ),
     [timeFields]
   );
 
@@ -128,32 +159,36 @@ const EditReportForm = ({
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>{t("edit_modal.title")}</DialogTitle>
+      <DialogHeader className="text-left">
+        <DialogTitle className="font-display text-lg font-semibold text-zinc-50">
+          {t("edit_modal.title")}
+        </DialogTitle>
         <p className="text-xs text-zinc-500">
           {session.date.toLocaleDateString("en", {
             day: "2-digit",
             month: "long",
             year: "numeric",
           })}{" "}
-          — {t("edit_modal.date_locked")}
+          · {t("edit_modal.date_locked")}
         </p>
       </DialogHeader>
 
-      <div className="flex flex-col gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="report-title">{t("edit_modal.title_label")}</Label>
+      <div className="flex flex-col gap-5">
+        <div className="space-y-2">
+          <Label htmlFor="report-title" className={fieldLabelClass}>
+            {t("edit_modal.title_label")}
+          </Label>
           <Input
             id="report-title"
             value={title}
             maxLength={MAX_TITLE_LENGTH}
             onChange={(event) => setTitle(event.target.value)}
-            className="border-white/10 bg-white/5 text-zinc-100"
+            className={inputClass}
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="report-description">
+        <div className="space-y-2">
+          <Label htmlFor="report-description" className={fieldLabelClass}>
             {t("edit_modal.description_label")}
           </Label>
           <Textarea
@@ -162,58 +197,65 @@ const EditReportForm = ({
             maxLength={MAX_DESCRIPTION_LENGTH}
             rows={3}
             onChange={(event) => setDescription(event.target.value)}
-            className="border-white/10 bg-white/5 text-zinc-100 resize-none"
+            className={cn(inputClass, "resize-none")}
             placeholder={t("edit_modal.description_placeholder")}
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>{t("edit_modal.time_label")}</Label>
-          {CATEGORIES.map(({ key, labelKey }) => (
-            <div key={key} className="flex items-center gap-2">
-              <span className="w-24 text-xs font-semibold text-zinc-400">
-                {t(labelKey)}
-              </span>
-              <Input
-                type="number"
-                min={0}
-                max={24}
-                value={timeFields[key].hours}
-                onChange={(event) => setField(key, "hours", event.target.value)}
-                className="w-20 border-white/10 bg-white/5 text-zinc-100"
-                aria-label={`${t(labelKey)} ${t("edit_modal.hours")}`}
-              />
-              <span className="text-xs text-zinc-500">
-                {t("edit_modal.hours")}
-              </span>
-              <Input
-                type="number"
-                min={0}
-                max={59}
-                value={timeFields[key].minutes}
-                onChange={(event) =>
-                  setField(key, "minutes", event.target.value)
-                }
-                className="w-20 border-white/10 bg-white/5 text-zinc-100"
-                aria-label={`${t(labelKey)} ${t("edit_modal.minutes")}`}
-              />
-              <span className="text-xs text-zinc-500">
-                {t("edit_modal.minutes")}
-              </span>
-            </div>
-          ))}
-          <p className="text-xs font-semibold text-zinc-400">
-            {t("edit_modal.total")}:{" "}
-            <span className="text-cyan-400">{convertMsToHM(totalMs)}h</span>
-          </p>
+        <div className="space-y-3">
+          <Label className={fieldLabelClass}>{t("edit_modal.time_label")}</Label>
+
+          <div className="flex flex-col gap-1.5">
+            {CATEGORY_META.map(({ key, labelKey, dot }) => (
+              <div
+                key={key}
+                className="flex items-center justify-between gap-3 rounded-lg px-1 py-0.5"
+              >
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
+                  <span className="truncate text-sm text-zinc-300">
+                    {t(labelKey)}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <TimeUnitInput
+                    value={timeFields[key].hours}
+                    max={24}
+                    unit={t("edit_modal.hours")}
+                    label={`${t(labelKey)} ${t("edit_modal.hours")}`}
+                    onChange={(value) => setField(key, "hours", value)}
+                  />
+                  <TimeUnitInput
+                    value={timeFields[key].minutes}
+                    max={59}
+                    unit={t("edit_modal.minutes")}
+                    label={`${t(labelKey)} ${t("edit_modal.minutes")}`}
+                    onChange={(value) => setField(key, "minutes", value)}
+                  />
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-baseline justify-between px-1 pt-1">
+            <span className={fieldLabelClass}>{t("edit_modal.total")}</span>
+            <span
+              className={cn(
+                "text-base font-semibold tabular-nums",
+                totalMs === 0 ? "text-zinc-500" : "text-cyan-300"
+              )}
+            >
+              {convertMsToHM(totalMs)}h
+            </span>
+          </div>
           {totalMs === 0 && (
-            <p className="text-xs text-rose-400">
+            <p className="px-1 text-xs text-rose-400">
               {t("edit_modal.total_required")}
             </p>
           )}
         </div>
 
-        <p className="text-[11px] text-zinc-500 border-t border-white/10 pt-3">
+        <p className="text-[11px] leading-relaxed text-zinc-600">
           {t("edit_modal.stats_note")}
         </p>
       </div>
@@ -221,14 +263,14 @@ const EditReportForm = ({
       <DialogFooter className="gap-2">
         <button
           onClick={() => onOpenChange(false)}
-          className="px-4 py-2 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 text-sm font-semibold transition-background"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100"
         >
           {t("edit_modal.cancel")}
         </button>
         <button
           onClick={handleSave}
           disabled={!isValid || isSaving}
-          className="px-4 py-2 rounded bg-cyan-500 hover:bg-cyan-400 text-zinc-950 text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-background"
+          className="rounded-lg bg-cyan-500 px-5 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isSaving ? t("edit_modal.saving") : t("edit_modal.save")}
         </button>
@@ -244,7 +286,7 @@ export const EditReportModal = ({
 }: EditReportModalProps) => {
   return (
     <Dialog open={!!session} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px] border-white/10 bg-zinc-950 text-zinc-100 max-h-[90dvh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto border-none bg-zinc-900 text-zinc-100 sm:max-w-[440px] sm:rounded-xl">
         {session && (
           <EditReportForm
             key={session.id}

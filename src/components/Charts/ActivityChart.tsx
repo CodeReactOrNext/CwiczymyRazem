@@ -34,9 +34,11 @@ interface ActivityChartProps {
   }[];
   /** Hide the built-in range select when the caller already filters the data. */
   showRangeSelect?: boolean;
+  /** Extra classes for the outer Card (e.g. "bg-transparent p-0" for flat pages). */
+  className?: string;
 }
 
-export function ActivityChart({ data, showRangeSelect = true }: ActivityChartProps) {
+export function ActivityChart({ data, showRangeSelect = true, className }: ActivityChartProps) {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = React.useState("all");
 
@@ -106,8 +108,11 @@ export function ActivityChart({ data, showRangeSelect = true }: ActivityChartPro
   const chartColor = isNegative ? "#f43f5e" : "#10b981";
 
   return (
-    <Card>
-      <CardHeader className='flex p-0 pb-4 flex-col items-start justify-start gap-4 space-y-0 border-b border-white/10 sm:flex-row sm:items-center'>
+    <Card className={className}>
+      <CardHeader
+        className={`flex p-0 pb-4 flex-col items-start justify-start gap-4 space-y-0 sm:flex-row sm:items-center ${
+          showRangeSelect ? "border-b border-white/10" : ""
+        }`}>
         <div className='flex flex-col gap-1 text-left'>
           <CardTitle className='text-lg font-bold text-white'>
             {t("chart.activity_overview")}
