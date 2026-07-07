@@ -61,7 +61,7 @@ const CATEGORIES = [
     tagline: "Understand what you play",
     description:
       "Fretboard mapping, guide-tone voice leading, chord-tone improvisation — turn knowledge into fluent playing.",
-    examples: ["Fretboard Mastery", "Guide Tone Voice Leading", "Natural Notes Map", "Scale Practice"],
+    examples: ["Fretboard Mastery", "Guide Tone Voice Leading", "Scale Practice"],
   },
   {
     id: "creativity",

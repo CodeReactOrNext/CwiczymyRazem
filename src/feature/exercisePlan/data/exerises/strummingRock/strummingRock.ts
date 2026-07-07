@@ -5,9 +5,9 @@ export const strummingRockExercise: Exercise = {
   title: "Rock Strumming Patterns",
   description: "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
   whyItMatters: "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence.",
-  difficulty: "beginner",
+  difficulty: "easy",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 3.5,
   instructions: [
     "Execute strums with a loose, relaxed wrist, maintaining a steady tempo.",
     "Vary your strumming force to create a clear contrast between soft and loud beats."

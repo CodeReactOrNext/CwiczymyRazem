@@ -1,5 +1,6 @@
 
 
+import { improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
@@ -18,7 +19,8 @@ export const basicImprovisationPractice: ExercisePlan = {
   exercises: [
     oneChordImprovExercise,
     oneStringBackingExercise,
-    triadImprovisationExercise],
+    triadImprovisationExercise,
+    improvPromptMedium],
   userId: "system",
   image: basicImprovisationPracticeImage,
 }; 

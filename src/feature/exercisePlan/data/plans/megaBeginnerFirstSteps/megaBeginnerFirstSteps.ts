@@ -5,7 +5,6 @@ import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/str
 import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
 import { strummingBasicExercise } from "feature/exercisePlan/data/exerises/strummingBasic/strummingBasic";
 import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
-import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -32,11 +31,11 @@ export const megaBeginnerFirstStepsPlan: ExercisePlan = {
   icon: "star",
   color: "emerald",
   title: "Mega Beginner: First Steps",
-  description: "Super simple exercises perfect for absolute beginners just starting their guitar journey. Focuses on melody, strumming, and basic chords.",
+  description: "Super simple exercises perfect for absolute beginners just starting their guitar journey. Focuses on string basics, melody, strumming, and basic chords.",
   difficulty: "beginner",
   category: "technique",
   exercises: [
-    quarterNotesDrillExercise,
+    stringRepetitionExercise,
     nakedToneMelodyExercise,
     strummingBasicExercise,
     chordPracticeExercise,

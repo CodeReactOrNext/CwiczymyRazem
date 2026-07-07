@@ -27,12 +27,12 @@ import { spiderPermutation2431Exercise } from "../../exerises/spiderPermutation2
 import spiderPermutationImage from "./image.webp";
 
 
-export const spiderPermutationPlan: ExercisePlan = {
-  id: "spider_permutation_complete",
-  icon: "hexagon",
-  color: "cyan",
-  title: "Complete Spider Exercises - Finger Permutations",
-  description: "Advanced training plan containing all spider permutations for improving finger independence and playing technique.",
+export const spiderPermutationPart1Plan: ExercisePlan = {
+  id: "spider_permutation_part1_index",
+  icon: "spider",
+  color: "fuchsia",
+  title: "[Part 1] Spider Permutations – Index-Led",
+  description: "Spider permutations that start on the index finger (1). The gentlest entry point for building finger independence.",
   difficulty: "medium",
   category: "technique",
   exercises: [
@@ -42,26 +42,67 @@ export const spiderPermutationPlan: ExercisePlan = {
     spiderPermutation1342Exercise,
     spiderPermutation1423Exercise,
     spiderPermutation1432Exercise,
+  ],
+  userId: "system",
+  image: spiderPermutationImage,
+};
+
+export const spiderPermutationPart2Plan: ExercisePlan = {
+  id: "spider_permutation_part2_middle",
+  icon: "spider",
+  color: "fuchsia",
+  title: "[Part 2] Spider Permutations – Middle-Led",
+  description: "Spider permutations that start on the middle finger (2). Trains control when leading with the second finger.",
+  difficulty: "medium",
+  category: "technique",
+  exercises: [
     spiderPermutation2134Exercise,
     spiderPermutation2143Exercise,
     spiderPermutation2314Exercise,
     spiderPermutation2341Exercise,
     spiderPermutation2413Exercise,
     spiderPermutation2431Exercise,
+  ],
+  userId: "system",
+  image: spiderPermutationImage,
+};
+
+export const spiderPermutationPart3Plan: ExercisePlan = {
+  id: "spider_permutation_part3_ring",
+  icon: "spider",
+  color: "fuchsia",
+  title: "[Part 3] Spider Permutations – Ring-Led",
+  description: "Spider permutations that start on the ring finger (3). Challenges the weaker third finger to lead each pattern.",
+  difficulty: "medium",
+  category: "technique",
+  exercises: [
     spiderPermutation3124Exercise,
     spiderPermutation3142Exercise,
     spiderPermutation3214Exercise,
     spiderPermutation3241Exercise,
     spiderPermutation3412Exercise,
     spiderPermutation3421Exercise,
+  ],
+  userId: "system",
+  image: spiderPermutationImage,
+};
+
+export const spiderPermutationPart4Plan: ExercisePlan = {
+  id: "spider_permutation_part4_pinky",
+  icon: "spider",
+  color: "fuchsia",
+  title: "[Part 4] Spider Permutations – Pinky-Led",
+  description: "Spider permutations that start on the pinky (4). The toughest set — builds strength and independence in the weakest finger.",
+  difficulty: "medium",
+  category: "technique",
+  exercises: [
     spiderPermutation4123Exercise,
     spiderPermutation4132Exercise,
     spiderPermutation4213Exercise,
     spiderPermutation4231Exercise,
     spiderPermutation4312Exercise,
     spiderPermutation4321Exercise,
-
   ],
   userId: "system",
   image: spiderPermutationImage,
-}; 
+};

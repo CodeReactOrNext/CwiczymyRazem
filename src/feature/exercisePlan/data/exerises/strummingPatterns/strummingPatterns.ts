@@ -131,7 +131,7 @@ export const strummingPattern8: Exercise = {
   whyItMatters: "Mixing rhythmic densities trains your hand to transition smoothly between sparse and busy strumming without altering your core tempo.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 3.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 115, recommended: 70 },
   instructions: [

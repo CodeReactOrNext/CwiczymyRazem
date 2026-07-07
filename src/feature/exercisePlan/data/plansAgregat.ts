@@ -35,7 +35,7 @@ import { rhythmTimingPlan } from "feature/exercisePlan/data/plans/rhythmTiming/r
 import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
 import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
 import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPlan/spiderMasterPlan";
-import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
+import { spiderPermutationPart1Plan, spiderPermutationPart2Plan, spiderPermutationPart3Plan, spiderPermutationPart4Plan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
 import { strummingFoundationsPlan } from "feature/exercisePlan/data/plans/strummingFoundations/strummingFoundations";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
@@ -98,7 +98,10 @@ const FREE_PLAN_IDS = new Set([
 
 export const defaultPlans: ExercisePlan[] = [
   spiderMasterPlan,
-  spiderPermutationPlan,
+  spiderPermutationPart1Plan,
+  spiderPermutationPart2Plan,
+  spiderPermutationPart3Plan,
+  spiderPermutationPart4Plan,
   basicImprovisationPractice,
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,

@@ -26,7 +26,6 @@ import {
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
 import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
-import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
@@ -112,7 +111,6 @@ const FREE_EXERCISE_IDS = new Set([
   "open_g_repetition",
   "all_strings_open_repetition",
   "improv_prompt_easy",
-  "natural_notes_map",
   "metronome_gap_test",
   // Exercises added in recent sessions — free
   "alternate_picking_pentatonic_a_positions",
@@ -281,7 +279,6 @@ const rawExercises: Exercise[] = [
   chordToneImprovisationExercise,
   callAndResponsePhrasingExercise,
   minimalMotionVoiceLeadingExercise,
-  naturalNotesMapExercise,
   fretboardMasteryExercise,
   smoothChordTransitionsExercise,
   metronomeGapTestExercise,
