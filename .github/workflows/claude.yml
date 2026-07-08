@@ -47,6 +47,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          base_branch: master # official input: base new branches / the PR on master
           # TODO: temporary — reveals Claude's full transcript in the logs for
           # debugging. Remove once the PR flow is confirmed working.
           show_full_output: true
