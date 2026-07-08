@@ -29,15 +29,29 @@ import type {
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
+  FirebaseLogsSongsStatuses,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { calculateActivityFame, EXERCISE_PLAN_FAME } from "feature/logs/utils/activityFame";
+import {
+  type AnyFirebaseLog,
+  groupConsecutiveLogs,
+  isFirebaseLogsCaseOpen,
+  isFirebaseLogsDailyQuest,
+  isFirebaseLogsMarketplace,
+  isFirebaseLogsPlaylist,
+  isFirebaseLogsRecording,
+  isFirebaseLogsSongs,
+  isFirebaseLogsTopPlayers,
+  type LogGroup,
+} from "feature/logs/utils/groupConsecutiveLogs";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { ExternalLink, Star,Video, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -47,47 +61,12 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 
-const isFirebaseLogsSongs = (
-  log: any
-): log is FirebaseLogsSongsInterface => {
-  return (log as FirebaseLogsSongsInterface).status !== undefined;
-};
+/** Fame reward for a group of `count` non-plan activities of the same type. */
+const getGroupFameAmount = (group: LogGroup): number =>
+  group.type === "exercisePlan" ? EXERCISE_PLAN_FAME : calculateActivityFame(group.logs.length);
 
-const isFirebaseLogsTopPlayers = (
-  log: any
-): log is FirebaseLogsTopPlayersInterface => {
-  return (log as FirebaseLogsTopPlayersInterface).type === "top_players_update";
-};
-
-const isFirebaseLogsRecording = (
-  log: any
-): log is FirebaseLogsRecordingsInterface => {
-  return (log as FirebaseLogsRecordingsInterface).type === "recording_added";
-};
-
-const isFirebaseLogsDailyQuest = (
-  log: any
-): log is FirebaseLogsDailyQuestInterface => {
-  return (log as FirebaseLogsDailyQuestInterface).type === "daily_quest_completed";
-};
-
-const isFirebaseLogsCaseOpen = (
-  log: any
-): log is FirebaseLogsCaseOpenInterface => {
-  return (log as FirebaseLogsCaseOpenInterface).type === "case_open";
-};
-
-const isFirebaseLogsMarketplace = (
-  log: any
-): log is FirebaseLogsMarketplaceInterface => {
-  return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
-};
-
-const isFirebaseLogsPlaylist = (
-  log: any
-): log is FirebaseLogsPlaylistInterface => {
-  return (log as FirebaseLogsPlaylistInterface).type === "playlist_created";
-};
+const getLogTimestampMs = (log: AnyFirebaseLog): number =>
+  new Date((log as any).timestamp ?? (log as any).data).getTime();
 
 const PLAYLIST_KIND_LABEL: Record<string, string> = {
   playlist: "playlist",
@@ -333,10 +312,12 @@ const FirebaseLogsCaseOpenItem = ({
   log,
   isNew,
   currentUserId,
+  fameAmount,
 }: {
   log: FirebaseLogsCaseOpenInterface;
   isNew: boolean;
   currentUserId: string;
+  fameAmount: number;
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, caseName, itemType, itemName, itemBrand, itemRarity, itemImageId } = log;
   const date = new Date(timestamp);
@@ -387,6 +368,7 @@ const FirebaseLogsCaseOpenItem = ({
                 reactions={log.reactions}
                 currentUserId={currentUserId}
                 disabled={log.uid === currentUserId}
+                fameAmount={fameAmount}
               />
             </div>
           )}
@@ -400,10 +382,12 @@ const FirebaseLogsMarketplaceItem = ({
   log,
   isNew,
   currentUserId,
+  fameAmount,
 }: {
   log: FirebaseLogsMarketplaceInterface;
   isNew: boolean;
   currentUserId: string;
+  fameAmount: number;
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, itemType, itemName, itemBrand, itemRarity, itemImageId, price } = log;
   const date = new Date(timestamp);
@@ -459,6 +443,7 @@ const FirebaseLogsMarketplaceItem = ({
                 reactions={log.reactions}
                 currentUserId={currentUserId}
                 disabled={log.uid === currentUserId}
+                fameAmount={fameAmount}
               />
             </div>
           )}
@@ -469,16 +454,7 @@ const FirebaseLogsMarketplaceItem = ({
 };
 
 interface LogsBoxLayoutProps {
-  logs: (
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsRecordingsInterface
-    | FirebaseLogsDailyQuestInterface
-    | FirebaseLogsCaseOpenInterface
-    | FirebaseLogsMarketplaceInterface
-    | FirebaseLogsPlaylistInterface
-  )[];
+  logs: AnyFirebaseLog[];
   marksLogsAsRead: () => void;
   currentUserId: string;
 }
@@ -548,10 +524,12 @@ const FirebaseLogsSongItem = ({
   log,
   isNew,
   currentUserId,
+  fameAmount,
 }: {
   log: FirebaseLogsSongsInterface;
   isNew: boolean;
   currentUserId: string;
+  fameAmount: number;
 }) => {
   const { t } = useTranslation("common");
   const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame, difficulty_rate } = log;
@@ -605,6 +583,7 @@ const FirebaseLogsSongItem = ({
               reactions={log.reactions}
               currentUserId={currentUserId}
               disabled={log.uid === currentUserId}
+              fameAmount={fameAmount}
             />
           )}
         </div>
@@ -618,11 +597,13 @@ const FirebaseLogsRecordingItem = ({
   isNew,
   currentUserId,
   onView,
+  fameAmount,
 }: {
   log: FirebaseLogsRecordingsInterface;
   isNew: boolean;
   currentUserId: string;
   onView: (id: string) => void;
+  fameAmount: number;
 }) => {
   // const { t } = useTranslation("recordings"); // Add translation if needed
   const { userName, timestamp, songArtist, songTitle, videoUrl, recordingTitle, uid, avatarUrl, userAvatarFrame, recordingId } = log;
@@ -678,6 +659,7 @@ const FirebaseLogsRecordingItem = ({
               reactions={log.reactions}
               currentUserId={currentUserId}
               disabled={log.uid === currentUserId}
+              fameAmount={fameAmount}
             />
           )}
         </div>
@@ -692,12 +674,14 @@ const FirebaseLogsItem = ({
   currentUserId,
   onPreviewPlan,
   onPreviewExercise,
+  fameAmount,
 }: {
   log: FirebaseLogsInterface;
   isNew: boolean;
   currentUserId: string;
   onPreviewPlan: (plan: ExercisePlan) => void;
   onPreviewExercise: (exercise: Exercise) => void;
+  fameAmount: number;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
   const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
@@ -848,6 +832,7 @@ const FirebaseLogsItem = ({
                 reactions={log.reactions}
                 currentUserId={currentUserId}
                 disabled={log.uid === currentUserId}
+                fameAmount={fameAmount}
               />
             </div>
           )}
@@ -1039,10 +1024,12 @@ const FirebaseLogsPlaylistItem = ({
   log,
   isNew,
   currentUserId,
+  fameAmount,
 }: {
   log: FirebaseLogsPlaylistInterface;
   isNew: boolean;
   currentUserId: string;
+  fameAmount: number;
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, playlistId, playlistName, playlistKind, songCount } = log;
   const date = new Date(timestamp);
@@ -1078,6 +1065,7 @@ const FirebaseLogsPlaylistItem = ({
               reactions={log.reactions}
               currentUserId={currentUserId}
               disabled={log.uid === currentUserId}
+              fameAmount={fameAmount}
             />
           )}
         </div>
@@ -1090,10 +1078,12 @@ const FirebaseLogsDailyQuestItem = ({
   log,
   isNew,
   currentUserId,
+  fameAmount,
 }: {
   log: FirebaseLogsDailyQuestInterface;
   isNew: boolean;
   currentUserId: string;
+  fameAmount: number;
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, points } = log;
   const date = new Date(timestamp);
@@ -1128,12 +1118,176 @@ const FirebaseLogsDailyQuestItem = ({
                 reactions={log.reactions}
                 currentUserId={currentUserId}
                 disabled={log.uid === currentUserId}
+                fameAmount={fameAmount}
               />
             </div>
           )}
         </div>
       </div>
     </LogItem>
+  );
+};
+
+const SONG_STATUS_GROUP_VERB: Partial<Record<FirebaseLogsSongsStatuses, string>> = {
+  learned: "learned",
+  learning: "started learning",
+  wantToLearn: "added to their list of songs to learn",
+  added: "added",
+  difficulty_rate: "rated the difficulty of",
+};
+
+const getGroupSummary = (group: LogGroup): { text: string; planTitle?: string | null } => {
+  const count = group.logs.length;
+
+  switch (group.type) {
+    case "song": {
+      const statuses = new Set(
+        group.logs.map((log) => (log as FirebaseLogsSongsInterface).status)
+      );
+      const [onlyStatus] = statuses;
+      const verb = statuses.size === 1 ? SONG_STATUS_GROUP_VERB[onlyStatus] ?? "updated" : "updated";
+      return { text: `${verb} ${count} songs` };
+    }
+    case "recording":
+      return { text: `added ${count} new recordings` };
+    case "caseOpen":
+      return { text: `opened ${count} cases` };
+    case "marketplace":
+      return { text: `listed ${count} items on the marketplace` };
+    case "playlist":
+      return { text: `created ${count} playlists` };
+    case "dailyQuest":
+      return { text: `completed all Daily Quests ${count} times` };
+    case "exercisePlan": {
+      const planIds = new Set(group.logs.map((log) => (log as FirebaseLogsInterface).planId));
+      const [onlyPlanId] = planIds;
+      const plan = planIds.size === 1 && onlyPlanId ? defaultPlans.find((p) => p.id === onlyPlanId) : null;
+      return { text: `practiced ${count} exercises`, planTitle: plan?.title ?? null };
+    }
+    case "exercise":
+    default:
+      return { text: `practiced ${count} exercises` };
+  }
+};
+
+const GroupedLogItem = ({
+  group,
+  isNew,
+  currentUserId,
+}: {
+  group: LogGroup;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const representative = group.logs[0] as FirebaseLogsInterface;
+  const { text, planTitle } = getGroupSummary(group);
+  const date = new Date(getLogTimestampMs(group.logs[0]));
+  const fameAmount = getGroupFameAmount(group);
+  const { uid, userName, avatarUrl, userAvatarFrame, id: logId, reactions } = representative;
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl ?? undefined} lvl={userAvatarFrame} />
+          </span>
+          <p className="text-secondText text-sm">{text}</p>
+          <span className="inline-flex items-center rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-zinc-300">
+            x{group.logs.length}
+          </span>
+          {planTitle && (
+            <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
+                Plan
+              </span>
+              <span className="font-medium">{planTitle}</span>
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
+          {logId && (
+            <LogReaction
+              logId={logId}
+              reactions={reactions}
+              currentUserId={currentUserId}
+              disabled={uid === currentUserId}
+              fameAmount={fameAmount}
+            />
+          )}
+        </div>
+      </div>
+    </LogItem>
+  );
+};
+
+const LogEntry = ({
+  log,
+  isNew,
+  currentUserId,
+  fameAmount,
+  onPreviewPlan,
+  onPreviewExercise,
+  onViewRecording,
+}: {
+  log: AnyFirebaseLog;
+  isNew: boolean;
+  currentUserId: string;
+  fameAmount: number;
+  onPreviewPlan: (plan: ExercisePlan) => void;
+  onPreviewExercise: (exercise: Exercise) => void;
+  onViewRecording: (id: string) => void;
+}) => {
+  if (isFirebaseLogsSongs(log)) {
+    return (
+      <FirebaseLogsSongItem log={log} isNew={isNew} currentUserId={currentUserId} fameAmount={fameAmount} />
+    );
+  }
+  if (isFirebaseLogsTopPlayers(log)) {
+    return <FirebaseLogsTopPlayersItem log={log} isNew={isNew} />;
+  }
+  if (isFirebaseLogsRecording(log)) {
+    return (
+      <FirebaseLogsRecordingItem
+        log={log}
+        isNew={isNew}
+        currentUserId={currentUserId}
+        onView={onViewRecording}
+        fameAmount={fameAmount}
+      />
+    );
+  }
+  if (isFirebaseLogsDailyQuest(log)) {
+    return (
+      <FirebaseLogsDailyQuestItem log={log} isNew={isNew} currentUserId={currentUserId} fameAmount={fameAmount} />
+    );
+  }
+  if (isFirebaseLogsCaseOpen(log)) {
+    return (
+      <FirebaseLogsCaseOpenItem log={log} isNew={isNew} currentUserId={currentUserId} fameAmount={fameAmount} />
+    );
+  }
+  if (isFirebaseLogsMarketplace(log)) {
+    return (
+      <FirebaseLogsMarketplaceItem log={log} isNew={isNew} currentUserId={currentUserId} fameAmount={fameAmount} />
+    );
+  }
+  if (isFirebaseLogsPlaylist(log)) {
+    return (
+      <FirebaseLogsPlaylistItem log={log} isNew={isNew} currentUserId={currentUserId} fameAmount={fameAmount} />
+    );
+  }
+  return (
+    <FirebaseLogsItem
+      log={log as FirebaseLogsInterface}
+      isNew={isNew}
+      currentUserId={currentUserId}
+      onPreviewPlan={onPreviewPlan}
+      onPreviewExercise={onPreviewExercise}
+      fameAmount={fameAmount}
+    />
   );
 };
 
@@ -1170,69 +1324,40 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
     };
   }, []); // Empty dependency array since we handle cleanup manually
 
+  const groups = useMemo(() => groupConsecutiveLogs(logs), [logs]);
+
   return (
     <>
       <div className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
         <OnlineUsers />
       </div>
       <div ref={spanRef} className='h-1' />
-      {logs.map((log) => (
-        <div
-          key={(log as any).id || String((log as any).timestamp) + (log as any).uid + (log as any).userName || "topPlayers"}
-          className='mr-2'>
-          {isFirebaseLogsSongs(log) ? (
-            <FirebaseLogsSongItem 
-              log={log} 
-              isNew={isNewMessage(log.data || (log as any).timestamp)} 
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsTopPlayers(log) ? (
-            <FirebaseLogsTopPlayersItem
-              log={log}
-              isNew={isNewMessage(log.data)}
-            />
-           ) : isFirebaseLogsRecording(log) ? (
-             <FirebaseLogsRecordingItem
-               log={log}
-               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-               currentUserId={currentUserId}
-               onView={setActiveRecordingId}
-             />
-          ) : isFirebaseLogsDailyQuest(log) ? (
-            <FirebaseLogsDailyQuestItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsCaseOpen(log) ? (
-            <FirebaseLogsCaseOpenItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsMarketplace(log) ? (
-            <FirebaseLogsMarketplaceItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsPlaylist(log) ? (
-            <FirebaseLogsPlaylistItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : (
-            <FirebaseLogsItem
-              log={log as FirebaseLogsInterface}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-              onPreviewPlan={setPreviewPlan}
-              onPreviewExercise={setPreviewExercise}
-            />
-          )}
-        </div>
-      ))}
+      {groups.map((group) => {
+        const representative = group.logs[0];
+        const key =
+          (representative as any).id ||
+          String(getLogTimestampMs(representative)) + (representative as any).uid + (representative as any).userName ||
+          "topPlayers";
+        const isNew = isNewMessage((representative as any).data || (representative as any).timestamp);
+
+        return (
+          <div key={key} className='mr-2'>
+            {group.logs.length > 1 ? (
+              <GroupedLogItem group={group} isNew={isNew} currentUserId={currentUserId} />
+            ) : (
+              <LogEntry
+                log={representative}
+                isNew={isNew}
+                currentUserId={currentUserId}
+                fameAmount={getGroupFameAmount(group)}
+                onPreviewPlan={setPreviewPlan}
+                onPreviewExercise={setPreviewExercise}
+                onViewRecording={setActiveRecordingId}
+              />
+            )}
+          </div>
+        );
+      })}
 
       <RecordingViewModal
         isOpen={!!activeRecordingId}
