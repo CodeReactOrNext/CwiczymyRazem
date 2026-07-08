@@ -25,7 +25,7 @@ jobs:
     # Only react to the `claude-code` label (rename if you prefer another).
     if: github.event.label.name == 'claude-code'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,33 +56,34 @@ jobs:
             Step 1 — Read the ticket:
               Run: gh issue view ${{ github.event.issue.number }}
 
-            Step 2 — Implement the change:
+            Step 2 — Save progress EARLY (so nothing is lost if the run is long or hits a limit):
+              As soon as you have a first meaningful change on disk, create a branch, push it,
+              and open a DRAFT pull request. Do this BEFORE finishing the whole task:
+                git checkout -b claude/issue-${{ github.event.issue.number }}
+                git add -A && git commit -m "wip: #${{ github.event.issue.number }}"
+                git push -u origin claude/issue-${{ github.event.issue.number }}
+                gh pr create --draft --base master --head claude/issue-${{ github.event.issue.number }} --title "<short title>" --body "Closes #${{ github.event.issue.number }} — <summary>"
+
+            Step 3 — Implement the change:
               - Follow the conventions, commands and rules in CLAUDE.md
                 (and docs/STYLEGUIDE.md for anything UI/styling).
               - Reuse existing components; keep the change scoped to what the ticket asks for.
+              - Commit and `git push` as you go, so partial work always survives on the branch.
 
-            Step 3 — Verify (dependencies are already installed):
+            Step 4 — Finish:
               - Run `npm run lint` and `npm test` and fix problems until both pass.
+              - Push the final commit, then mark the PR ready: `gh pr ready`
+              - The task is complete ONLY once a PR exists. Editing files without pushing is a FAILURE.
 
-            Step 4 — Ship it. THIS IS MANDATORY — editing files is NOT enough:
-              - Create a branch:  git checkout -b claude/issue-${{ github.event.issue.number }}
-              - Commit your changes with a clear message.
-              - Push it:          git push -u origin claude/issue-${{ github.event.issue.number }}
-              - Open the PR:      gh pr create --base master
-                                    --head claude/issue-${{ github.event.issue.number }}
-                                    --title "<short title>"
-                                    --body "Closes #${{ github.event.issue.number }} — <summary of the change>"
-              - The task is complete ONLY after `gh pr create` prints a PR URL. Do not stop before that.
-
-            If the ticket is genuinely too ambiguous or too large to implement safely, do NOT guess
-            and do NOT open a PR — instead run
-            `gh issue comment ${{ github.event.issue.number }} --body "<what exactly is blocking you>"`.
+            If the ticket is genuinely too ambiguous or too large to implement safely, do NOT guess —
+            instead run `gh issue comment ${{ github.event.issue.number }} --body "<what exactly is blocking you>"`
+            and stop.
           # --model pins the model explicitly (swap to claude-opus-4-8 for harder tickets).
-          # --max-turns caps iterations so a run can't drain your subscription limits.
+          # --max-turns is a safety ceiling; Claude stops when done, it won't always use all of them.
           # --dangerously-skip-permissions: no interactive prompts exist in CI, so Claude
           #   must be allowed to run its tools (Bash/gh/npm/git, file edits) without asking.
           #   Safe here: the runner is ephemeral and the job only triggers for admin-labeled issues.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 50
+            --max-turns 200
             --dangerously-skip-permissions
