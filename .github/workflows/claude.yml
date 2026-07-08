@@ -1,7 +1,7 @@
 name: Claude — implement labeled issue
 
 # When an issue is labeled `claude-code`, Claude reads the ticket,
-# implements the change, and opens a PR against the `develop` branch.
+# implements the change, and opens a PR against the `master` branch.
 # Auth: subscription token (secret CLAUDE_CODE_OAUTH_TOKEN).
 
 on:
@@ -31,23 +31,52 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: master # base the work on master (PRs target master)
-          fetch-depth: 1
+          fetch-depth: 0 # full history so branch/PR git operations are safe
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install deps up front so Claude can actually run lint/tests
+      # (a fresh checkout has no node_modules).
+      - name: Install dependencies
+        run: npm ci
 
       - name: Claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # TODO: temporary — reveals Claude's full transcript in the logs for
+          # debugging. Remove once the PR flow is confirmed working.
+          show_full_output: true
           prompt: |
-            Issue #${{ github.event.issue.number }} was labeled `claude-code` for implementation.
-            Read the full ticket with: gh issue view ${{ github.event.issue.number }}
+            Implement GitHub issue #${{ github.event.issue.number }} in this repository.
 
-            Then implement the change it describes:
-            - Follow the conventions and commands in CLAUDE.md.
-            - Create a new branch off `master` and open a PR targeting `master`.
-            - Put "Closes #${{ github.event.issue.number }}" in the PR description.
-            - Run `npm run lint` and `npm test` and make sure they pass before opening the PR.
-            - If the ticket is unclear or too large to do safely, do not guess.
-              Instead, comment on the issue explaining what is blocking you.
+            Step 1 — Read the ticket:
+              Run: gh issue view ${{ github.event.issue.number }}
+
+            Step 2 — Implement the change:
+              - Follow the conventions, commands and rules in CLAUDE.md
+                (and docs/STYLEGUIDE.md for anything UI/styling).
+              - Reuse existing components; keep the change scoped to what the ticket asks for.
+
+            Step 3 — Verify (dependencies are already installed):
+              - Run `npm run lint` and `npm test` and fix problems until both pass.
+
+            Step 4 — Ship it. THIS IS MANDATORY — editing files is NOT enough:
+              - Create a branch:  git checkout -b claude/issue-${{ github.event.issue.number }}
+              - Commit your changes with a clear message.
+              - Push it:          git push -u origin claude/issue-${{ github.event.issue.number }}
+              - Open the PR:      gh pr create --base master
+                                    --head claude/issue-${{ github.event.issue.number }}
+                                    --title "<short title>"
+                                    --body "Closes #${{ github.event.issue.number }} — <summary of the change>"
+              - The task is complete ONLY after `gh pr create` prints a PR URL. Do not stop before that.
+
+            If the ticket is genuinely too ambiguous or too large to implement safely, do NOT guess
+            and do NOT open a PR — instead run
+            `gh issue comment ${{ github.event.issue.number }} --body "<what exactly is blocking you>"`.
           # --model pins the model explicitly (swap to claude-opus-4-8 for harder tickets).
           # --max-turns caps iterations so a run can't drain your subscription limits.
           # --dangerously-skip-permissions: no interactive prompts exist in CI, so Claude
