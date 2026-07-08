@@ -7,6 +7,8 @@ import {
 import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +26,6 @@ import { useResponsiveStore } from "store/useResponsiveStore";
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
-import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { getReconciledStreak } from "utils/gameLogic";
 
 const StatsBox = ({
@@ -210,7 +211,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   return (
                     <img
                       className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
-                      src={`/static/images/rank/${imgPath}.webp`}
+                      src={getRankBadgeSrc(imgPath, "small")}
                       alt='equipped guitar'
                     />
                   );

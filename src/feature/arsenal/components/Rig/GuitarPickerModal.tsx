@@ -1,5 +1,6 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
@@ -90,7 +91,7 @@ export const GuitarPickerModal = ({
                     {getItemLevel(item, guitar)}
                   </span>
                   <img
-                    src={`/static/images/rank/${guitar.imageId}.webp`}
+                    src={getRankBadgeSrc(guitar.imageId, "small")}
                     alt={guitar.name}
                     className="-rotate-90 object-contain"
                     style={{ height: 80, width: 80 }}
