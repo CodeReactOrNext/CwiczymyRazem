@@ -2,6 +2,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Check, Store,Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -253,7 +254,7 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
         )}
 
         <img
-          src={`/static/images/rank/${guitar.imageId}.webp`}
+          src={getRankBadgeSrc(guitar.imageId, "medium")}
           alt={guitar.name}
           className="relative z-10 object-contain -rotate-90"
           style={{

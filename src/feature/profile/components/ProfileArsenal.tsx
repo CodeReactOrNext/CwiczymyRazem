@@ -10,6 +10,7 @@ import type {
   InventoryItem,
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { doc, getDoc } from "firebase/firestore";
 import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -149,7 +150,7 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover, onSelect }: GuitarSlotRe
           />
         </div>
         <img
-          src={`/static/images/rank/${guitar.imageId}.webp`}
+          src={getRankBadgeSrc(guitar.imageId, "medium")}
           alt={guitar.name}
           className="relative z-10 object-contain -rotate-45"
           style={{ height: 240, width: 240 }}
