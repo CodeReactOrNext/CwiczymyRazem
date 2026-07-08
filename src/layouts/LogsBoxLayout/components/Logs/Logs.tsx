@@ -32,13 +32,20 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { calculateActivityFame, EXERCISE_PLAN_FAME } from "feature/logs/utils/activityFame";
+import {
+  type AnyFirebaseLog,
+  groupConsecutiveLogs,
+  type LogActivityType,
+  type LogGroup,
+} from "feature/logs/utils/groupConsecutiveLogs";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { ExternalLink, Star,Video, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -48,47 +55,12 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 
-const isFirebaseLogsSongs = (
-  log: any
-): log is FirebaseLogsSongsInterface => {
-  return (log as FirebaseLogsSongsInterface).status !== undefined;
-};
+/** Fame reward for a group of `count` non-plan activities of the same type. */
+const getGroupFameAmount = (group: LogGroup): number =>
+  group.type === "exercisePlan" ? EXERCISE_PLAN_FAME : calculateActivityFame(group.logs.length);
 
-const isFirebaseLogsTopPlayers = (
-  log: any
-): log is FirebaseLogsTopPlayersInterface => {
-  return (log as FirebaseLogsTopPlayersInterface).type === "top_players_update";
-};
-
-const isFirebaseLogsRecording = (
-  log: any
-): log is FirebaseLogsRecordingsInterface => {
-  return (log as FirebaseLogsRecordingsInterface).type === "recording_added";
-};
-
-const isFirebaseLogsDailyQuest = (
-  log: any
-): log is FirebaseLogsDailyQuestInterface => {
-  return (log as FirebaseLogsDailyQuestInterface).type === "daily_quest_completed";
-};
-
-const isFirebaseLogsCaseOpen = (
-  log: any
-): log is FirebaseLogsCaseOpenInterface => {
-  return (log as FirebaseLogsCaseOpenInterface).type === "case_open";
-};
-
-const isFirebaseLogsMarketplace = (
-  log: any
-): log is FirebaseLogsMarketplaceInterface => {
-  return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
-};
-
-const isFirebaseLogsPlaylist = (
-  log: any
-): log is FirebaseLogsPlaylistInterface => {
-  return (log as FirebaseLogsPlaylistInterface).type === "playlist_created";
-};
+const getLogTimestampMs = (log: AnyFirebaseLog): number =>
+  new Date((log as any).timestamp ?? (log as any).data).getTime();
 
 const PLAYLIST_KIND_LABEL: Record<string, string> = {
   playlist: "playlist",
@@ -330,156 +302,8 @@ const ItemPill = ({
   );
 };
 
-const FirebaseLogsCaseOpenItem = ({
-  log,
-  isNew,
-  currentUserId,
-}: {
-  log: FirebaseLogsCaseOpenInterface;
-  isNew: boolean;
-  currentUserId: string;
-}) => {
-  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, caseName, itemType, itemName, itemBrand, itemRarity, itemImageId } = log;
-  const date = new Date(timestamp);
-
-  // Full rolled instance (newer logs) → proper card tooltip + computed level.
-  const rolled = log.rolledItem;
-  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
-  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
-  let level: number | null = null;
-  if (rolledGuitar) {
-    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
-    if (def) level = getItemLevel(rolledGuitar, def);
-  } else if (rolledEffect) {
-    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
-    if (def) level = getEffectLevel(rolledEffect, def);
-  }
-
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-          </span>
-          <span className="text-secondText text-sm">opened</span>
-          <span className="text-white font-bold text-sm">{caseName}</span>
-          <span className="text-secondText text-sm">and got</span>
-        </div>
-        
-        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <ItemPill
-              itemType={itemType}
-              itemName={itemName}
-              itemBrand={itemBrand}
-              itemRarity={itemRarity}
-              itemImageId={itemImageId}
-              level={level}
-              rolledGuitar={rolledGuitar}
-              rolledEffect={rolledEffect}
-            />
-          </div>
-          {log.id && (
-            <div className="shrink-0">
-              <LogReaction
-                logId={log.id}
-                reactions={log.reactions}
-                currentUserId={currentUserId}
-                disabled={log.uid === currentUserId}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </LogItem>
-  );
-};
-
-const FirebaseLogsMarketplaceItem = ({
-  log,
-  isNew,
-  currentUserId,
-}: {
-  log: FirebaseLogsMarketplaceInterface;
-  isNew: boolean;
-  currentUserId: string;
-}) => {
-  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, itemType, itemName, itemBrand, itemRarity, itemImageId, price } = log;
-  const date = new Date(timestamp);
-
-  const rolled = log.rolledItem;
-  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
-  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
-  let level: number | null = null;
-  if (rolledGuitar) {
-    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
-    if (def) level = getItemLevel(rolledGuitar, def);
-  } else if (rolledEffect) {
-    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
-    if (def) level = getEffectLevel(rolledEffect, def);
-  }
-
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-          </span>
-          <span className="text-secondText text-sm">listed</span>
-        </div>
-
-        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:flex-initial min-w-0">
-            <ItemPill
-              itemType={itemType}
-              itemName={itemName}
-              itemBrand={itemBrand}
-              itemRarity={itemRarity}
-              itemImageId={itemImageId}
-              level={level}
-              rolledGuitar={rolledGuitar}
-              rolledEffect={rolledEffect}
-            />
-
-            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>
-              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
-                {price}
-                <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
-              </span>
-            </span>
-          </div>
-          {log.id && (
-            <div className="shrink-0">
-              <LogReaction
-                logId={log.id}
-                reactions={log.reactions}
-                currentUserId={currentUserId}
-                disabled={log.uid === currentUserId}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </LogItem>
-  );
-};
-
 interface LogsBoxLayoutProps {
-  logs: (
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsRecordingsInterface
-    | FirebaseLogsDailyQuestInterface
-    | FirebaseLogsCaseOpenInterface
-    | FirebaseLogsMarketplaceInterface
-    | FirebaseLogsPlaylistInterface
-  )[];
+  logs: AnyFirebaseLog[];
   marksLogsAsRead: () => void;
   currentUserId: string;
 }
@@ -534,7 +358,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
+    className={`my-4 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg px-4 py-5 sm:px-6 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -545,329 +369,10 @@ const getSongStatusMessage = (status: string, t: any): string => {
   return t(`song_status.${status}`);
 };
 
-const FirebaseLogsSongItem = ({
-  log,
-  isNew,
-  currentUserId,
-}: {
-  log: FirebaseLogsSongsInterface;
-  isNew: boolean;
-  currentUserId: string;
-}) => {
-  const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame, difficulty_rate } = log;
-  const date = new Date(data);
-  const message = getSongStatusMessage(status, t);
-  const showRating = status === "difficulty_rate" && difficulty_rate !== undefined;
-  const ratingTier = showRating ? getSongTier(difficulty_rate as number) : null;
-
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-          </span>
-          <p className='text-secondText text-sm'>
-            {message}{" "}
-            {songId ? (
-              <Link href={`/songs?view=management&songId=${songId}`} className='inline-flex items-center gap-1 text-white hover:text-cyan-400 hover:underline transition-colors'>
-                {songArtist} {songTitle}
-                <ExternalLink className='h-3 w-3 opacity-60' />
-              </Link>
-            ) : (
-              <span className='text-white'>
-                {songArtist} {songTitle}
-              </span>
-            )}
-            {status !== "difficulty_rate" && "."}
-          </p>
-          {showRating && ratingTier && (
-            <span
-              className="inline-flex items-center gap-1 rounded-[4px] border px-1.5 py-0.5 text-[10px] font-bold"
-              style={{
-                color: ratingTier.color,
-                backgroundColor: `${ratingTier.color}1a`,
-                borderColor: `${ratingTier.color}40`,
-              }}
-              title={`Difficulty rated ${difficulty_rate}/10 (${ratingTier.label})`}
-            >
-              <Star className="h-2.5 w-2.5 fill-current" />
-              {difficulty_rate}/10
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
-          {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
-          )}
-        </div>
-      </div>
-    </LogItem>
-  );
-};
-
-const FirebaseLogsRecordingItem = ({
-  log,
-  isNew,
-  currentUserId,
-  onView,
-}: {
-  log: FirebaseLogsRecordingsInterface;
-  isNew: boolean;
-  currentUserId: string;
-  onView: (id: string) => void;
-}) => {
-  // const { t } = useTranslation("recordings"); // Add translation if needed
-  const { userName, timestamp, songArtist, songTitle, videoUrl, recordingTitle, uid, avatarUrl, userAvatarFrame, recordingId } = log;
-  const date = new Date(timestamp);
-
-  // Simple YouTube ID extraction for log preview maybe? Or just link
-  const getYoutubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-  };
-  const _videoId = getYoutubeId(videoUrl);
-
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-          </span>
-          <p className='text-secondText text-sm'>
-            <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
-            added a new recording:{" "}
-            {recordingId ? (
-              <button 
-                  onClick={() => onView(recordingId)}
-                  className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors text-left'
-              >
-                  {recordingTitle}
-              </button>
-            ) : (
-              <a 
-                  href={videoUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors'
-              >
-                  {recordingTitle}
-              </a>
-            )}
-            {" "}
-            {songTitle && (
-               <span className="text-xs opacity-70">({songArtist} - {songTitle})</span>
-            )}
-          </p>
-        </div>
-        
-        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
-          {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
-          )}
-        </div>
-      </div>
-    </LogItem>
-  );
-};
-
-const FirebaseLogsItem = ({
-  log,
-  isNew,
-  currentUserId,
-  onPreviewPlan,
-  onPreviewExercise,
-}: {
-  log: FirebaseLogsInterface;
-  isNew: boolean;
-  currentUserId: string;
-  onPreviewPlan: (plan: ExercisePlan) => void;
-  onPreviewExercise: (exercise: Exercise) => void;
-}) => {
-  const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
-  const date = new Date(timestamp as string);
-
-  const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
-
-  // Match logged exercise back to a known exercise definition (logs only store the title).
-  const matchedExercise: Exercise | null = exerciseTitle
-    ? exercisesAgregat.find(ex => ex.title === exerciseTitle) ?? null
-    : null;
-
-  const _currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
-  
-  const getLocalizedTitle = (title: any) => {
-      if (!title) return null;
-      return title;
-  };
-
-  const planTitle = plan ? getLocalizedTitle(plan.title) : null;
-
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-            <UserLink
-              uid={uid}
-              userName={userName}
-              avatarUrl={avatarUrl ?? undefined}
-              lvl={userAvatarFrame ?? newLevel?.level}
-            />
-          </span>{" "}
-          <span className='text-secondText text-sm'>{t("common:logsBox.get")}</span>
-          <span className='mr-1 flex items-center gap-1 text-main text-sm'>
-            +{points}
-            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
-          </span>
-
-          {newLevel?.isNewLevel && (
-            <span className='text-secondText text-sm'>
-              {" "}
-              {t("common:logsBox.lvl_up")}
-              <span className='ml-1 text-main'>
-                {newLevel.level}
-                {" lvl"}
-              </span>
-            </span>
-          )}
-          {newAchievements?.length > 0 && (
-            <span className='inline-flex items-center gap-2 text-sm'>
-              {t("common:logsBox.achievements")}{" "}
-              {newAchievements.map((achievement, index) => (
-                <span key={index} className='inline-flex items-center gap-2'>
-                  <AchievementIcon id={achievement} />
-                </span>
-              ))}
-            </span>
-          )}
-        </div>
-
-        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-          {planTitle && (
-            plan ? (
-              <button
-                type="button"
-                onClick={() => onPreviewPlan(plan)}
-                title="Click to preview and start this plan"
-                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
-                <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
-              </button>
-            ) : (
-              <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
-                    Plan
-                </span>
-                <span className="font-medium">{planTitle}</span>
-              </span>
-            )
-          )}
-
-          {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
-            matchedExercise ? (
-              <button
-                type="button"
-                onClick={() => onPreviewExercise(matchedExercise)}
-                title="Click to preview and start this exercise"
-                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
-                <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{exerciseTitle}</span>
-              </button>
-            ) : (
-              <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
-                    Exercise
-                </span>
-                <span className="font-medium">{exerciseTitle}</span>
-              </span>
-            )
-          )}
-
-          {micPerformance && !(micPerformance.score === 0 && micPerformance.accuracy === 100) && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
-                <span className="flex items-center gap-1">
-                    <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider mr-0.5">Score:</span>
-                    <span className="font-bold tabular-nums text-main">{micPerformance.score}</span>
-                </span>
-                <span className="w-px h-2.5 bg-blue-500/30" />
-                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold tabular-nums">
-                    {micPerformance.accuracy}%
-                </span>
-              </span>
-          )}
-
-          {earTrainingPerformance && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider">Score:</span>
-                <span className="font-bold tabular-nums">{earTrainingPerformance.score}</span>
-              </span>
-          )}
-
-          {songTitle && songArtist && (
-            songId ? (
-              <Link
-                href={`/songs?view=management&songId=${songId}`}
-                title="Click to open this song"
-                className="group inline-flex items-center text-left text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-                <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
-                <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
-              </Link>
-            ) : (
-              <span className="inline-block text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-                <span className="font-medium">{songArtist} - {songTitle}</span>
-              </span>
-            )
-          )}
-
-          </div>
-          {log.id && (
-            <div className="shrink-0">
-              <LogReaction
-                logId={log.id}
-                reactions={log.reactions}
-                currentUserId={currentUserId}
-                disabled={log.uid === currentUserId}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </LogItem>
-  );
-};
-
 // Podkomponenty dla FirebaseLogsTopPlayersItem
 
 
-const PlayerAvatar = ({
-  player,
-  isFirst,
-}: {
-  player: TopPlayerData;
-  isFirst: boolean;
-}) => (
+const PlayerAvatar = ({ player }: { player: TopPlayerData }) => (
   <div className='relative flex flex-shrink-0 items-center justify-center'>
     <div className="scale-[0.8] origin-center -mx-1">
        <Avatar 
@@ -933,11 +438,9 @@ const SeasonHeader = ({
 const PlayerRow = ({
   player,
   index,
-  t,
 }: {
   player: TopPlayerData;
   index: number;
-  t: (key: string) => string;
 }) => {
   const isTop3 = index < 3;
   
@@ -949,7 +452,7 @@ const PlayerRow = ({
 
       {/* User info with photo */}
       <div className='flex items-center gap-1 sm:gap-2'>
-        <PlayerAvatar player={player} isFirst={index === 0} />
+        <PlayerAvatar player={player} />
 
         <UserTooltip userId={player.uid}>
           <Link
@@ -1030,108 +533,406 @@ const FirebaseLogsTopPlayersItem = ({
 
       <div className='divide-y divide-white/5'>
         {topPlayers.map((player, index) => (
-          <PlayerRow key={player.uid} player={player} index={index} t={t} />
+          <PlayerRow key={player.uid} player={player} index={index} />
         ))}
       </div>
     </div>
   );
 };
-const FirebaseLogsPlaylistItem = ({
-  log,
-  isNew,
-  currentUserId,
-}: {
-  log: FirebaseLogsPlaylistInterface;
-  isNew: boolean;
-  currentUserId: string;
-}) => {
-  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, playlistId, playlistName, playlistKind, songCount } = log;
-  const date = new Date(timestamp);
-  const kindLabel = PLAYLIST_KIND_LABEL[playlistKind] ?? "playlist";
+/** Compact per-line timestamp used inside a grouped feed row, where the group header already owns the full date. */
+const LineTimeStamp = ({ date }: { date: Date }) => (
+  <span className="w-9 shrink-0 text-[11px] leading-5 tabular-nums text-secondText opacity-50">
+    {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
+  </span>
+);
 
-  return (
-    <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-          </span>
-          <p className="text-secondText text-sm">
-            created a new {kindLabel}:{" "}
+/** One activity line: fixed time column + content that wraps in its own column (never under the time). */
+const GroupedLine = ({ date, children }: { date: Date; children: React.ReactNode }) => (
+  <div className="flex items-start gap-2">
+    <LineTimeStamp date={date} />
+    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2">{children}</div>
+  </div>
+);
+
+/** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
+const GroupedLogLine = ({
+  log,
+  type,
+  onPreviewPlan,
+  onPreviewExercise,
+  onViewRecording,
+}: {
+  log: AnyFirebaseLog;
+  type: LogActivityType;
+  onPreviewPlan: (plan: ExercisePlan) => void;
+  onPreviewExercise: (exercise: Exercise) => void;
+  onViewRecording: (id: string) => void;
+}) => {
+  const { t } = useTranslation(["common", "exercises"]);
+
+  if (type === "song") {
+    const songLog = log as FirebaseLogsSongsInterface;
+    const date = new Date(songLog.data);
+    const message = getSongStatusMessage(songLog.status, t);
+    const showRating = songLog.status === "difficulty_rate" && songLog.difficulty_rate !== undefined;
+    const ratingTier = showRating ? getSongTier(songLog.difficulty_rate as number) : null;
+
+    return (
+      <GroupedLine date={date}>
+        <p className="text-secondText text-sm">
+          {message}{" "}
+          {songLog.songId ? (
             <Link
-              href={`/songs?view=playlists&playlistId=${playlistId}`}
-              className="inline-flex items-center gap-1 font-bold text-white hover:text-cyan-400 hover:underline transition-colors"
-            >
-              {playlistName}
+              href={`/songs?view=management&songId=${songLog.songId}`}
+              className="inline-flex items-center gap-1 text-white hover:text-cyan-400 hover:underline transition-colors">
+              {songLog.songArtist} {songLog.songTitle}
               <ExternalLink className="h-3 w-3 opacity-60" />
             </Link>
-            {songCount > 0 && (
-              <span className="text-xs opacity-70"> ({songCount} {songCount === 1 ? "song" : "songs"})</span>
-            )}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
-          {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
+          ) : (
+            <span className="text-white">
+              {songLog.songArtist} {songLog.songTitle}
+            </span>
           )}
-        </div>
-      </div>
-    </LogItem>
+          {songLog.status !== "difficulty_rate" && "."}
+        </p>
+        {showRating && ratingTier && (
+          <span
+            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold"
+            style={{
+              color: ratingTier.color,
+              backgroundColor: `${ratingTier.color}1a`,
+              borderColor: `${ratingTier.color}40`,
+            }}
+            title={`Difficulty rated ${songLog.difficulty_rate}/10 (${ratingTier.label})`}
+          >
+            <Star className="h-2.5 w-2.5 fill-current" />
+            {songLog.difficulty_rate}/10
+          </span>
+        )}
+      </GroupedLine>
+    );
+  }
+
+  if (type === "recording") {
+    const recLog = log as FirebaseLogsRecordingsInterface;
+    const date = new Date(recLog.timestamp);
+
+    return (
+      <GroupedLine date={date}>
+        <p className="text-secondText text-sm">
+          <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
+          added a new recording:{" "}
+          {recLog.recordingId ? (
+            <button
+              onClick={() => onViewRecording(recLog.recordingId as string)}
+              className="font-bold text-white hover:text-cyan-400 hover:underline transition-colors text-left"
+            >
+              {recLog.recordingTitle}
+            </button>
+          ) : (
+            <a
+              href={recLog.videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-white hover:text-cyan-400 hover:underline transition-colors"
+            >
+              {recLog.recordingTitle}
+            </a>
+          )}
+          {" "}
+          {recLog.songTitle && (
+            <span className="text-xs opacity-70">({recLog.songArtist} - {recLog.songTitle})</span>
+          )}
+        </p>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "caseOpen") {
+    const caseLog = log as FirebaseLogsCaseOpenInterface;
+    const date = new Date(caseLog.timestamp);
+    const rolled = caseLog.rolledItem;
+    const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+    const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+    let level: number | null = null;
+    if (rolledGuitar) {
+      const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+      if (def) level = getItemLevel(rolledGuitar, def);
+    } else if (rolledEffect) {
+      const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+      if (def) level = getEffectLevel(rolledEffect, def);
+    }
+
+    return (
+      <GroupedLine date={date}>
+        <span className="text-secondText text-sm">opened</span>
+        <span className="text-white font-bold text-sm">{caseLog.caseName}</span>
+        <span className="text-secondText text-sm">and got</span>
+        <ItemPill
+          itemType={caseLog.itemType}
+          itemName={caseLog.itemName}
+          itemBrand={caseLog.itemBrand}
+          itemRarity={caseLog.itemRarity}
+          itemImageId={caseLog.itemImageId}
+          level={level}
+          rolledGuitar={rolledGuitar}
+          rolledEffect={rolledEffect}
+        />
+      </GroupedLine>
+    );
+  }
+
+  if (type === "marketplace") {
+    const marketLog = log as FirebaseLogsMarketplaceInterface;
+    const date = new Date(marketLog.timestamp);
+    const rolled = marketLog.rolledItem;
+    const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+    const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+    let level: number | null = null;
+    if (rolledGuitar) {
+      const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+      if (def) level = getItemLevel(rolledGuitar, def);
+    } else if (rolledEffect) {
+      const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+      if (def) level = getEffectLevel(rolledEffect, def);
+    }
+
+    return (
+      <GroupedLine date={date}>
+        <span className="text-secondText text-sm">listed</span>
+        <ItemPill
+          itemType={marketLog.itemType}
+          itemName={marketLog.itemName}
+          itemBrand={marketLog.itemBrand}
+          itemRarity={marketLog.itemRarity}
+          itemImageId={marketLog.itemImageId}
+          level={level}
+          rolledGuitar={rolledGuitar}
+          rolledEffect={rolledEffect}
+        />
+        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+          <span className="text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>
+          <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+            {marketLog.price}
+            <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+          </span>
+        </span>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "playlist") {
+    const playlistLog = log as FirebaseLogsPlaylistInterface;
+    const date = new Date(playlistLog.timestamp);
+    const kindLabel = PLAYLIST_KIND_LABEL[playlistLog.playlistKind] ?? "playlist";
+
+    return (
+      <GroupedLine date={date}>
+        <p className="text-secondText text-sm">
+          created a new {kindLabel}:{" "}
+          <Link
+            href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
+            className="inline-flex items-center gap-1 font-bold text-white hover:text-cyan-400 hover:underline transition-colors"
+          >
+            {playlistLog.playlistName}
+            <ExternalLink className="h-3 w-3 opacity-60" />
+          </Link>
+          {playlistLog.songCount > 0 && (
+            <span className="text-xs opacity-70"> ({playlistLog.songCount} {playlistLog.songCount === 1 ? "song" : "songs"})</span>
+          )}
+        </p>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "dailyQuest") {
+    const questLog = log as FirebaseLogsDailyQuestInterface;
+    const date = new Date(questLog.timestamp);
+
+    return (
+      <GroupedLine date={date}>
+        <p className="text-secondText text-sm">
+          completed all <span className="text-zinc-200 font-semibold">Daily Quests!</span>
+        </p>
+        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-yellow-400 bg-yellow-950/30 border-yellow-500/20">
+          <span className="text-[10px] font-semibold capitalize tracking-wider opacity-70">Claimed</span>
+          <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+            +{questLog.points}
+            <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+          </span>
+        </span>
+      </GroupedLine>
+    );
+  }
+
+  // "exercise" | "exercisePlan" — general practice log (points, level ups, achievements, plan/exercise/song refs).
+  const genericLog = log as FirebaseLogsInterface;
+  const date = new Date(genericLog.timestamp as string);
+  const plan: any = genericLog.planId ? defaultPlans.find((p) => p.id === genericLog.planId) : null;
+  const matchedExercise: Exercise | null = genericLog.exerciseTitle
+    ? exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ?? null
+    : null;
+  const planTitle = plan ? plan.title : null;
+
+  return (
+    <GroupedLine date={date}>
+      <span className="text-secondText text-sm">{t("common:logsBox.get")}</span>
+      <span className="flex items-center gap-1 text-main text-sm">
+        +{genericLog.points}
+        <img src="/images/points.png" alt="points" className="h-4 w-4 object-contain" />
+      </span>
+
+      {genericLog.newLevel?.isNewLevel && (
+        <span className="text-secondText text-sm">
+          {t("common:logsBox.lvl_up")}
+          <span className="ml-1 text-main">
+            {genericLog.newLevel.level}
+            {" lvl"}
+          </span>
+        </span>
+      )}
+
+      {genericLog.newAchievements?.length > 0 && (
+        <span className="inline-flex items-center gap-2 text-sm">
+          {t("common:logsBox.achievements")}{" "}
+          {genericLog.newAchievements.map((achievement, index) => (
+            <span key={index} className="inline-flex items-center gap-2">
+              <AchievementIcon id={achievement} />
+            </span>
+          ))}
+        </span>
+      )}
+
+      {planTitle && (
+        plan ? (
+          <button
+            type="button"
+            onClick={() => onPreviewPlan(plan)}
+            title="Click to preview and start this plan"
+            className="group inline-flex items-center text-left text-xs px-2.5 py-1 rounded-md border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
+            <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
+          </button>
+        ) : (
+          <span className="inline-block text-xs px-2.5 py-1 rounded-md border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
+            <span className="font-medium">{planTitle}</span>
+          </span>
+        )
+      )}
+
+      {genericLog.exerciseTitle && !genericLog.exerciseTitle.includes("Practicing: ") && !planTitle && !genericLog.songTitle && (
+        matchedExercise ? (
+          <button
+            type="button"
+            onClick={() => onPreviewExercise(matchedExercise)}
+            title="Click to preview and start this exercise"
+            className="group inline-flex items-center text-left text-xs px-2.5 py-1 rounded-md border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
+            <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{genericLog.exerciseTitle}</span>
+          </button>
+        ) : (
+          <span className="inline-block text-xs px-2.5 py-1 rounded-md border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
+            <span className="font-medium">{genericLog.exerciseTitle}</span>
+          </span>
+        )
+      )}
+
+      {genericLog.micPerformance && !(genericLog.micPerformance.score === 0 && genericLog.micPerformance.accuracy === 100) && (
+        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
+          <span className="flex items-center gap-1">
+            <span className="text-[10px] font-semibold capitalize opacity-70 tracking-wider mr-0.5">Score:</span>
+            <span className="font-bold tabular-nums text-main">{genericLog.micPerformance.score}</span>
+          </span>
+          <span className="w-px h-2.5 bg-blue-500/30" />
+          <span className="flex items-center gap-1 font-bold tabular-nums">{genericLog.micPerformance.accuracy}%</span>
+        </span>
+      )}
+
+      {genericLog.earTrainingPerformance && (
+        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+          <span className="text-[10px] font-semibold capitalize opacity-70 tracking-wider">Score:</span>
+          <span className="font-bold tabular-nums">{genericLog.earTrainingPerformance.score}</span>
+        </span>
+      )}
+
+      {genericLog.songTitle && genericLog.songArtist && (
+        genericLog.songId ? (
+          <Link
+            href={`/songs?view=management&songId=${genericLog.songId}`}
+            title="Click to open this song"
+            className="group inline-flex items-center text-left text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+            <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{genericLog.songArtist} - {genericLog.songTitle}</span>
+            <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+          </Link>
+        ) : (
+          <span className="inline-block text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 max-w-full whitespace-normal break-words align-middle">
+            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+            <span className="font-medium">{genericLog.songArtist} - {genericLog.songTitle}</span>
+          </span>
+        )
+      )}
+    </GroupedLine>
   );
 };
 
-const FirebaseLogsDailyQuestItem = ({
-  log,
+const GroupedLogItem = ({
+  group,
   isNew,
   currentUserId,
+  onPreviewPlan,
+  onPreviewExercise,
+  onViewRecording,
 }: {
-  log: FirebaseLogsDailyQuestInterface;
+  group: LogGroup;
   isNew: boolean;
   currentUserId: string;
+  onPreviewPlan: (plan: ExercisePlan) => void;
+  onPreviewExercise: (exercise: Exercise) => void;
+  onViewRecording: (id: string) => void;
 }) => {
-  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, points } = log;
-  const date = new Date(timestamp);
+  const representative = group.logs[0] as FirebaseLogsInterface;
+  const date = new Date(getLogTimestampMs(group.logs[0]));
+  const fameAmount = getGroupFameAmount(group);
+  const { uid, userName, avatarUrl, userAvatarFrame, id: logId, reactions } = representative;
 
   return (
     <LogItem isNew={isNew}>
-      <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+      <div className="flex w-full flex-col gap-4 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <span className="inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl ?? undefined} lvl={userAvatarFrame} />
           </span>
-          <p className='text-secondText text-sm'>
-            completed all <span className="text-zinc-200 font-semibold">Daily Quests!</span>
-          </p>
-        </div>
+          <span className="shrink-0 text-[11px] text-secondText opacity-50 tabular-nums">
+            {date.toLocaleDateString()}
+          </span>
 
-        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-yellow-400 bg-yellow-950/30 border-yellow-500/20">
-              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">Claimed</span>
-              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
-                +{points}
-                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
-              </span>
-            </span>
-          </div>
-          {log.id && (
-            <div className="shrink-0">
+          {logId && (
+            <div className="ml-auto shrink-0">
               <LogReaction
-                logId={log.id}
-                reactions={log.reactions}
+                logId={logId}
+                reactions={reactions}
                 currentUserId={currentUserId}
-                disabled={log.uid === currentUserId}
+                disabled={uid === currentUserId}
+                fameAmount={fameAmount}
               />
             </div>
           )}
+        </div>
+
+        <div className="flex flex-col gap-4 pl-1 sm:gap-2.5 sm:pl-10">
+          {group.logs.map((log, index) => (
+            <GroupedLogLine
+              key={(log as { id?: string }).id ?? `${getLogTimestampMs(log)}-${index}`}
+              log={log}
+              type={group.type}
+              onPreviewPlan={onPreviewPlan}
+              onPreviewExercise={onPreviewExercise}
+              onViewRecording={onViewRecording}
+            />
+          ))}
         </div>
       </div>
     </LogItem>
@@ -1171,69 +972,42 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
     };
   }, []); // Empty dependency array since we handle cleanup manually
 
+  const groups = useMemo(() => groupConsecutiveLogs(logs), [logs]);
+
   return (
     <>
       <div className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
         <OnlineUsers />
       </div>
       <div ref={spanRef} className='h-1' />
-      {logs.map((log) => (
-        <div
-          key={(log as any).id || String((log as any).timestamp) + (log as any).uid + (log as any).userName || "topPlayers"}
-          className='mr-2'>
-          {isFirebaseLogsSongs(log) ? (
-            <FirebaseLogsSongItem 
-              log={log} 
-              isNew={isNewMessage(log.data || (log as any).timestamp)} 
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsTopPlayers(log) ? (
-            <FirebaseLogsTopPlayersItem
-              log={log}
-              isNew={isNewMessage(log.data)}
-            />
-           ) : isFirebaseLogsRecording(log) ? (
-             <FirebaseLogsRecordingItem
-               log={log}
-               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-               currentUserId={currentUserId}
-               onView={setActiveRecordingId}
-             />
-          ) : isFirebaseLogsDailyQuest(log) ? (
-            <FirebaseLogsDailyQuestItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsCaseOpen(log) ? (
-            <FirebaseLogsCaseOpenItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsMarketplace(log) ? (
-            <FirebaseLogsMarketplaceItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : isFirebaseLogsPlaylist(log) ? (
-            <FirebaseLogsPlaylistItem
-              log={log}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-            />
-          ) : (
-            <FirebaseLogsItem
-              log={log as FirebaseLogsInterface}
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
-              currentUserId={currentUserId}
-              onPreviewPlan={setPreviewPlan}
-              onPreviewExercise={setPreviewExercise}
-            />
-          )}
-        </div>
-      ))}
+      {groups.map((group) => {
+        const representative = group.logs[0];
+        const key =
+          (representative as any).id ||
+          String(getLogTimestampMs(representative)) + (representative as any).uid + (representative as any).userName ||
+          "topPlayers";
+        const isNew = isNewMessage((representative as any).data || (representative as any).timestamp);
+
+        return (
+          <div key={key} className='mr-2'>
+            {group.type === "topPlayers" ? (
+              <FirebaseLogsTopPlayersItem
+                log={representative as FirebaseLogsTopPlayersInterface}
+                isNew={isNew}
+              />
+            ) : (
+              <GroupedLogItem
+                group={group}
+                isNew={isNew}
+                currentUserId={currentUserId}
+                onPreviewPlan={setPreviewPlan}
+                onPreviewExercise={setPreviewExercise}
+                onViewRecording={setActiveRecordingId}
+              />
+            )}
+          </div>
+        );
+      })}
 
       <RecordingViewModal
         isOpen={!!activeRecordingId}
