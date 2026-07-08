@@ -9,7 +9,12 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-export const toggleLogReaction = async (logId: string, userId: string, isRemoving: boolean = false) => {
+export const toggleLogReaction = async (
+  logId: string,
+  userId: string,
+  isRemoving: boolean = false,
+  fameAmount: number
+) => {
   if (!logId || !userId) return;
 
   const logRef = doc(db, "logs", logId);
@@ -36,7 +41,7 @@ export const toggleLogReaction = async (logId: string, userId: string, isRemovin
       if (recipientId && recipientId !== userId) {
         // Update Fame
         transaction.update(recipientRef, {
-          "statistics.fame": increment(isRemoving ? -10 : 10)
+          "statistics.fame": increment(isRemoving ? -fameAmount : fameAmount)
         });
 
         transaction.update(reactorDocRef, {

@@ -14,6 +14,8 @@ interface LogReactionProps {
   reactions?: string[];
   currentUserId: string;
   disabled?: boolean;
+  /** Fame the recipient gets when this row (or grouped row) is motivated. */
+  fameAmount: number;
 }
 
 interface Ripple {
@@ -22,7 +24,7 @@ interface Ripple {
   y: number;
 }
 
-export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: LogReactionProps) => {
+export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fameAmount }: LogReactionProps) => {
   const isReacted = reactions.includes(currentUserId);
   const [localReactions, setLocalReactions] = useState(reactions);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -62,7 +64,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: 
       setLocalReactions(localReactions.filter((id) => id !== currentUserId));
     }
 
-    await toggleLogReaction(logId, currentUserId, !nowReacted);
+    await toggleLogReaction(logId, currentUserId, !nowReacted, fameAmount);
   };
 
   if (disabled && localReactions.length === 0) return null;
@@ -117,15 +119,15 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: 
             )} 
           />
           {localReactions.length > 0 ? (
-            <span className="text-xs font-bold">{localReactions.length * 10}</span>
+            <span className="text-xs font-bold">{localReactions.length * fameAmount}</span>
           ) : (
-            <span className="text-xs font-semibold">+10</span>
+            <span className="text-xs font-semibold">+{fameAmount}</span>
           )}
         </button>
       </TooltipTrigger>
       <TooltipContent className="bg-white text-zinc-900 border-zinc-200 font-bold shadow-xl">
         <div className="flex items-center gap-1.5 py-0.5">
-          <span>Motivate the player and give them +10</span>
+          <span>Motivate the player and give them +{fameAmount}</span>
           <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
           <span className="mx-1 opacity-50">|</span>
           <span>you get +1</span>
