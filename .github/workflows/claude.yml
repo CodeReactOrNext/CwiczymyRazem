@@ -1,0 +1,54 @@
+name: Claude — implement labeled issue
+
+# When an issue is labeled `claude-code`, Claude reads the ticket,
+# implements the change, and opens a PR against the `develop` branch.
+# Auth: subscription token (secret CLAUDE_CODE_OAUTH_TOKEN).
+
+on:
+  issues:
+    types: [labeled]
+
+# Don't run two jobs for the same issue at the same time.
+concurrency:
+  group: claude-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create branches and commits
+  issues: write # comment on / close issues
+  pull-requests: write # open the PR
+  id-token: write # auth via the GitHub App (OIDC token exchange)
+  actions: read # read CI results
+
+jobs:
+  implement:
+    # Only react to the `claude-code` label (rename if you prefer another).
+    if: github.event.label.name == 'claude-code'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Issue #${{ github.event.issue.number }} was labeled `claude-code` for implementation.
+            Read the full ticket with: gh issue view ${{ github.event.issue.number }}
+
+            Then implement the change it describes:
+            - Follow the conventions and commands in CLAUDE.md.
+            - Create a new branch off `develop` and open a PR targeting `develop`.
+            - Put "Closes #${{ github.event.issue.number }}" in the PR description.
+            - Run `npm run lint` and `npm test` and make sure they pass before opening the PR.
+            - If the ticket is unclear or too large to do safely, do not guess.
+              Instead, comment on the issue explaining what is blocking you.
+          # --model pins the model explicitly (swap to claude-opus-4-8 for harder tickets).
+          # --max-turns caps iterations so a run can't drain your subscription limits.
+          claude_args: |
+            --model claude-sonnet-5
+            --max-turns 50
