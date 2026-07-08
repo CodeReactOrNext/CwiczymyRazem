@@ -53,6 +53,14 @@ jobs:
           prompt: |
             Implement GitHub issue #${{ github.event.issue.number }} in this repository.
 
+            IMPORTANT — how to work:
+            - You run in ONE non-interactive session. There is NO continuation and nothing will
+              resume you, so complete the ENTIRE task yourself before ending your turn.
+            - Do NOT delegate to sub-agents and do NOT "wait for" anything to report back.
+              Explore and edit the code directly, in this session.
+            - You are finished ONLY after `gh pr create` has printed a PR URL. If you stop before
+              that (e.g. after just researching), the task has FAILED.
+
             Step 1 — Read the ticket:
               Run: gh issue view ${{ github.event.issue.number }}
 
@@ -83,7 +91,11 @@ jobs:
           # --dangerously-skip-permissions: no interactive prompts exist in CI, so Claude
           #   must be allowed to run its tools (Bash/gh/npm/git, file edits) without asking.
           #   Safe here: the runner is ephemeral and the job only triggers for admin-labeled issues.
+          # --disallowedTools Task: block sub-agent delegation. In a one-shot CLI run, delegating
+          #   makes Claude yield its turn ("I'll wait for the agent...") and finish without doing
+          #   the work. Force it to explore and implement inline instead.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 200
             --dangerously-skip-permissions
+            --disallowedTools "Task"
