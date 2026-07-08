@@ -1,12 +1,16 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { Snail, X } from "lucide-react";
+import { RippleButton } from "hooks/useRipple";
+import { Check, ChevronDown, Snail, X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
+import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
+import { MicTroubleshooting } from "./MicTroubleshooting";
 import { useLiveTuner } from "../hooks/useLiveTuner";
 
 const SPEED_MODES: { value: number; label: string }[] = [
@@ -31,6 +35,14 @@ interface MediaControlsToolbarProps {
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
+  /** Full-width stacked layout for narrow (portrait phone) screens. */
+  mobile?: boolean;
+  disableTuner?: boolean;
+  baseBpm?: number;
+  trailing?: React.ReactNode;
+  examMode?: boolean;
+  /** Keep the backing-track (guitar) toggle available even in exam mode (e.g. scale exams). */
+  showBackingInExam?: boolean;
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -48,111 +60,215 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   frequencyRef,
   volumeRef,
   compact = false,
+  mobile = false,
+  disableTuner = false,
+  baseBpm,
+  trailing,
+  examMode = false,
+  showBackingInExam = false,
 }: MediaControlsToolbarProps) {
   const [isTunerOpen, setIsTunerOpen] = useState(false);
+
+  // In exam mode the speed control is always hidden (tempo is fixed). The backing
+  // track (guitar) toggle is hidden too, unless the exam explicitly keeps it
+  // (e.g. scale exams, where hearing the reference scale is allowed).
+  const showSpeed   = !examMode;
+  const showBacking = !examMode || showBackingInExam;
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
   const isSlowed = speedMultiplier < 1;
-  const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef;
+  const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
   const h = compact ? "h-8" : "h-12";
+
+  if (mobile) {
+    const gridBtn = "flex h-11 w-full items-center justify-center gap-2 rounded-lg transition-all active:scale-95";
+
+    return (
+      <div className="flex flex-col gap-2">
+        {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
+          <div className="flex gap-2">
+            {showSpeed && hasMetronome && (
+              <SpeedDropdown
+                speedMultiplier={speedMultiplier}
+                onSpeedMultiplierChange={onSpeedMultiplierChange}
+                baseBpm={baseBpm}
+                isSlowed={isSlowed}
+                h="h-11"
+                className="flex-1 justify-center"
+              />
+            )}
+
+            {showBacking && hasAudioTrack && (
+              <RippleButton
+                onClick={onAudioToggle}
+                disabled={isRiddleMode}
+                title={isAudioMuted ? "Backing track off" : "Backing track on"}
+                className={cn(
+                  gridBtn, "flex-1",
+                  isAudioMuted
+                    ? "bg-zinc-800 text-zinc-400"
+                    : "bg-white/15 text-white",
+                  isRiddleMode && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <GiGuitar className="text-lg shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Backing</span>
+              </RippleButton>
+            )}
+          </div>
+        )}
+
+        {hasMicControls && (
+          <div className="grid grid-cols-2 gap-2">
+            <RippleButton
+              onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+              disabled={examMode && isMicEnabled}
+              title={examMode && isMicEnabled ? "Pitch Detect required during exam" : isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
+              className={cn(
+                gridBtn,
+                isMicEnabled
+                  ? "bg-emerald-950 text-emerald-400"
+                  : "bg-zinc-800 text-zinc-400",
+                examMode && isMicEnabled && "cursor-not-allowed active:scale-100"
+              )}
+            >
+              <FaMicrophone className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-[10px] font-semibold tracking-wide">Pitch Detect</span>
+            </RippleButton>
+
+            {hasTuner && (
+              <RippleButton
+                onClick={() => setIsTunerOpen(true)}
+                title="Tuner"
+                className={cn(
+                  gridBtn,
+                  isTunerOpen ? "bg-violet-950 text-violet-400" : "bg-zinc-800 text-zinc-400"
+                )}
+              >
+                <TuningForkIcon className="h-4 w-4 shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Tuner</span>
+              </RippleButton>
+            )}
+
+            {isMicEnabled && (
+              <RippleButton
+                onClick={onRecalibrate}
+                title="Recalibrate"
+                className={cn(gridBtn, "bg-zinc-800 text-zinc-400")}
+              >
+                <FaSync className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-[10px] font-semibold tracking-wide">Recalibrate</span>
+              </RippleButton>
+            )}
+
+            {/* Electron-only amp simulator (renders nothing on web) */}
+            <AmpSimButton h="h-11" />
+          </div>
+        )}
+
+        {hasMicControls && <MicTroubleshooting className="self-center py-1" />}
+
+        {trailing}
+
+        {isTunerOpen && hasTuner && createPortal(
+          <TunerDialog
+            frequencyRef={frequencyRef!}
+            volumeRef={volumeRef!}
+            isMicEnabled={isMicEnabled}
+            onClose={() => setIsTunerOpen(false)}
+          />,
+          document.body
+        )}
+      </div>
+    );
+  }
 
   if (compact) {
     return (
       <div className="flex flex-col gap-1.5">
-        {hasMetronome && (
-          <div className={cn(
-            "flex items-center rounded-[6px] border overflow-hidden transition-all",
-            isSlowed ? "border-cyan-500/30 bg-cyan-500/5" : "border-white/5 bg-white/5"
-          )}>
-            <div className={cn(
-              "flex items-center justify-center w-7 shrink-0 border-r border-white/5 h-8 select-none",
-              isSlowed ? "text-cyan-400" : "text-zinc-500"
-            )}>
-              <Snail className="h-3 w-3" />
-            </div>
-            {SPEED_MODES.map(({ value, label }) => {
-              const active = speedMultiplier === value;
-              const isNormal = value === 1;
-              return (
-                <button
-                  key={value}
-                  onClick={() => onSpeedMultiplierChange(isNormal ? 1 : active ? 1 : value)}
-                  className={cn(
-                    "flex items-center justify-center flex-1 h-8 text-[10px] font-mono font-semibold transition-all border-r border-white/5 last:border-r-0",
-                    active && isNormal
-                      ? "bg-white/10 text-white"
-                      : active
-                      ? "bg-cyan-500/15 text-cyan-300"
-                      : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+        {showSpeed && hasMetronome && (
+          <SpeedDropdown
+            compact
+            speedMultiplier={speedMultiplier}
+            onSpeedMultiplierChange={onSpeedMultiplierChange}
+            baseBpm={baseBpm}
+            isSlowed={isSlowed}
+            h="h-8"
+          />
         )}
 
         <div className="flex gap-1.5 flex-wrap">
-          {hasAudioTrack && (
-            <button
+          {showBacking && hasAudioTrack && (
+            <RippleButton
               onClick={onAudioToggle}
               disabled={isRiddleMode}
               title={isAudioMuted ? "Backing track off" : "Backing track on"}
               className={cn(
-                "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all border",
+                "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                 isAudioMuted
-                  ? "bg-white/5 border-white/5 text-zinc-400 hover:text-white"
-                  : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20",
+                  ? "bg-zinc-800 text-zinc-400 hover:text-white"
+                  : "bg-white/15 text-white hover:bg-white/25",
                 isRiddleMode && "opacity-50 cursor-not-allowed"
               )}
             >
               <GiGuitar className="text-sm" />
-            </button>
+            </RippleButton>
+          )}
+
+          {showBacking && hasAudioTrack && hasMicControls && (
+            <div className="h-8 w-px bg-white/10 self-center mx-0.5" aria-hidden />
           )}
 
           {hasMicControls && (
             <>
-              <button
-                onClick={onMicToggle}
-                title={isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
+              <RippleButton
+                onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+                disabled={examMode && isMicEnabled}
+                title={examMode && isMicEnabled ? "Pitch Detect required during exam" : isMicEnabled ? "Pitch Detect on" : "Pitch Detect off"}
                 className={cn(
-                  "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all border",
+                  "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                   isMicEnabled
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                    : "bg-white/5 border-white/5 text-zinc-400 hover:text-white"
+                    ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white",
+                  examMode && isMicEnabled && "cursor-not-allowed active:scale-100 hover:bg-emerald-950"
                 )}
               >
                 <FaMicrophone className="h-3 w-3" />
-              </button>
+              </RippleButton>
 
               {isMicEnabled && (
-                <button
+                <RippleButton
                   onClick={onRecalibrate}
                   title="Recalibrate"
-                  className="flex items-center justify-center h-8 w-8 rounded-[6px] transition-all border bg-white/5 border-white/5 text-zinc-400 hover:text-white"
+                  className="flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90 bg-zinc-800 text-zinc-400 hover:text-white"
                 >
                   <FaSync className="h-3 w-3" />
-                </button>
+                </RippleButton>
               )}
 
+              {/* Electron-only amp simulator (renders nothing on web) */}
+              <AmpSimButton compact />
+
               {hasTuner && (
-                <button
+                <RippleButton
                   onClick={() => setIsTunerOpen(true)}
                   title="Tuner"
                   className={cn(
-                    "flex items-center justify-center h-8 w-8 rounded-[6px] transition-all border",
+                    "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
                     isTunerOpen
-                      ? "bg-violet-500/10 border-violet-500/30 text-violet-400"
-                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white"
+                      ? "bg-violet-950 text-violet-400"
+                      : "bg-zinc-800 text-zinc-400 hover:text-white"
                   )}
                 >
                   <TuningForkIcon className="h-3 w-3" />
-                </button>
+                </RippleButton>
               )}
+
+              <MicTroubleshooting compact />
             </>
           )}
+          {trailing}
         </div>
 
         {isTunerOpen && hasTuner && createPortal(
@@ -170,93 +286,75 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-      {hasMetronome && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className={cn(
-              "flex items-center rounded-[8px] border overflow-hidden transition-all",
-              h,
-              isSlowed ? "border-cyan-500/30 bg-cyan-500/5" : "border-white/5 bg-white/5"
-            )}>
-              <div className={cn(
-                "flex items-center gap-1.5 px-3 border-r border-white/5 h-full select-none",
-                isSlowed ? "text-cyan-400" : "text-zinc-500"
-              )}>
-                <Snail className="h-4 w-4 shrink-0" />
-                <span className="text-[10px] font-semibold tracking-wide hidden sm:block">Slow</span>
-              </div>
-              {SPEED_MODES.map(({ value, label }) => {
-                const active = speedMultiplier === value;
-                const isNormal = value === 1;
-                return (
-                  <button
-                    key={value}
-                    onClick={() => onSpeedMultiplierChange(isNormal ? 1 : active ? 1 : value)}
-                    className={cn(
-                      "flex items-center justify-center px-3 h-full text-xs font-mono font-semibold transition-all border-r border-white/5 last:border-r-0",
-                      active && isNormal
-                        ? "bg-white/10 text-white"
-                        : active
-                        ? "bg-cyan-500/15 text-cyan-300"
-                        : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
-                    )}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Play at reduced speed — great for learning difficult passages. Click active mode to return to normal.
-          </TooltipContent>
-        </Tooltip>
+      {/* ── PLAYBACK zone: speed + backing track ── */}
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
+        <div className="flex items-center gap-1.5">
+          {showSpeed && hasMetronome && (
+            <SpeedDropdown
+              speedMultiplier={speedMultiplier}
+              onSpeedMultiplierChange={onSpeedMultiplierChange}
+              baseBpm={baseBpm}
+              isSlowed={isSlowed}
+              h={h}
+            />
+          )}
+
+          {showBacking && hasAudioTrack && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RippleButton
+                  onClick={onAudioToggle}
+                  disabled={isRiddleMode}
+                  className={cn(
+                    "flex items-center justify-center w-12 rounded-lg transition-all active:scale-95",
+                    h,
+                    isAudioMuted
+                      ? "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                      : "bg-white/15 text-white hover:bg-white/25",
+                    isRiddleMode && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <GiGuitar className="text-lg" />
+                </RippleButton>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {isAudioMuted ? "Backing track off" : "Backing track on"}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       )}
 
-      {hasAudioTrack && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={onAudioToggle}
-              disabled={isRiddleMode}
-              className={cn(
-                "flex items-center justify-center w-12 rounded-[8px] transition-all border",
-                h,
-                isAudioMuted
-                  ? "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                  : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20",
-                isRiddleMode && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <GiGuitar className="text-lg" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {isAudioMuted ? "Backing track off" : "Backing track on"}
-          </TooltipContent>
-        </Tooltip>
+      {/* ── Divider between playback and input zones ── */}
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && hasMicControls && (
+        <div className="h-7 w-px bg-white/10 self-center" aria-hidden />
       )}
 
+      {/* ── INPUT zone: mic / recalibrate / tuner ── */}
       {hasMicControls && (
-        <>
+        <div className="flex items-center gap-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={onMicToggle}
+              <RippleButton
+                onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+                disabled={examMode && isMicEnabled}
                 className={cn(
-                  "flex items-center gap-2 px-4 rounded-[8px] transition-all border font-semibold",
+                  "flex items-center gap-2 px-4 rounded-lg transition-all font-semibold active:scale-95",
                   h,
                   isMicEnabled
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                    : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+                    : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700",
+                  examMode && isMicEnabled && "cursor-not-allowed active:scale-100 hover:bg-emerald-950"
                 )}
               >
                 <FaMicrophone className="h-4 w-4 shrink-0" />
                 <span className="text-[10px] font-semibold tracking-wide">Pitch Detect</span>
-              </button>
+              </RippleButton>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              {isMicEnabled
+              {examMode && isMicEnabled
+                ? "Pitch Detect required during the exam"
+                : isMicEnabled
                 ? "Microphone active — app is listening to your guitar"
                 : "Enable microphone to detect what you're playing"}
             </TooltipContent>
@@ -265,43 +363,50 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           {isMicEnabled && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <RippleButton
                   onClick={onRecalibrate}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-[8px] transition-all border bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 active:scale-95",
                     h
                   )}
                 >
                   <FaSync className="h-4 w-4 shrink-0" />
                   <span className="text-[10px] font-semibold tracking-wide">Recalibrate</span>
-                </button>
+                </RippleButton>
               </TooltipTrigger>
               <TooltipContent side="bottom">Recalibrate microphone</TooltipContent>
             </Tooltip>
           )}
 
+          {/* Electron-only amp simulator (renders nothing on web) */}
+          <AmpSimButton h={h} />
+
           {hasTuner && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <RippleButton
                   onClick={() => setIsTunerOpen(true)}
                   className={cn(
-                    "flex items-center gap-2 px-4 rounded-[8px] transition-all border",
+                    "flex items-center gap-2 px-4 rounded-lg transition-all active:scale-95",
                     h,
                     isTunerOpen
-                      ? "bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/20"
-                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                      ? "bg-violet-950 text-violet-400 hover:bg-violet-900"
+                      : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
                   )}
                 >
                   <TuningForkIcon className="h-4 w-4 shrink-0" />
                   <span className="text-[10px] font-semibold tracking-wide">Tuner</span>
-                </button>
+                </RippleButton>
               </TooltipTrigger>
               <TooltipContent side="bottom">Chromatic tuner</TooltipContent>
             </Tooltip>
           )}
-        </>
+
+          <MicTroubleshooting />
+        </div>
       )}
+
+      {trailing}
 
       {isTunerOpen && hasTuner && createPortal(
         <TunerDialog
@@ -315,6 +420,70 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     </div>
   );
 });
+
+function SpeedDropdown({
+  speedMultiplier,
+  onSpeedMultiplierChange,
+  baseBpm,
+  isSlowed,
+  h,
+  compact = false,
+  className,
+}: {
+  speedMultiplier: number;
+  onSpeedMultiplierChange: (value: number) => void;
+  baseBpm?: number;
+  isSlowed: boolean;
+  h: string;
+  compact?: boolean;
+  className?: string;
+}) {
+  const current = SPEED_MODES.find((m) => m.value === speedMultiplier) ?? SPEED_MODES[0];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <RippleButton
+          title="Playback speed — slow down to learn tricky passages"
+          className={cn(
+            "flex items-center rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+            h,
+            compact ? "gap-1.5 px-2" : "gap-2 px-3",
+            isSlowed
+              ? "bg-white/15 text-white hover:bg-white/25"
+              : "bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700",
+            className
+          )}
+        >
+          <Snail className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
+          <span className={cn("font-mono font-bold", compact ? "text-[10px]" : "text-sm")}>{current.label}</span>
+          <ChevronDown className={cn("opacity-60 shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
+        </RippleButton>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="min-w-[9rem] border border-white/10 bg-zinc-900 text-white">
+        {SPEED_MODES.map(({ value, label }) => {
+          const active = speedMultiplier === value;
+          return (
+            <DropdownMenuItem
+              key={value}
+              onSelect={() => onSpeedMultiplierChange(value)}
+              className={cn(
+                "flex cursor-pointer items-center gap-2 text-xs font-semibold focus:bg-zinc-800 focus:text-white",
+                active ? "text-cyan-300" : "text-zinc-300"
+              )}
+            >
+              <span className="w-9 font-mono">{label}</span>
+              {baseBpm ? (
+                <span className="font-mono text-[10px] text-zinc-500">{Math.round(baseBpm * value)} BPM</span>
+              ) : null}
+              {active && <Check className="ml-auto h-3.5 w-3.5 text-cyan-300" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function TuningForkIcon({ className }: { className?: string }) {
   return (
@@ -350,15 +519,15 @@ function TunerDialog({
       onClick={onClose}
     >
       <div
-        className="relative bg-zinc-900 border border-white/10 rounded-[8px] shadow-2xl p-8 w-72"
+        className="relative bg-zinc-900 rounded-lg shadow-2xl p-8 w-72"
         onClick={e => e.stopPropagation()}
       >
-        <button
+        <RippleButton
           onClick={onClose}
           className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
         >
           <X size={16} />
-        </button>
+        </RippleButton>
 
         <p className="text-[10px] font-semibold tracking-wide text-zinc-500 text-center mb-4">Tuner</p>
 

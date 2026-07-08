@@ -10,21 +10,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const fingerIndependence1aExercise: Exercise = {
   id: "finger_independence_1a",
   title: "Finger Independence Exercise 1a",
-  description: "Cross-string isolation exercise developing independence between all four fretting fingers. Outer fingers pick on the higher string while inner fingers press silently on the adjacent lower string — then all four fingers move to the same string. Works every adjacent string pair ascending from A/E to e/B.",
+  description: "Isolate individual fingers of the fretting hand while keeping the others anchored.",
+  whyItMatters: "Finger independence prevents secondary muscle tension and sympathetic finger movement. Developing isolated control over each finger ensures clean note execution, smoother transitions, and superior economy of motion during complex playing.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Place fingers 1 and 4 on frets 5 and 8 of the higher string. Place fingers 2 and 3 on frets 6 and 7 of the string below — all four fingers stay pressed throughout variation A.",
-    "Pick only fret 5 and fret 8. Fingers 2 and 3 are silent — do not lift them between picks.",
-    "In variation B (even-numbered measures), move fingers 2 and 3 to the same string and repeat the same picking pattern.",
-    "Work through all adjacent string pairs from low to high.",
+    "Anchor the designated fingers firmly to the fretboard without squeezing.",
+    "Move the active finger slowly and deliberately without letting the anchored fingers lift."
   ],
   tips: [
-    "The cross-string variant (variation A) is harder — the middle fingers work against a different plane of resistance.",
-    "Do not let the ghost fingers fly off the string. The entire point is keeping them pressed.",
-    "Keep your picking wrist loose — all the effort is in the fretting hand.",
-    "Once clean, try the reverse: pick frets 6 & 7 while 5 & 8 are ghost notes.",
+    "Focus on eliminating sympathetic movement in the fingers immediately adjacent to the active one.",
+    "Keep your hand relaxed; carrying static tension makes isolation significantly harder."
   ],
   metronomeSpeed: {
     min: 20,

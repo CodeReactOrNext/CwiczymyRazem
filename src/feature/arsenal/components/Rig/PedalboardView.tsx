@@ -3,19 +3,34 @@ import { Plus, X } from "lucide-react";
 import { useCallback, useEffect,useRef, useState } from "react";
 
 import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
+import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
 
-const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;
 
+// The board surface renders at this aspect ratio (see aspectRatio below). We use
+// it to convert a pedal's image aspect ratio into a width-in-board-% so that all
+// pedals share the same on-board height but keep their natural proportions —
+// wide (dual) pedals end up genuinely wider instead of being squished.
+const BOARD_W = 16;
+const BOARD_H = 7;
+/** Aspect used before an image has reported its natural size (a typical pedal). */
+const DEFAULT_ASPECT = 480 / 515;
+
+const widthPctForAspect = (aspect: number) =>
+  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
+
+/** Fallback width for collision math before an image has loaded. */
+const PEDAL_W_PCT = widthPctForAspect(DEFAULT_ASPECT);
+
 const DEFAULT_POSITIONS = [
-  { xPct: 5,  yPct: 8  },
-  { xPct: 28, yPct: 8  },
-  { xPct: 51, yPct: 8  },
-  { xPct: 5,  yPct: 52 },
-  { xPct: 28, yPct: 52 },
-  { xPct: 51, yPct: 52 },
+  { xPct: 3,  yPct: 8  },
+  { xPct: 35, yPct: 8  },
+  { xPct: 67, yPct: 8  },
+  { xPct: 3,  yPct: 52 },
+  { xPct: 35, yPct: 52 },
+  { xPct: 67, yPct: 52 },
 ];
 
 
@@ -28,13 +43,18 @@ interface DragState {
 interface PedalboardViewProps {
   data: ArsenalUserData;
   onUpdateItems: (items: PedalboardPlacement[]) => void;
+  onHover?: (e: React.MouseEvent | null, content: React.ReactNode | null) => void;
+  /** Touch-only: tapping a pedal opens its card in a modal (drag is disabled when set). */
+  onShowCard?: (content: React.ReactNode) => void;
 }
 
-export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => {
+export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: PedalboardViewProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDragging] = useState<DragState | null>(null);
   const [isColliding, setIsColliding] = useState(false);
+  // Natural aspect ratio (w/h) per image, measured once the image loads.
+  const [aspectById, setAspectById] = useState<Record<number | string, number>>({});
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingSaveRef = useRef(false);
   const onUpdateItemsRef = useRef(onUpdateItems);
@@ -70,12 +90,28 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
     }
   }, [data.rig.pedalboardItems, dragging]);
 
-  const checkCollision = (xPct: number, yPct: number, excludeId: string): boolean => {
+  // Resolve a placed pedal's effect → its image aspect → its width in board %.
+  const aspectForItemId = (itemId: string): number => {
+    const invItem = data.effectInventory.find((e) => e.id === itemId);
+    const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+    return effect ? aspectById[effect.imageId] ?? DEFAULT_ASPECT : DEFAULT_ASPECT;
+  };
+
+  // Width-in-board-% for each placed pedal, kept in a ref so the drag handlers
+  // (which read it during mousemove) always see the current values.
+  const itemWidthsRef = useRef<Record<string, number>>({});
+  itemWidthsRef.current = Object.fromEntries(
+    localItems.map((p) => [p.itemId, widthPctForAspect(aspectForItemId(p.itemId))])
+  );
+  const widthOf = (itemId: string) => itemWidthsRef.current[itemId] ?? PEDAL_W_PCT;
+
+  const checkCollision = (xPct: number, yPct: number, excludeId: string, w: number): boolean => {
     return localItemsRef.current.some(item => {
       if (item.itemId === excludeId) return false;
+      const iw = widthOf(item.itemId);
       return (
-        xPct < item.xPct + PEDAL_W_PCT &&
-        xPct + PEDAL_W_PCT > item.xPct &&
+        xPct < item.xPct + iw &&
+        xPct + w > item.xPct &&
         yPct < item.yPct + PEDAL_H_PCT &&
         yPct + PEDAL_H_PCT > item.yPct
       );
@@ -85,7 +121,8 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragging || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
-    const rawX = Math.max(0, Math.min(100 - PEDAL_W_PCT, ((e.clientX - rect.left) / rect.width) * 100 - dragging.offXPct));
+    const w = widthOf(dragging.itemId);
+    const rawX = Math.max(0, Math.min(100 - w, ((e.clientX - rect.left) / rect.width) * 100 - dragging.offXPct));
     const rawY = Math.max(0, Math.min(100 - PEDAL_H_PCT, ((e.clientY - rect.top) / rect.height) * 100 - dragging.offYPct));
 
     const current = localItemsRef.current.find(i => i.itemId === dragging.itemId);
@@ -95,13 +132,13 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
     let finalX = rawX;
     let finalY = rawY;
 
-    if (checkCollision(rawX, rawY, dragging.itemId)) {
+    if (checkCollision(rawX, rawY, dragging.itemId, w)) {
       // Try sliding on X axis only
-      if (!checkCollision(rawX, prevY, dragging.itemId)) {
+      if (!checkCollision(rawX, prevY, dragging.itemId, w)) {
         finalX = rawX;
         finalY = prevY;
       // Try sliding on Y axis only
-      } else if (!checkCollision(prevX, rawY, dragging.itemId)) {
+      } else if (!checkCollision(prevX, rawY, dragging.itemId, w)) {
         finalX = prevX;
         finalY = rawY;
       // Full block — keep previous position
@@ -141,7 +178,10 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
   }, [dragging, handleMouseMove, handleMouseUp]);
 
   const handlePedalMouseDown = (e: React.MouseEvent, item: PedalboardPlacement) => {
+    // On touch devices we open the card on tap instead of dragging.
+    if (onShowCard) return;
     e.preventDefault();
+    onHover?.(null, null);
     if (!boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
     const curXPct = ((e.clientX - rect.left) / rect.width) * 100;
@@ -174,7 +214,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
         className="relative w-full select-none"
         style={{
           background: "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
-          borderRadius: 12,
+          borderRadius: 4,
           padding: "10px 14px 14px",
           boxShadow: "0 20px 60px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
           border: "2px solid #383838",
@@ -184,13 +224,13 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex gap-2">
             {[0,1].map(i => (
-              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
+              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 4, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
             ))}
           </div>
-          <span className="text-[8px] font-black uppercase tracking-[0.35em] text-zinc-600">Pedalboard</span>
+          <span className="text-[8px] font-black capitalize tracking-[0.35em] text-zinc-600">Pedalboard</span>
           <div className="flex gap-2">
             {[0,1].map(i => (
-              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
+              <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 4, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
             ))}
           </div>
         </div>
@@ -201,7 +241,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           className="relative w-full overflow-hidden"
           style={{
             aspectRatio: "16 / 7",
-            borderRadius: 6,
+            borderRadius: 4,
             backgroundImage: "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
             backgroundSize: "9px 9px",
             backgroundColor: "#141414",
@@ -214,12 +254,12 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
             </div>
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Amp</span>
+            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Amp</span>
           </div>
 
           {/* Instr jack — bottom right */}
           <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Instr</span>
+            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Instr</span>
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
             </div>
@@ -233,25 +273,31 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
             if (!effect || !rs) return null;
             const isDragging = dragging?.itemId === placement.itemId;
             const showCollision = isDragging && isColliding;
+            const wPct = widthPctForAspect(
+              aspectById[effect.imageId] ?? DEFAULT_ASPECT
+            );
 
             return (
               <div
                 key={placement.itemId}
                 onMouseDown={(e) => handlePedalMouseDown(e, placement)}
+                onMouseMove={(e) => { if (!dragging && invItem) onHover?.(e, <EffectCard item={invItem} readOnly />); }}
+                onMouseLeave={() => onHover?.(null, null)}
+                onClick={() => { if (onShowCard && invItem) onShowCard(<EffectCard item={invItem} readOnly />); }}
                 className="absolute group"
                 style={{
                   left: `${placement.xPct}%`,
                   top: `${placement.yPct}%`,
-                  width: `${PEDAL_W_PCT}%`,
+                  width: `${wPct}%`,
                   height: `${PEDAL_H_PCT}%`,
                   zIndex: isDragging ? 50 : 2,
                   cursor: isDragging ? "grabbing" : "grab",
                   filter: showCollision
                     ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
                     : isDragging
-                    ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                    : `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
-                  transform: isDragging ? "scale(1.07) translateY(-5px)" : "scale(1)",
+                    ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
+                    : `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))`,
+                  transform: isDragging ? "scale(1.07) translateY(-6px)" : "scale(1)",
                   transition: isDragging ? "none" : "filter 0.15s, transform 0.15s",
                 }}
               >
@@ -260,6 +306,16 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                   alt={effect.name}
                   className="w-full h-full object-contain"
                   draggable={false}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.naturalWidth || !img.naturalHeight) return;
+                    const ar = img.naturalWidth / img.naturalHeight;
+                    setAspectById((prev) =>
+                      prev[effect.imageId] === ar
+                        ? prev
+                        : { ...prev, [effect.imageId]: ar }
+                    );
+                  }}
                 />
                 {/* LED indicator */}
                 <div
@@ -270,7 +326,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
                 <button
                   onMouseDown={e => e.stopPropagation()}
                   onClick={e => handleRemove(placement.itemId, e)}
-                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/90 border border-zinc-500 flex items-center justify-center text-zinc-300 opacity-0 group-hover:opacity-100 hover:text-white hover:border-zinc-300 transition-opacity z-10"
+                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded bg-black/90 border border-zinc-500 flex items-center justify-center text-zinc-300 opacity-0 group-hover:opacity-100 hover:text-white hover:border-zinc-300 transition-opacity z-10"
                 >
                   <X size={8} />
                 </button>
@@ -281,11 +337,11 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           {/* Add pedal button */}
           <button
             onClick={() => setShowPicker(true)}
-            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-sm border border-zinc-500 bg-zinc-800/80 text-zinc-300 hover:text-white hover:border-zinc-300 hover:bg-zinc-700/80 transition-all duration-150 z-10"
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded border border-zinc-500 bg-zinc-800/80 text-zinc-300 hover:text-white hover:border-zinc-300 hover:bg-zinc-700/80 transition-all duration-150 z-10"
             style={{ fontSize: 9, boxShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
           >
             <Plus size={10} strokeWidth={2.5} />
-            <span className="font-black uppercase tracking-[0.2em]">Add Pedal</span>
+            <span className="font-black capitalize tracking-[0.2em]">Add Pedal</span>
           </button>
         </div>
 
@@ -294,7 +350,7 @@ export const PedalboardView = ({ data, onUpdateItems }: PedalboardViewProps) => 
           <div style={{ width: 52, height: 9, background: "linear-gradient(180deg,#555,#2a2a2a)", borderRadius: 4, boxShadow: "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)" }} />
           <div className="flex gap-6">
             {[0,1,2,3].map(i => (
-              <div key={i} style={{ width: 11, height: 11, borderRadius: "50%", background: "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)", boxShadow: "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)" }} />
+              <div key={i} style={{ width: 11, height: 11, borderRadius: 4, background: "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)", boxShadow: "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)" }} />
             ))}
           </div>
           <div style={{ width: 52, height: 9, background: "linear-gradient(180deg,#555,#2a2a2a)", borderRadius: 4, boxShadow: "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)" }} />

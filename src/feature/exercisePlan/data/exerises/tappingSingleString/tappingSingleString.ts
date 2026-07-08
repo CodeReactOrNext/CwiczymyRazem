@@ -8,23 +8,18 @@ export const tappingSingleStringExercise: Exercise = {
   id: "tapping_single_string",
   title: "Tapping – Simple Melody",
   description:
-    "An Am pentatonic melody on the high e string where both the tapped note and the pull-off target move independently. Every two notes form a melodic interval — a descending third, a fifth, a step. Quarter note pace so every note has room to breathe.",
+    "Learn basic tapping mechanics by playing a simple melody along a single string.",
+  whyItMatters: "Starting with a simple melody lets you focus entirely on the physical mechanics of tapping: landing exactly in the middle of the fret and executing a clean pull-off without string noise.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Left hand shifts position each beat — it is not locked in one place.",
-    "Every beat is a pair: tap the upper note, pull-off to reveal the lower note.",
-    "Measures 1–2: phrases descend through E→C, D→A, C→G, E→C.",
-    "Measures 3–4: reach up to G(15) then step down through E, D, C.",
-    "Measures 5–8 repeat — aim for even volume on both notes of every pair."
+    "Execute each tap cleanly, keeping the finger curved and landing vertically.",
+    "Flick the tapped finger off the string cleanly to sound the fretted note."
   ],
   tips: [
-    "The pull-off note is not a throwaway — treat it as part of the melody, not a reset.",
-    "Left-hand finger must be in position before the tap lands — pre-plant it.",
-    "Sing or hum the two-note intervals as you play: your ear will guide your hands.",
-    "If the pull-off note is quieter, snap the finger more decisively sideways.",
-    "Play very slowly the first time through to hear the melodic shape."
+    "Focus on achieving a consistent volume between tapped and fretted notes.",
+    "Keep your fretting hand thumb anchored to stabilize the neck."
   ],
   metronomeSpeed: { min: 40, max: 75, recommended: 52 },
   relatedSkills: ["tapping"],

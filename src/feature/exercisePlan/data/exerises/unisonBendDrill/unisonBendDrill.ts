@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const unisonBendDrillExercise: Exercise = {
   id: "unison_bend_drill",
   title: "Unison Bending",
-  description: "Unison bends — play a note on one string while bending the adjacent string to match its pitch. Two-note simultaneous hits that create a dramatic unison effect. Progresses across string pairs.",
+  description: "Master pitch matching and microtonal adjustments in unison bends.",
+  whyItMatters: "Unison bends (holding one note while bending an adjacent string to match its pitch) sound powerful and aggressive. Achieving perfect pitch unison eliminates beat frequencies, creating a massive, focused rock sound.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
-    "Measures 1-2: String 3 fret 9 (target D) + string 2 fret 7 bend whole step (B→D unison). Play both notes simultaneously.",
-    "Measures 3-4: String 2 fret 10 (target A) + string 3 fret 7 bend whole step (G→A). Reverse string pair.",
-    "Measures 5-6: Moving unisons across positions with vibrato on the bent note for extra expression.",
-    "The goal is to hear both notes merge into one — when the pitches match perfectly, any beating disappears.",
+    "Hold the lower note steady while bending the adjacent string to match its pitch.",
+    "Listen carefully for the microtonal 'beats' and adjust the bend until they disappear."
   ],
   tips: [
-    "Use your ear — the moment the pitches match, you'll hear the beating stop and the notes fuse.",
-    "The unbent note is your pitch reference. Keep it steady and adjust the bend to match.",
-    "Use multiple fingers behind the bending finger for strength and control.",
-    "Start without the metronome (free time) to focus on pitch accuracy, then add rhythm.",
+    "Support the bending finger with your other fingers for maximum control.",
+    "Keep the unbent string anchored firmly so its pitch does not shift."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 55 },
   relatedSkills: ["bending"],

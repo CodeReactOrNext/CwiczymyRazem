@@ -17,16 +17,15 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
-import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
-import { getPointsToLvlUp } from "utils/gameLogic";
+import { getPointsToLvlUp, getReconciledStreak } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
 import { StatsSection } from "./components/StatsSection";
-import { UserRecordingsSection } from "./components/UserRecordingsSection";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -61,7 +60,18 @@ const ProfileLayout = ({
   } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
-  const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+
+  // Streak: same logic as the header — the activity log (local time) is the
+  // timezone-correct source of truth, with the stored counter as a fallback
+  // until the log loads. See getReconciledStreak.
+  const { dayWithoutBreak: streak } = getReconciledStreak({
+    actualDayWithoutBreak: statistics.actualDayWithoutBreak || 0,
+    lastReportDate,
+    reportDates: (reportList ?? []).map(
+      (report: { date: Date | string }) => report.date
+    ),
+  });
 
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
@@ -103,7 +113,7 @@ const ProfileLayout = ({
   const glowColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? "#0891b2") : "#0891b2";
 
   return (
-    <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16 overflow-hidden md:overflow-visible'>
+    <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>
       <HeroBanner
         eyebrow='Player Profile'
         title={displayName}
@@ -117,7 +127,7 @@ const ProfileLayout = ({
 
               {/* Guitar with CSS fade on the right side */}
               <img
-                src={`/static/images/rank/${imgPath}.png`}
+                src={`/static/images/rank/${imgPath}.webp`}
                 className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
                 style={{ 
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
@@ -199,7 +209,18 @@ const ProfileLayout = ({
 
             {/* Info */}
             <div className='space-y-2 bg-black/40 backdrop-blur-md px-4 py-3 rounded-xl border border-white/5 shadow-2xl'>
-              <DaySinceMessage date={new Date(lastReportDate)} />
+              <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
+                <DaySinceMessage date={new Date(lastReportDate)} />
+                {streak > 0 && (
+                  <div className='flex items-center gap-1.5 rounded-[4px] bg-orange-500/15 px-2.5 py-1 border border-orange-500/30'>
+                    <FaFire className='text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' size={13} />
+                    <span className='text-xs font-black text-white tabular-nums'>{streak}</span>
+                    <span className='text-[11px] font-semibold tracking-wide text-orange-400/90'>
+                      day streak
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className='flex flex-wrap gap-x-4 gap-y-1'>
                 <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-400'>
                   <div className='h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]'></div>
@@ -267,8 +288,8 @@ const ProfileLayout = ({
         <SongSkillShowcase userSongs={songs} profileUserId={userAuth} />
 
         {/* Skills Section */}
-        {userSkills && (
-          <div className='rounded-2xl bg-zinc-900/30 p-6'>
+        {userSkills && Object.keys(userSkills.unlockedSkills ?? {}).length > 0 && (
+          <div className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'>
             <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
@@ -277,22 +298,21 @@ const ProfileLayout = ({
         {/* Arsenal Section */}
         <ProfileArsenal userAuth={userAuth} />
 
-        {/* Recordings Section */}
-        <UserRecordingsSection userId={userAuth} />
-
         {/* Achievement Sections */}
         <div className='space-y-8'>
-          <SeasonalAchievements userId={userAuth} />
+          <SeasonalAchievements userId={userAuth} hideWhenEmpty />
 
-          <div className='space-y-4 px-2'>
-            <div className='flex items-center gap-2'>
-              <h2 className='text-xl font-bold text-white uppercase tracking-wider'>Achievements</h2>
-              <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
-                {achievements?.length || 0}
-              </span>
+          {(achievements?.length ?? 0) > 0 && (
+            <div className='space-y-4 px-2'>
+              <div className='flex items-center gap-2'>
+                <h2 className='text-xl font-bold text-white capitalize tracking-wider'>Achievements</h2>
+                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
+                  {achievements?.length || 0}
+                </span>
+              </div>
+              <AchievementWrapper userAchievements={achievements ?? []} />
             </div>
-            <AchievementWrapper userAchievements={achievements ?? []} />
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { ActionCard } from 'components/Blog/ActionCard';
+import { AppCard } from 'components/Blog/AppCard';
 import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
@@ -17,6 +18,7 @@ import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import { useEffect, useState } from 'react';
+import remarkGfm from 'remark-gfm';
 
 
 
@@ -32,14 +34,24 @@ const components = {
   YouTube,
   BlogAlert,
   ActionCard,
+  AppCard,
   PracticeTable,
   // Mapping h2 to include IDs for ToC
   h2: (props: any) => (
-    <h2 
-      id={props.children?.toString().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')} 
-      {...props} 
+    <h2
+      id={props.children?.toString().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}
+      {...props}
     />
   ),
+  // Content images live below the fold; lazy-load them to cut initial page weight
+  img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
+  // GFM task-list checkboxes render as bare inputs; give them an accessible name
+  input: (props: any) =>
+    props.type === 'checkbox' ? (
+      <input aria-label='Checklist item' {...props} />
+    ) : (
+      <input {...props} />
+    ),
 };
 
 const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], faqs = [] }: BlogPostProps) => {
@@ -72,6 +84,11 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
     return () => observer.disconnect();
   }, [headings]);
 
+  // Frontmatter images are either site-relative paths or already-absolute CDN URLs.
+  const absoluteImage = frontmatter.image?.startsWith('http')
+    ? frontmatter.image
+    : `https://riff.quest${frontmatter.image}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -79,10 +96,11 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         "@type": "BlogPosting",
         "headline": frontmatter.title,
         "description": frontmatter.description,
-        "image": `https://riff.quest${frontmatter.image}`,
+        "image": absoluteImage,
         "author": {
-          "@type": "Organization",
-          "name": "Riff Quest"
+          "@type": "Person",
+          "name": frontmatter.author || "Riff Quest",
+          "url": "https://riff.quest"
         },
         "publisher": {
           "@type": "Organization",
@@ -93,6 +111,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
           }
         },
         "datePublished": frontmatter.date,
+        "dateModified": frontmatter.updatedAt || frontmatter.date,
         "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": `https://riff.quest/blog/${frontmatter.slug}`
@@ -121,6 +140,15 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
           }
         ]
       },
+      frontmatter.listItems && frontmatter.listItems.length > 0 ? {
+        "@type": "ItemList",
+        "name": frontmatter.title,
+        "itemListElement": frontmatter.listItems.map((name, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": name,
+        })),
+      } : null,
       faqs.length > 0 ? {
         "@type": "FAQPage",
         "mainEntity": faqs.map(faq => ({
@@ -135,16 +163,28 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
     ].filter(Boolean)
   };
 
+  // SEO <title>: prefer an explicit metaTitle, fall back to the (often longer) H1 title.
+  // Append the brand only when the result still fits within Google's ~60-char SERP limit.
+  const seoBase = frontmatter.metaTitle || frontmatter.title;
+  const pageTitle = seoBase.length <= 47 ? `${seoBase} | Riff Quest` : seoBase;
+
   return (
     <>
       <Head>
-        <title>{frontmatter.title} | Riff Quest Blog</title>
+        <title>{pageTitle}</title>
         <meta name="description" content={frontmatter.description} />
         <meta property="og:title" content={frontmatter.title} />
         <meta property="og:description" content={frontmatter.description} />
-        <meta property="og:image" content={frontmatter.image} />
+        <meta property="og:image" content={absoluteImage} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://riff.quest/blog/${frontmatter.slug}`} />
+        <meta property="article:published_time" content={frontmatter.date} />
+        <meta property="article:modified_time" content={frontmatter.updatedAt || frontmatter.date} />
+        <meta property="article:author" content={frontmatter.author || "Riff Quest"} />
         <link rel='canonical' href={`https://riff.quest/blog/${frontmatter.slug}`} />
+        {frontmatter.image && (
+          <link rel='preload' as='image' href={frontmatter.image} fetchPriority='high' />
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -257,7 +297,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
   const { frontmatter, content } = await getBlogBySlug(slug);
-  const mdxSource = await serialize(content);
+  const mdxSource = await serialize(content, {
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+    },
+  });
 
   const headings = content.split('\n')
     .filter(line => line.startsWith('## '))
@@ -283,10 +327,26 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     });
   }
 
+  // Hub-and-spoke related posts: surface same-cluster posts first (pillar leading),
+  // then top up with the most recent posts so every article still shows three.
   const allBlogs = getAllBlogs();
-  const relatedBlogs = allBlogs
-    .filter((blog) => blog.slug !== slug)
-    .slice(0, 3);
+  const current = allBlogs.find((blog) => blog.slug === slug);
+  const others = allBlogs.filter((blog) => blog.slug !== slug);
+
+  const sameCluster = current?.cluster
+    ? others
+        .filter((blog) => blog.cluster === current.cluster)
+        .sort((a, b) => Number(b.pillar ?? false) - Number(a.pillar ?? false))
+    : [];
+
+  // Rotate the fill deterministically per slug so incoming links spread across
+  // the whole catalog instead of always pointing at the newest posts.
+  const fill = others.filter((blog) => !sameCluster.includes(blog));
+  const offset = fill.length
+    ? [...slug].reduce((sum, char) => sum + char.charCodeAt(0), 0) % fill.length
+    : 0;
+  const rotatedFill = [...fill.slice(offset), ...fill.slice(0, offset)];
+  const relatedBlogs = [...sameCluster, ...rotatedFill].slice(0, 3);
 
   return {
     props: {

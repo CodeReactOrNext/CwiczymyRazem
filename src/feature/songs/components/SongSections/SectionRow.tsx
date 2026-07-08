@@ -12,12 +12,15 @@ const PREDEFINED_NAMES = [
 
 interface SectionRowProps {
   section: SongSection;
+  endTime: number;
+  isLastSection: boolean;
   isLooping: boolean;
   onPlay: (section: SongSection) => void;
   onLoop: (section: SongSection) => void;
   onMasteryChange: (id: string, mastery: MasteryLevel) => void;
   onRename: (id: string, name: string) => void;
   onTimeChange: (id: string, startTime: number) => void;
+  onEndTimeChange?: (t: number) => void;
   onDelete: (id: string) => void;
   isLocked?: boolean;
 }
@@ -37,12 +40,15 @@ const parseTime = (value: string): number | null => {
 
 export const SectionRow = ({
   section,
+  endTime,
+  isLastSection,
   isLooping,
   onPlay,
   onLoop,
   onMasteryChange,
   onRename,
   onTimeChange,
+  onEndTimeChange,
   onDelete,
   isLocked,
 }: SectionRowProps) => {
@@ -50,8 +56,11 @@ export const SectionRow = ({
   const [nameValue, setNameValue] = useState(section.name);
   const [editingTime, setEditingTime] = useState(false);
   const [timeValue, setTimeValue] = useState(formatTime(section.startTime));
+  const [editingEndTime, setEditingEndTime] = useState(false);
+  const [endTimeValue, setEndTimeValue] = useState(formatTime(endTime));
   const nameInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
+  const endTimeInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editingName) nameInputRef.current?.focus();
@@ -60,6 +69,10 @@ export const SectionRow = ({
   useEffect(() => {
     if (editingTime) timeInputRef.current?.select();
   }, [editingTime]);
+
+  useEffect(() => {
+    if (editingEndTime) endTimeInputRef.current?.select();
+  }, [editingEndTime]);
 
   const commitName = () => {
     const trimmed = nameValue.trim();
@@ -75,15 +88,22 @@ export const SectionRow = ({
     setEditingTime(false);
   };
 
+  const commitEndTime = () => {
+    const parsed = parseTime(endTimeValue);
+    if (parsed !== null && onEndTimeChange) onEndTimeChange(parsed);
+    else setEndTimeValue(formatTime(endTime));
+    setEditingEndTime(false);
+  };
+
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:px-4 sm:py-3 rounded-lg border transition-all",
+        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:px-4 sm:py-3 rounded-lg transition-all",
         isLooping
-          ? "bg-cyan-500/5 border-cyan-500/20"
+          ? "bg-cyan-500/5"
           : section.mastery === 3
-          ? "bg-green-500/5 border-green-500/20"
-          : "bg-white/[0.02] border-white/5 hover:bg-white/5"
+          ? "bg-green-500/5"
+          : "bg-white/[0.02] hover:bg-white/5"
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -93,38 +113,77 @@ export const SectionRow = ({
           style={{ backgroundColor: section.color }}
         />
 
-        {/* timestamp */}
-        {editingTime ? (
-          <input
-            ref={timeInputRef}
-            value={timeValue}
-            onChange={(e) => setTimeValue(e.target.value)}
-            onBlur={commitTime}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commitTime();
-              if (e.key === "Escape") {
+        {/* timestamps: start → end */}
+        <div className="flex items-center gap-1 shrink-0 font-mono text-[13px]">
+          {editingTime ? (
+            <input
+              ref={timeInputRef}
+              value={timeValue}
+              onChange={(e) => setTimeValue(e.target.value)}
+              onBlur={commitTime}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitTime();
+                if (e.key === "Escape") {
+                  setTimeValue(formatTime(section.startTime));
+                  setEditingTime(false);
+                }
+              }}
+              className="w-12 bg-white/5 rounded-lg px-2 py-1 text-white text-center outline-none"
+            />
+          ) : (
+            <button
+              type="button"
+              disabled={isLocked}
+              onClick={() => {
                 setTimeValue(formatTime(section.startTime));
-                setEditingTime(false);
-              }
-            }}
-            className="w-12 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[13px] text-white font-mono text-center outline-none focus:border-cyan-500/50 transition-colors"
-          />
-        ) : (
-          <button
-            type="button"
-            disabled={isLocked}
-            onClick={() => {
-              setTimeValue(formatTime(section.startTime));
-              setEditingTime(true);
-            }}
-            className={cn(
-              "w-12 text-[13px] font-mono text-zinc-500 hover:text-white transition-colors text-center shrink-0",
-              isLocked && "hover:text-zinc-500 cursor-default"
-            )}
-          >
-            {formatTime(section.startTime)}
-          </button>
-        )}
+                setEditingTime(true);
+              }}
+              className={cn(
+                "w-12 text-zinc-500 hover:text-white transition-colors text-center",
+                isLocked && "hover:text-zinc-500 cursor-default"
+              )}
+            >
+              {formatTime(section.startTime)}
+            </button>
+          )}
+
+          <span className="text-zinc-700">→</span>
+
+          {editingEndTime ? (
+            <input
+              ref={endTimeInputRef}
+              value={endTimeValue}
+              onChange={(e) => setEndTimeValue(e.target.value)}
+              onBlur={commitEndTime}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitEndTime();
+                if (e.key === "Escape") {
+                  setEndTimeValue(formatTime(endTime));
+                  setEditingEndTime(false);
+                }
+              }}
+              className="w-12 bg-white/5 rounded-lg px-2 py-1 text-white text-center outline-none"
+            />
+          ) : (
+            <button
+              type="button"
+              disabled={isLocked || isLastSection}
+              onClick={() => {
+                if (isLastSection) return;
+                setEndTimeValue(formatTime(endTime));
+                setEditingEndTime(true);
+              }}
+              className={cn(
+                "w-12 text-zinc-500 transition-colors text-center",
+                !isLastSection && !isLocked
+                  ? "hover:text-white cursor-pointer"
+                  : "cursor-default opacity-40"
+              )}
+            >
+              {formatTime(endTime)}
+            </button>
+          )}
+        </div>
 
         {/* name */}
         {editingName ? (
@@ -141,7 +200,7 @@ export const SectionRow = ({
                   setEditingName(false);
                 }
               }}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white outline-none focus:border-cyan-500/50 transition-colors"
+              className="w-full bg-white/5 rounded-lg px-3 py-1.5 text-sm text-white outline-none transition-colors"
             />
             <div
               className="flex flex-wrap gap-1"
@@ -157,10 +216,10 @@ export const SectionRow = ({
                     setEditingName(false);
                   }}
                   className={cn(
-                    "px-2.5 py-1 rounded-md border text-[10px] font-medium transition-colors",
+                    "px-2.5 py-1 rounded-[4px] text-[10px] font-medium transition-colors",
                     nameValue === name
-                      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
-                      : "bg-white/[0.03] border-white/10 text-zinc-500 hover:bg-cyan-500/10 hover:border-cyan-500/30 hover:text-cyan-400"
+                      ? "bg-cyan-500/10 text-cyan-400"
+                      : "bg-white/[0.03] text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400"
                   )}
                 >
                   {name}

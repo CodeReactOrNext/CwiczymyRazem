@@ -107,7 +107,7 @@ export const HeroBanner = ({
               {eyebrow}
             </p>
           )}
-          <div className="md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 bg-second-600/60 backdrop-blur-md rounded-none md:rounded-lg px-3 py-2 inline-block">
+          <div className="inline-block !mb-4 md:!mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
               {title}
             </h1>
@@ -116,7 +116,7 @@ export const HeroBanner = ({
             )}
           </div>
           {leftContent && (
-            <div className="mt-4 sm:mt-6 relative z-20">
+            <div className="mt-6 sm:mt-8 relative z-20">
               {leftContent}
             </div>
           )}

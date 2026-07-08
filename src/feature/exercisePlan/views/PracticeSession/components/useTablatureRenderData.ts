@@ -3,11 +3,13 @@ import { useMemo } from "react";
 
 export const STRING_SPACING = 32;
 export const NOTE_RADIUS    = 11;
-export const STAFF_TOP      = 85;
+export const STAFF_TOP      = 62;
 export const STRING_COLORS  = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc"] as const;
 
 export interface NoteRD {
   noteKey: string;
+  /** 1–6 string number (1 = high e). Exposed for the 3D highway lane mapping. */
+  string: number;
   noteY: number;
   fret: number;
   color: string;
@@ -95,6 +97,7 @@ export function useTablatureRenderData(measures: TablatureMeasure[] | undefined)
           if (note.dynamics !== undefined) hasDyn     = true;
           return {
             noteKey:       `${mIdx}-${bIdx}-${nIdx}`,
+            string:        note.string,
             noteY:         STAFF_TOP + (note.string - 1) * STRING_SPACING,
             fret:          note.fret,
             color:         STRING_COLORS[note.string - 1] ?? "#ffffff",

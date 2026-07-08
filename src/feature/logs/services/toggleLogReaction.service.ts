@@ -52,7 +52,7 @@ export const toggleLogReaction = async (logId: string, userId: string, isRemovin
             userId: recipientId,
             senderId: userId,
             senderName: reactorData.displayName || "Someone",
-            senderAvatarUrl: reactorData.photoURL || null,
+            senderAvatarUrl: reactorData.avatar || reactorData.photoURL || null,
             senderFrame: reactorData.selectedFrame ?? reactorData.statistics?.lvl ?? 0,
             type: "reaction",
             recordingId: logId,

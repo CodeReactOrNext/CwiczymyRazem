@@ -1,0 +1,106 @@
+{
+  "page": {
+    "empty": "No practice sessions yet",
+    "empty_hint": "Complete a practice session or add a manual report to see it here.",
+    "empty_filtered": "Nothing matches your filters",
+    "empty_filtered_hint": "Try widening the date range or clearing the filters.",
+    "sessions_heading": "Sessions",
+    "day_sessions": "{{count}} session(s)"
+  },
+  "pagination": {
+    "label": "Sessions pages",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page_of": "Page {{page}} of {{total}}"
+  },
+  "timeline": {
+    "heading": "Day timeline"
+  },
+  "calendar": {
+    "prev_month": "Previous month",
+    "next_month": "Next month",
+    "clear_day": "Clear selected day",
+    "hint": "Tap a highlighted day",
+    "less": "Less",
+    "more": "More"
+  },
+  "filters": {
+    "heading": "Filters",
+    "range_7d": "7 days",
+    "range_30d": "30 days",
+    "range_90d": "90 days",
+    "range_all": "All time",
+    "pick_day": "Pick a day",
+    "clear_date": "Clear selected day",
+    "clear_all": "Clear filters",
+    "type_label": "Session type",
+    "type_all": "All types",
+    "type_manual": "Manual reports",
+    "type_plan": "Plan sessions",
+    "type_song": "Song practice",
+    "duration_label": "Duration",
+    "duration_all": "Any duration",
+    "duration_short": "Under 15 min",
+    "duration_medium": "15–45 min",
+    "duration_long": "Over 45 min",
+    "sort_label": "Sort",
+    "sort_date_desc": "Newest first",
+    "sort_date_asc": "Oldest first",
+    "sort_time_desc": "Longest first",
+    "sort_points_desc": "Most points"
+  },
+  "summary": {
+    "heading": "Overview",
+    "time_split": "Time split",
+    "total_time": "Total time",
+    "sessions": "Sessions",
+    "points": "Points",
+    "active_days": "Active days",
+    "avg_session": "Avg session"
+  },
+  "card": {
+    "type_manual": "Manual",
+    "type_plan": "Plan",
+    "type_song": "Song",
+    "backdated": "Backdated",
+    "duration": "Time",
+    "points": "Points",
+    "edit": "Edit report",
+    "delete": "Delete report",
+    "recorded_tooltip": "Recorded exercise — cannot be edited"
+  },
+  "edit_modal": {
+    "title": "Edit report",
+    "date_locked": "date cannot be changed",
+    "title_label": "Title",
+    "description_label": "Description",
+    "description_placeholder": "Optional notes about this session",
+    "time_label": "Practice time",
+    "hours": "h",
+    "minutes": "min",
+    "total": "Total",
+    "total_required": "Total time must be greater than zero.",
+    "stats_note": "Editing does not change points, level, streak or achievements.",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving..."
+  },
+  "delete_dialog": {
+    "title": "Delete this report?",
+    "description": "\"{{title}}\" will be removed from your practice log. Points, level and achievements already earned will not change. This cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "deleting": "Deleting..."
+  },
+  "toast": {
+    "edit_success": "Report updated.",
+    "edit_error": "Failed to update report. Try again.",
+    "delete_success": "Report deleted.",
+    "delete_error": "Failed to delete report. Try again."
+  },
+  "widget": {
+    "title": "Recent sessions",
+    "view_all": "View all",
+    "empty": "No sessions yet — your recent practice will show up here."
+  }
+}

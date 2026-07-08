@@ -8,7 +8,31 @@
       "Bash(done)",
       "Read(//c/Users/Krokon/.claude/projects/c--cw-CwiczymyRazem/bdab00ad-dfa9-44e5-a6c4-2b3337f1b00b/tool-results/**)",
       "Read(//c/cw/CwiczymyRazem/**)",
-      "Bash(xargs grep -l \"collection\\(\"\"users\"\"\\)\")"
+      "Bash(xargs grep -l \"collection\\(\"\"users\"\"\\)\")",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'style: capitalize '\\\\''Your Position'\\\\'' label in leaderboard header *)",
+      "WebFetch(domain:riff.quest)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Read(//c/Users/Krokon/.claude/**)",
+      "Bash(node tmp_parse.js; rm -f tmp_parse.js /tmp/parse.js /tmp/parse2.js)",
+      "Bash(echo \"EXIT_GREP=$?\")",
+      "PowerShell(npx tsc --noEmit -p tsconfig.json 2>&1)",
+      "PowerShell(npx tsc --noEmit; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(npx eslint \"src/feature/exercisePlan/chords/chordTones.ts\" \"src/feature/exercisePlan/chords/rootProgressionGenerator.ts\" \"src/feature/exercisePlan/data/exerises/intervalHunt/intervalHunt.ts\" \"src/feature/exercisePlan/data/exerises/buildTheChord/buildTheChord.ts\" \"src/feature/exercisePlan/data/exerises/hitTheRoot/hitTheRoot.ts\" \"src/feature/exercisePlan/views/PracticeSession/hooks/useChordHunt.ts\" \"src/feature/exercisePlan/views/PracticeSession/components/ChordHuntPanel.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/NoteHuntDetector.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/MobileExerciseContent.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/ExerciseContentArea.tsx\" 2>&1 | Select-String -NotMatch \"Browserslist|caniuse|update-browserslist|npx update|FullyQualified|CategoryInfo|node.exe|At line|\\\\+ \" | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(npx eslint --fix \"src/feature/exercisePlan/views/PracticeSession/components/ExerciseContentArea.tsx\" \"src/feature/exercisePlan/views/PracticeSession/components/MobileExerciseContent.tsx\" 2>&1 | Select-String -NotMatch \"Browserslist|caniuse|update-browserslist|npx update|FullyQualified|CategoryInfo|node.exe|At line|\\\\+ \" | Select-Object -First 40; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(npx tsc --noEmit; \"TSC=$LASTEXITCODE\")",
+      "Bash(node -e ' *)",
+      "Bash(npx eslint *)",
+      "Bash(grep -viE \"browserslist|no-img-element|exhaustive-deps|^\\\\s*$\")",
+      "PowerShell(npx tsc --noEmit)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://assets.seobotai.com/undefined/698bcc98676cd2891cb2b8fb-1770780007178.jpg\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://assets.seobotai.com/undefined/69c7f1c01b352ff267cc69a0-1774713073785.jpg\")",
+      "WebFetch(domain:www.siccasguitars.com)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

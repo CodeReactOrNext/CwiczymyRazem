@@ -3,27 +3,27 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const strummingBasicExercise: Exercise = {
   id: "strumming_basic",
   title: "Basic Down Strumming",
-  description: "Foundation of rhythm guitar — steady down strums on every beat.",
-  difficulty: "easy",
+  description: "Strum steady downward strokes on every beat over an Em chord to build basic rhythm and timing.",
+  whyItMatters: "This is the basic up-and-down arm movement used in all rhythm playing. Strumming steady downbeats locks your timing to the metronome, keeps your wrist relaxed, and helps you hit all the strings of the chord evenly.",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Hold a chord of your choice (Em or G are great for beginners).",
-    "Strum downward on every beat: 1, 2, 3, 4.",
-    "Keep your strumming arm moving at a steady pendulum motion — don't tense up.",
-    "Focus on hitting all strings cleanly with consistent volume.",
-    "Once comfortable, try switching chords every 2 beats without stopping.",
+    "Hold an Em chord (the easiest open chord) and let it ring through the whole exercise.",
+    "Strum only downward, one stroke on each beat, with a relaxed swing of the wrist and forearm.",
+    "Keep your strumming arm swinging gently even on the empty beats, so the rhythm stays steady."
   ],
   tips: [
-    "Think of your arm as a pendulum — it should always keep swinging even when you skip a strum.",
-    "Start very slow (60 BPM) and only speed up when the pattern feels automatic.",
-    "Listen for even spacing between strums — use the metronome as a guide.",
+    "Angle the pick slightly so it glides across the strings instead of catching.",
+    "Keep the pick shallow — just skim the strings rather than digging in.",
+    "Count out loud (1-2-3-4) with the metronome to stay locked to the beat."
   ],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   relatedSkills: ["rhythm"],
   strummingPatterns: [
     {
-      name: "Pattern: All Downs",
+      name: "Pattern: All Downs (Em)",
+      chord: "Em",
       timeSignature: [4, 4],
       subdivisions: 2,
       strums: [

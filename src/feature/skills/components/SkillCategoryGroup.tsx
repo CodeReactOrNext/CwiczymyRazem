@@ -10,6 +10,10 @@ interface SkillCategoryGroupProps {
   category: CategoryKeys;
   skills: GuitarSkill[];
   userSkills: UserSkills;
+  skillProgressMap?: Record<
+    string,
+    { completed: number; total: number; states: { done: boolean; title: string }[] }
+  >;
   onSkillClick: (skillId: string) => void;
 }
 
@@ -17,6 +21,7 @@ export const SkillCategoryGroup = ({
   category,
   skills,
   userSkills,
+  skillProgressMap,
   onSkillClick,
 }: SkillCategoryGroupProps) => {
   const { t } = useTranslation("skills");
@@ -38,6 +43,7 @@ export const SkillCategoryGroup = ({
                  key={skill.id}
                  skill={skill}
                  currentPoints={userSkills.unlockedSkills[skill.id] || 0}
+                 exerciseProgress={skillProgressMap?.[skill.id]}
                  onSkillClick={() => onSkillClick(skill.id)}
               />
           ))}

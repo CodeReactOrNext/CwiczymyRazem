@@ -1,11 +1,18 @@
-import React from "react";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import React from "react";
 
+import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { MetronomeGapTest } from "./MetronomeGapTest";
+import { NoteHuntDetector } from "./NoteHuntDetector";
+import { OpenExercisePanel } from "./OpenExercisePanel";
+import { StrummingSection } from "./StrummingSection";
 import { TablatureViewer } from "./TablatureViewer";
 
 interface MobileExerciseContentProps {
@@ -18,6 +25,7 @@ interface MobileExerciseContentProps {
   hasPlayedRiddleOnce?: boolean;
   isPlaying: boolean;
   isListening: boolean;
+  isMicEnabled?: boolean;
   frequencyRef?: React.MutableRefObject<number>;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
@@ -30,6 +38,7 @@ interface MobileExerciseContentProps {
   handleRevealRiddle?: () => void;
   handleNextRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   onPlayRiddle: () => void;
 }
 
@@ -43,6 +52,7 @@ export function MobileExerciseContent({
   hasPlayedRiddleOnce,
   isPlaying,
   isListening,
+  isMicEnabled,
   frequencyRef,
   tabResetKey,
   setVideoDuration,
@@ -55,6 +65,7 @@ export function MobileExerciseContent({
   handleRevealRiddle,
   handleNextRiddle,
   onEarTrainingGuessed,
+  riddleProgress,
   onPlayRiddle,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
@@ -62,6 +73,25 @@ export function MobileExerciseContent({
 
   return (
     <>
+      {currentExercise.customGoal && (
+        <div className="flex w-full justify-center py-2" key={currentExercise.customGoal}>
+          {currentExercise.noteHuntConfig?.mode === "chord" ? (
+            <ChordHuntPanel
+              chordName={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          ) : (
+            <NoteHuntDetector
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          )}
+        </div>
+      )}
       {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
         <EarTrainingView
           difficulty={currentExercise.riddleConfig.difficulty}
@@ -75,27 +105,33 @@ export function MobileExerciseContent({
           score={earTrainingScore || 0}
           highScore={earTrainingHighScore}
           canGuess={hasPlayedRiddleOnce || false}
+          isMicEnabled={!!isMicEnabled}
+          riddleProgress={riddleProgress}
           onRecordsClick={openLeaderboard}
         />
       )}
       {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
         <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
       )}
-      {activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
-        <TablatureViewer
-          measures={activeTablature}
-          bpm={effectiveBpm || metronome.bpm}
-          isPlaying={metronome.isPlaying}
-          startTime={metronome.startTime || null}
-          countInRemaining={(metronome as any).countInRemaining}
-          className="w-full"
-          frequencyRef={frequencyRef}
-          isListening={isListening}
-          hitNotes={hitNotes}
-          missedNotes={missedNotes}
-          currentBeatsElapsed={0}
-          resetKey={tabResetKey}
-        />
+      {currentExercise.id === "metronome_gap_test" ? (
+        <MetronomeGapTest compact />
+      ) : activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
+        <div className="w-full overflow-hidden rounded-2xl border border-white/5 bg-[#09090b] shadow-lg">
+          <TablatureViewer
+            measures={activeTablature}
+            bpm={effectiveBpm || metronome.bpm}
+            isPlaying={metronome.isPlaying}
+            startTime={metronome.startTime || null}
+            countInRemaining={(metronome as any).countInRemaining}
+            className="w-full"
+            frequencyRef={frequencyRef}
+            isListening={isListening}
+            hitNotes={hitNotes}
+            missedNotes={missedNotes}
+            currentBeatsElapsed={0}
+            resetKey={tabResetKey}
+          />
+        </div>
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
           <YouTubePlayalong
@@ -132,12 +168,26 @@ export function MobileExerciseContent({
             })()}
           </div>
         </div>
+      ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
+        <div className="w-full overflow-hidden rounded-2xl border border-white/5 shadow-lg">
+          <StrummingSection
+            patterns={currentExercise.strummingPatterns}
+            bpm={effectiveBpm || metronome.bpm}
+            isPlaying={metronome.isPlaying}
+            startTime={metronome.startTime || null}
+            countInRemaining={(metronome as any).countInRemaining}
+            isMicEnabled={isMicEnabled}
+            audioContext={metronome.audioContext}
+          />
+        </div>
       ) : (currentExercise.imageUrl || currentExercise.image) ? (
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}
           title={currentExercise.title}
           isMobileView={true}
         />
+      ) : isOpenExercise(currentExercise) ? (
+        <OpenExercisePanel compact />
       ) : null}
     </>
   );

@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
+    "electron": "electron .",
+    "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,green \"npm:dev\" \"wait-on tcp:127.0.0.1:3000 && electron .\"",
     "build": "next build",
+    "prebuild": "npm run export-exercises && node scripts/generateExerciseSitemap.mjs && node scripts/generateBlogSitemap.mjs",
     "start": "next start",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -14,7 +18,9 @@
     "coverage": "vitest run --coverage",
     "postinstall": "node patch-aubio.js",
     "export-exercises": "vitest run scripts/exportExercises.test.ts",
-    "knip": "knip"
+    "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
+    "knip": "knip",
+    "email": "email dev --dir src/lib/email/templates --port 3001"
   },
   "browserslist": {
     "production": [
@@ -44,6 +50,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hello-pangea/dnd": "^18.0.1",
     "@ncdai/react-wheel-picker": "^1.0.19",
+    "@octokit/rest": "^22.0.1",
     "@openai/agents": "^0.5.2",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -59,6 +66,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@react-email/components": "^1.0.12",
     "@reduxjs/toolkit": "^2.5.0",
     "@sentry/nextjs": "^10.32.1",
     "@tanstack/react-query": "^5.90.12",
@@ -97,19 +105,26 @@
     "react-redux": "^9.2.0",
     "react-youtube": "^10.1.0",
     "recharts": "^3.8.1",
+    "remark-gfm": "^4.0.1",
+    "resend": "^6.12.3",
     "sonner": "^2.0.7",
     "soundfont-player": "^0.12.0",
     "stripe": "^22.1.0",
     "tailwind-merge": "^3.5.0",
+    "three": "^0.185.1",
     "uuid": "^14.0.0",
     "vaul": "^1.1.2",
     "yup": "^1.7.1",
     "zod": "^4.3.6",
     "zustand": "^5.0.8"
   },
+  "optionalDependencies": {
+    "audify": "^1.10.1"
+  },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@eslint/eslintrc": "^3.3.5",
+    "@react-email/ui": "^6.3.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@testing-library/jest-dom": "^6.0.0",
@@ -119,12 +134,16 @@
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.0",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "@vitejs/plugin-react": "^6.0.1",
     "@welldone-software/why-did-you-render": "^10.0.1",
     "autoprefixer": "10.4.12",
     "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^10.0.3",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -135,6 +154,7 @@
     "postcss": "^8.4.18",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "react-email": "^6.3.1",
     "sharp": "^0.34.5",
     "tailwind-scrollbar": "^2.1.0",
     "tailwindcss": "^3.4.19",
@@ -142,6 +162,7 @@
     "tailwindcss-themer": "^2.0.3",
     "typescript": "^6.0.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wait-on": "^9.0.10"
   }
 }

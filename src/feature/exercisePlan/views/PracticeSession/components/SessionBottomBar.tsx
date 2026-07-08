@@ -59,7 +59,7 @@ export const SessionBottomBar = memo(({
 
   return (
     <>
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-zinc-950">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-white/5">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
@@ -109,7 +109,7 @@ export const SessionBottomBar = memo(({
                 className={cn(
                   "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior",
                   isLastExercise
-                    ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
+                    ? "h-12 px-6 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
                     : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                   isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
                 )}
@@ -119,9 +119,13 @@ export const SessionBottomBar = memo(({
                 {(isFinishing || isSubmittingReport) ? (
                   <span>Saving...</span>
                 ) : isLastExercise ? (
-                  <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+                  <>
+                    <span className="flex items-center gap-2">{t("common:finish_session")}</span> <FaCheck />
+                  </>
                 ) : (
-                  <span className="flex items-center gap-2">{t("skip") || "Skip"} <FaStepForward /></span>
+                  <>
+                    <span className="flex items-center gap-2">{t("next") || "Next"}</span> <FaStepForward />
+                  </>
                 )}
               </Button>
               {isLastExercise && !canFinishSession && (
@@ -137,7 +141,7 @@ export const SessionBottomBar = memo(({
     </div>
 
     <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-      <DialogContent className="max-w-md bg-zinc-900 border border-white/10 text-white">
+      <DialogContent className="max-w-md bg-zinc-900 text-white">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
@@ -147,14 +151,14 @@ export const SessionBottomBar = memo(({
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
           <Button
             variant="ghost"
-            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 border border-white/10 hover:border-red-500/30 font-semibold text-sm"
+            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-semibold text-sm"
             onClick={() => { setShowExitDialog(false); onClose?.(); }}
           >
             <FaSignOutAlt className="mr-2" />
             Exit without saving
           </Button>
           <Button
-            className="flex-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-lg shadow-cyan-500/20"
+            className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
             loading={isFinishing || isSubmittingReport}
             disabled={!canFinishSession}
             onClick={async () => { setShowExitDialog(false); await onFinishSession(); }}

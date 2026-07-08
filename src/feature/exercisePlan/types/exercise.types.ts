@@ -2,7 +2,7 @@ import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { StaticImageData } from "next/image";
 
 
-export type DifficultyLevel = "easy" | "medium" | "hard";
+export type DifficultyLevel = "beginner" | "easy" | "medium" | "hard";
 export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing" | "mixed";
 
 export type LocalizedContent = string;
@@ -29,7 +29,10 @@ export interface TablatureNote {
   isVibrato?: boolean;
   isTap?: boolean;
   dynamics?: number; // 0.0 (pp) to 1.0 (ff) — expected volume level
-  midiNote?: number; // GM MIDI note number — for drums (35=kick, 38=snare, 42=hi-hat, etc.)
+  // Real sounding MIDI pitch. Drums: GM note (35=kick, 38=snare, …). Vocals: notated pitch.
+  // Guitar/bass: open-string tuning + fret, so alternate tunings (Drop C/D, 7-string, capo)
+  // score against the actual pitch instead of assuming standard tuning.
+  midiNote?: number;
   // Extended techniques
   isDead?: boolean;       // muted/dead note — shown as X, percussive thud sound
   isGhost?: boolean;      // ghost note — softer, shown semi-transparent
@@ -125,6 +128,10 @@ export interface BackingTrack {
 export interface Exercise {
   id: string;
   premium?: boolean;
+  /** ISO date (YYYY-MM-DD) the exercise was added to the library. Used to show a
+   *  "New" badge and surface recent exercises at the top of the browse table.
+   *  See feature/exercisePlan/utils/isExerciseNew. */
+  addedAt?: string;
   title: LocalizedContent;
   description: LocalizedContent;
   difficulty: DifficultyLevel;
@@ -132,6 +139,7 @@ export interface Exercise {
   timeInMinutes: number;
   instructions: LocalizedContent[];
   tips: LocalizedContent[];
+  whyItMatters?: string;
   metronomeSpeed: {
     min: number;
     max: number;
@@ -154,11 +162,46 @@ export interface Exercise {
   hideTablatureNotes?: boolean;
   customGoal?: string;
   customGoalDescription?: string;
+  /** For exercises whose customGoal is randomized: picks a fresh target. Called
+   *  once when the exercise is entered or restarted, so the goal stays stable
+   *  during a session (e.g. across pauses). See randomNoteHunt. */
+  rerollCustomGoal?: () => void;
+  /** Marks a rotating note-hunt: the target note is re-rolled every
+   *  `rotateSeconds` (via rerollCustomGoal) while the session is playing, with a
+   *  visible countdown. `mode` selects the variant:
+   *   - "octaves" (default): find the note across the whole neck.
+   *   - "region": also rotates a fretboard window (customGoalRegion) + renders the neck.
+   *   - "interval": customGoal is the (hidden) answer; show customGoalPrompt instead.
+   *   - "chord": customGoal is a chord name; track its tones via useChordHunt.
+   *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
+  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" };
+  /** Rotating hunts: returns a fresh target each call. A plain function (not a
+   *  getter) so it survives object spreads/clones — the rotation hook holds the
+   *  result in React state. See randomNoteHunt / intervalHunt / buildTheChord. */
+  rollHuntTarget?: () => {
+    goal: string;
+    prompt?: { title: string; subtitle?: string };
+    region?: { startFret: number; endFret: number };
+  };
+  /** For region-mode note hunts: the fret window the target must be found in.
+   *  Re-rolled alongside customGoal. */
+  customGoalRegion?: { startFret: number; endFret: number };
+  /** Prompt to show on the goal card when the answer must stay hidden (interval
+   *  mode): e.g. { title: "A", subtitle: "Perfect 5th ↑" }. The real target stays
+   *  in customGoal for detection. Re-rolled alongside customGoal. */
+  customGoalPrompt?: { title: string; subtitle?: string };
   riddleConfig?: ExerciseRiddleConfig;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */
   examBacking?: { url: string; sourceBpm: number };
+  disableMic?: boolean;
+  disableBackingTrack?: boolean;
+  disableTuner?: boolean;
+  isHiddenFromLibrary?: boolean;
+  requiresBackingTrack?: boolean;
+  additionalText?: string;
+  isHiddenFromLanding?: boolean;
 }
 
 export interface ExercisePlan {
@@ -177,4 +220,13 @@ export interface ExercisePlan {
     name: string;
     avatar: StaticImageData;
   };
+  isPublic?: boolean;
+  authorUsername?: string;
+  /** Author's avatar URL, stored when a user publishes their plan to the community. */
+  authorAvatar?: string;
+  /** Optional appearance overrides chosen in the create/edit wizard. Resolved to
+   *  Tailwind classes / icon component via feature/exercisePlan/data/planAppearance.
+   *  When absent, PlanCard falls back to the category-derived style. */
+  icon?: string;
+  color?: string;
 }

@@ -14,8 +14,9 @@ import {
   SheetTitle,
 } from "assets/components/ui/sheet";
 import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
-import { ArrowUpDown, Check, Filter, Music, X } from "lucide-react";
+import { ArrowUpDown, Check, Music, X } from "lucide-react";
 import React from "react";
 
 interface FilterSheetProps {
@@ -98,41 +99,39 @@ const FilterSheet = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-md border-l border-white/5 bg-zinc-950 p-0 shadow-2xl">
+      <SheetContent side="right" className="w-full sm:max-w-md bg-zinc-950 p-0 shadow-2xl">
         <div className="flex flex-col h-full">
-          <SheetHeader className="p-6 border-b border-white/5">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                <Filter className="h-5 w-5 text-cyan-500" />
-                Filter & Sort
-              </SheetTitle>
+          <SheetHeader className="p-6">
+            <SheetTitle className="pr-10 text-2xl font-semibold text-white">
+              Filter & Sort
+            </SheetTitle>
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <SheetDescription className="text-zinc-500">
+                Refine your song discovery experience
+              </SheetDescription>
               {hasFilters && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     onClearFilters();
                     onClose();
                   }}
-                  className="text-xs font-bold uppercase tracking-widest text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  className="h-9 shrink-0 rounded-md border border-red-400/30 px-3 text-sm font-bold text-red-400 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-300"
                 >
                   Reset
                 </Button>
               )}
             </div>
-            <SheetDescription className="text-zinc-500 mt-1">
-              Refine your song discovery experience
-            </SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-9 no-scrollbar">
             {/* Tier Section (Multi-select) */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Skill Tiers</h4>
-                <span className="text-[10px] text-zinc-600 font-bold uppercase">{localTiers.length} Selected</span>
+                <h4 className="text-sm font-semibold text-zinc-300">Skill tiers</h4>
+                <span className="text-[10px] text-zinc-600 font-bold">{localTiers.length} selected</span>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-8 gap-2">
                 {tiers.map((t) => {
                   const isActive = localTiers.includes(t.tier);
                   return (
@@ -140,15 +139,15 @@ const FilterSheet = ({
                       key={t.tier}
                       onClick={() => toggleTier(t.tier)}
                       className={cn(
-                        "flex aspect-square items-center justify-center rounded-xl border text-base font-black transition-all active:scale-95",
+                        "relative flex aspect-square items-center justify-center rounded-lg text-sm font-black transition-all active:scale-95",
                         isActive ? "scale-105 shadow-lg brightness-110" : "opacity-30 grayscale-[0.8] hover:opacity-70 hover:grayscale-0"
                       )}
                       style={{
-                        borderColor: isActive ? t.color : "rgba(255,255,255,0.05)",
                         backgroundColor: isActive ? `${t.color}20` : "rgba(255,255,255,0.02)",
                         color: t.color,
                       }}
                     >
+                      <Ripple />
                       {t.tier}
                     </button>
                   );
@@ -159,11 +158,11 @@ const FilterSheet = ({
             {/* Genre Section (Multi-select) */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Music Genres</h4>
+                  <h4 className="text-sm font-semibold text-zinc-300">Music genres</h4>
                   {localGenres.length > 0 && (
-                    <button 
+                    <button
                         onClick={() => setLocalGenres([])}
-                        className="text-[10px] font-black uppercase text-cyan-500 hover:text-cyan-400"
+                        className="rounded-md px-2 py-1 text-xs font-bold text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
                     >
                         Clear
                     </button>
@@ -176,7 +175,7 @@ const FilterSheet = ({
                     {localGenres.map(g => (
                       <span 
                         key={g} 
-                        className="flex items-center gap-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 px-3 py-1 text-[10px] font-bold text-cyan-400 animate-in zoom-in-95 duration-200"
+                        className="flex items-center gap-1.5 rounded-[4px] bg-cyan-500/10 px-3 py-1 text-[10px] font-bold text-cyan-400 animate-in zoom-in-95 duration-200"
                       >
                         {g}
                         <X 
@@ -188,7 +187,7 @@ const FilterSheet = ({
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 no-scrollbar border-t border-white/5 pt-4">
+                <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1 no-scrollbar pt-4">
                   {availableGenres.map((g) => {
                     const isActive = localGenres.includes(g);
                     return (
@@ -196,12 +195,13 @@ const FilterSheet = ({
                         key={g}
                         onClick={() => toggleGenre(g)}
                         className={cn(
-                          "flex h-10 items-center gap-2 rounded-lg border px-3 text-xs font-bold transition-all text-left",
+                          "relative flex h-10 items-center gap-2 rounded-lg px-3 text-xs font-bold transition-all text-left",
                           isActive
-                            ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-400"
-                            : "border-white/5 bg-white/[0.02] text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-300"
+                            ? "bg-cyan-500/10 text-cyan-400"
+                            : "bg-white/[0.02] text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-300"
                         )}
                       >
+                        <Ripple />
                         <Music className={cn("h-3 w-3", isActive ? "text-cyan-400" : "opacity-30")} />
                         <span className="truncate capitalize">{g}</span>
                         {isActive && <Check className="ml-auto h-3 w-3" />}
@@ -213,7 +213,7 @@ const FilterSheet = ({
 
             {/* Sort Section */}
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Display Order</h4>
+              <h4 className="text-sm font-semibold text-zinc-300">Display order</h4>
               <Select 
                 value={localSortBy} 
                 onValueChange={(val) => {
@@ -221,27 +221,27 @@ const FilterSheet = ({
                   setLocalSortDirection(val === 'popularity' || val === 'createdAt' ? 'desc' : 'asc');
                 }}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl border-white/5 bg-white/[0.02] text-zinc-300 focus:ring-0">
+                <SelectTrigger className="h-12 w-full rounded-lg bg-white/[0.02] text-zinc-300 focus:ring-0 border-none">
                   <div className="flex items-center gap-2">
                     <ArrowUpDown className="h-4 w-4 opacity-50 text-cyan-500" />
                     <SelectValue placeholder="Sort by..." />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="border-zinc-800 bg-zinc-900 shadow-2xl">
+                <SelectContent className="bg-zinc-900 shadow-2xl border-none">
                   <SelectItem value="title">Title (A-Z)</SelectItem>
                   <SelectItem value="popularity">Popularity (High-Low)</SelectItem>
-                  <SelectItem value="createdAt">Date Added (Newest)</SelectItem>
+                  <SelectItem value="createdAt">Date added (Newest)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="p-6 pb-40 sm:pb-6 border-t border-white/5 bg-zinc-950/50 backdrop-blur-sm">
-            <Button 
+          <div className="px-6 pt-6 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] bg-zinc-950/50 backdrop-blur-sm">
+            <Button
                 onClick={handleApply}
-                className="h-14 w-full rounded-2xl bg-cyan-600 font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-cyan-900/20 hover:bg-cyan-500 transition-all active:scale-[0.98]"
+                className="h-14 w-full rounded-lg bg-white font-semibold text-black shadow-xl hover:bg-zinc-200 transition-all active:scale-[0.98]"
             >
-              Apply Changes
+              Apply changes
             </Button>
           </div>
         </div>

@@ -45,10 +45,45 @@ export const useSongsStatusChange = ({
       return;
     }
 
+    // Snapshot the current lists so we can roll back if the network call fails.
+    const previousUserSongs = {
+      wantToLearn: userSongs.wantToLearn,
+      learning: userSongs.learning,
+      learned: userSongs.learned,
+    };
+
+    // Optimistically move the card immediately, before the network round-trip.
+    if (!options?.skipOptimisticUpdate) {
+      const allSongs = [
+        ...userSongs.wantToLearn,
+        ...userSongs.learning,
+        ...userSongs.learned,
+      ];
+      const updatedSong = allSongs.find((song) => song.id === songId);
+
+      if (updatedSong) {
+        const newUserSongs = {
+          wantToLearn:
+            newStatus === "wantToLearn"
+              ? [...userSongs.wantToLearn, updatedSong]
+              : userSongs.wantToLearn.filter((s) => s.id !== songId),
+          learning:
+            newStatus === "learning"
+              ? [...userSongs.learning, updatedSong]
+              : userSongs.learning.filter((s) => s.id !== songId),
+          learned:
+            newStatus === "learned"
+              ? [...userSongs.learned, updatedSong]
+              : userSongs.learned.filter((s) => s.id !== songId),
+        };
+
+        onChange(newUserSongs);
+      }
+    }
+
     try {
       const result = await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
 
-      // Update Points in local store
       // Update Points in local store
       if (result.pointsAdded !== 0) {
         dispatch(updatePoints(result.pointsAdded));
@@ -58,44 +93,25 @@ export const useSongsStatusChange = ({
         dispatch(updateQuestProgress({ type: 'add_want_to_learn' }));
       }
 
-      if (!options?.skipOptimisticUpdate) {
-          const allSongs = [
-            ...userSongs.wantToLearn,
-            ...userSongs.learning,
-            ...userSongs.learned,
-          ];
-          const updatedSong = allSongs.find((song) => song.id === songId);
-
-          if (updatedSong) {
-            const newUserSongs = {
-              wantToLearn:
-                newStatus === "wantToLearn"
-                  ? [...userSongs.wantToLearn, updatedSong]
-                  : userSongs.wantToLearn.filter((s) => s.id !== songId),
-              learning:
-                newStatus === "learning"
-                  ? [...userSongs.learning, updatedSong]
-                  : userSongs.learning.filter((s) => s.id !== songId),
-              learned:
-                newStatus === "learned"
-                  ? [...userSongs.learned, updatedSong]
-                  : userSongs.learned.filter((s) => s.id !== songId),
-            };
-
-            onChange(newUserSongs);
-          }
-      }
-
       if (onTableStatusChange && !options?.skipRefetch) {
         await onTableStatusChange();
       }
 
-      const pointsMsg = result.pointsAdded !== 0 
-        ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)` 
-        : "";
-      
-      toast.success(`${t("status_updated")}${pointsMsg}`);
+      if (result.insufficientPracticeTime) {
+        toast.success(t("status_updated"));
+        toast.info(t("learned_needs_practice_time"));
+      } else {
+        const pointsMsg = result.pointsAdded !== 0
+          ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)`
+          : "";
+
+        toast.success(`${t("status_updated")}${pointsMsg}`);
+      }
     } catch {
+      // Roll back the optimistic move so the UI matches the server again.
+      if (!options?.skipOptimisticUpdate) {
+        onChange(previousUserSongs);
+      }
       toast.error(t("error_updating_status"));
     }
   };

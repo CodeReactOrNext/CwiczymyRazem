@@ -1,12 +1,15 @@
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
+import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { useRouter } from "next/router";
 import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
+import { getReconciledStreak } from "utils/gameLogic";
 
 export const StreakBox = () => {
+  const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const { reportList } = useActivityLog(userAuth || "");
@@ -14,23 +17,26 @@ export const StreakBox = () => {
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
 
-  const userLastReportDate = new Date(lastReportDate);
-  const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const isStreak = getUpdatedActualDayWithoutBreak(
+  // The stored counter can drift from the truth in either direction after a
+  // timezone slip; the activity log (local time) is authoritative once loaded.
+  const { didPracticeToday, dayWithoutBreak } = getReconciledStreak({
     actualDayWithoutBreak,
-    userLastReportDate,
-    didPracticeToday
-  );
-  
-  const dayWithoutBreak = isStreak === 1 && !didPracticeToday ? 0 : actualDayWithoutBreak;
+    lastReportDate,
+    reportDates: (reportList ?? []).map(
+      (report: { date: Date | string }) => report.date
+    ),
+  });
 
   return (
-    <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
+    <ScoreBreakdownTooltip streak={dayWithoutBreak}>
+    <div
+      onClick={() => router.push("/practice-log")}
+      className='flex h-10 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <FaFire className={cn(
           "text-xl transition-all duration-500",
-          dayWithoutBreak > 0 
-            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
+          dayWithoutBreak > 0
+            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
             : "text-zinc-700 opacity-50"
         )} />
         {dayWithoutBreak > 0 && (
@@ -70,5 +76,6 @@ export const StreakBox = () => {
         })}
       </div>
     </div>
+    </ScoreBreakdownTooltip>
   );
 };

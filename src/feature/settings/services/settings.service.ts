@@ -6,10 +6,13 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {
+  arrayRemove,
+  arrayUnion,
   doc,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import type { EmailNotificationPreferences } from "types/api.types";
 import { db, firebaseUpdateUserDocument, storage } from "utils/firebase/client/firebase.utils";
 import { shuffleUid } from "utils/user/shuffleUid";
 
@@ -75,7 +78,44 @@ export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
 export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
-}; export const firebaseUpdateProfileCustomization = async (
+}; export const firebaseUpdateEmailNotifications = async (
+  preferences: EmailNotificationPreferences
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { emailNotifications: preferences });
+};
+
+export const firebaseToggleFavoritePlan = async (
+  planId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoritePlanIds: isFavorite ? arrayUnion(planId) : arrayRemove(planId),
+  });
+};
+
+export const firebaseToggleFavoriteExercise = async (
+  exerciseId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoriteExerciseIds: isFavorite ? arrayUnion(exerciseId) : arrayRemove(exerciseId),
+  });
+};
+
+export const firebaseToggleFavoriteSong = async (
+  songId: string,
+  isFavorite: boolean
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    favoriteSongIds: isFavorite ? arrayUnion(songId) : arrayRemove(songId),
+  });
+};
+
+export const firebaseUpdateProfileCustomization = async (
   selectedFrame?: number,
   selectedGuitar?: number | string
 ) => {

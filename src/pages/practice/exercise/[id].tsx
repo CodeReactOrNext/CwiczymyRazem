@@ -12,7 +12,6 @@ export default function PracticeExercisePage() {
   const router = useRouter();
   const { id, mode, bpm, stepId, moduleId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -20,6 +19,11 @@ export default function PracticeExercisePage() {
   const examBpm = bpm ? parseInt(bpm as string, 10) : undefined;
 
   useEffect(() => {
+    if (!router.isReady) return;
+    if (!userAuth) {
+      router.push('/login');
+      return;
+    }
     if (!id) return;
 
     const exerciseId = (id as string).replace(/-/g, "_");
@@ -35,7 +39,7 @@ export default function PracticeExercisePage() {
         exercises: [exercise],
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: userAuth || "anonymous",
+        userId: userAuth,
         image: (exercise.imageUrl || "") as any,
       };
       setPlan(dummyPlan);
@@ -54,13 +58,13 @@ export default function PracticeExercisePage() {
         stars
       );
     }
-    router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy * 100) } });
+    router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy) } });
   };
 
   const isDataReady = router.isReady && !!plan;
 
-  if (!sessionReady) {
-    return <PracticeLoadingScreen isReady={isDataReady} onDone={() => setSessionReady(true)} />;
+  if (!isDataReady) {
+    return <PracticeLoadingScreen isReady={false} />;
   }
 
   return (

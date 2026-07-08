@@ -11,13 +11,13 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "assets/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 import { Textarea } from "assets/components/ui/textarea";
 import type {
     BackingTrack,
@@ -78,6 +78,7 @@ export const CreateCustomExerciseDialog = ({
   const [gpBackingTracks, setGpBackingTracks] = useState<BackingTrack[] | null>(null);
   const [gpFileName, setGpFileName] = useState<string | null>(null);
   const [gpRawFile, setGpRawFile] = useState<File | null>(null);
+  const [gpFileCleared, setGpFileCleared] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   // Effect to reset/initialize when open status changes
@@ -103,12 +104,19 @@ export const CreateCustomExerciseDialog = ({
           setUseMetronome(false);
         }
 
+        setGpFileCleared(false);
         if (initialData.gpFileUrl) {
           setGpFileName("(uploaded GP file)");
+          setGpTablature(null);
+          setGpBackingTracks(null);
         } else if (initialData.tablature && initialData.tablature.length > 0) {
           setGpTablature(initialData.tablature);
           setGpBackingTracks(initialData.backingTracks ?? null);
           setGpFileName("(existing GP data)");
+        } else {
+          setGpFileName(null);
+          setGpTablature(null);
+          setGpBackingTracks(null);
         }
       } else if (mode === "create") {
           resetForm();
@@ -148,6 +156,7 @@ export const CreateCustomExerciseDialog = ({
     setGpBackingTracks(null);
     setGpFileName(null);
     setGpRawFile(null);
+    setGpFileCleared(true);
   };
 
   const handleAddInstruction = () => {
@@ -180,8 +189,19 @@ export const CreateCustomExerciseDialog = ({
         return;
     }
 
+    const finalInstructions = currentInstruction.trim()
+      ? [...instructions, currentInstruction.trim()]
+      : instructions;
+    const finalTips = currentTip.trim()
+      ? [...tips, currentTip.trim()]
+      : tips;
+
     let gpFileUrl: string | undefined;
-    if (gpRawFile && userId) {
+    if (gpRawFile) {
+      if (!userId) {
+        toast.error("You must be logged in to upload a GP file");
+        return;
+      }
       setIsUploading(true);
       try {
         const uploaded = await uploadUserGpFile(userId, gpRawFile);
@@ -194,8 +214,8 @@ export const CreateCustomExerciseDialog = ({
       setIsUploading(false);
     }
 
-    // Preserve existing gpFileUrl in edit mode when no new file was uploaded
-    const effectiveGpFileUrl = gpFileUrl ?? (mode === "edit" ? initialData?.gpFileUrl : undefined);
+    // Preserve existing gpFileUrl in edit mode when no new file was uploaded (unless user explicitly cleared it)
+    const effectiveGpFileUrl = gpFileUrl ?? (mode === "edit" && !gpFileCleared ? initialData?.gpFileUrl : undefined);
     const hasGpFile = !!effectiveGpFileUrl;
 
     const newExercise: Exercise = {
@@ -205,8 +225,8 @@ export const CreateCustomExerciseDialog = ({
       difficulty,
       category,
       timeInMinutes: parseInt(duration) || 5,
-      instructions: instructions,
-      tips: tips,
+      instructions: finalInstructions,
+      tips: finalTips,
       metronomeSpeed: useMetronome ? {
         min: parseInt(minBpm) || 60,
         max: parseInt(maxBpm) || 180,
@@ -256,23 +276,24 @@ export const CreateCustomExerciseDialog = ({
       setGpBackingTracks(null);
       setGpFileName(null);
       setGpRawFile(null);
+      setGpFileCleared(false);
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-xl bg-zinc-950 border-l border-white/10 text-zinc-100 flex flex-col h-full p-0">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-full max-w-xl bg-zinc-950 border border-white/10 text-zinc-100 flex flex-col max-h-[90vh] overflow-hidden p-0 gap-0">
         <div className="px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
-            <SheetHeader>
-                <SheetTitle className="text-xl">
+            <DialogHeader>
+                <DialogTitle className="text-xl">
                     {mode === "edit" ? t("exercises:custom_exercise.edit_button") : t("exercises:custom_exercise.title")}
-                </SheetTitle>
-                <SheetDescription>
+                </DialogTitle>
+                <DialogDescription>
                     {t("exercises:custom_exercise.description")}
-                </SheetDescription>
-            </SheetHeader>
+                </DialogDescription>
+            </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar min-h-0">
             <form id="create-exercise-form" onSubmit={handleSubmit} className="flex flex-col gap-8">
 
             {/* GP File Upload */}
@@ -414,6 +435,7 @@ export const CreateCustomExerciseDialog = ({
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-900 border-zinc-800">
+                            <SelectItem value="beginner">{t("exercises:difficulty.beginner")}</SelectItem>
                             <SelectItem value="easy">{t("exercises:difficulty.easy")}</SelectItem>
                             <SelectItem value="medium">{t("exercises:difficulty.medium")}</SelectItem>
                             <SelectItem value="hard">{t("exercises:difficulty.hard")}</SelectItem>
@@ -580,7 +602,7 @@ export const CreateCustomExerciseDialog = ({
         </div>
 
         <div className="p-6 border-t border-white/10 bg-zinc-950 shrink-0">
-            <SheetFooter>
+            <DialogFooter>
                 <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto mt-2 sm:mt-0 border-zinc-700 hover:bg-zinc-800">
                     {t("common:cancel" as any)}
                 </Button>
@@ -589,9 +611,9 @@ export const CreateCustomExerciseDialog = ({
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading GP file...</>
                     ) : mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
                 </Button>
-            </SheetFooter>
+            </DialogFooter>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };

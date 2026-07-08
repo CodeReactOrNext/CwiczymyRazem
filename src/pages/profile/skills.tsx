@@ -1,4 +1,4 @@
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
@@ -23,13 +23,13 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 overflow-visible flex flex-col min-h-screen">
       <HeroBanner
         title="Skills"
         subtitle="Track and develop your guitar playing skills"
         eyebrow="Skill Tree"
-        characterImage="/images/3d/skills.png"
-        className="w-full !rounded-none !shadow-none min-h-[160px] md:min-h-[140px] lg:min-h-[180px]"
+        backgroundContent={<HeroPattern />}
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       {userSkills ? (
         <SkillDashboard userSkills={userSkills as UserSkills} />

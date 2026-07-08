@@ -102,7 +102,7 @@ describe("makeRatingData", () => {
         streak: 0,
         multiplier: 0,
         habitsCount: habbitsCount,
-        additionalPoints: 6,
+        additionalPoints: Math.floor(habbitsCount * HABBITS_POINTS_VALUE),
         time: 0,
         timePoints: 0,
       },

@@ -1,0 +1,77 @@
+import Link from 'next/link';
+import { ArrowRight, Lock } from 'lucide-react';
+
+interface ExerciseCardProps {
+  exercise: {
+    id: string;
+    title: string;
+    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
+    category: string;
+    description: string;
+    timeInMinutes: number;
+    premium?: boolean;
+  };
+  href: string;
+}
+
+const categoryColors: Record<string, { label: string; color: string; badge: string }> = {
+  technique: { label: 'Technique', color: 'text-rose-400', badge: 'bg-rose-500/10 text-rose-300' },
+  theory: { label: 'Theory', color: 'text-indigo-400', badge: 'bg-indigo-500/10 text-indigo-300' },
+  creativity: { label: 'Creativity', color: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-300' },
+  hearing: { label: 'Hearing', color: 'text-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300' },
+  mixed: { label: 'Mixed', color: 'text-cyan-400', badge: 'bg-cyan-500/10 text-cyan-300' },
+};
+
+const difficultyColors: Record<string, string> = {
+  beginner: 'bg-sky-500/10 text-sky-300',
+  easy: 'bg-emerald-500/10 text-emerald-300',
+  medium: 'bg-amber-500/10 text-amber-300',
+  hard: 'bg-rose-500/10 text-rose-300',
+};
+
+export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, href }) => {
+  const categoryInfo = categoryColors[exercise.category] || categoryColors.mixed;
+  const difficultyColor = difficultyColors[exercise.difficulty] || '';
+
+  return (
+    <Link href={href}>
+      <div className="group rounded-lg bg-zinc-900/40 hover:bg-zinc-900/60 transition-all duration-200 p-6 cursor-pointer">
+        {/* Badges */}
+        <div className="flex gap-2 mb-4">
+          <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold ${categoryInfo.badge}`}>
+            {categoryInfo.label}
+          </span>
+          <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold capitalize ${difficultyColor}`}>
+            {exercise.difficulty}
+          </span>
+          {exercise.premium && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-yellow-500/10 text-yellow-300">
+              <Lock className="w-3 h-3" />
+              Pro
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors line-clamp-2">
+          {exercise.title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
+          {exercise.description}
+        </p>
+
+        {/* Metadata */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="text-xs text-zinc-500">
+            ⏱ {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`}
+          </div>
+          <div className="flex items-center gap-1 text-xs font-semibold text-cyan-400 group-hover:translate-x-1 transition-transform">
+            Explore <ArrowRight className="w-3 h-3" />
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};

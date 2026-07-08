@@ -46,11 +46,11 @@ export const firebaseCompleteJourneyStep = async (
   } as any);
 };
 
-/** Pass threshold: 80%. Stars: ≥95% = 3, ≥90% = 2, ≥80% = 1. Returns null if failed. */
+/** Accuracy is on a 0–100 scale. Pass threshold: 80%. Stars: ≥95% = 3, ≥90% = 2, ≥80% = 1. Returns null if failed. */
 export function accuracyToStars(accuracy: number): 1 | 2 | 3 | null {
-  if (accuracy >= 0.95) return 3;
-  if (accuracy >= 0.90) return 2;
-  if (accuracy >= 0.80) return 1;
+  if (accuracy >= 95) return 3;
+  if (accuracy >= 90) return 2;
+  if (accuracy >= 80) return 1;
   return null;
 }
 

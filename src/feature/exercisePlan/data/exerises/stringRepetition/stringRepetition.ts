@@ -3,8 +3,8 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const stringRepetitionExercise: Exercise = {
   id: "all_strings_open_repetition",
   title: "All Strings Open Repetition",
-  description: "Advanced rhythm exercise moving across all strings using open notes.",
-  difficulty: "easy",
+  description: "Rhythm exercise moving across all strings using open notes.",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 1.5,
   instructions: [
@@ -17,10 +17,11 @@ export const stringRepetitionExercise: Exercise = {
     "Mute adjacent strings to avoid unwanted noise.",
     "Pay attention to a consistent eighth-note rhythm."
   ],
+  whyItMatters: "This exercise trains clean string switching while keeping a steady rhythm. It helps improve picking accuracy and control between strings.",
   metronomeSpeed: {
     min: 40,
     max: 140,
-    recommended: 70
+    recommended: 60
   },
   relatedSkills: ["rhythm"],
   tablature: [

@@ -1,9 +1,10 @@
+import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { motion } from "framer-motion";
 import { ChevronRight,
-Drum,   Guitar, Mic2,
+Drum,   Guitar, Lightbulb, Mic2,
 Music2, } from "lucide-react";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import type { JourneyModuleWithStatus, LockedModulePlaceholder } from "../../types/journey.types";
 
@@ -135,6 +136,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
   placeholders,
   onSelectModule,
 }) => {
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const cfg = MODULE_CFG[activeModule.id] ?? MODULE_CFG.fundamentals;
 
   const pct       = activeModule.totalCount > 0
@@ -153,7 +155,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
         <div className="space-y-4">
           <div>
             <div
-              className="group relative cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl transition-all"
+              className="group relative cursor-pointer overflow-hidden rounded-lg bg-zinc-900/60 transition-background hover:bg-zinc-900/80"
               onClick={() => onSelectModule(activeModule.id)}
             >
               <div className="flex flex-col md:flex-row">
@@ -192,8 +194,8 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   />
 
                   {/* Tag badge */}
-                  <div className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-[8px] border bg-black/60 px-3 py-1 text-[10px] font-bold tracking-widest backdrop-blur-sm"
-                       style={{ borderColor: `rgba(${cfg.accentRgb},0.35)`, color: `rgb(${cfg.accentRgb})` }}>
+                  <div className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded bg-black/60 px-3 py-1 text-[10px] font-bold tracking-widest backdrop-blur-sm"
+                       style={{ color: `rgb(${cfg.accentRgb})` }}>
                     <span
                       className="h-1.5 w-1.5 rounded-full"
                       style={{
@@ -214,7 +216,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                       </span>
                     </div>
 
-                    <h2 className="text-2xl font-black text-white md:text-3xl">
+                    <h2 className="font-display text-2xl font-black text-zinc-100 md:text-3xl">
                       {activeModule.title}
                     </h2>
                     <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-400">
@@ -252,7 +254,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 
                     {/* CTA button */}
                     <button
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm text-zinc-950 transition-all hover:bg-zinc-200"
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3.5 text-sm font-semibold text-zinc-200 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       {completed > 0 ? "Continue Learning" : "Start Module"}
                       <ChevronRight size={18} strokeWidth={2.5} />
@@ -271,7 +273,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                 return (
                   <div
                     key={mod.id}
-                    className="group relative overflow-hidden rounded-2xl bg-zinc-900/50 cursor-not-allowed transition-all"
+                    className="group relative cursor-not-allowed overflow-hidden rounded-lg bg-zinc-900/50"
                     title="Coming soon"
                   >
                     {/* Image area */}
@@ -289,12 +291,12 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 
                       {/* Lock */}
                       <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800/50 bg-zinc-900/80 backdrop-blur-md">
-                        <div className="text-zinc-600">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900/80 backdrop-blur-md">
+                        <div className="text-zinc-500">
                           {lcfg.icon}
                         </div>
                         </div>
-                        <span className="rounded-full bg-zinc-900/60 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-700 backdrop-blur-sm ring-1 ring-zinc-800/50">
+                        <span className="rounded-full bg-zinc-900/60 px-3 py-0.5 text-[9px] font-bold tracking-widest text-zinc-500 backdrop-blur-sm">
                           Coming Soon
                         </span>
                       </div>
@@ -303,13 +305,13 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                     {/* Info */}
                     <div className="p-4 opacity-40 grayscale">
                       <div className="mb-2 flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/50 text-zinc-700">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/50 text-zinc-500">
                           {lcfg.icon}
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-800">
+                        <span className="text-[10px] font-bold tracking-widest text-zinc-500">
                           Locked Module
                         </span>
-                        <span className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-zinc-800">
+                        <span className="ml-auto text-[10px] font-semibold tracking-wider text-zinc-500">
                           Module 0{idx + 2}
                         </span>
                       </div>
@@ -322,7 +324,21 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
             </div>
           )}
 
+          {/* ─── Suggest a path ─── */}
+          <button
+            onClick={() => setSuggestOpen(true)}
+            className="mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background hover:bg-zinc-900/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
+              <Lightbulb className="h-4 w-4 text-zinc-400" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-300">Suggest a learning path</p>
+              <p className="text-xs text-zinc-500">Missing a topic? Let us know what you'd like to see next.</p>
+            </div>
+          </button>
 
+          <FeedbackModal isOpen={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
         </div>
       </div>

@@ -1,4 +1,6 @@
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { PedalboardPlacement } from "feature/arsenal/types/arsenal.types";
+import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -22,7 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const userRef = firestore.collection("users").doc(userId);
-    await userRef.update({ "arsenal.rig.pedalboardItems": items });
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+
+    const arsenal = userDoc.data()!.arsenal;
+    const rigLevel = getRigLevel({
+      inventory: arsenal?.inventory ?? [],
+      effectInventory: arsenal?.effectInventory ?? [],
+      rig: { ...(arsenal?.rig ?? DEFAULT_RIG), pedalboardItems: items },
+    });
+    await userRef.update({ "arsenal.rig.pedalboardItems": items, rigLevel });
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("[update-pedalboard]", error);

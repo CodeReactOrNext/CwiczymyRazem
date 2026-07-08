@@ -58,10 +58,26 @@ OUTPUT — return ONLY valid JSON:
   ]
 }
 
+PEDAGOGY — these principles override any naive "all technique first, music last" ordering:
+
+1. THE GOAL IS THE THROUGH-LINE. Whatever the student wants to DO (improvise, play a song, play a style) they must do a simplified version of it from the EARLY phases — not only at the end. Example: for an improvisation goal, the student should already be improvising with a tiny note set over a backing within the first phase or two, then expand. Never gate the target skill behind dozens of prerequisite techniques.
+
+2. THREAD EAR & LISTENING THROUGHOUT. Ear training, singing/audiation, call-and-response, and transcribing short phrases from real music belong across MANY phases starting early — never dumped into a single late step. For any creative or improvisation goal these are primary, not optional extras.
+
+3. CONNECT THEORY TO SOUND. When you introduce scales, pair them with the harmony they work over (chord–scale relationship, chord/target tones, intervals) so the student learns WHY notes work — not isolated shape-running up and down boxes.
+
+4. RUTHLESS PRIORITIZATION. Every step must sit on the critical path to THIS goal. Do not include general guitar skills the goal does not need (e.g. don't teach fingerstyle or economy picking for a pick-based blues-improv goal). Fewer, well-aimed steps beat an exhaustive catalogue.
+
+5. USE CONSTRAINTS for creative skills — frame practice as deliberate limitations (two notes, one string, a fixed rhythm) rather than piling on more technique.
+
+---
+
 REQUIREMENTS:
-- 4–6 phases covering 3–6 months of learning
-- 4–6 steps per phase, 15–30 steps total
-- Phases build logically: physical techniques before music theory, single-string skills before chord-based skills
+- 6–8 phases; right-size the total to the goal (aim ~35–55 steps) — never pad with filler
+- 6–9 steps per phase; every step a distinct, meaningful skill on the critical path to the goal
+- Phase 1 already includes a simplified taste of the end goal; difficulty ramps across phases
+- Order by dependency (a skill's prerequisites come before it), BUT interleave musicianship — rhythm, phrasing, ear — from the start rather than saving it all for the final phases
+- Final phase = full application to the goal's specific style / song / context
 - Phase titles: concise top-level themes
 - Step titles: concept names only — no exercise numbers, no BPM`;
 

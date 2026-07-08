@@ -18,7 +18,19 @@ export type DailyQuestTaskType =
   | 'practice_plan'
   | 'practice_total_time'
   | 'practice_technique_time'
-  | 'practice_specific_exercise';
+  | 'practice_specific_exercise'
+  | 'practice_theory_time'
+  | 'practice_hearing_time'
+  | 'practice_creativity_time'
+  | 'creativity_focus'
+  | 'long_session'
+  | 'well_rounded'
+  | 'two_categories_min'
+  | 'balanced_session'
+  | 'rate_multiple_songs'
+  | 'complete_two_plans'
+  | 'improve_skill'
+  | 'practice_three_exercises';
 
 export interface DailyQuestTask {
   id: string;
@@ -36,6 +48,18 @@ export interface DailyQuest {
   isRewardClaimed: boolean;
 }
 
+export interface EmailNotificationPreferences {
+  /** Daily streak / "come back and practice" reminder emails */
+  streakReminders: boolean;
+  /** Season start, ending-soon and results emails */
+  seasonUpdates: boolean;
+}
+
+export const DEFAULT_EMAIL_NOTIFICATIONS: EmailNotificationPreferences = {
+  streakReminders: true,
+  seasonUpdates: true,
+};
+
 export interface UserDataInterface {
   userInfo: {
     displayName: string;
@@ -47,6 +71,10 @@ export interface UserDataInterface {
     selectedGuitar?: number | string;
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
+    emailNotifications?: EmailNotificationPreferences;
+    favoritePlanIds?: string[];
+    favoriteExerciseIds?: string[];
+    favoriteSongIds?: string[];
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -148,6 +176,10 @@ export interface userSliceInitialState {
     feedbackAskedAt?: Timestamp | null;
     feedbackDismissCount?: number;
     feedbackLastDismissedAt?: Timestamp | null;
+    emailNotifications?: EmailNotificationPreferences;
+    favoritePlanIds?: string[];
+    favoriteExerciseIds?: string[];
+    favoriteSongIds?: string[];
   } | null;
   timer: TimerInterface;
   currentActivity: {

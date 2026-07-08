@@ -40,7 +40,7 @@ function makeSingleStringNode(
   return {
     id: `${scaleId}_single_string`,
     label,
-    subtitle: "Jedna struna",
+    subtitle: "Single String",
     scaleType,
     scaleFamily,
     description: "",

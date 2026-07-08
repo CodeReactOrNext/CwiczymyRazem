@@ -2,6 +2,7 @@ import type { DifficultyLevel, Exercise } from "../types/exercise.types";
 
 export const determinePlanDifficulty = (exercises: Exercise[]) => {
   const difficultyCount: Record<DifficultyLevel, number> = {
+    beginner: 0,
     easy: 0,
     medium: 0,
     hard: 0,

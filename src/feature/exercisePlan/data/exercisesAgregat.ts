@@ -4,6 +4,7 @@ import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exeris
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
@@ -25,7 +26,6 @@ import {
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
 import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
-import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
@@ -96,7 +96,6 @@ import {
 import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 // Exercises available for free — all others require Pro
@@ -112,7 +111,6 @@ const FREE_EXERCISE_IDS = new Set([
   "open_g_repetition",
   "all_strings_open_repetition",
   "improv_prompt_easy",
-  "natural_notes_map",
   "metronome_gap_test",
   // Exercises added in recent sessions — free
   "alternate_picking_pentatonic_a_positions",
@@ -166,6 +164,17 @@ const FREE_EXERCISE_IDS = new Set([
   "musician_fitness_lvl2_s18",
   "musician_fitness_lvl2_s19",
   "musician_fitness_lvl2_s20",
+  // Guitar Playalongs — free
+  "gp_pentatonic_10min_workout",
+  "gp_sweep_picking_15min",
+  "gp_speed_builder_part1",
+  "gp_stamina_picking_workout",
+  "gp_gallop_picking_10_levels",
+  "gp_alternate_picking_speed_builder",
+  "gp_rock_metal_riffs",
+  "gp_music_theory_essential",
+  "gp_drop2_chords_arpeggios",
+  "gp_pentatonic_tutorial",
 ]);
 
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
@@ -200,6 +209,11 @@ import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pink
 import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
 import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
 import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
+import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
+import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
+import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
+import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
+import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
 import { rhythmTrainingEasy, rhythmTrainingHard,rhythmTrainingMedium } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
@@ -237,9 +251,11 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
+import { spiderQuarterNotesExercise } from "./exerises/spiderQuarterNotes/spiderQuarterNotes";
 
 
 const rawExercises: Exercise[] = [
+  spiderQuarterNotesExercise,
   spiderOneStringExercise,
   spiderStairsHardExercise,
   SpiderStringSkippingExercise,
@@ -263,15 +279,18 @@ const rawExercises: Exercise[] = [
   chordToneImprovisationExercise,
   callAndResponsePhrasingExercise,
   minimalMotionVoiceLeadingExercise,
-  naturalNotesMapExercise,
   fretboardMasteryExercise,
   smoothChordTransitionsExercise,
-  vibratoMasteryExercise,
   metronomeGapTestExercise,
   singWhatYouPlayExercise,
   openGRepetitionExercise,
   stringRepetitionExercise,
   randomNoteHuntExercise,
+  chromaticNoteHuntExercise,
+  fretboardRegionHuntExercise,
+  intervalHuntExercise,
+  buildTheChordExercise,
+  fingerstyleArpeggiosExercise,
 
 
   spiderPermutation1234Exercise,
@@ -312,6 +331,7 @@ const rawExercises: Exercise[] = [
   musicianFitnessLvl1S7Exercise,
   musicianFitnessLvl1S8Exercise,
   pentatonicPlayalongExercise,
+  ...guitarPlayalongsExercises,
   jpStretching,
 
   alternatePickingCrossStringExercise,

@@ -2,7 +2,7 @@ import "react-circular-progressbar/dist/styles.css";
 
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserInfo} from "feature/user/store/userSlice";
-import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
+import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -13,27 +13,30 @@ import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import type { ExercisePlan } from "../../types/exercise.types";
-import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
+import { DesktopSessionView } from "./components/DesktopSessionView";
+import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
+import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
+import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
+import { SessionDialogs } from "./components/SessionDialogs";
+import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
 import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
+import { SessionUIProvider } from "./contexts/SessionUIContext";
+import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
+import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
+import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
+import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
+import { useRiddleSequenceMatcher } from "./hooks/useRiddleSequenceMatcher";
 import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
-import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
-import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
-import { DesktopSessionView } from "./components/DesktopSessionView";
-import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
-import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
-import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
-import { SessionUIProvider } from "./contexts/SessionUIContext";
-import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import SessionModal from "./modals/SessionModal";
-import { SessionDialogs } from "./components/SessionDialogs";
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -64,7 +67,7 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 export const PracticeSession = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
-  examMode, onExamComplete, skipExitDialog = false,
+  examMode, examBpm, onExamComplete, skipExitDialog = false,
 }: PracticeSessionProps) => {
   const router = useRouter();
 
@@ -83,6 +86,12 @@ export const PracticeSession = ({
   const isPlaying = timer.timerEnabled;
   const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
   const examModeObject = typeof examMode === 'object' ? examMode : undefined;
+  // In exam mode the metronome tempo is fixed: lock min === max === bpm so it
+  // can't be changed (slider/±/edit all clamp to this single value).
+  const lockedExamBpm = examModeObject ? examModeObject.requiredBpm : (isExamMode ? examBpm : undefined);
+  // Scale (theory) exams keep the metronome and backing-track controls visible —
+  // unlike regular exercise exams, the metronome is the audible guide here.
+  const isScaleExam = isExamMode && currentExercise.category === "theory";
 
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
@@ -93,7 +102,7 @@ export const PracticeSession = ({
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
           <PremiumGate feature="gp-practice" children={<div />} />
-          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold uppercase tracking-widest text-[10px]">
+          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
             ← Return
           </button>
         </div>
@@ -115,9 +124,9 @@ export const PracticeSession = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, show3dHighway, selectedGpTrackIdx,
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
-    toggleAlphaTabScore, resetForExercise
+    toggleAlphaTabScore, toggle3dHighway, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
@@ -137,17 +146,21 @@ export const PracticeSession = ({
   useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     examModeObject ? examModeObject.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
-    minBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.min,
-    maxBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.max,
-    recommendedBpm: examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.recommended,
+    initialBpm:     lockedExamBpm ?? (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
+    maxBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.max,
+    recommendedBpm: lockedExamBpm ?? activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
   });
 
-  const effectiveBpm           = Math.round(metronome.bpm * speedMultiplier);
+  // Must NOT be rounded: the metronome schedules its clicks from the exact
+  // `bpm * speedMultiplier`, so the tablature audio + visual cursor (which use
+  // effectiveBpm) must use the same exact value or they drift apart at non-100%
+  // speeds (e.g. 55 × 0.75 = 41.25 vs rounded 41).
+  const effectiveBpm           = metronome.bpm * speedMultiplier;
   const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
   // ── Ear training ──────────────────────────────────────────────────────────
@@ -160,6 +173,11 @@ export const PracticeSession = ({
   } = useEarTraining({ currentExercise, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
   useEffect(() => {
+    // Dynamic customGoal (e.g. Random Note Hunt): pick a fresh target on entry,
+    // then keep it fixed for the session so pausing never changes it. This runs
+    // once per exercise and the resetForExercise() below re-renders to show it.
+    currentExercise.rerollCustomGoal?.();
+
     let nextAudioMuted = true;
     if (isExamMode) {
       nextAudioMuted = true;
@@ -170,7 +188,11 @@ export const PracticeSession = ({
       nextAudioMuted = pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0);
     }
 
-    resetForExercise({ isAudioMuted: nextAudioMuted });
+    // In exam mode with a backing track, the backing guides the tempo, so the
+    // metronome click is redundant — mute it (it still runs to keep timing/sync).
+    const nextMetronomeMuted = isExamMode && !!currentExercise.examBacking;
+
+    resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted });
   }, [currentExercise.id]);
 
   const activeTablature = riddleMeasures
@@ -187,6 +209,8 @@ export const PracticeSession = ({
 
   // ── Audio subsystem ───────────────────────────────────────────────────────
 
+  const [tabRestartKey, setTabRestartKey] = useState(0);
+
   const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm,
@@ -198,6 +222,8 @@ export const PracticeSession = ({
     metronomeAudioStartTime: metronome.audioStartTime,
     stopMetronome: metronome.stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
+    tabRestartKey,
+    pendingSeekBeatRef: metronome.pendingSeekBeatRef,
   });
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
@@ -205,7 +231,7 @@ export const PracticeSession = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useAudioAnalyzer();
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useGuitarAudioInput();
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
@@ -220,6 +246,10 @@ export const PracticeSession = ({
   // ── Note matching ─────────────────────────────────────────────────────────
 
   const activeStrumPattern = currentExercise.strummingPatterns?.[0];
+  // Rotating hunts: the provider flips this to true once the whole goal is solved,
+  // so the rotation hook can fast-forward to the next target.
+  const huntSolvedRef = useRef(false);
+  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef);
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
@@ -233,7 +263,7 @@ export const PracticeSession = ({
   // ── Controls & handlers ───────────────────────────────────────────────────
 
   const {
-    tabRestartKey, handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
@@ -244,7 +274,28 @@ export const PracticeSession = ({
     isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+    tabRestartKey, setTabRestartKey,
   });
+
+  // ── Ear training: mic answer matching ─────────────────────────────────────
+
+  // Armed only while playback is fully stopped — otherwise the mic would hear
+  // the riddle itself coming from the speakers and solve it on its own.
+  const riddleProgress = useRiddleSequenceMatcher({
+    measures: riddleMeasures,
+    active: isMicEnabled && isListening && hasPlayedRiddleOnce && !isRiddleRevealed && !isPlaying && !metronome.isPlaying,
+    frequencyRef: audioRefs.frequencyRef,
+    volumeRef: audioRefs.volumeRef,
+    onComplete: handleEarTrainingGuessed,
+  });
+
+  // Next riddle auto-plays its melody; if the player answered while stopped
+  // (mic flow), restart the timer too so the Play/Stop button and the answer
+  // matcher stay consistent with the audible playback.
+  const handleNextRiddleClick = useCallback(() => {
+    if (!isPlaying) startTimer();
+    handleNextRiddle();
+  }, [isPlaying, startTimer, handleNextRiddle]);
 
   // ── Misc effects ──────────────────────────────────────────────────────────
 
@@ -275,12 +326,24 @@ export const PracticeSession = ({
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
+      customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
+      customGoalRegion={huntTarget ? huntTarget.region : currentExercise.customGoalRegion}
+      customGoalPrompt={huntTarget ? huntTarget.prompt : currentExercise.customGoalPrompt}
+      noteHuntMode={currentExercise.noteHuntConfig?.mode}
+      noteHuntSecondsLeft={noteHuntSecondsLeft}
+      solvedRef={huntSolvedRef}
+      onAdvanceHunt={advanceHunt}
+      onEnableMic={handleMicToggle}
       onReset={handleNoteMatchingReset}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
     <SessionUIProvider>
     <>
+      {/* Intro splash that always plays on session mount, then parts open
+          (door-reveal) to show the session beneath. */}
+      <PracticeLoadingScreen isReady />
+
       <SessionPageHead exerciseTitle={activeExercise.title} />
 
       <GeneratedExerciseDialogs
@@ -292,7 +355,7 @@ export const PracticeSession = ({
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
-            onClick={() => router.push("/dashboard")} activityData={activityDataToUse} onRestart={handleRestartFullSession}
+            onClick={onClose} activityData={activityDataToUse} onRestart={handleRestartFullSession}
           />
         </div>
       )}
@@ -350,9 +413,10 @@ export const PracticeSession = ({
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
           isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-          handleNextRiddle={handleNextRiddle} handleRevealRiddle={handleRevealRiddle}
+          handleNextRiddle={handleNextRiddleClick} handleRevealRiddle={handleRevealRiddle}
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
           onEarTrainingGuessed={handleEarTrainingGuessed}
+          riddleProgress={riddleProgress}
         />,
         document.body,
       )}
@@ -367,6 +431,7 @@ export const PracticeSession = ({
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
+        show3dHighway={show3dHighway} handleToggle3dHighway={toggle3dHighway}
         selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
         handleToggleAlphaTabScore={toggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
@@ -381,8 +446,9 @@ export const PracticeSession = ({
         isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce} earTrainingScore={earTrainingScore}
         earTrainingHighScore={earTrainingHighScore}
-        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
+        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddleClick}
         handleEarTrainingGuessed={handleEarTrainingGuessed}
+        riddleProgress={riddleProgress}
         isPlaying={isPlaying} handleToggleTimer={handleToggleTimer}
         startTimer={startTimer} stopTimer={stopTimer}
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
@@ -393,7 +459,7 @@ export const PracticeSession = ({
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
-        examMode={examModeObject} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
+        examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart}
         canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}
@@ -401,12 +467,13 @@ export const PracticeSession = ({
         onFinishSession={async () => { metronome.stopMetronome(); await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
         onClose={onClose} skipExitDialog={skipExitDialog}
         planHasTablature={planHasTablature} planHasGpFile={planHasGpFile} planHasStrumming={planHasStrumming}
+        skillRewardSkillId={skillRewardSkillId} skillRewardAmount={skillRewardAmount}
       />
 
       <SessionDialogs
         showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
-        onFinish={onFinish} resetTimer={resetTimer} startTimer={startTimer}
+        onFinish={onFinish} handleRestart={handleRestart}
         sessionPhase={sessionPhase} examMode={isExamMode}
         handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic}
         existingCalibrationTimestamp={existingCalibrationTimestamp}

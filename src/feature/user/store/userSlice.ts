@@ -12,6 +12,7 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
+import { getLocalDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import {
@@ -25,6 +26,7 @@ import {
   logUserOff,
   rateSong,
   restartUserStats,
+  updateEmailNotifications,
   updateProfileCustomization,
   updateUserEmail,
   updateUserPassword,
@@ -136,10 +138,15 @@ const userSlice = createSlice({
         );
       }
     },
+    addFame: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.fame = (state.currentUserStats.fame || 0) + payload;
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateKey();
 
       // Templates
       const taskTemplates: { type: DailyQuestTaskType; title: string; target: number }[] = [
@@ -152,13 +159,31 @@ const userSlice = createSlice({
         { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15 },
         { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10 },
         { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1 },
+        { type: 'practice_theory_time', title: 'Practice Theory for 10 minutes', target: 10 },
+        { type: 'practice_hearing_time', title: 'Train your Ear for 10 minutes', target: 10 },
+        { type: 'practice_creativity_time', title: 'Be Creative for 10 minutes', target: 10 },
+        { type: 'creativity_focus', title: 'Spend 15 minutes on Creativity', target: 15 },
+        { type: 'long_session', title: 'Practice for 30 minutes total', target: 30 },
+        { type: 'well_rounded', title: 'Practice 3 different categories', target: 3 },
+        { type: 'two_categories_min', title: 'Practice 2 categories for 5 min each', target: 2 },
+        { type: 'balanced_session', title: 'Practice Technique & Theory in one session', target: 2 },
+        { type: 'rate_multiple_songs', title: 'Rate 3 Songs', target: 3 },
+        { type: 'complete_two_plans', title: 'Complete 2 Practice Plans', target: 2 },
+        { type: 'improve_skill', title: 'Earn points in any Skill', target: 1 },
+        { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3 },
       ];
 
       // If quest exists for today, do nothing
       if (state.currentUserStats.dailyQuest?.date === today && state.currentUserStats.dailyQuest?.tasks?.length > 0) return;
 
-      // Shuffle and pick 3
-      const shuffled = [...taskTemplates].sort(() => 0.5 - Math.random());
+      // Shuffle and pick 3. Use Fisher-Yates for a uniform distribution;
+      // sort(() => 0.5 - Math.random()) is biased and over-selects the
+      // templates near the start of the array.
+      const shuffled = [...taskTemplates];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
       const selected = shuffled.slice(0, 3);
 
       const tasks = selected.map((t, index) => {
@@ -196,7 +221,7 @@ const userSlice = createSlice({
       if (!state.currentUserStats?.dailyQuest) return;
 
       // Check if today
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateKey();
       if (state.currentUserStats.dailyQuest.date !== today) return;
 
       const quest = state.currentUserStats.dailyQuest;
@@ -224,11 +249,14 @@ const userSlice = createSlice({
       const allCompleted = quest.tasks.every(t => t.isCompleted);
       if (allCompleted && !quest.isRewardClaimed) {
         quest.isRewardClaimed = true;
-        const newPoints = (state.currentUserStats.points || 0) + 30;
+        const newPoints = (state.currentUserStats.points || 0) + 10;
         state.currentUserStats.points = newPoints;
 
         const newLvl = levelUpUser(state.currentUserStats.lvl || 1, newPoints);
         state.currentUserStats.lvl = newLvl;
+
+        // Mirror the Fame increment written to Firestore in claimQuestRewardAction.
+        state.currentUserStats.fame = (state.currentUserStats.fame || 0) + 40;
       }
     },
     setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
@@ -246,17 +274,50 @@ const userSlice = createSlice({
         state.userInfo.selectedGuitarCountry = payload.country;
       }
     },
+    setFavoritePlan: (state, { payload }: PayloadAction<{ planId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoritePlanIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.planId)) {
+          state.userInfo.favoritePlanIds = [...current, payload.planId];
+        }
+      } else {
+        state.userInfo.favoritePlanIds = current.filter((id) => id !== payload.planId);
+      }
+    },
+    setFavoriteExercise: (state, { payload }: PayloadAction<{ exerciseId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoriteExerciseIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.exerciseId)) {
+          state.userInfo.favoriteExerciseIds = [...current, payload.exerciseId];
+        }
+      } else {
+        state.userInfo.favoriteExerciseIds = current.filter((id) => id !== payload.exerciseId);
+      }
+    },
+    setFavoriteSong: (state, { payload }: PayloadAction<{ songId: string; isFavorite: boolean }>) => {
+      if (!state.userInfo) return;
+      const current = state.userInfo.favoriteSongIds ?? [];
+      if (payload.isFavorite) {
+        if (!current.includes(payload.songId)) {
+          state.userInfo.favoriteSongIds = [...current, payload.songId];
+        }
+      } else {
+        state.userInfo.favoriteSongIds = current.filter((id) => id !== payload.songId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(rateSong.pending, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) + 25;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) + 3;
         }
       })
       .addCase(rateSong.rejected, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) - 25;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) - 3;
         }
       })
       // Challenges removed
@@ -284,7 +345,7 @@ const userSlice = createSlice({
 
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
-          const today = new Date().toISOString().split('T')[0];
+          const today = getLocalDateKey();
 
           state.currentUserStats = {
             ...payload.currentUserStats,
@@ -376,6 +437,12 @@ const userSlice = createSlice({
           }
         }
       })
+      .addCase(updateEmailNotifications.fulfilled, (state, { payload }) => {
+        state.isFetching = null;
+        if (state.userInfo) {
+          state.userInfo.emailNotifications = payload;
+        }
+      })
       .addCase(autoLogIn.rejected, (state) => {
         state.isFetching = null;
         state.userAuth = null;
@@ -393,7 +460,8 @@ const userSlice = createSlice({
           updateUserPassword.pending,
           updateUserEmail.pending,
           uploadUserSocialData.pending,
-          updateProfileCustomization.pending
+          updateProfileCustomization.pending,
+          updateEmailNotifications.pending
         ),
         (state) => {
           state.isFetching = "updateData";
@@ -416,7 +484,8 @@ const userSlice = createSlice({
           logInViaGoogleCredential.rejected,
           createAccount.rejected,
           uploadUserSocialData.rejected,
-          updateProfileCustomization.rejected
+          updateProfileCustomization.rejected,
+          updateEmailNotifications.rejected
         ),
         (state) => {
           state.isFetching = null;
@@ -457,7 +526,11 @@ export const {
   setActivity,
   setUserRole,
   deductFame,
+  addFame,
   setSelectedGuitar,
+  setFavoritePlan,
+  setFavoriteExercise,
+  setFavoriteSong,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;

@@ -18,8 +18,8 @@ interface SessionDialogsProps {
   exerciseTitle: string;
   exerciseDuration: number;
   onFinish?: () => void;
-  resetTimer: () => void;
-  startTimer: () => void;
+  /** Full exercise restart: resets metronome timing accumulators + tab cursor, then starts with count-in. */
+  handleRestart: () => void;
 
   // Mic / Calibration
   sessionPhase: string;
@@ -54,8 +54,7 @@ export const SessionDialogs = ({
   exerciseTitle,
   exerciseDuration,
   onFinish,
-  resetTimer,
-  startTimer,
+  handleRestart,
   sessionPhase,
   examMode,
   handleEnableMic,
@@ -109,8 +108,7 @@ export const SessionDialogs = ({
         }}
         onRestart={() => {
           setShowCompleteDialog(false);
-          resetTimer();
-          startTimer();
+          handleRestart();
         }}
         exerciseTitle={exerciseTitle}
         duration={exerciseDuration}

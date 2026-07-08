@@ -1,4 +1,9 @@
-import { Button } from "assets/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -6,26 +11,44 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
+import { AddToPlaylistSub } from "feature/songs/components/Playlists/AddToPlaylistSub";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { toggleFavoriteSong } from "feature/user/store/userSlice.favoriteActions";
 import {
-  Bookmark,
-  Check,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Eye,
+  Heart,
+  ListMusic,
+  MoreVertical,
   Music,
-  Plus,
-  Settings2,
+  Play,
   Star,
-  TrendingUp,
-  Trophy,
+  Trash2,
   Users,
-  Loader2,
-  ArrowRight,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useAppSelector } from "store/hooks";
-import { TierBadge } from "./TierBadge";
+import { useRouter } from "next/router";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+
+const STATUS_META = {
+  wantToLearn: { label: "Want to Learn", icon: ListMusic, color: "text-zinc-300", ring: "ring-zinc-400/40" },
+  learning: { label: "Learning", icon: BookOpen, color: "text-amber-400", ring: "ring-amber-400/50" },
+  learned: { label: "Learned", icon: CheckCircle2, color: "text-green-400", ring: "ring-green-400/50" },
+} as const;
+
+function formatPracticeMs(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${totalSec}s`;
+}
 
 interface SongCardProps {
   song: Song;
@@ -34,231 +57,294 @@ interface SongCardProps {
   footerAction?: { label: string; icon: ReactNode };
   onStatusChange?: (status: SongStatus | undefined) => void;
   isPracticeMode?: boolean;
+  onPlay?: () => void;
+  /** Board view: show practice time / "Not practiced" instead of genre & popularity. */
+  showPracticeStatus?: boolean;
+  practiceMs?: number;
 }
 
 export const SongCard = ({
   song,
   onOpenDetails,
   userStatus,
-  footerAction,
   onStatusChange,
-  isPracticeMode,
+  onPlay,
+  showPracticeStatus,
+  practiceMs,
 }: SongCardProps) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isFavorite = (userInfo?.favoriteSongIds ?? []).includes(song.id);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
   const isRated = song.difficulties?.some(d => d.userId === userId);
 
+  // Only enable the title tooltip when the text is actually truncated.
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [isTitleTruncated, setIsTitleTruncated] = useState(false);
+  const [isTitleHovered, setIsTitleHovered] = useState(false);
 
+  // Right-click anywhere on the card opens the same actions menu.
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const check = () => setIsTitleTruncated(el.scrollWidth > el.clientWidth);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [song.title]);
 
   return (
-    <div 
+    <div
       onClick={onOpenDetails}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setIsMenuOpen(true);
+      }}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-[8px] glass-card p-5 transition-all duration-500 click-behavior cursor-pointer border border-white/5",
-        "hover:glass-card-hover hover:shadow-2xl hover:shadow-black/60",
-        userStatus && "border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.1)]"
+        "group relative flex flex-col overflow-hidden rounded-md p-3 transition-all duration-300 ease-out click-behavior cursor-pointer",
+        "hover:bg-zinc-800/40"
       )}
     >
-      {/* Premium Completed Glow */}
-      {userStatus && (
-        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
-      )}
-      {/* Glassmorphism Depth Borders */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
+      <Ripple />
 
-      {/* Premium Blurred Background Cover */}
-      {song.coverUrl && (
-        <div className={cn(
-          "absolute inset-0 z-0 overflow-hidden opacity-[0.12] transition-all duration-1000 group-hover:opacity-[0.22]",
-          userStatus && "opacity-[0.08] grayscale-[0.5]"
-        )}>
-          <img 
-            src={song.coverUrl} 
-            alt=""
-            className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
+      {/* Cover */}
+      <div className="relative z-10 aspect-square w-full overflow-hidden rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+        {song.coverUrl ? (
+          <img
+            src={song.coverUrl}
+            alt={`${song.title} cover`}
+            className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-zinc-950/40" />
-        </div>
-      )}
-
-      {/* User Status Badge */}
-      {userStatus && (
-        <div className="absolute top-0 right-0 z-30">
-             <div className={cn(
-               "flex items-center gap-1.5 px-3 py-1.5 rounded-bl-xl text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-lg border-b border-l",
-               userStatus === "wantToLearn" && "bg-amber-500/20 text-amber-400 border-amber-500/20",
-               userStatus === "learning" && "bg-cyan-500/20 text-cyan-400 border-cyan-500/20",
-               userStatus === "learned" && "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
-             )}>
-                {userStatus === "wantToLearn" && <Bookmark className="h-3 w-3 fill-current" />}
-                {userStatus === "learning" && <TrendingUp className="h-3 w-3" />}
-                {userStatus === "learned" && <Trophy className="h-3 w-3" />}
-                {userStatus === "wantToLearn" && "Want to Learn"}
-                {userStatus === "learning" && "Practicing"}
-                {userStatus === "learned" && "Completed"}
-             </div>
-        </div>
-      )}
-
-      {/* Header Section */}
-      <div className="relative z-10 mb-6 flex items-start gap-4">
-        {/* Cover Image Wrapper */}
-        <div className="relative shrink-0">
-          {song.coverUrl ? (
-            <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-white/20">
-              <img 
-                src={song.coverUrl} 
-                alt={`${song.title} cover`}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ) : (
-            <div 
-              className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-white/5 bg-zinc-950/40 text-zinc-700 transition-colors group-hover:border-white/10"
-            >
-              <Music className="h-8 w-8 opacity-20" />
-            </div>
-          )}
-          
-          {/* Tier Badge */}
-          <TierBadge 
-            song={song} 
-            className="absolute -bottom-1 -right-1 z-20" 
-          />
-        </div>
-        
-        <div className="min-w-0 flex-1 pt-1">
-            <div className="flex items-center justify-between gap-1.5">
-              <h3 translate="no" className="line-clamp-1 text-base font-bold text-white transition-colors group-hover:text-white/90">
-                {song.title}
-              </h3>
-            </div>
-            
-            <p translate="no" className="truncate text-sm font-medium text-zinc-400">
-              {song.artist}
-            </p>
-            
-            <div className="mt-2 flex items-center gap-3">
-              {song.popularity !== undefined && song.popularity > 0 && (
-                <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-                  <Users className="h-3 w-3 text-cyan-500" />
-                  <span className="text-[11px] font-black text-zinc-500 tracking-tighter">{song.popularity}</span>
-                </div>
-              )}
-              {song.genres && song.genres.length > 0 && (
-                <div className="flex gap-1">
-                  {song.genres.slice(0, 1).map(g => (
-                    <span key={g} className="px-2.5 py-0.5 capitalize rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 transition-colors">
-                      {g}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Section: Difficulty Meter */}
-        <div className="relative z-10 mb-6 space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 transition-colors">
-               <span>Difficulty</span>
-               <span className="text-sm font-bold" style={{ color: tier.color }}>{avgDifficulty.toFixed(1)}</span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40 p-0.5 ring-1 ring-white/5">
-              <div
-                className="h-full rounded-full transition-all duration-1000 ease-out"
-                style={{
-                  width: `${Math.min(avgDifficulty * 10, 100)}%`,
-                  backgroundColor: tier.color,
-                  boxShadow: `0 0 10px ${tier.color}40`,
-                }}
-              />
-            </div>
-        </div>
-
-        <div className="relative z-10 mt-auto flex items-center gap-2 p-1 rounded-[8px] bg-black/20 border border-white/5 backdrop-blur-sm">
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenDetails();
-            }}
-            variant="ghost"
-            className={cn(
-              "h-9 flex-1 group/btn justify-between rounded-lg px-4 text-[11px] font-bold transition-all",
-              isPracticeMode
-                ? "bg-white text-black hover:bg-zinc-100 group-hover/btn:text-black"
-                : "text-zinc-300 hover:bg-white/5"
-            )}
+        ) : (
+          <div
+            className="flex h-full w-full items-center justify-center text-white/30"
+            style={{ background: `linear-gradient(135deg, ${tier.color}26, ${tier.color}0d)` }}
           >
-            <span className={cn("tracking-wide", isPracticeMode && "!text-black")}>{isPracticeMode ? "Practice" : "View Details"}</span>
-            {isPracticeMode ? (
-              <ArrowRight className="h-3.5 w-3.5 opacity-70 transition-transform group-hover/btn:translate-x-0.5 !text-black ml-2" />
-            ) : (
-              <Settings2 className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:rotate-90 group-hover:opacity-100" />
-            )}
-          </Button>
+            <Music className="h-10 w-10" />
+          </div>
+        )}
 
-          {!userStatus && !isPracticeMode && onStatusChange && (
-            <TooltipProvider delayDuration={200}>
+        {/* Top scrim for badge legibility */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
+
+        {/* Status badge (top-left) */}
+        {userStatus && (() => {
+          const meta = STATUS_META[userStatus];
+          const StatusIcon = meta.icon;
+          return (
+            <TooltipProvider delayDuration={150}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      if (isProcessing || isAdded) return;
-                      setIsProcessing(true);
-                      try {
-                        await onStatusChange("wantToLearn");
-                        setIsAdded(true);
-                      } catch (error) {
-                        setIsProcessing(false);
-                      }
-                    }}
+                  <div
                     className={cn(
-                      "h-9 w-10 shrink-0 rounded-lg transition-all active:scale-95 border-none shadow-lg overflow-hidden relative",
-                      (isProcessing || isAdded)
-                        ? "bg-emerald-500 text-white shadow-emerald-500/40 hover:bg-emerald-500"
-                        : "bg-white text-black hover:bg-zinc-200 shadow-white/10"
+                      "absolute left-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-[4px] bg-zinc-900/80 shadow-md ring-1 backdrop-blur-md",
+                      meta.ring,
+                      meta.color
                     )}
                   >
-                    <AnimatePresence mode="wait">
-                      {isProcessing || isAdded ? (
-                        <motion.div
-                          key="check"
-                          initial={{ scale: 0, rotate: -45 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          className="flex items-center justify-center"
-                        >
-                          {isProcessing && !isAdded ? (
-                            <Loader2 className="h-4 w-4 animate-spin opacity-70" />
-                          ) : (
-                            <Check className="h-4 w-4 stroke-[4]" />
-                          )}
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="plus"
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 1.5, opacity: 0 }}
-                        >
-                          <Plus className="h-4 w-4 stroke-[3]" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Button>
+                    <StatusIcon className="h-3.5 w-3.5" />
+                  </div>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="bg-zinc-900 border-white/10 text-zinc-200 font-bold">
-                  {isAdded ? "Added to Library" : "Add to Library"}
+                <TooltipContent side="right" className="bg-zinc-900 border-white/10 text-xs font-bold text-zinc-200">
+                  {meta.label}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+          );
+        })()}
+
+        {/* Actions (bottom-right of cover) — shown on hover (always visible on touch) */}
+        <div
+          className={cn(
+            "absolute bottom-2 right-2 z-20 flex translate-y-1 items-center gap-1.5 opacity-0 transition-all duration-200 ease-out focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100",
+            isMenuOpen && "translate-y-0 opacity-100"
           )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {onPlay && (
+            <button
+              aria-label="Practice"
+              onClick={(e) => { e.stopPropagation(); onPlay(); }}
+              className="flex h-8 w-8 items-center justify-center gap-1.5 rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 lg:w-auto lg:px-2.5"
+            >
+              <Play className="h-4 w-4 fill-current" />
+              <span className="hidden text-xs font-bold lg:inline">Practice</span>
+            </button>
+          )}
+
+          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Song actions"
+                className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 data-[state=open]:bg-zinc-900"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-56 space-y-1 rounded-lg bg-zinc-950 p-2 text-zinc-400 shadow-2xl backdrop-blur-xl"
+            >
+              <DropdownMenuItem
+                onClick={() => router.push(`/songs?view=board&songId=${song.id}`)}
+                className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                Open in board
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => (onPlay ? onPlay() : router.push(`/timer/song/${song.id}`))}
+                className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
+              >
+                <Play className="h-3 w-3 fill-current" />
+                Practice
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  dispatch(toggleFavoriteSong({ songId: song.id, isFavorite: !isFavorite }))
+                }
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  isFavorite ? "text-rose-400 hover:bg-zinc-800" : "hover:bg-zinc-800 hover:text-white"
+                )}
+              >
+                <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
+                {isFavorite ? "Remove from favorites" : "Add to favorites"}
+              </DropdownMenuItem>
+              <AddToPlaylistSub song={song} />
+
+              <div className="my-1 h-px bg-white/5" />
+
+              {(["wantToLearn", "learning", "learned"] as const).map((status) => {
+                const meta = STATUS_META[status];
+                const Icon = meta.icon;
+                const isActive = status === userStatus;
+                return (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() => onStatusChange?.(status)}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                      isActive ? "bg-zinc-800/50 text-white" : "hover:bg-zinc-800 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("h-3.5 w-3.5", meta.color)} />
+                    <span className="flex-1">
+                      {isActive ? meta.label : `Move to ${meta.label}`}
+                    </span>
+                    {isActive && <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />}
+                  </DropdownMenuItem>
+                );
+              })}
+
+              {userStatus && (
+                <>
+                  <div className="my-1 h-px bg-white/5" />
+                  <DropdownMenuItem
+                    onClick={() => onStatusChange?.(undefined)}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Remove from collection
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+      </div>
+
+      {/* Info */}
+      <div className="relative z-10 flex flex-col pt-3">
+        <TooltipProvider delayDuration={300}>
+          <Tooltip open={isTitleTruncated && isTitleHovered} onOpenChange={setIsTitleHovered}>
+            <TooltipTrigger asChild>
+              <h3
+                ref={titleRef}
+                translate="no"
+                className="w-full truncate text-base font-bold text-white"
+              >
+                {song.title}
+              </h3>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[260px] border-white/10 bg-zinc-900 text-xs font-bold text-zinc-200">
+              {song.title}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <p translate="no" className="truncate text-sm font-medium tracking-wide text-zinc-300 mt-1">
+          {song.artist}
+        </p>
+
+        <div className="mt-3.5 flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            {showPracticeStatus ? (
+              practiceMs && practiceMs > 0 ? (
+                <div className="flex items-center gap-1 text-zinc-400">
+                  <Clock className="h-3 w-3" />
+                  <span className="text-xs font-semibold">{formatPracticeMs(practiceMs)}</span>
+                </div>
+              ) : (
+                <span className="text-xs font-medium text-zinc-500">Not practiced</span>
+              )
+            ) : (
+              <>
+                {song.popularity !== undefined && song.popularity > 0 && (
+                  <div className="flex items-center gap-1 text-zinc-400">
+                    <Users className="h-3 w-3" />
+                    <span className="text-xs font-semibold">{song.popularity}</span>
+                  </div>
+                )}
+                {song.genres && song.genres.length > 0 && (
+                  <>
+                    <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                    {song.genres.slice(0, 1).map(g => (
+                      <span key={g} className="truncate capitalize text-xs font-medium text-zinc-400">
+                        {g}
+                      </span>
+                    ))}
+                  </>
+                )}
+              </>
+            )}
+            {/* Rated indicator (subtle, only when rated) */}
+            {isRated && (
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="border-white/10 bg-zinc-900 text-xs font-bold text-zinc-200">
+                    Rated by you
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+
+          {/* Tier / difficulty badge */}
+          <div
+            className="flex shrink-0 items-center gap-2 rounded-[4px] px-2 py-1"
+            style={{ backgroundColor: `${tier.color}14` }}
+          >
+            <span className="text-[11px] font-semibold leading-none" style={{ color: tier.color }}>
+              {tier.tier}
+            </span>
+            <span className="h-3 w-px" style={{ backgroundColor: `${tier.color}33` }} />
+            <span className="text-sm font-semibold leading-none tabular-nums" style={{ color: tier.color }}>
+              {avgDifficulty.toFixed(1)}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

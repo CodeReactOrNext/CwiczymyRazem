@@ -29,6 +29,7 @@ interface SongStatusCardProps {
   onPracticeWithGp?: (song: Song) => void;
   isCollapsedInitially?: boolean;
   disableDnd?: boolean;
+  activeId?: string | null;
 }
 
 export const SongStatusCard = ({
@@ -46,6 +47,7 @@ export const SongStatusCard = ({
   onOpenDetails,
   activeOverContainer,
   disableDnd = false,
+  activeId,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[id as keyof typeof STATUS_CONFIG];
@@ -77,20 +79,21 @@ export const SongStatusCard = ({
     <div className="flex flex-col overflow-hidden bg-transparent">
       {/* Header (Steam Style) */}
       {(!isMobile || !hideHeaderOnMobile) && (
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-2 px-3 py-1.5 text-zinc-500 group/header cursor-pointer select-none w-full bg-zinc-800/30 hover:bg-zinc-800/50 transition-colors rounded-md mb-1"
+          className="flex items-center gap-2.5 px-3 py-2 text-zinc-200 group/header cursor-pointer select-none w-full bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors rounded-lg mb-1.5"
         >
-            <ChevronDown 
-              size={10} 
+            <ChevronDown
+              size={12}
               className={cn(
-                "transition-transform duration-300 opacity-40",
+                "shrink-0 text-zinc-500 transition-transform duration-300",
                 isCollapsed ? "-rotate-90" : "rotate-0"
-              )} 
+              )}
             />
-            <h3 className="text-xs font-bold uppercase tracking-wider transition-colors group-hover/header:text-zinc-300">{title}</h3>
-            <span className="text-xs font-medium opacity-60">
-              ({songs?.length || 0})
+            <StatusIcon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+            <h3 className="flex-1 text-left text-[13px] font-bold">{title}</h3>
+            <span className="rounded-full bg-zinc-700/60 px-2 py-0.5 text-[10px] font-bold text-zinc-300">
+              {songs?.length || 0}
             </span>
         </button>
       )}
@@ -108,9 +111,9 @@ export const SongStatusCard = ({
             <div 
               ref={setNodeRef}
               className={cn(
-                "group relative flex flex-col overflow-hidden rounded-2xl bg-zinc-900/10 transition-all duration-300",
-                isLibraryDropTarget && "ring-2 ring-cyan-500/50 bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.15)]",
-                isDropTarget && "scale-[1.02] border-cyan-500/30 bg-cyan-500/5"
+                "group relative flex flex-col overflow-hidden rounded-lg bg-zinc-900/10 transition-all duration-300",
+                isLibraryDropTarget && "bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.15)]",
+                isDropTarget && "scale-[1.02] bg-cyan-500/5"
               )}
             >
               {/* Premium Gradient Background for Drop Highlight */}
@@ -135,24 +138,27 @@ export const SongStatusCard = ({
                       {id === "learned" && "Nothing mastered yet"}
                   </div>
                 ) : (
-                  songs?.map((song) => (
-                    <SortableSongItem
-                      key={song.id}
-                      song={song}
-                      config={config}
-                      isMobile={isMobile ?? false}
-                      droppableId={id}
-                      nextStatus={nextStatus}
-                      getPrimaryActionText={getPrimaryActionText}
-                      onStatusChange={onStatusChange || (() => {})}
-                      onSongRemove={onSongRemove || (() => {})}
-                      progress={progressMap?.[song.id] ?? null}
-                      isPremium={isPremium}
-                      onPracticeWithGp={onPracticeWithGp}
-                      onOpenDetails={onOpenDetails}
-                      disableDnd={disableDnd}
-                    />
-                  ))
+                  <AnimatePresence initial={false}>
+                    {songs?.map((song) => (
+                      <SortableSongItem
+                        key={song.id}
+                        song={song}
+                        config={config}
+                        isMobile={isMobile ?? false}
+                        droppableId={id}
+                        nextStatus={nextStatus}
+                        getPrimaryActionText={getPrimaryActionText}
+                        onStatusChange={onStatusChange || (() => {})}
+                        onSongRemove={onSongRemove || (() => {})}
+                        progress={progressMap?.[song.id] ?? null}
+                        isPremium={isPremium}
+                        onPracticeWithGp={onPracticeWithGp}
+                        onOpenDetails={onOpenDetails}
+                        disableDnd={disableDnd}
+                        isDragActive={activeId != null}
+                      />
+                    ))}
+                  </AnimatePresence>
                 )}
               </SortableContext>
             </div>

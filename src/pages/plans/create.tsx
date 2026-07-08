@@ -23,7 +23,9 @@ const CreatePlanPage: NextPageWithLayout = () => {
   const handleCreatePlan = async (
     title: string,
     description: string,
-    exercises: Exercise[]
+    exercises: Exercise[],
+    isPublic: boolean,
+    appearance?: { icon?: string; color?: string }
   ): Promise<void> => {
     try {
       if (!userAuth) return;
@@ -31,12 +33,15 @@ const CreatePlanPage: NextPageWithLayout = () => {
       await createExercisePlan(userAuth, {
         title,
         description,
+        isPublic,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
+        icon: appearance?.icon,
+        color: appearance?.color,
       });
 
       toast.success(t("exercises:my_plans.create_success") as string);
@@ -49,7 +54,7 @@ const CreatePlanPage: NextPageWithLayout = () => {
 
   return (
     <PremiumGate feature="plans">
-      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <div className="flex flex-col min-h-screen rounded-lg bg-zinc-900/40">
         <HeroBanner
           title="Create Plan"
           subtitle="Build your custom practice routine"

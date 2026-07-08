@@ -1,4 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { todayKey } from "lib/email/cooldown";
+import { markCooldown } from "lib/email/cooldownStore";
+import { sendWelcomeEmail } from "lib/email/send";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 const statisticsInitial = {
@@ -42,11 +45,29 @@ export default async function handler(
           displayName: user.displayName ?? null,
           avatar: user.photoURL ?? null,
           createdAt: new Date(),
+          email: user.email ?? null,
           statistics: statisticsInitial,
+          rigLevel: 0,
         });
+
+        if (user.email) {
+          sendWelcomeEmail({
+            to: user.email,
+            userName: user.displayName,
+          })
+            .then(() => markCooldown(uid, "welcome", todayKey()))
+            .catch((err) =>
+              console.error("[welcome-email] failed for", user.email, err)
+            );
+        }
       }
 
-      const userData = (await userDocRef.get()).data();
+      const userSnapshotFresh = await userDocRef.get();
+      const userData = userSnapshotFresh.data();
+
+      if (userData && !userData.email && user.email) {
+        await userDocRef.update({ email: user.email });
+      }
 
       return res.status(200).json({
         userInfo: {
@@ -65,6 +86,15 @@ export default async function handler(
           feedbackAskedAt: userData?.feedbackAskedAt ?? null,
           feedbackDismissCount: userData?.feedbackDismissCount ?? 0,
           feedbackLastDismissedAt: userData?.feedbackLastDismissedAt ?? null,
+          favoritePlanIds: userData?.favoritePlanIds ?? [],
+          favoriteExerciseIds: userData?.favoriteExerciseIds ?? [],
+          favoriteSongIds: userData?.favoriteSongIds ?? [],
+          emailNotifications: {
+            streakReminders:
+              userData?.emailNotifications?.streakReminders ?? true,
+            seasonUpdates:
+              userData?.emailNotifications?.seasonUpdates ?? true,
+          },
         },
         userAuth: uid,
         currentUserStats: {

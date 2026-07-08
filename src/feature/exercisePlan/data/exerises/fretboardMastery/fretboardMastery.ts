@@ -4,11 +4,12 @@ export const fretboardMasteryExercise: Exercise = {
   id: "fretboard_mastery",
   title: "Fretboard Mastery",
   description:
-    "Exercise developing full fretboard awareness by playing the same melodic phrase in multiple positions, forcing note-based thinking instead of relying on shapes.",
+    "Take a short melodic phrase you know and play it in multiple positions across the neck, navigating by note names instead of shapes.",
+  whyItMatters: "Complete fretboard visualization removes the guesswork from your playing. Knowing note names instantly allows you to transpose keys, construct chords, and find scale shapes on the fly without relying on fixed geometric patterns.",
   difficulty: "hard",
   category: "theory",
   timeInMinutes: 8,
-  instructions: [
+instructions: [
     "Choose a short melodic phrase or riff (3–5 notes) that you know well by ear and can clearly name by note (e.g. C–D–E–G).",
     "Play the phrase in one familiar position, making sure you know the exact note names.",
     "Find another position on the fretboard where the same notes can be played and repeat the phrase there.",

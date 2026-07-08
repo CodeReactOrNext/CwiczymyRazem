@@ -83,6 +83,29 @@ const nextConfig = {
         destination: '/blog/practice-habits',
         permanent: true,
       },
+      // SEO consolidation: merged duplicate "guitar practice routine" posts into the
+      // canonical beginner pillar to resolve keyword cannibalization.
+      {
+        source: '/blog/beginner-guitar-practice-routine',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-routine-builder',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-routine-build-one-15-minutes',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
+      // Tool page removed in 94770b1b but still ranking in search (pos ~6) — keep the equity.
+      {
+        source: '/guitar-practice-builder',
+        destination: '/blog/guitar-practice-routine-for-beginners',
+        permanent: true,
+      },
     ]
   },
   async headers() {
@@ -130,11 +153,8 @@ module.exports = withSentryConfig(module.exports, {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: "/monitoring",
+  // tunnelRoute disabled to reduce Vercel edge requests
+  // tunnelRoute: "/monitoring",
 
   webpack: {
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)

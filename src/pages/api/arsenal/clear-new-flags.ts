@@ -26,12 +26,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const data = userDoc.data()!;
     const inventory: InventoryItem[] = data.arsenal?.inventory || [];
+    const effectInventory = data.arsenal?.effectInventory || [];
 
     const updatedInventory = inventory.map((item) =>
       item.isNew ? { ...item, isNew: false } : item
     );
+    const updatedEffectInventory = effectInventory.map((item: any) =>
+      item.isNew ? { ...item, isNew: false } : item
+    );
 
-    await userRef.update({ "arsenal.inventory": updatedInventory });
+    await userRef.update({
+      "arsenal.inventory": updatedInventory,
+      "arsenal.effectInventory": updatedEffectInventory,
+    });
 
     return res.status(200).json({ success: true });
   } catch (error) {

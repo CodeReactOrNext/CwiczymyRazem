@@ -1,29 +1,23 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const stringSkippingBasicExercise: Exercise = {
   id: "string_skipping_basic",
   title: "Pentatonic String Skips",
-  description: "Master the fundamental string skipping motion with pentatonic patterns.",
+  description: "Practice jumping over strings while playing pentatonic scale shapes.",
+  whyItMatters: "Pentatonic scales can sound repetitive if played sequentially. Adding string skips opens up the scale, creating larger interval jumps that sound highly expressive and modern.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
-    "Play the A minor pentatonic scale, skipping one string between each note.",
-    "Use strict alternate picking throughout (down-up-down-up).",
-    "Start with the pattern: 6th string → 4th string → 3rd string → 1st string.",
-    "Make an arc motion with your pick to skip over the unwanted string.",
-    "Keep your fretting hand relaxed - only the picking hand needs to work harder.",
-    "Once comfortable, reverse the pattern going back down."
+    "Skip strings accurately, keeping your pick strokes compact and efficient.",
+    "Sync fretting finger placement perfectly with picking hand skips."
   ],
   tips: [
-    "The picking motion should come from the wrist, not the whole arm.",
-    "Visualize the target string before you move your pick.",
-    "Start extremely slow - accuracy is more important than speed.",
-    "Practice the arc motion on open strings first to build muscle memory.",
-    "Listen to Paul Gilbert's string skipping runs for inspiration."
+    "Rest your picking-hand palm on lower strings to prevent unwanted vibration.",
+    "Visualize the pentatonic skeleton to locate the target notes instantly."
   ],
-  metronomeSpeed: { min: 60, max: 120, recommended: 80 },
-  relatedSkills: ["hybrid_picking"],
+  metronomeSpeed: { min: 40, max: 120, recommended: 80 },
+  relatedSkills: ["string_skipping"],
   tablature: [
     {
       timeSignature: [4, 4],

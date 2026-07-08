@@ -1,6 +1,7 @@
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -18,23 +19,27 @@ const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
+  const [communityPlans, setCommunityPlans] = useState<ExercisePlan[]>([]);
   const userAuth = useAppSelector(selectUserAuth);
   const [isFinishing, setIsFinishing] = useState(false);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadCustomPlans = async () => {
+    const loadPlans = async () => {
       if (!userAuth) return;
-      
       try {
-        const plans = await getUserExercisePlans(userAuth);
-        setCustomPlans(plans);
+        const [userPlans, publicPlans] = await Promise.all([
+          getUserExercisePlans(userAuth),
+          getPublicExercisePlans(),
+        ]);
+        setCustomPlans(userPlans);
+        setCommunityPlans(publicPlans);
       } catch (error) {
-        console.error("Failed to load custom plans:", error);
+        console.error("Failed to load plans:", error);
       }
     };
 
-    loadCustomPlans();
+    loadPlans();
   }, [userAuth]);
 
   useEffect(() => {
@@ -53,7 +58,7 @@ const TimerPlans: NextPageWithLayout = () => {
   };
 
   const handlePlanSelect = (planId: string) => {
-    const allPlans = [...defaultPlans, ...customPlans];
+    const allPlans = [...defaultPlans, ...customPlans, ...communityPlans];
     const plan = allPlans.find((p) => p.id === planId);
     if (plan) {
       setLoadingPlanId(planId);
@@ -74,16 +79,16 @@ const TimerPlans: NextPageWithLayout = () => {
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none min-h-screen ">
       <HeroBanner
-        title="Exercises"
+        title="Practice Routines"
         subtitle="Build your skills with focused practice exercises"
         eyebrow="Exercise Hub"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
         rightContent={
           <button
             onClick={() => router.push("/timer")}
-            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
+            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-background rounded-lg bg-white/5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             Back
           </button>

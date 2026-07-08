@@ -12,9 +12,10 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 import { BookOpen, Flame, Music, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { useRouter } from "next/router";
@@ -70,6 +71,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
+  const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
   const [internalTab, setInternalTab] = useState(
@@ -100,7 +103,9 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const handleCreatePlan = async (
     title: string,
     description: string,
-    exercises: Exercise[]
+    exercises: Exercise[],
+    isPublic: boolean,
+    appearance?: { icon?: string; color?: string }
   ): Promise<void> => {
     try {
       if (!userAuth) {
@@ -114,6 +119,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       const formattedPlanData = {
         title,
         description,
+        isPublic,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,
@@ -121,6 +127,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
+        icon: appearance?.icon,
+        color: appearance?.color,
       };
 
       const planId = await createExercisePlan(userAuth, formattedPlanData);
@@ -147,6 +155,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         exercises: updatedPlan.exercises,
         category: updatedPlan.category,
         difficulty: updatedPlan.difficulty,
+        icon: updatedPlan.icon,
+        color: updatedPlan.color,
       });
 
       setPlans((prevPlans) =>
@@ -173,6 +183,27 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     }
   };
 
+  const handleTogglePublic = async (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    const newIsPublic = !plan.isPublic;
+    // Optimistic update — icon changes immediately
+    setPlans(prev => prev.map(p => p.id === planId ? { ...p, isPublic: newIsPublic } : p));
+    try {
+      await updateExercisePlan(planId, {
+        isPublic: newIsPublic,
+        authorUsername: userName ?? undefined,
+        authorAvatar: userAvatar ?? undefined,
+      });
+      toast.success(newIsPublic ? "Plan published to community" : "Plan unpublished");
+    } catch (error) {
+      // Revert on failure
+      setPlans(prev => prev.map(p => p.id === planId ? { ...p, isPublic: plan.isPublic } : p));
+      logger.error(error, { context: "handleTogglePublic" });
+      toast.error("Failed to update plan visibility");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className='flex h-[400px] items-center justify-center'>
@@ -195,11 +226,12 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   }
 
   const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
-    return (["easy", "medium", "hard"] as const).map((difficulty) => {
+    return (["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
       const difficultyPlans = sourcePlans.filter((p) => p.difficulty === difficulty);
       if (difficultyPlans.length === 0) return null;
 
       const difficultyLabel = {
+        beginner: { color: "text-sky-500" },
         easy: { color: "text-emerald-500" },
         medium: { color: "text-amber-500" },
         hard: { color: "text-red-500" }
@@ -305,7 +337,11 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               </Button>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {plans.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -314,9 +350,10 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
                   onStart={() => onPlanSelect(plan)}
                   onEdit={() => setEditingPlan(plan)}
                   onDelete={() => handleDeletePlan(plan.id)}
+                  onTogglePublic={() => handleTogglePublic(plan.id)}
                 />
               ))}
-            </div>
+            </motion.div>
           )}
         </TabsContent>
       </Tabs>

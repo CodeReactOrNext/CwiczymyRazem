@@ -7,27 +7,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
  */
 export const scalePracticeExercise: Exercise = {
   id: "scale_practice_configurable",
+  isHiddenFromLanding: true,
   title: "Scale Practice (Configurable)",
-  description: "Choose your scale, pattern, and position for customized scale practice.",
+  description: "Practice scale patterns, fingerings, and alternate picking across customizable scales.",
+  whyItMatters: "Scales are the foundation of melody and harmony. Developing speed, accuracy, and muscle memory across a wide range of scales is critical for advanced lead playing and composing.",
   difficulty: "medium",
   category: "theory",
   timeInMinutes: 10,
   instructions: [
-    "This is a configurable scale practice exercise.",
-    "When you start, you'll be able to choose:",
-    "• Root note (C, D, E, F, G, A, B, and their sharps)",
-    "• Scale type (Major, Minor, Pentatonic, Modes)",
-    "• Practice pattern (Ascending, Descending, Sequences)",
-    "• Position on the fretboard (1-12)",
-    "The system will generate tablature automatically based on your choices."
+    "Maintain strict alternate picking, keeping the motion highly compact.",
+    "Ensure each note rings clearly and is fully muted before the next begins."
   ],
   tips: [
-    "Start with Major and Minor pentatonic scales - they're the foundation.",
-    "Practice each position until you can play it smoothly without looking.",
-    "Use a metronome and gradually increase tempo.",
-    "Learn the sound of each scale - not just the finger patterns.",
-    "Practice modes to understand how they differ from major/minor.",
-    "Move the same pattern across all 12 positions to master the fretboard."
+    "Practice slowly to master the shifting points between scale positions.",
+    "Keep your fretting fingers hovered close to the strings to maximize efficiency."
   ],
   metronomeSpeed: {
     min: 30,

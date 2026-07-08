@@ -32,10 +32,9 @@ interface ScaleNodeModalProps {
   status: NodeStatus | null;
   onClose: () => void;
   onPractice: () => void;
-  onMarkComplete?: () => void;
 }
 
-export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComplete }: ScaleNodeModalProps) {
+export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeModalProps) {
   const req = node?.requiredExercises[0];
 
   const tablature = useMemo(() => {
@@ -70,7 +69,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20"
+            className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -79,20 +78,21 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute left-1/2 top-1/2 z-30 w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-md"
+            className="absolute left-1/2 top-1/2 z-30 w-[90vw] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-zinc-900/95 backdrop-blur-md"
           >
             {/* Header */}
             <div className="flex items-start justify-between p-4 pb-2">
               <div className="min-w-0">
-                <p className={`text-[10px] font-semibold uppercase tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
+                <p className={`text-[10px] font-semibold capitalize tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
                   {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
                 </p>
-                <h2 className="mt-0.5 text-base font-bold leading-tight text-white">{node.label}</h2>
-                <p className="text-xs text-zinc-500">{node.subtitle === "Jedna struna" ? "Single String" : node.subtitle}</p>
+                <h2 className="mt-0.5 text-base font-bold leading-tight text-zinc-100">{node.label}</h2>
+                <p className="text-xs text-zinc-500">{node.subtitle}</p>
               </div>
               <button
                 onClick={onClose}
-                className="ml-3 mt-0.5 flex-shrink-0 text-zinc-600 transition-colors hover:text-zinc-300"
+                aria-label="Close"
+                className="ml-3 mt-0.5 flex-shrink-0 rounded text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <X size={15} />
               </button>
@@ -115,13 +115,13 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
 
             {/* Tablature preview */}
             {tablature && tablature.length > 0 && (
-              <div className="mx-4 mb-3 overflow-hidden rounded-lg border border-white/5 bg-zinc-950">
+              <div className="mx-4 mb-3 overflow-hidden rounded-lg bg-zinc-950">
                 <TablaturePreview measures={tablature} />
               </div>
             )}
 
             {/* Action */}
-            <div className="p-4 pt-1 space-y-2">
+            <div className="p-4 pt-1">
               {status === "locked" ? (
                 <div className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2.5 text-xs text-zinc-500">
                   <Lock size={12} className="flex-shrink-0" />
@@ -134,14 +134,6 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
                 >
                   <Play size={14} />
                   Start Exam
-                </button>
-              )}
-              {onMarkComplete && status !== "locked" && (
-                <button
-                  onClick={onMarkComplete}
-                  className="w-full rounded-lg bg-emerald-600/40 px-4 py-2 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-600/60 active:bg-emerald-600"
-                >
-                  ✓ Mark as Complete (Test)
                 </button>
               )}
             </div>

@@ -6,6 +6,8 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const harmonicVoiceLeadingPlan: ExercisePlan = {
   id: "harmonic_voice_leading",
+  icon: "brain",
+  color: "indigo",
   title: "Harmonic Voice Leading",
   description: "Advanced drill focusing on guide tones, smooth chord transitions, and minimal melodic movement.",
   difficulty: "hard",

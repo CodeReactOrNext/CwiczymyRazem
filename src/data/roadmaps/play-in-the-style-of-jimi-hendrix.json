@@ -1,0 +1,670 @@
+{
+  "id": "0cbc5208-e56a-428f-8465-a0510e7b1f88",
+  "title": "Play in the style of Jimi Hendrix",
+  "goal": "Play in the style of Jimi Hendrix",
+  "level": "Intermediate",
+  "phases": [
+    {
+      "id": "9e0662dc-a7cc-46ae-a36d-205c5df36c91",
+      "title": "Bending and Vibrato Control",
+      "order": 0,
+      "steps": [
+        {
+          "id": "01bc1322-ad3f-4331-a721-55b9927296ff",
+          "title": "Whole and half bends",
+          "description": "Whole and half bends are left‑hand motions that raise a fretted note by a full step or a half step so the pitch lands exactly on a target; execute them with a wrist‑turn and by leveraging adjacent fingers for support rather than relying on a single finger stretch. They matter because precise bent pitches create the vocal, expressive phrases heard in Hendrix-style lead playing and let you resolve lines with convincing intonation. Develop them by practicing slow, controlled raises and clean releases to the target pitch, checking the bend by singing or playing the target before and after, and alternating whole and half bends until both accuracy and smoothness are consistent.",
+          "successCriteria": "You can reliably hit and hold whole- and half-step targets so the bent note matches your sung or played reference, with a clear attack, minimal string noise, and a clean, in-tune release back to the original pitch; you can move between whole and half bends within a phrase without losing pitch accuracy or control.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedLessonIds": [
+            "CqC-e6hzsSQ"
+          ]
+        },
+        {
+          "id": "97c253cf-aea1-4af4-beae-e313c816d6a1",
+          "title": "Pre-bend release",
+          "description": "A pre-bend release is when you bring a string up to the intended pitch with your fretting hand before you strike it, then allow the pitch to fall back down by releasing the bend while the note sustains. It creates a vocal, descending cry that punctuates a phrase and gives strong expressive contrast in lead lines. Develop it by holding the bent pitch steady with firm left-hand support, pick the note while it’s held, and practice releasing with a controlled, smooth wrist/arm motion so the descent lands cleanly and without unwanted string noise.",
+          "successCriteria": "You can pick a held-bent note and release it so the pitch descends smoothly and lands precisely on the target without wobble, buzz, or abrupt jumps; the gesture sounds like a single expressive phrase rather than two disconnected actions. Control is consistent across neck positions and repeatable at will.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "bend_and_release",
+          "suggestedLessonIds": [
+            "v7hTZgHtI9Q",
+            "3rACLmS4roU",
+            "7yQLHM5H10c"
+          ]
+        },
+        {
+          "id": "02549b77-e52e-49a9-9148-b97810c70c3f",
+          "title": "Vibrato depth control",
+          "description": "[What it is]\nVibrato depth control is your ability to vary how far the pitch moves away from the note’s center—from a very narrow, subtle wobble to a wide, dramatic sweep—while keeping the note musical and in tune. Depth is an expressive parameter: it changes the perceived intensity and color of a sustained note without changing its underlying pitch class. Controlling depth means choosing excursion size deliberately and being able to change it mid-phrase.\n\n[Why it matters]\nDifferent vibrato depths convey different emotions and sit differently in a mix: narrow vibrato reads as intimate or vocal-like, while wide vibrato sounds raw and vocalizing at the top of its range. In expressive lead playing, depth shapes phrasing, helps notes sing over a band, and can make bends and sustained tones feel more human. Mastering depth gives you the ability to match vibrato to the musical moment instead of it becoming a default, one-size-fits-all effect.\n\n[How to practice]\nOn a comfortable position on the neck, hold a sustained note and explore a spectrum from barely-there motion to a large sweep, listening back to each attempt and choosing what fits the phrase. Practice smoothly switching between narrow and wide vibrato within a single sustained note and practice maintaining pitch center as depth changes; record yourself and compare takes to judge consistency. Add dynamic variation (softer to louder) while changing depth, and practice these choices over backing chords or a steady pulse—start slow and increase control as you go.",
+          "successCriteria": "You can produce narrow and wide vibratos on demand, transition smoothly between depths within a phrase, and keep the note’s center pitch stable as excursion changes. Your vibrato depth consistently matches the emotional intent of the line and sits appropriately in a musical context (not overly intrusive or absent). Recordings of your playing reliably show repeatable, controlled depth choices across different dynamic levels.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "vibrato_control_drill",
+          "suggestedLessonIds": [
+            "MQrn-xCi7to"
+          ]
+        },
+        {
+          "id": "89493eef-3a54-41f2-b487-a1c6fceb6255",
+          "title": "Vibrato speed modulation",
+          "description": "[What it is]\nBuilding on your vibrato control, vibrato speed modulation is the deliberate adjustment of how fast the pitch oscillates during a sustained note or phrase. It means being able to slow, speed up, or create rhythmic variations in the wobble so the note breathes like a sung phrase.\n\n[Why it matters]\nSpeed changes are a primary tool for expression: a slow, wide cycle can sound aching and warm; a quick, tight cycle can sound urgent or aggressive. In the Hendrix style this modulation gives single notes that vocal, crying quality and lets you shape tension and release without changing volume or pitch content.\n\n[How to practice]\nSustain a comfortable note and practice moving the rate from very slow to faster in one smooth motion, then reverse the motion—focus on seamless transitions rather than abrupt jumps. Work on starting a note with one speed and arriving at another mid-note, then practice short phrases where you deliberately vary rate between notes; record and listen for musical effect. Keep the motion relaxed, using small, controlled hand/wrist adjustments, and repeat the exercises in different neck positions and dynamic levels so modulation becomes repeatable and musical.",
+          "successCriteria": "You can change vibrato rate smoothly within a sustained note so the change sounds intentional and expressive rather than jerky. The tone remains steady and in tune while you accelerate or decelerate, and you can reproduce the same speed shaping reliably in musical phrases. Applied across positions and dynamics, your vibrato speed modulation reads as a vocal inflection that enhances phrasing in the Hendrix idiom.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "vibrato_control_drill"
+        },
+        {
+          "id": "7583107f-4a5c-4031-816c-7f9ab632588e",
+          "title": "Bend pitch accuracy",
+          "description": "[What it is]\nBend pitch accuracy is the ability to arrive precisely at a chosen pitch when you bend a string and to reproduce that target pitch consistently. It means the final sounding note is reliably in tune and steady when held, not just roughly 'close enough.'\n\n[Why it matters]\nAccurate bends make melodic lines sing and let expressive phrases land where you intend—especially when calling attention to a single note as a climax. Tight pitch control prevents phrases from sounding sloppy or accidental, and it gives you confidence to use bends as a deliberate expressive device rather than a guess.\n\n[How to practice]\nUse a steady reference tone (a drone, another sustained note, or a chromatic tuner) and practice matching the bend to that target: sound the reference, then bend until your ear confirms the match, then hold and check stability. Repeat slowly and deliberately, varying neck position and string so you learn consistent feel across the instrument; listen for small pitch differences and correct them by adjusting finger pressure and wrist rotation. Finish each rep by descending back to the original pitch to ensure your release is controlled; gradually tighten accuracy before increasing speed or adding phrasing.",
+          "successCriteria": "You can bend to a chosen pitch and hit it reliably every time in common playing positions; the bent note stays steady and musical when held, and pitch-targeted phrases sound intentional rather than approximate. You notice improved ability to place expressive accents and melodic high points without retuning your ear each time.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "expressive_bend_phrasing"
+        },
+        {
+          "id": "dec76c3f-cd1c-4949-b3b5-69df56097bb4",
+          "title": "Microtonal bend nuance",
+          "description": "[What it is]\nMicrotonal bend nuance is the deliberate use of very small pitch inflections that sit between the guitar's standard fretted pitches — tiny pushes or releases that change a note by a fraction of a step. These micro-adjustments are meant to shape a single tone's center-of-pitch and add a vocal, expressive shiver rather than produce a full interval.\n\n[Why it matters]\nThose subtle pitch choices are a big part of the soulful, conversational phrasing heard in classic rock and blues-influenced lead styles; they turn straightforward notes into expressive statements. Microtonal nuance creates tension, color, and a feeling of spontaneity that helps a phrase breathe and connect emotionally with the listener.\n\n[How to practice]\nWork in short, repeated motifs and focus on making very small, deliberate pitch nudges with minimal extra motion—use fine finger pressure and small wrist/hand adjustments to control the amount of shift. Record short runs, compare takes, and practice varying the landing point by the smallest increments so you can choose a barely-detectable or more pronounced micro-inflection as the musical moment requires. Pay attention to clean articulation and avoid excess noise so the listener perceives the pitch change as expressive rather than inaccurate.",
+          "successCriteria": "You can place and repeat tiny pitch inflections reliably so they sound intentional and musical within a phrase, choosing appropriate subtlety without audible strain or large, obvious movement.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "bend_and_release"
+        },
+        {
+          "id": "74638bbb-c4b1-4c03-8259-aa629c18d565",
+          "title": "Left-hand strength conditioning",
+          "description": "Left-hand strength conditioning is a focused routine of small, repeatable drills that build fingertip pressure, thumb anchoring, wrist alignment, and forearm endurance so your fretting hand can operate precisely and without unwanted tension. It matters because reliable strength and relaxed endurance let you hold notes cleanly, articulate fast passages consistently, and shape touch dynamically across long phrases. Develop it with short daily work: slow, controlled isometric holds in any comfortable position on the neck; fingertip resistance exercises using a soft hand trainer or squeeze ball; gentle stretch-and-release sequences; and progressive endurance sets with scheduled rest so you increase capacity without creating tension.",
+          "successCriteria": "Mastery feels like clean, even fretting with minimal excess force; sustained notes and faster passages remain clear and controlled without hand fatigue or collapse; and you can shift positions and release tension quickly between phrases while preserving consistent tone and articulation.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "pinky_power_drill",
+          "suggestedLessonIds": [
+            "fbu8d0oqVjw"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0d1d16d4-2f55-45a7-9d0a-a760996b4a97",
+      "title": "Single-String Lead Technique",
+      "order": 1,
+      "steps": [
+        {
+          "id": "e5bb1b68-4a05-4175-b3d8-aa054f4dee37",
+          "title": "Minor pentatonic fluency",
+          "description": "[What it is]\nMinor pentatonic fluency means you can find, connect and improvise with the minor pentatonic scale anywhere on the neck, turning scale fragments into musical phrases rather than running exercises. It’s more about knowing the scale as a vocabulary of shapes, intervals and melodic targets you can call on spontaneously.\n\n[Why it matters]\nThe minor pentatonic is the core melodic language for blues-rock soloing; fluency lets you craft memorable licks, respond to chord movement, and shape phrases that sing. When it’s internalized you spend less time thinking about fingerings and more time shaping rhythm, dynamics and note choice to tell a musical story.\n\n[How to practice]\nPractice by linking adjacent pentatonic areas so you can slide, shift and pivot smoothly between them; work short melodic motifs and move them through different parts of the neck until they sound natural. Use targeted drills: play small 2–3 note patterns, sequence them through positions, practice interval skips and string-crossing patterns, and then turn those patterns into call-and-response phrases over a backing feel. Focus each session on clean articulation, evenness of picking, expressive timing and ending phrases on strong target notes that imply the harmony.",
+          "successCriteria": "You can move between pentatonic positions without pausing, create short, varied phrases from small motifs, and intentionally land on target notes that outline the harmony. Lines feel melodic rather than mechanical, with clean string crossings and consistent articulation, and you can adapt motifs to different parts of the neck on the fly. Overall playing sounds confident, musical and flexible—the pentatonic scale feels like a natural vocabulary, not a set of shapes.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "pentatonic_string_crossing_3",
+          "suggestedLessonIds": [
+            "Oco-lfsJy5M"
+          ]
+        },
+        {
+          "id": "19098548-dbd1-4f8b-897f-2bfb684cfa2b",
+          "title": "Major pentatonic blending",
+          "description": "[What it is]\nMajor pentatonic blending is the deliberate use of major-pentatonic tones and motifs inside single-string lead lines so your phrases take on a brighter, major-inflected color. It’s about selecting and emphasizing the notes that define a major sound, then weaving those motifs into your runs and turns so they feel like a coherent melodic voice rather than isolated shapes.\n\n[Why it matters]\nAdding major-pentatonic material gives contrast and lyricism to single-string solos: it brightens phrases, creates optimistic-sounding answers to darker material, and makes call-and-response ideas sing. Mastering this color lets you craft lines that resolve convincingly against harmony and gives you another expressive palette for phrasing in the Hendrix style.\n\n[How to practice]\nIsolate short major-pentatonic motifs on a single string and practice sequencing them up and down the neck, focusing on clear, intentional targeting of chord tones as landing points. Work on connecting motifs with small connecting gestures—slides, hammer-ons, pull-offs, or short chromatic approach notes—so transitions feel smooth and purposeful; record and judge whether each phrase reads as \"major\" rather than random notes. Vary rhythmic placement and dynamics to make the same motif say different things, and increase tempo only after phrases remain musical and well-shaped at slower speeds.",
+          "successCriteria": "Phrases consistently sound major-bright and melodic on a single string, resolving cleanly to chordal targets and sounding like deliberate statements rather than scale runs. Transitions between motifs are smooth and intentional, motifs can be varied rhythmically and dynamically to create call-and-response, and recorded lines communicate a clear major tonal center even when placed over changing harmony.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "one_string_backing",
+          "suggestedLessonIds": [
+            "Oco-lfsJy5M",
+            "KW35LLP1USg",
+            "PBIxfCFzmJo",
+            "BgRzzvVWBrU",
+            "GNCLB0fHl-w"
+          ]
+        },
+        {
+          "id": "a4aff63b-294d-4860-be9f-47559d26055e",
+          "title": "Blues scale phrasing",
+          "description": "[What it is] Blues scale phrasing is the practice of shaping melodic lines so they sound vocal and conversational using the characteristic tones and rhythmic gestures of the blues. It emphasizes selective note choice, the use of space, rhythmic push-and-pull, and tension-to-release around the 'blue' pitch. Well-crafted phrasing turns short motifs into memorable statements rather than endless runs.\n\n[Why it matters] Mastering blues phrasing is how you give solos personality and emotional direction: listeners hear intent, not just notes. It creates the call-and-response shapes, gritty color, and rhythmic swagger that define blues-based lead playing and makes your lines sit naturally over changing harmony. Strong phrasing is a major part of sounding stylistically authentic in a Hendrix-influenced voice.\n\n[How to practice] Work with very small motifs and repeat them while changing only one element at a time—rhythm, ending note, dynamic, or articulation—to hear what alters the feel. Practice approaching and resolving the tension note with different approaches (stepwise, chromatic, or short inflections), leave deliberate space after key hits, and use rhythmic displacement to create surprise; start slow, increase gradually. Record short call-and-response ideas, listen back for where tension resolves and where timing feels lumpy, then refine; building on your vibrato control, add subtle pitch inflections and dynamic shading once the phrase itself is convincing.",
+          "successCriteria": "Phrases sound like intentional musical sentences: motifs are repeated with purposeful variation, the blue-note tension is created and resolved convincingly, space and syncopation are used economically, and lines convey a vocal, emotive quality that sits comfortably over the harmony—resulting in solos that feel expressive and stylistically true to a Hendrix-like blues voice.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedLessonIds": [
+            "kHYfCNrW-M4",
+            "nW4DeVdC0Rc",
+            "2xR1QJfawjg",
+            "G3oVZ9HVmT4",
+            "r-1mbf8X9Cg"
+          ]
+        },
+        {
+          "id": "a70f2a59-76fc-44f3-9237-2b9bedd4ebdd",
+          "title": "Legato hammer-ons pull-offs",
+          "description": "Legato hammer-ons and pull-offs are left‑hand articulations that produce connected notes without re‑picking each one, giving lines a smooth, singing quality. This technique matters because it creates fluid runs and expressive ornaments that sit at the heart of a soulful lead voice. Develop them by isolating the fretting motion: strike a hammer-on with a firm fingertip and controlled follow‑through, execute a pull-off by slightly plucking the string with the releasing finger while keeping fingers close to the strings, and coordinate minimal right‑hand contact so only the first note is attacked. Focused, slow repetitions that emphasize clean tone, even volume, and minimal finger travel will build reliable legato control.",
+          "successCriteria": "Runs sound seamless with no audible gaps; hammered and pulled notes ring with consistent pitch and volume comparable to picked notes; pull-offs clearly articulate the target pitch and transitions feel economical and repeatable in musical phrases.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "spider_legato_basic",
+          "suggestedLessonIds": [
+            "DlqPITGLr2s",
+            "TTBdEDZexOg",
+            "zv0PTZVW4dI",
+            "a_XSCPlcIVU",
+            "44X3rS8Q9w4"
+          ]
+        },
+        {
+          "id": "dbc6710d-90f3-4a6f-ba5c-e74750a6c00b",
+          "title": "Slide and glissando",
+          "description": "Slide and glissando are lateral-fretting techniques where a finger (or a glass/metal slide) travels along the string to produce a continuous pitch transition; a slide usually connects two clear pitches, while a glissando is a more fluid, expressive sweep through intermediate pitches. They add a vocal, crying quality and help glue phrases together so single-note lines sing and breathe. To develop them, practice slow, controlled lateral motion with steady finger pressure so the pitch remains clean and the timbre stays even; focus first on short, precise moves in any comfortable position on the neck, then extend the distance and fluidity. Vary pick attack and sweep length as you progress so you can shape each gesture intentionally—from a subtle micro-gliss to a long, singing slide.",
+          "successCriteria": "Slides and glissandi sound smooth and intentional with no audible gaps or buzzing; the pitch transitions continuously and lands cleanly on the target note while maintaining even volume and tone. You can produce short and long sweeps reliably in different neck positions and shape them dynamically for expressive phrasing.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "one_string_backing",
+          "suggestedLessonIds": [
+            "tVKAbx3KLXY",
+            "MBywJO7qTXg"
+          ]
+        },
+        {
+          "id": "1afafd36-1c1c-4faf-abfb-d6b61066e234",
+          "title": "Palm muting control",
+          "description": "Palm muting control is the ability to place and vary the fleshy edge of your picking-hand near the bridge so you can dampen string vibration anywhere between a dead, percussive choke and a lightly damped ringing note. It matters because those subtle differences give rhythmic bite, dynamic shading, and textural contrast that make single-string lines and riffs feel punchy and expressive. Develop it by sliding the palm slowly toward and away from the bridge while playing single notes and short phrases, experimenting with tiny changes in contact point and pressure, keeping the wrist relaxed, and alternating muted and open tones until the transitions are clean and repeatable.",
+          "successCriteria": "You can produce controlled gradations from fully muted thuds to lightly damped singing notes, switch cleanly between muted and open tones inside a phrase, and maintain consistent attack and decay while varying palm position and pressure for tonal color.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "muting_spotlight_drill",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "76ZOPqcjK8c",
+            "6fm2VihcB54",
+            "iIHx-lU0j6E",
+            "d41GHKVrzCI"
+          ]
+        },
+        {
+          "id": "b1da55cb-08f1-4adc-8db0-b1c7133caae2",
+          "title": "Cross-string phrasing",
+          "description": "[What it is]\nCross-string phrasing means building single-line melodies that deliberately move from one string to another, using the different fingerings and timbres each string offers. It’s about thinking horizontally and vertically at once: matching target tones across strings and choosing the most musical route between them. On guitar this widens your interval choices and lets lines breathe with varied attack and sustain.\n\n[Why it matters]\nMoving across strings gives your lines a vocal, conversational quality: you can reach wider melodic shapes, create smoother voice-leading, and exploit subtle tone changes between strings for expressive contrast. For Hendrix-style playing, cross-string choices help make phrases sound less scalar and more songlike — more surprising and more organic. It also frees your right-hand phrasing options so accents and dynamics land where they matter.\n\n[How to practice]\nWork short motifs (two to four notes) and repeat them while relocating the last note of the motif to the same pitch on an adjacent string, focusing on clean, lossless transitions and even tone. Practice relaxed, minimal left-hand shifts so your fingers land precisely on target notes, and coordinate your picking hand so attack and volume stay consistent through the string change. Start slow and increase speed only after transitions are accurate; then apply the same approach to longer melodic fragments and improvisations, deliberately choosing different string routes to hear how timbre and interval shape change.",
+          "successCriteria": "Phrases move across strings without audible hesitation or missed targets; tone and volume stay consistent through the change, and you can choose alternate string routes to shape melodic contours intentionally. Your cross-string shifts feel economical and controlled, letting you play more varied, vocal-sounding lines that fit the Hendrix aesthetic. Pitch accuracy, timing, and right-hand attack remain reliable during and after each string change.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "pentatonic_string_crossing_3"
+        }
+      ]
+    },
+    {
+      "id": "93b4a2a6-1aa5-4509-afd5-0c5ccdef85b0",
+      "title": "Double-Stop and Octaves",
+      "order": 2,
+      "steps": [
+        {
+          "id": "c1c2c64a-8a0f-48a4-b7a3-39ba06253ec1",
+          "title": "Octave melody control",
+          "description": "[What it is]\nPlaying a single-line melody where each pitch is doubled an octave apart so the two voices move as one. It relies on precise fingering and coordinated right-hand attack so the octave pair sounds like a single, thicker melodic voice rather than two disparate notes. Octave shapes are shifted up and down the neck to follow melodies while preserving consistent timbre.\n\n[Why it matters]\nOctave melodies add immediate weight and presence to lead lines — they cut through a band mix and give a phrase a rhythmic, chordal quality without full chords. In the Hendrix aesthetic, octaves let a player imply harmony while keeping the momentum of single-note phrasing, making solos and fills sound bigger and more expressive. Mastering them improves your sense of intervallic melody and voice-leading across the neck.\n\n[How to practice]\nIsolate the octave shape and practice changing positions cleanly: fret both notes lightly at first to check intonation, then add full pressure so both notes ring evenly. Work on economy of motion in the fretting hand (minimal travel when shifting) and consistent pick attack so the top and bottom notes have matched dynamics and sustain. Silence unwanted strings by resting unused fingers and the thumb; practice common melodic patterns and arpeggiated movements using octave pairs, starting slow and increasing speed only after accuracy and tone are steady. Finish sessions by varying dynamics and articulation so octave lines can sound punchy, rounded, or vocal depending on the musical context.",
+          "successCriteria": "Octave lines sound like one coherent, full melody: both notes in each octave pair have equal clarity and sustain, position changes are smooth and in tune, unwanted strings remain quiet, and you can shape dynamics so octave phrases sit expressively in a mix.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "random_note_hunt"
+        },
+        {
+          "id": "413735c0-5575-4daa-8b0b-80541dfa06ee",
+          "title": "Parallel thirds and sixths",
+          "description": "[What it is]\nParallel thirds and sixths are two-note harmonies where a melodic line is doubled at a constant interval — either a third or a sixth — and both voices move together. On guitar this creates a richer, more vocal-sounding single line by stacking intervals rather than playing a single-note melody.\n\n[Why it matters]\nThese interval pairs are a staple of expressive, blues-rock lead playing because they thicken melodies without turning them into full chords, giving solos a singing, harmonized quality. In the style you're pursuing, well-placed parallel thirds and sixths add bite and color to fills and hooks, making simple phrases sound more arranged and distinctive.\n\n[How to practice]\nStart by choosing a short, singable melody and play it while adding the parallel interval above or below, keeping both notes fretted and released together so they lock rhythmically. Work on clean fretting and consistent attack between the two fingers, add controlled slides or small positional shifts while maintaining the interval, and practice muting adjacent strings with unused fingers or the picking-hand thumb to keep the lines clear. Gradually expand the melodic material and move the same interval shapes up and down the neck in different keys so the fingering feels effortless and the interval remains in tune.",
+          "successCriteria": "Two-note lines move as a single, locked unit: attacks and releases are simultaneous, intonation between the notes is steady, and both voices have balanced tone and sustain. You can execute short melodic phrases in parallel thirds and sixths cleanly across multiple neck positions, mute unwanted string noise, and use these doubled lines musically within solos and fills so they enhance — rather than clutter — the phrase.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "guide_tone_voice_leading"
+        },
+        {
+          "id": "bf4a9810-3b34-4b02-b79c-5af16209cf2f",
+          "title": "Double-stop bends",
+          "description": "[What it is] Building on your bending control, double-stop bends are when two-note harmonies are bent so the interval between them moves expressively — either by bending one voice against a static partner or by bending both voices by different amounts. The result is a singing, voice-led gesture that sits between single-note phrasing and chordal embellishment.\n\n[Why it matters] This technique thickens solos and adds vocal-like tension and release, a signature element of the Hendrix approach to melodic harmony. Used sparingly it creates focused emotional peaks, helps you voice-lead across small intervals, and lets single-line licks sound more chordal without losing mobility.\n\n[How to practice] Start by isolating two-finger combinations and listen for the target pitch of the bent voice while keeping the other note steady; train your ear to match and maintain the interval as you bend. Progress from single-voice vs. static partner to coordinated dual bends, work on clean fretting and muting to avoid sympathetic noise, and integrate gentle shaping (subtle vibrato or release) once the pitches are reliable. Record short phrase attempts and compare intonation and sustain between the two notes, then apply the move into short bluesy or pentatonic phrases to build musical context.",
+          "successCriteria": "You can bend double-stops so the intended interval stays in tune and sustained, with minimal string noise, and make the bend resolve musically — sounding like a controlled, vocalized harmony rather than an accidental clash.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "unison_bend_drill",
+          "suggestedLessonIds": [
+            "CqC-e6hzsSQ",
+            "v7hTZgHtI9Q",
+            "3rACLmS4roU",
+            "e7xL8EUDhRw",
+            "1MSnYiXMZ0g"
+          ]
+        },
+        {
+          "id": "6ef8184c-a590-4fad-8946-7cd64c06c285",
+          "title": "Double-stop hammer-ons",
+          "description": "Double-stop hammer-ons are a left-hand technique where you force two notes to sound together by hammering-on into an interval so the second note speaks without an additional pick stroke. It thickens single-line playing into harmonized, vocal-like gestures that add immediacy and expression to intervallic licks in the Hendrix idiom. Develop it by practicing slow, deliberate hammer motions with both fingers—focus on equal attack and clear ringing of both voices, then increase speed and move the shapes around the neck while varying attack intensity and timing.",
+          "successCriteria": "Both notes of the double-stop sound cleanly and with even volume on each hammer-on, transitions between hammered shapes are smooth and musical, you can execute them reliably at performance pace with controlled dynamics and no extraneous string noise.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "hammer_on_pentatonic_run",
+          "suggestedLessonIds": [
+            "TTBdEDZexOg",
+            "7hDdZAjKBjY",
+            "zv0PTZVW4dI",
+            "DWebdd8Qd6U",
+            "P6_ipwWZROs"
+          ]
+        },
+        {
+          "id": "8ecdf100-9ccd-47ba-b3a1-d19cd8ea2fdc",
+          "title": "Octave slides",
+          "description": "Octave slides are sliding an octave pair as a single unit up or down the neck so the two notes glide together while keeping their interval and relative tuning intact. This technique thickens single-note lines, creates expressive swoops and clear voice-leading, and helps your lines stand out in a mix. Develop it with slow, deliberate repetitions that focus on keeping even pressure across both fretted notes, pivoting or slightly rolling the fretting hand to maintain the octave lock, and using controlled picking-hand contact to mute unwanted strings; increase slide distance and speed only after the glide is consistently clean and in tune.",
+          "successCriteria": "Slides sound smooth and musical with both notes in tune and balanced volume, minimal string noise, and precise, repeatable landings so the octave remains locked throughout the motion.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "muting_spotlight_drill"
+        },
+        {
+          "id": "18167cc9-97a1-4a9d-9bd3-b686051be4b5",
+          "title": "Intervallic voice leading",
+          "description": "[What it is]\nIntervallic voice leading is the art of moving two-note textures so each voice has a clear, purposeful line. It emphasizes small, efficient shifts, common tones, and contrary or oblique motion so the interval between the voices changes smoothly rather than jumping unpredictably. On guitar this means thinking of double-stops as two independent voices that create a single harmonic statement.\n\n[Why it matters]\nGood voice leading makes double-stops and octave-based lines sound melodic and harmonically intentional instead of blocky or chaotic. It allows you to imply chord movement inside a solo, create satisfying tension-and-release, and make transitions between chordal fragments and lead lines feel seamless. For expressive playing, it turns paired notes into conversational parts rather than just simultaneous notes.\n\n[How to practice]\nChoose simple two-note shapes and move them so one or both voices shift by small intervals, preserving common tones when possible; listen for smoothness and target resolutions. Practice isolating each voice—play the top note alone, then the bottom—so you can hear their independent motion, then combine them and aim for minimal hand movement. Work slowly, focus on clean articulation and balance between voices, and add small approach tones or chromatic fills once the basic motions are secure.\n\n[Common trap]\nDon’t rely on large parallel jumps that make the pair sound like a single block; that reduces melodic interest and can mask harmonic direction. Also avoid letting one voice dominate in volume or clarity—both should be audible and intentional—or the imagined harmony will collapse. Finally, resist over-complicating runs before the underlying voice movements are firmly under your control.",
+          "successCriteria": "You hear two independent but complementary lines: movements between notes feel economical, target tones resolve clearly, double-stops outline harmony without sounding blocky, and you can move between paired-voice shapes with consistent balance and minimal hand fuss.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+        },
+        {
+          "id": "33a7ecdd-4eb5-4419-ba4f-b9c87d51d37a",
+          "title": "Minor-major octave shifts",
+          "description": "[What it is]\nMinor-major octave shifts are the technique of alternating the same octave-shaped line between a minor-inflected version and a major-inflected version so a single melodic contour changes its color while staying in the same register. Rather than moving the whole phrase up or down, you alter one voice within the octave interval to flip the modal quality and produce a vocal, call-and-response effect inside a compact range. In Hendrix-style playing this creates a bittersweet tension that can sound bluesy one moment and brighter the next.\n\n[Why it matters]\nThis move is a compact way to introduce immediate emotional contrast without disrupting your line or rhythmic placement: the listener hears the same shape but with a different emotional tag. It’s a key expressive device for Hendrix-esque phrasing because it foregrounds tonal ambiguity and lets you punctuate phrases with surprise and release. Used sparingly, it makes solos sound more conversational and dynamic.\n\n[How to practice]\nIsolate a short octave figure and practice switching one voice by the small interval that changes its minor/major color, keeping the other voice steady so the contrast is obvious; repeat until the shift is clean and intentional. Work on matching volume and timbre between the two voices so the change reads as a color shift rather than a change in attack or balance, and practice moving the shift into different rhythmic placements inside a phrase. Gradually chain the switch into longer lines and vary attack and sustain to explore expressive options in the Hendrix idiom.",
+          "successCriteria": "You can flip the octave’s modal color inside a phrase without losing timing or balance, and listeners hear a deliberate minor→major or major→minor tint rather than a messy pitch change; the octave voices ring in tune and the shift feels like an expressive punctuation in a solo. The move is repeatable in different positions and rhythmic spots and adds a clear Hendrix-like emotional twist to your lines.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedLessonIds": [
+            "0kB4X3w1IBk",
+            "Oco-lfsJy5M",
+            "-iEAxS26pL0",
+            "r-1mbf8X9Cg"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1eedfc4c-ab2e-4a92-81a8-6c18c50ace1a",
+      "title": "Chordal Embellishment Techniques",
+      "order": 3,
+      "steps": [
+        {
+          "id": "2036bb36-1878-4c63-bb44-e70ec35c0d6a",
+          "title": "Thumb-over bass fretting",
+          "description": "Thumb-over bass fretting is the picking-hand thumb coming over the neck to fret and control bass notes while your fretting fingers handle chord shapes and embellishments. It matters because it lets one player supply a solid bass voice and punchy chord-bass textures at the same time—an essential component of Hendrix-style solo guitar arrangements. Develop it by finding a relaxed thumb position that frets cleanly, practicing holding single bass tones with steady pressure, then alternating between thumb-held bass and full chord shapes while keeping the wrist relaxed, clear attack, and reliable muting; start slow and increase speed as control improves.",
+          "successCriteria": "You can fret bass notes with the thumb cleanly and consistently without tension, maintaining balanced volume between the bass note and accompanying chord tones. Switching between thumb-held bass and fingered chords is smooth and deliberate, with unwanted strings muted and each bass-note insertion sounding intentional and well articulated.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "jazz_chord_melody",
+          "suggestedLessonIds": [
+            "iAGDox4PGuA",
+            "6V-X-FJw7yQ",
+            "0BWqplNzEBY",
+            "noFlWeyJzdI"
+          ]
+        },
+        {
+          "id": "de5cd021-0ca1-47ab-a4a6-7ca0d6c351c7",
+          "title": "Dominant seventh voicings",
+          "description": "[What it is]\nDominant seventh voicings are chord shapes that emphasize the major third and the minor seventh, the two intervals that create the dominant function and forward motion in harmony. On guitar you can present that function as full four-note shapes or as reduced \"shell\" and triad-based voicings that keep the essential color while economizing fingers. Choosing between fuller or sparser voicings is a matter of texture and context.\n\n[Why it matters]\nThese voicings provide the bluesy, tension-filled quality heard throughout rock, blues, and Hendrix-influenced playing; they set up resolutions and give solos and comping a clear harmonic anchor. Different voicings change brightness and density, letting you tune how much edge or warmth you place under a line or vocal. Being fluent in several options lets you respond to a band, create call-and-response textures, and place melodic fills over harmonically rich beds.\n\n[How to practice]\nLearn a handful of movable full and partial shapes in any comfortable position on the neck, then practice voice-leading them to common target chords so your fingerings become economical and musical. Focus on keeping the third and seventh audible while simplifying other voices as needed; strike chords cleanly and experiment adding or removing notes to hear the color changes. Integrate these voicings into short comp patterns and small turnarounds, starting slow and increasing gradually until the shapes are natural in performance.",
+          "successCriteria": "Voicings ring clearly with the third and seventh present and the harmony resolving convincingly; you can shift between full and reduced versions smoothly without extraneous finger movement. You choose voicings that sit well in the mix—adding tension when needed and thinning out when space is required—and place them effortlessly across the neck during comping and short fills. The shapes become reliable tools for creating Hendrix-style harmonic color and rhythmic punctuation.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "guide_tone_voice_leading",
+          "suggestedLessonIds": [
+            "DtySc0zjN74",
+            "JgS9ai_KEHE",
+            "hVnnfgTBk8k",
+            "g88pJ1eqi-E",
+            "PG2wc4fcv0I"
+          ]
+        },
+        {
+          "id": "eee8afde-afbf-4eac-9fcc-c4de238228d1",
+          "title": "Sharp nine voicings",
+          "description": "[What it is]\nA sharp nine voicing is a chord texture that places a raised ninth interval against the chord's third and seventh, producing a simultaneous major- and minor-third color. That close, dissonant clash gives the voicing a gritty, vocal quality that sounds unstable yet very purposeful.\n[Why it matters]\nIt supplies immediate tension and a cutting timbral edge that slices through accompaniment and commands attention when used in comping or turnarounds. In the Hendrix aesthetic this sound becomes a signature punctuation—raw, ambiguous, and excellent for signaling a change or launching a lead phrase.\n[How to practice]\nFirst train your ear by isolating the third versus the raised-ninth so you can clearly hear their interaction, then alternate between a neutral chord sonority and the #9 color to feel the change. Work compact, movable fingerings around the neck, practice smooth voice-leading into common resolution targets, and experiment with partial fingerings, muted strums, and percussive stabs so you learn how and when the voicing cuts through a mix.",
+          "successCriteria": "You can place sharp-nine voicings cleanly within progressions so their dissonant bite is obvious but controlled; the clash between third and raised-ninth is audible and intentional, and you can use the voicing as a rhythmic punctuation or setup for a lead without muddying the harmony.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "guide_tone_voice_leading"
+        },
+        {
+          "id": "b7dd6519-7680-4b4d-908b-f9fabd9b3654",
+          "title": "Suspended chord textures",
+          "description": "[What it is]\nSuspended chord textures are voicings that omit the conventional third and replace it with a suspended degree (commonly labeled sus2 or sus4), producing an open, ambiguous harmony. On guitar this often means using partial shapes, open strings, dyads, or added tones to create ringing, airy clusters rather than full triads. The focus is on intervalic color and sustained ringing rather than dense, settled chords.\n\n[Why it matters]\nThese textures give comping a floating, tension-filled character that can sit behind solos or become a melodic statement on their own. They let you move smoothly between unresolved color and resolution, add call-and-response possibilities with lead lines, and create the bright, spacious sonorities heard in many classic electric-guitar styles. Used selectively, suspended textures broaden your palette without cluttering the mix.\n\n[How to practice]\nIsolate a few comfortable suspended shapes and practice switching between sus2, sus4, and their resolved counterparts across different neck areas using both single-note ringing and percussive stabs. Work on clean string separation and intentional muting so individual suspended notes ring clearly or cut off sharply when you want rhythmic punctuation. Experiment with partial voicings and open strings to hear how different string combinations change the texture, and record short comping phrases to evaluate balance, sustain, and how smoothly the suspensions resolve when desired.",
+          "successCriteria": "Suspended chords sound clearly open and purposeful: they ring with an unresolved color when intended, move between suspended and resolved shapes cleanly, and provide tasteful comping textures that support leads without masking them.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "chord_practice_configurable",
+          "suggestedLessonIds": [
+            "qu49nYaBfdM",
+            "16d6nx_pSrs",
+            "otjuDwSMRjk"
+          ]
+        },
+        {
+          "id": "b2b2e41f-34e1-499c-ab57-92df31570be5",
+          "title": "Movable bass lines",
+          "description": "[What it is]\nMovable bass lines are the technique of shifting the low voice beneath a stable chord shape so the bass pitches create a melodic, stepwise or chromatic line while the upper chord tones provide harmonic context. Rather than strumming full block chords, you preserve selected chord tones and alter only the bass pitch to outline progressions and create voice-leading motion. This lets a single guitarist imply a bassist and add forward motion to comping.\n\n[Why it matters]\nIn guitar-centered styles, movable bass lines give comping a sense of direction and rhythmic life—turning static chords into mini-melodies that link changes and fill space. They make solos and riffs feel more grounded because the ear follows a clear low-end line even when the harmony above shifts. For a Hendrix-influenced sound, tasteful bass movement helps recreate that blend of rhythm and lead on one instrument.\n\n[How to practice]\nChoose a comfortable chord shape and keep the upper voices ringing while consciously fretting different lower notes to form stepwise or chromatic patterns; work the pattern up and down through a simple progression, starting slow and increasing gradually. Focus on clean transitions: minimize left-hand travel, mute unwanted strings with adjacent fingers or the picking hand, and emphasize the bass note with a slightly stronger attack so it reads through the texture. Practice varied rhythmic placements—on the beat, anticipations, and syncopations—and record yourself to check that the bass line is melodic, consistent in volume, and supportive of the chordal color.",
+          "successCriteria": "Bass movement sounds melodic and intentional beneath stable chord tones; the low voice connects chord changes without disrupting the chordal texture, and the upper voices remain clear. Transitions between bass notes are smooth with minimal finger motion and controlled string muting. You can place bass notes rhythmically to create push, pull, or steady walking motion that supports soloing and comping.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "jazz_chord_melody"
+        },
+        {
+          "id": "d3901b99-d25f-4407-bdca-d1730b2447b2",
+          "title": "Partial chord inversions",
+          "description": "[What it is]\nPartial chord inversions are compact voicings that rearrange a chord's tones while omitting some notes (often the root) so the remaining voices form a new bass–inner–top relationship. Instead of full barre or open chords, you play a reduced set of chord tones in a specific order so one voice becomes the bass and others sit above it. The result is a smaller, more movable shape that preserves the harmony while changing its color and implied direction.\n\n[Why it matters]\nThey let you create smooth, guitar-friendly voice leading and rhythmic comping without moving large hand shapes, which produces the intimate, singing chordal textures heard in classic electric guitar styles. Partial inversions change how the same harmony feels—placing a third or seventh in the bass or a different note on top can turn a static chord into a melodic event. Using them makes your comping more interactive with lead lines and bass movement, adding subtle harmonic tension and release.\n\n[How to practice]\nPick common chord qualities and form small 2–4 note voicings that omit the root, then practice swapping which note sits in the bass so you hear the new colors each inversion creates. Work on moving a single voice stepwise between voicings so changes are minimal and smooth, and practice quick grips and releases so you can insert these shapes into comping or fills without losing groove. Listen for which inverted bass choices create pull toward the next chord and train your fingers to favor those minimal shifts; repeat until switching feels automatic and the voicings ring clearly.",
+          "successCriteria": "You can pick a compact voicing and rearrange its voices so the harmony still reads clearly but moves melodically; changes between inversions happen with minimal finger movement and clear ringing tones; comping with these shapes sounds intentional and harmonically distinct, adding melodic bass or top-note motion to your rhythm playing.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "minimal_motion_voice_leading",
+          "suggestedLessonIds": [
+            "OdbcisEH95Q",
+            "xIwjyUOpiHE"
+          ]
+        },
+        {
+          "id": "a1d64802-b5e2-4406-b1a5-736d8ddd9857",
+          "title": "Sliding chord voicings",
+          "description": "[What it is]\nSliding chord voicings means moving a fretted chord shape laterally along the neck while preserving the important voices (melody, bass, or inner harmony) so the chord changes feel like a single continuous gesture instead of separate hits. It uses compact, movable shapes and partial voicings so the slide becomes a melodic or rhythmic connector rather than just a technical flourish.\n\n[Why it matters]\nThis technique creates fluid, vocal-sounding transitions between chords and gives comping a singing, conversational quality — a hallmark of the Hendrix aesthetic. Sliding voicings let you link harmony and rhythm: they add momentum, chromatic approach tones, and expressive punctuation that make comping and fills sound more organic and immediate.\n\n[How to practice]\nChoose a small, movable voicing and practice sliding it up and down the neck while keeping the target voices audible; concentrate on clean contact at the destination and minimal string noise during the move. Work both ascending and descending slides, vary slide length, and practice coordinating your right-hand attack so the slide reads as part of the groove; use muting with unused fingers to eliminate buzz. Start slow, increase speed and musical context gradually, and practice inserting short sliding voicings into simple chord progressions so they become practical comping tools.",
+          "successCriteria": "Slides land cleanly and musically: the important chord tones remain clearly audible, unwanted noise is controlled, and each slide functions as a smooth connector or accent within a comping phrase. You can execute ascending and descending slides with consistent intonation and dynamic control, and comfortably drop short sliding voicings into rhythm playing so they enhance rather than disrupt the groove.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "minimal_motion_voice_leading",
+          "suggestedLessonIds": [
+            "viTvfArd4Mo"
+          ]
+        },
+        {
+          "id": "b4ec14fa-1672-42fd-a1fa-584ace39345c",
+          "title": "Chordal stab dynamics",
+          "description": "Chordal stab dynamics are the deliberate, percussive attacks and immediate cut-offs of chords—short, accented 'stabs' whose attack strength and sustain you control to create rhythmic punctuation. They matter because tight, varied stabs add punch and contrast to a part, helping phrases breathe and cutting through a mix when you need emphasis. Develop them by practicing single, focused attacks with controlled release to stop sustain, alternating between chords that ring and chords you stop quickly, refining evenness across the strings and widening your attack intensity; start slow and increase speed and contrast as control improves.",
+          "successCriteria": "Stabs sound punchy and precise: each chord attack has a clear, consistent onset and a reliably controlled cut-off with no unwanted ringing. You can produce a range from soft to aggressive stabs while keeping them even across strings and placing them musically within a groove so they punctuate rather than blur the arrangement.",
+          "sessionsRequired": 8,
+          "order": 7,
+          "suggestedExerciseId": "muting_discipline_drill"
+        }
+      ]
+    },
+    {
+      "id": "3ee0ca11-a0fb-42ca-ae99-75a7a7d915e4",
+      "title": "Rhythmic Feel and Comping",
+      "order": 4,
+      "steps": [
+        {
+          "id": "b0d3d64e-9173-4374-8594-7a6409d6d73d",
+          "title": "Syncopated strumming patterns",
+          "description": "[What it is]\nSyncopated strumming places chord attacks and silences off the expected strong beats so the rhythm feels pushed, pulled, and surprise-driven. It’s about displacing accents and using rests or muted hits to create forward motion and conversational tension between guitar and groove.\n\n[Why it matters]\nThis kind of strumming makes your comping sound rhythmic and alive rather than merely accompanimental; it carves space for solos and vocal lines and gives your playing a conversational, danceable energy. In the Hendrix style, syncopation is a main ingredient that turns simple chords into propulsive, expressive statements.\n\n[How to practice]\nStart slow and increase gradually: pick a short two-bar chord pattern in any comfortable neck position and practice moving the emphasis off the main beats—try accents on unexpected subdivisions, drop-outs (silences), and quick percussive strokes between full strums. Isolate the rhythm hand to focus on placement and economy of motion, loop variations that move an accent earlier or later, and then add dynamic contrast so accented strokes cut while surrounding strums sit back. Record or play with a steady groove to check that your displaced accents lock with the pocket and make deliberate small changes rather than rushing into complexity.",
+          "successCriteria": "Your strumming consistently places accents off the strong beats so the groove feels pushed and relaxed at the same time; two-bar patterns can be varied without losing the pocket, accented strokes are clear and musically expressive, and you can insert brief silences or percussive hits that enhance rather than disrupt the overall groove.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "rhythm_training_medium",
+          "suggestedLessonIds": [
+            "dy0_MMA1Dfo",
+            "2XFZ5vExH7c",
+            "OJLc3cWlYR4",
+            "r3HNaLANUrE",
+            "YCA6YuN0Pug"
+          ]
+        },
+        {
+          "id": "44d24248-0e3e-43de-be08-726f8ea179fb",
+          "title": "Muted percussive strums",
+          "description": "Muted percussive strums are deliberate strumming strokes that deaden the strings on contact to create a short, snappy, drum‑like sound instead of sustained pitches. They matter because they punctuate and drive groove, letting your comping serve both rhythmic and harmonic roles. To develop them, practice controlled down- and up-strokes with light, consistent contact from the strumming hand to stop ringing, vary where you mute across the strings to change the click, and alternate muted and ringing strums to build clean transitions and dynamic control.",
+          "successCriteria": "Muted strums sound like a clear, repeatable percussive click with little to no ringing; you can place them reliably on different subdivisions, switch smoothly between muted and ringing textures, and shape their loudness and length to accent the groove without disrupting the comping.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "rhythm_training_medium",
+          "suggestedLessonIds": [
+            "8OOoUEhhvHw",
+            "97_u9KqulKQ",
+            "76ZOPqcjK8c",
+            "xARmgKQmbYw",
+            "HnhbAvAruao"
+          ]
+        },
+        {
+          "id": "64df90f8-2b99-47bc-b875-e772eaf4bd89",
+          "title": "Groove-driven comping",
+          "description": "[What it is]\nBuilding on your syncopated strumming patterns, groove-driven comping is the craft of using short chordal hits, rhythmic placement, and tasteful space to lock the guitar into the band pocket and propel the groove. It focuses less on continuous chordal motion and more on well-timed motifs, anticipations, suspensions and rests that interact with the rhythm section. The goal is to make each chord hit feel intentional—part push, part support—so the comping breathes with the music.\n\n[Why it matters]\nComping defines the rhythmic character of a performance: it sets groove, creates forward motion, and prepares or contrasts soloists and vocal lines without stealing attention. In a Hendrix-informed style, comping adds color through rhythmic tension, small chromatic or blues-leaning chordal inserts, and dynamic contrast, all of which make the arrangement feel alive. Good comping makes a simple progression feel cinematic and turns repetition into momentum.\n\n[How to practice]\nWork with a steady backing loop or drum groove and practice small, repeatable comping motifs that emphasize placement and silence as much as the chord hits; start slow and increase gradually. Practice shifting accents, dropping out for rests, and inserting short chromatic or altered chord stabs to taste, then record and listen specifically for pocket and interplay with the bass/drums. Common trap: overplaying — prioritize tastefully placed hits and clear rhythmic intent over filling every bar.\n",
+          "successCriteria": "Your comping locks consistently with the rhythmic bed so that it feels like part of the groove rather than decoration; short motifs and rests are used deliberately to create motion and space. Dynamic contrast and rhythmic placement support soloists and singers without clutter, and you can vary patterns to change intensity while keeping the underlying pulse steady. Listeners should feel the pocket and rhythmic intent even when the comping is sparse.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "chord_spotlight_drill",
+          "suggestedLessonIds": [
+            "zmAS3fcLWbc",
+            "Ew40AbclS0A",
+            "kOtT5c8pD1U"
+          ]
+        },
+        {
+          "id": "0dce7088-27c4-4685-b11d-e51b78cb4347",
+          "title": "Triplet subdivision feel",
+          "description": "[What it is]\nTriplet subdivision feel is the rhythmic division of a beat into three equal parts, creating a rolling, lilted pulse that sits between straight and swung timing. On guitar this means placing strokes, accents, or notes into groups of three so phrases breathe with a three-part flow rather than square twos or fours. It’s felt as a gentle forward motion—neither rushed nor rigid—but measured in evenly spaced triplet units.\n\n[Why it matters]\nMastering triplet feel opens a different palette of grooves and phrasing: comping can push or soften a progression, and solos gain a conversational, singing quality when shaped around three-part subdivisions. It also helps you lock with a rhythm section that favors swung or shuffled feels, and gives your accents and fills a more elastic timing that listeners perceive as soulful or bluesy. Being comfortable with triplets makes transitions between straight and swung feels smooth and intentional.\n\n[How to practice]\nStart slow and isolate the three-part pulse—count or vocalize the subdivision as you play short chord or single-note figures so the three equal parts become internalized. Alternate exercises that place your chord hits or single-note shapes on different positions inside each triplet group to hear how accents change the groove. Gradually increase speed once spacing and hand coordination stay even, and practice swapping between straight subdivisions and triplet subdivisions to build control over the change of feel.",
+          "successCriteria": "Triplet subdivisions sound and feel even and natural inside your comping and fills; accents and phrase placement within the three-part groups are deliberate rather than accidental. You can move smoothly between straight and triplet feels without losing timing, and your solos and rhythmic hits use triplet-based phrasing that grooves with the band instead of sounding forced.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "rhythm_triole",
+          "suggestedLessonIds": [
+            "7XVHXA5GIAw"
+          ]
+        },
+        {
+          "id": "78793337-49b8-422f-afc1-d53047885bca",
+          "title": "Dynamic accent control",
+          "description": "[What it is]\nDynamic accent control is the deliberate shaping of loudness and attack on individual notes or strums to make certain beats or tones stand out while others recede. It’s about deciding which pulses become focal points and executing that decision with consistent physical intent so the pattern reads clearly to a listener. Consistent control lets you place accents precisely without upsetting the overall time feel.\n\n[Why it matters]\nAccents are what give comping personality—they create tension and release, suggest forward motion, and communicate phrasing to other players. Well-placed accents can turn a simple chordal pattern into a conversational response within a band context, drawing the ear to what you want emphasized without increasing overall volume. For a Hendrix-styled approach, dynamic accents help replicate the vocal, percussive, and call-and-response energy heard in that style.\n\n[How to practice]\nWork with a single repeated comp pattern and systematically move a strong accent to different beats and subdivisions; listen for how the groove shifts even when the notes remain the same. Focus on the physical source of each accent—pick hand attack, stroke length, or fingertip touch—and exaggerate those motions, then reduce them to a controlled, musical level. Record short runs where you alternate heavy and light accents, then refine the smallest motion that still produces a clear dynamic change; practice this in progressively more complex patterns and in the company of a backing track or metronome, starting slow and increasing speed as control improves.",
+          "successCriteria": "You can place clear, repeatable accents that cut through the band without raising overall volume; unaccented notes remain relaxed and supportive. Accents shift the perceived groove intentionally, and listeners can identify the emphasized beats while the time feel stays steady.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "chromatic_accents"
+        },
+        {
+          "id": "c5d64600-9ebc-4f0a-af5a-388cfce5c1e9",
+          "title": "Upstroke-driven accents",
+          "description": "[What it is]\nUpstroke-driven accents are intentional emphasis placed on the upward pick stroke to make certain chords or notes pop. Instead of relying on louder downstrokes, the upstroke itself is made stronger, shorter, and sharper so accents sit slightly higher in the mix and feel more forward. Physically it means timing a more pronounced release or snap during the upward motion so the attack and tonal edge change without big arm movement.\n\n[Why it matters]\nThese accents create a lively, syncopated comping voice that cuts through dense band textures and gives rhythm parts a conversational push. They help produce the 'bite' and behind-the-beat lilt often heard in expressive electric-guitar styles, making comping feel more rhythmic and responsive. Using upstroke accents also opens space for lead lines by shifting perceived emphasis away from bass-weighted downstrokes.\n\n[How to practice]\nIsolate the upstroke: mute the strings and practise making every upstroke noticeably louder and sharper than surrounding strokes, then add actual chord shapes once the motion is stable. Work on minimal motion — a quick wrist/finger snap rather than large arm movement — and alternate between unaccented patterns and targeted upstroke accents so the accent feels intentional, not accidental. Vary accent placement across subdivisions and within chord comping so you learn to choose which upstrokes to highlight for musical effect.",
+          "successCriteria": "Upstroke accents are audible and consistent without extra tension: they cut through a full band sound, land with a slightly brighter attack than surrounding strokes, and feel effortless and repeatable in different comping patterns. Your right hand uses a small, efficient motion so accents stay precise across tempo changes and voicings.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "strumming_pattern_7"
+        },
+        {
+          "id": "da99d710-4835-49b7-b6a8-3e1aeeacec80",
+          "title": "Ghost note placement",
+          "description": "[What it is]\nGhost notes are short, percussive, pitch-ambiguous strikes produced by lightly muting the strings so they thud instead of ring. They function as rhythmic ornaments rather than pitched events, filling space and creating a textural layer between full chords and lead lines. When used sparingly they become a rhythmic punctuation mark that shapes the groove.\n\n[Why it matters]\nGhost notes give comping a breathing, conversational quality: they emphasize syncopation, increase forward motion, and make accented chords land with more impact. In the Hendrix-style landscape they add funk and a rhythmic push without adding harmonic clutter, helping you create tension and release inside a groove. They also let you imply movement when you want the focus on rhythm rather than harmony.\n\n[How to practice]\nIsolate a simple comping pattern and insert muted hits on different subdivisions, listening to how each placement shifts the pocket; start slow, increase gradually. Use the fretting hand to lightly touch the strings for a controlled, short decay while the picking/strumming hand controls attack and relative volume—practice varying touch so ghost notes can be softer or punchier as needed. Alternate sequences of ghost notes and full chords until switching between them is seamless, and record or listen back to check that the ghosts support the groove rather than crowd it.",
+          "successCriteria": "Muted hits are clearly audible but not pitched, and they sit naturally inside the groove so accents and full chords pop. You can place ghost notes on different subdivisions and switch smoothly between ghosted and full-sounding strokes without timing or volume glitches. Comping feels more dynamic, syncopated, and conversational as a result.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "muting_discipline_drill"
+        },
+        {
+          "id": "c973676e-06bf-4155-9894-6748236bec84",
+          "title": "Left-hand muting rhythms",
+          "description": "Left-hand muting rhythms use the fretting hand to stop string vibration selectively, creating short, percussive chops and controlled staccato while releasing to let notes speak. This skill matters because those clipped, syncopated accents shape groove and space—they turn simple comping into punchy, conversational rhythm work that sits in the pocket. Develop it by practicing slow, repeatable mute/unmute patterns: rest your fingertips lightly to silence strings, alternate between muted and fully fretted positions in small rhythmic cells, then move those patterns across different chord shapes and short melodic fragments while tightening release timing and consistency.",
+          "successCriteria": "You can produce crisp, percussive chops with consistent mute length and clean releases, lock left-hand muting precisely with the rhythmic pulse, and transfer the same mute patterns reliably across chord changes and short licks without unwanted ringing.",
+          "sessionsRequired": 8,
+          "order": 7,
+          "suggestedExerciseId": "muting_discipline_drill",
+          "suggestedLessonIds": [
+            "97_u9KqulKQ",
+            "8OOoUEhhvHw",
+            "xARmgKQmbYw",
+            "76ZOPqcjK8c",
+            "ClbgoJlbzSc"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e714dde2-6062-4e8d-851a-9d6cc93e8ece",
+      "title": "Tone Shaping and Effects",
+      "order": 5,
+      "steps": [
+        {
+          "id": "45375b0e-b3ca-4b12-826b-915c2af55190",
+          "title": "Wah pedal articulation",
+          "description": "[What it is]\nWah pedal articulation is the deliberate use of the pedal's sweep to shape the guitar's frequency response like a talking filter—from a narrow, nasal peak to a darker, scooped tone. It’s about moving the pedal as an expressive extension of your picking and fretting so the guitar 'sings' vowel-like shapes or punctuates rhythmic hits. Treat the foot as a micro-phrasing tool: small shifts and held positions matter as much as full sweeps.\n\n[Why it matters]\nWah articulation turns static notes and chords into expressive statements: it can make a sustained line vocal, make a chord stab bite, or create rhythmic punctuation that interacts with groove. Controlled articulation lets you place emphasis inside a phrase, create call-and-response shapes, and carve space in a dense mix without changing your picking or fretting. Subtle control distinguishes tasteful use from gimmicky overuse—it’s the difference between an accent and a scream.\n\n[How to develop it]\nStart by coordinating single-note and chord strikes with full sweeps, then reduce the range to practice half-sweeps and fixed midpoint colors for tonal variety; focus on smooth heel-to-toe motion and minimal, deliberate adjustments. Practice matching sweep shape and duration to phrase lengths and accents, then work on leaving the pedal at intermediate positions to hear how small shifts affect harmonic content. Build foot independence by combining articulation with dynamic picking and muting so the pedal becomes an integrated expressive choice rather than an afterthought.",
+          "successCriteria": "You can produce consistent vowel-like tones and rhythmic accents with the pedal, move smoothly between heel and toe without disrupting your fretting or picking, and use partial positions to color sustained notes and chords. Your wah movements clearly support phrasing—accenting intended notes and creating vocal textures—without drawing attention to imperfect timing or abrupt jumps.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "one_string_backing"
+        },
+        {
+          "id": "307415e8-784c-477f-ac87-720045e3c3de",
+          "title": "Controlled amp feedback",
+          "description": "[What it is]\nControlled amp feedback is the deliberate creation, shaping, and release of the sustained ringing that occurs when your guitar and amplifier interact. It’s about exciting a specific harmonic or fundamental so the amp sustains it, then using your instrument position, touch and simple controls to sculpt the pitch and timbre. The goal is musical sustain that can be started and stopped on cue rather than random squeal.\n\n[Why it matters]\nUsed musically, feedback becomes an expressive extension of your phrasing: a singing sustain, an agressive squeal, or a warm harmonic drone that complements a line. It increases the emotional impact of long notes and can act as a dynamic punctuation or texture in solos and comping. Learning to control it keeps it musical and repeatable so it enhances rather than distracts from what you play.\n\n[How to practice]\nFind the amp/guitar distance and angle that produce a reliable, repeatable feedback threshold, then practice moving into and out of that zone so the sound starts and stops cleanly; small adjustments change harmonic content. Use pickup selection, subtle changes in pick attack and palm/left-hand damping to steer pitch and choke the feedback when needed, and experiment with EQ and gain to emphasize usable harmonics. Practice calling up a sustained feedback on cue, altering its timbre by angling or shifting the guitar, and silencing it instantly without creating extra noise; journal what body positions and control settings produce the tones you want, and always protect your hearing while experimenting.",
+          "successCriteria": "You can evoke a stable sustained tone on command, alter its pitch or harmonic character by moving and angling the guitar or changing touch, and stop it cleanly without excess noise; the feedback sounds purposeful and musical within a phrase rather than accidental. It integrates smoothly into your playing as an intentional color or extension of a note.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "muting_spotlight_drill",
+          "suggestedLessonIds": [
+            "zBIQYGavvPI",
+            "ie0u-IZl3mA"
+          ]
+        },
+        {
+          "id": "7828bcf2-3174-49b8-afe1-b2d747ccb048",
+          "title": "Fuzz and overdrive feel",
+          "description": "[What it is]\nFuzz and overdrive are two kinds of saturation used to color your tone: fuzz produces a thick, compressed, harmonically rich bark with long sustain and more apparent harmonic distortion, while overdrive provides smoother, touch-sensitive breakup that adds warmth and harmonic complexity without obliterating note definition. Together they create the gritty, singing quality and dynamic edge associated with classic electric guitar lead and rhythm work. Understanding their different responses to pick attack and guitar-volume changes is key to controlling the sound.\n\n[Why it matters]\nThese textures shape how phrases sit in the mix—fuzz gives sustained, aggressive presence for lead lines and raw chordal hits, and overdrive supplies the midrange push that makes notes sing while preserving articulation. For the Hendrix-style palette, mastering the feel lets you move between searing sustain and percussive, biting rhythm tones so your phrasing and dynamics carry emotional weight. The right balance keeps notes clear rather than muddy, so every bend, stab, or chordal vamp communicates intent.\n\n[How to practice]\nA/B between clean, overdrive, and fuzz while playing the same short phrase to hear how saturation changes clarity, sustain, and harmonic content; note what your ear prefers for leads versus rhythm. Practice controlling gain interaction with pick attack and the guitar’s volume knob—play a line with a hard attack, then play the same line with a softer touch or rolled-back volume to listen for cleanup and changes in harmonic balance. Work both single-note runs and compact chord stabs: dial in tone and gain in small steps until you get singing sustain without lost note definition, then record and compare takes to refine settings and touch. Finish each session by noting one concrete adjustment (gain, tone, or attack) to focus on next time.",
+          "successCriteria": "You consistently produce saturated tones that sustain and harmonically enrich single-note leads while still allowing note articulation; chord hits have grit but retain clarity; you can change the character between aggressive fuzz and more touch-sensitive overdrive by adjusting gain, tone, and pick/volume technique, and listeners can hear intentional phrasing rather than indistinct noise.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "dynamic_crescendo"
+        },
+        {
+          "id": "97950630-bdd7-4710-8d50-bd5e55c3c85a",
+          "title": "Univibe and modulation",
+          "description": "[What it is]\nUnivibe and related modulation effects create a slow, phasey swirl that moves the guitar's tone in pitch and amplitude, producing a chorus-like, rotary-speaker impression with a slightly warbling character. The effect is produced by combining phase shift and amplitude modulation, and can range from subtle shimmer to a throbbing, psychedelic wobble.\n\n[Why it matters]\nThis texture is a core ingredient of the Hendrix-era sonic palette: it makes sustained lines sing, gives chordal comping a liquid motion, and helps solos and rhythm parts occupy a distinct, vocal-like space in the mix. Used tastefully, modulation can add emotional movement without changing your notes; used heavily, it creates an unmistakable psychedelic atmosphere.\n\n[How to practice]\nExplore the rate and depth controls across a range of settings, listening for where the effect complements single-note lines versus when it enhances chordal textures; practice switching between subtle and extreme settings so you can summon either reaction on demand. Work on timing your on/off foot control and gradual adjustments so the sweep aligns musically with your phrasing, and practice muting or releasing strings while the effect is engaged to hear how the modulation interacts with attack and sustain. Finally, record short comping and soloing phrases as you adjust parameters so you can compare takes and choose settings that sit best for each musical context.",
+          "successCriteria": "You can dial a Univibe/modulation setting that either sits behind your playing or sings in front of it, smoothly change intensity mid-phrase without disrupting feel, and use the effect to add movement that supports your phrasing rather than masking it.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "one_string_backing"
+        },
+        {
+          "id": "7433a743-a8a7-414a-8e60-45b2e9a37506",
+          "title": "Volume knob swells",
+          "description": "[Why it matters]\nVolume knob swells let single notes and chords bloom like a human voice, removing the initial pick attack so phrases feel more vocal and expressive. In the Hendrix-style palette they create tension and release, making hits and endings feel dramatic and giving space to sustain and modulation textures.\n\n[How to practice]\nStart with the volume rolled down, pluck a comfortable note or chord, then smoothly turn the knob up so the sound fades in rather than beginning with a pick click; train the smooth, consistent motion and the timing between pick and turn. Vary the swell speed and the target volume, practice muting to shape the release, and rehearse switching between swells and normal picked attacks so the technique becomes a seamless expressive option.\n\n[Common trap]\nRelying on excessive amp gain or heavy picking will make swells sound harsh or abrupt instead of smooth—find the knob range and hand movement that produce a clean bloom. Also avoid large left-hand motion during the swell that causes unwanted pitch wobble or string noise; small, controlled gestures keep the effect singing.",
+          "successCriteria": "Swells begin with little or no perceived pick attack and bloom into full tone reliably; you can control swell speed and target loudness musically across different registers and insert swells into phrases without unwanted noise or pitch instability.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "dynamic_crescendo"
+        },
+        {
+          "id": "4f3d57fc-95d8-4e97-937e-6c96e5c4697f",
+          "title": "Touch sensitive dynamics",
+          "description": "[What it is]\nTouch sensitive dynamics is the deliberate control of note and chord loudness, attack and sustain by changing how you touch the strings—pick force and angle, finger attack, and subtle release timing—rather than by altering gear settings. It’s the fine-grained ability to make notes float, edge, or snap so a phrase carries emotional shading within a single take.\n\n[Why it matters]\nThis skill is what makes phrasing speak: the same lick can sound intimate, pleading, or aggressive purely through touch. Developing it lets you place accents that cut through a mix, keep quiet passages articulate, and shape lines so they breathe like a human voice.\n\n[How to practice]\nWork short phrases and deliberately vary your attack from very soft to firm while keeping timing and intonation steady; record and compare takes to hear the differences. Practice call-and-response where one repeat is subdued and the next is assertive, then swap roles; explore pick versus finger attack and different contact points along the string to notice changes in brightness and sustain. Gradually apply those controlled contrasts to longer lines and chordal comping so dynamic intent becomes automatic in performance.",
+          "successCriteria": "You can make a phrase move smoothly between soft and strong touches while preserving pitch and timing; quiet notes remain clear, accented notes cut through without losing tone, and you can shape sustain and harmonic color through attack alone. Dynamics feel intentional and expressive rather than accidental.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "dynamic_crescendo"
+        },
+        {
+          "id": "60c84b65-75a8-4e33-9005-a345e38ae0b2",
+          "title": "Tone knob sculpting",
+          "description": "[What it is] Tone knob sculpting is the intentional use of your guitar's tone control to shape high-frequency content and harmonic character in real time. Rather than a static setting, it's an expressive tool you move during playing to alter bite, shimmer, and warmth. Used well, it changes how notes attack, sustain, and sit in the mix.\n\n[Why it matters] Small rotations can make a line cut through or melt into the background, turn a chord from glassy to mellow, and change how distortion or amp dynamics react to your attack. That control expands your tonal vocabulary without swapping gear, letting you create distinct lead and rhythm personalities and add conversational color to repeated phrases. It also helps you craft reliable, repeatable sounds suited to different parts of a song or a live setting.\n\n[How to practice] Pick a short lick or chord figure in any comfortable neck position and loop it while listening closely as you rotate the tone knob: compare fully open, fully rolled, and intermediate settings. Practice slow continuous sweeps during sustained notes to hear gradual timbral change, then practice quick, deliberate jumps between two settings to use the knob as a punctuation or call-and-response device. Record yourself, refine the required hand motion so it becomes as deliberate and repeatable as a picking gesture, and pair changes with variations in pick attack to lock in the desired color.",
+          "successCriteria": "You can reliably dial at least three distinct, useful tones (bright/cutting, balanced, dark/warm) on command; execute smooth sweeps that produce audible, musical color changes during sustained notes; snap between preset positions cleanly to punctuate phrases; and reproduce those tonal choices consistently in recorded playback and performance.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "tone_matching_challenge",
+          "suggestedLessonIds": [
+            "Wu9PpJWjXRg"
+          ]
+        },
+        {
+          "id": "96789e83-4ff0-4eb7-9365-b8dbda41f70d",
+          "title": "Pedal timing discipline",
+          "description": "[What it is]\nPedal timing discipline means treating your foot or hand-operated effect as a rhythmic and expressive element: engaging, sweeping, or nudging the control exactly when a note, chord, or rest needs that color. It’s about predictability and repeatability so the effect becomes part of your phrasing rather than an unpredictable accent.\n\n[Why it matters]\nWell-timed effect changes shape dynamics, articulation, and tension — they can make a sustained line sing, a chord hit cut through, or a phrase breathe. When the timing is tight the pedal acts like a second voice that reinforces musical intent; when it’s loose it blurs attacks, disrupts the groove, or draws attention to the gear instead of the music.\n\n[How to practice]\nChoose a short riff or chord pattern and mark the exact moments you want the effect to start, change, or stop; practice executing those movements deliberately, starting slow and increasing speed only after they’re consistent. Repeat short sections and record yourself to check alignment; isolate the foot motion and practice it silently as a dry run, then reintegrate with the hands. Aim for small, economical motions and learn to anticipate the sonic result so the control lands musically rather than reacting after the note is played.",
+          "successCriteria": "Pedal movements occur reliably at the intended musical moments so the effect enhances phrasing rather than distracting from it; recorded takes show the effect engaging exactly on the desired attack or release; motions are minimal and repeatable, and you can reproduce the same expressive result across multiple performances.",
+          "sessionsRequired": 8,
+          "order": 7,
+          "suggestedExerciseId": "metronome_gap_test"
+        }
+      ]
+    },
+    {
+      "id": "0fb4894d-425c-4a0f-97dc-d558ff2e9e64",
+      "title": "Hendrix Repertoire Integration",
+      "order": 6,
+      "steps": [
+        {
+          "id": "df5be3e7-ae7c-40f0-ba18-037950a32e10",
+          "title": "Voodoo wah soloing",
+          "description": "[What it is]\nVoodoo wah soloing is a vocal, filter-driven lead approach that uses rhythmic and timbral motion to make single-note lines feel like spoken phrases. It relies on timed sweeps of the filter effect, dynamic attack contrasts, and purposeful use of silence to create a hypnotic, conversational lead voice. The overall sound is moody and expressive, carving a distinct sonic identity within a band texture.\n\n[Why it matters]\nThis skill turns simple melodic material into dramatic statements that command attention and shape a song's emotional arc. It bridges lead and rhythm by making tone movement as important as pitch, so your solos communicate character and groove simultaneously. Developing it gives you a recognizable tonal palette that can define a performance and cut through dense mixes.\n\n[How to practice]\nChoose a short melodic cell and repeat it while varying the timing and depth of the filter sweep so the sweep becomes an intentional part of the phrase rather than an afterthought. Practice toggling between short, percussive attacks and sustained, singing notes, experimenting with placing sweeps on different subdivisions and on the note's attack versus sustain. Record short phrases, listen back for balance between clarity and sweep intensity, and extend phrase length only when the filter motion consistently serves the musical sentence; also practice leaving space—well-timed silence amplifies the effect.",
+          "successCriteria": "Your solos sound like a talking, hypnotic line where filter motion is timed musically and enhances phrasing; phrases have clear beginning, shape, and release with purposeful space; dynamics and sweep intensity are controlled so the effect supports musical statements rather than distracting from them.",
+          "sessionsRequired": 8,
+          "order": 0,
+          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedLessonIds": [
+            "2UeDySAH9jk"
+          ]
+        },
+        {
+          "id": "e6f269f2-0a18-40d0-93b2-934f3ba40ed9",
+          "title": "Little Wing chord-melody",
+          "description": "[Why it matters]\nLittle Wing chord-melody is the art of putting the song’s singing line into the upper voice of your chordal accompaniment so one guitar delivers both melody and harmony. That focused, harp-like texture is central to the song’s emotional signature: the melody must breathe while the chords provide a warm, supportive bed. Mastering this lets you perform the piece as a complete musical statement rather than separate rhythm and lead parts.\n\n[How to practice]\nWork in short passages: extract the vocal line, fit it into chord shapes in any comfortable neck position, and practice the motion that brings the top-note out clearly while the inner voices hold the harmony. Play slowly and prioritize sustaining the melody tone through each change, then add small, tasteful ornaments and dynamic shading so phrases feel vocal. Link sections together only after each local connection is smooth, and listen for the melody to remain prominent even as the accompaniment moves beneath it.\n\n[Common trap]\nA common mistake is overcomplicating the texture—too many fills or dense voicings will bury the top-line and lose the song’s fragile quality. Another pitfall is rigid timing: the arrangement needs a lightly flexible feel so the melody can breathe. Keep voicings open and spare when in doubt, and choose chord shapes that naturally let the melody ring.\n",
+          "successCriteria": "You can play the song’s chord-melody so the principal melody sings clearly over supportive harmony, with smooth, musical connections between chord shapes and tasteful, restrained ornamentation. Phrases breathe naturally, dynamics respond to the song’s arc, and transitions feel seamless—the result sounds like one cohesive guitar voice conveying both tune and accompaniment.",
+          "sessionsRequired": 8,
+          "order": 1,
+          "suggestedExerciseId": "jazz_chord_melody"
+        },
+        {
+          "id": "eda63cb8-eb4b-47c9-aeef-e15e98110a76",
+          "title": "Foxy Lady riff feel",
+          "description": "[What it is]\nA compact, swaggering riff feel that trades blunt, percussive attacks for single sustained, vocal-like tones. It lives in the space between tight rhythmic stabs and slightly pushed or pulled sustained notes, creating a confrontational, singing quality rather than a smooth legato line. Tone, timing, and the contrast between choked hits and held notes define it more than flashy fingering.\n\n[Why it matters]\nThis riff feel is a hallmark of the style you're targeting: it plants a memorable rhythmic hook while sounding raw and expressive, so one simple figure can carry an entire section. Mastering it teaches you how to make a few notes read as both rhythm and statement, which is essential when dropping riffs into soloing, comping, or song intros. It also refines your control over accent placement and dynamic contrast so the guitar behaves like a voice with attitude.\n\n[How to practice]\nLoop a spare backing groove and, starting slow, alternate short, percussive strikes with open, sustaining notes; exaggerate the contrast until the two elements feel intentional. Experiment with nudging key accents fractionally behind and ahead of the beat—record takes and compare to find the sweet-spot that gives the riff its swagger. Create small variations (remove a hit, lengthen a sustain, add a brief choke) and practice inserting them naturally so phrasing becomes flexible and expressive rather than mechanical.",
+          "successCriteria": "The riff sits confidently in the groove: percussive attacks and sustained tones contrast clearly, accents feel deliberate (with a slight behind-or-ahead placement as desired), and small variations sound natural and expressive. When played with band or backing, the figure commands attention and retains its raw, vocal quality across repeats.",
+          "sessionsRequired": 8,
+          "order": 2,
+          "suggestedExerciseId": "muting_spotlight_drill"
+        },
+        {
+          "id": "c40fbf8c-2eb7-4047-9ec7-7e10ffc4ad39",
+          "title": "Purple Haze chord riffing",
+          "description": "[What it is]\nA compact, driving riff built from tight, crunchy chord hits and brief single-note responses that repeat with rhythmic displacement and chromatic approach tones. It lives in the pocket—syncopated accents, short silences, and controlled sustain give the phrase its forward momentum. The overall effect is equal parts rhythmic engine and melodic hook.\n\n[Why it matters]\nMastering this riff lets you anchor a band with a memorable, attitude-filled groove while leaving space for lead interplay. It teaches precision in starting and stopping chords, economy of notes, and how subtle timing shifts change a phrase from mechanical to expressive. For playing in the Hendrix idiom, it’s a central lesson in combining chordal power with phrasing finesse.\n\n[How to practice]\nBreak the riff into its smallest repeated cell and loop it slowly, isolating the exact moments you want notes to ring or cut off; increase speed only after the timing and tone are consistent. Work on varying attack and release so some hits bite while others sustain, and add small chromatic neighbor tones between chord hits to taste. Record short takes to judge placement and feel, then practice moving out of the riff into brief melodic fills and back again until the transitions are seamless.",
+          "successCriteria": "You can play the riff fluidly at a comfortable tempo so the chord hits lock with the groove, accents land precisely, ringing tones and cut-offs are controlled, and brief single-note fills sit naturally between the chord stabs. The riff feels and sounds purposeful rather than mechanical, and you can move in and out of it without losing the pocket.",
+          "sessionsRequired": 8,
+          "order": 3,
+          "suggestedExerciseId": "call_and_response_phrasing",
+          "suggestedLessonIds": [
+            "vhz-yf0DF10",
+            "oE3eca6yDDY",
+            "G3I0VxdMB8Q"
+          ]
+        },
+        {
+          "id": "311fb033-1875-4f46-8632-bbd5c81cb73c",
+          "title": "Castles slide phrasing",
+          "description": "[What it is]\nCastles slide phrasing is a melodic approach that treats short, vocal-like motifs as conversational statements, using pitch shifts as expressive punctuation rather than constant decoration. It emphasizes where you start and stop a gesture, the tiny timing delays before landing on a target tone, and the relative silence around phrases to make each slide-land feel intentional.\n\n[Why it matters]\nThis phrasing gives solos a storytelling quality—lines breathe, resolve, and respond to the underlying harmony rather than simply running scales. It helps your lead playing sit in the mix, convey melancholy or wistfulness, and interact with chordal textures in a way that feels distinctly expressive and stylistically Hendrixian.\n\n[How to practice]\nIsolate short two- to four-note motifs and repeat them, varying the approach into the target tone (quick approach, slow approach, or a slight delay before landing) and the length of the hold after landing; record and listen for which choices communicate most effectively. Practice placing those motifs over changing chords so you learn which target tones create the strongest emotional pull, then work on dynamic contrast—soft entries, louder punctuations, and deliberate space between phrases. Start slow and increase tempo as the phrasing choices feel natural; focus on restraint and vocal-like intent rather than flashy speed.",
+          "successCriteria": "Phrases sound conversational and deliberate: each pitch shift feels like an expressive punctuation, target tones resolve clearly into the harmony, dynamics and space make lines sing, and the overall effect reads as intentional storytelling rather than technical showmanship.",
+          "sessionsRequired": 8,
+          "order": 4,
+          "suggestedExerciseId": "one_string_backing"
+        },
+        {
+          "id": "53a35a34-e0c2-48cb-802a-dfc22fc3b085",
+          "title": "Axis dynamics and tone",
+          "description": "[What it is]\nAxis dynamics and tone is the deliberate shaping of loudness and timbral color within phrases: subtle shifts in attack, right‑hand contact point, pick vs. finger articulation, and register choice that move a phrase from soft and warm to sharp and aggressive. It’s about making the guitar behave like a singing, breathing voice that can whisper, plead, and scream within the space of a single idea.\n\n[Why it matters]\nThis control creates the emotional arc that defines the Hendrix sound—phrases that feel conversational and dramatic instead of uniformly loud or one‑dimensional. When you can manipulate dynamics and tone on demand, your comping and solos gain tension, release, and personality, turning technical skill into musical storytelling.\n\n[How to practice]\nTake short melodic cells and repeat them while changing only one variable at a time: alter right‑hand attack from very soft to aggressive, move your contact point along the string to hear neck-versus-bridge color, and switch between pick and finger articulation to compare bite and warmth. Use space deliberately—practice inserting silence and dynamic contrast so peaks land with impact—and record short takes to judge whether you can reproduce the same tonal/dynamic outcome reliably. Finally, map how small physical adjustments (hand position, angle, and contact point) translate into tonal changes so you can choose the exact color you want in performance.",
+          "successCriteria": "You can take a short phrase and play it several times with clearly different emotional colors (from intimate to biting) while keeping pitch and timing steady. Dynamic peaks and valleys are deliberate and repeatable, and timbral choices (contact point, articulation, register) consistently produce the intended warmth or edge. Listeners perceive a coherent arc—tension and release—rather than random volume or tone changes.",
+          "sessionsRequired": 8,
+          "order": 5,
+          "suggestedExerciseId": "dynamic_crescendo",
+          "suggestedLessonIds": [
+            "Wu9PpJWjXRg",
+            "8R4Ab4-FxX4",
+            "416rgou7Ijo"
+          ]
+        },
+        {
+          "id": "06b6c7e4-4ca5-417d-a1ee-6514dbe67c48",
+          "title": "Electric Lady improvisation",
+          "description": "[What it is] Electric Lady improvisation is an expressive soloing approach that balances blues-rooted melodic statements with conversational phrasing and rhythmic unpredictability. It focuses on developing short motifs into larger ideas, alternating sparse, vocal-like lines with denser passages so the solo breathes like a story. The overall aim is a memorable, personality-driven solo that sits in the groove while pushing emotional contours.\n\n[Why it matters] Mastering this approach makes your solos feel purposeful rather than a string of technical displays; listeners can follow a theme and feel the arc of your playing. It shapes interactions with the rhythm section so your lines respond to and influence the groove, creating moments that stand out in a band context. Developing this voice turns musical tools into an identifiable style that audiences remember.\n\n[How to practice] Work with very short musical cells: take a two- or three-note motif and practice varying its rhythm, interval direction, articulation, and dynamics while keeping the motif recognizable as it develops. Use call-and-response with a loop or a backing part—alternate 'question' phrases that leave space with 'answer' phrases that resolve—and prioritize ending phrases on strong target tones to create a sense of arrival. Explore rhythmic displacement by shifting motifs slightly ahead or behind the beat, cultivate silence as an expressive device, and record short takes to evaluate melodic shape, pacing, and emotional impact.",
+          "successCriteria": "Your solos introduce clear motifs, develop them across statements, and resolve with intentional target notes; listeners can hum back at least one memorable phrase. Phrasing shows purposeful use of space and dynamic contrast, and your lines feel integrated with the groove rather than isolated runs.",
+          "sessionsRequired": 8,
+          "order": 6,
+          "suggestedExerciseId": "two_notes_per_bar_phrasing",
+          "suggestedLessonIds": [
+            "pI1rbjGSk3o"
+          ]
+        }
+      ]
+    }
+  ]
+}

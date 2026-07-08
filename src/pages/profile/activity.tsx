@@ -5,7 +5,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
@@ -19,13 +19,15 @@ import {
 } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
 const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
-  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth as string);
+  const [refreshKey] = useState(0);
+  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth as string, refreshKey);
 
   const { data: songs, refetch: refreshSongs } = useQuery({
     queryKey: ['userSongs', userAuth],
@@ -41,6 +43,7 @@ const ProfileActivityPage = () => {
         title="Your Activity"
         subtitle="Track your practice history and progress over time"
         eyebrow="Practice stats"
+        backgroundContent={<HeroPattern />}
         rightContent={
           <div className="w-full h-full flex items-center md:justify-end">
             <LevelProgressHero 
@@ -91,10 +94,10 @@ const ProfileActivityPage = () => {
           {/* 3. Song Learning Stats */}
           <SongLearningSection userSongs={songs} />
 
-          {/* 4. Activity Log calendar */}
-          <ActivityLog userAuth={userAuth as string} />
+          {/* 5. Activity Log calendar */}
+          <ActivityLog key={refreshKey} userAuth={userAuth as string} />
 
-          {/* 5. Achievement Sections */}
+          {/* 6. Achievement Sections */}
           <div className='space-y-8 mt-4'>
                 <SeasonalAchievements userId={userAuth as string} />
 

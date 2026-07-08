@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
@@ -64,9 +65,9 @@ export const MainTimerSection = ({
           )}
           
           {/* Session Stats (Left) */}
-          <div className="flex items-center gap-4 border-r border-white/10 pr-8 mr-4">
+          <div className="flex items-center gap-4 pr-8 mr-4">
              <div className="flex flex-col items-end gap-1">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">Session</span>
+                <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Session</span>
                 <div className="flex items-center gap-2 text-white">
                     <FaHistory className="h-3.5 w-3.5 text-cyan-500/50" />
                     <span className="font-mono text-lg font-black tracking-wide">{formattedTotalSession}</span>
@@ -76,8 +77,12 @@ export const MainTimerSection = ({
 
           {/* Exercise Time Display */}
           <div className="flex flex-col items-start gap-1">
+             <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Exercise</span>
              <div className="flex items-center gap-2">
-                 <div className="font-mono text-3xl font-black text-white leading-none tracking-tight">
+                 <div className={cn(
+                   "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-300",
+                   isFinished ? "text-emerald-400" : isPlaying ? "text-cyan-400" : "text-white"
+                 )}>
                      {formattedTimeLeft}
                  </div>
              </div>
@@ -113,7 +118,7 @@ export const MainTimerSection = ({
         className='space-y-6'>
         {/* Conditionally render Exercise Information Card */}
         {showExerciseInfo && (
-          <Card className='border-zinc-700/50 bg-zinc-900'>
+          <Card className='bg-zinc-900'>
             <div className='bg-gradient-to-r from-zinc-800/30 to-zinc-800/10'>
               <ExerciseDescription exercise={currentExercise} />
             </div>
@@ -122,7 +127,7 @@ export const MainTimerSection = ({
 
         {/* Timer Card - Always render when showExerciseInfo is false */}
         {!showExerciseInfo && (
-          <Card className='rounded-2xl glass-card border-white/5 relative overflow-hidden'>
+          <Card className='rounded-2xl glass-card relative overflow-hidden'>
             {/* Playalong Progress Bar (Top) */}
             {currentExercise.isPlayalong && (
                <div className="absolute top-0 left-0 w-full h-1.5 bg-zinc-800">
@@ -154,9 +159,9 @@ export const MainTimerSection = ({
                 
                 {/* Time Info (Default) */}
                 <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-max">
-                    <div className="flex items-center gap-6 bg-zinc-900 px-6 py-3 rounded-2xl border border-white/10 shadow-2xl">
+                    <div className="flex items-center gap-6 bg-zinc-900 px-6 py-3 rounded-2xl shadow-2xl">
                         <div className="flex flex-col items-center px-2">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-500/70 mb-1.5">Session Total</span>
+                            <span className="text-[9px] font-black capitalize tracking-[0.2em] text-cyan-500/70 mb-1.5">Session Total</span>
                             <div className="flex items-center gap-2">
                                 <FaHistory className="h-3 w-3 text-cyan-500/50" />
                                 <span className="text-base font-mono font-black text-cyan-400 tracking-wide">

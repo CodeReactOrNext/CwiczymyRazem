@@ -3,27 +3,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const pinkyPowerDrillExercise: Exercise = {
   id: "pinky_power_drill",
   title: "Pinky-Led Patterns",
-  description: "Strengthen your weakest finger by making it lead every phrase.",
+  description: "Strengthen your weakest finger by playing linear patterns that initiate with the pinky.",
+  whyItMatters: "Most guitarists suffer from an under-developed pinky finger, leading to uneven speed and restricted fretboard patterns. Isolating the pinky improves hand balance, dexterity, and overall fretting agility.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 8,
   instructions: [
-    "Every pattern starts with the pinky (4th finger) on the highest fret.",
-    "Play descending patterns: 4-3-2-1 (pinky-ring-middle-index).",
-    "Focus on making the pinky strike with the same power as your index finger.",
-    "Keep the pinky curved - a flat pinky is a weak pinky.",
-    "Practice patterns where the pinky hammers on or pulls off to build strength.",
-    "Move the pattern across all strings and different positions on the neck."
+    "Start each pattern with a strong, clean pinky contact.",
+    "Ensure the pinky finger remains curved and does not collapse at the joints."
   ],
   tips: [
-    "The pinky is naturally weaker because it shares a tendon with the ring finger.",
-    "Keep the pinky curved at all times - this engages the proper muscles.",
-    "Don't compensate by twisting your wrist - maintain neutral wrist position.",
-    "Build strength gradually - forcing it can lead to injury.",
-    "Practice pinky trills (rapid hammer/pull-off) to build endurance.",
-    "Listen to Django Reinhardt who played incredible lines with only two fingers!"
+    "Focus on equal volume between your index and pinky fingers.",
+    "Keep your hand position balanced to prevent over-reaching with the pinky."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 80 },
   relatedSkills: ["finger_independence"],
   tablature: [
     {

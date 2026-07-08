@@ -104,15 +104,15 @@ export default async function handler(
       tier: finalTier
     });
 
-    // Update User Points (+25) ONLY if new rating (remains same)
+    // Update User Points (+5) ONLY if new rating (remains same)
     let addedPoints = 0;
     if (isNewRating) {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        "statistics.points": increment(25)
+        "statistics.points": increment(3)
       });
-      addedPoints = 25;
-      await updateSeasonalPoints(userId, 25);
+      addedPoints = 3;
+      await updateSeasonalPoints(userId, 3);
     }
 
     // Add Log ...
@@ -123,7 +123,8 @@ export default async function handler(
       artist,
       "difficulty_rate",
       avatarUrl,
-      rating
+      rating,
+      songId
     );
 
     return res.status(200).json({

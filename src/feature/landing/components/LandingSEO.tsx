@@ -11,24 +11,27 @@ interface LandingSEOProps {
 export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
   const { t } = useTranslation(["common"]);
   const siteUrl = "https://riff.quest";
-  const ogImageUrl = `${siteUrl}/promo.png`;
+  const ogImageUrl = `${siteUrl}/images/og-image.png`;
 
   const title = t("common:seo.title") as string;
   const description = t("common:seo.description") as string;
-  const keywords = t("common:seo.keywords") as string;
 
   return (
     <Head>
       <title>{title}</title>
       <meta name='description' content={description} />
-      <meta name='keywords' content={keywords} />
 
       {/* Open Graph / Facebook */}
       <meta property='og:type' content='website' />
+      <meta property='og:site_name' content='Riff Quest' />
+      <meta property='og:locale' content='en_US' />
       <meta property='og:url' content={siteUrl} />
       <meta property='og:title' content={title} />
       <meta property='og:description' content={description} />
       <meta property='og:image' content={ogImageUrl} />
+      <meta property='og:image:width' content='1200' />
+      <meta property='og:image:height' content='630' />
+      <meta property='og:image:alt' content='Riff Quest guitar practice tracker dashboard' />
 
       {/* Twitter */}
       <meta name='twitter:card' content='summary_large_image' />
@@ -91,10 +94,29 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
             "@type": "VideoObject",
             "name": "Riff Quest Demo",
             "description": "See how Riff Quest turns guitar practice into visible progress.",
-            "thumbnailUrl": "/images/video-poster.png",
+            "thumbnailUrl": `${siteUrl}/images/video-poster.png`,
             "uploadDate": "2024-01-27T12:00:00Z",
             "contentUrl": `${siteUrl}/demo.webm`,
             "embedUrl": `${siteUrl}/`,
+          }),
+        }}
+      />
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Riff Quest",
+            "url": siteUrl,
+            "description": description,
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+            },
           }),
         }}
       />

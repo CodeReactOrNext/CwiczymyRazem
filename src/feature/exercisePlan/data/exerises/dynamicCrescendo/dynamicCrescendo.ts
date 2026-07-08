@@ -1,33 +1,28 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const dynamicCrescendoExercise: Exercise = {
   id: "dynamic_crescendo",
   title: "Dynamic Range Control",
-  description: "Master the full spectrum from whisper-quiet to aggressive attack. The volume bars below the tab show exactly how loud each note should be.",
+  description: "Master the full dynamic spectrum of the guitar, from whisper-quiet to an aggressive attack. Control your picking depth and attack speed to match the required volume curves.",
+  whyItMatters: "This exercise trains exact physical control over pick depth and attack velocity. Differentiating volume levels smoothly (crescendo and decrescendo) separates expressive, professional guitarists from mechanical ones.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
-    "Watch the volume bars below the tablature — they show the expected loudness for each note.",
-    "Measure 1: Crescendo — start as quiet as possible and gradually build to maximum volume.",
-    "Measure 2: Decrescendo — start loud and smoothly fade to near-silence.",
-    "Measure 3: Swell — crescendo up to full volume, then decrescendo back down.",
-    "Measure 4: Subito dynamics — sudden jumps between very quiet and very loud.",
-    "Measure 5: Applied to a chromatic line — maintain the crescendo shape while moving notes.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "Soft playing requires more control than loud playing — don't rush the quiet notes.",
-    "Your grip pressure should stay constant — only change pick depth and attack speed.",
-    "Think of a volume knob turning smoothly, not jumping between levels.",
-    "For subito dynamics (measure 4), the contrast should be as extreme as possible.",
-    "Record yourself and compare the volume curve to the bars — are you matching the shape?",
-    "This skill separates expressive players from mechanical ones.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: { min: 50, max: 100, recommended: 70 },
   examBacking: { url: "/static/sounds/exercise/dynamic-control.mp3", sourceBpm: 70 },
   relatedSkills: ["articulation", "alternate_picking"],
   tablature: [
-    // M1: Crescendo (pp → ff) — gradual volume increase
+    // M1: Crescendo (pp â†’ ff) â€” gradual volume increase
     {
       timeSignature: [4, 4],
       beats: [
@@ -41,7 +36,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 1.0 }] },
       ],
     },
-    // M2: Decrescendo (ff → pp) — gradual volume decrease
+    // M2: Decrescendo (ff â†’ pp) â€” gradual volume decrease
     {
       timeSignature: [4, 4],
       beats: [
@@ -55,7 +50,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 0.1 }] },
       ],
     },
-    // M3: Swell (pp → ff → pp) — crescendo then decrescendo
+    // M3: Swell (pp â†’ ff â†’ pp) â€” crescendo then decrescendo
     {
       timeSignature: [4, 4],
       beats: [
@@ -69,7 +64,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 0.1 }] },
       ],
     },
-    // M4: Subito dynamics — sudden pp↔ff contrast
+    // M4: Subito dynamics â€” sudden ppâ†”ff contrast
     {
       timeSignature: [4, 4],
       beats: [
@@ -83,7 +78,7 @@ export const dynamicCrescendoExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 5, fret: 5, dynamics: 1.0 }] },
       ],
     },
-    // M5: Crescendo applied to chromatic line — dynamics + movement
+    // M5: Crescendo applied to chromatic line â€” dynamics + movement
     {
       timeSignature: [4, 4],
       beats: [

@@ -3,26 +3,23 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const speedBurstChromaticBlitzExercise: Exercise = {
   id: "speed_burst_chromatic_blitz",
   title: "Speed Burst Chromatic Blitz",
-  description: "Short explosive chromatic bursts followed by rests. Train your hands to fire fast and reset cleanly.",
+  description: "Execute brief, rapid chromatic note groups interspersed with quick rests to build fast twitch muscle response and control hand tension.",
+  whyItMatters: "This exercise develops fast-twitch muscle response in both hands. It trains your fingers to fire quickly in sync, and teaches you how to release tension instantly during rests, preventing hand fatigue.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Each burst is a short explosive sprint — play the notes as fast and clean as you can.",
-    "Use the rests to completely relax your hands before the next burst.",
-    "Measures 1-3: 4-note bursts on single strings with a full beat of rest between each.",
-    "Measures 4-5: 6-note cross-string bursts (3 notes per string, Paul Gilbert style) with a half-beat rest.",
-    "The goal is maximum speed during the burst and total relaxation during the rest.",
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "The rest is just as important as the burst — use it to fully reset tension.",
-    "Think of each burst as one explosive gesture, not individual notes.",
-    "Relax your picking hand completely between bursts — shake it out if needed.",
-    "On cross-string bursts, focus on a seamless string transition with no gap.",
-    "If a burst feels sloppy, drop tempo by 20 BPM. Speed without clarity is useless.",
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
-    min: 100,
+    min: 40,
     max: 160,
     recommended: 120,
   },

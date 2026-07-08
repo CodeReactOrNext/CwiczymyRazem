@@ -1,3 +1,5 @@
+import type { YouTubeLessonResult } from "./youtubeLesson.types";
+
 export interface RoadmapStep {
   id: string;
   title: string;
@@ -7,7 +9,12 @@ export interface RoadmapStep {
   sessionsCompleted: number;
   order: number;
   suggestedExerciseId?: string;
+  noExercise?: boolean;
   suggestedLessonIds?: string[];
+  /** Lessons authored directly in the roadmap JSON (rendered without a Firestore lookup). */
+  lessons?: YouTubeLessonResult[];
+  exerciseCompleted?: boolean;
+  completedLessonIds?: string[];
 }
 
 export interface RoadmapPhase {
@@ -26,4 +33,13 @@ export interface Roadmap {
   createdAt: string;
   updatedAt: string;
   phases: RoadmapPhase[];
+  image?: string;
 }
+
+// Static roadmap stored in JSON (no per-user progress data)
+export type StaticRoadmapStep = Omit<RoadmapStep, "sessionsCompleted">;
+export type StaticRoadmapPhase = Omit<RoadmapPhase, "steps"> & { steps: StaticRoadmapStep[] };
+export type StaticRoadmap = Omit<Roadmap, "userId" | "createdAt" | "updatedAt" | "phases"> & {
+  phases: StaticRoadmapPhase[];
+  image?: string;
+};

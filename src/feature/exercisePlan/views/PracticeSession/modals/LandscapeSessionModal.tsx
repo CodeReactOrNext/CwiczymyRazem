@@ -4,14 +4,17 @@ import { cn } from "assets/lib/utils";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward, FaUndo } from "react-icons/fa";
 
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
+import { FavoriteExerciseButton } from "../components/FavoriteExerciseButton";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
+import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 
 interface LandscapeSessionModalProps {
   isOpen: boolean;
@@ -43,6 +46,7 @@ interface LandscapeSessionModalProps {
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
   isListening: boolean;
   frequencyRef?: React.RefObject<number>;
@@ -90,6 +94,7 @@ export function LandscapeSessionModal({
   earTrainingScore,
   earTrainingHighScore,
   onEarTrainingGuessed,
+  riddleProgress,
   examMode,
   isListening,
   frequencyRef,
@@ -110,6 +115,13 @@ export function LandscapeSessionModal({
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
 
+  // If landscape was forced via RotateDeviceHint (fullscreen + orientation
+  // lock), release both when the session closes so the app isn't stuck sideways.
+  useEffect(() => () => {
+    (screen.orientation as unknown as { unlock?: () => void }).unlock?.();
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+  }, []);
+
   return (
     <ModalWrapper zIndex='z-[9999999]'>
       <AnimatePresence>
@@ -118,11 +130,11 @@ export function LandscapeSessionModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={cn("flex h-full flex-row overflow-hidden", gradientClasses)}
+            className={cn("relative flex h-full flex-row overflow-hidden", gradientClasses)}
           >
-            {/* Left panel: exercise content */}
-            <div className="flex flex-1 items-center justify-center overflow-hidden p-2">
-              <div className="w-full h-full flex items-center justify-center">
+            {/* Left panel: exercise content + timer underneath */}
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden p-2">
+              <div className="flex min-h-0 w-full flex-1 items-center justify-center">
                 <MobileExerciseContent
                   currentExercise={currentExercise}
                   activeTablature={activeTablature}
@@ -133,6 +145,7 @@ export function LandscapeSessionModal({
                   hasPlayedRiddleOnce={hasPlayedRiddleOnce}
                   isPlaying={isPlaying}
                   isListening={isListening}
+                  isMicEnabled={isMicEnabled}
                   frequencyRef={frequencyRef}
                   tabResetKey={tabResetKey}
                   setVideoDuration={setVideoDuration}
@@ -145,68 +158,65 @@ export function LandscapeSessionModal({
                   handleRevealRiddle={handleRevealRiddle}
                   handleNextRiddle={handleNextRiddle}
                   onEarTrainingGuessed={onEarTrainingGuessed}
+                  riddleProgress={riddleProgress}
                   onPlayRiddle={handleToggleTimer}
                 />
               </div>
+
+              {/* Timer — always visible, even with the details drawer collapsed */}
+              <div className="flex shrink-0 items-center justify-center pt-1.5">
+                <div className={cn(
+                  "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
+                  isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
+                )}>
+                  {formattedTimeLeft}
+                </div>
+              </div>
             </div>
 
-            {/* Right panel */}
-            <motion.div
-              animate={{ width: isPanelExpanded ? 240 : 56 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative flex shrink-0 flex-row border-l border-white/10 bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
-            >
-              {/* Scrollable details — visible only when expanded */}
-              <AnimatePresence>
-                {isPanelExpanded && (
+            {/* Details drawer — overlays the tablature instead of squeezing it,
+                sliding out from behind the always-visible controls strip. */}
+            <AnimatePresence>
+              {isPanelExpanded && (
                   <motion.div
                     key="details"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex w-[184px] shrink-0 flex-col overflow-y-auto overscroll-contain scrollbar-hide border-r border-white/5"
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "100%" }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="absolute bottom-0 right-14 top-0 z-10 flex w-[264px] flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950/90 shadow-2xl shadow-black/50 backdrop-blur-xl"
                   >
                     {/* Title + counter */}
-                    <div className="flex items-center gap-1 border-b border-white/5 px-2 py-2">
-                      <span className='flex-1 truncate text-[10px] font-bold text-foreground'>{currentExercise.title}</span>
+                    <div className="flex items-center gap-1.5 px-3 pt-3 pb-1">
+                      <span className='flex-1 truncate text-[11px] font-bold text-foreground'>{currentExercise.title}</span>
+                      {currentExercise.id && <FavoriteExerciseButton exerciseId={currentExercise.id} compact />}
                       <Badge variant='outline' className='shrink-0 text-[8px]'>{currentExerciseIndex + 1}/{totalExercises}</Badge>
-                    </div>
-
-                    {/* Timer */}
-                    <div className="flex items-center justify-center px-2 pt-3 pb-1">
-                      <div className={cn(
-                        "text-3xl font-mono font-black tracking-tighter leading-none transition-colors",
-                        isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
-                      )}>
-                        {formattedTimeLeft}
-                      </div>
                     </div>
 
                     {/* Mic stats */}
                     {isMicEnabled && (
-                      <div className="px-2 py-1 space-y-1 border-b border-white/5">
+                      <div className="px-3 py-1 space-y-1">
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Score</span>
+                          <span className="text-zinc-600 tracking-widest">Score</span>
                           <span className="font-black text-white tabular-nums">{gameState.score.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Acc</span>
+                          <span className="text-zinc-600 tracking-widest">Acc</span>
                           <span className="font-black text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
                         </div>
                         <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 uppercase tracking-widest">Streak</span>
+                          <span className="text-zinc-600 tracking-widest">Streak</span>
                           <span className="font-black text-cyan-400 tabular-nums">{gameState.combo}×{gameState.multiplier}</span>
                         </div>
                       </div>
                     )}
 
                     {/* Controls */}
-                    <div className="px-1 py-2 space-y-1">
+                    <div className="px-3 py-3 space-y-2">
                       <MediaControlsToolbar
                         hasMetronome={!!currentExercise.metronomeSpeed}
-                        hasAudioTrack={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
-                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
+                        hasAudioTrack={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack}
+                        hasMicControls={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic}
                         speedMultiplier={speedMultiplier ?? 1}
                         onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
                         isAudioMuted={isAudioMuted}
@@ -217,7 +227,8 @@ export function LandscapeSessionModal({
                         onRecalibrate={onRecalibrate ?? (() => {})}
                         frequencyRef={frequencyRef}
                         volumeRef={volumeRef}
-                        compact
+                        disableTuner={currentExercise.disableTuner}
+                        mobile
                       />
                       <ExerciseQuickActionsBar
                         exercise={currentExercise}
@@ -227,13 +238,14 @@ export function LandscapeSessionModal({
                         examMode={examMode}
                         compact
                       />
+                      <MobileInstructionsCard exercise={currentExercise} />
                     </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
+              )}
+            </AnimatePresence>
 
-              {/* Always-visible controls strip */}
-              <div className="flex w-14 shrink-0 flex-col items-center gap-2 py-2">
+            {/* Always-visible controls strip */}
+            <div className="relative z-20 flex w-14 shrink-0 flex-col items-center gap-2 bg-zinc-950/80 py-2 backdrop-blur-xl">
                 <Button variant='ghost' size='icon' onClick={onClose} className='h-8 w-8 shrink-0 text-zinc-500 hover:text-white'>
                   <X className='h-4 w-4' />
                 </Button>
@@ -255,13 +267,13 @@ export function LandscapeSessionModal({
 
                 {currentExerciseIndex > 0 && (
                   <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white">
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
                     <FaStepBackward className="h-3 w-3" />
                   </Button>
                 )}
                 {activeTablature && activeTablature.length > 0 && (
                   <Button onClick={handleRestart} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-amber-400 hover:text-amber-300">
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
                     <FaUndo className="h-3 w-3" />
                   </Button>
                 )}
@@ -270,7 +282,7 @@ export function LandscapeSessionModal({
                   onClick={handleToggleTimer}
                   size="icon"
                   className={cn(
-                    "h-11 w-11 shrink-0 rounded-2xl transition-all click-behavior",
+                    "h-11 w-11 shrink-0 rounded-lg transition-all click-behavior",
                     isPlaying ? "bg-white text-black shadow-lg" : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
                   )}
                 >
@@ -282,16 +294,15 @@ export function LandscapeSessionModal({
                     onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                     disabled={isFinishing || isSubmittingReport }
                     variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white"
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
                   >
                     {isFinishing || isSubmittingReport
-                      ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
+                      ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-lg" />
                       : isLastExercise ? <FaCheck className="h-4 w-4" /> : <FaStepForward className="h-4 w-4" />
                     }
                   </Button>
                 )}
-              </div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

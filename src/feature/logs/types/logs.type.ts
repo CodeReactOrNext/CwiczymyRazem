@@ -1,4 +1,5 @@
 import type { AchievementList } from "feature/achievements/types";
+import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 
 export type FirebaseLogsSongsStatuses =
@@ -14,6 +15,7 @@ export interface FirebaseLogsSongsInterface {
   userName: string;
   songTitle: string;
   songArtist: string;
+  songId?: string;
   difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
   avatarUrl: string | undefined;
@@ -24,6 +26,9 @@ export interface FirebaseLogsSongsInterface {
 }
 
 export interface FirebaseUserExceriseLog {
+  /** Firestore doc id (reportDate ISO string) — needed to edit/delete a report. */
+  id?: string;
+  description?: string;
   reportDate: any;
   bonusPoints: {
     additionalPoints: number;
@@ -141,6 +146,22 @@ export interface FirebaseLogsRecordingsInterface {
   reactions?: string[];
 }
 
+export interface FirebaseLogsPlaylistInterface {
+  type: "playlist_created";
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  playlistId: string;
+  playlistName: string;
+  playlistKind: "playlist" | "path" | "top";
+  songCount: number;
+  id?: string;
+  reactions?: string[];
+}
+
 export interface FirebaseLogsDailyQuestInterface {
   uid: string;
   userName: string;
@@ -150,6 +171,26 @@ export interface FirebaseLogsDailyQuestInterface {
   points: number;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  id?: string;
+  reactions?: string[];
+}
+
+export interface FirebaseLogsMarketplaceInterface {
+  type: "marketplace_listing";
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  price: number;
+  /** Full rolled instance — drives the card tooltip + level. */
+  rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
 }
@@ -169,6 +210,8 @@ export interface FirebaseLogsCaseOpenInterface {
   itemBrand: string;
   itemRarity: string;
   itemImageId: number | string;
+  /** Full rolled instance — drives the proper card tooltip + level. Optional on legacy logs. */
+  rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
 }

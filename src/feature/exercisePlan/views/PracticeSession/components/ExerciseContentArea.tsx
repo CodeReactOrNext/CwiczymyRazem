@@ -1,10 +1,19 @@
 import { cn } from "assets/lib/utils";
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
-import { ExerciseImage } from "./ExerciseImage";
+import { isOpenExercise } from "../../../utils/isOpenExercise";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
+import { ChordHuntPanel } from "./ChordHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
+import { ExerciseImage } from "./ExerciseImage";
+import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { MetronomeGapTest } from "./MetronomeGapTest";
+import { NoteHuntDetector } from "./NoteHuntDetector";
+import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
 import { TablatureSection } from "./TablatureSection";
 import { VideoSection } from "./VideoSection";
@@ -16,6 +25,7 @@ interface ExerciseContentAreaProps {
   rawGpFile?: File;
   showAlphaTabScore: boolean;
   onToggleAlphaTabScore: () => void;
+  show3dHighway?: boolean;
   isAudioPlaying: boolean;
   startTime: number | null;
   effectiveBpm: number;
@@ -41,11 +51,15 @@ interface ExerciseContentAreaProps {
   onNextRiddle: () => void;
   onEarTrainingGuessed: () => void;
   onLeaderboardClick: () => void;
+  riddleProgress?: RiddleProgress | null;
 
 
   // Rhythm detection
   isMicEnabled?: boolean;
   volumeRef?: React.MutableRefObject<number>;
+  onSeek?: (beatPosition: number) => void;
+  onLoopRestart?: (loopStartBeat: number) => void;
+  isExamMode?: boolean;
 
   // Video / playalong
   startTimer: () => void;
@@ -54,6 +68,10 @@ interface ExerciseContentAreaProps {
   setTimerTime: (t: number) => void;
   onVideoEnd: () => void;
   isPlaying: boolean;
+  rewardSkillId?: string;
+  rewardAmount?: number;
+  /** Playback controls (media toolbar + metronome) docked under the player, above the instructions. */
+  controlsSlot?: React.ReactNode;
 }
 
 export const ExerciseContentArea = memo(function ExerciseContentArea({
@@ -63,6 +81,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rawGpFile,
   showAlphaTabScore,
   onToggleAlphaTabScore,
+  show3dHighway,
   isAudioPlaying,
   startTime,
   effectiveBpm,
@@ -84,6 +103,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   onNextRiddle,
   onEarTrainingGuessed,
   onLeaderboardClick,
+  riddleProgress,
   startTimer,
   stopTimer,
   setVideoDuration,
@@ -92,7 +112,19 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isPlaying,
   isMicEnabled,
   volumeRef,
+  onSeek,
+  onLoopRestart,
+  isExamMode,
+  rewardSkillId,
+  rewardAmount,
+  controlsSlot,
 }: ExerciseContentAreaProps) {
+  const { backingVideoId, setBackingVideoId } = useSessionUI();
+
+  useEffect(() => {
+    setBackingVideoId(null);
+  }, [currentExercise.id, setBackingVideoId]);
+
   const hasTablature =
     activeTablature &&
     activeTablature.length > 0 &&
@@ -100,13 +132,12 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl",
-      currentExercise.isPlayalong ? "" : "border border-white/10"
+      "relative w-full overflow-hidden rounded-xl bg-[#1a1a1d] shadow-xl shadow-black/40"
     )}>
 
       {/* Ear Training */}
       {currentExercise.riddleConfig?.mode === "sequenceRepeat" && (
-        <div className="p-4 border-b border-white/5">
+        <div className="p-4">
           <EarTrainingView
             difficulty={currentExercise.riddleConfig.difficulty}
             isRevealed={isRiddleRevealed}
@@ -119,6 +150,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
             score={earTrainingScore}
             highScore={earTrainingHighScore}
             canGuess={hasPlayedRiddleOnce}
+            isMicEnabled={!!isMicEnabled}
+            riddleProgress={riddleProgress}
             onRecordsClick={onLeaderboardClick}
           />
         </div>
@@ -131,13 +164,36 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       )}
 
-      {/* Content: tablature / video / strumming / image */}
-      {hasTablature ? (
+      {/* Content: note hunt / chord hunt / tablature / video / strumming / image */}
+      {currentExercise.id === "metronome_gap_test" ? (
+        <div className="p-4">
+          <MetronomeGapTest />
+        </div>
+      ) : currentExercise.customGoal ? (
+        <div className="flex w-full justify-center py-10">
+          {currentExercise.noteHuntConfig?.mode === "chord" ? (
+            <ChordHuntPanel
+              chordName={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          ) : (
+            <NoteHuntDetector
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              isMicEnabled={!!isMicEnabled}
+              isListening={isListening}
+            />
+          )}
+        </div>
+      ) : hasTablature ? (
         <TablatureSection
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           showAlphaTabScore={showAlphaTabScore}
-          onToggleAlphaTabScore={onToggleAlphaTabScore}
+          show3dHighway={show3dHighway}
+          onSeek={onSeek}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}
           effectiveBpm={effectiveBpm}
@@ -152,6 +208,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           hideNotes={activeExercise.hideTablatureNotes}
           hideDynamicsLane={!!rawGpFile}
           volumeRef={volumeRef}
+          isExamMode={isExamMode}
+          onLoopRestart={onLoopRestart}
         />
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         <VideoSection
@@ -166,6 +224,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           setTimerTime={setTimerTime}
           onVideoEnd={onVideoEnd}
         />
+      ) : currentExercise.requiresBackingTrack ? (
+        backingVideoId
+          ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
+          : <BackingTrackPicker exerciseTitle={currentExercise.title} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <StrummingSection
           patterns={currentExercise.strummingPatterns}
@@ -176,6 +238,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMicEnabled={isMicEnabled}
           audioContext={audioContext}
         />
+      ) : isOpenExercise(currentExercise) ? (
+        <div className="p-4">
+          <OpenExercisePanel />
+        </div>
       ) : (
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}
@@ -183,6 +249,22 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMobileView={false}
         />
       )}
+      
+      {controlsSlot && (
+        <div
+          style={{ zoom: 0.9 }}
+          className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-white/5 px-4 py-3.5 [&>*]:!mb-0"
+        >
+          {controlsSlot}
+        </div>
+      )}
+
+      <ExerciseInstructionsInline
+        exercise={activeExercise}
+        isPlaying={isPlaying}
+        rewardSkillId={rewardSkillId}
+        rewardAmount={rewardAmount}
+      />
     </div>
   );
 });

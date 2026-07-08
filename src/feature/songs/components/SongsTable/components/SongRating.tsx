@@ -100,11 +100,12 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
 
 
       if (rateSong.fulfilled.match(resultAction)) {
-        toast.success(isNewRating ? "+15 Points! Rating updated." : "Rating updated.");
+        toast.success(isNewRating ? "+3 Points! Rating updated." : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
 
         if (isNewRating) {
             dispatch(updateQuestProgress({ type: 'rate_song' }));
+            dispatch(updateQuestProgress({ type: 'rate_multiple_songs' }));
         }
 
         queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {

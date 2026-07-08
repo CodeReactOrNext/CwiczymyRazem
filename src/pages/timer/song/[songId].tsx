@@ -81,24 +81,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
         }
 
         setIsSubmitting(true);
-        
-        if (markAsLearned && userId) {
-            try {
-                 await updateSongStatus(
-                     userId,
-                     song.id,
-                     song.title,
-                     song.artist,
-                     "learned",
-                     userAvatar || "" 
-                 );
-                 toast.success("Song marked as learned!");
-            } catch (error) {
-                console.error("Failed to update song status", error);
-                toast.error("Failed to mark as learned");
-            }
-        }
-        
+
         // Calculate minutes independently of Redux, ensuring precision
         const totalMinutes = Math.round((techniqueTime + hearingTime) / 60000);
         const finalTotalMinutes = totalMinutes === 0 && (techniqueTime + hearingTime) > 30000 ? 1 : totalMinutes;
@@ -130,15 +113,49 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             const totalMins = Math.floor(tMins + hMins);
             if (totalMins > 0) {
                dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMins }));
+               dispatch(updateQuestProgress({ type: 'long_session', amount: totalMins }));
             }
             if (tMins > 0) {
                dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: tMins }));
             }
+            if (hMins > 0) {
+               dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hMins }));
+            }
 
-            // Record session for the specific song progress
+            // A song session counts technique + hearing as practice categories,
+            // so it should feed the combo quests just like a plan session does.
+            const songActiveCategories = [tMins, hMins].filter((m) => m > 0).length;
+            if (songActiveCategories > 0) {
+               dispatch(updateQuestProgress({ type: 'well_rounded', amount: songActiveCategories }));
+            }
+            const songCategoriesOverFive = [tMins, hMins].filter((m) => m >= 5).length;
+            if (songCategoriesOverFive > 0) {
+               dispatch(updateQuestProgress({ type: 'two_categories_min', amount: songCategoriesOverFive }));
+            }
+
+            // Record session for the specific song progress first, so the time
+            // from this session counts towards the practice-time threshold that
+            // gates the "learned" points awarded below.
             if (userId) {
                 const { recordPracticeSession } = await import("feature/songs/services/userSongProgress.service");
                 await recordPracticeSession(userId, song.id, techniqueTime + hearingTime, null, null);
+            }
+
+            if (markAsLearned && userId) {
+                try {
+                    await updateSongStatus(
+                        userId,
+                        song.id,
+                        song.title,
+                        song.artist,
+                        "learned",
+                        userAvatar || ""
+                    );
+                    toast.success("Song marked as learned!");
+                } catch (error) {
+                    console.error("Failed to update song status", error);
+                    toast.error("Failed to mark as learned");
+                }
             }
 
             await dispatch(updateUserStats({ inputData })).unwrap();
@@ -154,10 +171,19 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     };
 
     const handleBack = () => {
-        if (timer.getTime() > 0 && confirm("Abandon this session?")) {
-            router.push("/timer/song-select");
-        } else if (timer.getTime() === 0) {
-            router.push("/timer/song-select");
+        // Return to wherever the user came from (favorites, songs board, …);
+        // only fall back to song-select when there's no history to go back to.
+        const leave = () => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+                router.back();
+            } else {
+                router.push("/timer/song-select");
+            }
+        };
+        if (timer.getTime() > 0) {
+            if (confirm("Abandon this session?")) leave();
+        } else {
+            leave();
         }
     };
 

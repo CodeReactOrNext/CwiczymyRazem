@@ -3,21 +3,18 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const strummingDownUpExercise: Exercise = {
   id: "strumming_down_up",
   title: "Down-Up Strumming",
-  description: "Introduces alternating down-up strumming — the foundation of most rhythm guitar patterns.",
+  description: "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
+  whyItMatters: "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 3.5,
   instructions: [
-    "Keep your strumming arm moving in a constant pendulum: DOWN on every beat, UP on every '&' (the 'and' between beats).",
-    "Pattern: ↓ ↑ ↓ ↑ ↓ ↑ ↓ ↑ — all 8 strums per bar.",
-    "Even when you eventually skip strums, your arm keeps swinging — never stop the motion.",
-    "Start with open Em chord at slow tempo until both hands are synchronized.",
-    "Gradually introduce chord changes (Em → Am → C → D).",
+    "Keep your strumming arm moving in a steady, pendulum-like motion.",
+    "Strum across all target strings with equal pick depth."
   ],
   tips: [
-    "Down strums use the weight of your arm; up strums are lighter — let that dynamic contrast happen naturally.",
-    "Your wrist should be loose. Tension is the enemy of rhythm.",
-    "If you're rushing, focus your ears on the metronome click — let it be your anchor.",
+    "Relax your wrist completely; a stiff wrist ruins the fluid strumming motion.",
+    "Hold the pick lightly to prevent it from catching on the strings."
   ],
   metronomeSpeed: { min: 50, max: 110, recommended: 65 },
   relatedSkills: ["rhythm"],

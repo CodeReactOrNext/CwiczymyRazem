@@ -8,6 +8,7 @@ const REST_VOLUME_THRESHOLD = 0.05;
 
 interface WorkerBridgeOptions {
   canvasRef:       { current: HTMLCanvasElement | null };
+  containerRef?:   { current: HTMLElement | null };
   containerSize:   { width: number; height: number };
   renderData:      TablatureRenderData;
   isPlaying:       boolean;
@@ -23,21 +24,30 @@ interface WorkerBridgeOptions {
   resetKey:        number | undefined;
   audioContext:    AudioContext | null | undefined;
   volumeRef:       MutableRefObject<number> | undefined;
+  onSeek?:         (beatPosition: number) => void;
+  loopStartBeat?:  number | null;
+  loopEndBeat?:    number | null;
+  zoom?:           number;
 }
 
 export function useTablatureWorkerBridge({
-  canvasRef, containerSize, renderData,
+  canvasRef, containerRef, containerSize, renderData,
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
   hitNotes, missedNotes, hideNotes, hideDynamicsLane,
-  measures, resetKey, audioContext, volumeRef,
+  measures, resetKey, audioContext, volumeRef, onSeek,
+  loopStartBeat, loopEndBeat, zoom = 1,
 }: WorkerBridgeOptions) {
-  const workerRef        = useRef<Worker | null>(null);
-  const transferredRef   = useRef(false);
-  const prevStartTimeRef = useRef<number | null>(startTime);
-  const isDraggingRef    = useRef(false);
-  const dragStartXRef    = useRef(0);
-  const initScrollXRef   = useRef(0);
-  const pausedScrollRef  = useRef({ scrollX: 0, cursorPos: 0 });
+  const workerRef           = useRef<Worker | null>(null);
+  const transferredRef      = useRef(false);
+  const prevStartTimeRef    = useRef<number | null>(startTime);
+  const isDraggingRef       = useRef(false);
+  const dragStartXRef       = useRef(0);
+  const mouseDownXRef       = useRef(0);
+  const mouseDownTimeRef    = useRef(0);
+  const initScrollXRef      = useRef(0);
+  const pausedScrollRef     = useRef({ scrollX: 0, cursorPos: 0 });
+  const lastHoverMeasureRef = useRef<number>(-1);
+  const prevZoomRef         = useRef(zoom);
 
   const [isRestActive,    setIsRestActive]    = useState(false);
   const [showRestWarning, setShowRestWarning] = useState(false);
@@ -130,6 +140,27 @@ export function useTablatureWorkerBridge({
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIT_NOTES',    hitNotes });   }, [hitNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes }); }, [missedNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
+  useEffect(() => {
+    workerRef.current?.postMessage({
+      type: 'LOOP_RANGE',
+      startBeat: loopStartBeat ?? null,
+      endBeat:   loopEndBeat   ?? null,
+    });
+  }, [loopStartBeat, loopEndBeat]);
+  useEffect(() => {
+    const prev = prevZoomRef.current;
+    prevZoomRef.current = zoom;
+    // Keep the main-thread scrub anchor (base for drag/seek) aligned with the
+    // worker's rescaled pixel-space position after a zoom change.
+    if (prev > 0 && prev !== zoom) {
+      const ratio = zoom / prev;
+      pausedScrollRef.current = {
+        scrollX:   pausedScrollRef.current.scrollX   * ratio,
+        cursorPos: pausedScrollRef.current.cursorPos * ratio,
+      };
+    }
+    workerRef.current?.postMessage({ type: 'ZOOM', zoom });
+  }, [zoom]);
 
   // Reset cursor when measures or resetKey changes
   useEffect(() => {
@@ -149,9 +180,16 @@ export function useTablatureWorkerBridge({
 
   const handleDragStart = (clientX: number) => {
     if (isPlaying) return;
-    isDraggingRef.current  = true;
-    dragStartXRef.current  = clientX;
-    initScrollXRef.current = pausedScrollRef.current.scrollX;
+    isDraggingRef.current    = true;
+    dragStartXRef.current    = clientX;
+    mouseDownXRef.current    = clientX;
+    mouseDownTimeRef.current = Date.now();
+    initScrollXRef.current   = pausedScrollRef.current.scrollX;
+    // Clear hover preview while dragging
+    if (lastHoverMeasureRef.current !== -1) {
+      lastHoverMeasureRef.current = -1;
+      workerRef.current?.postMessage({ type: 'HOVER', startX: null });
+    }
   };
   const handleDragMove = (clientX: number) => {
     if (!isDraggingRef.current) return;
@@ -159,7 +197,91 @@ export function useTablatureWorkerBridge({
     pausedScrollRef.current = { ...pausedScrollRef.current, scrollX: newScrollX };
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: pausedScrollRef.current.cursorPos });
   };
-  const handleDragEnd = () => { isDraggingRef.current = false; };
+  const handleDragEnd = (clientX?: number) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
 
-  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd };
+    if (
+      clientX !== undefined &&
+      onSeek &&
+      containerRef?.current &&
+      Math.abs(clientX - mouseDownXRef.current) < 5 &&
+      Date.now() - mouseDownTimeRef.current < 400
+    ) {
+      const containerLeft = containerRef.current.getBoundingClientRect().left;
+      const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
+      const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
+      let beatPos = Math.max(0, worldX / dynBW);
+
+      // Snap to start of the measure that was clicked
+      const ends = renderData.measureEndXs;
+      if (ends.length > 0) {
+        let measureStart = 0;
+        for (let i = 0; i < ends.length; i++) {
+          if (beatPos < ends[i]) break;
+          measureStart = ends[i];
+        }
+        beatPos = measureStart;
+      }
+
+      const newCursorPos = beatPos * dynBW;
+      const newScrollX   = Math.max(0, newCursorPos - containerSize.width / 4);
+      pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
+      workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
+      // Clear hover preview after seek click
+      lastHoverMeasureRef.current = -1;
+      workerRef.current?.postMessage({ type: 'HOVER', startX: null });
+
+      onSeek(beatPos);
+    }
+  };
+
+  const handleHover = (clientX: number) => {
+    if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
+    const containerLeft = containerRef.current.getBoundingClientRect().left;
+    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
+    const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
+    const beatPos = Math.max(0, worldX / dynBW);
+
+    // Find which measure start this position snaps to
+    const ends = renderData.measureEndXs;
+    let measureStart = 0;
+    for (let i = 0; i < ends.length; i++) {
+      if (beatPos < ends[i]) break;
+      measureStart = ends[i];
+    }
+
+    // Only send message when hovered measure changes
+    if (measureStart === lastHoverMeasureRef.current) return;
+    lastHoverMeasureRef.current = measureStart;
+    workerRef.current?.postMessage({ type: 'HOVER', startX: measureStart * dynBW });
+  };
+
+  const handleHoverEnd = () => {
+    if (lastHoverMeasureRef.current === -1) return;
+    lastHoverMeasureRef.current = -1;
+    workerRef.current?.postMessage({ type: 'HOVER', startX: null });
+  };
+
+  const resetSeek = () => {
+    pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
+    workerRef.current?.postMessage({ type: 'SCROLL', scrollX: 0, cursorPos: 0 });
+    lastHoverMeasureRef.current = -1;
+    workerRef.current?.postMessage({ type: 'HOVER', startX: null });
+    onSeek?.(0);
+  };
+
+  // Seek the worker canvas position without going through the canvas click handler.
+  // Called by TablatureSection when the minimap is clicked (to keep both in sync).
+  const seekWorker = (beat: number) => {
+    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
+    const newCursorPos = beat * dynBW;
+    const newScrollX   = Math.max(0, newCursorPos - containerSize.width / 4);
+    pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
+    workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
+    lastHoverMeasureRef.current = -1;
+    workerRef.current?.postMessage({ type: 'HOVER', startX: null });
+  };
+
+  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker };
 }

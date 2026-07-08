@@ -1,5 +1,4 @@
 import type { ExercisePlan } from "../../../types/exercise.types";
-import { legatoSextuplets457Exercise } from "../../exerises/legatoSextuplets457/legatoSextuplets457";
 import { spiderBasicExercise } from "../../exerises/spiderBasic/spiderBasic";
 import { spiderPermutation1234Exercise } from "../../exerises/spiderPermutation1234/spiderPermutation1234";
 import { spiderStairsHardExercise } from "../../exerises/spiderStairsHard/spiderStairsHard";
@@ -10,6 +9,8 @@ import spiderImage from "../spiderPermutationPlan/image.webp";
 
 export const spiderMasterPlan: ExercisePlan = {
   id: "spider_master_plan",
+  icon: "hexagon",
+  color: "teal",
   title: "Master Spider Training",
   description: "The ultimate chromatic technical development program. Covers basic permutations, stairs, skips, X-patterns, and rhythmic variations.",
   difficulty: "medium",
@@ -21,7 +22,6 @@ export const spiderMasterPlan: ExercisePlan = {
     SpiderStringSkippingExercise,
     spiderXExercise,
     spiderXExtendedExercise,
-    legatoSextuplets457Exercise,
   ],
   userId: "system",
   image: spiderImage,

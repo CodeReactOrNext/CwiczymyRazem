@@ -8,8 +8,10 @@ import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { useTranslation } from "hooks/useTranslation";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FaClock,
   FaExternalLinkAlt,
@@ -18,9 +20,12 @@ import {
   FaMusic,
   FaTrophy,
 } from "react-icons/fa";
+import { useResponsiveStore } from "store/useResponsiveStore";
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
+import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
+import { getReconciledStreak } from "utils/gameLogic";
 
 const StatsBox = ({
   Icon,
@@ -50,29 +55,57 @@ interface UserTooltipProps {
 
 export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipProps) => {
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
+  const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation("common");
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!userId) {
       return;
     }
+    let cancelled = false;
     const fetchData = async () => {
       const data = await firebaseGetUserTooltipData(userId);
+      if (cancelled) return;
       setUserData(data);
       setLoading(false);
+
+      // The stored `actualDayWithoutBreak` counter can drift from the truth in
+      // either direction after a timezone slip; the activity log (local time) is
+      // authoritative once loaded, so reconcile against it exactly like the
+      // header StreakBox / profile do (see getReconciledStreak).
+      if (data) {
+        try {
+          const logs = await firebaseGetUserRaprotsLogs(userId, "all");
+          if (cancelled) return;
+          const { dayWithoutBreak } = getReconciledStreak({
+            actualDayWithoutBreak: data.statistics.actualDayWithoutBreak,
+            lastReportDate: data.statistics.lastReportDate,
+            reportDates: logs.map((log) =>
+              log?.reportDate?.seconds
+                ? new Date(log.reportDate.seconds * 1000)
+                : null
+            ),
+          });
+          setReconciledStreak(dayWithoutBreak);
+        } catch (error) {
+          console.error("Failed to reconcile tooltip streak:", error);
+        }
+      }
     };
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   if (!userId) return <>{children}</>;
 
-  return (
-    <TooltipProvider>
-      <Tooltip delayDuration={200}>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
-          {loading ? (
+  const panel = (
+    <>
+      {loading ? (
             <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
           ) : userData ? (
             <div className='relative flex flex-col gap-5 text-gray-900'>
@@ -114,11 +147,8 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   </div>
                 )}
                 <div>
-                  <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
+                  <h3 className='text-base font-bold text-gray-900'>
                     {userData.displayName}
-                    <Link href={`/user/${userId}`} className="cursor-pointer hover:text-cyan-500 transition-colors">
-                      <FaExternalLinkAlt className='text-xs text-gray-400 hover:text-cyan-500' />
-                    </Link>
                   </h3>
                 </div>
               </div>
@@ -148,7 +178,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                 <StatsBox
                   Icon={FaFire}
                   label={t("tooltip.actual_streak")}
-                  value={userData.statistics.actualDayWithoutBreak}
+                  value={reconciledStreak ?? userData.statistics.actualDayWithoutBreak}
                 />
                 <StatsBox
                   Icon={FaMusic}
@@ -162,6 +192,14 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                 />
               </div>
 
+              <Link
+                href={`/user/${userId}`}
+                className='relative z-10 flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-700'
+              >
+                {t("tooltip.viewProfile")}
+                <FaExternalLinkAlt className='text-[10px]' />
+              </Link>
+
               {/* Guitar Absolute */}
               {(() => {
                 const lvl = userData.statistics.level ?? 0;
@@ -172,7 +210,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   return (
                     <img
                       className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
-                      src={`/static/images/rank/${imgPath}.png`}
+                      src={`/static/images/rank/${imgPath}.webp`}
                       alt='equipped guitar'
                     />
                   );
@@ -197,6 +235,56 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
               <p>{t("tooltip.userNotFound")}</p>
             </div>
           )}
+    </>
+  );
+
+  // Touch devices: tap opens the stats card in a centered modal instead of
+  // navigating straight to the profile (hover tooltips don't fire on touch).
+  if (isMobile) {
+    return (
+      <>
+        <span
+          className="contents"
+          onClickCapture={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
+        >
+          {children}
+        </span>
+        {open && typeof document !== "undefined" &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+              onClick={() => setOpen(false)}
+            >
+              <div
+                className="relative w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-100 bg-white/95 p-4 shadow-2xl backdrop-blur-md"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Close"
+                  className="absolute right-2 top-2 z-30 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900/80 text-gray-200 shadow-lg hover:text-white"
+                >
+                  <X size={15} />
+                </button>
+                {panel}
+              </div>
+            </div>,
+            document.body
+          )}
+      </>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
+          {panel}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -9,12 +9,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
+import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
 
 export default function PracticeScalePage() {
   const router = useRouter();
   const { type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -35,6 +35,9 @@ export default function PracticeScalePage() {
         return;
       }
       const exercise = generateSingleStringScaleExercise({ rootNote: "C", scaleType, stringNum });
+      if (exam === 'true') {
+        exercise.timeInMinutes = 3;
+      }
       setPlan({
         id: `scale-plan-${exercise.id}`,
         title: exercise.title,
@@ -61,6 +64,9 @@ export default function PracticeScalePage() {
     }
 
     const exercise = generateScaleExercise({ rootNote: "C", scaleType, patternType, position });
+    if (exam === 'true') {
+      exercise.timeInMinutes = 3;
+    }
     setPlan({
       id: `scale-plan-${exercise.id}`,
       title: exercise.title,
@@ -77,31 +83,47 @@ export default function PracticeScalePage() {
 
   const isDataReady = router.isReady && !!plan;
 
-  if (!sessionReady) {
-    return (
-      <PracticeLoadingScreen
-        isReady={isDataReady}
-        onDone={() => setSessionReady(true)}
-      />
-    );
+  const handleExamComplete = async (accuracy: number) => {
+    if (!userAuth || !requiredBpm || !plan?.exercises[0]) {
+      setIsFinishing(true);
+      router.push(backUrl);
+      return;
+    }
+    const exercise = plan.exercises[0];
+    try {
+      await toggleBpmStage(
+        userAuth,
+        exercise.id,
+        Number(requiredBpm),
+        exercise.title,
+        'theory'
+      );
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsFinishing(true);
+      router.push(backUrl);
+    }
+  };
+
+  const backUrl = nodeId ? `/scale-tree?fromExam=true&nodeId=${nodeId}` : "/scale-tree?fromExam=true";
+
+  if (!isDataReady) {
+    return <PracticeLoadingScreen isReady={false} />;
   }
 
   return (
     <PracticeSession
       plan={plan!}
       examMode={examMode}
-      onClose={() => {
-        if (typeof window !== "undefined" && window.history.length > 1) {
-          router.back();
-        } else {
-          router.push("/scale-tree");
-        }
-      }}
+      onClose={() => router.push(backUrl)}
       onFinish={() => {
         setIsFinishing(true);
-        router.push("/scale-tree");
+        router.push(backUrl);
       }}
+      onExamComplete={handleExamComplete}
       isFinishing={isFinishing}
+      skipExitDialog={true}
     />
   );
 }

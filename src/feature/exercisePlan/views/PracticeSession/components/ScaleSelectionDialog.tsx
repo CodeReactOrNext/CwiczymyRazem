@@ -114,8 +114,14 @@ export function ScaleSelectionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      {/* z-index must beat the mobile session modal (z-[9999999]) or the setup
+          dialog is invisible on phones. Flex column + capped height keeps the
+          header/footer on screen (middle scrolls) even on short landscape phones. */}
+      <DialogContent
+        overlayClassName="z-[99999998]"
+        className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[500px]"
+      >
+        <DialogHeader className="shrink-0">
           <DialogTitle>Choose Scale to Practice</DialogTitle>
           <DialogDescription>
             Configure scale practice parameters. The system will generate
@@ -123,6 +129,7 @@ export function ScaleSelectionDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         <div className="space-y-6 py-4">
           {/* Root Note Selection */}
           <div className="space-y-2">
@@ -236,8 +243,9 @@ export function ScaleSelectionDialog({
             }
           />
         )}
+        </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex shrink-0 justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>

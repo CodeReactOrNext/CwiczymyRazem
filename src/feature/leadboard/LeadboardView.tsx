@@ -2,12 +2,14 @@ import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";
+import type { LeaderboardViewType } from "./hooks/useLeaderboard";
 import { useLeaderboard } from "./hooks/useLeaderboard";
+import { useUserRank } from "./hooks/useUserRank";
 
 const ITEMS_PER_PAGE = 10;
 
 interface LeadboardViewProps {
-  defaultView?: "all-time" | "seasonal";
+  defaultView?: LeaderboardViewType;
 }
 
 export const LeadboardView = ({
@@ -20,17 +22,21 @@ export const LeadboardView = ({
     isLoading,
     totalUsers,
     currentPage,
-    isSeasonalView,
+    view,
     seasons,
     selectedSeason,
     handlePageChange,
-    handleViewChange,
     handleSeasonChange,
     lastAccessiblePage,
   } = useLeaderboard({
     itemsPerPage: ITEMS_PER_PAGE,
     defaultView,
   });
+
+  const { userRank, isLoading: isRankLoading } = useUserRank(
+    view,
+    selectedSeason
+  );
 
   if (!usersData.length && !isLoading) {
     return <PageLoadingLayout />;
@@ -45,11 +51,13 @@ export const LeadboardView = ({
       currentPage={currentPage}
       itemsPerPage={ITEMS_PER_PAGE}
       onPageChange={handlePageChange}
-      isSeasonalView={isSeasonalView}
+      view={view}
       seasons={seasons}
       selectedSeason={selectedSeason}
       setSelectedSeason={handleSeasonChange}
       lastAccessiblePage={lastAccessiblePage}
+      userRank={userRank}
+      isRankLoading={isRankLoading}
     />
   );
 };

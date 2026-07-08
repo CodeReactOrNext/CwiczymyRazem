@@ -41,7 +41,7 @@ function StrummingPatternViewerInner({
   const hasChords = pattern.chords && pattern.chords.length > 1;
 
   return (
-    <div className={cn("relative w-full bg-[#0a0a0a] rounded-xl overflow-hidden", className)}>
+    <div className={cn("relative w-full bg-[#0a0a0a] rounded-lg overflow-hidden", className)}>
       <div ref={containerRef} style={{ width: "100%", height: canvasH }}>
         <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
       </div>
@@ -52,14 +52,14 @@ function StrummingPatternViewerInner({
             <span className="text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">
               {countInRemaining}
             </span>
-            <span className="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mt-4">
+            <span className="text-xs font-bold tracking-[0.3em] text-white/50 mt-4">
               Get Ready
             </span>
           </div>
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 border-t border-white/5 text-xs text-zinc-400">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-zinc-400">
         <span className="flex items-center gap-1">
           <svg width={9} height={14} viewBox="0 0 9 14">
             <line x1={4.5} y1={1} x2={4.5} y2={9} stroke={DOWN_COLOR} strokeWidth={2} strokeLinecap="round"/>
@@ -79,7 +79,7 @@ function StrummingPatternViewerInner({
           Muted
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block rounded-full" style={{ width: 6, height: 6, background: ACCENT_DOT }}/>
+          <span className="inline-block rounded-lg" style={{ width: 6, height: 6, background: ACCENT_DOT }}/>
           Accent
         </span>
         <span className="flex-1" />

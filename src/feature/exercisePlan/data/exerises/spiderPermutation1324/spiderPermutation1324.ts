@@ -4,26 +4,23 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const spiderPermutation1324Exercise: Exercise = {
   id: "spider_permutation_1324",
   title: "Spider Exercise - 1-3-2-4 Permutation",
-  description: "Chromatic exercise using finger permutation 1-3-2-4, developing finger independence and coordination.",
+  description: "Fret notes on a single string using finger permutation 1-3-2-4 to isolate specific finger movements and develop deep coordination control.",
+  whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 1-3-2-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Place your left hand fingers on four consecutive frets of one string (e.g., 1st finger on 5th fret, 2nd on 6th, 3rd on 7th, 4th on 8th).",
-    "Start playing according to the permutation 1-3-2-4, which means: finger 1, finger 3, finger 2, finger 4.",
-    "Repeat the pattern several times, ensuring even attacks and clean sound.",
-    "Shift the entire position up one fret and repeat the exercise.",
-    "Continue throughout the length of the fretboard, then try the exercise on other strings."
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Maintain even tempo and spacing between notes - use a metronome.",
-    "Use minimal pressure on the frets - only as much as needed for a clean sound.",
-    "Pay attention to unusual transitions (e.g., 3-2), which may be more difficult.",
-    "Try to keep other fingers close to the strings, ready to use.",
-    "Initially practice slowly, focusing on precision rather than speed."
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 180,
     recommended: 80
   },

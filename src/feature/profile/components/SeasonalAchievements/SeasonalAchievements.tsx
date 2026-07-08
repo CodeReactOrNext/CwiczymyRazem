@@ -18,10 +18,13 @@ import {
 
 interface SeasonalAchievementProps {
   userId?: string;
+  /** When true, render nothing (instead of a placeholder/loading card) if there are no achievements. */
+  hideWhenEmpty?: boolean;
 }
 
 const SeasonalAchievements = ({
   userId,
+  hideWhenEmpty = false,
 }: SeasonalAchievementProps) => {
   const { t, i18n } = useTranslation("profile");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -137,6 +140,7 @@ const SeasonalAchievements = ({
 
 
   if (!loading && achievements.length === 0) {
+    if (hideWhenEmpty) return null;
     return (
       <Card className='border-white/5 bg-zinc-800/40 p-6 backdrop-blur-md'>
         <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
@@ -163,6 +167,7 @@ const SeasonalAchievements = ({
   }
 
   if (loading) {
+    if (hideWhenEmpty) return null;
     return (
       <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
         <h4 className='mb-4 text-lg font-bold text-white'>

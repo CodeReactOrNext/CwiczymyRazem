@@ -1,17 +1,34 @@
+import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
+import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type {
   ArsenalUserData,
   InventoryItem,
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
 import { doc, getDoc } from "firebase/firestore";
+import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { db } from "utils/firebase/client/firebase.utils";
 
-const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;
+
+// Mirror of the pedalboard editor (PedalboardView): pedals share the same
+// on-board height but keep their natural image proportions, so widths must be
+// derived from each image's aspect ratio rather than fixed. This keeps the
+// readonly profile view pixel-consistent with the editable arsenal view.
+const BOARD_W = 16;
+const BOARD_H = 7;
+/** Aspect used before an image has reported its natural size (a typical pedal). */
+const DEFAULT_ASPECT = 480 / 515;
+
+const widthPctForAspect = (aspect: number) =>
+  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
 
 interface TooltipData {
   x: number;
@@ -22,21 +39,9 @@ interface TooltipData {
 const RpgTooltip = ({ tooltip }: { tooltip: TooltipData }) => (
   <div
     className="pointer-events-none fixed z-[9999]"
-    style={{ left: tooltip.x + 14, top: tooltip.y - 8 }}
+    style={{ left: tooltip.x + 14, top: tooltip.y - 8, width: 250 }}
   >
-    <div
-      style={{
-        background: "linear-gradient(160deg, #1a1a2e 0%, #0f0f1a 100%)",
-        border: "1px solid #333",
-        borderRadius: 8,
-        padding: "10px 14px",
-        minWidth: 160,
-        maxWidth: 220,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04)",
-      }}
-    >
-      {tooltip.content}
-    </div>
+    {tooltip.content}
   </div>
 );
 
@@ -44,83 +49,54 @@ interface GuitarSlotReadonlyProps {
   item: InventoryItem | null;
   slotIndex: number;
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
+  onSelect: (content: React.ReactNode) => void;
 }
 
-const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProps) => {
+const GuitarSlotReadonly = ({ item, slotIndex, onHover, onSelect }: GuitarSlotReadonlyProps) => {
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const rs = guitar ? RARITY_STYLES[guitar.rarity] : null;
+  const level = item && guitar ? getItemLevel(item, guitar) : 0;
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!guitar || !item || !rs) return;
     onHover(e, {
       x: e.clientX,
       y: e.clientY,
-      content: (
-        <div style={{ minWidth: 240 }}>
-          {/* Rarity bar */}
-          <div className="h-1 w-full mb-3 rounded-full" style={{ background: `linear-gradient(90deg, ${rs.baseColor}, transparent)` }} />
-          {/* Name block */}
-          <div className="mb-3">
-            <div className="text-[11px] font-semibold tracking-widest uppercase mb-1" style={{ color: rs.baseColor }}>
-              {guitar.rarity} · {guitar.brand}
-            </div>
-            <div className="text-2xl font-bold text-white leading-tight">
-              {guitar.name}
-            </div>
-          </div>
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 pt-3 border-t" style={{ borderColor: `${rs.baseColor}25` }}>
-            {item.year && (
-              <div>
-                <div className="text-[10px] uppercase tracking-widest text-zinc-500">Year</div>
-                <div className="text-base font-semibold text-zinc-100">{item.year}</div>
-              </div>
-            )}
-            {item.country && (
-              <div>
-                <div className="text-[10px] uppercase tracking-widest text-zinc-500">Origin</div>
-                <div className="text-base font-semibold text-zinc-100">{item.country}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      ),
+      content: <GuitarCard item={item} readOnly />,
     });
+  };
+
+  const handleClick = () => {
+    if (!guitar || !item || !rs) return;
+    onHover(null as any, null);
+    onSelect(<GuitarCard item={item} readOnly />);
   };
 
   if (!guitar || !rs) {
     return (
       <div
-        className="relative flex flex-col items-center justify-center rounded-md"
-        style={{
-          height: 320,
-          border: "1px dashed #2a2a2a",
-          background: "#0c0c10",
-        }}
+        className="relative flex flex-col items-center justify-center gap-2 rounded-lg bg-zinc-800/40"
+        style={{ height: 320 }}
       >
-        <span className="text-[9px] uppercase tracking-widest text-zinc-700 font-black">Slot {slotIndex + 1}</span>
+        <Guitar className="h-7 w-7 text-zinc-600" />
+        <span className="text-[11px] tracking-wide text-zinc-500">Slot {slotIndex + 1}</span>
       </div>
     );
   }
 
   return (
     <div
-      className="relative flex flex-col overflow-hidden rounded-md cursor-default select-none"
+      className="relative flex flex-col overflow-hidden rounded-lg cursor-pointer select-none"
       style={{
         height: 320,
         background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
-        border: `1px solid ${rs.baseColor}28`,
-        borderBottom: `3px solid ${rs.baseColor}`,
-        boxShadow: `0 8px 24px rgba(0,0,0,0.6)`,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
+      onClick={handleClick}
     >
-      {/* Rarity stripe */}
-      <div className="h-[3px] w-full flex-shrink-0" style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}90, transparent)` }} />
-
       {/* Header */}
-      <div className="px-3 pt-3 pb-0 flex flex-col gap-0.5">
+      <div className="px-3 pt-4 pb-0 flex flex-col gap-0.5">
         <p className="text-xs font-semibold tracking-wide leading-none truncate" style={{ color: rs.baseColor }}>
           {guitar.brand}
         </p>
@@ -130,17 +106,53 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover }: GuitarSlotReadonlyProp
       </div>
 
       {/* Image */}
-      <div
-        className="relative flex items-center justify-center flex-1 overflow-hidden"
-        style={{
-          background: `radial-gradient(ellipse at 50% 60%, ${rs.baseColor}20 0%, transparent 70%)`,
-        }}
-      >
+      <div className="relative flex items-center justify-center flex-1 overflow-hidden">
+        {/* Level emblem (every guitar has a level) */}
+        {level > 0 && (
+          <div
+            className="absolute top-2 left-2 z-20 flex flex-col items-center justify-center rounded-full"
+            style={{
+              width: 38,
+              height: 38,
+              background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
+              border: `1.5px solid ${rs.baseColor}`,
+              boxShadow: `0 0 10px ${rs.baseColor}55, inset 0 0 6px rgba(0,0,0,0.6)`,
+            }}
+            title="Guitar level"
+          >
+            <span className="text-[15px] font-black leading-none text-white">{level}</span>
+          </div>
+        )}
+
+        {/* Subtle structural grid */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: [
+              `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
+              `linear-gradient(90deg, ${rs.baseColor} 1px, transparent 1px)`,
+            ].join(","),
+            backgroundSize: "22px 22px",
+            opacity: 0.04,
+          }}
+        />
+        {/* Neutral spotlight so dark guitars separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+        {/* Rarity glow backdrop */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none translate-y-[60px] opacity-50">
+          <div
+            className="absolute w-[170px] h-[170px] rounded-full blur-[34px]"
+            style={{ background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)` }}
+          />
+        </div>
         <img
-          src={`/static/images/rank/${guitar.imageId}.png`}
+          src={`/static/images/rank/${guitar.imageId}.webp`}
           alt={guitar.name}
-          className="object-contain -rotate-90"
-          style={{ height: "85%", width: "85%", maxHeight: 110 }}
+          className="relative z-10 object-contain -rotate-45"
+          style={{ height: 240, width: 240 }}
         />
       </div>
     </div>
@@ -151,58 +163,55 @@ interface PedalReadonlyProps {
   placement: PedalboardPlacement;
   effectInventory: ArsenalUserData["effectInventory"];
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
+  onSelect: (content: React.ReactNode) => void;
 }
 
-const PedalReadonly = ({ placement, effectInventory, onHover }: PedalReadonlyProps) => {
+const PedalReadonly = ({ placement, effectInventory, onHover, onSelect }: PedalReadonlyProps) => {
+  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
   const invItem = effectInventory.find((e) => e.id === placement.itemId);
   const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
   const rs = effect ? RARITY_STYLES[effect.rarity] : null;
   if (!effect || !rs) return null;
 
+  const wPct = widthPctForAspect(aspect);
+
   const handleMouseMove = (e: React.MouseEvent) => {
     onHover(e, {
       x: e.clientX,
       y: e.clientY,
-      content: (
-        <div className="space-y-1.5">
-          <div className="text-[8px] font-black uppercase tracking-[0.3em]" style={{ color: rs.baseColor }}>
-            {effect.rarity}
-          </div>
-          <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: rs.baseColor }}>
-              {effect.brand}
-            </div>
-            <div className="text-sm font-black text-white uppercase tracking-wide leading-tight">
-              {effect.name}
-            </div>
-          </div>
-          <div className="pt-1 border-t" style={{ borderColor: `${rs.baseColor}30` }}>
-            <div className="text-[7px] uppercase tracking-widest text-zinc-600">Type</div>
-            <div className="text-[10px] font-bold text-zinc-300">{effect.type}</div>
-          </div>
-        </div>
-      ),
+      content: <EffectCard item={invItem!} readOnly />,
     });
+  };
+
+  const handleClick = () => {
+    onHover(null as any, null);
+    onSelect(<EffectCard item={invItem!} readOnly />);
   };
 
   return (
     <div
-      className="absolute"
+      className="absolute cursor-pointer"
       style={{
         left: `${placement.xPct}%`,
         top: `${placement.yPct}%`,
-        width: `${PEDAL_W_PCT}%`,
+        width: `${wPct}%`,
         height: `${PEDAL_H_PCT}%`,
         filter: `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
+      onClick={handleClick}
     >
       <img
         src={`/static/images/effects/${effect.imageId}.png`}
         alt={effect.name}
         className="w-full h-full object-contain"
         draggable={false}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (!img.naturalWidth || !img.naturalHeight) return;
+          setAspect(img.naturalWidth / img.naturalHeight);
+        }}
       />
       <div
         className="absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full"
@@ -219,6 +228,9 @@ interface ProfileArsenalProps {
 export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   const [arsenal, setArsenal] = useState<ArsenalUserData | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  // Clicking/tapping an item opens its card in a centered modal, matching the
+  // arsenal editor and the activity view.
+  const [pinnedCard, setPinnedCard] = useState<React.ReactNode | null>(null);
 
   useEffect(() => {
     getDoc(doc(db, "users", userAuth)).then((snap) => {
@@ -251,23 +263,33 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   };
 
   return (
-    <div className="rounded-2xl bg-zinc-900/30 p-6" onMouseMove={handleMouseMove}>
-      <h2 className="mb-6 text-2xl font-bold text-white">Rig</h2>
+    <div className="rounded-lg bg-zinc-900/30 p-4 sm:p-6" onMouseMove={handleMouseMove}>
+      <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
+        Rig
+        <span
+          className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-sm font-black tabular-nums text-cyan-300"
+          title="Total rig level (equipped guitars + pedalboard)"
+        >
+          Lv {getRigLevel(arsenal)}
+        </span>
+      </h2>
 
       {/* Guitar Slots */}
-      <div className="mb-6">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-3">Guitars</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {guitarItems.map((item, i) => (
-            <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} />
-          ))}
+      {hasGuitars && (
+        <div className="mb-6">
+          <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Guitars</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {guitarItems.map((item, i) => (
+              <GuitarSlotReadonly key={i} item={item} slotIndex={i} onHover={handleTooltip} onSelect={setPinnedCard} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Pedalboard */}
       {hasPedals && (
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-3">Pedalboard</p>
+          <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Pedalboard</p>
           <div
             style={{
               background: "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
@@ -284,7 +306,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
                 ))}
               </div>
-              <span className="text-[8px] font-black uppercase tracking-[0.35em] text-zinc-600">Pedalboard</span>
+              <span className="text-[8px] font-black tracking-[0.35em] text-zinc-600">Pedalboard</span>
               <div className="flex gap-2">
                 {[0, 1].map((i) => (
                   <div key={i} style={{ width: 32, height: 11, background: "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)", borderRadius: 3, boxShadow: "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)" }} />
@@ -309,12 +331,12 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                 <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
                 </div>
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Amp</span>
+                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Amp</span>
               </div>
 
               {/* Instr jack — bottom right */}
               <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "uppercase", color: "#78350f" }}>Instr</span>
+                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Instr</span>
                 <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
                 </div>
@@ -327,6 +349,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   placement={placement}
                   effectInventory={effectInventory ?? []}
                   onHover={handleTooltip}
+                  onSelect={setPinnedCard}
                 />
               ))}
             </div>
@@ -345,7 +368,30 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
         </div>
       )}
 
-      {tooltip && <RpgTooltip tooltip={tooltip} />}
+      {tooltip && !pinnedCard && <RpgTooltip tooltip={tooltip} />}
+
+      {pinnedCard && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={() => setPinnedCard(null)}
+          >
+            <div
+              className="relative w-full max-w-[320px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setPinnedCard(null)}
+                aria-label="Close"
+                className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
+              >
+                <X size={15} />
+              </button>
+              {pinnedCard}
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

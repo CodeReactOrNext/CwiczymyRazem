@@ -9,9 +9,10 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
+  YAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { checkIsPracticeToday, getUpdatedActualDayWithoutBreak } from "utils/gameLogic";
+import { getReconciledStreak } from "utils/gameLogic";
 
 const DAILY_GOAL_MIN = 15;
 const DAILY_GOAL_MS = DAILY_GOAL_MIN * 60 * 1000;
@@ -104,10 +105,15 @@ export const PracticeStatsWidget = ({
 
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
-  const userLastReportDate = new Date(lastReportDate);
-  const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const isStreak = getUpdatedActualDayWithoutBreak(actualDayWithoutBreak, userLastReportDate, didPracticeToday);
-  const dayWithoutBreak = isStreak === 1 && !didPracticeToday ? 0 : actualDayWithoutBreak;
+
+  // The activity log (local time) is the timezone-correct source of truth for the
+  // streak; the stored counter only fills in until the log loads. See
+  // getReconciledStreak.
+  const { dayWithoutBreak } = getReconciledStreak({
+    actualDayWithoutBreak,
+    lastReportDate,
+    reportDates: reportList.map((r) => r.date),
+  });
 
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
 
@@ -150,7 +156,7 @@ export const PracticeStatsWidget = ({
   }));
 
   return (
-    <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm", className)}>
+    <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm p-5 sm:p-6", className)}>
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -163,7 +169,7 @@ export const PracticeStatsWidget = ({
                   : "text-zinc-700"
               )}
             />
-            <span className="text-[11px] font-semibold text-zinc-400">This week</span>
+            <span className="text-[12px] font-semibold text-zinc-400 tracking-wide">This week</span>
           </div>
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
@@ -178,7 +184,12 @@ export const PracticeStatsWidget = ({
         {/* Chart */}
         <div className="flex-1 min-h-[130px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 18, right: 28, bottom: 0, left: 0 }} barCategoryGap="20%">
+            <BarChart data={chartData} margin={{ top: 18, right: 44, bottom: 0, left: 0 }} barCategoryGap="20%">
+              {/* Hidden Y axis fixes the scale so the 15-min goal line stays visible
+                  even on low-practice days (otherwise the domain collapses to dataMax
+                  and the reference line gets discarded for overflowing). */}
+              <YAxis hide domain={[0, maxMinutes]} />
+
               <XAxis
                 dataKey="day"
                 axisLine={false}
@@ -241,14 +252,14 @@ export const PracticeStatsWidget = ({
 
               <ReferenceLine
                 y={DAILY_GOAL_MIN}
-                stroke="rgba(255,255,255,0.18)"
+                stroke="rgba(255,255,255,0.35)"
                 strokeDasharray="4 3"
                 label={{
                   value: "15 min",
                   position: "right",
-                  fill: "rgba(255,255,255,0.25)",
-                  fontSize: 8,
-                  fontWeight: 600,
+                  fill: "rgba(255,255,255,0.7)",
+                  fontSize: 10,
+                  fontWeight: 700,
                 }}
               />
 

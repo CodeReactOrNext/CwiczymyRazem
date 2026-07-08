@@ -8,31 +8,43 @@ import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
-import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
+import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
+import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { getEffectLevel } from "feature/arsenal/data/effectStats";
+import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemLevel } from "feature/arsenal/data/itemStats";
 // challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsInterface,
+  FirebaseLogsMarketplaceInterface,
+  FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { Video } from "lucide-react"; 
+import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import { ExternalLink, Star,Video, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   FaTrophy,
 } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
+import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 
 const isFirebaseLogsSongs = (
@@ -65,6 +77,24 @@ const isFirebaseLogsCaseOpen = (
   return (log as FirebaseLogsCaseOpenInterface).type === "case_open";
 };
 
+const isFirebaseLogsMarketplace = (
+  log: any
+): log is FirebaseLogsMarketplaceInterface => {
+  return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
+};
+
+const isFirebaseLogsPlaylist = (
+  log: any
+): log is FirebaseLogsPlaylistInterface => {
+  return (log as FirebaseLogsPlaylistInterface).type === "playlist_created";
+};
+
+const PLAYLIST_KIND_LABEL: Record<string, string> = {
+  playlist: "playlist",
+  path: "learning path",
+  top: "top 10",
+};
+
 const RARITY_COLORS: Record<string, string> = {
   Common: "#9ca3af",
   Uncommon: "#4ade80",
@@ -89,7 +119,7 @@ const ItemTooltipCard = ({
 }) => {
   const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
   const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.png`
+    ? `/static/images/rank/${itemImageId}.webp`
     : `/static/images/effects/${itemImageId}.png`;
 
   const guitarDef = itemType === "guitar"
@@ -117,14 +147,33 @@ const ItemTooltipCard = ({
       </div>
 
       {/* Image */}
-      <div
-        className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg"
-        style={{ background: `radial-gradient(ellipse at center, ${color}18 0%, transparent 70%)` }}
-      >
+      <div className="relative flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg overflow-hidden">
+        {/* Subtle structural grid */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: [
+              `linear-gradient(${color} 1px, transparent 1px)`,
+              `linear-gradient(90deg, ${color} 1px, transparent 1px)`,
+            ].join(","),
+            backgroundSize: "22px 22px",
+            opacity: 0.04,
+          }}
+        />
+        {/* Neutral spotlight so dark items separate from the background */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+        />
+        {/* Rarity glow */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at center, ${color}18 0%, transparent 70%)` }}
+        />
         <img
           src={imgSrc}
           alt={itemName}
-          className={`object-contain drop-shadow-xl ${itemType === "guitar" ? "h-36 w-auto -rotate-90" : "h-24 w-24"}`}
+          className={`relative z-10 object-contain drop-shadow-xl ${itemType === "guitar" ? "h-36 w-auto -rotate-90" : "h-24 w-24"}`}
         />
       </div>
 
@@ -153,6 +202,133 @@ const ItemTooltipCard = ({
   );
 };
 
+/** Centered, tap-to-dismiss modal used on touch devices where hover tooltips don't fire. */
+const CardModal = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => {
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div className="relative w-full max-w-[320px]" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
+        >
+          <X size={15} />
+        </button>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+const ItemPill = ({
+  itemType,
+  itemName,
+  itemBrand,
+  itemRarity,
+  itemImageId,
+  level,
+  rolledGuitar,
+  rolledEffect,
+}: {
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  level: number | null;
+  rolledGuitar: any;
+  rolledEffect: any;
+}) => {
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const [open, setOpen] = useState(false);
+  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const imgSrc = itemType === "guitar"
+    ? `/static/images/rank/${itemImageId}.webp`
+    : `/static/images/effects/${itemImageId}.png`;
+
+  const cardContent = rolledGuitar ? (
+    <div style={{ width: 250 }}>
+      <GuitarCard item={rolledGuitar} readOnly />
+    </div>
+  ) : rolledEffect ? (
+    <div style={{ width: 250 }}>
+      <EffectCard item={rolledEffect} readOnly />
+    </div>
+  ) : (
+    <ItemTooltipCard
+      itemType={itemType}
+      itemName={itemName}
+      itemBrand={itemBrand}
+      itemRarity={itemRarity}
+      itemImageId={itemImageId}
+    />
+  );
+
+  const pill = (
+    <span className="inline-flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-white/5 p-2 sm:w-auto sm:gap-1.5 sm:rounded-none sm:bg-transparent sm:p-0">
+            {/* Guitar/effect art — fixed size, never shrinks. Leads on mobile, trails on desktop. */}
+            <img
+              src={imgSrc}
+              alt={itemName}
+              className={`h-10 w-10 shrink-0 object-contain opacity-80 sm:order-last sm:h-7 sm:w-7 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+            />
+            {/* Name + badges: stacked on mobile, inline on desktop */}
+            <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-initial sm:flex-row sm:items-center sm:gap-1.5">
+              <span className="order-1 min-w-0 break-words text-sm font-bold sm:order-2" style={{ color }}>
+                {itemBrand} {itemName}
+              </span>
+              {/* Badges stay on one line and keep together */}
+              <span className="order-2 flex shrink-0 items-center gap-1.5 sm:order-1">
+                <span
+                  className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide"
+                  style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                >
+                  {itemRarity}
+                </span>
+                {level !== null && (
+                  <span
+                    className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
+                    style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+                    title="Item level"
+                  >
+                    Lv {level}
+                  </span>
+                )}
+              </span>
+            </span>
+          </span>
+  );
+
+  // Touch devices: tap opens the card in a centered modal (hover tooltips don't fire).
+  if (isMobile) {
+    return (
+      <>
+        <span onClick={() => setOpen(true)}>{pill}</span>
+        {open && <CardModal onClose={() => setOpen(false)}>{cardContent}</CardModal>}
+      </>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={150}>
+        <TooltipTrigger asChild>{pill}</TooltipTrigger>
+        <TooltipContent
+          className="p-0 border-0 bg-transparent shadow-2xl"
+          side="top"
+        >
+          {cardContent}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const FirebaseLogsCaseOpenItem = ({
   log,
   isNew,
@@ -164,10 +340,19 @@ const FirebaseLogsCaseOpenItem = ({
 }) => {
   const { timestamp, userName, uid, avatarUrl, userAvatarFrame, caseName, itemType, itemName, itemBrand, itemRarity, itemImageId } = log;
   const date = new Date(timestamp);
-  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
-  const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.png`
-    : `/static/images/effects/${itemImageId}.png`;
+
+  // Full rolled instance (newer logs) → proper card tooltip + computed level.
+  const rolled = log.rolledItem;
+  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+  let level: number | null = null;
+  if (rolledGuitar) {
+    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+    if (def) level = getItemLevel(rolledGuitar, def);
+  } else if (rolledEffect) {
+    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+    if (def) level = getEffectLevel(rolledEffect, def);
+  }
 
   return (
     <LogItem isNew={isNew}>
@@ -184,40 +369,88 @@ const FirebaseLogsCaseOpenItem = ({
         
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <TooltipProvider>
-              <Tooltip delayDuration={150}>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
-                    <span
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
-                      style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
-                    >
-                      {itemRarity}
-                    </span>
-                    <span className="font-bold text-sm" style={{ color }}>
-                      {itemBrand} {itemName}
-                    </span>
-                    <img
-                      src={imgSrc}
-                      alt={itemName}
-                      className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
-                    />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="p-0 border-0 bg-transparent shadow-2xl"
-                  side="top"
-                >
-                  <ItemTooltipCard
-                    itemType={itemType}
-                    itemName={itemName}
-                    itemBrand={itemBrand}
-                    itemRarity={itemRarity}
-                    itemImageId={itemImageId}
-                  />
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ItemPill
+              itemType={itemType}
+              itemName={itemName}
+              itemBrand={itemBrand}
+              itemRarity={itemRarity}
+              itemImageId={itemImageId}
+              level={level}
+              rolledGuitar={rolledGuitar}
+              rolledEffect={rolledEffect}
+            />
+          </div>
+          {log.id && (
+            <div className="shrink-0">
+              <LogReaction
+                logId={log.id}
+                reactions={log.reactions}
+                currentUserId={currentUserId}
+                disabled={log.uid === currentUserId}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </LogItem>
+  );
+};
+
+const FirebaseLogsMarketplaceItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsMarketplaceInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, itemType, itemName, itemBrand, itemRarity, itemImageId, price } = log;
+  const date = new Date(timestamp);
+
+  const rolled = log.rolledItem;
+  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+  let level: number | null = null;
+  if (rolledGuitar) {
+    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+    if (def) level = getItemLevel(rolledGuitar, def);
+  } else if (rolledEffect) {
+    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+    if (def) level = getEffectLevel(rolledEffect, def);
+  }
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <span className="text-secondText text-sm">listed</span>
+        </div>
+
+        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:flex-initial min-w-0">
+            <ItemPill
+              itemType={itemType}
+              itemName={itemName}
+              itemBrand={itemBrand}
+              itemRarity={itemRarity}
+              itemImageId={itemImageId}
+              level={level}
+              rolledGuitar={rolledGuitar}
+              rolledEffect={rolledEffect}
+            />
+
+            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>
+              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+                {price}
+                <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+              </span>
+            </span>
           </div>
           {log.id && (
             <div className="shrink-0">
@@ -243,6 +476,8 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsRecordingsInterface
     | FirebaseLogsDailyQuestInterface
     | FirebaseLogsCaseOpenInterface
+    | FirebaseLogsMarketplaceInterface
+    | FirebaseLogsPlaylistInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -319,9 +554,11 @@ const FirebaseLogsSongItem = ({
   currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, status, uid, avatarUrl, userAvatarFrame } = log;
+  const { userName, data, songArtist, songTitle, songId, status, uid, avatarUrl, userAvatarFrame, difficulty_rate } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status, t);
+  const showRating = status === "difficulty_rate" && difficulty_rate !== undefined;
+  const ratingTier = showRating ? getSongTier(difficulty_rate as number) : null;
 
   return (
     <LogItem isNew={isNew}>
@@ -333,13 +570,34 @@ const FirebaseLogsSongItem = ({
           </span>
           <p className='text-secondText text-sm'>
             {message}{" "}
-            <span className='text-white'>
-              {songArtist} {songTitle}
-            </span>
+            {songId ? (
+              <Link href={`/songs?view=management&songId=${songId}`} className='inline-flex items-center gap-1 text-white hover:text-cyan-400 hover:underline transition-colors'>
+                {songArtist} {songTitle}
+                <ExternalLink className='h-3 w-3 opacity-60' />
+              </Link>
+            ) : (
+              <span className='text-white'>
+                {songArtist} {songTitle}
+              </span>
+            )}
             {status !== "difficulty_rate" && "."}
           </p>
+          {showRating && ratingTier && (
+            <span
+              className="inline-flex items-center gap-1 rounded-[4px] border px-1.5 py-0.5 text-[10px] font-bold"
+              style={{
+                color: ratingTier.color,
+                backgroundColor: `${ratingTier.color}1a`,
+                borderColor: `${ratingTier.color}40`,
+              }}
+              title={`Difficulty rated ${difficulty_rate}/10 (${ratingTier.label})`}
+            >
+              <Star className="h-2.5 w-2.5 fill-current" />
+              {difficulty_rate}/10
+            </span>
+          )}
         </div>
-        
+
         <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
           {log.id && (
             <LogReaction
@@ -432,16 +690,25 @@ const FirebaseLogsItem = ({
   log,
   isNew,
   currentUserId,
+  onPreviewPlan,
+  onPreviewExercise,
 }: {
   log: FirebaseLogsInterface;
   isNew: boolean;
   currentUserId: string;
+  onPreviewPlan: (plan: ExercisePlan) => void;
+  onPreviewExercise: (exercise: Exercise) => void;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
   const date = new Date(timestamp as string);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
+
+  // Match logged exercise back to a known exercise definition (logs only store the title).
+  const matchedExercise: Exercise | null = exerciseTitle
+    ? exercisesAgregat.find(ex => ex.title === exerciseTitle) ?? null
+    : null;
 
   const _currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
   
@@ -496,31 +763,53 @@ const FirebaseLogsItem = ({
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
           {planTitle && (
+            plan ? (
+              <button
+                type="button"
+                onClick={() => onPreviewPlan(plan)}
+                title="Click to preview and start this plan"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
+              </button>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="tracking-wide mr-1.5 opacity-80">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
                     Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>
               </span>
+            )
           )}
 
           {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
+            matchedExercise ? (
+              <button
+                type="button"
+                onClick={() => onPreviewExercise(matchedExercise)}
+                title="Click to preview and start this exercise"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{exerciseTitle}</span>
+              </button>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">
                     Exercise
                 </span>
                 <span className="font-medium">{exerciseTitle}</span>
               </span>
+            )
           )}
 
           {micPerformance && !(micPerformance.score === 0 && micPerformance.accuracy === 100) && (
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
                 <span className="flex items-center gap-1">
-                    <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest mr-0.5">Score:</span>
-                    <span className="font-bold text-main">{micPerformance.score}</span>
+                    <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider mr-0.5">Score:</span>
+                    <span className="font-bold tabular-nums text-main">{micPerformance.score}</span>
                 </span>
                 <span className="w-px h-2.5 bg-blue-500/30" />
-                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold">
+                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold tabular-nums">
                     {micPerformance.accuracy}%
                 </span>
               </span>
@@ -528,16 +817,27 @@ const FirebaseLogsItem = ({
 
           {earTrainingPerformance && (
               <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-                <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
-                <span className="font-bold">{earTrainingPerformance.score}</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize opacity-70 tracking-wider">Score:</span>
+                <span className="font-bold tabular-nums">{earTrainingPerformance.score}</span>
               </span>
           )}
 
           {songTitle && songArtist && (
+            songId ? (
+              <Link
+                href={`/songs?view=management&songId=${songId}`}
+                title="Click to open this song"
+                className="group inline-flex items-center text-left text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+                <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
+                <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+              </Link>
+            ) : (
               <span className="inline-block text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
+                <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
                 <span className="font-medium">{songArtist} - {songTitle}</span>
               </span>
+            )
           )}
 
           </div>
@@ -735,6 +1035,57 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
+const FirebaseLogsPlaylistItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsPlaylistInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, playlistId, playlistName, playlistKind, songCount } = log;
+  const date = new Date(timestamp);
+  const kindLabel = PLAYLIST_KIND_LABEL[playlistKind] ?? "playlist";
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <p className="text-secondText text-sm">
+            created a new {kindLabel}:{" "}
+            <Link
+              href={`/songs?view=playlists&playlistId=${playlistId}`}
+              className="inline-flex items-center gap-1 font-bold text-white hover:text-cyan-400 hover:underline transition-colors"
+            >
+              {playlistName}
+              <ExternalLink className="h-3 w-3 opacity-60" />
+            </Link>
+            {songCount > 0 && (
+              <span className="text-xs opacity-70"> ({songCount} {songCount === 1 ? "song" : "songs"})</span>
+            )}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
+      </div>
+    </LogItem>
+  );
+};
+
 const FirebaseLogsDailyQuestItem = ({
   log,
   isNew,
@@ -762,10 +1113,12 @@ const FirebaseLogsDailyQuestItem = ({
 
         <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] ">
-              <FaTrophy className="h-2.5 w-2.5" />
-              Claimed +{points}
-              <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-yellow-400 bg-yellow-950/30 border-yellow-500/20">
+              <span className="text-[9px] sm:text-[10px] font-semibold capitalize tracking-wider opacity-70">Claimed</span>
+              <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+                +{points}
+                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+              </span>
             </span>
           </div>
           {log.id && (
@@ -787,6 +1140,8 @@ const FirebaseLogsDailyQuestItem = ({
 const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
+  const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const spanRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -817,7 +1172,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
 
   return (
     <>
-      <div className="mb-2">
+      <div className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
         <OnlineUsers />
       </div>
       <div ref={spanRef} className='h-1' />
@@ -855,20 +1210,43 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}
             />
-          ) : (
-            <FirebaseLogsItem 
-              log={log as FirebaseLogsInterface} 
-              isNew={isNewMessage((log as any).data || (log as any).timestamp)} 
+          ) : isFirebaseLogsMarketplace(log) ? (
+            <FirebaseLogsMarketplaceItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}
+            />
+          ) : isFirebaseLogsPlaylist(log) ? (
+            <FirebaseLogsPlaylistItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+            />
+          ) : (
+            <FirebaseLogsItem
+              log={log as FirebaseLogsInterface}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+              onPreviewPlan={setPreviewPlan}
+              onPreviewExercise={setPreviewExercise}
             />
           )}
         </div>
       ))}
 
-      <RecordingViewModal 
+      <RecordingViewModal
         isOpen={!!activeRecordingId}
         onClose={() => setActiveRecordingId(null)}
         recordingId={activeRecordingId}
+      />
+
+      <ActivityStartModal
+        plan={previewPlan}
+        exercise={previewExercise}
+        onClose={() => {
+          setPreviewPlan(null);
+          setPreviewExercise(null);
+        }}
       />
     </>
   );

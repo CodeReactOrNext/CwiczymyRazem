@@ -89,20 +89,20 @@ const hardConfig: ImprovPromptRiddleConfig = {
 export const improvPromptEasy: Exercise = {
   id: "improv_prompt_easy",
   title: "Improv Prompts — Easy",
-  description: "Follow rotating creative constraints while improvising. Simple, single rules that focus your playing.",
+  description: "Improvise over a backing track while adhering to a single, rotating creative constraint.",
+  whyItMatters: "Random constraints force you to break out of habitual playing patterns. By imposing artificial limitations (like playing only on two strings or avoiding certain rhythms), you are forced to discover new pathways and creative solutions on the spot.",
+  requiresBackingTrack: true,
   difficulty: "easy",
   category: "creativity",
   timeInMinutes: 10,
   instructions: [
     "Start improvising freely over a backing track or drone.",
-    "A prompt will appear on screen — follow that constraint in your playing.",
-    "When the prompt changes, adapt immediately to the new rule.",
-    "Don't stop playing when prompts rotate — transition smoothly."
+    "When a prompt appears on screen, immediately alter your playing to follow that specific constraint.",
+    "When the prompt changes, transition your playing to the new rule without stopping.",
   ],
   tips: [
-    "There are no wrong notes — commit fully to each constraint.",
-    "If a prompt feels hard, simplify: play fewer notes but follow the rule.",
-    "Use a backing track in a key you're comfortable with."
+    "Commit fully to the constraint, even if it feels uncomfortable or unnatural at first.",
+    "If a prompt is challenging, drastically reduce the number of notes you play to give yourself processing time.",
   ],
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
@@ -112,20 +112,20 @@ export const improvPromptEasy: Exercise = {
 export const improvPromptMedium: Exercise = {
   id: "improv_prompt_medium",
   title: "Improv Prompts — Medium",
-  description: "Musical concept prompts that push your vocabulary. Faster rotation keeps you on your toes.",
+  description: "Improvise over a backing track while rapidly adapting to rotating musical and theoretical constraints.",
+  whyItMatters: "Faster rotations and more complex constraints test your ability to instantly recall and apply musical vocabulary. It trains your brain to quickly formulate musical ideas that fit specific structural requirements in real-time.",
+  requiresBackingTrack: true,
   difficulty: "medium",
   category: "creativity",
   timeInMinutes: 10,
   instructions: [
-    "Improvise while following each rotating prompt.",
-    "Prompts rotate every 30 seconds — adapt quickly.",
-    "Focus on musicality, not just following the rule literally.",
-    "Try to make each constraint sound intentional, not forced."
+    "Improvise over a backing track while following each rotating prompt.",
+    "Adapt immediately to new constraints as they rotate every 30 seconds.",
+    "Focus on making the constraint sound like an intentional musical choice, not just a forced rule.",
   ],
   tips: [
-    "Pre-hear the sound before you play it.",
-    "Use the constraint as inspiration, not a cage.",
-    "Record yourself and listen back — did it sound musical?"
+    "Use the constraint as a seed for inspiration, rather than a cage.",
+    "Listen to your phrasing and prioritize musicality over strict technical execution.",
   ],
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
@@ -135,20 +135,21 @@ export const improvPromptMedium: Exercise = {
 export const improvPromptHard: Exercise = {
   id: "improv_prompt_hard",
   title: "Improv Prompts — Hard",
-  description: "Two simultaneous advanced constraints. Demands real-time creative problem-solving.",
+  description: "Improvise over a backing track while simultaneously adhering to multiple advanced creative constraints.",
+  whyItMatters: "Balancing multiple, sometimes conflicting constraints demands extreme cognitive flexibility and advanced fretboard mastery. This workout pushes your improvisational bandwidth to its absolute limit, turning moments of struggle into spontaneous creative breakthroughs.",
+  requiresBackingTrack: true,
   difficulty: "hard",
   category: "creativity",
   timeInMinutes: 15,
   instructions: [
-    "Two prompts appear at the same time — follow BOTH simultaneously.",
-    "Prompts rotate every 30 seconds.",
-    "This is a creative workout — expect to struggle and embrace it.",
-    "The goal is creative flexibility, not perfection."
+    "Improvise over a backing track while strictly following BOTH active prompts simultaneously.",
+    "Adapt immediately as the pairs of prompts rotate every 30 seconds.",
+    "Maintain the musical flow even if the active constraints contradict your natural playing style.",
   ],
   tips: [
-    "If both constraints clash, find a creative compromise.",
-    "Slow down your playing to give your brain processing time.",
-    "Think of this as improvisation gym — the struggle IS the exercise."
+    "If two constraints clash, creatively interpret a compromise that satisfies the essence of both.",
+    "Slow down your playing significantly to allow your brain to process the dual requirements.",
+    "Embrace the struggle; the cognitive friction is the primary benefit of the exercise.",
   ],
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],

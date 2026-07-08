@@ -31,6 +31,10 @@ interface UseSessionAudioOptions {
   setTimerTime:            (t: number) => void;
   setHasPlayedRiddleOnce:  (v: boolean) => void;
   onAlphaTabAudioContextReady: (ctx: AudioContext) => void;
+  /** Incremented on explicit restarts so AlphaTab resets to beat 0 instead of resuming. */
+  tabRestartKey:           number;
+  /** One-shot GP-audio seek target (in beats) owned by the metronome; keeps AlphaTab aligned with bar-click seeks. */
+  pendingSeekBeatRef?:     MutableRefObject<number | null>;
 }
 
 export function useSessionAudio({
@@ -40,7 +44,7 @@ export function useSessionAudio({
   isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
-  onAlphaTabAudioContextReady,
+  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -124,6 +128,8 @@ export function useSessionAudio({
     metronomeVolume: isMetronomeMuted ? 0 : 1,
     trackConfigs:    alphaTabTrackConfigs,
     backingTrackIds: alphaTabBackingTrackIds,
+    resetKey:        tabRestartKey,
+    pendingSeekBeatRef,
   });
 
   // ── Exam backing track ─────────────────────────────────────────────────────

@@ -5,22 +5,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const spiderStairsHardExercise: Exercise = {
   id: "spider_stairs_hard",
   title: "Advanced Spider Stairs Exercise",
-  description: "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
+  description: "Fret non-adjacent string skipping patterns with wide interval leaps to build absolute finger independence and fingerboard stretch control.",
+  whyItMatters: "This exercise develops extreme finger independence and wide stretching capacity. By crossing multiple strings non-sequentially while maintaining a wide fret stretch, it trains your hand to stay relaxed under technical strain and prevents your fingers from tensing up during large interval leaps.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Start from the first fret on the E string, using fingers 1-2-4.",
-    "Move to the next string shifting two frets higher.",
-    "Continue the pattern until the highest string, increasing finger stretch.",
-    "Return the same way down, maintaining movement precision."
+    "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
+    "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",
+    "Practice at a slow tempo first, focusing on rhythmic precision and fluid position shifts."
   ],
   tips: [
-    "Pay special attention to precision with wider stretches.",
-    "Maintain proper wrist position despite larger distances.",
-    "Control pressure - it's easy to press too hard with wider stretches.",
-    "If you feel discomfort, reduce tempo.",
-
+    "Keep your fretting hand fingers hovered close to the fretboard to minimize unnecessary movement.",
+    "Position your thumb behind the middle of the neck to support a curved, relaxed hand arch.",
+    "Avoid excess tension in your shoulder and wrist; efficiency of movement builds speed naturally."
   ],
   tablature: [
     {

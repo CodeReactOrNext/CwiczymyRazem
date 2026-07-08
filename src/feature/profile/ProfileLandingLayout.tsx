@@ -3,10 +3,12 @@ import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
 // ActiveChallengeWidget removed
+import { AnimatedNumber } from "components/UI/AnimatedNumber/AnimatedNumber";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { SupportBanner } from "feature/dashboard/components/SupportBanner";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { getTrendData } from "feature/profile/utils/getTrendData";
@@ -20,7 +22,6 @@ import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
-import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
@@ -71,7 +72,7 @@ const ProfileLandingLayout = ({
   const glowColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? "#0891b2") : "#0891b2";
 
   return (
-    <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
+    <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none">
       <HeroBanner
         title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
         className="w-full !rounded-none !shadow-none !flex-row !items-center !justify-between min-h-[160px] md:min-h-[200px] lg:min-h-[240px]"
@@ -84,7 +85,7 @@ const ProfileLandingLayout = ({
 
               {/* Guitar with CSS fade on the right side */}
               <img
-                src={`/static/images/rank/${imgPath}.png`}
+                src={`/static/images/rank/${imgPath}.webp`}
                 className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
                 style={{ 
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
@@ -144,32 +145,31 @@ const ProfileLandingLayout = ({
             {(userStats?.fame ?? 0) >= 30 && (
               <button
                 onClick={() => router.push("/arsenal")}
-                className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-800/80 backdrop-blur-md border border-orange-500/30 hover:border-orange-400/60 hover:bg-zinc-700/80 text-white px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95"
+                className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-900 hover:bg-zinc-800 text-amber-300 px-4 py-2 text-sm font-normal transition-all duration-300 active:scale-95"
               >
                 <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
                 {/* Mobile: compact */}
-                <span className="md:hidden text-orange-400 font-bold">{(userStats.fame ?? 0).toLocaleString()}</span>
-                <span className="md:hidden text-zinc-300 text-xs">pts</span>
-                <span className="md:hidden text-zinc-500 text-xs">·</span>
-                <span className="md:hidden text-orange-400 group-hover/fame:text-orange-300 transition-colors duration-200">Arsenal</span>
+                <AnimatedNumber value={userStats.fame ?? 0} className="md:hidden text-amber-300 font-bold" />
+                <span className="md:hidden text-amber-300/70 text-xs">pts</span>
+                <span className="md:hidden text-amber-300/40 text-xs">·</span>
+                <span className="md:hidden text-amber-300">Arsenal</span>
                 {/* Desktop: full */}
-                <span className="hidden md:inline text-zinc-300 group-hover/fame:text-white transition-colors duration-200">
+                <span className="hidden md:inline text-amber-300">
                   {(userStats.fame ?? 0).toLocaleString()} Fame Points
                 </span>
-                <span className="hidden md:inline text-zinc-500 text-xs">·</span>
-                <span className="hidden md:inline text-orange-400 group-hover/fame:text-orange-300 transition-colors duration-200">Spend in Arsenal</span>
-                <ArrowRight className="h-3.5 w-3.5 text-orange-400 transition-transform duration-300 group-hover/fame:translate-x-0.5 shrink-0" />
+                <span className="hidden md:inline text-amber-300/40 text-xs">·</span>
+                <span className="hidden md:inline text-amber-300">Spend in Arsenal</span>
+                <ArrowRight className="h-3.5 w-3.5 text-amber-300 transition-transform duration-300 group-hover/fame:translate-x-0.5 shrink-0" />
               </button>
             )}
           </div>
         }
       />
-      
+
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
-          <div className="mt-6">
             <DashboardSection compact>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <DailyQuestWidget />
                 <PracticeStatsWidget
                   userStats={userStats}
@@ -180,15 +180,16 @@ const ProfileLandingLayout = ({
                 />
               </div>
             </DashboardSection>
-          </div>
 
-          <div className="mt-8">
             <ActivityLogView
               year={year}
               setYear={setYear}
               datasWithReports={datasWithReports}
               isLoading={isLoading}
             />
+
+          <div className="mt-6 mb-6">
+            <SupportBanner />
           </div>
 
           {featSlot && featSlot}

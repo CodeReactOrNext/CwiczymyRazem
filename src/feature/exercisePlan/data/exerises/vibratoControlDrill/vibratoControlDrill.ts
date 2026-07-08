@@ -3,24 +3,23 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const vibratoControlDrillExercise: Exercise = {
   id: "vibrato_control_drill",
   title: "Vibrato Control",
-  description: "Long sustained notes with vibrato on different strings and frets. Practice slow wide vibrato and fast narrow vibrato. Builds expressive control and consistency.",
+  description: "Control the speed, width, and depth of your pitch modulation by sustaining notes and bent pitches across multiple strings.",
+  whyItMatters: "Sustaining clean vibrato requires maintaining uniform oscillation width and speed across different fretboard locations. Practicing vibrato on regular notes, during string changes, and on bent pitches develops the finger strength and forearm rotational control needed for high-level expression and pitch consistency.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Measure 1: Whole notes with vibrato on string 2 fret 8 and string 3 fret 7. Let each note ring and focus on even oscillation.",
-    "Measure 2: Half notes with vibrato moving across strings 2, 3, and 1.",
-    "Measure 3: Quarter notes with vibrato — faster transitions require quicker vibrato onset.",
-    "Measure 4: Vibrato on bent notes — bend up a whole step first, then apply vibrato while holding the bend.",
+    "Sustain each note cleanly before starting a steady, controlled pitch modulation.",
+    "Maintain consistent width and speed throughout the duration of the note.",
+    "Keep the pitch modulation symmetric to ensure perfect intonation."
   ],
   tips: [
-    "Vibrato movement should come from the wrist, not just the fingers.",
-    "Start with slow, wide vibrato and gradually tighten the oscillation.",
-    "Keep the vibrato rhythmic and even — avoid random wobbling.",
-    "When applying vibrato to a bent note, maintain the bend pressure while oscillating.",
+    "Rotate your wrist and forearm to drive the vibrato rather than bending your finger joints.",
+    "Support the vibrating finger with adjacent fingers whenever possible for maximum control.",
+    "Maintain a relaxed thumb position behind the neck to avoid hand strain."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 90,
     recommended: 70,
   },

@@ -2,24 +2,21 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const firstMelodyExercise: Exercise = {
   id: "first_melody",
+  isHiddenFromLibrary: true,
   title: "First Melody — One String",
   description:
-    "Your very first melody: 'Mary Had a Little Lamb' played entirely on the B string using only three fret positions (1, 3, 5). No string changes, no chords — just a real tune from day one.",
+    "Play a simple, expressive melody along a single string to develop horizontal movement.",
+  whyItMatters: "Playing along a single string shifts your perspective from vertical shapes to horizontal intervals. This trains you to hear pitch distances clearly and develops slide and shift mechanics that make your playing sound fluid.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 2.36,
   instructions: [
-    "All notes are on string 2 (B string). You only need three frets: 1 (C), 3 (D), and 5 (E).",
-    "Use only downstrokes for now — pick the string once per note.",
-    "Play slowly: let every note ring fully before moving to the next fret.",
-    "The dash (—) means silence — don't pick, just let the previous note decay.",
-    "Once you can play the whole melody smoothly, add a metronome at 50 BPM.",
+    "Slide smoothly between fret positions, keeping your finger pressed lightly against the string.",
+    "Use index or middle finger to lead the horizontal shifts cleanly."
   ],
   tips: [
-    "Press the string just behind the fret wire, not on it — that's where the clearest tone comes from.",
-    "If a note buzzes, press a little harder or move your fingertip closer to the fret.",
-    "Keep unused fingers hovering near the fretboard — don't let them fly away.",
-    "Hum or sing the melody as you play — it connects your ear to your hands.",
+    "Focus on the rhythmic spacing between shifts to keep the melody flowing.",
+    "Add subtle vibrato to sustained notes to enhance the vocal character."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/Metronome%20Citrus.mp3", sourceBpm: 50 },

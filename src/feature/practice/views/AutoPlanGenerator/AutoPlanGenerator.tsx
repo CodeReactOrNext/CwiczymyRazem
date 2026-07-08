@@ -76,6 +76,7 @@ export const AutoPlanGenerator = ({
     )[0]?.[0] as ExerciseCategory) || "mixed";
 
     const difficultyValues = {
+      beginner: 0,
       easy: 1,
       medium: 2,
       hard: 3,

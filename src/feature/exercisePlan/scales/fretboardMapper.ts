@@ -41,6 +41,31 @@ function getPositionsForNote(
 }
 
 /**
+ * Get every position of a pitch class (0=C … 11=B) within a fret window, across
+ * all six strings. Each result carries its concrete octave (Math.floor(midi/12)-1)
+ * so the note-hunt can light positions and track found octaves. Sorted by pitch.
+ */
+export function getNotePositionsInRange(
+  pitchClass: number,
+  startFret: number,
+  endFret: number
+): (FretPosition & { octave: number })[] {
+  const positions: (FretPosition & { octave: number })[] = [];
+
+  for (let string = 1; string <= 6; string++) {
+    const openNote = STANDARD_TUNING[string - 1];
+    for (let fret = Math.max(0, startFret); fret <= endFret; fret++) {
+      const midiNote = openNote + fret;
+      if (midiNote % 12 === ((pitchClass % 12) + 12) % 12) {
+        positions.push({ string, fret, midiNote, octave: Math.floor(midiNote / 12) - 1 });
+      }
+    }
+  }
+
+  return positions.sort((a, b) => a.midiNote - b.midiNote);
+}
+
+/**
  * Get scale pattern in a specific position
  * Position system: position 1 starts at fret 0, position 2 at fret 2, etc.
  */
@@ -75,7 +100,27 @@ export function getScalePatternForPosition(
   }
 
   // Sort by MIDI pitch (pitch-ascending order)
-  return pattern.sort((a, b) => a.midiNote - b.midiNote);
+  pattern.sort((a, b) => a.midiNote - b.midiNote);
+
+  // A straight 5-fret box can capture the SAME pitch on two adjacent
+  // strings — most often at the G→B transition, whose interval is a major
+  // third (4 semitones) instead of a perfect fourth. The shared pitch then
+  // sits at the top fret of the lower string AND the bottom fret of the
+  // higher string, so after the pitch-sort it appears twice in a row and
+  // the exercise made you play the same note twice. Keep a single fingering
+  // per pitch; prefer the thicker (higher-numbered) string so the run keeps
+  // climbing through the position before crossing to the next string.
+  const deduped: FretPosition[] = [];
+  for (const pos of pattern) {
+    const prev = deduped[deduped.length - 1];
+    if (prev && prev.midiNote === pos.midiNote) {
+      if (pos.string > prev.string) deduped[deduped.length - 1] = pos;
+      continue;
+    }
+    deduped.push(pos);
+  }
+
+  return deduped;
 }
 
 /**

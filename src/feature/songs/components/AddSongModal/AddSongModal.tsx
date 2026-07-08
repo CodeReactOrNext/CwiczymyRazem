@@ -17,13 +17,14 @@ import { getSongs } from "feature/songs/services/getSongs";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
 import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
 import posthog from "posthog-js";
 import { useCallback,useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { SpotifyPlayer } from "../SpotifyPlayer";
 
@@ -55,6 +56,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
+  const dispatch = useAppDispatch();
 
   const searchSongs = useCallback(
     debounce(async (t: string, a: string) => {
@@ -162,6 +164,11 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       setIsLoading(true);
       posthog.capture("song_addition_flow", { action: "set_status", status, song_id: addedSongId });
       await updateSongStatus(userId, addedSongId, title, artist, status, avatar);
+
+      if (status === "wantToLearn") {
+        dispatch(updateQuestProgress({ type: "add_want_to_learn" }));
+      }
+
       toast.success(t("status_updated"));
       onSuccess();
       handleClose();

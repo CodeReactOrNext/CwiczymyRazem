@@ -6,17 +6,50 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { AnimatePresence,motion } from "framer-motion";
+import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { useCallback, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaSpinner } from "react-icons/fa";
+import { getLocalDateKey } from "utils/converter";
 
 import type { DateWithReport } from "./activityLog.types";
 import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import { useActivityLog } from "./hooks/useActivityLog";
 
-const CALENDAR_HEIGHT = 7 * 19;
+const CALENDAR_CELL_SIZE = 19;
+const CALENDAR_HEIGHT = 7 * CALENDAR_CELL_SIZE;
+
+const YearTabButton = ({
+  yearValue,
+  active,
+  onSelect,
+}: {
+  yearValue: number;
+  active: boolean;
+  onSelect: () => void;
+}) => {
+  const { createRipple, ripple } = useRipple();
+  return (
+    <button
+      role='tab'
+      onClick={(e) => {
+        createRipple(e);
+        onSelect();
+      }}
+      className={`relative overflow-hidden rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+        active
+          ? "bg-white/20 text-white"
+          : "text-white/60 hover:bg-white/15 hover:text-white"
+      }`}>
+      {ripple}
+      {yearValue}
+    </button>
+  );
+};
 
 interface ActivityLogViewProps {
   year: number;
@@ -37,6 +70,28 @@ export const ActivityLogView = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [selectedDay, setSelectedDay] = useState<DateWithReport | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // On mobile the calendar overflows horizontally and defaults to the start of
+  // the year. Scroll to today's column once data is ready so the most recent
+  // activity is visible without manual scrolling.
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoading) return;
+    if (typeof window === "undefined" || window.innerWidth >= 1024) return;
+    if (year !== new Date().getFullYear()) return;
+
+    const todayStr = new Date().toDateString();
+    const todayIndex = datasWithReports.findIndex(
+      (d) => d.date.toDateString() === todayStr
+    );
+    if (todayIndex === -1) return;
+
+    const todayCol = Math.floor(todayIndex / 7);
+    const todayX = todayCol * CALENDAR_CELL_SIZE;
+    const target = todayX - container.clientWidth + CALENDAR_CELL_SIZE * 2;
+    container.scrollLeft = Math.max(0, target);
+  }, [datasWithReports, isLoading, year]);
 
   const handleHover = useCallback(
     (item: DateWithReport | null, x: number, y: number) => {
@@ -67,7 +122,7 @@ export const ActivityLogView = ({
   }
 
   return (
-    <Card className='relative w-full p-5 sm:p-6 mb-4'>
+    <Card className='relative w-full p-5 sm:p-6 mb-6'>
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -95,17 +150,12 @@ export const ActivityLogView = ({
 
           <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
             {yearButtons.map((yearValue) => (
-              <button
+              <YearTabButton
                 key={`year-btn-${yearValue}`}
-                role='tab'
-                onClick={() => setYear(yearValue)}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  year === yearValue
-                    ? "bg-white/20 text-white"
-                    : "text-white/60 hover:bg-white/15 hover:text-white"
-                }`}>
-                {yearValue}
-              </button>
+                yearValue={yearValue}
+                active={year === yearValue}
+                onSelect={() => setYear(yearValue)}
+              />
             ))}
           </div>
         </div>
@@ -120,6 +170,7 @@ export const ActivityLogView = ({
           </div>
 
           <div
+            ref={scrollContainerRef}
             className='flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20'
             style={{ height: CALENDAR_HEIGHT + 8 }}>
             {isLoading && datasWithReports.length === 0 ? (
@@ -146,35 +197,6 @@ export const ActivityLogView = ({
           </div>
         </div>
 
-        <div className='mt-5 flex w-full flex-wrap items-center justify-between gap-4'>
-          <div className='flex flex-wrap items-center gap-4'>
-            <div className='flex items-center gap-1.5'>
-              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
-                <div className='absolute left-1/2 top-1/2 h-[4px] w-[4px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white' />
-              </div>
-              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.hasTitle")}</span>
-            </div>
-            <div className='flex items-center gap-1.5'>
-              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
-                <div className='absolute left-1/2 top-1/2 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white' />
-              </div>
-              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.backDate")}</span>
-            </div>
-          </div>
-
-          <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-400'>
-            <span>Less</span>
-            <div className='flex gap-[4px]'>
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#3f3f46]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#A5F3FC]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#67E8F9]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#22D3EE]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#06B6D4]' />
-              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#0891B2]' />
-            </div>
-            <span>More</span>
-          </div>
-        </div>
       </div>
 
       {hoveredItem?.report &&
@@ -201,11 +223,20 @@ export const ActivityLogView = ({
               <DialogTitle className="text-zinc-900">Activity Details</DialogTitle>
             </DialogHeader>
             {selectedDay?.report && (
-              <ExerciseShortInfo
-                date={selectedDay.date}
-                report={selectedDay.report}
-                isModal={true}
-              />
+              <>
+                <ExerciseShortInfo
+                  date={selectedDay.date}
+                  report={selectedDay.report}
+                  isModal={true}
+                />
+                <Link
+                  href={`/practice-log?date=${getLocalDateKey(selectedDay.date)}`}
+                  className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#e8e4db] bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-black/[0.06] hover:text-stone-900"
+                >
+                  Open in Practice Log
+                  <ArrowRight size={14} />
+                </Link>
+              </>
             )}
           </div>
         </DialogContent>

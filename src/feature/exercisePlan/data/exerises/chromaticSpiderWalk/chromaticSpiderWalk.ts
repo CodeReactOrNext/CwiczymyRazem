@@ -3,27 +3,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const chromaticSpiderWalkExercise: Exercise = {
   id: "chromatic_spider_walk",
   title: "Chromatic Spider Drill",
-  description: "Build finger independence with chromatic permutation patterns.",
+  description: "Improve finger synchronization, independent muscle control, and clean cross-string coordination.",
+  whyItMatters: "The spider walk is a fundamental warm-up that isolates each finger of the fretting hand. By coordinating finger movement with alternate picking, you build rhythmic accuracy, reduce excess tension, and lay a solid foundation for advanced speed and endurance.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Play the pattern 1-2-3-4 (index-middle-ring-pinky) chromatically across all strings.",
-    "Each finger gets one fret: 1st finger on fret 5, 2nd on fret 6, 3rd on fret 7, 4th on fret 8.",
-    "Keep all fingers hovering close to the strings - don't lift them high.",
-    "After completing all 6 strings, shift position and play the reverse pattern 4-3-2-1.",
-    "Practice the permutation 1-3-2-4 to challenge weaker finger coordination.",
-    "Maintain consistent rhythm and equal volume across all fingers."
+    "Coordinate each pick stroke with precise, synchronized fretting finger contact.",
+    "Maintain strict alternate picking, keeping the motion small and close to the strings."
   ],
   tips: [
-    "Keep your thumb positioned in the middle of the back of the neck for balance.",
-    "The pinky (4th finger) will be the weakest - give it extra attention.",
-    "Don't tense up - relaxation is key to building endurance.",
-    "This is the foundation exercise for all finger independence work.",
-    "Start slow enough that every note rings clearly with no buzzing.",
-    "Used by virtuosos like John Petrucci and Paul Gilbert for daily warm-ups."
+    "Keep your fretting fingers hovering close to the fretboard to minimize travel time.",
+    "Ensure each note is fully muted the instant the next finger makes contact."
   ],
-  metronomeSpeed: { min: 60, max: 140, recommended: 90 },
+  metronomeSpeed: { min: 40, max: 140, recommended: 90 },
   relatedSkills: ["finger_independence"],
   tablature: [
     {

@@ -195,7 +195,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-emerald-400" />
-              <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
+              <h4 className="text-sm font-semibold text-emerald-400 capitalize tracking-wide">Strengths</h4>
             </div>
             <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
           </div>
@@ -204,7 +204,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
               <TriangleAlert size={15} className="text-yellow-400" />
-              <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
+              <h4 className="text-sm font-semibold text-yellow-400 capitalize tracking-wide">To Improve</h4>
             </div>
             <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
           </div>
@@ -212,7 +212,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
       </div>
 
       {rating.nextSessionTip && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-zinc-700/50 bg-zinc-800/40 px-4 py-3">
+        <div className="flex items-start gap-2.5 rounded-lg border-none bg-zinc-800/40 px-4 py-3">
           <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
           <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
         </div>
@@ -311,8 +311,8 @@ function SessionRatingCard({ log }: SessionRatingCardProps) {
 
   return (
     <div className={cn(
-      "mt-2 rounded-2xl border p-5 space-y-5 transition-all duration-500",
-      "border-zinc-800 bg-zinc-900"
+      "mt-2 rounded-lg border-none p-5 space-y-5 transition-all duration-500",
+      "bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}
       {error && (
@@ -419,8 +419,8 @@ export function DailyAssessmentCard({
 
   return (
     <div className={cn(
-      "rounded-2xl border overflow-hidden transition-all duration-500",
-      "border-zinc-800 bg-zinc-900"
+      "rounded-lg border-none overflow-hidden transition-all duration-500",
+      "bg-zinc-900"
     )}>
 
       {isLoading && <div className="p-5"><RatingSkeleton /></div>}
@@ -451,7 +451,7 @@ export function DailyAssessmentCard({
               <div className="space-y-3">
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 size={15} className="text-emerald-400" />
-                  <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
+                  <h4 className="text-sm font-semibold text-emerald-400 capitalize tracking-wide">Strengths</h4>
                 </div>
                 <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
               </div>
@@ -460,7 +460,7 @@ export function DailyAssessmentCard({
               <div className="space-y-3">
                 <div className="flex items-center gap-1.5">
                   <TriangleAlert size={15} className="text-yellow-400" />
-                  <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
+                  <h4 className="text-sm font-semibold text-yellow-400 capitalize tracking-wide">To Improve</h4>
                 </div>
                 <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
               </div>
@@ -468,7 +468,7 @@ export function DailyAssessmentCard({
           </div>
 
           {rating.nextSessionTip && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-zinc-700/50 bg-zinc-800/40 px-4 py-3">
+            <div className="flex items-start gap-2.5 rounded-lg border-none bg-zinc-800/40 px-4 py-3">
               <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
               <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
             </div>
@@ -538,8 +538,8 @@ export function PeriodRatingCard({
 
   return (
     <div className={cn(
-      "rounded-2xl border p-5 space-y-5 transition-all duration-500",
-      "border-zinc-800 bg-zinc-900"
+      "rounded-lg border-none p-5 space-y-5 transition-all duration-500",
+      "bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}
       {error && (

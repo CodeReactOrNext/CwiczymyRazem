@@ -26,27 +26,17 @@ export const SetupStep = React.memo(function SetupStep({
   onGrant, onNext, onBack, onCancel,
 }: SetupStepProps) {
   const [volume, setVolume] = useState(0);
-  const [readyProgress, setReadyProgress] = useState(0);
   const rafRef = useRef(0);
 
   useEffect(() => {
     if (!isListening) {
       setVolume(0);
-      setReadyProgress(0);
       return;
     }
 
     const tick = () => {
       const currentVol = audioRefs.volumeRef.current;
       setVolume(currentVol);
-
-      const isGood = currentVol * 300 >= 8;
-      setReadyProgress(prev => {
-        if (isGood) {
-          return Math.min(100, prev + 0.33);
-        }
-        return prev;
-      });
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -58,7 +48,8 @@ export const SetupStep = React.memo(function SetupStep({
   const fillPct    = Math.min(100, volume * 300);
   const tooQuiet   = fillPct < 8;
   const signalGood = isListening && !tooQuiet;
-  const isReady    = readyProgress >= 100;
+
+
 
   return (
     <div className="flex h-full flex-col px-5 py-5 text-white">
@@ -81,10 +72,7 @@ export const SetupStep = React.memo(function SetupStep({
 
       <div className="flex-1 flex flex-col gap-3 w-full overflow-y-auto">
       
-        <div className="w-full h-28 shrink-0 rounded-xl overflow-hidden mb-2 relative border border-white/10 shadow-xl">
-          <img src="/images/calibration/setup.png" alt="Setup" className="w-full h-full object-cover object-center opacity-90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
-        </div>
+
 
         {/* Source-specific tips — always visible */}
         {inputSource === "microphone" ? <MicrophoneTips /> : <InterfaceTips />}
@@ -104,13 +92,13 @@ export const SetupStep = React.memo(function SetupStep({
         {/* Signal + gain — shown after mic grant */}
         {isListening && (
           <>
-            <div className="rounded-xl bg-zinc-900/70 border border-white/5 p-4 space-y-4">
+            <div className="rounded-lg bg-zinc-900/70 p-4 space-y-4">
               {/* Signal meter */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FaMicrophone className={cn("h-3 w-3 transition-colors", signalGood ? "text-emerald-400 animate-pulse" : "text-zinc-500")} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Signal Level</span>
+                    <span className="text-[10px] font-bold tracking-widest text-zinc-500">Signal Level</span>
                   </div>
                   <span className={cn("text-[10px] font-bold transition-colors",
                     tooQuiet ? "text-amber-400" : "text-emerald-400"
@@ -118,7 +106,7 @@ export const SetupStep = React.memo(function SetupStep({
                     {tooQuiet ? "Too quiet — strum a string" : "Good level ✓"}
                   </span>
                 </div>
-                <div className="relative h-5 rounded-lg bg-zinc-800 overflow-hidden border border-white/5">
+                <div className="relative h-5 rounded-lg bg-zinc-800 overflow-hidden">
                   <div className="absolute inset-y-0 left-[8%] w-px bg-white/10" />
                   <div
                     className={cn(
@@ -133,7 +121,7 @@ export const SetupStep = React.memo(function SetupStep({
               {/* Gain slider — manual only */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Input Sensitivity</span>
+                  <span className="text-[10px] font-bold tracking-widest text-zinc-500">Input Sensitivity</span>
                   <span className="text-xs font-mono text-zinc-400">{inputGain.toFixed(1)}×</span>
                 </div>
                 <Slider
@@ -145,54 +133,13 @@ export const SetupStep = React.memo(function SetupStep({
               </div>
             </div>
 
-            {/* Preparation Progress Bar */}
-            <div className="px-1 pt-4 pb-2 space-y-3">
-              <div className="flex justify-between items-end">
-                <div className="space-y-1">
-                  <span className={cn(
-                    "text-[10px] font-bold uppercase tracking-widest transition-colors duration-300 block",
-                    isReady ? "text-cyan-400" : "text-zinc-500"
-                  )}>
-                    {isReady ? "System Ready" : "Input Detection"}
-                  </span>
-                  <p className={cn(
-                    "text-xs font-bold transition-all duration-500",
-                    isReady ? "text-white" : "text-zinc-400"
-                  )}>
-                    {isReady ? "Ready to calibrate!" : "Keep strumming to prepare..."}
-                  </p>
-                </div>
-                <span className={cn(
-                  "text-xs font-mono transition-colors",
-                  isReady ? "text-cyan-400" : "text-zinc-600"
-                )}>{Math.round(readyProgress)}%</span>
-              </div>
-              <div className="relative h-3 rounded-full bg-zinc-950 overflow-hidden border border-white/5 shadow-inner">
-                <div
-                  className={cn(
-                    "h-full transition-all duration-150 ease-out relative",
-                    isReady ? "bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.8)]" : "bg-cyan-600/60"
-                  )}
-                  style={{ width: `${readyProgress}%` }}
-                >
-                  {readyProgress > 0 && readyProgress < 100 && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
-                  )}
-                </div>
-              </div>
-            </div>
+
 
             <Button
               onClick={onNext}
-              disabled={!isReady}
-              className={cn(
-                "w-full font-bold h-12 transition-all mt-2",
-                isReady
-                  ? "bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] scale-[1.02]"
-                  : "bg-zinc-800 text-zinc-500 grayscale opacity-50"
-              )}
+              className="w-full h-12 mt-4"
             >
-              Start Calibrating <FaChevronRight className="ml-1.5 h-3 w-3" />
+              Tune Guitar <FaChevronRight className="ml-1.5 h-3 w-3" />
             </Button>
           </>
         )}
@@ -208,8 +155,8 @@ export const SetupStep = React.memo(function SetupStep({
 function MicrophoneTips() {
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-4">
-        <div className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+      <div className="rounded-lg bg-amber-500/10 p-4 flex items-start gap-4">
+        <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
           <FaHeadphones className="text-lg text-amber-400" />
         </div>
         <div>
@@ -220,8 +167,8 @@ function MicrophoneTips() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-4">
-        <div className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+      <div className="rounded-lg bg-amber-500/10 p-4 flex items-start gap-4">
+        <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
           <FaVolumeOff className="text-lg text-amber-400" />
         </div>
         <div>
@@ -237,8 +184,8 @@ function MicrophoneTips() {
 
 function InterfaceTips() {
   return (
-    <div className="rounded-xl border border-white/5 bg-zinc-900/70 p-4 flex items-start gap-4">
-      <div className="shrink-0 w-10 h-10 rounded-xl bg-zinc-800 border border-white/8 flex items-center justify-center">
+    <div className="rounded-lg bg-zinc-900/70 p-4 flex items-start gap-4">
+      <div className="shrink-0 w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
         <FaPlug className="text-lg text-zinc-400" />
       </div>
       <div>

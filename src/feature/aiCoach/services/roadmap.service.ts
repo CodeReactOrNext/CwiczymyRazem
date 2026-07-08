@@ -34,6 +34,20 @@ export const firebaseGetUserRoadmaps = async (userId: string): Promise<Roadmap[]
   );
 };
 
+export const firebaseGetAllRoadmaps = async (): Promise<Roadmap[]> => {
+  const roadmapsRef = collection(db, ROADMAPS_COLLECTION);
+  const querySnapshot = await getDocs(roadmapsRef);
+
+  const roadmaps: Roadmap[] = [];
+  querySnapshot.forEach((doc) => {
+    roadmaps.push(doc.data() as Roadmap);
+  });
+
+  return roadmaps.sort((a, b) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+};
+
 export const firebaseUpdateRoadmap = async (roadmapId: string, data: Partial<Roadmap>) => {
   const roadmapRef = doc(db, ROADMAPS_COLLECTION, roadmapId);
   await updateDoc(roadmapRef, {

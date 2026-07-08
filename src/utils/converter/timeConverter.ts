@@ -11,7 +11,7 @@ export const convertMsToHM = (milliseconds: number) => {
 };
 
 export const convertMsToHMObject = (milliseconds: number) => {
-  const totalMinutes = Math.round(milliseconds / 60000);
+  const totalMinutes = Math.floor(milliseconds / 60000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 

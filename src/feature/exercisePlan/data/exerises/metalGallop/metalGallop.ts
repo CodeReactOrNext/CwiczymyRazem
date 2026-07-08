@@ -4,23 +4,20 @@ export const metalGallopExercise: Exercise = {
   id: "metal_gallop",
   title: "Iron Gallop — Thrash Rhythm Drill",
   description:
-    "Pure gallop rhythm (16th–16th–8th) on the low E string with palm mute. Each measure is a looping single-note pattern with fret shifts — E, A, G. Clean, mechanical picking with no chords. Think Metallica 'Battery', Iron Maiden 'The Trooper'.",
+    "Master precise, high-speed rhythmic galloping patterns.",
+  whyItMatters: "The gallop (one eighth note followed by two sixteenth notes) is the rhythmic heartbeat of heavy metal and hard rock. Achieving a tight, aggressive gallop requires strict pick stroke direction and palm-muting discipline.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 6,
   instructions: [
-    "The gallop cell = [16th PM] [16th PM] [8th PM]. Three strokes, one quarter note. Repeated endlessly.",
-    "Measure 1: Pure E (fret 0), 4 identical gallop cells. Pure hand synchronization — nothing else.",
-    "Measure 2: E × 2 beats, then A (fret 5) × 1, G (fret 3) × 1. Your fretting hand shifts position without interrupting the picking rhythm.",
-    "Loop: play M1→M2→M1→M2→... non-stop. Two measures, over and over.",
+    "Maintain a strict Down-Down-Up picking pattern for each gallop sequence.",
+    "Rest the side of your picking-hand palm on the strings near the bridge for a tight mute."
   ],
   tips: [
-    "Your picking arm moves like a pendulum on 16th notes NON-STOP — even when the two 16th notes are muted silence. Never stop the arm.",
-    "Palm mute: the side of your picking hand rests on the bridge. Too far forward = no muting. Too close to the neck = dead tone. Find the sweet spot.",
-    "Fret shifts (E→A, G) must be invisible to the rhythm. Practice each shift in isolation × 8 before combining them.",
-    "Record yourself. The gallop should sound like a galloping horse — even 'dum-dum-DAH dum-dum-DAH', not chaotic strumming.",
+    "Focus on locking the gallop into the metronome click—avoid letting the notes rush.",
+    "Keep your pick angled slightly to slice through the strings with minimal resistance."
   ],
-  metronomeSpeed: { min: 80, max: 180, recommended: 120 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 120 },
   relatedSkills: ["rhythm", "articulation"],
   tablature: [
     // M1: Czyste E (fret 0) — 4 identyczne komórki gallopu, tylko str6

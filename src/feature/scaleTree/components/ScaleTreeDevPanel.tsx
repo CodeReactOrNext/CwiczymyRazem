@@ -95,7 +95,7 @@ export function ScaleTreeDevPanel({
         className="absolute right-4 top-[72px] z-20 w-72 rounded-xl border border-white/10 bg-black/80 backdrop-blur p-3 space-y-3 select-none"
       >
         {/* Header */}
-        <div className="text-[11px] font-bold uppercase tracking-widest text-cyan-400/80 px-1">
+        <div className="text-[11px] font-bold capitalize tracking-widest text-cyan-400/80 px-1">
           {selectedNodes.length === 1
             ? singleNode?.id || "1 selected"
             : `${selectedNodes.length} selected`}
@@ -103,7 +103,7 @@ export function ScaleTreeDevPanel({
 
         {/* Multi-selection section */}
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest px-1">
+          <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest px-1">
             Alignment
           </p>
           <div className="grid grid-cols-2 gap-1.5">
@@ -125,7 +125,7 @@ export function ScaleTreeDevPanel({
         {/* Distribution & Layout section (multi-selection) */}
         {selectedNodes.length >= 2 && (
           <div className="space-y-2 border-t border-white/5 pt-2">
-            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest px-1">
+            <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest px-1">
               Distribute / Layout
             </p>
             <div className="grid grid-cols-2 gap-1.5">
@@ -175,7 +175,7 @@ export function ScaleTreeDevPanel({
         {/* Children layout section */}
         {hasChildren && (
           <div className="space-y-2 border-t border-white/5 pt-2">
-            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest px-1">
+            <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest px-1">
               Arrange Children
             </p>
             <div className="grid grid-cols-2 gap-1.5">
@@ -202,7 +202,7 @@ export function ScaleTreeDevPanel({
 
         {/* Preset Layouts section */}
         <div className="space-y-2 border-t border-white/5 pt-2">
-          <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest px-1">
+          <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest px-1">
             Load Preset
           </p>
           <div className="grid grid-cols-2 gap-1.5">
@@ -233,7 +233,7 @@ export function ScaleTreeDevPanel({
         {/* Pattern section */}
         {singleNode && (
           <div className="space-y-2 border-t border-white/5 pt-2">
-            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest px-1">
+            <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest px-1">
               Pattern
             </p>
             <div className="grid grid-cols-2 gap-1.5">

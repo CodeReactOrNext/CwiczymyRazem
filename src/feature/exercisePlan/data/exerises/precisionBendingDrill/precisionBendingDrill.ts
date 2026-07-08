@@ -2,24 +2,21 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const precisionBendingDrillExercise: Exercise = {
   id: "precision_bending_drill",
-  title: "First Bend – Whole Step",
-  description:
-    "Your first whole-step bend. String 2 (B), fret 7 — push up to match fret 9. Every bend is preceded by the target pitch so your ear always has a reference.",
+  title: "Precision Bend & Release",
+  description: "Develop precise whole-step bending and control. Follow the reference notes to train your ears, and master slow, controlled releases back to the starting pitch.",
+  whyItMatters: "This exercise gives you total control over string tension during sustained bends and releases. You will learn to hold bent notes perfectly in tune and guide them back down smoothly without any abrupt noise.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 3,
   instructions: [
-    "All bends are on string 2 (B string), fret 7. The target pitch is fret 9 (same string) — play it first, then bend up to match.",
-    "Bars 1–2: Pick fret 9 (reference), then bend from fret 7 up a whole step. Repeat 4 times per bar. Listen — they must sound identical.",
-    "Bars 3–4: Bend and release — push up to fret 9, hold for a beat, then slowly release back to fret 7. No reference note this time, trust your ear.",
-    "Use ring finger to bend, supported by middle and index behind it. Three fingers pushing together.",
-    "Push the string toward the ceiling (upward) — small, controlled motion from the wrist, not just the fingers.",
+    "Bend the string smoothly to reach the exact target pitch with perfect intonation.",
+    "Maintain steady finger pressure and hand stability at the peak of the bend.",
+    "Listen carefully to match the pitch perfectly with the underlying harmony."
   ],
   tips: [
-    "Play the target note (fret 9) before every bend — your ear needs a reference. Don't skip this step.",
-    "Overshooting is worse than undershooting — come up slowly and stop when it matches.",
-    "Keep your thumb anchored over the top of the neck for leverage. Without it you'll run out of strength.",
-    "The release must be controlled — don't just drop the string, guide it back.",
+    "Support the bending finger with adjacent fingers on the same string for maximum strength.",
+    "Rotate your wrist and forearm upward to execute the bend rather than pushing with fingers alone.",
+    "Keep idle strings muted with your picking hand palm to prevent unwanted noise."
   ],
   metronomeSpeed: {
     min: 50,

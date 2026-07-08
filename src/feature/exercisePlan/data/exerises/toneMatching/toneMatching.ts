@@ -3,11 +3,12 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const toneMatchingExercise: Exercise = {
   id: "tone_matching_challenge",
   title: "Tone Matching Challenge",
-  description: "Select any song and copy the sound of a selected fragment. This exercise focuses on recreating the timbre and nuance of a specific guitar part.",
+  description: "Listen to reference tones and adjust your attack and pickup selection to match them.",
+  whyItMatters: "Matching reference tones trains your ear to recognize subtle changes in dynamics, timbre, and equalization, helping you dial in the perfect sound on any gear.",
   difficulty: "medium",
   category: "hearing",
   timeInMinutes: 15,
-  instructions: [
+   instructions: [
     "Choose any song you like.",
     "Select a specific fragment (riff, solo, or chord progression) to focus on.",
     "Listen closely to the guitar tone in that fragment. Analyze the level of gain, EQ balance, pickup selection, and effects.",

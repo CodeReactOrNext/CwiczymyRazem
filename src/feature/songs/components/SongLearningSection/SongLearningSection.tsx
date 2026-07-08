@@ -1,40 +1,20 @@
-import type {
-  DragEndEvent,
-  DragStartEvent} from "@dnd-kit/core";
-import {
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Button } from "assets/components/ui/button";
+
+
+
 import { Input } from "assets/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
-import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
+  ListMusic,
   Search,
-  X,
-  Library,
-  ChevronRight,
 } from "lucide-react";
-import { Music, Plus } from "lucide-react";
+import { Music } from "lucide-react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import { useEffect, useMemo,useState } from "react";
@@ -61,8 +41,9 @@ interface SongLearningSectionProps {
   isPremium?: boolean;
   onPracticeWithGp?: (song: Song) => void;
   onOpenDetails?: (song: Song) => void;
-  onExploreLibrary?: () => void;
+  onExploreLibrary?: (view: 'board' | 'explore' | 'playlists') => void;
   isLibraryActive?: boolean;
+  isPlaylistsActive?: boolean;
   activeId?: string | null;
   disableDnd?: boolean;
   isMobile?: boolean;
@@ -78,7 +59,7 @@ const FilterBar = ({
   t: any;
 }) => {
   return (
-    <div className="mb-6 px-4 shrink-0">
+    <div className="mb-7 px-3 shrink-0">
       <div className="relative group/search">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <Search className="h-3.5 w-3.5 text-zinc-600 group-focus-within/search:text-cyan-500 transition-colors" />
@@ -87,7 +68,7 @@ const FilterBar = ({
           placeholder="Search songs..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-9 w-full border-white/5 bg-zinc-950/40 pl-9 text-[12px] text-white placeholder:text-zinc-600 transition-all focus:border-cyan-500/30 focus:bg-zinc-950/60 focus:ring-4 focus:ring-cyan-500/5 rounded-lg"
+          className="h-9 w-full border-none bg-zinc-950/40 pl-9 text-[12px] text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-950/60 focus:ring-4 focus:ring-cyan-500/5 rounded-lg"
         />
       </div>
     </div>
@@ -127,6 +108,7 @@ export const SongLearningSection = ({
   onOpenDetails,
   onExploreLibrary,
   isLibraryActive,
+  isPlaylistsActive,
   activeId,
   disableDnd = false,
   isMobile = false,
@@ -198,58 +180,58 @@ export const SongLearningSection = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="p-3 space-y-1">
-        <button
-          onClick={onExploreLibrary}
-          className={cn(
-            "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 border",
-            isLibraryActive 
-              ? "bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.1)] border-cyan-500/30" 
-              : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border-white/5"
-          )}
-        >
-          <div className={cn(
-            "h-8 w-8 rounded-lg flex items-center justify-center transition-colors",
-            isLibraryActive ? "bg-cyan-500/20" : "bg-zinc-800/50"
-          )}>
-            <Search size={16} />
-          </div>
-          <div className="flex-1 flex items-center justify-between">
-            <div className="flex flex-col items-start leading-none">
-              <span className="text-sm font-bold">Explore Library</span>
-              <span className="text-[10px] opacity-60 mt-1">Discover new songs</span>
-            </div>
-            <ChevronRight size={14} className={cn(
-              "transition-all duration-300",
-              isLibraryActive ? "translate-x-0.5 opacity-100 text-cyan-400" : "opacity-20 text-zinc-500"
-            )} />
-          </div>
-        </button>
+      <div className="hidden px-3 pb-3 xl:block">
+        <div className="flex p-1 rounded-xl bg-zinc-900/50">
+          <button
+            onClick={() => onExploreLibrary?.('board')}
+            className={cn(
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
+              !isLibraryActive && !isPlaylistsActive
+                ? "bg-zinc-800 text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Ripple />
+            <Music size={14} className={!isLibraryActive && !isPlaylistsActive ? "text-white" : ""} />
+            Board
+          </button>
+          <button
+            onClick={() => onExploreLibrary?.('explore')}
+            className={cn(
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
+              isLibraryActive
+                ? "bg-zinc-800 text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Ripple />
+            <Search size={14} className={isLibraryActive ? "text-white" : ""} />
+            Library
+          </button>
+          <button
+            onClick={() => onExploreLibrary?.('playlists')}
+            className={cn(
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
+              isPlaylistsActive
+                ? "bg-zinc-800 text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Ripple />
+            <ListMusic size={14} className={isPlaylistsActive ? "text-white" : ""} />
+            Playlists
+          </button>
+        </div>
       </div>
 
-      <div className="px-5 py-4">
-         <h2 className="text-xs font-black text-zinc-600 uppercase tracking-[0.2em]">Your collection</h2>
+      <div className="px-3 pt-2 pb-3">
+         <h2 className="text-xs font-bold text-zinc-400">Your collection</h2>
       </div>
       <FilterBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} t={t} />
 
 
 
-      <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth">
-        <SongStatusCard
-          id="wantToLearn"
-          title={t("want_to_learn", "Want to Learn") as string}
-          songs={filteredSongs.wantToLearn}
-          onStatusChange={handleStatusChange}
-          progressMap={progressMap}
-          isPremium={isPremium}
-          onPracticeWithGp={onPracticeWithGp}
-          onOpenDetails={onOpenDetails}
-          activeOverContainer={activeOverContainer}
-          isCollapsedInitially={false}
-          disableDnd={disableDnd}
-          isMobile={isMobile}
-          onSongRemove={handleSongRemoval}
-        />
+      <div className="flex-1 overflow-y-auto pb-10 space-y-4 overscroll-contain scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-700/80">
         <SongStatusCard
           id="learning"
           title={t("learning", "In Progress") as string}
@@ -264,6 +246,23 @@ export const SongLearningSection = ({
           isCollapsedInitially={false}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          activeId={activeId}
+        />
+        <SongStatusCard
+          id="wantToLearn"
+          title={t("want_to_learn", "Want to Learn") as string}
+          songs={filteredSongs.wantToLearn}
+          onStatusChange={handleStatusChange}
+          progressMap={progressMap}
+          isPremium={isPremium}
+          onPracticeWithGp={onPracticeWithGp}
+          onOpenDetails={onOpenDetails}
+          activeOverContainer={activeOverContainer}
+          isCollapsedInitially={false}
+          disableDnd={disableDnd}
+          isMobile={isMobile}
+          onSongRemove={handleSongRemoval}
+          activeId={activeId}
         />
         <SongStatusCard
           id="learned"
@@ -279,6 +278,7 @@ export const SongLearningSection = ({
           isCollapsedInitially={true}
           disableDnd={disableDnd}
           isMobile={isMobile}
+          activeId={activeId}
         />
       </div>
 

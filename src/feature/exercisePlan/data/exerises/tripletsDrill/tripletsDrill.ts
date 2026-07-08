@@ -56,24 +56,20 @@ const accentBar = (): TablatureMeasure => ({
 export const tripletsDrillExercise: Exercise = {
   id: "rhythm_triole",
   title: "Triplets Drill",
-  description:
-    "Three notes per beat on the G string — C, D, E ascending and descending. Feel the even 3-against-1 pulse while playing a real melodic shape.",
+  description: "Play three even notes per beat on a single string to master the feel and timing of triplet subdivisions.",
+  whyItMatters: "This exercise programs the feel of three-note subdivisions (triplets) directly into your internal rhythm. It develops an even picking pulse, prevents rushing the third note, and establishes the essential hand coordination needed for odd-numbered divisions.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 1.520,
   instructions: [
-    "All notes are on string 3 (G string): fret 5 = C, fret 7 = D, fret 9 = E. Use one finger per fret (index–ring–pinky).",
-    "Bar 1: ascending C→D→E, repeated 4 times. Use only downstrokes. Count 'trip-a-let' — one syllable per note.",
-    "Bar 2: descending E→D→C, repeated 4 times. Same downstroke-only picking.",
-    "Bar 3: ascending then descending alternating per beat — asc, desc, asc, desc. Switch to ↓↑↓ per group.",
-    "Bar 4: ascending again with ↓↑↓. Accent the first note of every group — hit it slightly harder.",
-    "Start at 50 BPM. Tap your foot on every beat — 3 picks per foot tap.",
+    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
+    "Audit your dynamic consistency and attack angle using a clean tone.",
+    "Transition between positions fluidly without disrupting the rhythmic grid."
   ],
   tips: [
-    "If the syllables feel uneven, the notes are uneven.",
-    "The most common mistake: rushing the third note (E on fret 9). It must land exactly when the next foot tap arrives.",
-    "Keep your fretting fingers close to the strings — no more than 1 cm above. Flying fingers break the flow.",
-    "Triplets feel different from 8th notes — the upstroke now falls on note 2, not note 3.",
+    "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",
+    "Ensure notes do not bleed together during chord transitions unless explicitly sustained.",
+    "Maintain an upright, relaxed posture to prevent muscle fatigue."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 45 },
   examBacking: { url: "/static/sounds/exercise/triplets_drill_backing_track.mp3", sourceBpm: 50 },

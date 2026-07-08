@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { cn } from 'assets/lib/utils';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
 import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
 import { guitarSkills } from 'feature/skills/data/guitarSkills';
@@ -15,16 +14,14 @@ import { Activity, CheckCircle2, Clock, Lightbulb, Play } from 'lucide-react';
 
 interface ExercisePreviewDialogProps {
   exercise: Exercise | null;
-  isSelected?: boolean;
   onClose: () => void;
-  onToggleExercise?: (exercise: Exercise) => void;
+  onStart?: () => void;
 }
 
 export function ExercisePreviewDialog({
   exercise,
-  isSelected,
   onClose,
-  onToggleExercise,
+  onStart,
 }: ExercisePreviewDialogProps) {
   const { t } = useTranslation(['common', 'exercises']);
 
@@ -57,7 +54,7 @@ export function ExercisePreviewDialog({
             <div className="hidden sm:flex flex-wrap items-center gap-2 mt-5">
               <Badge variant="outline" className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-zinc-900/80 border-white/10 text-white flex items-center gap-1.5">
                 <Clock className="w-3 h-3 text-cyan-400" />
-                {exercise.timeInMinutes} min
+                {exercise.timeInMinutes < 1 ? `${Math.round(exercise.timeInMinutes * 60)}s` : `${exercise.timeInMinutes} min`}
               </Badge>
               
               <Badge variant="outline" className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
@@ -173,22 +170,17 @@ export function ExercisePreviewDialog({
         {/* Action Footer */}
         <div className="flex items-center justify-end p-5 border-t border-white/5 bg-zinc-950/40 gap-3 mt-auto shrink-0 pb-6 sm:pb-5">
            <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[11px] rounded-[8px]">
-             Cancel
+             Close
            </Button>
-           <Button 
-             onClick={() => {
-                if(onToggleExercise) onToggleExercise(exercise);
-                onClose();
-             }}
-             className={cn(
-               "px-8 rounded-[8px] font-black uppercase tracking-widest text-[11px] transition-all",
-               isSelected 
-                 ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 shadow-none hover:border-red-500/50"
-                 : "bg-white text-black hover:bg-zinc-200 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-[1.02]"
-             )}
-           >
-             {isSelected ? "Remove from Plan" : "Add to Plan"}
-           </Button>
+           {onStart && (
+             <Button
+               onClick={onStart}
+               className="bg-zinc-100 hover:bg-white text-zinc-950 font-bold uppercase tracking-widest text-[11px] rounded-[8px] gap-1.5"
+             >
+               <Play className="w-3.5 h-3.5 fill-current" />
+               Start
+             </Button>
+           )}
         </div>
         </div>
       </DialogContent>

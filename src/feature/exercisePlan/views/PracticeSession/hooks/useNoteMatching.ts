@@ -1,6 +1,6 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useEffect, useMemo, useRef } from "react";
-import { computeChromagram, freqToPitchClass, getCentsDistance, getFrequencyFromTab } from "utils/audio/noteUtils";
+import { computeChromagram, freqToPitchClass, getCentsDistance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { getFeedbackForCombo } from "./noteMatchingFeedback";
@@ -127,7 +127,7 @@ export function useNoteMatching({
       const beatsPerSec      = effectiveBpm / 60;
       const beatDurationMs   = 60000 / effectiveBpm;
       const onsetRecencyMs   = Math.min(800, Math.max(200, beatDurationMs * 0.8));
-      const windowMs         = Math.min(500, Math.max(150, beatDurationMs * 0.35));
+      const windowMs         = Math.min(420, Math.max(130, beatDurationMs * 0.30));
       const windowBeats      = (windowMs / 1000) * beatsPerSec;
       const earlyWindowBeats = (Math.max(16, Math.min(50, beatDurationMs * 0.05)) / 1000) * beatsPerSec;
 
@@ -168,22 +168,30 @@ export function useNoteMatching({
         notes.forEach(({ note, noteKey }) => {
           if (processedNotesRef.current.has(noteKey) && !hitNotesRef.current[noteKey]) return;
 
+          // Already hit — nothing left to decide for this note until the loop wraps.
+          // Bailing out here skips the per-frame pitch/chroma re-checks (the chord
+          // path costs a full analyser FFT via computeChromagram) and stops
+          // re-flagging a React flush every frame while a hit note rings in window.
+          if (hitNotesRef.current[noteKey]) return;
+
           const requiresOnset = !note.isHammerOn && !note.isPullOff;
-          const alreadyHit    = !!hitNotesRef.current[noteKey];
 
           if (isWithinWindow) {
-            if (currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset || alreadyHit)) {
+            if (currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset)) {
               let isHit = false;
-              let targetFreqToLog = 0;
               if (note.isDead) {
                 isHit = hasRecentTick || hasRecentOnset;
               } else {
-                const targetFret     = (note.isBend || note.isPreBend) && note.bendSemitones ? note.fret + note.bendSemitones : note.fret;
-                const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
+                const bendOffset     = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
+                // Prefer the note's real MIDI pitch (carries the track's actual tuning:
+                // Drop C/D, 7-string, capo). Falls back to standard-tuning fret math for
+                // regular exercises, where midiNote is undefined.
+                const baseTargetFreq = typeof note.midiNote === "number"
+                  ? midiToFrequency(note.midiNote + bendOffset)
+                  : getFrequencyFromTab(note.string, note.fret + bendOffset);
                 const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
-                targetFreqToLog = targetFreq;
                 if (beat.notes.length > 1) {
-                  const chroma = (requiresOnset && !alreadyHit) ? audioRefs.onsetChromaRef.current : getChromagram();
+                  const chroma = requiresOnset ? audioRefs.onsetChromaRef.current : getChromagram();
                   if (chroma) isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
                 } else {
                   // Thicker strings (like E6) often drift sharp on attack and are harder to tune perfectly.
@@ -200,25 +208,26 @@ export function useNoteMatching({
               }
 
               if (isHit) {
-                if (!processedNotesRef.current.has(noteKey)) {
-                  processedNotesRef.current.add(noteKey);
+                // First (and only) grade of this note — the early return above
+                // guarantees it was neither processed nor hit before.
+                processedNotesRef.current.add(noteKey);
 
-                  s.hits++;
-                  consecutiveMissesRef.current = 0;
-                  const newCombo      = gs.combo + 1;
-                  if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
-                  const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                  if (newMultiplier > gs.multiplier) { gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++; }
-                  else { const tier = getFeedbackForCombo(newCombo); if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; } }
-                  gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
-                  gs.combo  = newCombo;
-                  gs.multiplier = newMultiplier;
-                }
+                s.hits++;
+                consecutiveMissesRef.current = 0;
+                const newCombo      = gs.combo + 1;
+                if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
+                const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+                if (newMultiplier > gs.multiplier) { gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++; }
+                else { const tier = getFeedbackForCombo(newCombo); if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; } }
+                gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
+                gs.combo  = newCombo;
+                gs.multiplier = newMultiplier;
+
                 hitNotesRef.current[noteKey] = loopedBeatsElapsed;
                 needsFlushRef.current = true;
               }
             }
-          } else if (isPassed && !hitNotesRef.current[noteKey]) {
+          } else if (isPassed) {
 
             processedNotesRef.current.add(noteKey);
             missedNotesRef.current[noteKey] = true;

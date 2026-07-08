@@ -95,9 +95,15 @@ export function ChordSelectionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] bg-zinc-950 border-white/10 shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-black italic tracking-tighter text-white uppercase">
+      {/* z-index must beat the mobile session modal (z-[9999999]) or the setup
+          dialog is invisible on phones. Flex column + capped height keeps the
+          header/footer on screen (middle scrolls) even on short landscape phones. */}
+      <DialogContent
+        overlayClassName="z-[99999998]"
+        className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[550px] bg-zinc-950 border-white/10 shadow-2xl"
+      >
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="text-2xl font-black italic tracking-tighter text-white capitalize">
             Chord Practice Setup
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
@@ -105,9 +111,9 @@ export function ChordSelectionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto py-4 pr-1">
           <div className="space-y-3">
-            <Label className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest pl-1">
+            <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">
                 Active Sequence ({selectedChords.length}/8)
             </Label>
             <div className="flex flex-wrap gap-2 p-4 bg-white/[0.03] rounded-xl border border-white/5 min-h-[72px] items-center">
@@ -129,9 +135,9 @@ export function ChordSelectionDialog({
           <div className="space-y-3">
             <Tabs defaultValue="beginner" className="w-full">
               <TabsList className="grid w-full grid-cols-3 bg-zinc-900/50 border border-white/5 p-1 h-11">
-                <TabsTrigger value="beginner" className="data-[state=active]:bg-zinc-800 uppercase text-[10px] font-bold tracking-wider">Beginner</TabsTrigger>
-                <TabsTrigger value="intermediate" className="data-[state=active]:bg-zinc-800 uppercase text-[10px] font-bold tracking-wider">Inter</TabsTrigger>
-                <TabsTrigger value="advanced" className="data-[state=active]:bg-zinc-800 uppercase text-[10px] font-bold tracking-wider">Advanced</TabsTrigger>
+                <TabsTrigger value="beginner" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Beginner</TabsTrigger>
+                <TabsTrigger value="intermediate" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Inter</TabsTrigger>
+                <TabsTrigger value="advanced" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Advanced</TabsTrigger>
               </TabsList>
               
               {(Object.keys(categorizedChords) as Array<keyof typeof categorizedChords>).map((level) => (
@@ -143,7 +149,7 @@ export function ChordSelectionDialog({
                         variant="ghost" 
                         size="sm"
                         onClick={() => handleAddChord(chord)}
-                        className="font-black text-sm border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all h-10 uppercase tracking-tight"
+                        className="font-black text-sm border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all h-10 capitalize tracking-tight"
                       >
                         {chord}
                       </Button>
@@ -156,7 +162,7 @@ export function ChordSelectionDialog({
 
           <div className="grid grid-cols-2 gap-6 pt-2">
             <div className="space-y-2">
-              <Label className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest pl-1">Changes Frequency</Label>
+              <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">Changes Frequency</Label>
               <Select
                 value={changesPerMeasure.toString()}
                 onValueChange={(v) => setChangesPerMeasure(parseInt(v))}
@@ -193,11 +199,11 @@ export function ChordSelectionDialog({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
-          <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[11px]">
+        <div className="flex shrink-0 justify-end gap-3 pt-4 border-t border-white/5">
+          <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold capitalize tracking-widest text-[11px]">
             Cancel
           </Button>
-          <Button onClick={handleGenerate} disabled={selectedChords.length === 0} className="bg-white text-black hover:bg-zinc-200 px-8 font-black uppercase tracking-widest text-[11px] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          <Button onClick={handleGenerate} disabled={selectedChords.length === 0} className="bg-white text-black hover:bg-zinc-200 px-8 font-black capitalize tracking-widest text-[11px] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
             Add to Plan
           </Button>
         </div>

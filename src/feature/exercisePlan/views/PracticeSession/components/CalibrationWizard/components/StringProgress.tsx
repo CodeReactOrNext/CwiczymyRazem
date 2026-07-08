@@ -20,15 +20,15 @@ export const StringProgress = React.memo(function StringProgress({
         return (
           <div key={s.id} className="flex flex-col items-center gap-1.5">
             <div className={cn(
-              "flex items-center justify-center rounded-full border-2 transition-all duration-300",
-              isDone    ? "h-7 w-7 border-emerald-500 bg-emerald-500/15" :
-              isCurrent ? "h-8 w-8 border-cyan-400 bg-cyan-400/10" :
-                          "h-6 w-6 border-zinc-800 bg-zinc-900/60"
+              "flex items-center justify-center rounded-lg transition-all duration-300",
+              isDone    ? "h-7 w-7 bg-emerald-500/15" :
+              isCurrent ? "h-8 w-8 bg-cyan-400/10" :
+                          "h-6 w-6 bg-zinc-900/60"
             )}>
               {isDone
                 ? <FaCheck className="h-2.5 w-2.5 text-emerald-400" />
                 : isCurrent
-                ? <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+                ? <div className="h-2 w-2 rounded-lg bg-cyan-400 animate-pulse" />
                 : null}
             </div>
             <span className={cn(

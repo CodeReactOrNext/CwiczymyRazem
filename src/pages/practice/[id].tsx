@@ -15,7 +15,6 @@ export default function PracticePage() {
   const router = useRouter();
   const { id } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -36,14 +35,14 @@ export default function PracticePage() {
     loadPlan();
   }, [id, userAuth, router, t]);
 
-  if (!sessionReady) {
-    return <PracticeLoadingScreen isReady={!!plan} onDone={() => setSessionReady(true)} />;
+  if (!plan) {
+    return <PracticeLoadingScreen isReady={false} />;
   }
 
   return (
     <PremiumGate feature="practice" requiredPlan="master">
       <PracticeSession
-        plan={plan!}
+        plan={plan}
         onClose={() => router.push("/exercises")}
         onFinish={() => {
           setIsFinishing(true);

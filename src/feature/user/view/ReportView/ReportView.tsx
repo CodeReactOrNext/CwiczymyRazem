@@ -22,11 +22,12 @@ import {
   AcceptExceedingPopUp,
   ErrorBox,
   HealthHabbitsBox,
+  LongPracticeConfirmPopUp,
   TimeInputBox,
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { ArrowDown, Check } from "lucide-react";
+import { ArrowDown, Check, Flame } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useState } from "react";
@@ -41,6 +42,7 @@ import {
   getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
+import { getDailyStreakMultiplier } from "utils/gameLogic";
 import { i18n } from "utils/translation";
 
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
@@ -52,11 +54,13 @@ type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const router = useRouter();
-  const { songId, songTitle, songArtist, planId, planTitle, applyTimer } = router.query;
+  const { songId, songTitle, songArtist, planId, planTitle, applyTimer, returnTo } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
+  const [longTimePopUpVisible, setLongTimePopUpVisible] = useState(false);
+  const [acceptLongTime, setAcceptLongTime] = useState(false);
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -79,6 +83,13 @@ const ReportView = () => {
     timerData.technique;
 
   const hasSavedTime = savedTimerSum > 0 && !savedTimeApplied && !autoApplyTimer;
+
+  // Streak multiplier (kicks in at a 2-day streak). It is applied to the combined
+  // time + habit points in makeRatingData, so each ticked habit is worth
+  // HABBITS_POINTS_VALUE × this multiplier — we surface it next to the checklist.
+  const streak = currentUserStats?.actualDayWithoutBreak ?? 0;
+  const streakMultiplier = 1 + getDailyStreakMultiplier(streak);
+  const hasStreakBonus = streakMultiplier > 1;
 
   const techniqueTime = convertMsToHMObject(timerData.technique);
   const theoryTime = convertMsToHMObject(timerData.theory);
@@ -218,6 +229,11 @@ const ReportView = () => {
       return;
     }
 
+    if (sumTime > 6 * 60 * 60 * 1000 && !acceptLongTime) {
+      setLongTimePopUpVisible(true);
+      return;
+    }
+
     if (lastReportTimeExceded && !acceptExceedingTime) {
       setAcceptPopUpVisible(true);
       setExceedingTime(lastReportTimeExceded);
@@ -229,6 +245,7 @@ const ReportView = () => {
     const enrichedInputData = {
       ...inputData,
       clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
+      clientNowISO: new Date().toISOString(),
     };
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));
@@ -240,6 +257,10 @@ const ReportView = () => {
 
     if (inputData.planId) {
         dispatch(updateQuestProgress({ type: 'practice_plan' }));
+        dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
+        // Structured practice (a plan or a specific exercise) awards skill points
+        // server-side even though the manual form does not populate skillPointsGained.
+        dispatch(updateQuestProgress({ type: 'improve_skill' }));
         if (inputData.planId.startsWith('auto')) {
             dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
@@ -249,21 +270,55 @@ const ReportView = () => {
         if (inputData.planId.startsWith('exercise-')) {
             const exerciseId = inputData.planId.replace('exercise-', '');
             dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId, amount: 1 }));
-        } 
+            dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: 1 }));
+        }
         // Case 2: Started from Skill Dashboard / Daily Quest (no prefix, planId is exerciseId)
         else {
             dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: inputData.planId, amount: 1 }));
+            dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: 1 }));
         }
     }
 
     const totalMinutes = Math.floor(sumTime / 60000);
     if (totalMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMinutes }));
+        dispatch(updateQuestProgress({ type: 'long_session', amount: totalMinutes }));
     }
 
     const techMinutes = Number(inputData.techniqueHours || 0) * 60 + Number(inputData.techniqueMinutes || 0);
     if (techMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMinutes }));
+    }
+
+    const theoryMinutes = Number(inputData.theoryHours || 0) * 60 + Number(inputData.theoryMinutes || 0);
+    if (theoryMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_theory_time', amount: theoryMinutes }));
+    }
+
+    const hearingMinutes = Number(inputData.hearingHours || 0) * 60 + Number(inputData.hearingMinutes || 0);
+    if (hearingMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hearingMinutes }));
+    }
+
+    const creativityMinutes = Number(inputData.creativityHours || 0) * 60 + Number(inputData.creativityMinutes || 0);
+    if (creativityMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_creativity_time', amount: creativityMinutes }));
+        dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creativityMinutes }));
+    }
+
+    const activeCategories = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m > 0).length;
+    if (activeCategories > 0) {
+        dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
+    }
+    const categoriesOverFive = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m >= 5).length;
+    if (categoriesOverFive > 0) {
+        dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+    }
+    if (techMinutes > 0 && theoryMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));
+    }
+    if (inputData.skillPointsGained && Object.keys(inputData.skillPointsGained).length > 0) {
+        dispatch(updateQuestProgress({ type: 'improve_skill' }));
     }
 
     const totalMinutesForCapture =
@@ -347,11 +402,14 @@ const ReportView = () => {
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
         <RatingPopUpLayout
-          onClick={() => setView('form')}
+          onClick={() => returnTo ? router.push(returnTo as string) : setView('form')}
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
           activityData={activityDataToUse}
+          sessionTitle={submittedValues?.reportTitle}
+          songTitle={submittedValues?.songTitle}
+          songArtist={submittedValues?.songArtist}
         />
       ) : (
         <Formik
@@ -372,20 +430,20 @@ const ReportView = () => {
                     <div className='mb-8 flex flex-col gap-2'>
                         <div className='flex items-center gap-3'>
                           <div className={cn(
-                            'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
-                            isStep1Done ? "bg-emerald-500 text-black border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]" : "bg-cyan-500/20 text-cyan-400 border-cyan-500/20"
+                            'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
+                            isStep1Done ? "bg-emerald-500 text-black" : "bg-cyan-500/10 text-cyan-400"
                           )}>
                             {isStep1Done ? <Check className="h-5 w-5 stroke-[3]" /> : "1"}
                           </div>
                           <div className="flex-1">
-                            <h3 className='font-openSans text-xl font-bold text-white'>
+                            <h3 className='font-display text-xl font-bold text-zinc-100'>
                               {t("exercise_type_title")}
                             </h3>
                           </div>
                         </div>
                         <p className={cn(
-                          "text-sm font-medium transition-colors duration-500 ml-12",
-                          isStep1Done ? "text-emerald-400/80" : "text-zinc-500"
+                          "ml-12 text-sm font-medium transition-colors duration-500",
+                          isStep1Done ? "text-emerald-400" : "text-zinc-400"
                         )}>
                           {isStep1Done 
                             ? "Great! Practice time added. You can save now or fill optional details below." 
@@ -421,14 +479,14 @@ const ReportView = () => {
                         )
                       )}
                     </div>
-                    <div className='mt-8 pt-8 border-t border-white/5'>
-                      <div className="flex flex-col items-center md:items-end gap-4">
-                        <div className='flex items-center rounded-xl  bg-zinc-900/60 p-1 px-6 py-4 shadow-2xl backdrop-blur-md'>
-                          <div className="flex flex-col items-start mr-6">
-                            <span className='text-[9px] font-semibold tracking-wide text-zinc-600 mb-0.5'>
+                    <div className='mt-10'>
+                      <div className="flex flex-col items-center gap-4 md:items-end">
+                        <div className='flex items-center rounded-lg bg-zinc-900/60 px-6 py-4 backdrop-blur-md'>
+                          <div className="mr-6 flex flex-col items-start">
+                            <span className='mb-0.5 text-[9px] font-semibold tracking-wide text-zinc-400'>
                               {t("total_time")}
                             </span>
-                            <span className='font-mono text-2xl font-bold text-white leading-none'>
+                            <span className='font-mono text-2xl font-bold leading-none text-zinc-100'>
                                {convertMsToHM(getSumTime(values))}
                             </span>
                           </div>
@@ -437,7 +495,7 @@ const ReportView = () => {
                             <Button
                               type='submit'
                               loading={isFetching}
-                              className=" bg-emerald-600 hover:bg-emerald-500 text-white "
+                              className="bg-emerald-600 text-white hover:bg-emerald-500"
                             >
                               <Check className="mr-2 h-4 w-4" />
                               Save Now
@@ -446,14 +504,14 @@ const ReportView = () => {
                         </div>
 
                         {isStep1Done ? (
-                          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-700 pr-4 mt-2">
-                             <p className="text-[10px] font-semibold text-emerald-500/80 tracking-wide">
+                          <div className="mt-2 flex items-center gap-3 pr-4 duration-700 animate-in fade-in slide-in-from-top-2">
+                             <p className="text-[10px] font-semibold tracking-wide text-emerald-400">
                                 Or add more details below
                              </p>
-                             <ArrowDown className="h-5 w-5 text-emerald-500 animate-bounce" />
+                             <ArrowDown className="h-5 w-5 animate-bounce text-emerald-500" />
                           </div>
                         ) : (
-                          <p className="text-[10px] font-semibold text-zinc-700 tracking-wide italic pr-4 mt-2">Complete Step 1 to continue</p>
+                          <p className="mt-2 pr-4 text-[10px] font-semibold italic tracking-wide text-zinc-500">Complete Step 1 to continue</p>
                         )}
                       </div>
                     </div>
@@ -461,22 +519,22 @@ const ReportView = () => {
 
                   {/* STEP 2: FOCUS & DETAILS (OPTIONAL) */}
                   <div className={cn('mb-12 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
-                    <div className='mb-6 flex items-center gap-3 border-t border-white/5 pt-12'>
+                    <div className='mb-6 flex items-center gap-3 pt-8'>
                       <div className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
+                        'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
                         isStep2Completed
-                          ? "bg-indigo-500 text-white border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+                          ? "bg-emerald-500 text-black"
                           : isStep1Done
-                            ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/20"
-                            : "bg-zinc-800 text-zinc-500 border-white/5"
+                            ? "bg-cyan-500/10 text-cyan-400"
+                            : "bg-zinc-800 text-zinc-500"
                       )}>
                          {isStep2Completed ? <Check className="h-5 w-5 stroke-[3]" /> : "2"}
                       </div>
                       <div className="flex items-baseline gap-3">
-                        <h3 className='font-openSans text-xl font-bold text-white tracking-tight'>
+                        <h3 className='font-display text-xl font-bold tracking-tight text-zinc-100'>
                            Session focus & habits
                         </h3>
-                        <span className="text-[10px] font-bold text-zinc-500 bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional</span>
+                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">Optional</span>
                       </div>
                     </div>
 
@@ -484,7 +542,7 @@ const ReportView = () => {
                        <div className="lg:col-span-12 xl:col-span-7 space-y-6">
                         <div className='space-y-4'>
                           <div className="flex items-center justify-between">
-                            <label className='font-openSans text-sm font-bold text-zinc-400'>
+                            <label className='font-sans text-sm font-bold text-zinc-400'>
                               Session title
                             </label>
                           </div>
@@ -492,12 +550,15 @@ const ReportView = () => {
                             <Input
                               name='reportTitle'
                               placeholder='e.g. Practicing major scales'
-                              className={`h-11 border-white/10 bg-zinc-900/40 text-sm shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
+                              className={cn(
+                                "h-11 bg-zinc-900/40 text-sm focus-visible:ring-cyan-500/40",
+                                errors.reportTitle && "ring-1 ring-red-500/40"
+                              )}
                               value={values.reportTitle}
                               onChange={(e) => { setSelectedTags([]); setFieldValue("reportTitle", e.target.value); }}
                             />
                             {errors.reportTitle && (
-                              <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-500">
+                              <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-400">
                                 {errors.reportTitle}
                               </p>
                             )}
@@ -522,7 +583,7 @@ const ReportView = () => {
                                 { label: "Alt Picking", icon: "🔄" },
                                 { label: "Sweep Picking", icon: "🌪️" },
                                 { label: "Tapping", icon: "👆" },
-                                { label: "Hybrid Picking", icon: "🤏" },
+                                { label: "Picking Control", icon: "🤏" },
                                 { label: "String Skipping", icon: "⏩" },
                                 { label: "Down Picking", icon: "⬇️" },
                               ]},
@@ -550,7 +611,7 @@ const ReportView = () => {
                               ]},
                             ].map((group) => (
                               <div key={group.label} className="space-y-2">
-                                <p className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">
+                                <p className="text-[10px] font-bold tracking-wide text-zinc-400">
                                   {group.icon} {group.label}
                                 </p>
                                 <div className='flex flex-wrap gap-2'>
@@ -570,10 +631,10 @@ const ReportView = () => {
                                           });
                                         }}
                                         className={cn(
-                                          "group flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[10px] font-bold tracking-wide transition-all",
+                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-[10px] font-bold tracking-wide transition-[background-color,color,transform] duration-150 active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
                                           isActive
-                                            ? "border-cyan-500/50 bg-cyan-500/20 text-cyan-300"
-                                            : "border-white/5 bg-zinc-900 text-zinc-500 hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                            ? "border-cyan-500/30 bg-cyan-500/10 text-zinc-100"
+                                            : "bg-zinc-800/60 text-zinc-400 hover:bg-cyan-500/10 hover:text-cyan-400"
                                         )}
                                       >
                                         <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")}>{tag.icon}</span>
@@ -589,8 +650,26 @@ const ReportView = () => {
                        </div>
 
                        <div className="lg:col-span-12 xl:col-span-5 space-y-4">
-                          <div className="flex flex-col px-1">
-                            <p className="text-lg font-bold text-zinc-300">Habits checklist</p>
+                          <div className="flex items-center justify-between gap-2 px-1">
+                            <p className="text-lg font-bold text-zinc-200">Habits checklist</p>
+                            <span
+                              className={cn(
+                                "flex shrink-0 items-center gap-1 rounded px-2 py-0.5 text-xs font-bold",
+                                hasStreakBonus
+                                  ? "bg-orange-500/10 text-orange-400"
+                                  : "bg-zinc-800 text-zinc-400"
+                              )}
+                              title={
+                                hasStreakBonus
+                                  ? `${streak}-day streak — points ×${streakMultiplier.toFixed(1)}`
+                                  : `No streak yet — points ×${streakMultiplier.toFixed(1)}`
+                              }>
+                              <Flame
+                                className={cn("h-3.5 w-3.5", !hasStreakBonus && "text-zinc-500")}
+                                aria-hidden
+                              />
+                              ×{streakMultiplier.toFixed(1)}
+                            </span>
                           </div>
                           <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1'>
                             {healthHabbitsList.map(
@@ -610,25 +689,25 @@ const ReportView = () => {
 
                   {/* STEP 3: LOGGING (OPTIONAL DETAILS) */}
                   <div className={cn('scroll-mt-24 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
-                    <div className="mb-8 border-t border-white/5 pt-12">
+                    <div className="mb-8 pt-8">
                       <div className='mb-6 flex items-center gap-3'>
                         <div className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
-                          isStep1Done 
-                            ? "bg-rose-500/20 text-rose-400 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]" 
-                            : "bg-zinc-800 text-zinc-500 border-white/5"
+                          'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
+                          isStep1Done
+                            ? "bg-cyan-500/10 text-cyan-400"
+                            : "bg-zinc-800 text-zinc-500"
                         )}>3</div>
                         <div className="flex items-baseline gap-3">
-                          <h3 className='font-openSans text-lg font-bold text-white'>
+                          <h3 className='font-display text-lg font-bold text-zinc-100'>
                              Finalize Log
                           </h3>
-                          <span className="text-[10px] font-semibold text-zinc-600 tracking-wide bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional Details</span>
+                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-400">Optional Details</span>
                         </div>
                       </div>
 
                       <div className='flex flex-col items-center gap-8 py-4'>
                           <div className='flex flex-col items-center gap-4'>
-                            <p className='text-xs font-semibold text-zinc-500 tracking-wide'>When did this happen?</p>
+                            <p className='text-xs font-semibold tracking-wide text-zinc-400'>When did this happen?</p>
                             <div className='flex flex-wrap items-center justify-center gap-3'>
                               {[0, 1, 2, 3, 4].map((days) => {
                                 const isSelected = values.countBackDays === days;
@@ -641,23 +720,22 @@ const ReportView = () => {
                                     variant={isSelected ? "default" : "outline"}
                                     onClick={() => setFieldValue("countBackDays", days)}
                                     className={cn(
+                                      "border-transparent",
                                       isSelected
-                                        ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-bold"
-                                        : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
+                                        ? "bg-cyan-500 font-bold text-black"
+                                        : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
                                     )}>
                                     {label}
                                   </Button>
                                 );
                               })}
                             </div>
-                            <p className='text-xs font-medium text-zinc-600'>
-                              Selected: <span className="text-zinc-300">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
+                            <p className='text-xs font-medium text-zinc-400'>
+                              Selected: <span className="text-zinc-200">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
                             </p>
                           </div>
 
-                          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-
-                          <div className='flex flex-col items-center gap-4'>
+                          <div className='mt-2 flex flex-col items-center gap-4'>
                             {Object.keys(errors).length !== 0 && <ErrorBox errors={errors} />}
                             <Button
                               size='lg'
@@ -685,6 +763,23 @@ const ReportView = () => {
                         isFetching={isFetching}
                         setAcceptExceedingTime={setAcceptExceedingTime}
                         setAcceptPopUpVisible={setAcceptPopUpVisible}
+                      />
+                    </div>
+                  </Backdrop>
+                )}
+
+                {longTimePopUpVisible && (
+                  <Backdrop selector='overlays'>
+                    <div>
+                      <LongPracticeConfirmPopUp
+                        totalTime={getSumTime(values)}
+                        onAccept={() => {
+                          setLongTimePopUpVisible(false);
+                          reportOnSubmit(values);
+                        }}
+                        isFetching={isFetching}
+                        setAcceptLongTime={setAcceptLongTime}
+                        setLongTimePopUpVisible={setLongTimePopUpVisible}
                       />
                     </div>
                   </Backdrop>

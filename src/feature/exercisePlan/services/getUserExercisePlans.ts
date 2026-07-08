@@ -26,11 +26,19 @@ export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan
         exercises: data.exercises,
         totalDuration: data.totalDuration,
         isPrivate: data.isPrivate,
+        isPublic: data.isPublic ?? false,
+        authorUsername: data.authorUsername,
+        authorAvatar: data.authorAvatar,
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
         userId: data.userId,
         completionHistory: data.completionHistory || [],
         image: data.image,
+        // Custom appearance chosen in the create wizard — without these the card
+        // falls back to category-derived icon/color (community plans keep them via
+        // the spread in getPublicExercisePlans).
+        icon: data.icon,
+        color: data.color,
       };
     });
   } catch (error) {

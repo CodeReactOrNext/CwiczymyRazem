@@ -3,26 +3,21 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const legatoContinuousFlowExercise: Exercise = {
   id: "legato_continuous_flow",
   title: "Continuous Legato Flow",
-  description: "Non-stop 3nps legato runs across the full fretboard. Pick only the first note of each string — everything else is hammer-ons and pull-offs. Builds extreme left-hand endurance and seamless string transitions.",
+  description: "Maintain a continuous, unbroken stream of notes using pure legato technique.",
+  whyItMatters: "Legato playing minimizes picking hand involvement to create a smooth, flowing sound. Developing continuous flow trains your fretting hand to generate consistent note volume and tone purely through finger strength and coordination.",
   difficulty: "hard",
   category: "technique",
   timeInMinutes: 8,
   instructions: [
-    "Pick ONLY the first note on each new string. All other notes are pure legato (hammer-ons ascending, pull-offs descending).",
-    "Measures 1-2: Full ascending and descending A natural minor run across all 6 strings at 5th position.",
-    "Measures 3-4: Same run shifted to 7th position. Transition between positions without stopping.",
-    "Measures 5-6: Extended run combining both positions into one continuous phrase. No breaks, no repicking.",
-    "Loop the entire pattern for the full 15 minutes. This is an endurance test — stay relaxed.",
+    "Generate all notes purely through strong hammer-ons and clean pull-offs.",
+    "Execute pull-offs with a slight downward flicking motion of the finger."
   ],
   tips: [
-    "If you feel pain in your hand or forearm, STOP immediately. Soreness is OK, pain is not.",
-    "Breathe steadily. Holding your breath creates tension which kills legato flow.",
-    "The string transition is the hardest moment — practice crossing to the next string without any gap.",
-    "Volume consistency is everything. Every note should be at the same loudness regardless of technique.",
-    "On descending runs, keep your higher fingers hovering close to the frets they just left.",
+    "Maintain a steady rhythmic pace, matching the speed of your hammers and pulls.",
+    "Mute idle strings with your picking-hand palm to keep the flow dead-silent."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },

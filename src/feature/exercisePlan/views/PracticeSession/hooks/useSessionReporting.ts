@@ -48,10 +48,12 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
       setIsSubmittingReport(true);
       try {
-        const techMin = Math.floor(timerData.technique / 60000);
-        const theoryMin = Math.floor(timerData.theory / 60000);
-        const hearMin = Math.floor(timerData.hearing / 60000);
-        const creatMin = Math.floor(timerData.creativity / 60000);
+        // Round to the nearest minute — the tracked time runs a hair short of the
+        // exercise timer (sub-second ticks), so flooring turned 5:00 into 4 min.
+        const techMin = Math.round(timerData.technique / 60000);
+        const theoryMin = Math.round(timerData.theory / 60000);
+        const hearMin = Math.round(timerData.hearing / 60000);
+        const creatMin = Math.round(timerData.creativity / 60000);
 
         const reportData: ReportFormikInterface = {
           techniqueHours: Math.floor(techMin / 60).toString(),
@@ -73,7 +75,8 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             }
 
             let points = 0;
-            if (exercise.difficulty === 'easy') points = 1;
+            if (exercise.difficulty === 'beginner') points = 1;
+            else if (exercise.difficulty === 'easy') points = 1;
             else if (exercise.difficulty === 'medium') points = 2;
             else if (exercise.difficulty === 'hard') points = 3;
 
@@ -91,6 +94,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           })(),
+          clientNowISO: new Date().toISOString(),
         };
 
         const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
@@ -98,6 +102,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setReportResult(result.raitingData);
 
         dispatch(updateQuestProgress({ type: 'practice_plan' }));
+        dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
 
         if (plan.id.startsWith('auto')) {
           dispatch(updateQuestProgress({ type: 'auto_plan' }));
@@ -105,17 +110,47 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
         dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: plan.id }));
 
-        const hasSongs = plan.exercises.some((ex) => ex.isPlayalong || (ex.tablature && ex.tablature.length > 0));
-        if (hasSongs) {
-          dispatch(updateQuestProgress({ type: 'practice_any_song' }));
-        }
+        // "Practice any Song" is completed only via the song timer (/timer/song,
+        // route songs). Practice-plan sessions — including auto plans and playalong
+        // exercises — must not complete it, so there is no practice_any_song dispatch here.
 
         const totalMin = techMin + theoryMin + hearMin + creatMin;
         if (totalMin > 0) {
           dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMin }));
+          dispatch(updateQuestProgress({ type: 'long_session', amount: totalMin }));
         }
         if (techMin > 0) {
           dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMin }));
+        }
+        if (theoryMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_theory_time', amount: theoryMin }));
+        }
+        if (hearMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_hearing_time', amount: hearMin }));
+        }
+        if (creatMin > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_creativity_time', amount: creatMin }));
+          dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creatMin }));
+        }
+
+        const activeCategories = [techMin, theoryMin, hearMin, creatMin].filter((m) => m > 0).length;
+        if (activeCategories > 0) {
+          dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
+        }
+        const categoriesOverFive = [techMin, theoryMin, hearMin, creatMin].filter((m) => m >= 5).length;
+        if (categoriesOverFive > 0) {
+          dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+        }
+        if (techMin > 0 && theoryMin > 0) {
+          dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));
+        }
+
+        const exercisesPracticed = completedExercises.length;
+        if (exercisesPracticed > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_three_exercises', amount: exercisesPracticed }));
+        }
+        if (Object.keys(reportData.skillPointsGained || {}).length > 0) {
+          dispatch(updateQuestProgress({ type: 'improve_skill' }));
         }
       } catch (error) {
         console.error('Auto report failed:', error);

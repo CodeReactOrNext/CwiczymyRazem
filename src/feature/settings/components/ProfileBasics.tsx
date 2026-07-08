@@ -201,7 +201,7 @@ const ProfileBasics = () => {
           <DialogHeader>
             <DialogTitle>Adjust Image</DialogTitle>
           </DialogHeader>
-          <div className="relative h-64 w-full bg-black/50 overflow-hidden rounded-md">
+          <div className="relative h-64 w-full bg-black/50 overflow-hidden rounded-lg">
             {tempImageSrc && (
               <Cropper
                 image={tempImageSrc}

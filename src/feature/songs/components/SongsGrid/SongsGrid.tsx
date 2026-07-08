@@ -1,7 +1,9 @@
 import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
+import { ITEMS_PER_PAGE } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import posthog from "posthog-js";
@@ -9,38 +11,70 @@ import { useState } from "react";
 
 interface SongsGridProps {
   songs: Song[];
+  isLoading?: boolean;
   hasFilters: boolean;
   currentPage: number;
   hasMore: boolean;
   onPageChange: (page: number) => void;
   onAddSong: () => void;
   onStatusChange: () => void;
+  onPractice?: (song: Song) => void;
   userSongs: {
     wantToLearn: Song[];
     learning: Song[];
     learned: Song[];
   };
+  updateUserSongsCache: (songs: {
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  }) => void;
 }
 
 export const SongsGrid = ({
   songs,
+  isLoading,
   currentPage,
   hasMore,
   onPageChange,
   onAddSong,
   hasFilters,
   onStatusChange,
+  onPractice,
   userSongs,
+  updateUserSongsCache,
 }: SongsGridProps) => {
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
-    onChange: () => {}, // Handled by refreshSongs in SongsView
+    onChange: updateUserSongsCache,
     userSongs,
     onTableStatusChange: onStatusChange,
   });
+
+  // Adding a library song that isn't in the collection yet: handleStatusChange's
+  // optimistic move can't help (it only reshuffles songs already in userSongs), so
+  // we insert the full song into the cache here. The sidebar reads the same cache,
+  // so it appears instantly; the refetch afterwards reconciles order/progress.
+  const handleAddOrMove = (song: Song, status: SongStatus) => {
+    const isInCollection =
+      userSongs.wantToLearn.some((s) => s.id === song.id) ||
+      userSongs.learning.some((s) => s.id === song.id) ||
+      userSongs.learned.some((s) => s.id === song.id);
+
+    if (!isInCollection) {
+      updateUserSongsCache({
+        ...userSongs,
+        [status]: [...userSongs[status], song],
+      });
+      return handleStatusChange(song.id, status, song.title, song.artist, {
+        skipOptimisticUpdate: true,
+      });
+    }
+    return handleStatusChange(song.id, status, song.title, song.artist);
+  };
 
   if (!userSongs) {
     return <div>Loading...</div>;
@@ -48,12 +82,18 @@ export const SongsGrid = ({
 
   return (
     <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
-      {songs.length === 0 ? (
+      {isLoading ? (
+        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
+          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+            <SongCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : songs.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-in fade-in duration-500'>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 animate-in fade-in duration-500'>
           {songs.map((song) => {
             let userStatus: SongStatus | undefined;
             if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
@@ -72,9 +112,12 @@ export const SongsGrid = ({
                 }}
                 onStatusChange={(status) => {
                   if (status) {
-                    handleStatusChange(song.id, status, song.title, song.artist);
+                    handleAddOrMove(song, status);
+                  } else {
+                    handleSongRemoval(song.id);
                   }
                 }}
+                onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
               />
             );
           })}
@@ -112,7 +155,7 @@ export const SongsGrid = ({
       <div className='mt-auto pt-8'>
         {(currentPage > 1 || hasMore) && (
           <div className='flex justify-center'>
-            <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
+            <div className='rounded-2xl bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -120,12 +163,12 @@ export const SongsGrid = ({
                   onPageChange(currentPage - 1);
                 }}
                 disabled={currentPage <= 1}
-                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Previous
               </Button>
               
-              <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-2">
+              <div className="text-xs font-bold text-zinc-500 px-2">
                 Page {currentPage}
               </div>
 
@@ -136,7 +179,7 @@ export const SongsGrid = ({
                   onPageChange(currentPage + 1);
                 }}
                 disabled={!hasMore}
-                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Next
               </Button>

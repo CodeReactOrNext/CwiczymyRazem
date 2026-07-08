@@ -4,12 +4,12 @@ import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/compl
 import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
 import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
 import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
-import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
 import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
+import { guitarPlayalongsPlans } from "feature/exercisePlan/data/plans/guitarPlayalongs/guitarPlayalongsPlans";
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
 import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
 import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
-import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
+import { beginnerDailyExercisesPlan, megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
 import { musicianFitnessLvl1S1Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S1";
 import { musicianFitnessLvl1S2Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S2";
 import { musicianFitnessLvl1S3Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S3";
@@ -31,18 +31,19 @@ import { musicianFitnessLvl2S18Plan } from "feature/exercisePlan/data/plans/meta
 import { musicianFitnessLvl2S19Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S19";
 import { musicianFitnessLvl2S20Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S20";
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
-import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
+import { rhythmTimingPlan } from "feature/exercisePlan/data/plans/rhythmTiming/rhythmTiming";
 import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
 import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
 import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPlan/spiderMasterPlan";
-import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
-import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
+import { spiderPermutationPart1Plan, spiderPermutationPart2Plan, spiderPermutationPart3Plan, spiderPermutationPart4Plan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
+import { strummingFoundationsPlan } from "feature/exercisePlan/data/plans/strummingFoundations/strummingFoundations";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
 const difficultyOrder: Record<string, number> = {
+  beginner: 0,
   easy: 1,
   medium: 2,
   hard: 3,
@@ -51,8 +52,11 @@ const difficultyOrder: Record<string, number> = {
 // Plans available for free — all others require Pro
 const FREE_PLAN_IDS = new Set([
   "mega_beginner_first_steps",
+  "beginner_daily_exercises",
   "ear_rhythm_fundamentals",
   "daily_dexterity_starter",
+  "strumming_foundations",
+  "rhythm_timing_foundations",
   "warm_up_15_minutes",
   "soloing_explorer",
   "spider_master_plan",
@@ -79,26 +83,41 @@ const FREE_PLAN_IDS = new Set([
   "musician_fitness_lvl2_s18",
   "musician_fitness_lvl2_s19",
   "musician_fitness_lvl2_s20",
+  // Guitar Playalongs — free
+  "gp_pentatonic_10min_workout",
+  "gp_sweep_picking_15min",
+  "gp_speed_builder_part1",
+  "gp_stamina_picking_workout",
+  "gp_gallop_picking_10_levels",
+  "gp_alternate_picking_speed_builder",
+  "gp_rock_metal_riffs",
+  "gp_music_theory_essential",
+  "gp_drop2_chords_arpeggios",
+  "gp_pentatonic_tutorial",
 ]);
 
 export const defaultPlans: ExercisePlan[] = [
   spiderMasterPlan,
-  spiderPermutationPlan,
+  spiderPermutationPart1Plan,
+  spiderPermutationPart2Plan,
+  spiderPermutationPart3Plan,
+  spiderPermutationPart4Plan,
   basicImprovisationPractice,
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,
   pentatonicPlayalongPlan,
+  ...guitarPlayalongsPlans,
   fretboardAwarenessPlan,
   harmonicVoiceLeadingPlan,
   creativePhrasingPlan,
   advancedImprovisationPlan,
-  expressiveLeadPlayingPlan,
-  rhythmicPrecisionPlan,
-  theIntervalMapPlan,
   megaBeginnerFirstStepsPlan,
+  beginnerDailyExercisesPlan,
   earRhythmFundamentalsPlan,
   handHealthStrengthPlan,
   dailyDexterityStarterPlan,
+  strummingFoundationsPlan,
+  rhythmTimingPlan,
   soloingExplorerPlan,
   speedBuildingProgressivePlan,
   legatoMasterPlan,

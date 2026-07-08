@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { memoryCache } from "utils/cache/memoryCache";
 
 import { updatePedalboard } from "../services/arsenal.service";
 import type { ArsenalUserData, PedalboardPlacement } from "../types/arsenal.types";
@@ -16,6 +17,12 @@ export const useUpdatePedalboard = () => {
         ARSENAL_QUERY_KEY,
         (prev) => prev ? { ...prev, rig: { ...prev.rig, pedalboardItems: items } } : prev
       );
+    },
+    onSuccess: () => {
+      // Pedalboard changed → gear leaderboard caches are stale
+      memoryCache.clear("leaderboard:gear");
+      memoryCache.clear("userRank:gear");
+      queryClient.invalidateQueries({ queryKey: ["userGearLevel"] });
     },
     onError: (error: any) => {
       const message = error?.response?.data?.error || "Failed to update pedalboard";

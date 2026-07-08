@@ -3,29 +3,25 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const mutingDisciplineDrillExercise: Exercise = {
   id: "muting_discipline_drill",
   title: "Muting Discipline Drill",
-  description: "String-skipping patterns on E minor that force clean muting of unused strings. Progresses from small skips to maximum skips (string 6 to string 1), building right and left hand muting technique.",
+  description: "Eliminate unwanted string noise using systematic dual-hand muting.",
+  whyItMatters: "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in clear, professional-grade performances.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    "Play each measure with strict alternate picking. Use high gain or distortion to expose any unwanted string noise.",
-    "Measures 1-2: String-skip between strings 6 and 4, then strings 6 and 3. Mute the unused middle strings with your fretting hand fingers and picking hand palm.",
-    "Measures 3-4: Palm mute section on low strings. Keep your right hand anchored near the bridge for tight, percussive muting.",
-    "Measures 5-6: Wide skips from string 6 to string 2, then string 6 to string 1. These require maximum muting discipline — all middle strings must stay silent.",
+    "Mute all strings below the active note with your picking-hand palm.",
+    "Mute all strings above the active note with the underside of your fretting index finger."
   ],
   tips: [
-    "Use your fretting hand index finger laid flat to lightly touch and mute strings you're not playing.",
-    "Your picking hand palm should rest on lower strings when you play higher strings, and vice versa.",
-    "The more gain/distortion you use, the more exposed your muting flaws will be — use that as feedback.",
-    "If you hear any sympathetic ringing or buzz, stop and identify which string is the culprit before continuing.",
-    "Start very slowly — clean muting at 80 BPM is far more valuable than sloppy playing at 140 BPM.",
+    "Under high gain, even small finger lifts create noise; keep unused fingers touching the strings.",
+    "Practice slowly to identify the exact source of any accidental string ring."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },
-  relatedSkills: ['hybrid_picking'],
+  relatedSkills: ["articulation"],
   tablature: [
     // M1: String-skip between strings 6 and 4 (E minor: E-G-B pattern)
     {

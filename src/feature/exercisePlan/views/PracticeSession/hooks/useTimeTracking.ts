@@ -22,17 +22,17 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
       lastTickRef.current = Date.now();
     }
 
-    const interval = setInterval(() => {
+    let skillType = currentExercise.category as SkillsType;
+
+    if (skillType === "mixed" as any || !skillType) {
+      skillType = "technique";
+    }
+
+    const flush = () => {
       const now = Date.now();
-      const delta = now - (lastTickRef.current || now);
+      const delta = now - (lastTickRef.current ?? now);
 
-      if (delta >= 1000) {
-        let skillType = currentExercise.category as SkillsType;
-
-        if (skillType === "mixed" as any || !skillType) {
-          skillType = "technique";
-        }
-
+      if (delta > 0) {
         dispatch(
           increaseTimerTime({
             type: skillType,
@@ -42,9 +42,21 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
 
         lastTickRef.current = now;
       }
+    };
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+
+      if (now - (lastTickRef.current || now) >= 1000) {
+        flush();
+      }
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      // flush the partial second so it isn't lost on pause/exercise change/finish
+      flush();
+    };
   }, [timer.timerEnabled, currentExercise.category, currentExercise.id, dispatch]);
 
   return {};

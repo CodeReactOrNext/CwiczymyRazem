@@ -1,27 +1,22 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chickenPickinExercise: Exercise = {
   id: "chicken_pickin",
   title: "Snap and Pop",
-  description: "Practice snapping strings with fingers for that classic country 'pop' sound.",
+  description: "Develop hybrid picking coordination and percussive snapping dynamics.",
+  whyItMatters: "Chicken picking is a cornerstone of country and blues lead styles. Snapping the string with your fingers while muting it with your picking hand creates a percussive, high-attack note definition that adds rhythmic energy and dynamic contrast to your playing.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
-    "Use the pick for bass notes and downbeats.",
-    "Snap the higher strings by pulling them away from the fretboard with your middle or ring finger.",
-    "The 'pop' sound comes from the string snapping back against the frets.",
-    "Practice on open strings first to get the snapping motion right.",
-    "Combine picked notes with snapped notes in a rhythmic pattern.",
-    "Add muted 'chick' sounds by lightly touching muted strings with pick."
+    "Snap the higher strings aggressively with your middle and ring fingers.",
+    "Keep your picking-hand palm rested lightly on the lower strings for instant damping."
   ],
   tips: [
-    "Pull the string slightly away from the fretboard before releasing for maximum snap.",
-    "The snapping motion should be quick and percussive, not a slow pull.",
-    "Keep your picking hand relaxed - tension kills the snap.",
-    "Listen to Brent Mason, Brad Paisley, or Albert Lee for inspiration."
+    "Pull the string slightly upward away from the fretboard so it snaps back against the frets.",
+    "Relax your picking hand between snaps to maintain fluid rhythmic movement."
   ],
-  metronomeSpeed: { min: 60, max: 140, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 140, recommended: 80 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

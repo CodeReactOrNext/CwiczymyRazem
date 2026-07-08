@@ -26,9 +26,14 @@ export const fetchInventory = async (): Promise<ArsenalUserData & { fame: number
   return data;
 };
 
-export const equipGuitar = async (guitarId: number | string): Promise<void> => {
+export const equipGuitar = async (guitarId: number | string, itemId?: string): Promise<void> => {
   const idToken = await getIdToken();
-  await axios.post("/api/arsenal/equip-guitar", { idToken, guitarId });
+  await axios.post("/api/arsenal/equip-guitar", { idToken, guitarId, itemId });
+};
+
+export const unequipGuitar = async (): Promise<void> => {
+  const idToken = await getIdToken();
+  await axios.post("/api/arsenal/unequip-guitar", { idToken });
 };
 
 export const clearNewFlags = async (): Promise<void> => {
@@ -50,4 +55,44 @@ const openEffectPack = async (): Promise<OpenEffectPackResult> => {
 export const updatePedalboard = async (items: PedalboardPlacement[]): Promise<void> => {
   const idToken = await getIdToken();
   await axios.post("/api/arsenal/update-pedalboard", { idToken, items });
+};
+
+export const sellGuitar = async (inventoryItemId: string): Promise<{ fameReward: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number }>("/api/arsenal/sell-guitar", {
+    idToken,
+    inventoryItemId,
+  });
+  return data;
+};
+
+export const sellGuitarsBulk = async (
+  inventoryItemIds: string[]
+): Promise<{ fameReward: number; soldCount: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number; soldCount: number }>(
+    "/api/arsenal/sell-guitars-bulk",
+    { idToken, inventoryItemIds }
+  );
+  return data;
+};
+
+export const sellEffect = async (inventoryItemId: string): Promise<{ fameReward: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number }>("/api/arsenal/sell-effect", {
+    idToken,
+    inventoryItemId,
+  });
+  return data;
+};
+
+export const sellEffectsBulk = async (
+  inventoryItemIds: string[]
+): Promise<{ fameReward: number; soldCount: number }> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<{ fameReward: number; soldCount: number }>(
+    "/api/arsenal/sell-effects-bulk",
+    { idToken, inventoryItemIds }
+  );
+  return data;
 };

@@ -1,4 +1,4 @@
-type EffectType =
+export type EffectType =
   | "Overdrive"
   | "Distortion"
   | "Delay"
@@ -10,7 +10,9 @@ type EffectType =
   | "Fuzz"
   | "Phaser"
   | "Flanger"
-  | "Boost";
+  | "Boost"
+  | "Vibrato"
+  | "Tuner";
 
 export interface EffectDefinition {
   id: number | string;
@@ -19,6 +21,17 @@ export interface EffectDefinition {
   type: EffectType;
   imageId: number | string;
   rarity: GuitarRarity;
+  /** Optional production-era range for the vintage roll; falls back to global defaults. */
+  yearFrom?: number;
+  yearTo?: number;
+  countries?: string[];
+}
+
+/** Per-category stat sums for an effect (Tone / Headroom / Versatility). */
+export interface EffectStats {
+  tone: number;
+  headroom: number;
+  versatility: number;
 }
 
 export interface EffectInventoryItem {
@@ -26,6 +39,18 @@ export interface EffectInventoryItem {
   effectId: number | string;
   acquiredAt: number;
   isNew: boolean;
+  /** Rolled production year (vintage). Optional for legacy items. */
+  year?: number;
+  /** Country of manufacture. Optional for legacy items. */
+  country?: string;
+  /** Rolled cosmetic quality float 0–1. Optional for legacy items. */
+  condition?: number;
+  /** Global mint number for this effectId. Optional for legacy items. */
+  serial?: number;
+  /** Cached per-category stat sums; their total feeds the level. Optional for legacy/plain items. */
+  stats?: EffectStats;
+  /** Rolled named features that produced the stats. Optional for legacy/plain items. */
+  features?: ItemFeature[];
 }
 
 export type GuitarRarity =
@@ -87,6 +112,19 @@ export interface CaseDefinition {
   country: ProductionCountry;
 }
 
+/** Per-category stat sums (each a "+N" that adds into the item level). */
+export interface ItemStats {
+  pickups: number;
+  sustain: number;
+  playFeeling: number;
+}
+
+/** A single rolled named feature on an item (references a GuitarFeatureDef by id). */
+export interface ItemFeature {
+  id: string;
+  points: number;
+}
+
 export interface InventoryItem {
   id: string;
   guitarId: number | string;
@@ -94,6 +132,14 @@ export interface InventoryItem {
   isNew: boolean;
   year: number;
   country: ProductionCountry;
+  /** Rolled quality float 0–1 → condition grade (Relic…Museum). Optional for legacy items. */
+  condition?: number;
+  /** Global mint number for this guitarId (e.g. 42 → "#0042"). Optional for legacy items. */
+  serial?: number;
+  /** Cached per-category stat sums; their total is the item level. Optional for legacy/plain items. */
+  stats?: ItemStats;
+  /** Rolled named features that produced the stats. Optional for legacy/plain items. */
+  features?: ItemFeature[];
 }
 
 export interface PedalboardPlacement {
@@ -119,6 +165,8 @@ export const DEFAULT_RIG: RigSetup = {
 export interface ArsenalUserData {
   inventory: InventoryItem[];
   equippedGuitarId: number | string | null;
+  /** Unique inventory item id of the equipped guitar — distinguishes duplicates of the same guitarId */
+  equippedItemId: string | null;
   rig: RigSetup;
   effectInventory: EffectInventoryItem[];
 }

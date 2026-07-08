@@ -4,19 +4,20 @@ export const openGRepetitionExercise: Exercise = {
   id: "open_g_repetition",
   title: "Open G String Repetition",
   description: "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
-  difficulty: "easy",
+  difficulty: "beginner",
   category: "technique",
   timeInMinutes: 1.5,
   instructions: [
-    "Play the open G string (3rd string) repeatedly.",
-    "Focus on maintaining a steady rhythm and even volume.",
-    "Use alternate picking if possible."
+    "Pick the open G string (the 3rd string) in a steady, even stream along with the metronome.",
+    "Keep every note the same length and the same volume.",
+    "Use a clean, plain sound so you can clearly hear each note."
   ],
   tips: [
-    "Keep your picking hand relaxed.",
-    "Listen carefully to the metronome.",
-    "Try to sync your picks perfectly with the beats."
+    "Pick with small, controlled movements so the rhythm stays even.",
+    "Lightly rest your hands against the strings you're not playing to keep them quiet.",
+    "Sit up straight and stay relaxed to avoid tiring out."
   ],
+  whyItMatters: "This exercise improves timing consistency and alternate picking control by training you to play evenly with the metronome. It helps build the precision and stability needed for clean rhythm guitar playing.",
   metronomeSpeed: {
     min: 40,
     max: 120,

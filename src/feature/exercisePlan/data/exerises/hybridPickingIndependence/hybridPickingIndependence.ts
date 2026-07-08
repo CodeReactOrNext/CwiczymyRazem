@@ -1,26 +1,22 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const hybridPickingIndependenceExercise: Exercise = {
   id: "hybrid_picking_independence",
-  title: "String Skipping",
-  description: "Use the pick on bass strings and fingers (m, a) on treble strings.",
+  title: "Hybrid Picking Independence",
+  description: "Combine your pick and fingers to play wide-interval string-skipping lines.",
+  whyItMatters: "Hybrid picking bridges the gap between pick control and fingerstyle agility. Using the pick for low strings and fingers for high strings allows you to cross wide string gaps effortlessly, which is essential for modern rock, country, and jazz fusion styles.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
-    "Use pick for strings 6, 5, and 4 (bass strings).",
-    "Use middle finger (m) for string 3 and ring finger (a) for strings 2 and 1.",
-    "Play the pattern: Pick on bass, then pluck strings 2 and 1 simultaneously with fingers.",
-    "Practice the ascending pattern across different string combinations.",
-    "Keep steady rhythm and balance volume between pick and fingers."
+    "Use the pick for lower strings and pluck higher strings with your middle and ring fingers.",
+    "Maintain a consistent volume balance between picked and plucked notes."
   ],
   tips: [
-    "Try to balance the volume between the pick stroke and the finger pluck.",
-    "Rest your pinky on the guitar body for stability.",
-    "Use the pad of your fingers, not the nails, for a warmer tone.",
-    "Start very slow - hybrid picking requires independence between pick and fingers."
+    "Keep your picking hand fingers close to the strings to minimize plucking lag.",
+    "Anchor your fretting hand fingers firmly to prevent notes from bleeding together."
   ],
-  metronomeSpeed: { min: 60, max: 100, recommended: 80 },
+  metronomeSpeed: { min: 40, max: 100, recommended: 80 },
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {

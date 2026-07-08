@@ -61,6 +61,13 @@ export const useMetronome = ({
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
+  // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
+  const [volume, setVolume] = useState(0.5);
+  // Playback anchor mirrored into React state. The refs are set on the audio
+  // thread's first scheduled beat, which on a skipCountIn start (loop restart,
+  // live seek) changes no state at all — without this mirror the memoized
+  // return value would keep exposing startTime/audioStartTime = null forever.
+  const [playbackAnchor, setPlaybackAnchor] = useState<{ wall: number | null; audio: number | null }>({ wall: null, audio: null });
 
   const audioContextRef      = useRef<AudioContext | null>(null);
   const nextNoteTimeRef      = useRef<number>(0);
@@ -71,8 +78,18 @@ export const useMetronome = ({
   const audioStartTimeRef    = useRef<number | null>(null);
   const beatCounterRef       = useRef<number>(0);
   const isMutedRef           = useRef(isMuted);
+  const volumeRef            = useRef(volume);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef= useRef<number>(0);
+  // Beat position the next GP playback (AlphaTab) should seek to, or null to
+  // start/resume normally. Set by seekToBeats, cleared on restart, consumed once
+  // by the AlphaTab player before it calls play(). Without this the GP audio
+  // ignores bar-click seeks (visual cursor jumps, audio does not).
+  const pendingSeekBeatRef   = useRef<number | null>(null);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   // Keep schedulerRef current so the worklet message handler never captures a stale closure.
   const schedulerRef    = useRef<(() => void) | null>(null);
@@ -84,6 +101,10 @@ export const useMetronome = ({
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
+
+  useEffect(() => {
+    setBpm(initialBpm);
+  }, [initialBpm]);
 
   // ── AudioContext + AudioWorklet setup ───────────────────────────────────────
   // When externalAudioContext is provided (e.g. AlphaTab's context for GP files),
@@ -128,6 +149,9 @@ export const useMetronome = ({
   const playSound = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
+    const peak = 0.85 * volumeRef.current;
+    if (peak <= 0.0001) return;
+
     const context    = audioContextRef.current;
     const oscillator = context.createOscillator();
     const gainNode   = context.createGain();
@@ -136,8 +160,8 @@ export const useMetronome = ({
     oscillator.frequency.value = isAccent ? 1200 : 800;
 
     gainNode.gain.setValueAtTime(0, time);
-    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.001);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    gainNode.gain.linearRampToValueAtTime(peak, time + 0.001);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
 
     oscillator.connect(gainNode);
     gainNode.connect(context.destination);
@@ -165,13 +189,25 @@ export const useMetronome = ({
       } else {
         if (startTimeRef.current === null) {
           const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - ctx.currentTime) * 1000);
-          startTimeRef.current = Date.now() + msUntilBeat - pausedElapsedTimeRef.current;
+          // When resuming from a pause, snap the resume offset to a WHOLE number of
+          // beats. Otherwise resuming mid-beat (e.g. at beat 5.3) makes the click grid
+          // land at 5.3 / 6.3 / … instead of on the beat, drifting away from the notes.
+          // On a fresh start pausedElapsed is 0, so this is a no-op there.
+          const beatsPaused      = secondsPerBeat > 0 ? Math.round((pausedAudioElapsedRef.current / 1000) / secondsPerBeat) : 0;
+          const snappedElapsedMs = beatsPaused * secondsPerBeat * 1000;
+          startTimeRef.current = Date.now() + msUntilBeat - snappedElapsedMs;
           if (audioContextRef.current) {
-            audioStartTimeRef.current = nextNoteTimeRef.current - (pausedAudioElapsedRef.current / 1000);
+            audioStartTimeRef.current = nextNoteTimeRef.current - (snappedElapsedMs / 1000);
           }
-          beatCounterRef.current = 0;
+          // Continue the accent grid from the resumed beat so downbeats stay aligned.
+          beatCounterRef.current = beatsPaused;
           onPlayStartRef.current?.();
-          setTimeout(() => setCountInRemaining(0), 0);
+          const wall  = startTimeRef.current;
+          const audio = audioStartTimeRef.current;
+          setTimeout(() => {
+            setCountInRemaining(0);
+            setPlaybackAnchor({ wall, audio });
+          }, 0);
         }
         playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
         beatCounterRef.current += 1;
@@ -207,24 +243,25 @@ export const useMetronome = ({
     return workletNodeRef.current;
   }, []);
 
-  const startMetronome = useCallback(() => {
+  const startMetronome = useCallback((options?: { skipCountIn?: boolean }) => {
     const ctx = audioContextRef.current;
     if (!ctx) return;
 
     if (ctx.state === 'suspended') ctx.resume();
 
-    nextNoteTimeRef.current  = ctx.currentTime;
-    countInTargetRef.current = 4;
-    startTimeRef.current     = null;
-    audioStartTimeRef.current= null;
-    beatCounterRef.current   = 0;
-    setCountInRemaining(4);
+    const useCountIn = !options?.skipCountIn;
+    nextNoteTimeRef.current   = ctx.currentTime;
+    countInTargetRef.current  = useCountIn ? 4 : 0;
+    startTimeRef.current      = null;
+    audioStartTimeRef.current = null;
+    beatCounterRef.current    = 0;
+    setCountInRemaining(useCountIn ? 4 : 0);
+    setPlaybackAnchor({ wall: null, audio: null });
 
     const node = ensureWorkletNode();
     if (node) {
       node.port.postMessage({ type: 'start' });
     } else {
-      // Worklet not yet ready — run the first tick immediately so there's no silent gap.
       scheduler();
     }
 
@@ -245,6 +282,7 @@ export const useMetronome = ({
     audioStartTimeRef.current = null;
     countInTargetRef.current  = 0;
     setCountInRemaining(0);
+    setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
   }, []);
 
@@ -253,6 +291,7 @@ export const useMetronome = ({
     pausedElapsedTimeRef.current  = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current        = 0;
+    pendingSeekBeatRef.current    = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -273,6 +312,17 @@ export const useMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  const seekToBeats = useCallback((beats: number) => {
+    // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
+    // without waiting for the next React render cycle.
+    if (startTimeRef.current !== null) return;
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    const elapsedMs = beats * secondsPerBeat * 1000;
+    pausedElapsedTimeRef.current  = elapsedMs;
+    pausedAudioElapsedRef.current = elapsedMs;
+    pendingSeekBeatRef.current    = beats; // GP audio jumps here on the next play()
+  }, [bpm, speedMultiplier]);
+
   return useMemo(() => ({
     bpm,
     isPlaying,
@@ -280,18 +330,23 @@ export const useMetronome = ({
     minBpm,
     maxBpm,
     setBpm,
+    volume,
+    setVolume,
     toggleMetronome,
     startMetronome,
     stopMetronome,
     restartMetronome,
+    seekToBeats,
+    pendingSeekBeatRef,
     handleSetRecommendedBpm,
     recommendedBpm,
-    startTime: startTimeRef.current,
+    startTime: playbackAnchor.wall,
     audioContext: audioContextRef.current,
-    audioStartTime: audioStartTimeRef.current,
+    audioStartTime: playbackAnchor.audio,
   }), [
-    bpm, isPlaying, countInRemaining, minBpm, maxBpm, 
-    setBpm, toggleMetronome, startMetronome, stopMetronome, 
-    restartMetronome, handleSetRecommendedBpm, recommendedBpm
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm,
+    setBpm, volume, setVolume, toggleMetronome, startMetronome, stopMetronome,
+    restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm,
+    playbackAnchor,
   ]);
 };

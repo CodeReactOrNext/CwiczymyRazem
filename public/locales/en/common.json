@@ -1,5 +1,6 @@
 {
   "or": "or",
+  "favorites": "Favorites",
   "start": "Start",
   "finish": "Finish",
   "min": "min",
@@ -108,7 +109,8 @@
     "habits": "Habits",
     "userNotFound": "User not found",
     "actual_streak": "Streak",
-    "fame_description": "Fame points are awarded for likes received and community activity."
+    "fame_description": "Fame points are awarded for likes received and community activity.",
+    "viewProfile": "View profile"
   },
   "song_status": {
     "move_to": "Move to",
@@ -155,7 +157,7 @@
     "music_theory": "Music Theory",
     "slide_guitar": "Slide Guitar",
     "audio_production": "Audio Production",
-    "hybrid_picking": "Hybrid Picking",
+    "hybrid_picking": "Picking Control",
     "transcription": "Transcription",
     "picking": "Picking",
     "finger_independence": "Finger Independence",
@@ -175,6 +177,7 @@
     "difficulty": "Difficulty"
   },
   "difficulty": {
+    "beginner": "Beginner",
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard"
@@ -196,11 +199,10 @@
   },
   "finish_session": "Finish Session",
   "next_step": "Next Step",
-  "skip": "Skip",
+  "skip": "Next",
   "seo": {
-    "title": "Riff Quest - See Your Guitar Progress",
-    "description": "The free guitar practice tracker that turns random sessions into visible progress. Track songs, skills, and streaks without the stress.",
-    "keywords": "guitar practice routine, daily guitar practice, guitar practice app, track guitar practice, guitar practice progress, track song difficulty, what guitar song to learn, guitar song recommender, guitar song picker, learn guitar songs quiz"
+    "title": "Guitar Practice Tracker - See Your Progress | Riff Quest",
+    "description": "The free guitar practice tracker that turns random sessions into visible progress. Track songs, skills, and streaks without the stress."
   },
   "practice": {
     "congratulations": "Congratulations!",

@@ -33,6 +33,13 @@ export const reportUpdateUserStats = ({
     return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   };
   const clientToday = inputData.clientTodayISO ? parseClientDate(inputData.clientTodayISO) : new Date();
+  // Real client instant (with time-of-day) — used as the base for the stored
+  // reportDate so its calendar day stays correct in every timezone (charts/summary
+  // render in the viewer's local time). Falls back to the server clock if absent.
+  const clientNow =
+    inputData.clientNowISO && !isNaN(new Date(inputData.clientNowISO).getTime())
+      ? new Date(inputData.clientNowISO)
+      : new Date();
   const {
     time = { technique: 0, theory: 0, hearing: 0, creativity: 0, longestSession: 0 },
     habitsCount = 0,
@@ -102,8 +109,8 @@ export const reportUpdateUserStats = ({
 
   const raiting = {
     ...(isDateBackReport
-      ? makeRatingData(inputData, sumTime, 1)
-      : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak)),
+      ? makeRatingData(inputData, sumTime, 1, clientNow)
+      : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak, clientNow)),
   };
   const updatedLevel = levelUpUser(lvl, points + raiting.totalPoints);
   const isNewLevel = updatedLevel > lvl;
@@ -156,8 +163,8 @@ export const reportUpdateUserStats = ({
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
   const dateToReport = isDateBackReport
-    ? getDateFromPast(isDateBackReport)
-    : new Date();
+    ? getDateFromPast(isDateBackReport, clientNow)
+    : clientNow;
 
   const newRecords = {
     maxPoints: raiting.totalPoints > maxPoints,

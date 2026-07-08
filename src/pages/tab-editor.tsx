@@ -2,13 +2,18 @@ import { cn } from 'assets/lib/utils';
 import { useTablatureAudio } from 'feature/exercisePlan/hooks/useTablatureAudio';
 import type { TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
 import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
+import { ImportTablature } from 'feature/songs/components/ImportTablature/ImportTablature';
 import { AnimatePresence,motion } from 'framer-motion';
-import { LucideCopy, LucideEraser, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
+import { LucideChevronLeft, LucideCopy, LucideEraser, LucideFileMusic, LucideMonitor, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useCallback,useEffect, useState } from 'react';
 
 
+type ArticulationType = 'isHammerOn' | 'isPullOff' | 'isAccented' | 'isDead' | 'isVibrato' | 'isTap' | 'isPalmMute';
+
 export default function TabEditor() {
+  const router = useRouter();
   const [measures, setMeasures] = useState<TablatureMeasure[]>([
     {
       timeSignature: [4, 4],
@@ -21,6 +26,7 @@ export default function TabEditor() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [selectedCell, setSelectedCell] = useState<{ measureIdx: number; beatIdx: number; stringIdx: number } | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isGpModalOpen, setIsGpModalOpen] = useState(false);
   const [importText, setImportText] = useState("");
   const selectionStartRef = React.useRef<{ mIdx: number; bIdx: number; sIdx: number; x: number; y: number } | null>(null);
   const [activeSelection, setActiveSelection] = useState<{ measureIdx: number; startBeat: number; endBeat: number; startString: number; endString: number } | null>(null);
@@ -52,11 +58,11 @@ export default function TabEditor() {
   const saveHistory = useCallback((newMeasures: TablatureMeasure[]) => {
     const serialized = JSON.stringify(newMeasures);
     if (history[historyIdx] === serialized) return;
-    
+
     const newHistory = history.slice(0, historyIdx + 1);
     newHistory.push(serialized);
     if (newHistory.length > 50) newHistory.shift();
-    
+
     setHistory(newHistory);
     setHistoryIdx(newHistory.length - 1);
   }, [history, historyIdx, setHistory, setHistoryIdx]);
@@ -77,12 +83,44 @@ export default function TabEditor() {
     }
   }, [history, historyIdx, setMeasures, setHistoryIdx]);
 
+  const editId = typeof router.query.edit === "string" ? router.query.edit : null;
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+
+  // On mount, restore any saved draft so navigating away and back (e.g. a
+  // round-trip to the publish page) doesn't wipe the editor. Works for both
+  // edit mode (draft holds the exercise's tablature) and create mode.
   useEffect(() => {
-    if (history.length === 0) {
+    let restored = false;
+    try {
+      const raw = localStorage.getItem("tab-editor-draft");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMeasures(parsed);
+          setHistory([JSON.stringify(parsed)]);
+          setHistoryIdx(0);
+          restored = true;
+        }
+      }
+    } catch {}
+    if (!restored) {
       setHistory([JSON.stringify(measures)]);
       setHistoryIdx(0);
     }
+    setIsDraftLoaded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Keep the draft in sync so a round-trip to the publish page (or a refresh)
+  // preserves the user's work. Gated on isDraftLoaded (state, not a ref) so the
+  // initial render's run is skipped — otherwise it would overwrite the saved
+  // draft with the default measures before the restore above is committed.
+  useEffect(() => {
+    if (!isDraftLoaded) return;
+    try {
+      localStorage.setItem("tab-editor-draft", JSON.stringify(measures));
+    } catch {}
+  }, [isDraftLoaded, measures]);
 
   useTablatureAudio({
     measures,
@@ -107,15 +145,15 @@ export default function TabEditor() {
               cleanText = cleanText.substring(startIndex, endIndex + 1);
           }
       }
-      
+
       if (cleanText.endsWith(',')) {
           cleanText = cleanText.slice(0, -1).trim();
       }
-      
+
       const parseValue = (text: string) => {
           return new Function(`return (${text})`)();
       };
-      
+
       const parsed = parseValue(cleanText);
       if (!Array.isArray(parsed)) return null;
 
@@ -149,7 +187,7 @@ export default function TabEditor() {
                       isPullOff: !!n.isPullOff
                   }))
               }));
-              
+
               while (beatsInMeasure.length < BEATS_PER_MEASURE) {
                   beatsInMeasure.push({ duration: 0.25, notes: [] });
               }
@@ -179,6 +217,24 @@ export default function TabEditor() {
     }
   };
 
+  const handleGpImported = useCallback((
+    importedMeasures: TablatureMeasure[],
+    fileName: string,
+    tempo: number,
+    trackName: string,
+  ) => {
+    if (!importedMeasures || importedMeasures.length === 0) {
+      showToast("This track has no tablature notes.", "error");
+      return;
+    }
+    setMeasures(importedMeasures);
+    saveHistory(importedMeasures);
+    if (tempo > 0) setBpm(Math.round(tempo));
+    setSelectedCell(null);
+    setActiveSelection(null);
+    showToast(`Loaded "${trackName}" from ${fileName}`, "success");
+  }, [saveHistory, showToast]);
+
   const stopPlayback = () => {
     setIsPlaying(false);
     setStartTime(null);
@@ -194,7 +250,7 @@ export default function TabEditor() {
   const updateMeasureSteps = (mIdx: number, steps: number) => {
     const newMeasures = [...measures];
     const currentBeats = newMeasures[mIdx].beats;
-    const duration = 4 / steps; // 4 quarter notes / number of steps
+    const duration = 4 / steps;
 
     const newBeats = Array(steps).fill(null).map((_, i) => {
       if (i < currentBeats.length) {
@@ -206,7 +262,7 @@ export default function TabEditor() {
     newMeasures[mIdx].beats = newBeats;
     setMeasures(newMeasures);
     saveHistory(newMeasures);
-    showToast(`Takt #${mIdx + 1}: ${steps} kroków`, "info");
+    showToast(`Measure #${mIdx + 1}: ${steps} steps`, "info");
   };
 
   const removeMeasure = (index: number) => {
@@ -224,25 +280,6 @@ export default function TabEditor() {
     }
   };
 
-  const toggleFret = (measureIdx: number, beatIdx: number, stringIdx: number, fret: number) => {
-    const string = stringIdx + 1;
-    const newMeasures = [...measures];
-    const beat = newMeasures[measureIdx].beats[beatIdx];
-    const noteIndex = beat.notes.findIndex(n => n.string === string);
-
-    if (noteIndex > -1) {
-      if (beat.notes[noteIndex].fret === fret) {
-        beat.notes.splice(noteIndex, 1);
-      } else {
-        beat.notes[noteIndex].fret = fret;
-      }
-    } else {
-      beat.notes.push({ string, fret });
-    }
-
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
-  };
 
   const updateDuration = (measureIdx: number, beatIdx: number, duration: number) => {
     const newMeasures = [...measures];
@@ -266,7 +303,7 @@ export default function TabEditor() {
     const newMeasures = [...measures];
     const beat = newMeasures[mIdx].beats[bIdx];
     const note = beat.notes.find(n => n.string === string);
-    
+
     if (note) {
         const delta = e.deltaY < 0 ? 1 : -1;
         note.fret = Math.max(0, Math.min(24, note.fret + delta));
@@ -290,7 +327,7 @@ export default function TabEditor() {
     setMeasures(newMeasures);
   };
 
-  const toggleEffect = (measureIdx: number, beatIdx: number, stringIdx: number, type: 'isHammerOn' | 'isPullOff' | 'isAccented') => {
+  const toggleEffect = (measureIdx: number, beatIdx: number, stringIdx: number, type: ArticulationType) => {
     const string = stringIdx + 1;
     const newMeasures = [...measures];
     const beat = newMeasures[measureIdx].beats[beatIdx];
@@ -305,6 +342,14 @@ export default function TabEditor() {
         if (note.isPullOff) note.isHammerOn = false;
       } else if (type === 'isAccented') {
         note.isAccented = !note.isAccented;
+      } else if (type === 'isDead') {
+        note.isDead = !note.isDead;
+      } else if (type === 'isVibrato') {
+        note.isVibrato = !note.isVibrato;
+      } else if (type === 'isTap') {
+        note.isTap = !note.isTap;
+      } else if (type === 'isPalmMute') {
+        note.isPalmMute = !note.isPalmMute;
       }
     }
 
@@ -315,7 +360,7 @@ export default function TabEditor() {
     const { permutation, startFret, endFret, strings, includeReturn, duration } = spiderConfig;
     const fingerDelta = permutation.split('').map(char => parseInt(char) - 1);
     const newMeasures: TablatureMeasure[] = [];
-    
+
     const frets = [];
     for (let f = startFret; f <= endFret; f++) frets.push(f);
     if (includeReturn) {
@@ -328,7 +373,6 @@ export default function TabEditor() {
     };
 
     frets.forEach(baseFret => {
-      // Forward strings
       strings.forEach(stringIdx => {
         fingerDelta.forEach(delta => {
           currentMeasure.beats.push({
@@ -343,9 +387,7 @@ export default function TabEditor() {
         });
       });
 
-      // Backward strings (String Return)
       if (spiderConfig.returnStrings) {
-        // Skip the very last string played to avoid duplicate beat on turnaround
         const returnStringsList = [...strings].reverse().slice(1);
         returnStringsList.forEach(stringIdx => {
           fingerDelta.forEach(delta => {
@@ -376,17 +418,6 @@ export default function TabEditor() {
     showToast("Spider patterns generated!", "success");
   };
 
-  const generateBasicPattern = () => {
-    const newMeasures: TablatureMeasure[] = [{
-      timeSignature: [4, 4],
-      beats: Array(16).fill(null).map((_, i) => ({
-        duration: 0.25,
-        notes: i < 4 ? [{ string: 6, fret: i + 1 }] : []
-      }))
-    }];
-    setMeasures(newMeasures);
-  };
-
   const copyCode = () => {
     const cleanMeasures = measures.map(m => ({
       ...m,
@@ -397,7 +428,7 @@ export default function TabEditor() {
       if (key === 'isHammerOn' || key === 'isPullOff') return value || undefined;
       return value;
     }, 2)},`;
-    
+
     navigator.clipboard.writeText(formattedCode);
     showToast("Full tablature code exported to clipboard!", "success");
   };
@@ -421,7 +452,7 @@ export default function TabEditor() {
         if (tMIdx < newMeasures.length) {
             const targetBeat = newMeasures[tMIdx].beats[tBIdx];
             targetBeat.duration = beat.duration;
-            
+
             beat.notes.forEach((note: TablatureNote) => {
                 const newString = note.string + stringOffset;
                 if (newString >= 1 && newString <= 6) {
@@ -449,18 +480,18 @@ export default function TabEditor() {
             Math.min(activeSelection.startBeat, activeSelection.endBeat),
             Math.max(activeSelection.startBeat, activeSelection.endBeat) + 1
         );
-        
+
         const minS = Math.min(activeSelection.startString, activeSelection.endString);
         const maxS = Math.max(activeSelection.startString, activeSelection.endString);
-        
+
         const filteredBeats = beats.map((beat: TablatureBeat) => ({
             ...beat,
             notes: beat.notes.filter((n: TablatureNote) => (n.string - 1) >= minS && (n.string - 1) <= maxS)
         }));
 
-        setClipboard({ 
-            beats: JSON.parse(JSON.stringify(filteredBeats)), 
-            baseStringIdx: minS 
+        setClipboard({
+            beats: JSON.parse(JSON.stringify(filteredBeats)),
+            baseStringIdx: minS
         });
         showToast("Copied selection", "success");
         setContextMenu(null);
@@ -488,7 +519,7 @@ export default function TabEditor() {
   }, [activeSelection, measures, saveHistory, showToast, setMeasures, setContextMenu]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (isImportModalOpen) return;
+    if (isImportModalOpen || isGpModalOpen) return;
 
     if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -514,12 +545,12 @@ export default function TabEditor() {
         const beat = measures[measureIdx].beats[beatIdx];
         const note = beat.notes.find(n => n.string === stringIdx + 1);
         let newFret = parseInt(e.key);
-        
+
         if (note && note.fret < 10 && note.fret > 0) {
             const combined = parseInt(`${note.fret}${e.key}`);
             if (combined <= 24) newFret = combined;
         }
-        
+
         updateFret(measureIdx, beatIdx, stringIdx, newFret);
         saveHistory(measures);
 
@@ -546,8 +577,11 @@ export default function TabEditor() {
         }
         setMeasures(newMeasures);
         saveHistory(newMeasures);
-    } else if (e.key.toLowerCase() === 'h' || e.key.toLowerCase() === 'p' || e.key.toLowerCase() === 'a') {
-        const typeMap: Record<string, 'isHammerOn' | 'isPullOff' | 'isAccented'> = { h: 'isHammerOn', p: 'isPullOff', a: 'isAccented' };
+    } else if (['h', 'p', 'a', 'd', 'v', 't', 'm'].includes(e.key.toLowerCase())) {
+        const typeMap: Record<string, ArticulationType> = {
+          h: 'isHammerOn', p: 'isPullOff', a: 'isAccented',
+          d: 'isDead', v: 'isVibrato', t: 'isTap', m: 'isPalmMute'
+        };
         const type = typeMap[e.key.toLowerCase()];
         if (activeSelection) {
             const newMeasures = [...measures];
@@ -562,6 +596,10 @@ export default function TabEditor() {
                         if (type === 'isHammerOn') { note.isHammerOn = !note.isHammerOn; if (note.isHammerOn) note.isPullOff = false; }
                         else if (type === 'isPullOff') { note.isPullOff = !note.isPullOff; if (note.isPullOff) note.isHammerOn = false; }
                         else if (type === 'isAccented') note.isAccented = !note.isAccented;
+                        else if (type === 'isDead') note.isDead = !note.isDead;
+                        else if (type === 'isVibrato') note.isVibrato = !note.isVibrato;
+                        else if (type === 'isTap') note.isTap = !note.isTap;
+                        else if (type === 'isPalmMute') note.isPalmMute = !note.isPalmMute;
                     }
                 }
             }
@@ -592,10 +630,10 @@ export default function TabEditor() {
     } else if (e.key.toLowerCase() === 'v' && (e.ctrlKey || e.metaKey)) {
         handlePasteAtCursor();
     }
-  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isImportModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
+  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isImportModalOpen, isGpModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
 
   const handlePaste = useCallback((e: ClipboardEvent) => {
-    if (isImportModalOpen) return;
+    if (isImportModalOpen || isGpModalOpen) return;
     const text = e.clipboardData?.getData('text');
     if (text) {
         const processed = processImportText(text);
@@ -606,7 +644,7 @@ export default function TabEditor() {
             if (isSnippet && selectedCell) {
                 const newMeasures = [...measures];
                 const flatBeats = processed.flatMap(m => m.beats);
-                
+
                 let currentM = selectedCell.measureIdx;
                 let currentB = selectedCell.beatIdx;
 
@@ -630,7 +668,7 @@ export default function TabEditor() {
             }
         }
     }
-  }, [isImportModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
+  }, [isImportModalOpen, isGpModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -638,17 +676,17 @@ export default function TabEditor() {
         const { mIdx, x: startX, y: startY } = selectionStartRef.current;
         const container = document.getElementById(`measure-grid-${mIdx}`);
         const box = document.getElementById(`selection-box-${mIdx}`);
-        
+
         if (container && box) {
           const rect = container.getBoundingClientRect();
           const currentX = e.clientX;
           const currentY = e.clientY;
-          
+
           const left = Math.min(startX, currentX) - rect.left;
           const top = Math.min(startY, currentY) - rect.top;
           const width = Math.abs(currentX - startX);
           const height = Math.abs(currentY - startY);
-          
+
           box.style.display = 'block';
           box.style.left = `${left}px`;
           box.style.top = `${top}px`;
@@ -670,17 +708,16 @@ export default function TabEditor() {
         const { mIdx, x: startAbsoluteX, y: startAbsoluteY } = selectionStartRef.current;
         const container = document.getElementById(`measure-grid-${mIdx}`);
         const box = document.getElementById(`selection-box-${mIdx}`);
-        
+
         if (container) {
-          const rect = container.getBoundingClientRect();
           const boxLeft = Math.min(startAbsoluteX, e.clientX);
           const boxRight = Math.max(startAbsoluteX, e.clientX);
           const boxTop = Math.min(startAbsoluteY, e.clientY);
           const boxBottom = Math.max(startAbsoluteY, e.clientY);
-          
+
           let minB = measures[mIdx].beats.length, maxB = -1, minS = 6, maxS = -1;
           const cells = container.querySelectorAll('.group-cell');
-          const BUFFER = 2; // Selection must overlap cell by 2px to be counted
+          const BUFFER = 2;
 
           cells.forEach((cell: any) => {
               const cRect = cell.getBoundingClientRect();
@@ -707,7 +744,7 @@ export default function TabEditor() {
             setActiveSelection(null);
           }
         }
-        
+
         if (box) box.style.display = 'none';
       }
       setIsDragging(false);
@@ -720,7 +757,7 @@ export default function TabEditor() {
     window.addEventListener('mouseup', handleMouseUp);
     const handleGlobalClick = () => setContextMenu(null);
     window.addEventListener('click', handleGlobalClick);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
@@ -732,6 +769,19 @@ export default function TabEditor() {
 
   return (
     <>
+      {/* Mobile blocker */}
+      <div className="md:hidden fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center p-8 text-center gap-6">
+        <div className="w-16 h-16 bg-zinc-900 border border-white/10 rounded-lg flex items-center justify-center">
+          <LucideMonitor className="text-white/30" size={32} />
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-xl font-black tracking-tight text-white">Desktop Only</h2>
+          <p className="text-sm text-white/40 max-w-xs leading-relaxed">
+            Tab Editor requires a keyboard and larger screen. Please open it on a desktop or laptop computer.
+          </p>
+        </div>
+      </div>
+
       <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-cyan-500/30">
         <Head>
           <title>Tablature Editor | Riff Quest</title>
@@ -742,51 +792,75 @@ export default function TabEditor() {
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => router.back()}
+                    className="p-1.5 text-white/30 hover:text-white transition-colors"
+                    title="Go back"
+                  >
+                    <LucideChevronLeft size={20} />
+                  </button>
                   <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center rotate-3">
-                      <LucideWand2 className="text-black" size={18} />
+                      <LucideWand2 className="text-zinc-950" size={18} />
                   </div>
-                  <h1 className="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40 uppercase">
+                  <h1 className="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">
                   Tab Editor
                   </h1>
               </div>
             </div>
-            
-            <div className="flex flex-wrap items-center gap-3 bg-white/5 p-1.5 rounded-2xl border border-white/10">
+
+            <div className="flex flex-wrap items-center gap-3 bg-white/5 p-1.5 rounded-lg border border-white/10">
+              <button
+                onClick={() => setIsGpModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-black text-cyan-400 group"
+              >
+                <LucideFileMusic size={12} />
+                <span>Import GP</span>
+              </button>
               <button
                 onClick={() => setIsImportModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-xl transition-all text-[10px] font-black group"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-[10px] font-black group"
               >
-                <span>PASTE CODE</span>
+                <span>Paste code</span>
               </button>
               <button
                 onClick={copyCode}
-                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-black hover:bg-cyan-400 rounded-xl transition-all text-[10px] font-black group shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg transition-all text-[10px] font-black group"
               >
                 <LucideCopy size={14} />
-                <span>COPY EXPORT</span>
+                <span>Copy export</span>
               </button>
               <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
               <button
                 onClick={() => setIsSpiderModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-xl transition-all text-[10px] font-bold text-cyan-400"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-bold text-cyan-400"
               >
                 <LucideWand2 size={12} />
-                <span>SPIDER GEN</span>
+                <span>Spider gen</span>
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.setItem('tab-editor-draft', JSON.stringify(measures));
+                  router.push(editId ? `/tab-editor/publish?edit=${editId}` : '/tab-editor/publish');
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg transition-all text-[10px] font-bold text-emerald-400"
+              >
+                <LucidePlus size={12} />
+                <span>{editId ? 'Save changes' : 'Publish'}</span>
               </button>
               <button
                 onClick={clearAll}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 rounded-xl transition-all text-[10px] font-bold text-white/40 hover:text-red-400"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 rounded-lg transition-all text-[10px] font-bold text-white/40 hover:text-red-400"
               >
                 <LucideEraser size={12} />
-                <span>CLEAR</span>
+                <span>Clear</span>
               </button>
               <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
-              <div className="flex items-center gap-1 bg-black rounded-xl border border-white/10 p-1">
+              <div className="flex items-center gap-1 bg-black rounded-lg border border-white/10 p-1">
                 <button
                   onClick={() => isPlaying ? stopPlayback() : startPlayback()}
                   className={cn(
-                    "p-2 w-8 h-8 flex items-center justify-center rounded-lg transition-all",
-                    isPlaying ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]" : "bg-white/10 text-white hover:bg-white/20"
+                    "p-2 w-8 h-8 flex items-center justify-center rounded transition-all",
+                    isPlaying ? "bg-red-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
                   )}
                 >
                   {isPlaying ? <LucideSquare size={14} fill="currentColor" /> : <LucidePlay size={14} fill="currentColor" className="ml-0.5" />}
@@ -794,29 +868,29 @@ export default function TabEditor() {
                 <button
                   onClick={() => setIsMuted(!isMuted)}
                   className={cn(
-                      "p-2 w-8 h-8 flex items-center justify-center rounded-lg transition-all",
+                      "p-2 w-8 h-8 flex items-center justify-center rounded transition-all",
                       isMuted ? "text-red-400 bg-red-400/10" : "text-white/40 hover:text-white"
                   )}
                 >
                   {isMuted ? <LucideVolumeX size={14} /> : <LucideVolume2 size={14} />}
                 </button>
                 <div className="px-2 py-1 flex flex-col justify-center min-w-[40px]">
-                  <span className="text-[7px] uppercase font-black text-white/20 leading-tight">BPM</span>
-                  <input 
-                      type="number" 
-                      value={bpm} 
+                  <span className="text-[7px] font-black text-white/20 leading-tight">BPM</span>
+                  <input
+                      type="number"
+                      value={bpm}
                       onChange={(e) => setBpm(parseInt(e.target.value) || 80)}
                       className="bg-transparent text-[11px] font-black w-8 outline-none text-cyan-400"
                   />
                 </div>
-                <div className="flex items-center gap-1 bg-black/40 rounded-xl border border-white/10 p-0.5">
+                <div className="flex items-center gap-1 bg-black/40 rounded border border-white/10 p-0.5">
                     {[1, 0.5, 0.25, 0.125].map(d => (
                         <button
                             key={d}
                             onClick={() => setGlobalDuration(d)}
                             className={cn(
-                                "px-2 h-7 flex items-center justify-center rounded-lg transition-all text-[8px] font-black uppercase whitespace-nowrap",
-                                d === (measures[0]?.beats[0]?.duration) ? "bg-cyan-500 text-black" : "text-white/40 hover:text-white hover:bg-white/5"
+                                "px-2 h-7 flex items-center justify-center rounded transition-all text-[8px] font-black whitespace-nowrap",
+                                d === (measures[0]?.beats[0]?.duration) ? "bg-cyan-500 text-zinc-950" : "text-white/40 hover:text-white hover:bg-white/5"
                             )}
                         >
                             {d === 1 && "1/4"}
@@ -830,8 +904,8 @@ export default function TabEditor() {
                 <button
                     onClick={() => setAutoAdvance(!autoAdvance)}
                     className={cn(
-                        "px-2 h-8 flex items-center justify-center rounded-lg transition-all text-[8px] font-black uppercase tracking-widest gap-2",
-                        autoAdvance ? "bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "bg-white/5 text-white/40 hover:text-white"
+                        "px-2 h-8 flex items-center justify-center rounded transition-all text-[8px] font-black tracking-widest gap-2",
+                        autoAdvance ? "bg-cyan-500 text-zinc-950" : "bg-white/5 text-white/40 hover:text-white"
                     )}
                 >
                     <div className={cn("w-1 h-1 rounded-full", autoAdvance ? "bg-black animate-pulse" : "bg-white/20")} />
@@ -847,40 +921,40 @@ export default function TabEditor() {
           {/* Import Modal */}
           <AnimatePresence>
             {isImportModalOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
               >
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.9, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 max-w-2xl w-full space-y-6 shadow-2xl"
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-cyan-400">Import Tablature</h3>
+                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Tablature</h3>
                     <p className="text-sm text-white/40 font-medium">Paste your exercise code snippet or JSON array here.</p>
                   </div>
-                  
+
                   <textarea
                     value={importText}
                     onChange={(e) => setImportText(e.target.value)}
                     placeholder="tablature: [ ... ]"
-                    className="w-full h-64 bg-black/50 border border-white/10 rounded-2xl p-4 font-mono text-[11px] text-cyan-100/70 outline-none focus:border-cyan-500/50 transition-all resize-none custom-scrollbar"
+                    className="w-full h-64 bg-black/50 border border-white/10 rounded-lg p-4 font-mono text-[11px] text-cyan-100/70 outline-none focus:border-cyan-500/50 transition-all resize-none custom-scrollbar"
                   />
 
                   <div className="flex gap-4">
                     <button
                       onClick={() => { setIsImportModalOpen(false); setImportText(""); }}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={importCode}
-                      className="flex-1 py-3 bg-cyan-500 text-black hover:bg-cyan-400 rounded-xl text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Import & Load
                     </button>
@@ -890,55 +964,95 @@ export default function TabEditor() {
             )}
           </AnimatePresence>
 
-          {/* Spider Generator Modal */}
+          {/* GP Import Modal */}
           <AnimatePresence>
-            {isSpiderModalOpen && (
-              <motion.div 
+            {isGpModalOpen && (
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
               >
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.9, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 max-w-2xl w-full space-y-6 shadow-2xl"
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Guitar Pro</h3>
+                      <p className="text-sm text-white/40 font-medium">
+                        Drop a GP3/GP4/GP5/GPX/GP file, then pick a track to load it into the editor.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setIsGpModalOpen(false)}
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-black tracking-widest transition-all shrink-0"
+                    >
+                      Done
+                    </button>
+                  </div>
+
+                  <ImportTablature
+                    onImported={(importedMeasures, fileName, tempo, trackName) =>
+                      handleGpImported(importedMeasures, fileName, tempo, trackName)
+                    }
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Spider Generator Modal */}
+          <AnimatePresence>
+            {isSpiderModalOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
+                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
                     <p className="text-sm text-white/40 font-medium">Configure your spider pattern parameters.</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-white/40">Finger Permutation</label>
-                        <input 
-                          type="text" 
-                          value={spiderConfig.permutation} 
+                        <label className="text-[10px] font-black text-white/40">Finger Permutation</label>
+                        <input
+                          type="text"
+                          value={spiderConfig.permutation}
                           onChange={(e) => setSpiderConfig({...spiderConfig, permutation: e.target.value})}
                           placeholder="e.g. 1234, 1324"
-                          className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                          className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase text-white/40">Start Fret</label>
-                          <input 
-                            type="number" 
-                            value={spiderConfig.startFret} 
+                          <label className="text-[10px] font-black text-white/40">Start Fret</label>
+                          <input
+                            type="number"
+                            value={spiderConfig.startFret}
                             onChange={(e) => setSpiderConfig({...spiderConfig, startFret: parseInt(e.target.value) || 1})}
-                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase text-white/40">End Fret</label>
-                          <input 
-                            type="number" 
-                            value={spiderConfig.endFret} 
+                          <label className="text-[10px] font-black text-white/40">End Fret</label>
+                          <input
+                            type="number"
+                            value={spiderConfig.endFret}
                             onChange={(e) => setSpiderConfig({...spiderConfig, endFret: parseInt(e.target.value) || 12})}
-                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
                           />
                         </div>
                       </div>
@@ -946,11 +1060,11 @@ export default function TabEditor() {
 
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-white/40">Rhythm (Duration)</label>
-                        <select 
+                        <label className="text-[10px] font-black text-white/40">Rhythm (Duration)</label>
+                        <select
                           value={spiderConfig.duration}
                           onChange={(e) => setSpiderConfig({...spiderConfig, duration: parseFloat(e.target.value)})}
-                          className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                          className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
                         >
                           <option value={0.5}>1/8 (Eighth)</option>
                           <option value={0.25}>1/16 (Sixteenth)</option>
@@ -958,20 +1072,20 @@ export default function TabEditor() {
                         </select>
                       </div>
                       <div className="flex items-center gap-3 py-2">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           id="includeReturn"
-                          checked={spiderConfig.includeReturn} 
+                          checked={spiderConfig.includeReturn}
                           onChange={(e) => setSpiderConfig({...spiderConfig, includeReturn: e.target.checked})}
                           className="w-5 h-5 accent-cyan-500"
                         />
                         <label htmlFor="includeReturn" className="text-sm font-bold text-white/60">Fret Return (Loop Down)</label>
                       </div>
                       <div className="flex items-center gap-3 py-2">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           id="returnStrings"
-                          checked={spiderConfig.returnStrings} 
+                          checked={spiderConfig.returnStrings}
                           onChange={(e) => setSpiderConfig({...spiderConfig, returnStrings: e.target.checked})}
                           className="w-5 h-5 accent-cyan-500"
                         />
@@ -983,13 +1097,13 @@ export default function TabEditor() {
                   <div className="flex gap-4 pt-4">
                     <button
                       onClick={() => setIsSpiderModalOpen(false)}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={generateSpider}
-                      className="flex-1 py-3 bg-cyan-500 text-black hover:bg-cyan-400 rounded-xl text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all uppercase tracking-widest"
+                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
                     >
                       Generate Spider
                     </button>
@@ -1000,20 +1114,18 @@ export default function TabEditor() {
           </AnimatePresence>
 
           {/* Live Preview Section */}
-
           <section className="space-y-4">
               <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Real-time Visualization</h2>
+                  <h2 className="text-[10px] font-black tracking-[0.3em] text-white/40">Real-time Visualization</h2>
               </div>
-              <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-duration-500" />
-                  <TablatureViewer 
+              <div className="relative">
+                  <TablatureViewer
                       measures={measures}
                       bpm={bpm}
                       isPlaying={isPlaying}
                       startTime={startTime}
-                      className="h-56 relative z-10 backdrop-blur-3xl"
+                      className="h-[280px] relative z-10 backdrop-blur-3xl"
                   />
               </div>
           </section>
@@ -1022,51 +1134,51 @@ export default function TabEditor() {
           <section className="space-y-6">
             <AnimatePresence>
               {measures.map((measure, mIdx) => (
-                <motion.div 
+                <motion.div
                   key={mIdx}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative"
+                  className="bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden relative"
                 >
                   <div className="bg-white/[0.02] p-4 flex items-center justify-between border-b border-white/10">
                     <div className="flex items-center gap-6">
                         <div className="bg-white/5 px-3 py-1 rounded-full">
-                          <span className="text-[10px] font-black text-white/40 uppercase tracking-tighter">Measure #{mIdx + 1}</span>
+                          <span className="text-[10px] font-black text-white/40 tracking-tighter">Measure #{mIdx + 1}</span>
                         </div>
                           <div className="flex items-center gap-4 text-[10px] font-bold text-white/20">
                             <span>4 / 4 TIME</span>
                             <span className="w-1 h-1 rounded-full bg-white/10" />
-                            <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded-lg border border-white/5">
+                            <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded">
                                 {[8, 12, 16, 24, 32].map(s => (
                                     <button
                                         key={s}
                                         onClick={() => updateMeasureSteps(mIdx, s)}
                                         className={cn(
                                             "px-2 py-0.5 rounded transition-all whitespace-nowrap",
-                                            measure.beats.length === s 
-                                                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" 
+                                            measure.beats.length === s
+                                                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
                                                 : "hover:bg-white/5 text-white/20"
                                         )}
                                     >
-                                        {s === 12 ? "Triole (12)" : s === 24 ? "Sekstole (24)" : `${s} KROKÓW`}
+                                        {s === 12 ? "Triplet (12)" : s === 24 ? "Sextuplet (24)" : `${s} steps`}
                                     </button>
                                 ))}
                             </div>
                           </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => removeMeasure(mIdx)}
-                      className="p-2.5 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all border border-transparent hover:border-red-400/20"
+                      className="p-2.5 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded transition-all"
                     >
                       <LucideTrash2 size={18} />
                     </button>
                   </div>
-                  
+
                     <div className="p-8 overflow-x-auto custom-scrollbar relative">
                       <div className="min-w-max">
-                          <div 
-                              id={`measure-grid-${mIdx}`} 
+                          <div
+                              id={`measure-grid-${mIdx}`}
                               className="flex gap-4 relative"
                               onMouseDown={(e) => {
                                   if (e.button !== 0) return;
@@ -1080,11 +1192,11 @@ export default function TabEditor() {
                                       const rect = e.currentTarget.getBoundingClientRect();
                                       const localX = e.clientX - rect.left;
                                       const localY = e.clientY - rect.top;
-                                      const gridStartX = 40; 
+                                      const gridStartX = 40;
                                       bIdx = Math.max(0, Math.min(15, Math.floor((localX - gridStartX) / 55)));
                                       sIdx = Math.max(0, Math.min(5, Math.floor(localY / 52)));
                                   }
-                                  
+
                                   setSelectedCell({ measureIdx: mIdx, beatIdx: bIdx, stringIdx: sIdx });
                                   selectionStartRef.current = { mIdx, bIdx, sIdx, x: e.clientX, y: e.clientY };
                                   setActiveSelection(null);
@@ -1108,8 +1220,8 @@ export default function TabEditor() {
                                       sIdx = Math.max(0, Math.min(5, Math.floor(localY / 52)));
                                   }
 
-                                  const isCellInSelection = activeSelection && activeSelection.measureIdx === mIdx && 
-                                      bIdx >= Math.min(activeSelection.startBeat, activeSelection.endBeat) && 
+                                  const isCellInSelection = activeSelection && activeSelection.measureIdx === mIdx &&
+                                      bIdx >= Math.min(activeSelection.startBeat, activeSelection.endBeat) &&
                                       bIdx <= Math.max(activeSelection.startBeat, activeSelection.endBeat) &&
                                       sIdx >= Math.min(activeSelection.startString, activeSelection.endString) &&
                                       sIdx <= Math.max(activeSelection.startString, activeSelection.endString);
@@ -1128,10 +1240,10 @@ export default function TabEditor() {
                                   setContextMenu({ x, y });
                               }}
                           >
-                              {/* Selection Rect Overlay (Direct DOM) */}
-                              <div 
+                              {/* Selection Rect Overlay */}
+                              <div
                                 id={`selection-box-${mIdx}`}
-                                className="absolute z-20 pointer-events-none border border-cyan-400 bg-cyan-400/20 shadow-[0_0_10px_rgba(6,182,212,0.1)] hidden"
+                                className="absolute z-20 pointer-events-none border border-cyan-400 bg-cyan-400/20 hidden"
                               />
                             {/* String Labels */}
                             <div className="flex flex-col justify-between py-2 mb-10 text-[10px] font-black text-white/20 w-4">
@@ -1148,16 +1260,15 @@ export default function TabEditor() {
                                         const note = beat.notes.find(n => n.string === sIdx + 1);
                                         const isSelected = selectedCell?.measureIdx === mIdx && selectedCell?.beatIdx === bIdx && selectedCell?.stringIdx === sIdx;
                                         const isInActiveSelection = !isDragging && activeSelection?.measureIdx === mIdx &&
-                                          bIdx >= Math.min(activeSelection.startBeat, activeSelection.endBeat) && 
+                                          bIdx >= Math.min(activeSelection.startBeat, activeSelection.endBeat) &&
                                           bIdx <= Math.max(activeSelection.startBeat, activeSelection.endBeat) &&
                                           sIdx >= Math.min(activeSelection.startString, activeSelection.endString) &&
                                           sIdx <= Math.max(activeSelection.startString, activeSelection.endString);
-                                      const isHovered = hoveredCell?.mIdx === mIdx && hoveredCell?.bIdx === bIdx && hoveredCell?.sIdx === sIdx;
                                       const isCrosshair = (selectedCell?.measureIdx === mIdx && (selectedCell?.beatIdx === bIdx || selectedCell?.stringIdx === sIdx));
                                       const isBeatMark = bIdx % 4 === 0;
 
                                       return (
-                                        <button 
+                                        <button
                                           key={sIdx}
                                           data-bidx={bIdx}
                                           data-sidx={sIdx}
@@ -1167,22 +1278,28 @@ export default function TabEditor() {
                                           onMouseLeave={() => setHoveredCell(null)}
                                           onWheel={(e) => handleWheel(e, mIdx, bIdx, sIdx)}
                                           className={cn(
-                                            "w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all border-2 relative group-cell",
-                                            isSelected 
-                                              ? "border-cyan-500 bg-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]" 
+                                            "w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-all border-2 relative group-cell",
+                                            isSelected
+                                              ? "border-cyan-500 bg-cyan-500/20"
                                               : isInActiveSelection
                                                 ? "border-cyan-500/40 bg-cyan-500/10"
                                                 : isCrosshair
                                                   ? "border-white/5 bg-white/[0.02]"
-                                                  : isBeatMark 
-                                                    ? "border-white/10 bg-white/[0.03] hover:bg-white/10" 
+                                                  : isBeatMark
+                                                    ? "border-white/10 bg-white/[0.03] hover:bg-white/10"
                                                     : "border-white/5 bg-transparent hover:bg-white/5",
-                                            note ? "text-white scale-100" : "text-white/10 scale-95 hover:scale-100"
+                                            note ? "text-white" : "text-white/10",
+                                            note?.isPalmMute ? "border-b-amber-500/40" : ""
                                           )}
                                         >
                                           {note ? (
                                             <div className="flex flex-col items-center justify-center leading-none relative">
-                                              <span className="text-sm font-black tracking-tighter">{note.fret}</span>
+                                              <span className={cn(
+                                                "text-sm font-black tracking-tighter",
+                                                note.isDead ? "text-zinc-500" : ""
+                                              )}>
+                                                {note.isDead ? "×" : note.fret}
+                                              </span>
                                               {(note.isHammerOn || note.isPullOff) && (
                                                 <span className={cn(
                                                   "text-[9px] font-black mt-0.5",
@@ -1191,35 +1308,44 @@ export default function TabEditor() {
                                                   {note.isHammerOn ? 'H' : 'P'}
                                                 </span>
                                               )}
+                                              {note.isTap && (
+                                                <span className="text-[9px] font-black mt-0.5 text-purple-400">T</span>
+                                              )}
+                                              {note.isVibrato && (
+                                                <span className="text-[9px] font-black mt-0.5 text-cyan-300">~</span>
+                                              )}
+                                              {note.isPalmMute && (
+                                                <span className="text-[8px] font-black mt-0.5 text-amber-500/70 leading-none">PM</span>
+                                              )}
                                               {note.isAccented && (
-                                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
+                                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                                               )}
                                             </div>
                                           ) : (
                                             <span className="text-[14px] opacity-20">·</span>
                                           )}
                                           {isBeatMark && !note && !isSelected && (
-                                              <div className="absolute inset-0 bg-white/[0.02] rounded-xl pointer-events-none" />
+                                              <div className="absolute inset-0 bg-white/[0.02] rounded pointer-events-none" />
                                           )}
                                         </button>
                                       );
                                     })}
                                   </div>
 
-                                  <div className="grid grid-cols-2 gap-1 p-1 bg-white/[0.02] rounded-lg border border-white/5">
+                                  <div className="grid grid-cols-2 gap-1 p-1 bg-white/[0.02] rounded">
                                     {[1, 0.5, 0.25, 0.125].map(d => (
                                         <button
                                             key={d}
                                             onClick={() => updateDuration(mIdx, bIdx, d)}
                                             className={cn(
                                                 "h-4 px-1 rounded flex items-center justify-center transition-all whitespace-nowrap",
-                                                beat.duration === d ? "bg-cyan-500 text-[7px] text-black font-black" : "text-[7px] font-black text-white/20 hover:text-white/40"
+                                                beat.duration === d ? "bg-cyan-500 text-[7px] text-zinc-950 font-black" : "text-[7px] font-black text-white/20 hover:text-white/40"
                                             )}
                                         >
-                                            {d === 1 && "Ćwierć"}
-                                            {d === 0.5 && "8-ka"}
-                                            {d === 0.25 && "16-ka"}
-                                            {d === 0.125 && "32-ka"}
+                                            {d === 1 && "1/4"}
+                                            {d === 0.5 && "1/8"}
+                                            {d === 0.25 && "1/16"}
+                                            {d === 0.125 && "1/32"}
                                         </button>
                                     ))}
                                   </div>
@@ -1233,16 +1359,16 @@ export default function TabEditor() {
               ))}
             </AnimatePresence>
 
-            <button 
+            <button
               onClick={addMeasure}
-              className="w-full py-10 border-2 border-dashed border-white/5 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02] rounded-3xl flex flex-col items-center justify-center gap-3 group transition-all"
+              className="w-full py-10 border-2 border-dashed border-white/5 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02] rounded-lg flex flex-col items-center justify-center gap-3 group transition-all"
             >
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-cyan-500/20 group-hover:text-cyan-400 group-hover:rotate-90 transition-all duration-500">
+              <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-cyan-500/20 group-hover:text-cyan-400 group-hover:rotate-90 transition-all duration-500">
                   <LucidePlus size={24} />
               </div>
               <div className="flex flex-col items-center">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-white/30 group-hover:text-cyan-400 transition-all">Add New Measure</span>
-                  <span className="text-[10px] font-bold text-white/10 uppercase mt-1">Append 16 more steps to your pattern</span>
+                  <span className="text-xs font-black tracking-[0.2em] text-white/30 group-hover:text-cyan-400 transition-all">Add New Measure</span>
+                  <span className="text-[10px] font-bold text-white/10 mt-1">Append more steps to your pattern</span>
               </div>
             </button>
           </section>
@@ -1250,71 +1376,87 @@ export default function TabEditor() {
         </div>
 
         {/* Floating Shortcuts Sidebar */}
-        <div className="fixed top-1/2 -translate-y-1/2 right-6 z-40 hidden xl:flex flex-col gap-4 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl">
+        <div className="fixed top-1/2 -translate-y-1/2 right-6 z-40 hidden xl:flex flex-col gap-4 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-lg shadow-2xl">
             <div className="flex flex-col items-center gap-1 border-b border-white/5 pb-4 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/40 italic">Shortcuts</span>
+                <span className="text-[10px] font-black tracking-widest text-white/40 italic">Shortcuts</span>
             </div>
-            
-            <div className="space-y-6">
+
+            <div className="space-y-4">
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded-lg text-[11px] font-black border border-white/10 shadow-lg shadow-black">↑</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↑</kbd>
                     </div>
                     <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded-lg text-[11px] font-black border border-white/10 shadow-lg shadow-black">←</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded-lg text-[11px] font-black border border-white/10 shadow-lg shadow-black">↓</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded-lg text-[11px] font-black border border-white/10 shadow-lg shadow-black">→</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">←</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↓</kbd>
+                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">→</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20 mt-1">Navigate</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20 mt-1">Navigate</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <kbd className="px-3 h-7 flex items-center justify-center bg-white/10 rounded-lg text-[11px] font-black border border-white/10 shadow-lg shadow-black">0-9</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Fret</span>
+                    <kbd className="px-3 h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">0-9</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 text-center">
                     <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-400/20 text-amber-400 rounded-lg text-[11px] font-black border border-amber-400/20 shadow-lg shadow-black">H</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-red-400/20 text-red-400 rounded-lg text-[11px] font-black border border-red-400/20 shadow-lg shadow-black">P</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-400/20 text-amber-400 rounded text-[11px] font-black border border-amber-400/20">H</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-red-400/20 text-red-400 rounded text-[11px] font-black border border-red-400/20">P</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Legato</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Legato</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-400/20 text-cyan-400 rounded-lg text-[11px] font-black border border-cyan-400/20 shadow-lg shadow-black shadow-cyan-500/10">A</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Accent</span>
+                    <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-400/20 text-cyan-400 rounded text-[11px] font-black border border-cyan-400/20">A</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Accent</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-1">
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-zinc-400/20 text-zinc-400 rounded text-[11px] font-black border border-zinc-400/20">D</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-300/20 text-cyan-300 rounded text-[11px] font-black border border-cyan-300/20">V</kbd>
+                    </div>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Dead / Vib</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-1">
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-purple-400/20 text-purple-400 rounded text-[11px] font-black border border-purple-400/20">T</kbd>
+                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-500/20 text-amber-500 rounded text-[11px] font-black border border-amber-500/20">M</kbd>
+                    </div>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Tap / PM</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/5">
-                    <kbd className="px-2 h-7 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg text-[9px] font-black border border-red-500/20 shadow-lg shadow-black">DEL</kbd>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Clear</span>
+                    <kbd className="px-2 h-7 flex items-center justify-center bg-red-500/10 text-red-500 rounded text-[9px] font-black border border-red-500/20">DEL</kbd>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Clear</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-cyan-500/10 text-cyan-400 rounded-lg text-[9px] font-black border border-cyan-500/20 shadow-lg shadow-black">CTRL+Z</kbd>
+                        <kbd className="px-2 h-7 flex items-center justify-center bg-cyan-500/10 text-cyan-400 rounded text-[9px] font-black border border-cyan-500/20">CTRL+Z</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Undo</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Undo</span>
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-white/10 rounded-lg text-[10px] font-black border border-white/10 shadow-lg shadow-black">SCROLL</kbd>
+                        <kbd className="px-2 h-7 flex items-center justify-center bg-white/10 rounded text-[10px] font-black border border-white/10">SCROLL</kbd>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-white/20">Fret +/-</span>
+                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret +/-</span>
                 </div>
             </div>
       </div>
-        
+
         <AnimatePresence>
             {toast && (
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     className={cn(
-                        "fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl",
-                        toast.type === 'success' ? "bg-cyan-500 text-black" : "bg-red-500 text-white"
+                        "fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg font-black text-xs tracking-widest shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl",
+                        toast.type === 'success' ? "bg-cyan-500 text-zinc-950" : "bg-red-500 text-white"
                     )}
                 >
                     <div className={cn("w-2 h-2 rounded-full", toast.type === 'success' ? "bg-black animate-pulse" : "bg-white animate-bounce")} />
@@ -1325,40 +1467,40 @@ export default function TabEditor() {
 
         <AnimatePresence>
             {contextMenu && (
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     style={{ left: contextMenu.x, top: contextMenu.y }}
-                    className="fixed z-[110] bg-[#0f0f0f] border border-white/10 rounded-xl shadow-2xl overflow-hidden p-1 min-w-[140px]"
+                    className="fixed z-[110] bg-[#0f0f0f] border border-white/10 rounded shadow-2xl overflow-hidden p-1 min-w-[140px]"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <button 
+                    <button
                         onClick={handleCopySelection}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded-lg text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Copy</span>
                         <span className="text-[10px] opacity-30">CTRL+C</span>
                     </button>
-                    <button 
+                    <button
                         onClick={() => { handlePasteAtCursor(); setContextMenu(null); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded-lg text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Paste</span>
                         <span className="text-[10px] opacity-30">CTRL+V</span>
                     </button>
                     <div className="h-px bg-white/5 my-1" />
-                    <button 
+                    <button
                         onClick={() => { handleCopySelection(); handleDeleteSelection(); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded-lg text-xs font-black uppercase tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
                     >
                         <span>Cut</span>
                         <span className="text-[10px] opacity-30">CTRL+X</span>
                     </button>
                     <div className="h-px bg-white/5 my-1" />
-                    <button 
+                    <button
                         onClick={handleDeleteSelection}
-                        className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded-lg text-xs font-black uppercase tracking-widest text-red-400/60 hover:text-red-400 flex items-center justify-between transition-all"
+                        className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded text-xs font-black tracking-widest text-red-400/60 hover:text-red-400 flex items-center justify-between transition-all"
                     >
                         <span>Clear Area</span>
                         <span className="text-[10px] opacity-30">DEL</span>

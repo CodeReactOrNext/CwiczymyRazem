@@ -1,16 +1,20 @@
 import { Card } from "assets/components/ui/card";
+import Changelog, { hasRecentChanges, markChangelogAsViewed,useChangelogData } from "components/Changelog/Changelog";
 import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
+  FirebaseLogsMarketplaceInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
-import { useState } from "react";
+import { useEffect,useState } from "react";
 import { FaGuitar, FaMedal } from "react-icons/fa";
+import { FiBook } from "react-icons/fi";
 import { IoChatboxEllipses } from "react-icons/io5";
 
 import Chat from "../../feature/chat/Chat";
@@ -21,6 +25,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsSongsInterface
     | FirebaseLogsInterface
     | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsMarketplaceInterface
   )[];
   userAchievements: AchievementList[];
   currentUserId: string;
@@ -29,8 +34,9 @@ interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "discord" | "excerise" | "chat"
+    "logs" | "achievements" | "discord" | "excerise" | "chat" | "changelog"
   >("logs");
+  const [hasNewChangelog, setHasNewChangelog] = useState(false);
 
   const {
     unreadCount: unreadChats,
@@ -44,6 +50,14 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
     markAsRead: markLogsAsRead,
   } = useUnreadMessages("logs");
 
+  const { changelog } = useChangelogData("2026-05");
+
+  useEffect(() => {
+    if (changelog?.entries) {
+      setHasNewChangelog(hasRecentChanges(changelog.entries));
+    }
+  }, [changelog?.entries]);
+
   const { t } = useTranslation("common");
 
   const handleCategoryChange = (category: typeof showedCategory) => {
@@ -51,6 +65,9 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
       markChatsAsRead();
     } else if (category === "logs") {
       markLogsAsRead();
+    } else if (category === "changelog" && changelog?.entries) {
+      markChangelogAsViewed(changelog.entries);
+      setHasNewChangelog(false);
     }
     setShowedCategory(category);
   };
@@ -58,7 +75,7 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
   return (
     <Card
       className={`relative m-auto flex ${
-        showedCategory !== "achievements" && !className.includes("h-") ? "h-[600px]" : ""
+        showedCategory !== "achievements" && !className.includes("h-") ? "h-[800px]" : ""
       } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} text-xs leading-5 rounded-xl xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
       <div className=' left-0 top-0 flex flex-row  justify-around gap-4 mb-2  font-bold'>
         <LogsBoxButton
@@ -78,30 +95,67 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
           hasNewMessages={hasNewChats}
         />
         {!className.includes("border-none") && (
-          <LogsBoxButton
-            title={t("logsBox.achievements_map")}
-            active={showedCategory === "achievements"}
-            onClick={() => handleCategoryChange("achievements")}
-            Icon={FaMedal}
-          />
-        )}
-      </div>
-      {showedCategory === "achievements" && (
-        <AchievementsMap userAchievements={userAchievements} />
-      )}
-      <div className='h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 mb-2 scrollbar-track-transparent'>
-        {showedCategory === "logs" && logs && (
-          <div onClick={markLogsAsRead}>
-            <Logs 
-              logs={logs} 
-              marksLogsAsRead={markLogsAsRead} 
-              currentUserId={currentUserId}
+          <>
+            <LogsBoxButton
+              title={t("logsBox.achievements_map")}
+              active={showedCategory === "achievements"}
+              onClick={() => handleCategoryChange("achievements")}
+              Icon={FaMedal}
             />
-          </div>
+            <LogsBoxButton
+              title="Changelog"
+              active={showedCategory === "changelog"}
+              onClick={() => handleCategoryChange("changelog")}
+              Icon={FiBook}
+              hasNewDot={hasNewChangelog}
+            />
+          </>
         )}
-
-        {showedCategory === "chat" && <Chat />}
       </div>
+      <AnimatePresence mode="wait" initial={false}>
+        {showedCategory === "achievements" && (
+          <m.div
+            key="achievements"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
+            <AchievementsMap userAchievements={userAchievements} />
+          </m.div>
+        )}
+        {showedCategory === "changelog" && (
+          <m.div
+            key="changelog"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent p-4'>
+            <Changelog month="2026-05" />
+          </m.div>
+        )}
+        {(showedCategory === "logs" || showedCategory === "chat") && (
+          <m.div
+            key={showedCategory}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
+            {showedCategory === "logs" && logs && (
+              <div onClick={markLogsAsRead}>
+                <Logs
+                  logs={logs}
+                  marksLogsAsRead={markLogsAsRead}
+                  currentUserId={currentUserId}
+                />
+              </div>
+            )}
+
+            {showedCategory === "chat" && <Chat />}
+          </m.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 };

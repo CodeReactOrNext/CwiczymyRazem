@@ -39,7 +39,7 @@ export const ExerciseItem = ({
     <div
       ref={provided.innerRef}
       {...provided.draggableProps}
-      className='rounded-lg border bg-card p-4'>
+      className='rounded-lg bg-zinc-900/40 p-4'>
       <div className='flex items-center gap-4'>
         <div
           {...provided.dragHandleProps}

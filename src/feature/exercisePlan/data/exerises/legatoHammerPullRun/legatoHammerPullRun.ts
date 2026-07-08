@@ -1,33 +1,29 @@
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+﻿import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const legatoHammerPullRunExercise: Exercise = {
   id: "legato_hammer_pull_run",
   title: "Legato Hammer-Pull Scale Run",
-  description: "4-note hammer-on / pull-off groups across A natural minor 3nps positions. Pick only the first note of each group, then hammer up and pull back. Builds left-hand strength and legato clarity.",
+  description: "Incorporate legato runs across multiple strings with precise rhythmic timing.",
+  whyItMatters: "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 3,
   instructions: [
-    "Each group is 4 sixteenth notes: pick the first note, hammer-on to the next two, then pull-off back. Pattern per string: root → hammer → hammer → pull.",
-    "Measures 1-3: Ascending then descending across all 6 strings at 5th position (A natural minor).",
-    "Measures 4-6: Same pattern shifted to 7th position. Your hand has to re-settle cleanly at the new frets.",
-    "Focus on making hammer-ons and pull-offs as loud as the picked note — no volume dips.",
+    "Pick only the first note on each string, executing all other notes with legato.",
+    "Coordinate string transitions quickly to prevent gaps in the rhythmic flow."
   ],
   tips: [
-    "Keep your thumb behind the neck center for maximum finger reach and pressing power.",
-    "Fingers stay close to the fretboard at all times — economy of motion is key.",
-    "The pull-off should snap sideways off the string, not lift straight up.",
-    "If your hand tenses up, slow down. Legato is about relaxed strength, not brute force.",
-    "Try playing without any distortion to honestly hear which notes are weak.",
+    "Use your fretting-hand index finger to mute the string you just exited.",
+    "Keep your pick strokes minimal and synchronized with the initial notes."
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 140,
     recommended: 80,
   },
   relatedSkills: ["legato"],
   tablature: [
-    // M1: Ascending 4-note groups — strings 6-5-4-3 at 5th position
+    // M1: Ascending 4-note groups â€” strings 6-5-4-3 at 5th position
     {
       timeSignature: [4, 4],
       beats: [
@@ -57,7 +53,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 6, fret: 8 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 7, isHammerOn: true }] },
       ],
     },
-    // M4: Position shift — ascending at 7th position, strings 6-5-4-3
+    // M4: Position shift â€” ascending at 7th position, strings 6-5-4-3
     {
       timeSignature: [4, 4],
       beats: [
@@ -67,7 +63,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 3, fret: 7 }] }, { duration: 0.25, notes: [{ string: 3, fret: 9, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 10, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 9, isPullOff: true }] },
       ],
     },
-    // M5: Position shift — ascending strings 2-1, then descend
+    // M5: Position shift â€” ascending strings 2-1, then descend
     {
       timeSignature: [4, 4],
       beats: [
@@ -77,7 +73,7 @@ export const legatoHammerPullRunExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 2, fret: 12 }] }, { duration: 0.25, notes: [{ string: 2, fret: 10, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 8, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 10, isHammerOn: true }] },
       ],
     },
-    // M6: Descending at 7th position — strings 3-4-5-6
+    // M6: Descending at 7th position â€” strings 3-4-5-6
     {
       timeSignature: [4, 4],
       beats: [

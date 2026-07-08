@@ -22,10 +22,17 @@ const LEVEL_STYLES: Record<string, string> = {
 
 interface YouTubeLessonCardProps {
   lesson: YouTubeLessonResult;
+  className?: string;
+  /** Override the default behaviour (open on YouTube) — e.g. open a practice window. */
+  onClick?: () => void;
 }
 
-const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
+const YouTubeLessonCard = ({ lesson, className, onClick }: YouTubeLessonCardProps) => {
   const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     window.open(`https://www.youtube.com/watch?v=${lesson.videoId}`, "_blank", "noopener,noreferrer");
   };
 
@@ -35,10 +42,10 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
   return (
     <button
       onClick={handleClick}
-      className="group flex w-full items-start gap-4 rounded-2xl border border-zinc-700/60 bg-zinc-900/80 p-3 text-left transition hover:border-red-500/40 hover:bg-red-950/10"
+      className={`group flex w-full items-start gap-4 rounded-lg bg-zinc-900/60 p-3 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${className ?? ""}`}
     >
       {/* Thumbnail */}
-      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-xl bg-zinc-800">
+      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-lg bg-zinc-800">
         <img
           src={lesson.thumbnailUrl}
           alt={lesson.title}
@@ -66,7 +73,7 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
               {lesson.level}
             </span>
           )}
-          {lesson.duration && (
+          {!!lesson.duration && (
             <span className="flex items-center gap-1 text-[11px] text-zinc-500">
               <Clock className="h-3 w-3" />
               {formatDuration(lesson.duration)}

@@ -1,17 +1,19 @@
 import { cn } from "assets/lib/utils";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
-import { motion } from "framer-motion";
 import { useIsLandscape } from "hooks/useIsLandscape";
 import React, { useState } from "react";
 
+import { categoryGradients } from "../../../constants/categoryStyles";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
+import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
+import { RotateDeviceHint } from "../components/RotateDeviceHint";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
-import { categoryGradients } from "../../../constants/categoryStyles";
+import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
@@ -55,6 +57,7 @@ interface SessionModalProps {
   earTrainingHighScore?: number | null;
   handleRevealRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
+  riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
 }
 
@@ -76,6 +79,7 @@ const SessionModal = ({
   isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
   handleNextRiddle, handleRevealRiddle,
   earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
+  riddleProgress,
   examMode,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
@@ -108,8 +112,10 @@ const SessionModal = ({
   const category = currentExercise.category || "mixed";
   const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
 
-  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl);
-  const hasAudioTrack  = hasMicControls;
+  // activeTablature (not currentExercise.tablature) so generated exercises
+  // (configurable chord/scale practice) get mic + backing controls too.
+  const hasMicControls = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic;
+  const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
 
   if (isLandscape) {
@@ -131,6 +137,7 @@ const SessionModal = ({
         handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
         earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
         onEarTrainingGuessed={onEarTrainingGuessed}
+        riddleProgress={riddleProgress}
         examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
         volumeRef={volumeRef} onRecalibrate={onRecalibrate}
         gradientClasses={gradientClasses} tabResetKey={tabResetKey}
@@ -148,6 +155,7 @@ const SessionModal = ({
     <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950", gradientClasses)}>
       <SessionModalHeader
         exerciseTitle={currentExercise.title}
+        exerciseId={currentExercise.id}
         currentExerciseIndex={currentExerciseIndex}
         totalExercises={totalExercises}
         onClose={onClose}
@@ -166,6 +174,7 @@ const SessionModal = ({
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
             isPlaying={isPlaying}
             isListening={isListening}
+            isMicEnabled={isMicEnabled}
             frequencyRef={frequencyRef}
             tabResetKey={tabResetKey}
             setVideoDuration={setVideoDuration}
@@ -178,31 +187,11 @@ const SessionModal = ({
             handleRevealRiddle={handleRevealRiddle}
             handleNextRiddle={handleNextRiddle}
             onEarTrainingGuessed={onEarTrainingGuessed}
+            riddleProgress={riddleProgress}
             onPlayRiddle={handleToggleTimer}
           />
 
-          {currentExercise.customGoal && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-              key={currentExercise.customGoal}
-              className="flex flex-col items-center gap-3"
-            >
-              <div className="relative group">
-                <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-                <div className="relative w-24 h-24 rounded-2xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-                  <span className="text-5xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-                    {currentExercise.customGoal}
-                  </span>
-                </div>
-              </div>
-              {currentExercise.customGoalDescription && (
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                  {currentExercise.customGoalDescription}
-                </p>
-              )}
-            </motion.div>
-          )}
+          {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}
 
           {currentExercise.spotifyId && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -210,7 +199,7 @@ const SessionModal = ({
             </div>
           )}
 
-          {isMicEnabled && <MobileMicGameHud />}
+          {isMicEnabled && !currentExercise.customGoal && <MobileMicGameHud />}
 
           <MobileTimerDisplay isPlaying={isPlaying} />
 
@@ -229,6 +218,8 @@ const SessionModal = ({
             onRecalibrate={onRecalibrate ?? (() => {})}
             frequencyRef={frequencyRef}
             volumeRef={volumeRef}
+            disableTuner={currentExercise.disableTuner}
+            mobile
           />
 
           <ExerciseQuickActionsBar
@@ -239,15 +230,17 @@ const SessionModal = ({
             examMode={examMode}
           />
 
+          <MobileInstructionsCard exercise={currentExercise} />
+
           {currentExercise.links && currentExercise.links.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 space-y-4 mb-20">
-              <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
+            <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4 mb-20">
+              <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-widest">
                 <span>Support Author</span>
               </div>
               <div className="flex flex-col gap-2">
                 {currentExercise.links.map((link: any, idx: number) => (
                   <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-between group px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm"
+                    className="flex items-center justify-between group px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-sm"
                   >
                     <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
                   </a>

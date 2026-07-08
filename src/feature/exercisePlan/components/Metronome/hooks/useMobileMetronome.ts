@@ -37,6 +37,13 @@ export const useMobileMetronome = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
   const [audioInitialized, setAudioInitialized] = useState(false);
+  // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
+  const [volume, setVolume] = useState(0.5);
+  // Playback anchor mirrored into React state. The refs are set by the scheduler
+  // on the first scheduled beat, which on a skipCountIn start (loop restart,
+  // live seek) changes no state at all — without this mirror the memoized
+  // return value would keep exposing startTime/audioStartTime = null forever.
+  const [playbackAnchor, setPlaybackAnchor] = useState<{ wall: number | null; audio: number | null }>({ wall: null, audio: null });
 
   const audioContextRef    = useRef<AudioContext | null>(null);
   const ownsAudioContextRef= useRef(true);
@@ -50,12 +57,19 @@ export const useMobileMetronome = ({
   const beatCounterRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
+  const volumeRef = useRef(volume);
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
   const onPlayStartRef = useRef(onPlayStart);
   const onTickRef      = useRef(onTick);
   useEffect(() => { onPlayStartRef.current = onPlayStart; }, [onPlayStart]);
   useEffect(() => { onTickRef.current = onTick; },         [onTick]);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef = useRef<number>(0);
+  // Beat position the next GP playback (AlphaTab) should seek to, or null to
+  // start/resume normally. Set by seekToBeats, cleared on restart, consumed once
+  // by the AlphaTab player before it calls play() — keeps GP audio aligned with
+  // bar-click seeks.
+  const pendingSeekBeatRef = useRef<number | null>(null);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
@@ -65,6 +79,10 @@ export const useMobileMetronome = ({
       gainNodeRef.current.gain.setTargetAtTime(isMuted ? 0 : 1, audioContextRef.current.currentTime, 0.01);
     }
   }, [isMuted]);
+
+  useEffect(() => {
+    setBpm(initialBpm);
+  }, [initialBpm]);
 
   // When the external context changes, adopt it (replacing the internal one if any).
   useEffect(() => {
@@ -126,6 +144,9 @@ export const useMobileMetronome = ({
   const scheduleNote = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
+    const peak = 0.85 * volumeRef.current;
+    if (peak <= 0.0001) return;
+
     const oscillator = audioContextRef.current.createOscillator();
     const noteGain = audioContextRef.current.createGain();
 
@@ -134,8 +155,8 @@ export const useMobileMetronome = ({
 
     // Use a per-note gain node to avoid interfering with global gain or concurrent notes
     noteGain.gain.setValueAtTime(0, time);
-    noteGain.gain.linearRampToValueAtTime(0.3, time + 0.001);
-    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    noteGain.gain.linearRampToValueAtTime(peak, time + 0.001);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
 
     oscillator.connect(noteGain);
     noteGain.connect(gainNodeRef.current || audioContextRef.current.destination);
@@ -172,6 +193,7 @@ export const useMobileMetronome = ({
           beatCounterRef.current = 0;
           onPlayStartRef.current?.();
           setCountInRemaining(0);
+          setPlaybackAnchor({ wall: startTimeRef.current, audio: audioStartTimeRef.current });
         }
         scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
         beatCounterRef.current += 1;
@@ -195,7 +217,7 @@ export const useMobileMetronome = ({
     }
   }, []);
 
-  const startMetronome = useCallback(() => {
+  const startMetronome = useCallback((options?: { skipCountIn?: boolean }) => {
     if (!initializeAudio()) return;
 
     resumeAudioContext();
@@ -205,12 +227,14 @@ export const useMobileMetronome = ({
     }
 
     if (audioContextRef.current) {
-      nextNoteTimeRef.current = audioContextRef.current.currentTime;
-      countInTargetRef.current = 4;
-      setCountInRemaining(4);
-      startTimeRef.current = null;
+      const useCountIn = !options?.skipCountIn;
+      nextNoteTimeRef.current   = audioContextRef.current.currentTime;
+      countInTargetRef.current  = useCountIn ? 4 : 0;
+      setCountInRemaining(useCountIn ? 4 : 0);
+      startTimeRef.current      = null;
       audioStartTimeRef.current = null;
-      beatCounterRef.current = 0;
+      beatCounterRef.current    = 0;
+      setPlaybackAnchor({ wall: null, audio: null });
       scheduler();
     }
 
@@ -234,6 +258,7 @@ export const useMobileMetronome = ({
     audioStartTimeRef.current = null;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
+    setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
   }, []);
 
@@ -243,6 +268,7 @@ export const useMobileMetronome = ({
     pausedElapsedTimeRef.current = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current = 0;
+    pendingSeekBeatRef.current = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -301,6 +327,17 @@ export const useMobileMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  const seekToBeats = useCallback((beats: number) => {
+    // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
+    // without waiting for the next React render cycle.
+    if (startTimeRef.current !== null) return;
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    const elapsedMs = beats * secondsPerBeat * 1000;
+    pausedElapsedTimeRef.current  = elapsedMs;
+    pausedAudioElapsedRef.current = elapsedMs;
+    pendingSeekBeatRef.current    = beats; // GP audio jumps here on the next play()
+  }, [bpm, speedMultiplier]);
+
   // Expose the same interface as the original hook
   return useMemo(() => ({
     bpm,
@@ -309,20 +346,25 @@ export const useMobileMetronome = ({
     minBpm,
     maxBpm,
     setBpm,
+    volume,
+    setVolume,
     toggleMetronome,
     startMetronome,
     stopMetronome,
     restartMetronome,
+    seekToBeats,
+    pendingSeekBeatRef,
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,
     audioInitialized,
-    startTime: startTimeRef.current,
+    startTime: playbackAnchor.wall,
     audioContext: audioContextRef.current,
-    audioStartTime: audioStartTimeRef.current,
+    audioStartTime: playbackAnchor.audio,
   }), [
-    bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, 
-    toggleMetronome, startMetronome, stopMetronome, restartMetronome, 
-    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
+    toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
+    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
+    playbackAnchor,
   ]);
 }; 
