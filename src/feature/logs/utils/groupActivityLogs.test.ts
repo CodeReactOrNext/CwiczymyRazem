@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import type { ActivityFeedLog } from "./groupActivityLogs";
 import { groupActivityLogs } from "./groupActivityLogs";
 
-const exerciseLog = (overrides: Partial<ActivityFeedLog> = {}): ActivityFeedLog =>
+const exerciseLog = (
+  overrides: Partial<ActivityFeedLog> = {},
+): ActivityFeedLog =>
   ({
     id: "ex-1",
     uid: "user-1",
@@ -13,7 +15,13 @@ const exerciseLog = (overrides: Partial<ActivityFeedLog> = {}): ActivityFeedLog 
     points: 10,
     newAchievements: [],
     newLevel: { isNewLevel: false, level: 1 },
-    timeSumary: { techniqueTime: 0, theoryTime: 0, hearingTime: 0, creativityTime: 0, sumTime: 0 },
+    timeSumary: {
+      techniqueTime: 0,
+      theoryTime: 0,
+      hearingTime: 0,
+      creativityTime: 0,
+      sumTime: 0,
+    },
     avatarUrl: null,
     planId: null,
     ...overrides,
@@ -35,7 +43,9 @@ const songLog = (overrides: Partial<ActivityFeedLog> = {}): ActivityFeedLog =>
 
 describe("groupActivityLogs", () => {
   it("groups sequential exercises from the same user into one item", () => {
-    const logs = Array.from({ length: 6 }, (_, i) => exerciseLog({ id: `ex-${i}` }));
+    const logs = Array.from({ length: 6 }, (_, i) =>
+      exerciseLog({ id: `ex-${i}` }),
+    );
 
     const groups = groupActivityLogs(logs);
 
@@ -45,7 +55,9 @@ describe("groupActivityLogs", () => {
   });
 
   it("groups sequential songs from the same user into one item", () => {
-    const logs = Array.from({ length: 4 }, (_, i) => songLog({ id: `song-${i}` }));
+    const logs = Array.from({ length: 4 }, (_, i) =>
+      songLog({ id: `song-${i}` }),
+    );
 
     const groups = groupActivityLogs(logs);
 
@@ -103,16 +115,26 @@ describe("groupActivityLogs", () => {
     [3, 15],
     [10, 50],
     [20, 50],
-  ])("awards %i grouped exercises as %i Fame (5/action, capped at 50)", (count, expectedFame) => {
-    const logs = Array.from({ length: count }, (_, i) => exerciseLog({ id: `ex-${i}` }));
+  ])(
+    "awards %i grouped exercises as %i Fame (5/action, capped at 50)",
+    (count, expectedFame) => {
+      const logs = Array.from({ length: count }, (_, i) =>
+        exerciseLog({ id: `ex-${i}` }),
+      );
 
-    const groups = groupActivityLogs(logs);
+      const groups = groupActivityLogs(logs);
 
-    expect(groups[0].fame).toBe(expectedFame);
-  });
+      expect(groups[0].fame).toBe(expectedFame);
+    },
+  );
 
   it("does not compute Fame for activity types the feed doesn't reward", () => {
-    const topPlayersLog = { type: "top_players_update", data: "x", topPlayers: [], message: "" } as unknown as ActivityFeedLog;
+    const topPlayersLog = {
+      type: "top_players_update",
+      data: "x",
+      topPlayers: [],
+      message: "",
+    } as unknown as ActivityFeedLog;
 
     const groups = groupActivityLogs([topPlayersLog]);
 

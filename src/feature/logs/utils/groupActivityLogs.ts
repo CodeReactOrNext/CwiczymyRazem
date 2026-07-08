@@ -34,10 +34,12 @@ export const FAME_GROUP_CAP = 50;
 export const EXERCISE_PLAN_FAME = 15;
 
 const isSongLog = (log: ActivityFeedLog): log is FirebaseLogsSongsInterface =>
-  !("type" in log) && typeof (log as FirebaseLogsSongsInterface).status === "string";
+  !("type" in log) &&
+  typeof (log as FirebaseLogsSongsInterface).status === "string";
 
-const isExerciseReportLog = (log: ActivityFeedLog): log is FirebaseLogsInterface =>
-  !("type" in log) && !isSongLog(log);
+const isExerciseReportLog = (
+  log: ActivityFeedLog,
+): log is FirebaseLogsInterface => !("type" in log) && !isSongLog(log);
 
 interface LogClassification {
   category: ActivityLogGroupCategory;
@@ -55,10 +57,17 @@ const classifyLog = (log: ActivityFeedLog): LogClassification => {
       : { category: "exercise", uid: log.uid, groupKey: "exercise" };
   }
   const otherLog = log as { uid?: string; type?: string };
-  return { category: "other", uid: otherLog.uid, groupKey: `other:${otherLog.type ?? "unknown"}` };
+  return {
+    category: "other",
+    uid: otherLog.uid,
+    groupKey: `other:${otherLog.type ?? "unknown"}`,
+  };
 };
 
-const calculateFame = (category: ActivityLogGroupCategory, actionCount: number): number | null => {
+const calculateFame = (
+  category: ActivityLogGroupCategory,
+  actionCount: number,
+): number | null => {
   switch (category) {
     case "plan":
       return EXERCISE_PLAN_FAME;
@@ -77,12 +86,16 @@ const calculateFame = (category: ActivityLogGroupCategory, actionCount: number):
  * between always starts a new group. Exercise Plans are never merged with
  * anything — each stays its own feed entry with a fixed Fame reward.
  */
-export const groupActivityLogs = (logs: ActivityFeedLog[]): ActivityLogGroup[] => {
+export const groupActivityLogs = (
+  logs: ActivityFeedLog[],
+): ActivityLogGroup[] => {
   const groups: (LogClassification & { logs: ActivityFeedLog[] })[] = [];
 
   logs.forEach((log) => {
     const classification = classifyLog(log);
-    const isGroupable = classification.category === "exercise" || classification.category === "song";
+    const isGroupable =
+      classification.category === "exercise" ||
+      classification.category === "song";
     const previous = groups[groups.length - 1];
 
     if (
@@ -99,7 +112,10 @@ export const groupActivityLogs = (logs: ActivityFeedLog[]): ActivityLogGroup[] =
   });
 
   return groups.map((group, index) => {
-    const firstLog = group.logs[0] as ActivityFeedLog & { id?: string; timestamp?: unknown };
+    const firstLog = group.logs[0] as ActivityFeedLog & {
+      id?: string;
+      timestamp?: unknown;
+    };
     return {
       key: `${group.groupKey}-${group.uid ?? "unknown"}-${index}-${firstLog.id ?? String(firstLog.timestamp)}`,
       category: group.category,
