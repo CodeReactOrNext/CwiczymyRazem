@@ -50,6 +50,10 @@ jobs:
               Instead, comment on the issue explaining what is blocking you.
           # --model pins the model explicitly (swap to claude-opus-4-8 for harder tickets).
           # --max-turns caps iterations so a run can't drain your subscription limits.
+          # --dangerously-skip-permissions: no interactive prompts exist in CI, so Claude
+          #   must be allowed to run its tools (Bash/gh/npm/git, file edits) without asking.
+          #   Safe here: the runner is ephemeral and the job only triggers for admin-labeled issues.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 50
+            --dangerously-skip-permissions
