@@ -87,7 +87,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
           animate={isAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className={cn(
-            "group relative flex min-h-[32px] items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 sm:min-h-[42px] sm:gap-2 sm:rounded-xl sm:px-4 sm:text-sm",
+            "group relative flex min-h-[32px] items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 sm:min-h-[38px] sm:gap-2 sm:rounded-xl sm:px-3.5 sm:text-sm",
             disabled
               ? "cursor-default bg-amber-500/15 text-amber-400"
               : isReacted
@@ -139,7 +139,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
             src="/images/coin.png"
             alt="coin"
             className={cn(
-              "h-5 w-5 object-contain transition-transform duration-200 sm:h-6 sm:w-6",
+              "h-5 w-5 object-contain transition-transform duration-200 sm:h-[22px] sm:w-[22px]",
               !isReacted && "opacity-50 group-hover:scale-110 group-hover:opacity-100"
             )}
           />
@@ -149,12 +149,12 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
               initial={{ scale: 1.5 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 22 }}
-              className="text-xs font-bold tabular-nums sm:text-sm"
+              className="text-xs font-bold tabular-nums sm:text-[13px]"
             >
               {localReactions.length * fameAmount}
             </motion.span>
           ) : (
-            <span className="text-xs font-semibold tabular-nums sm:text-sm">+{fameAmount}</span>
+            <span className="text-xs font-semibold tabular-nums sm:text-[13px]">+{fameAmount}</span>
           )}
         </motion.button>
       </TooltipTrigger>
