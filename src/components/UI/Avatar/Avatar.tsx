@@ -2,6 +2,7 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { useState } from "react";
 import { FaGem } from "react-icons/fa";
 
@@ -215,7 +216,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
         <img 
           className='absolute z-20 object-contain' 
           style={specialGuitarImgStyle} 
-          src={`/static/images/rank/${imgPath}.webp`} 
+          src={getRankBadgeSrc(imgPath, "small")} 
           alt='' 
           onError={() => setGuitarError(true)}
         />
@@ -227,7 +228,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
               <img 
                 className='absolute z-20 object-contain cursor-pointer' 
                 style={specialGuitarImgStyle} 
-                src={`/static/images/rank/${imgPath}.webp`} 
+                src={getRankBadgeSrc(imgPath, "small")} 
                 alt='' 
                 onError={() => setGuitarError(true)}
               />
@@ -272,7 +273,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
                     style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}30 0%, ${specialGuitarColor}0d 50%, transparent 72%)` }}
                   />
                   <img
-                    src={`/static/images/rank/${imgPath}.webp`}
+                    src={getRankBadgeSrc(imgPath, "small")}
                     alt={specialGuitarDef.name}
                     className="relative object-contain h-64 w-auto -rotate-90 drop-shadow-[0_6px_16px_rgba(0,0,0,0.65)] brightness-110"
                   />
@@ -290,7 +291,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
         <img 
           className='absolute -rotate-90 z-20' 
           style={size === "sm" ? { display: "none" } : { ...badgePosition }} 
-          src={`/static/images/rank/${imgPath}.webp`} 
+          src={getRankBadgeSrc(imgPath, "small")} 
           alt='' 
           onError={() => setGuitarError(true)}
         />

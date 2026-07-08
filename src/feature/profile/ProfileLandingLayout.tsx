@@ -7,6 +7,7 @@ import { AnimatedNumber } from "components/UI/AnimatedNumber/AnimatedNumber";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
@@ -85,7 +86,7 @@ const ProfileLandingLayout = ({
 
               {/* Guitar with CSS fade on the right side */}
               <img
-                src={`/static/images/rank/${imgPath}.webp`}
+                src={getRankBadgeSrc(imgPath, "large")}
                 className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
                 style={{ 
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,

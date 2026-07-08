@@ -14,6 +14,7 @@ import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDe
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -119,7 +120,7 @@ const ItemTooltipCard = ({
 }) => {
   const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
   const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.webp`
+    ? getRankBadgeSrc(itemImageId, "small")
     : `/static/images/effects/${itemImageId}.png`;
 
   const guitarDef = itemType === "guitar"
@@ -248,7 +249,7 @@ const ItemPill = ({
   const [open, setOpen] = useState(false);
   const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
   const imgSrc = itemType === "guitar"
-    ? `/static/images/rank/${itemImageId}.webp`
+    ? getRankBadgeSrc(itemImageId, "small")
     : `/static/images/effects/${itemImageId}.png`;
 
   const cardContent = rolledGuitar ? (

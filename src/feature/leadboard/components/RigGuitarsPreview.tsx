@@ -13,6 +13,7 @@ import type {
   GuitarDefinition,
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Guitar, X } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -74,7 +75,7 @@ const RigGuitarTile = ({
         }}
       />
       <img
-        src={`/static/images/rank/${guitar.imageId}.webp`}
+        src={getRankBadgeSrc(guitar.imageId, "small")}
         alt={`${guitar.brand} ${guitar.name}`}
         className='relative z-10 h-[52px] w-[52px] -rotate-45 object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.7)]'
         draggable={false}
