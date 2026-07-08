@@ -72,7 +72,7 @@ backend (Admin SDK), klient nie może ich modyfikować. Zmieniając model danych
 
 ## Git / PR
 
-- Domyślna gałąź: **`develop`** — nowe PR-y kieruj tutaj (nie na `master`).
+- Nowe PR-y kieruj na **`master`** (gałąź bazowa dla zmian).
 - Jedna zmiana = jedna gałąź = jeden PR. W opisie PR linkuj issue (`Closes #123`).
 - Nie commituj sekretów ani `.env*`.
 - ⚠️ **Jeśli zmiana wymaga nowej / zmienionej zmiennej środowiskowej (`.env`, config, sekret)** — nie dodawaj jej po cichu. **Zgłoś to właścicielowi w komentarzu na GitHubie**: podaj nazwę zmiennej, do czego służy i gdzie ją ustawić (lokalnie / w hostingu). Właściciel musi ją dodać ręcznie, zanim zmiana zadziała.

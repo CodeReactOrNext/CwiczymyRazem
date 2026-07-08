@@ -30,6 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: master # base the work on master (PRs target master)
           fetch-depth: 1
 
       - name: Claude
@@ -42,7 +43,7 @@ jobs:
 
             Then implement the change it describes:
             - Follow the conventions and commands in CLAUDE.md.
-            - Create a new branch off `develop` and open a PR targeting `develop`.
+            - Create a new branch off `master` and open a PR targeting `master`.
             - Put "Closes #${{ github.event.issue.number }}" in the PR description.
             - Run `npm run lint` and `npm test` and make sure they pass before opening the PR.
             - If the ticket is unclear or too large to do safely, do not guess.
