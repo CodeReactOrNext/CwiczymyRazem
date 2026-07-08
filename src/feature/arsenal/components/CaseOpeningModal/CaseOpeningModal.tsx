@@ -7,6 +7,7 @@ import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDef
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -206,7 +207,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       >
                         {item.kind === "guitar" ? (
                           <img
-                            src={`/static/images/rank/${item.def.imageId}.webp`}
+                            src={getRankBadgeSrc(item.def.imageId, "small")}
                             alt={item.def.name}
                             className="relative z-10 h-[440px] w-[440px] -rotate-45 object-contain"
                           />

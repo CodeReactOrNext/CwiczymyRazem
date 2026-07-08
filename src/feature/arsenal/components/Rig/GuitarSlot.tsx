@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Guitar, Plus, X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
@@ -127,7 +128,7 @@ export const GuitarSlot = ({ slotIndex, itemId, inventory, onOpenPicker, onRemov
           />
         </div>
         <img
-          src={`/static/images/rank/${guitar.imageId}.webp`}
+          src={getRankBadgeSrc(guitar.imageId, "medium")}
           alt={guitar.name}
           className="relative z-10 -rotate-45 object-contain"
           style={{ height: 260, width: 260 }}

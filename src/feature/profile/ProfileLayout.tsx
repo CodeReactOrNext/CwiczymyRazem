@@ -5,6 +5,7 @@ import Avatar from "components/UI/Avatar";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
@@ -13,8 +14,8 @@ import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
@@ -127,7 +128,7 @@ const ProfileLayout = ({
 
               {/* Guitar with CSS fade on the right side */}
               <img
-                src={`/static/images/rank/${imgPath}.webp`}
+                src={getRankBadgeSrc(imgPath, "medium")}
                 className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
                 style={{ 
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
