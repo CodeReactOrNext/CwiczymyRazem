@@ -41,7 +41,7 @@ jobs:
       # Install deps up front so Claude can actually run lint/tests
       # (a fresh checkout has no node_modules).
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps # project requires this (React 19 vs testing-library@13 peer conflict)
 
       - name: Claude
         uses: anthropics/claude-code-action@v1
