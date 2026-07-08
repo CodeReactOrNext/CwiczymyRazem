@@ -12,6 +12,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
+import { AddToPlaylistSub } from "feature/songs/components/Playlists/AddToPlaylistSub";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
@@ -217,6 +218,7 @@ export const SongCard = ({
                 <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
                 {isFavorite ? "Remove from favorites" : "Add to favorites"}
               </DropdownMenuItem>
+              <AddToPlaylistSub song={song} />
 
               <div className="my-1 h-px bg-white/5" />
 

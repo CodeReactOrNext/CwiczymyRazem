@@ -1,72 +1,54 @@
-import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
+import type {
+  DragEndEvent,
+  DragStartEvent} from "@dnd-kit/core";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
-import { cn } from "assets/lib/utils";
-import { HeroBanner } from "components/UI/HeroBanner";
-import { Ripple } from "components/Ripple/Ripple";
-import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
-import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
-import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
-import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
-import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
-import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
-import { SongBoard } from "feature/songs/components/SongBoard/SongBoard";
-import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
-import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
-import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
-import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
-import { useSongs } from "feature/songs/hooks/useSongs";
-import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
-import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
-import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
-import { getSongTier, getAllTiers } from "feature/songs/utils/getSongTier";
-import { selectCurrentUserStats, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { useTranslation } from "hooks/useTranslation";
-import {
-  LayoutDashboard,
-  Library as LibraryIcon,
-  LoaderCircle,
-  Music,
-  Play,
-  Plus,
-  Search,
-  SlidersHorizontal,
-  Trophy,
-  X,
-} from "lucide-react";
-import { useRouter } from "next/router";
-import posthog from "posthog-js";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppSelector } from "store/hooks";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from "assets/components/ui/tooltip";
-import {
+  closestCenter,
+  defaultDropAnimationSideEffects,
   DndContext,
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
-  DragStartEvent,
-  DragEndEvent,
-  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
-import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { SongStatus } from "feature/songs/types/songs.type";
+import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { Button } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
+import { cn } from "assets/lib/utils";
+import { Ripple } from "components/Ripple/Ripple";
+import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
+import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
+import { PlaylistsView } from "feature/songs/components/Playlists/PlaylistsView";
+import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
+import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
+import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
+import { useSongs } from "feature/songs/hooks/useSongs";
+import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
+import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
+import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
+import type { Song } from "feature/songs/types/songs.type";
+import type { SongStatus } from "feature/songs/types/songs.type";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
+import { selectCurrentUserStats, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import {
+  Library as LibraryIcon,
+  ListMusic,
+  Music,
+  Play,
+  Search,
+  SlidersHorizontal,
+  Trophy,
+} from "lucide-react";
+import { useRouter } from "next/router";
+import posthog from "posthog-js";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 
 interface SongsViewProps {
@@ -315,6 +297,53 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
         .find(s => s.id === activeId);
   }, [activeId, userSongs]);
 
+  // ── Playlists ────────────────────────────────────────────────────────────
+  const activePlaylistId = (router.query.playlistId as string) || null;
+
+  const collectionSongs = useMemo(() => {
+    const map = new Map<string, Song>();
+    [...userSongs.learning, ...userSongs.wantToLearn, ...userSongs.learned].forEach(
+      (s) => map.set(s.id, s)
+    );
+    return Array.from(map.values());
+  }, [userSongs]);
+
+  const learnedSongIds = useMemo(
+    () => new Set(userSongs.learned.map((s) => s.id)),
+    [userSongs.learned]
+  );
+
+  const handleOpenPlaylist = (playlistId: string | null) => {
+    const query: Record<string, any> = { ...router.query, view: "playlists" };
+    if (playlistId) query.playlistId = playlistId;
+    else delete query.playlistId;
+    router.push({ query }, undefined, { shallow: true });
+  };
+
+  const handleSwitchView = (v: string) => {
+    const query: Record<string, any> = { ...router.query, view: v };
+    delete query.playlistId;
+    router.push({ query }, undefined, { shallow: true });
+    setDetailsTarget(null);
+  };
+
+  const resolvePlaylistSong = async (songId: string): Promise<Song | null> => {
+    const local = collectionSongs.find((s) => s.id === songId);
+    if (local) return local;
+    const { getSongById } = await import("feature/songs/services/getSongs");
+    return getSongById(songId);
+  };
+
+  const openSongFromPlaylist = async (songId: string) => {
+    const song = await resolvePlaylistSong(songId);
+    if (song) setDetailsTarget(song);
+  };
+
+  const practiceSongFromPlaylist = async (songId: string) => {
+    const song = await resolvePlaylistSong(songId);
+    if (song) setPracticeTarget(song);
+  };
+
 
 
 
@@ -326,11 +355,14 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
         {/* Mobile View Switcher */}
         {!detailsTarget && (
           <div className="flex xl:hidden bg-zinc-900/80 p-1.5 backdrop-blur-md">
-            <button 
-              onClick={() => setMobileTab('explore')}
+            <button
+              onClick={() => {
+                setMobileTab('explore');
+                if (view === 'playlists') handleSwitchView('explore');
+              }}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
-                mobileTab === 'explore'
+                mobileTab === 'explore' && view !== 'playlists'
                   ? "text-white bg-white/10"
                   : "text-zinc-500 hover:text-zinc-400"
               )}
@@ -338,7 +370,22 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
               <Search size={14} />
               Explore
             </button>
-            <button 
+            <button
+              onClick={() => {
+                setMobileTab('explore');
+                if (view !== 'playlists') handleSwitchView('playlists');
+              }}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'explore' && view === 'playlists'
+                  ? "text-white bg-white/10"
+                  : "text-zinc-500 hover:text-zinc-400"
+              )}
+            >
+              <ListMusic size={14} />
+              Playlists
+            </button>
+            <button
               onClick={() => setMobileTab('collection')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
@@ -376,11 +423,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onOpenDetails={(song) => {
                     setDetailsTarget(song);
                   }}
-                  onExploreLibrary={(v) => {
-                    router.push({ query: { ...router.query, view: v } }, undefined, { shallow: true });
-                    setDetailsTarget(null);
-                  }}
+                  onExploreLibrary={handleSwitchView}
                   isLibraryActive={view === 'explore' && !detailsTarget}
+                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
                   activeId={activeId}
                   disableDnd={disableDnd}
                   isMobile={isMobile}
@@ -390,11 +435,12 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
           <main className={cn(
             "flex-1 overflow-y-auto no-scrollbar relative bg-black/20",
-            !detailsTarget ? "p-4 sm:p-6 md:p-10" : ""
+            // Playlists view manages its own padding so the header hue wash can bleed to the edges.
+            !detailsTarget && view !== 'playlists' ? "p-4 sm:p-6 md:p-10" : ""
           )}>
             {detailsTarget ? (
               <div className="h-full flex flex-col">
-                <SongDetailView 
+                <SongDetailView
                   song={detailsTarget}
                   progress={progressMap[detailsTarget.id] ?? null}
                   status={getSongStatus(detailsTarget.id)}
@@ -405,6 +451,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   }}
                   onStatusChange={handleStatusChange}
                   onBack={() => setDetailsTarget(null)}
+                  backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to library'}
+                  showBackOnDesktop={view === 'playlists'}
                 />
               </div>
             ) : view === 'board' ? (
@@ -512,16 +560,25 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                     setDetailsTarget(song);
                   }}
                   onExploreLibrary={(v) => {
-                    router.push({ query: { ...router.query, view: v } }, undefined, { shallow: true });
-                    setDetailsTarget(null);
-                    if (v === 'explore') setMobileTab('explore');
+                    handleSwitchView(v);
+                    if (v === 'explore' || v === 'playlists') setMobileTab('explore');
                   }}
                   isLibraryActive={view === 'explore' && !detailsTarget}
+                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
                   activeId={activeId}
                   disableDnd={disableDnd}
                   isMobile={isMobile}
                 />
               </div>
+            ) : view === 'playlists' ? (
+              <PlaylistsView
+                activePlaylistId={activePlaylistId}
+                onOpenPlaylist={handleOpenPlaylist}
+                collectionSongs={collectionSongs}
+                learnedSongIds={learnedSongIds}
+                onPracticeSong={practiceSongFromPlaylist}
+                onOpenSong={openSongFromPlaylist}
+              />
             ) : (
               <div className="space-y-6 animate-in fade-in-50 duration-300">
                 {/* Tier Selection Grid */}

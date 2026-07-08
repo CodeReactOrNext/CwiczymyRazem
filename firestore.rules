@@ -86,6 +86,34 @@ service cloud.firestore {
       }
     }
 
+    // ─── Song playlists ───────────────────────────────────────────────────────
+    match /playlists/{playlistId} {
+      // Owner can always read; any auth'd user can read public playlists
+      allow read: if request.auth != null
+        && (resource.data.ownerId == request.auth.uid || resource.data.isPublic == true);
+
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid;
+
+      // Owner edits their playlist (ownerId immutable). Any signed-in user may
+      // update ONLY the popularity fields (importCount / likeCount / likes) on a
+      // public playlist — written when they save (copy) or like it.
+      allow update: if request.auth != null && (
+        (
+          resource.data.ownerId == request.auth.uid
+          && !("ownerId" in request.resource.data.diff(resource.data).affectedKeys())
+        )
+        || (
+          resource.data.isPublic == true
+          && request.resource.data.diff(resource.data)
+              .affectedKeys().hasOnly(['importCount', 'likeCount', 'likes'])
+        )
+      );
+
+      allow delete: if request.auth != null
+        && resource.data.ownerId == request.auth.uid;
+    }
+
     // ─── Arsenal marketplace ──────────────────────────────────────────────────
     // Player-to-player listings. Every mutation (list / buy / cancel, the escrow
     // move, fame transfer and status change) runs server-side via the Firebase

@@ -26,6 +26,7 @@ import type {
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
+  FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
@@ -80,6 +81,18 @@ const isFirebaseLogsMarketplace = (
   log: any
 ): log is FirebaseLogsMarketplaceInterface => {
   return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
+};
+
+const isFirebaseLogsPlaylist = (
+  log: any
+): log is FirebaseLogsPlaylistInterface => {
+  return (log as FirebaseLogsPlaylistInterface).type === "playlist_created";
+};
+
+const PLAYLIST_KIND_LABEL: Record<string, string> = {
+  playlist: "playlist",
+  path: "learning path",
+  top: "top 10",
 };
 
 const RARITY_COLORS: Record<string, string> = {
@@ -464,6 +477,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsDailyQuestInterface
     | FirebaseLogsCaseOpenInterface
     | FirebaseLogsMarketplaceInterface
+    | FirebaseLogsPlaylistInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -1021,6 +1035,57 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
+const FirebaseLogsPlaylistItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsPlaylistInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, playlistId, playlistName, playlistKind, songCount } = log;
+  const date = new Date(timestamp);
+  const kindLabel = PLAYLIST_KIND_LABEL[playlistKind] ?? "playlist";
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <p className="text-secondText text-sm">
+            created a new {kindLabel}:{" "}
+            <Link
+              href={`/songs?view=playlists&playlistId=${playlistId}`}
+              className="inline-flex items-center gap-1 font-bold text-white hover:text-cyan-400 hover:underline transition-colors"
+            >
+              {playlistName}
+              <ExternalLink className="h-3 w-3 opacity-60" />
+            </Link>
+            {songCount > 0 && (
+              <span className="text-xs opacity-70"> ({songCount} {songCount === 1 ? "song" : "songs"})</span>
+            )}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
+      </div>
+    </LogItem>
+  );
+};
+
 const FirebaseLogsDailyQuestItem = ({
   log,
   isNew,
@@ -1147,6 +1212,12 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
             />
           ) : isFirebaseLogsMarketplace(log) ? (
             <FirebaseLogsMarketplaceItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+            />
+          ) : isFirebaseLogsPlaylist(log) ? (
+            <FirebaseLogsPlaylistItem
               log={log}
               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}

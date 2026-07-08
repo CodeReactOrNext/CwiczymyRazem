@@ -17,7 +17,9 @@ type NotificationType =
   | "reaction"
   | "season_reward"
   | "season_start"
-  | "marketplace_sold";
+  | "marketplace_sold"
+  | "playlist_saved"
+  | "playlist_liked";
 
 export interface AppNotification {
   id: string;
@@ -38,6 +40,9 @@ export interface AppNotification {
   itemImageId?: number | string;
   itemType?: "guitar" | "effect";
   itemRarity?: string;
+  // Playlist save/like fields
+  playlistId?: string;
+  playlistName?: string;
   timestamp: any;
   isRead: boolean;
 }

@@ -9,7 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight,Bell, Clock, Gem, Heart, MessageSquare, Store,Trophy, Zap } from "lucide-react";
+import { ArrowRight,Bell, Clock, Gem, Heart, ListMusic, MessageSquare, Store,Trophy, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -63,6 +63,26 @@ const typeConfig = {
       </span>
     ),
   },
+  playlist_saved: {
+    icon: <ListMusic className="h-3 w-3 text-white" />,
+    bg: "bg-emerald-500",
+    label: (n: any) => (
+      <span className="inline-flex items-center gap-1 flex-wrap">
+        saved your playlist {n.playlistName ? <span className="font-semibold text-white">{n.playlistName}</span> : ""} — you got +{n.fameAwarded}
+        <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+      </span>
+    ),
+  },
+  playlist_liked: {
+    icon: <Heart className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-rose-500",
+    label: (n: any) => (
+      <span className="inline-flex items-center gap-1 flex-wrap">
+        liked your playlist {n.playlistName ? <span className="font-semibold text-white">{n.playlistName}</span> : ""} — you got +{n.fameAwarded}
+        <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+      </span>
+    ),
+  },
 };
 
 export const NotificationsBell = () => {
@@ -73,8 +93,12 @@ export const NotificationsBell = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Where (if anywhere) a notification deep-links when clicked.
-  const notificationHref = (n: any): string | null =>
-    n.type === "marketplace_sold" ? "/arsenal?tab=market" : null;
+  const notificationHref = (n: any): string | null => {
+    if (n.type === "marketplace_sold") return "/arsenal?tab=market";
+    if ((n.type === "playlist_saved" || n.type === "playlist_liked") && n.playlistId)
+      return `/songs?view=playlists&playlistId=${n.playlistId}`;
+    return null;
+  };
 
   const handleNotificationClick = (n: any) => {
     markAsRead(n.id);
@@ -267,6 +291,12 @@ export const NotificationsBell = () => {
                       {n.type === "marketplace_sold" && (
                         <p className="text-xs text-amber-400/80 flex items-center gap-1 mt-1 font-medium">
                           Open Market
+                          <ArrowRight className="h-3 w-3" />
+                        </p>
+                      )}
+                      {(n.type === "playlist_saved" || n.type === "playlist_liked") && n.playlistId && (
+                        <p className="text-xs text-emerald-400/80 flex items-center gap-1 mt-1 font-medium">
+                          Open playlist
                           <ArrowRight className="h-3 w-3" />
                         </p>
                       )}
