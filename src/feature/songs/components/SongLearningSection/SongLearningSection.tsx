@@ -1,41 +1,20 @@
-import type {
-  DragEndEvent,
-  DragStartEvent} from "@dnd-kit/core";
-import {
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Button } from "assets/components/ui/button";
+
+
+
 import { Input } from "assets/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
-import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
+  ListMusic,
   Search,
-  X,
-  Library,
-  ChevronRight,
 } from "lucide-react";
-import { Music, Plus } from "lucide-react";
+import { Music } from "lucide-react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import { useEffect, useMemo,useState } from "react";
@@ -62,8 +41,9 @@ interface SongLearningSectionProps {
   isPremium?: boolean;
   onPracticeWithGp?: (song: Song) => void;
   onOpenDetails?: (song: Song) => void;
-  onExploreLibrary?: (view: 'board' | 'explore') => void;
+  onExploreLibrary?: (view: 'board' | 'explore' | 'playlists') => void;
   isLibraryActive?: boolean;
+  isPlaylistsActive?: boolean;
   activeId?: string | null;
   disableDnd?: boolean;
   isMobile?: boolean;
@@ -128,6 +108,7 @@ export const SongLearningSection = ({
   onOpenDetails,
   onExploreLibrary,
   isLibraryActive,
+  isPlaylistsActive,
   activeId,
   disableDnd = false,
   isMobile = false,
@@ -204,20 +185,20 @@ export const SongLearningSection = ({
           <button
             onClick={() => onExploreLibrary?.('board')}
             className={cn(
-              "relative flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
-              !isLibraryActive
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
+              !isLibraryActive && !isPlaylistsActive
                 ? "bg-zinc-800 text-white shadow-lg"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
             <Ripple />
-            <Music size={14} className={!isLibraryActive ? "text-white" : ""} />
-            My Board
+            <Music size={14} className={!isLibraryActive && !isPlaylistsActive ? "text-white" : ""} />
+            Board
           </button>
           <button
             onClick={() => onExploreLibrary?.('explore')}
             className={cn(
-              "relative flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
               isLibraryActive
                 ? "bg-zinc-800 text-white shadow-lg"
                 : "text-zinc-500 hover:text-zinc-300"
@@ -226,6 +207,19 @@ export const SongLearningSection = ({
             <Ripple />
             <Search size={14} className={isLibraryActive ? "text-white" : ""} />
             Library
+          </button>
+          <button
+            onClick={() => onExploreLibrary?.('playlists')}
+            className={cn(
+              "relative flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all",
+              isPlaylistsActive
+                ? "bg-zinc-800 text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Ripple />
+            <ListMusic size={14} className={isPlaylistsActive ? "text-white" : ""} />
+            Playlists
           </button>
         </div>
       </div>

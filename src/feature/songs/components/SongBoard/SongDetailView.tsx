@@ -49,6 +49,10 @@ interface SongDetailViewProps {
   onRemove: (songId: string) => void;
   onStatusChange: (songId: string, status: any, title: string, artist: string) => void;
   onBack?: () => void;
+  /** Text on the back button. Defaults to the library context. */
+  backLabel?: string;
+  /** Show the back button on desktop too (used when the detail is nested, e.g. inside a playlist). */
+  showBackOnDesktop?: boolean;
 }
 
 const MASTERY_COLORS: Record<MasteryLevel, string> = {
@@ -111,7 +115,7 @@ const LegendItem = ({ color, label, glow }: { color: string; label: string; glow
   </div>
 );
 
-export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onBack }: SongDetailViewProps) => {
+export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onBack, backLabel = "Back to library", showBackOnDesktop = false }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -258,17 +262,17 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent" />
          </div>
 
-         {/* Mobile Back Button */}
+         {/* Back button — mobile always; desktop only when nested (e.g. inside a playlist) */}
          {onBack && (
-           <div className="relative z-20 xl:hidden pt-4 px-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+           <div className={cn("relative z-20 pt-4 px-4", !showBackOnDesktop && "xl:hidden")}>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onBack}
                 className="gap-2 text-zinc-400 hover:text-white bg-white/5 backdrop-blur-md rounded-full px-4"
               >
                 <ArrowLeft size={16} />
-                <span className="text-xs font-bold">Back to library</span>
+                <span className="text-xs font-bold">{backLabel}</span>
               </Button>
            </div>
          )}

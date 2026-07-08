@@ -146,6 +146,22 @@ export interface FirebaseLogsRecordingsInterface {
   reactions?: string[];
 }
 
+export interface FirebaseLogsPlaylistInterface {
+  type: "playlist_created";
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  playlistId: string;
+  playlistName: string;
+  playlistKind: "playlist" | "path" | "top";
+  songCount: number;
+  id?: string;
+  reactions?: string[];
+}
+
 export interface FirebaseLogsDailyQuestInterface {
   uid: string;
   userName: string;
