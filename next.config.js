@@ -106,6 +106,28 @@ const nextConfig = {
         destination: '/blog/guitar-practice-routine-for-beginners',
         permanent: true,
       },
+      // SEO consolidation (2026-07): merged posts that cannibalized the same query intent
+      // into a single canonical post per topic. See issue #626.
+      {
+        source: '/blog/why-am-i-not-improving-at-guitar',
+        destination: '/blog/why-youre-not-improving-at-guitar-8-common-reasons',
+        permanent: true,
+      },
+      {
+        source: '/blog/track-guitar-practice-progress-effectively',
+        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        permanent: true,
+      },
+      {
+        source: '/blog/how-to-set-guitar-practice-goals',
+        destination: '/blog/guitar-practice-goal-setting',
+        permanent: true,
+      },
+      {
+        source: '/blog/effective-strategies-for-learning-new-guitar-songs-quickly',
+        destination: '/blog/learn-guitar-songs-faster-proven-methods',
+        permanent: true,
+      },
     ]
   },
   async headers() {
