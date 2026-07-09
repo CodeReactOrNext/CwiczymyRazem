@@ -164,15 +164,18 @@ export const createPlaylist = async (
   invalidatePlaylistCaches();
 
   // Announce it in the global activity feed (best-effort — never block creation).
-  logPlaylistCreated({
-    playlistId: docRef.id,
-    userId,
-    userName: ownerName,
-    userAvatar: ownerAvatar,
-    name: draft.name,
-    kind: draft.kind,
-    songCount: draft.songs.length,
-  }).catch((error) => logger.error(error, { context: "logPlaylistCreated" }));
+  // Private playlists are not announced — the feed is public and shouldn't leak them.
+  if (draft.isPublic) {
+    logPlaylistCreated({
+      playlistId: docRef.id,
+      userId,
+      userName: ownerName,
+      userAvatar: ownerAvatar,
+      name: draft.name,
+      kind: draft.kind,
+      songCount: draft.songs.length,
+    }).catch((error) => logger.error(error, { context: "logPlaylistCreated" }));
+  }
 
   return docRef.id;
 };
