@@ -115,17 +115,3 @@ export const firebaseToggleFavoriteSong = async (
   });
 };
 
-export const firebaseUpdateProfileCustomization = async (
-  selectedFrame?: number,
-  selectedGuitar?: number | string
-) => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  const updateData: any = {};
-  if (selectedFrame !== undefined) updateData.selectedFrame = selectedFrame;
-  if (selectedGuitar !== undefined) updateData.selectedGuitar = selectedGuitar;
-
-  if (Object.keys(updateData).length > 0) {
-    await updateDoc(userDocRef, updateData);
-  }
-};
-

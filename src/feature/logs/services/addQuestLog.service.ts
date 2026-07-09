@@ -17,7 +17,7 @@ export const firebaseAddQuestLog = async (uid: string) => {
 
     const userName = userData.displayName;
     const avatarUrl = userData.avatar || null;
-    const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.lvl ?? 0;
+    const userAvatarFrame = userData.statistics?.lvl ?? 0;
 
     const logsDocRef = doc(collection(db, "logs"));
 

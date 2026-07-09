@@ -13,7 +13,6 @@ export interface FirebaseUserDataInterface {
   youTubeLink?: string;
   band?: string;
   guitarStartDate?: Timestamp;
-  selectedFrame?: number;
   selectedGuitar?: number | string;
   selectedGuitarYear?: number;
   selectedGuitarCountry?: string;
