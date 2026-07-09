@@ -1,14 +1,18 @@
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
-import { increaseTimerTime } from "feature/user/store/userSlice";
+import { selectUserAvatar } from "feature/user/store/userSlice";
+import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import useTimer from "hooks/useTimer";
-import { Check, Pause, Play, X } from "lucide-react";
-import { useRouter } from "next/router";
+import { Check, Loader2, Pause, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaBrain, FaMusic } from "react-icons/fa";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool } from "react-icons/md";
-import { useAppDispatch } from "store/hooks";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import type { DailyQuestTaskType } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 
 const SKILL_OPTIONS: { id: SkillsType; label: string; Icon: typeof MdSchool }[] = [
@@ -17,6 +21,13 @@ const SKILL_OPTIONS: { id: SkillsType; label: string; Icon: typeof MdSchool }[] 
   { id: "hearing", label: "Hearing", Icon: FaMusic },
   { id: "creativity", label: "Creativity", Icon: FaBrain },
 ];
+
+const SKILL_TIME_QUEST: Record<SkillsType, DailyQuestTaskType> = {
+  technique: "practice_technique_time",
+  theory: "practice_theory_time",
+  hearing: "practice_hearing_time",
+  creativity: "practice_creativity_time",
+};
 
 function formatElapsed(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -30,23 +41,24 @@ function formatElapsed(ms: number): string {
 
 interface LessonPracticeModalProps {
   lesson: YouTubeLessonResult;
-  /** Where to return after logging the time (e.g. back to this roadmap). */
-  returnTo: string;
+  /** Called after the elapsed time (if any) has been logged — the caller marks the lesson watched and closes this modal. */
+  onFinish: () => void;
   onClose: () => void;
 }
 
 /**
  * Opens a YouTube lesson inside a practice-session window: the video plays
- * embedded while a stopwatch tracks how long the user practiced. On finish the
- * elapsed time is pushed into the practice timer and the user is sent to the
- * report screen to log it (same flow as the free-practice timer).
+ * embedded while a stopwatch tracks how long the user practiced. Finishing
+ * logs the elapsed time straight away (same accounting as the report page,
+ * skipping the form) instead of navigating anywhere.
  */
-const LessonPracticeModal = ({ lesson, returnTo, onClose }: LessonPracticeModalProps) => {
-  const router = useRouter();
+const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalProps) => {
   const dispatch = useAppDispatch();
+  const userAvatar = useAppSelector(selectUserAvatar);
   const timer = useTimer();
   const [elapsed, setElapsed] = useState(0);
   const [skill, setSkill] = useState<SkillsType>("technique");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isRunning = timer.timerEnabled;
 
@@ -73,13 +85,51 @@ const LessonPracticeModal = ({ lesson, returnTo, onClose }: LessonPracticeModalP
     else timer.startTimer();
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    if (isSubmitting) return;
     timer.stopTimer();
     const time = timer.getTime();
-    if (time > 0) {
-      dispatch(increaseTimerTime({ type: skill, time }));
+    if (time < 1000) {
+      onFinish();
+      return;
     }
-    router.push(`/report?applyTimer=true&returnTo=${encodeURIComponent(returnTo)}`);
+
+    setIsSubmitting(true);
+    const minutes = Math.max(1, Math.round(time / 60000));
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const zero = { hours: "0", minutes: "0" };
+    const skillTime = { hours: hours.toString(), minutes: mins.toString() };
+
+    const inputData: ReportFormikInterface = {
+      techniqueHours: skill === "technique" ? skillTime.hours : zero.hours,
+      techniqueMinutes: skill === "technique" ? skillTime.minutes : zero.minutes,
+      theoryHours: skill === "theory" ? skillTime.hours : zero.hours,
+      theoryMinutes: skill === "theory" ? skillTime.minutes : zero.minutes,
+      hearingHours: skill === "hearing" ? skillTime.hours : zero.hours,
+      hearingMinutes: skill === "hearing" ? skillTime.minutes : zero.minutes,
+      creativityHours: skill === "creativity" ? skillTime.hours : zero.hours,
+      creativityMinutes: skill === "creativity" ? skillTime.minutes : zero.minutes,
+      habbits: [],
+      countBackDays: 0,
+      reportTitle: `Lesson: ${lesson.title}`,
+      avatarUrl: userAvatar ?? null,
+      clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
+      clientNowISO: new Date().toISOString(),
+    };
+
+    try {
+      await dispatch(updateUserStats({ inputData })).unwrap();
+      dispatch(updateQuestProgress({ type: "practice_total_time", amount: minutes }));
+      dispatch(updateQuestProgress({ type: "long_session", amount: minutes }));
+      dispatch(updateQuestProgress({ type: SKILL_TIME_QUEST[skill], amount: minutes }));
+      toast.success(`Logged ${minutes} min of practice.`);
+      onFinish();
+    } catch {
+      toast.error("Failed to log practice time.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return createPortal(
@@ -158,10 +208,11 @@ const LessonPracticeModal = ({ lesson, returnTo, onClose }: LessonPracticeModalP
 
           <button
             onClick={handleFinish}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-500"
+            disabled={isSubmitting}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-500 disabled:opacity-60"
           >
-            <Check className="h-4 w-4" />
-            Finish &amp; log time
+            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            {isSubmitting ? "Logging time…" : "Finish & log time"}
           </button>
         </div>
       </div>
