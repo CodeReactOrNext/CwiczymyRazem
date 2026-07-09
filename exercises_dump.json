@@ -184,14 +184,6 @@
     "whyItMatters": "Minimal-motion voice leading makes chord progressions sound cohesive, elegant, and highly polished. It reduces large jumps across the fretboard, making your rhythm parts easier to play and much more satisfying to listen to."
   },
   {
-    "id": "natural_notes_map",
-    "title": "Natural Notes Map",
-    "description": "Visualize and map all natural notes across the entire fretboard.",
-    "difficulty": "medium",
-    "category": "theory",
-    "whyItMatters": "Learning natural note positions provides a reliable grid for the entire fretboard. Once natural notes are memorized, locating sharps and flats becomes a simple, immediate adjustment."
-  },
-  {
     "id": "fretboard_mastery",
     "title": "Fretboard Mastery",
     "description": "Take a short melodic phrase you know and play it in multiple positions across the neck, navigating by note names instead of shapes.",
@@ -210,10 +202,10 @@
   {
     "id": "metronome_gap_test",
     "title": "Metronome Gap Test",
-    "description": "Maintain a steady rhythmic pulse while the metronome is muted for several measures.",
+    "description": "Lock onto the click for two bars, then keep the pulse through the silence and tap the very next downbeat — the app measures how far off you land.",
     "difficulty": "medium",
     "category": "theory",
-    "whyItMatters": "This exercise exposes whether you are genuinely internalizing the tempo or just blindly following an external click. By forcing you to maintain the grid during silence, it develops the deep internal timing required to lead a band, lock in with a drummer, and prevent rushing or dragging."
+    "whyItMatters": "It reveals whether you've truly internalised the tempo or are just riding an external click. Holding the grid through silence builds the deep internal timing you need to lock in with a drummer, lead a band, and stop rushing or dragging."
   },
   {
     "id": "sing_what_you_play",
@@ -245,7 +237,7 @@
     "description": "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
     "difficulty": "beginner",
     "category": "theory",
-    "customGoal": "E",
+    "customGoal": "F",
     "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
   },
   {
@@ -254,7 +246,7 @@
     "description": "Find every occurrence of a note across the neck — now with sharps and flats, on a faster clock.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "B",
+    "customGoal": "C#",
     "whyItMatters": "Adding accidentals forces full chromatic command of the neck, not just the natural notes. The faster rotation builds quick recall under mild time pressure — the bridge from knowing the fretboard to using it in real time."
   },
   {
@@ -263,7 +255,7 @@
     "description": "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",
     "difficulty": "hard",
     "category": "theory",
-    "customGoal": "F#",
+    "customGoal": "G#",
     "whyItMatters": "Locating a note inside an arbitrary position box — rather than sliding to the open-string area — is exactly what real playing demands. The rotating region trains positional fretboard recall across the whole neck under time pressure."
   },
   {
@@ -272,7 +264,7 @@
     "description": "Read a root note and an interval, then find and play the target note anywhere on the neck.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "B",
+    "customGoal": "F#",
     "whyItMatters": "Intervals are the building blocks of melody and harmony. Translating an interval into a note and finding it instantly on the neck trains the ear-to-hands link that underpins improvising and playing by ear."
   },
   {
@@ -281,7 +273,7 @@
     "description": "Spell a chord by ear: play each of its tones and watch them light up one by one.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "E",
+    "customGoal": "Am",
     "whyItMatters": "Knowing the notes inside a chord — not just its shape — unlocks arpeggios, target notes for soloing, and chord substitutions. Spelling chords by ear cements the link between theory and the fretboard."
   },
   {
@@ -1046,7 +1038,7 @@
     "id": "strumming_down_up",
     "title": "Down-Up Strumming",
     "description": "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
-    "difficulty": "beginner",
+    "difficulty": "easy",
     "category": "technique",
     "whyItMatters": "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly."
   },
@@ -1054,7 +1046,7 @@
     "id": "strumming_rock",
     "title": "Rock Strumming Patterns",
     "description": "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
-    "difficulty": "beginner",
+    "difficulty": "easy",
     "category": "technique",
     "whyItMatters": "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence."
   },

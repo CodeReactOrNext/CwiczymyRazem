@@ -79,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         itemRarity: listing.itemRarity,
         buyerName: buyerData.displayName || "Someone",
         buyerAvatarUrl: buyerData.avatar || buyerData.photoURL || null,
-        buyerFrame: buyerData.selectedFrame ?? buyerData.statistics?.lvl ?? 0,
+        buyerFrame: buyerData.statistics?.lvl ?? 0,
       };
     });
 

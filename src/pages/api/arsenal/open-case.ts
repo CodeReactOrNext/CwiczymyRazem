@@ -158,7 +158,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         uid: userId,
         userName: capturedUserData?.displayName || "Unknown",
         avatarUrl: capturedUserData?.avatar || null,
-        userAvatarFrame: capturedUserData?.selectedFrame ?? capturedUserData?.statistics?.lvl ?? 0,
+        userAvatarFrame: capturedUserData?.statistics?.lvl ?? 0,
         timestamp: new Date().toISOString(),
         data: new Date().toISOString(),
         caseType,
