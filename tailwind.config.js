@@ -329,6 +329,15 @@ module.exports = {
           "0%":         { transform: "translateX(-130%) skewX(-12deg)" },
           "55%, 100%":  { transform: "translateX(230%) skewX(-12deg)" }
         },
+        "timer-particle": {
+          "0%":   { transform: "translate(50%, 50%) scale(0)", opacity: "0" },
+          "50%":  { transform: "translate(var(--particle-x), var(--particle-y)) scale(1)", opacity: "0.8" },
+          "100%": { transform: "translate(var(--particle-x), var(--particle-y)) scale(0)", opacity: "0" },
+        },
+        "timer-pulse-glow": {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.2" },
+          "50%":      { transform: "scale(1.03)", opacity: "0.4" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -340,6 +349,8 @@ module.exports = {
         "glow-float-2": "glow-float-2 10s ease-in-out infinite alternate",
         "ripple": "ripple 0.6s ease-out forwards",
         "shine": "shine 4.5s ease-in-out infinite",
+        "timer-particle": "timer-particle 2s ease-in-out infinite",
+        "timer-pulse-glow": "timer-pulse-glow 2s ease-in-out infinite",
       },
     },
     fontFamily: {
