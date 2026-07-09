@@ -1,8 +1,8 @@
+import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 
@@ -187,6 +187,21 @@ function getStatus(step: RoadmapStep): StepStatus {
   return "not-started";
 }
 
+/**
+ * Status derived from the checkable resources (exercise + lessons), so marking
+ * things as practiced/watched is what moves a step through its lifecycle.
+ * Returns null when the step has no trackable resource yet.
+ */
+function getResourceStatus(step: RoadmapStep, lessons: YouTubeLessonResult[]): StepStatus | null {
+  const hasExercise = !!step.suggestedExerciseId && !step.noExercise;
+  const total = (hasExercise ? 1 : 0) + lessons.length;
+  if (total === 0) return null;
+  const completed = (hasExercise && step.exerciseCompleted ? 1 : 0) + (step.completedLessonIds?.length ?? 0);
+  if (completed === 0) return "not-started";
+  if (completed >= total) return "done";
+  return "in-progress";
+}
+
 const STEP_CLS: Record<StepStatus, string> = {
   "not-started": "bg-zinc-900 text-zinc-300 hover:bg-zinc-800/80",
   "in-progress": "bg-amber-500/10 text-amber-200",
@@ -240,6 +255,478 @@ interface RoadmapViewProps {
   adminMode?: boolean;
 }
 
+// ─── Step page (replaces the old drawer — full-width, readable, no overlay) ─
+
+interface StepPageContentProps {
+  activeStepInfo: { step: RoadmapStep; phase: RoadmapPhase; stepIdx: number; phaseIdx: number };
+  adminMode?: boolean;
+  roadmap: Roadmap;
+  router: ReturnType<typeof useRouter>;
+  lessonsCache: Record<string, YouTubeLessonResult[]>;
+  loadingDetailIds: Set<string>;
+  loadingExerciseIds: Set<string>;
+  loadingLessonsId: string | null;
+  exerciseOptions: Record<string, string[]>;
+  customLessonInput: Record<string, string>;
+  addingCustomLesson: Set<string>;
+  onBack: () => void;
+  onRegenerateStep: (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => void;
+  onSetStepStatus: (phaseId: string, stepId: string, status: StepStatus) => void;
+  onEditStep: (stepId: string, phaseId: string, updates: Partial<RoadmapStep>) => void;
+  onFindExercises: (step: RoadmapStep) => void;
+  onSelectExercise: (stepId: string, phaseId: string, exerciseId: string) => void;
+  onToggleExercise: () => void;
+  onToggleLesson: (videoId: string) => void;
+  onFindLessons: (step: RoadmapStep, phase: RoadmapPhase) => void;
+  onRemoveLesson: (stepId: string, phaseId: string, videoId: string) => void;
+  onCustomLessonInputChange: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  onAddCustomLesson: (stepId: string, phaseId: string, url: string) => void;
+  onPracticeLesson: (lesson: YouTubeLessonResult) => void;
+}
+
+const StepPageContent: React.FC<StepPageContentProps> = ({
+  activeStepInfo: info,
+  adminMode,
+  roadmap,
+  router,
+  lessonsCache,
+  loadingDetailIds,
+  loadingExerciseIds,
+  loadingLessonsId,
+  exerciseOptions,
+  customLessonInput,
+  addingCustomLesson,
+  onBack,
+  onRegenerateStep,
+  onSetStepStatus,
+  onEditStep,
+  onFindExercises,
+  onSelectExercise,
+  onToggleExercise,
+  onToggleLesson,
+  onFindLessons,
+  onRemoveLesson,
+  onCustomLessonInputChange,
+  onAddCustomLesson,
+  onPracticeLesson,
+}) => {
+  const { step, phase, stepIdx, phaseIdx } = info;
+  const lessons = lessonsCache[step.id] ?? [];
+  const resourceStatus = getResourceStatus(step, lessons);
+
+  return (
+    <div className="flex flex-col gap-8 px-5 py-6 md:px-8 md:py-8">
+      {/* ── Top bar ── */}
+      <div className="flex flex-col gap-4">
+        <button
+          onClick={onBack}
+          className="flex w-fit items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-200"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to roadmap
+        </button>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="w-fit rounded bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-zinc-500">
+              Phase {phaseIdx + 1} · Step {stepIdx + 1} of {phase.steps.length}
+            </span>
+            <h1 className="font-display text-xl font-bold leading-snug text-zinc-100 md:text-2xl">{step.title}</h1>
+          </div>
+          {adminMode && step.description && !loadingDetailIds.has(step.id) && (
+            <button
+              onClick={() => onRegenerateStep(step, phase, stepIdx, phaseIdx)}
+              className="flex shrink-0 items-center gap-1 rounded bg-zinc-800 px-2.5 py-1.5 text-[11px] text-zinc-400 transition hover:bg-zinc-700 hover:text-zinc-200"
+            >
+              <RefreshCw className="h-3 w-3" /> Regen
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Status ── */}
+      {resourceStatus ? (
+        <div
+          className={cn(
+            "flex flex-wrap items-center gap-2.5 rounded-lg px-4 py-3.5",
+            resourceStatus === "done"
+              ? "bg-green-900/30 text-green-400"
+              : resourceStatus === "in-progress"
+              ? "bg-amber-500/10 text-amber-300"
+              : "bg-zinc-900/40 text-zinc-500"
+          )}
+        >
+          <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[resourceStatus]}`} />
+          <span className="text-sm font-semibold">{STATUS_LABEL[resourceStatus]}</span>
+          <span className="text-xs opacity-80">
+            {resourceStatus === "done"
+              ? "Nice — you've got this one!"
+              : resourceStatus === "in-progress"
+              ? "Mark everything below to complete this skill."
+              : "Mark a resource below as you practice it."}
+          </span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Your progress on this skill</p>
+          <div className="grid grid-cols-3 gap-2">
+            {STATUS_BTNS.map(({ status: s, label, Icon }) => {
+              const isActive = getStatus(step) === s;
+              return (
+                <button
+                  key={s}
+                  onClick={() => onSetStepStatus(phase.id, step.id, s)}
+                  className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-3.5 text-xs font-semibold transition-all ${
+                    isActive
+                      ? s === "not-started"
+                        ? "bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500"
+                        : s === "in-progress"
+                        ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
+                        : "bg-green-900/50 text-green-400 ring-1 ring-green-500/40"
+                      : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Content ── */}
+      {loadingDetailIds.has(step.id) ? (
+        <AiGeneratingLoader stepTitle={step.title} />
+      ) : step.description ? (
+        <div className="flex flex-col gap-8">
+          {/* Exercise (admin only) */}
+          {adminMode && (
+            <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
+              <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
+              </p>
+              {loadingExerciseIds.has(step.id) ? (
+                <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching exercises…
+                </div>
+              ) : exerciseOptions[step.id] ? (
+                <div className="space-y-2">
+                  <p className="text-[11px] text-zinc-600">Pick one:</p>
+                  {exerciseOptions[step.id].map((id) => {
+                    const ex = exercisesAgregat.find((e) => e.id === id);
+                    if (!ex) return null;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => onSelectExercise(step.id, phase.id, id)}
+                        className="flex w-full items-center gap-3 rounded bg-zinc-900 px-3 py-2.5 text-left text-xs transition hover:bg-zinc-800"
+                      >
+                        <Dumbbell className="h-4 w-4 shrink-0 text-cyan-500" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold text-zinc-100">{ex.title}</p>
+                          {ex.difficulty && <p className="capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
+                        </div>
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                      </button>
+                    );
+                  })}
+                  <button onClick={() => onFindExercises(step)} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
+                    Search again
+                  </button>
+                </div>
+              ) : step.noExercise ? (
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1.5 rounded bg-zinc-800/60 px-2.5 py-1.5 text-[11px] text-zinc-500">
+                    <X className="h-3 w-3" /> No exercise
+                  </span>
+                  <button onClick={() => onEditStep(step.id, phase.id, { noExercise: false })} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
+                    Undo
+                  </button>
+                </div>
+              ) : step.suggestedExerciseId ? (
+                (() => {
+                  const ex = exercisesAgregat.find((e) => e.id === step.suggestedExerciseId);
+                  if (!ex) return null;
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 rounded-lg bg-cyan-950/25 px-3 py-2.5">
+                        <Dumbbell className="h-4 w-4 shrink-0 text-cyan-400" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
+                          {ex.difficulty && <p className="text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button onClick={() => onFindExercises(step)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
+                          <RefreshCw className="h-2.5 w-2.5" /> Change exercise
+                        </button>
+                        <button onClick={() => onEditStep(step.id, phase.id, { suggestedExerciseId: undefined, noExercise: true })} className="text-[11px] text-zinc-700 underline underline-offset-2 hover:text-red-400">
+                          No exercise
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button onClick={() => onFindExercises(step)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-cyan-300">
+                    <Sparkles className="h-3.5 w-3.5" /> Find exercise
+                  </button>
+                  <button onClick={() => onEditStep(step.id, phase.id, { noExercise: true })} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-500 transition hover:bg-zinc-700 hover:text-zinc-300">
+                    <X className="h-3.5 w-3.5" /> No exercise
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Description */}
+          <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
+            {adminMode ? (
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold tracking-widest text-zinc-500">Description</label>
+                <textarea
+                  rows={8}
+                  className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
+                  value={step.description}
+                  onChange={(e) => onEditStep(step.id, phase.id, { description: e.target.value })}
+                />
+              </div>
+            ) : (
+              <StepDescription description={step.description} />
+            )}
+          </div>
+
+          {/* Success criteria */}
+          {(step.successCriteria || adminMode) && (
+            <div className="rounded-lg bg-cyan-950/20 p-5 md:p-6">
+              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-cyan-500/80">
+                <Target className="h-3.5 w-3.5" /> Success criteria
+              </p>
+              {adminMode ? (
+                <textarea
+                  rows={3}
+                  className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
+                  value={step.successCriteria}
+                  onChange={(e) => onEditStep(step.id, phase.id, { successCriteria: e.target.value })}
+                />
+              ) : (
+                <p className="text-sm leading-relaxed text-zinc-200">{step.successCriteria}</p>
+              )}
+            </div>
+          )}
+
+          {/* Suggested resources (user) */}
+          {!adminMode && (() => {
+            const hasExercise = loadingExerciseIds.has(step.id) || !!step.suggestedExerciseId;
+            const hasLessons = loadingLessonsId === step.id || lessons.length > 0;
+            if (!hasExercise && !hasLessons) return null;
+            return (
+              <div className="flex flex-col gap-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Suggested resources</p>
+                    <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-600">optional</span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-zinc-600">
+                    Mark them off as you use them — that&apos;s what moves this skill along.
+                  </p>
+                </div>
+
+                {/* Exercise */}
+                {hasExercise && (
+                  loadingExerciseIds.has(step.id) ? (
+                    <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
+                      <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
+                    </div>
+                  ) : (() => {
+                    const ex = exercisesAgregat.find((e) => e.id === step.suggestedExerciseId);
+                    if (!ex) return null;
+                    const isCompleted = !!step.exerciseCompleted;
+                    return (
+                      <div className="flex flex-col gap-2">
+                        <p className="flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                          <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
+                        </p>
+                        <button
+                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=${encodeURIComponent(`/ai-coach?roadmapId=${roadmap.id}`)}`)}
+                          className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-lg px-4 py-4 text-left transition-all ${
+                            isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
+                          }`}
+                        >
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition group-hover:bg-cyan-500/25 ${
+                            isCompleted ? "bg-green-500/15" : "bg-cyan-500/15"
+                          }`}>
+                            {isCompleted
+                              ? <CheckCircle2 className="h-5 w-5 text-green-400" />
+                              : <Dumbbell className="h-5 w-5 text-cyan-400" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
+                            {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
+                        </button>
+                        <button
+                          onClick={onToggleExercise}
+                          className={`flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-semibold transition-colors ${
+                            isCompleted
+                              ? "bg-green-950/30 text-green-400"
+                              : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
+                          }`}
+                        >
+                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                            isCompleted ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                          }`}>
+                            {isCompleted && <Check className="h-3 w-3 text-green-400" />}
+                          </span>
+                          {isCompleted ? "Practiced ✓" : "Mark as practiced"}
+                        </button>
+                      </div>
+                    );
+                  })()
+                )}
+
+                {/* YouTube lessons */}
+                {hasLessons && (
+                  <div className="flex flex-col gap-3">
+                    <p className="flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
+                      <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
+                    </p>
+                    {loadingLessonsId === step.id ? (
+                      <div className="space-y-2">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
+                            <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                              <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4">
+                        {lessons.map((lesson) => {
+                          const isWatched = step.completedLessonIds?.includes(lesson.videoId) ?? false;
+                          return (
+                            <div key={lesson.videoId} className="flex flex-col gap-2">
+                              <YouTubeLessonCard lesson={lesson} onClick={() => onPracticeLesson(lesson)} />
+                              <button
+                                onClick={() => onToggleLesson(lesson.videoId)}
+                                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-semibold transition-colors ${
+                                  isWatched
+                                    ? "bg-green-950/20 text-green-400"
+                                    : "bg-zinc-900/40 text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
+                                }`}
+                              >
+                                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
+                                  isWatched ? "border-green-500 bg-green-500/20" : "border-zinc-600"
+                                }`}>
+                                  {isWatched && <Check className="h-3 w-3 text-green-400" />}
+                                </span>
+                                {isWatched ? "Watched ✓" : "Mark as watched"}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* YouTube lessons (admin only) */}
+          {adminMode && (
+            <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
+              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
+                <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
+              </p>
+              {loadingLessonsId === step.id ? (
+                <div className="space-y-2">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
+                      <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                        <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : lessons.length ? (
+                <div className="space-y-2">
+                  {lessons.map((lesson) => (
+                    <div key={lesson.videoId} className="group relative">
+                      <YouTubeLessonCard lesson={lesson} />
+                      <button
+                        onClick={() => onRemoveLesson(step.id, phase.id, lesson.videoId)}
+                        className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-zinc-800/80 text-zinc-500 opacity-0 transition hover:bg-red-900/60 hover:text-red-400 group-hover:opacity-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button onClick={() => onFindLessons(step, phase)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
+                    <RefreshCw className="h-2.5 w-2.5" /> Search again
+                  </button>
+                  <div className="flex gap-2 pt-1">
+                    <input
+                      type="text" placeholder="Paste YouTube URL…"
+                      value={customLessonInput[step.id] ?? ""}
+                      onChange={(e) => onCustomLessonInputChange((prev) => ({ ...prev, [step.id]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? ""); }}
+                      className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
+                    />
+                    <button
+                      onClick={() => onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? "")}
+                      disabled={addingCustomLesson.has(step.id)}
+                      className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
+                    >
+                      {addingCustomLesson.has(step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
+                      Add
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <button onClick={() => onFindLessons(step, phase)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300">
+                    <FaYoutube className="h-3.5 w-3.5 text-red-500" /> Find lessons
+                  </button>
+                  <div className="flex gap-2">
+                    <input
+                      type="text" placeholder="Or paste YouTube URL…"
+                      value={customLessonInput[step.id] ?? ""}
+                      onChange={(e) => onCustomLessonInputChange((prev) => ({ ...prev, [step.id]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? ""); }}
+                      className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
+                    />
+                    <button
+                      onClick={() => onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? "")}
+                      disabled={addingCustomLesson.has(step.id)}
+                      className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
+                    >
+                      {addingCustomLesson.has(step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 py-12 text-center">
+          <p className="text-sm text-zinc-500">Detailed description will be generated.</p>
+          <p className="text-xs text-zinc-700">Close and reopen this step to load the description.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist, adminMode }) => {
   const persist = useCallback(
     async (phases: RoadmapPhase[]) => {
@@ -256,8 +743,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   const phasesRef = useRef(phases);
   useEffect(() => { phasesRef.current = phases; }, [phases]);
 
-  const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
-  const [practiceLesson, setPracticeLesson] = useState<YouTubeLessonResult | null>(null);
+  const [activeStepId, setActiveStepId] = useState<string | null>(null);
+  const [practiceLesson, setPracticeLesson] = useState<{
+    lesson: YouTubeLessonResult;
+    stepId: string;
+    phaseId: string;
+  } | null>(null);
   const [loadingDetailIds, setLoadingDetailIds] = useState<Set<string>>(new Set());
   const [loadingExerciseIds, setLoadingExerciseIds] = useState<Set<string>>(new Set());
 
@@ -274,31 +765,33 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   const [customLessonInput, setCustomLessonInput] = useState<Record<string, string>>({});
   const [addingCustomLesson, setAddingCustomLesson] = useState<Set<string>>(new Set());
 
+  const containerCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const phaseNodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const stepBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [svgPaths, setSvgPaths] = useState<SvgPath[]>([]);
   const [svgDims, setSvgDims] = useState({ w: 0, h: 0 });
 
+  // Opening/closing a step swaps the whole card content (graph <-> step page),
+  // so scroll back to the top of that content each time.
   useEffect(() => {
-    document.body.style.overflow = drawerStepId ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [drawerStepId]);
+    containerCardRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [activeStepId]);
 
-  const drawerInfo = useMemo((): {
+  const activeStepInfo = useMemo((): {
     step: RoadmapStep;
     phase: RoadmapPhase;
     stepIdx: number;
     phaseIdx: number;
   } | null => {
-    if (!drawerStepId) return null;
+    if (!activeStepId) return null;
     for (let pi = 0; pi < phases.length; pi++) {
-      const stepIdx = phases[pi].steps.findIndex((s) => s.id === drawerStepId);
+      const stepIdx = phases[pi].steps.findIndex((s) => s.id === activeStepId);
       if (stepIdx !== -1)
         return { step: phases[pi].steps[stepIdx], phase: phases[pi], stepIdx, phaseIdx: pi };
     }
     return null;
-  }, [drawerStepId, phases]);
+  }, [activeStepId, phases]);
 
   const recalcPaths = useCallback(() => {
     const container = containerRef.current;
@@ -372,8 +865,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   );
   const progress = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
 
-  const openDrawer = async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => {
-    setDrawerStepId(step.id);
+  const openStepPage = async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => {
+    setActiveStepId(step.id);
 
     let enrichedStep = step;
     if (!step.description && !loadingDetailIds.has(step.id)) {
@@ -703,13 +1196,26 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     }
   };
 
+  // Whenever a resource's completion changes, the step's own status (sessionsCompleted)
+  // is recomputed from it — checking anything moves the step to "in-progress", checking
+  // everything moves it to "done".
+  const applyAutoStatus = useCallback(
+    (step: RoadmapStep): RoadmapStep => {
+      const status = getResourceStatus(step, lessonsCache[step.id] ?? []);
+      if (status === null) return step;
+      const sessionsCompleted = status === "done" ? step.sessionsRequired : status === "in-progress" ? 1 : 0;
+      return { ...step, sessionsCompleted };
+    },
+    [lessonsCache]
+  );
+
   const handleToggleExercise = () => {
-    if (!drawerInfo) return;
+    if (!activeStepInfo) return;
     const newPhases = phases.map((p) =>
-      p.id !== drawerInfo.phase.id ? p : {
+      p.id !== activeStepInfo.phase.id ? p : {
         ...p,
         steps: p.steps.map((s) =>
-          s.id !== drawerInfo.step.id ? s : { ...s, exerciseCompleted: !s.exerciseCompleted }
+          s.id !== activeStepInfo.step.id ? s : applyAutoStatus({ ...s, exerciseCompleted: !s.exerciseCompleted })
         ),
       }
     );
@@ -718,22 +1224,46 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
   };
 
   const handleToggleLesson = (videoId: string) => {
-    if (!drawerInfo) return;
-    const current = drawerInfo.step.completedLessonIds ?? [];
+    if (!activeStepInfo) return;
+    const current = activeStepInfo.step.completedLessonIds ?? [];
     const next = current.includes(videoId)
       ? current.filter((id) => id !== videoId)
       : [...current, videoId];
     const newPhases = phases.map((p) =>
-      p.id !== drawerInfo.phase.id ? p : {
+      p.id !== activeStepInfo.phase.id ? p : {
         ...p,
         steps: p.steps.map((s) =>
-          s.id !== drawerInfo.step.id ? s : { ...s, completedLessonIds: next }
+          s.id !== activeStepInfo.step.id ? s : applyAutoStatus({ ...s, completedLessonIds: next })
         ),
       }
     );
     setPhases(newPhases);
     persist(newPhases).catch(() => toast.error("Failed to save."));
   };
+
+  // Used by the practice-session modal to force a lesson to "watched" on finish
+  // (never toggles it back off).
+  const markLessonWatched = useCallback(
+    (phaseId: string, stepId: string, videoId: string) => {
+      let changed = false;
+      const newPhases = phases.map((p) =>
+        p.id !== phaseId ? p : {
+          ...p,
+          steps: p.steps.map((s) => {
+            if (s.id !== stepId) return s;
+            const current = s.completedLessonIds ?? [];
+            if (current.includes(videoId)) return s;
+            changed = true;
+            return applyAutoStatus({ ...s, completedLessonIds: [...current, videoId] });
+          }),
+        }
+      );
+      if (!changed) return;
+      setPhases(newPhases);
+      persist(newPhases).catch(() => toast.error("Failed to save."));
+    },
+    [phases, applyAutoStatus, persist]
+  );
 
   const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
     const newPhases = phases.map((phase) =>
@@ -754,14 +1284,43 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     }
   };
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
   const markerId = `arr-${roadmap.id.slice(0, 8)}`;
 
   return (
     <>
-      <div className="rounded-lg bg-zinc-950 overflow-hidden">
+      <div ref={containerCardRef} className="rounded-lg bg-zinc-950 overflow-hidden">
+      {activeStepInfo && (
+        <StepPageContent
+          activeStepInfo={activeStepInfo}
+          adminMode={adminMode}
+          roadmap={roadmap}
+          router={router}
+          lessonsCache={lessonsCache}
+          loadingDetailIds={loadingDetailIds}
+          loadingExerciseIds={loadingExerciseIds}
+          loadingLessonsId={loadingLessonsId}
+          exerciseOptions={exerciseOptions}
+          customLessonInput={customLessonInput}
+          addingCustomLesson={addingCustomLesson}
+          onBack={() => setActiveStepId(null)}
+          onRegenerateStep={handleRegenerateStep}
+          onSetStepStatus={setStepStatus}
+          onEditStep={handleEditStep}
+          onFindExercises={handleFindExercises}
+          onSelectExercise={handleSelectExercise}
+          onToggleExercise={handleToggleExercise}
+          onToggleLesson={handleToggleLesson}
+          onFindLessons={handleFindLessons}
+          onRemoveLesson={handleRemoveLesson}
+          onCustomLessonInputChange={setCustomLessonInput}
+          onAddCustomLesson={handleAddCustomLesson}
+          onPracticeLesson={(lesson) =>
+            setPracticeLesson({ lesson, stepId: activeStepInfo.step.id, phaseId: activeStepInfo.phase.id })
+          }
+        />
+      )}
+      {!activeStepInfo && (
+      <>
         {/* ─── Hero header ─── */}
         {roadmap.image ? (
           <div className="relative h-48 w-full overflow-hidden md:h-56">
@@ -950,12 +1509,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                       <div className="ml-4 flex flex-col gap-3 pl-4">
                         {phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
-                          const isActive = drawerStepId === step.id;
+                          const isActive = activeStepId === step.id;
                           const isLoading = loadingDetailIds.has(step.id);
                           return (
                             <button
                               key={step.id}
-                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
                               className={`flex w-full items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-left ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
                             >
                               {isLoading
@@ -975,13 +1534,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                       <div className="flex flex-col items-end gap-5">
                         {!stepsRight && phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
-                          const isActive = drawerStepId === step.id;
+                          const isActive = activeStepId === step.id;
                           const isLoading = loadingDetailIds.has(step.id);
                           return (
                             <button
                               key={step.id}
                               ref={(el) => { if (el) stepBtnRefs.current.set(step.id, el); else stepBtnRefs.current.delete(step.id); }}
-                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
                               className={`flex max-w-[260px] items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-right ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
                             >
                               {isLoading
@@ -1012,13 +1571,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
                       <div className="flex flex-col items-start gap-5">
                         {stepsRight && phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
-                          const isActive = drawerStepId === step.id;
+                          const isActive = activeStepId === step.id;
                           const isLoading = loadingDetailIds.has(step.id);
                           return (
                             <button
                               key={step.id}
                               ref={(el) => { if (el) stepBtnRefs.current.set(step.id, el); else stepBtnRefs.current.delete(step.id); }}
-                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
                               className={`flex max-w-[260px] items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-left ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
                             >
                               {isLoading
@@ -1047,456 +1606,20 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               </div>
             )}
           </div>
+        </div>{/* end containerRef */}
         </div>{/* end relative z-[1] */}
         </div>{/* end p-5 md:p-8 */}
-        </div>{/* end rounded-lg bg-zinc-950 */}
-      </div>{/* end outer wrapper */}
-
-      {mounted && createPortal(
-        <>
-          {/* ─── Drawer overlay ─── */}
-          <div
-            className={`fixed inset-0 z-[800] bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${drawerInfo ? "opacity-100" : "pointer-events-none opacity-0"}`}
-            onClick={() => setDrawerStepId(null)}
-          />
-
-          {/* ─── Drawer panel ─── */}
-          <div className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-xl flex-col bg-zinc-950 transition-transform duration-300 ${drawerInfo ? "translate-x-0" : "translate-x-full"}`}>
-            {drawerInfo && (
-              <>
-                {/* ── Sticky header ── */}
-                <div className="shrink-0 bg-zinc-950/95 backdrop-blur-md">
-                  <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4">
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                          Phase {drawerInfo.phaseIdx + 1}
-                        </span>
-                        <span className="text-[10px] text-zinc-700">·</span>
-                        <span className="text-[10px] text-zinc-600">step {drawerInfo.stepIdx + 1}</span>
-                      </div>
-                      <h2 className="text-base font-bold leading-snug text-zinc-100">{drawerInfo.step.title}</h2>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {adminMode && drawerInfo.step.description && !loadingDetailIds.has(drawerInfo.step.id) && (
-                        <button
-                          onClick={() => handleRegenerateStep(drawerInfo.step, drawerInfo.phase, drawerInfo.stepIdx, drawerInfo.phaseIdx)}
-                          className="flex items-center gap-1 rounded bg-zinc-800 px-2 py-1 text-[11px] text-zinc-400 transition hover:bg-zinc-700 hover:text-zinc-200"
-                        >
-                          <RefreshCw className="h-3 w-3" /> Regen
-                        </button>
-                      )}
-                      <button
-                        onClick={() => setDrawerStepId(null)}
-                        aria-label="Close"
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Status buttons */}
-                  <div className="px-6 pb-5">
-                    <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                      Your progress on this skill
-                    </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {STATUS_BTNS.map(({ status: s, label, Icon }) => {
-                        const isActive = getStatus(drawerInfo.step) === s;
-                        return (
-                          <button
-                            key={s}
-                            onClick={() => setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)}
-                            className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-3.5 text-xs font-semibold transition-all ${
-                              isActive
-                                ? s === "not-started"
-                                  ? "bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500"
-                                  : s === "in-progress"
-                                  ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
-                                  : "bg-green-900/50 text-green-400 ring-1 ring-green-500/40"
-                                : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
-                            }`}
-                          >
-                            <Icon className="h-4 w-4" />
-                            {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── Mobile close bar ── */}
-                <div className="flex shrink-0 items-center justify-center py-2 sm:hidden">
-                  <button
-                    onClick={() => setDrawerStepId(null)}
-                    className="flex items-center gap-2 rounded px-4 py-1.5 text-xs font-medium text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
-                  >
-                    <X className="h-3.5 w-3.5" /> Close
-                  </button>
-                </div>
-
-                {/* ── Scrollable content ── */}
-                <div className="flex-1 overflow-y-auto">
-                  {loadingDetailIds.has(drawerInfo.step.id) ? (
-                    <div className="p-6">
-                      <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
-                    </div>
-                  ) : drawerInfo.step.description ? (
-                    <div className="flex flex-col gap-0">
-
-                      {/* ── Exercise (admin only at top) ── */}
-                      {adminMode && (
-                        <div className="px-6 py-5">
-                          <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                            <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
-                          </p>
-                          {loadingExerciseIds.has(drawerInfo.step.id) ? (
-                            <div className="flex items-center gap-2 text-xs text-zinc-500">
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching exercises…
-                            </div>
-                          ) : exerciseOptions[drawerInfo.step.id] ? (
-                            <div className="space-y-2">
-                              <p className="text-[11px] text-zinc-600">Pick one:</p>
-                              {exerciseOptions[drawerInfo.step.id].map((id) => {
-                                const ex = exercisesAgregat.find((e) => e.id === id);
-                                if (!ex) return null;
-                                return (
-                                  <button
-                                    key={id}
-                                    onClick={() => handleSelectExercise(drawerInfo.step.id, drawerInfo.phase.id, id)}
-                                    className="flex w-full items-center gap-3 rounded bg-zinc-900 px-3 py-2.5 text-left text-xs transition hover:bg-zinc-800"
-                                  >
-                                    <Dumbbell className="h-4 w-4 shrink-0 text-cyan-500" />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate font-semibold text-zinc-100">{ex.title}</p>
-                                      {ex.difficulty && <p className="capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                                    </div>
-                                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
-                                  </button>
-                                );
-                              })}
-                              <button onClick={() => handleFindExercises(drawerInfo.step)} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                                Search again
-                              </button>
-                            </div>
-                          ) : drawerInfo.step.noExercise ? (
-                            <div className="flex items-center gap-3">
-                              <span className="flex items-center gap-1.5 rounded bg-zinc-800/60 px-2.5 py-1.5 text-[11px] text-zinc-500">
-                                <X className="h-3 w-3" /> No exercise
-                              </span>
-                              <button onClick={() => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { noExercise: false })} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                                Undo
-                              </button>
-                            </div>
-                          ) : drawerInfo.step.suggestedExerciseId ? (
-                            (() => {
-                              const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
-                              if (!ex) return null;
-                              return (
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-3 rounded-lg bg-cyan-950/25 px-3 py-2.5">
-                                    <Dumbbell className="h-4 w-4 shrink-0 text-cyan-400" />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                                      {ex.difficulty && <p className="text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    <button onClick={() => handleFindExercises(drawerInfo.step)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                                      <RefreshCw className="h-2.5 w-2.5" /> Change exercise
-                                    </button>
-                                    <button onClick={() => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { suggestedExerciseId: undefined, noExercise: true })} className="text-[11px] text-zinc-700 underline underline-offset-2 hover:text-red-400">
-                                      No exercise
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => handleFindExercises(drawerInfo.step)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-cyan-300">
-                                <Sparkles className="h-3.5 w-3.5" /> Find exercise
-                              </button>
-                              <button onClick={() => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { noExercise: true })} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-500 transition hover:bg-zinc-700 hover:text-zinc-300">
-                                <X className="h-3.5 w-3.5" /> No exercise
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* ── Description ── */}
-                      <div className="border-b border-zinc-800/40 px-6 py-5">
-                        {adminMode ? (
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold tracking-widest text-zinc-500">Description</label>
-                            <textarea
-                              rows={8}
-                              className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
-                              value={drawerInfo.step.description}
-                              onChange={(e) => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { description: e.target.value })}
-                            />
-                          </div>
-                        ) : (
-                          <StepDescription description={drawerInfo.step.description} />
-                        )}
-                      </div>
-
-                      {/* ── Success criteria ── */}
-                      {(drawerInfo.step.successCriteria || adminMode) && (
-                        <div className="px-6 py-5">
-                          <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
-                            <Target className="h-3.5 w-3.5 text-cyan-500" /> Success criteria
-                          </p>
-                          {adminMode ? (
-                            <textarea
-                              rows={3}
-                              className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
-                              value={drawerInfo.step.successCriteria}
-                              onChange={(e) => handleEditStep(drawerInfo.step.id, drawerInfo.phase.id, { successCriteria: e.target.value })}
-                            />
-                          ) : (
-                            <div className="rounded-lg bg-cyan-950/25 px-4 py-3.5">
-                              <p className="text-sm leading-relaxed text-zinc-200">{drawerInfo.step.successCriteria}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* ── User: Suggested resources ── */}
-                      {!adminMode && (() => {
-                        const hasExercise = loadingExerciseIds.has(drawerInfo.step.id) || !!drawerInfo.step.suggestedExerciseId;
-                        const hasLessons = loadingLessonsId === drawerInfo.step.id ||
-                          (lessonsCache[drawerInfo.step.id]?.length ?? 0) > 0;
-                        if (!hasExercise && !hasLessons) return null;
-                        return (
-                          <>
-                            {/* Resources section header */}
-                            <div className="border-t border-zinc-800/40 px-6 pt-5 pb-3">
-                              <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Suggested resources</p>
-                                <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-600">optional</span>
-                              </div>
-                              <p className="mt-1 text-[11px] text-zinc-600">
-                                These don't affect your skill progress — check them off as you use them.
-                              </p>
-                            </div>
-
-                            {/* Exercise */}
-                            {hasExercise && (
-                              <div className="px-6 pb-5">
-                                {loadingExerciseIds.has(drawerInfo.step.id) ? (
-                                  <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
-                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
-                                    <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
-                                  </div>
-                                ) : (() => {
-                                  const ex = exercisesAgregat.find((e) => e.id === drawerInfo.step.suggestedExerciseId);
-                                  if (!ex) return null;
-                                  const isCompleted = !!drawerInfo.step.exerciseCompleted;
-                                  return (
-                                    <div className="space-y-0">
-                                      <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                                        <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
-                                      </p>
-                                      <div className={`rounded-lg ring-1 transition-all ${
-                                        isCompleted ? "ring-green-500/40" : "ring-zinc-800/60"
-                                      }`}>
-                                        <button
-                                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=${encodeURIComponent(`/ai-coach?roadmapId=${roadmap.id}`)}`)}
-                                          className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-t-lg px-4 py-4 text-left transition-all ${
-                                            isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
-                                          }`}
-                                        >
-                                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent" />
-                                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition group-hover:bg-cyan-500/25 ${
-                                            isCompleted ? "bg-green-500/15" : "bg-cyan-500/15"
-                                          }`}>
-                                            {isCompleted
-                                              ? <CheckCircle2 className="h-5 w-5 text-green-400" />
-                                              : <Dumbbell className="h-5 w-5 text-cyan-400" />}
-                                          </div>
-                                          <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                                            {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                                          </div>
-                                          <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
-                                        </button>
-                                        <button
-                                          onClick={handleToggleExercise}
-                                          className={`flex w-full items-center gap-3 rounded-b-lg border-t px-4 py-3 text-xs font-medium transition-colors ${
-                                            isCompleted
-                                              ? "border-green-500/20 bg-green-950/30 text-green-400"
-                                              : "border-zinc-800/60 bg-zinc-900/60 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
-                                          }`}
-                                        >
-                                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
-                                            isCompleted ? "border-green-500 bg-green-500/20" : "border-zinc-600"
-                                          }`}>
-                                            {isCompleted && <Check className="h-3 w-3 text-green-400" />}
-                                          </span>
-                                          {isCompleted ? "Practiced ✓" : "Mark as practiced"}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                            )}
-
-                            {/* YouTube lessons */}
-                            {hasLessons && (
-                              <div className="px-6 pb-6">
-                                <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                                  <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-                                </p>
-                                {loadingLessonsId === drawerInfo.step.id ? (
-                                  <div className="space-y-2">
-                                    {[0, 1, 2].map((i) => (
-                                      <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                                        <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                                        <div className="flex-1 space-y-2">
-                                          <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                                          <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <div className="space-y-3">
-                                    {lessonsCache[drawerInfo.step.id].map((lesson) => {
-                                      const isWatched = drawerInfo.step.completedLessonIds?.includes(lesson.videoId) ?? false;
-                                      return (
-                                        <div key={lesson.videoId} className={`rounded-lg ring-1 transition-all ${
-                                          isWatched ? "ring-green-500/40" : "ring-zinc-800/60"
-                                        }`}>
-                                          <YouTubeLessonCard lesson={lesson} className="rounded-b-none" onClick={() => setPracticeLesson(lesson)} />
-                                          <button
-                                            onClick={() => handleToggleLesson(lesson.videoId)}
-                                            className={`flex w-full items-center gap-3 rounded-b-lg border-t px-3 py-3 text-xs font-medium transition-colors ${
-                                              isWatched
-                                                ? "border-green-500/20 bg-green-950/20 text-green-400"
-                                                : "border-zinc-800/60 bg-zinc-900/40 text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-300"
-                                            }`}
-                                          >
-                                            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
-                                              isWatched ? "border-green-500 bg-green-500/20" : "border-zinc-600"
-                                            }`}>
-                                              {isWatched && <Check className="h-3 w-3 text-green-400" />}
-                                            </span>
-                                            {isWatched ? "Watched ✓" : "Mark as watched"}
-                                          </button>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
-
-                      {/* ── YouTube lessons (admin only) ── */}
-                      {adminMode && (
-                        <div className="px-6 py-5">
-                          <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
-                            <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-                          </p>
-                          {loadingLessonsId === drawerInfo.step.id ? (
-                            <div className="space-y-2">
-                              {[0, 1, 2].map((i) => (
-                                <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                                  <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                                  <div className="flex-1 space-y-2">
-                                    <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                                    <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : lessonsCache[drawerInfo.step.id]?.length ? (
-                            <div className="space-y-2">
-                              {lessonsCache[drawerInfo.step.id].map((lesson) => (
-                                <div key={lesson.videoId} className="group relative">
-                                  <YouTubeLessonCard lesson={lesson} />
-                                  <button
-                                    onClick={() => handleRemoveLesson(drawerInfo.step.id, drawerInfo.phase.id, lesson.videoId)}
-                                    className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-zinc-800/80 text-zinc-500 opacity-0 transition hover:bg-red-900/60 hover:text-red-400 group-hover:opacity-100"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              ))}
-                              <button onClick={() => handleFindLessons(drawerInfo.step, drawerInfo.phase)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                                <RefreshCw className="h-2.5 w-2.5" /> Search again
-                              </button>
-                              <div className="flex gap-2 pt-1">
-                                <input
-                                  type="text" placeholder="Paste YouTube URL…"
-                                  value={customLessonInput[drawerInfo.step.id] ?? ""}
-                                  onChange={(e) => setCustomLessonInput((prev) => ({ ...prev, [drawerInfo.step.id]: e.target.value }))}
-                                  onKeyDown={(e) => { if (e.key === "Enter") handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? ""); }}
-                                  className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
-                                />
-                                <button
-                                  onClick={() => handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? "")}
-                                  disabled={addingCustomLesson.has(drawerInfo.step.id)}
-                                  className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
-                                >
-                                  {addingCustomLesson.has(drawerInfo.step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
-                                  Add
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <button onClick={() => handleFindLessons(drawerInfo.step, drawerInfo.phase)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300">
-                                <FaYoutube className="h-3.5 w-3.5 text-red-500" /> Find lessons
-                              </button>
-                              <div className="flex gap-2">
-                                <input
-                                  type="text" placeholder="Or paste YouTube URL…"
-                                  value={customLessonInput[drawerInfo.step.id] ?? ""}
-                                  onChange={(e) => setCustomLessonInput((prev) => ({ ...prev, [drawerInfo.step.id]: e.target.value }))}
-                                  onKeyDown={(e) => { if (e.key === "Enter") handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? ""); }}
-                                  className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
-                                />
-                                <button
-                                  onClick={() => handleAddCustomLesson(drawerInfo.step.id, drawerInfo.phase.id, customLessonInput[drawerInfo.step.id] ?? "")}
-                                  disabled={addingCustomLesson.has(drawerInfo.step.id)}
-                                  className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
-                                >
-                                  {addingCustomLesson.has(drawerInfo.step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
-                                  Add
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 py-12 text-center">
-                      <p className="text-sm text-zinc-500">Detailed description will be generated.</p>
-                      <p className="text-xs text-zinc-700">Close and reopen this step to load the description.</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </>,
-        document.body
+      </>
       )}
+      </div>{/* end outer wrapper */}
 
       {practiceLesson && (
         <LessonPracticeModal
-          lesson={practiceLesson}
-          returnTo={`/ai-coach?roadmapId=${roadmap.id}`}
+          lesson={practiceLesson.lesson}
+          onFinish={() => {
+            markLessonWatched(practiceLesson.phaseId, practiceLesson.stepId, practiceLesson.lesson.videoId);
+            setPracticeLesson(null);
+          }}
           onClose={() => setPracticeLesson(null)}
         />
       )}
