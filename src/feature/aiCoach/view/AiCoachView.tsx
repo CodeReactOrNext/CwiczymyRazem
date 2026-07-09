@@ -16,6 +16,16 @@ import type { Roadmap, RoadmapPhase, StaticRoadmap } from "../types/roadmap.type
 import RoadmapCard from "./RoadmapCard/RoadmapCard";
 import RoadmapView from "./RoadmapView/RoadmapView";
 
+const LEVEL_ORDER: Record<string, number> = {
+  "Absolute Beginner": 0,
+  Beginner: 1,
+  Intermediate: 2,
+  Advanced: 3,
+};
+
+const sortByDifficulty = (list: StaticRoadmap[]) =>
+  [...list].sort((a, b) => (LEVEL_ORDER[a.level] ?? 99) - (LEVEL_ORDER[b.level] ?? 99));
+
 function mergeWithProgress(
   roadmap: StaticRoadmap,
   progress: UserRoadmapProgress | null,
@@ -65,6 +75,8 @@ const AiCoachView = () => {
       .catch(console.error)
       .finally(() => setLoadingProgress(false));
   }, [userAuth]);
+
+  const sortedRoadmaps = useMemo(() => sortByDifficulty(roadmaps), []);
 
   const selectedStaticRoadmap = useMemo(
     () => roadmaps.find((r) => r.id === selectedId) ?? null,
@@ -146,7 +158,7 @@ const AiCoachView = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {roadmaps.map((rm) => {
+            {sortedRoadmaps.map((rm) => {
               const merged = mergeWithProgress(rm, progressMap[rm.id] ?? null, userAuth as string);
               return (
                 <RoadmapCard
