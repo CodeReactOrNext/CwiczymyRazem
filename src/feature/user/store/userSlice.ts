@@ -147,43 +147,54 @@ const userSlice = createSlice({
       if (!state.currentUserStats) return;
       const today = getLocalDateKey();
 
-      // Templates
-      const taskTemplates: { type: DailyQuestTaskType; title: string; target: number }[] = [
-        { type: 'rate_song', title: 'Rate a Song', target: 1 },
-        { type: 'add_want_to_learn', title: 'Add song to "Want to Learn"', target: 1 },
-        { type: 'practice_any_song', title: 'Practice any Song', target: 1 },
-        { type: 'healthy_habits', title: 'Use 2 Healthy Habits', target: 2 },
-        { type: 'auto_plan', title: 'Generate & Practice Auto Plan', target: 1 },
-        { type: 'practice_plan', title: 'Complete a Practice Plan', target: 1 },
-        { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15 },
-        { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10 },
-        { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1 },
-        { type: 'practice_theory_time', title: 'Practice Theory for 10 minutes', target: 10 },
-        { type: 'practice_hearing_time', title: 'Train your Ear for 10 minutes', target: 10 },
-        { type: 'practice_creativity_time', title: 'Be Creative for 10 minutes', target: 10 },
-        { type: 'creativity_focus', title: 'Spend 15 minutes on Creativity', target: 15 },
-        { type: 'long_session', title: 'Practice for 30 minutes total', target: 30 },
-        { type: 'well_rounded', title: 'Practice 3 different categories', target: 3 },
-        { type: 'two_categories_min', title: 'Practice 2 categories for 5 min each', target: 2 },
-        { type: 'balanced_session', title: 'Practice Technique & Theory in one session', target: 2 },
-        { type: 'rate_multiple_songs', title: 'Rate 3 Songs', target: 3 },
-        { type: 'complete_two_plans', title: 'Complete 2 Practice Plans', target: 2 },
-        { type: 'improve_skill', title: 'Earn points in any Skill', target: 1 },
-        { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3 },
+      // Templates. `group` marks tasks that overlap in what they ask the
+      // player to do (e.g. rating songs, completing practice plans) so we
+      // never draw two of them into the same quest set (see #622).
+      const taskTemplates: { type: DailyQuestTaskType; title: string; target: number; group: string }[] = [
+        { type: 'rate_song', title: 'Rate a Song', target: 1, group: 'rate_song' },
+        { type: 'add_want_to_learn', title: 'Add song to "Want to Learn"', target: 1, group: 'add_want_to_learn' },
+        { type: 'practice_any_song', title: 'Practice any Song', target: 1, group: 'practice_any_song' },
+        { type: 'healthy_habits', title: 'Use 2 Healthy Habits', target: 2, group: 'healthy_habits' },
+        { type: 'auto_plan', title: 'Generate & Practice Auto Plan', target: 1, group: 'auto_plan' },
+        { type: 'practice_plan', title: 'Complete a Practice Plan', target: 1, group: 'practice_plan' },
+        { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15, group: 'total_time' },
+        { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10, group: 'technique_time' },
+        { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1, group: 'specific_exercise' },
+        { type: 'practice_theory_time', title: 'Practice Theory for 10 minutes', target: 10, group: 'theory_time' },
+        { type: 'practice_hearing_time', title: 'Train your Ear for 10 minutes', target: 10, group: 'hearing_time' },
+        { type: 'practice_creativity_time', title: 'Be Creative for 10 minutes', target: 10, group: 'creativity_time' },
+        { type: 'creativity_focus', title: 'Spend 15 minutes on Creativity', target: 15, group: 'creativity_time' },
+        { type: 'long_session', title: 'Practice for 30 minutes total', target: 30, group: 'total_time' },
+        { type: 'well_rounded', title: 'Practice 3 different categories', target: 3, group: 'multi_category' },
+        { type: 'two_categories_min', title: 'Practice 2 categories for 5 min each', target: 2, group: 'multi_category' },
+        { type: 'balanced_session', title: 'Practice Technique & Theory in one session', target: 2, group: 'multi_category' },
+        { type: 'rate_multiple_songs', title: 'Rate 3 Songs', target: 3, group: 'rate_song' },
+        { type: 'complete_two_plans', title: 'Complete 2 Practice Plans', target: 2, group: 'practice_plan' },
+        { type: 'improve_skill', title: 'Earn points in any Skill', target: 1, group: 'improve_skill' },
+        { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3, group: 'specific_exercise' },
       ];
 
       // If quest exists for today, do nothing
       if (state.currentUserStats.dailyQuest?.date === today && state.currentUserStats.dailyQuest?.tasks?.length > 0) return;
 
-      // Shuffle and pick 3. Use Fisher-Yates for a uniform distribution;
-      // sort(() => 0.5 - Math.random()) is biased and over-selects the
-      // templates near the start of the array.
+      // Shuffle and pick 3, skipping templates whose group is already
+      // represented in the selection so the quest set never contains two
+      // near-duplicate tasks (e.g. "Rate a Song" + "Rate 3 Songs"). Use
+      // Fisher-Yates for a uniform distribution; sort(() => 0.5 - Math.random())
+      // is biased and over-selects the templates near the start of the array.
       const shuffled = [...taskTemplates];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-      const selected = shuffled.slice(0, 3);
+      const usedGroups = new Set<string>();
+      const selected: typeof taskTemplates = [];
+      for (const template of shuffled) {
+        if (selected.length >= 3) break;
+        if (usedGroups.has(template.group)) continue;
+        usedGroups.add(template.group);
+        selected.push(template);
+      }
 
       const tasks = selected.map((t, index) => {
         const taskObj: DailyQuestTask = {
