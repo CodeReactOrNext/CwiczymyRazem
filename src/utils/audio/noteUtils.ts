@@ -58,13 +58,16 @@ export const getCentsDistance = (freqA: number, freqB: number): number => {
   return 1200 * Math.log2(freqA / freqB);
 };
 
-/**
- * Calculates the frequency of a specific note on a guitar string and fret.
- * Assumes Standard Tuning (E A D G B E).
- * @param string - String number (1-6, 1 is High E).
- * @param fret - Fret number.
- * @returns Frequency in Hz.
- */
+// Standard tuning open-string MIDI notes. String 1 is high E, string 6 is low E.
+export const STANDARD_OPEN_STRING_MIDI: Record<number, number> = {
+  1: 64, // E4
+  2: 59, // B3
+  3: 55, // G3
+  4: 50, // D3
+  5: 45, // A2
+  6: 40, // E2
+};
+
 /**
  * Maps a frequency in Hz to a pitch class index 0–11 (C=0, C#=1, …, B=11).
  */
@@ -109,31 +112,20 @@ export function computeChromagram(analyser: AnalyserNode): Float32Array | null {
 export const midiToFrequency = (midi: number): number =>
   A4 * Math.pow(2, (midi - 69) / 12);
 
-export const getFrequencyFromTab = (string: number, fret: number): number => {
-  // Standard Tuning Open String MIDI notes
-  // 1: E4 (64)
-  // 2: B3 (59)
-  // 3: G3 (55)
-  // 4: D3 (50)
-  // 5: A2 (45)
-  // 6: E2 (40)
-
-  // Correction: String 1 is high E, String 6 is low E.
-  // The previous implementation used standard tuning but let's be precise.
-
-  const stringMidiMap: Record<number, number> = {
-    1: 64, // E4
-    2: 59, // B3
-    3: 55, // G3
-    4: 50, // D3
-    5: 45, // A2
-    6: 40  // E2
-  };
-
-  const openStringMidi = stringMidiMap[string];
+/**
+ * Calculates the frequency of a specific note on a guitar string and fret.
+ * @param string - String number (1-6, 1 is High E).
+ * @param fret - Fret number.
+ * @param tuningOffsets - Per-string semitone offset from standard tuning
+ *   (index 0 = string 1 … index 5 = string 6). Omit for standard tuning.
+ * @returns Frequency in Hz.
+ */
+export const getFrequencyFromTab = (string: number, fret: number, tuningOffsets?: readonly number[]): number => {
+  const openStringMidi = STANDARD_OPEN_STRING_MIDI[string];
   if (!openStringMidi) return 0;
 
-  const targetMidi = openStringMidi + fret;
+  const offset = tuningOffsets?.[string - 1] ?? 0;
+  const targetMidi = openStringMidi + fret + offset;
 
   // Frequency = A4 * 2^((midi - 69) / 12)
   return A4 * Math.pow(2, (targetMidi - 69) / 12);

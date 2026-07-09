@@ -2,9 +2,9 @@ import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAlphaTabPlayer } from "../../../hooks/useAlphaTabPlayer";
+import { useExamBackingAudio } from "../../../hooks/useExamBackingAudio";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { useTablatureAudio } from "../../../hooks/useTablatureAudio";
-import { useExamBackingAudio } from "../../../hooks/useExamBackingAudio";
 import type { BackingTrack } from "../../../types/exercise.types";
 import type { TablatureMeasure } from "../../../types/exercise.types";
 
@@ -35,6 +35,9 @@ interface UseSessionAudioOptions {
   tabRestartKey:           number;
   /** One-shot GP-audio seek target (in beats) owned by the metronome; keeps AlphaTab aligned with bar-click seeks. */
   pendingSeekBeatRef?:     MutableRefObject<number | null>;
+  /** Per-string semitone offset from standard tuning, applied to the custom (non-GP) synth so the
+   *  background guitar matches the player's chosen tuning. */
+  tuningOffsets?:          readonly number[];
 }
 
 export function useSessionAudio({
@@ -44,7 +47,7 @@ export function useSessionAudio({
   isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
-  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef,
+  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -169,6 +172,7 @@ export function useSessionAudio({
     audioStartTime: effectiveAudioStartTime,
     disabled:       !!effectiveRawGpFile,
     repeatCount:    tabRepeatCount,
+    tuningOffsets,
   });
 
   return useMemo(() => ({

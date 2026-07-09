@@ -3,18 +3,20 @@ import React from "react";
 import { FaCheck } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
-import { STRINGS } from "../calibration.constants";
+import type { GuitarString } from "../calibration.constants";
 
 export const StringProgress = React.memo(function StringProgress({
   currentIndex,
   offsets,
+  strings,
 }: {
   currentIndex: number;
   offsets: CalibrationOffsets;
+  strings: GuitarString[];
 }) {
   return (
     <div className="flex items-end gap-2 justify-center">
-      {STRINGS.map((s, i) => {
+      {strings.map((s, i) => {
         const isDone    = offsets[s.id] !== undefined;
         const isCurrent = i === currentIndex;
         return (

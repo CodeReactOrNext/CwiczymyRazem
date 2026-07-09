@@ -106,6 +106,8 @@ interface NoteMatchingProviderProps {
   getLatencyMs: () => number;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
+  // per-string semitone offset from standard tuning, for notes without a real midiNote
+  tuningOffsets?: readonly number[];
   // inputs for useStrummingMatcher
   activeStrumPattern: StrumPattern | undefined;
   // input for useNoteHunt (customGoal exercises)
@@ -142,6 +144,7 @@ export function NoteMatchingProvider({
   getLatencyMs,
   audioRefs,
   getAdjustedTargetFreq,
+  tuningOffsets,
   activeStrumPattern,
   customGoal,
   customGoalRegion,
@@ -174,6 +177,7 @@ export function NoteMatchingProvider({
     getLatencyMs,
     audioRefs,
     getAdjustedTargetFreq,
+    tuningOffsets,
     onReset,
   });
 

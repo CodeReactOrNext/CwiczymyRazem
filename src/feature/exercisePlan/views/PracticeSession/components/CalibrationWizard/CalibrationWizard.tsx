@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useGuitarTuningContext } from "../../contexts/GuitarTuningContext";
 import type { CalibrationData } from "../../hooks/useCalibration";
+import { buildStringRefs } from "./calibration.constants";
 import { MicErrorScreen } from "./components/MicErrorScreen";
 import { PermissionStep } from "./components/PermissionStep";
 import { SetupStep } from "./components/SetupStep";
@@ -33,6 +35,9 @@ export const CalibrationWizard = ({
   const [isGranting,  setIsGranting]  = useState(false);
   const [micError,    setMicError]    = useState(false);
 
+  const { tuning } = useGuitarTuningContext();
+  const strings = useMemo(() => buildStringRefs(tuning), [tuning]);
+
   useEffect(() => {
     if (!isOpen) return;
     setStep("source");
@@ -41,7 +46,7 @@ export const CalibrationWizard = ({
   }, [isOpen]);
 
   const { currentStringIndex, stringState, offsets, currentOffset, sampleCount, handleRetry, advanceString } =
-    useCalibrationCapture({ step: step === "permission" || step === "source" ? "setup" : step, isOpen, isListening, audioRefs, onAllStringsDone: () => setStep("summary") });
+    useCalibrationCapture({ step: step === "permission" || step === "source" ? "setup" : step, isOpen, isListening, audioRefs, strings, onAllStringsDone: () => setStep("summary") });
 
   const handleGrant = useCallback(async () => {
     setIsGranting(true);
@@ -118,6 +123,7 @@ export const CalibrationWizard = ({
                   currentIndex={currentStringIndex} offsets={offsets}
                   sampleCount={sampleCount} stringState={stringState}
                   currentOffset={currentOffset} audioRefs={audioRefs}
+                  strings={strings}
                   onRetry={handleRetry} onAdvance={advanceString} onCancel={handleCancel}
                 />
               </motion.div>

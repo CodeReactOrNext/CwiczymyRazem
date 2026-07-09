@@ -19,6 +19,7 @@ export const useTablatureAudio = ({
   audioStartTime,
   disabled = false,
   repeatCount = 0,
+  tuningOffsets,
 }: UseTablatureAudioProps) => {
   // ── Audio graph refs ──────────────────────────────────────────────────────
   const ownAudioContextRef   = useRef<AudioContext | null>(null);
@@ -208,9 +209,9 @@ export const useTablatureAudio = ({
         bass:        bassPlayerRef.current,
         vocals:      vocalsPlayerRef.current,
       };
-      playStringNote(ctx, note, time, trackGain, Math.max(0.01, duration), trackType, trackId, activeNodesRef.current, players);
+      playStringNote(ctx, note, time, trackGain, Math.max(0.01, duration), trackType, trackId, activeNodesRef.current, players, tuningOffsets);
     }
-  }, []);
+  }, [tuningOffsets]);
 
   // ── Scheduler ─────────────────────────────────────────────────────────────
   // Beat times computed ABSOLUTELY from startAudioTime — no accumulation drift.

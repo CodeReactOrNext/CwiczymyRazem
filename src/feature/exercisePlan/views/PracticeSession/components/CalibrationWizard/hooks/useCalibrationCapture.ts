@@ -3,17 +3,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getCentsDistance } from "utils/audio/noteUtils";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
-import { ACCEPT_CENTS, MIN_SAMPLES, STALE_MS, STRINGS, median } from "../calibration.constants";
+import type { GuitarString } from "../calibration.constants";
+import { ACCEPT_CENTS, median, MIN_SAMPLES, STALE_MS, STRINGS } from "../calibration.constants";
 
 interface UseCaptureOptions {
   step:        "source" | "setup" | "tuning" | "summary";
   isOpen:      boolean;
   isListening: boolean;
   audioRefs:   AudioRefs;
+  /** Reference pitches to walk through — defaults to standard tuning. */
+  strings?:    GuitarString[];
   onAllStringsDone: () => void;
 }
 
-export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, onAllStringsDone }: UseCaptureOptions) {
+export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, strings = STRINGS, onAllStringsDone }: UseCaptureOptions) {
   const [currentStringIndex, setCurrentStringIndex] = useState(0);
   const [stringState,        setStringState]        = useState<"listening" | "done">("listening");
   const [offsets,            setOffsets]            = useState<CalibrationOffsets>({});
@@ -36,7 +39,7 @@ export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, on
     samplesRef.current = [];
   }, [isOpen]);
 
-  const currentStr = STRINGS[currentStringIndex];
+  const currentStr = strings[currentStringIndex];
 
   // Sample collection RAF — runs only during the tuning step in listening state
   useEffect(() => {
@@ -82,7 +85,7 @@ export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, on
   }, [step, stringState, isOpen, isListening, audioRefs, currentStr]);
 
   const advanceString = useCallback(() => {
-    if (currentStringIndex < STRINGS.length - 1) {
+    if (currentStringIndex < strings.length - 1) {
       setCurrentStringIndex(i => i + 1);
       setCurrentOffset(null);
       setSampleCount(0);
@@ -91,7 +94,7 @@ export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, on
     } else {
       onAllStringsDone();
     }
-  }, [currentStringIndex, onAllStringsDone]);
+  }, [currentStringIndex, strings.length, onAllStringsDone]);
 
 
 
