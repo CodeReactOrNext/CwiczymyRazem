@@ -10,7 +10,6 @@ import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
-import ProfileCustomization from "feature/settings/components/ProfileCustomization";
 import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
@@ -86,7 +85,6 @@ const SettingsView = () => {
           <div className="flex-1 min-w-0 pb-20">
             <TabsContent value="profile" className="mt-0 space-y-8">
               <ProfileBasics />
-              <ProfileCustomization />
               <GuitarStartDate />
             </TabsContent>
 

@@ -54,7 +54,7 @@ export const toggleLikeRecording = async (recordingId: string, userId: string) =
           senderId: userId,
           senderName: senderData.displayName || "Someone",
           senderAvatarUrl: senderData.avatar || senderData.photoURL || null,
-          senderFrame: senderData.selectedFrame ?? senderData.statistics?.lvl ?? 0,
+          senderFrame: senderData.statistics?.lvl ?? 0,
           type: "like",
           recordingId: recordingId,
           recordingTitle: recordingData.title,

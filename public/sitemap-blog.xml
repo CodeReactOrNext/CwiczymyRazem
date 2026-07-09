@@ -31,20 +31,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://riff.quest/blog/how-to-set-guitar-practice-goals</loc>
-    <lastmod>2026-06-26</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://riff.quest/blog/guitar-practice-plan-intermediate-players</loc>
     <lastmod>2026-06-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://riff.quest/blog/why-am-i-not-improving-at-guitar</loc>
-    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -229,12 +217,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://riff.quest/blog/effective-strategies-for-learning-new-guitar-songs-quickly</loc>
-    <lastmod>2026-05-31</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://riff.quest/blog/how-to-practice-guitar-scales-effectively</loc>
     <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
@@ -399,12 +381,6 @@
   <url>
     <loc>https://riff.quest/blog/how-to-track-guitar-practice-progress-effectively</loc>
     <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://riff.quest/blog/track-guitar-practice-progress-effectively</loc>
-    <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

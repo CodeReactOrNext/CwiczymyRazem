@@ -164,15 +164,18 @@ export const createPlaylist = async (
   invalidatePlaylistCaches();
 
   // Announce it in the global activity feed (best-effort — never block creation).
-  logPlaylistCreated({
-    playlistId: docRef.id,
-    userId,
-    userName: ownerName,
-    userAvatar: ownerAvatar,
-    name: draft.name,
-    kind: draft.kind,
-    songCount: draft.songs.length,
-  }).catch((error) => logger.error(error, { context: "logPlaylistCreated" }));
+  // Private playlists are not announced — the feed is public and shouldn't leak them.
+  if (draft.isPublic) {
+    logPlaylistCreated({
+      playlistId: docRef.id,
+      userId,
+      userName: ownerName,
+      userAvatar: ownerAvatar,
+      name: draft.name,
+      kind: draft.kind,
+      songCount: draft.songs.length,
+    }).catch((error) => logger.error(error, { context: "logPlaylistCreated" }));
+  }
 
   return docRef.id;
 };
@@ -241,7 +244,7 @@ const rewardPlaylistAuthor = async (params: {
           senderId: params.actorId,
           senderName: actorData.displayName || "Someone",
           senderAvatarUrl: actorData.avatar || actorData.photoURL || null,
-          senderFrame: actorData.selectedFrame ?? actorData.statistics?.lvl ?? 0,
+          senderFrame: actorData.statistics?.lvl ?? 0,
           type: params.notificationType,
           playlistId: params.playlistId,
           playlistName: params.playlistName,
@@ -343,7 +346,7 @@ export const togglePlaylistLike = async (
             senderId: userId,
             senderName: actorData.displayName || "Someone",
             senderAvatarUrl: actorData.avatar || actorData.photoURL || null,
-            senderFrame: actorData.selectedFrame ?? actorData.statistics?.lvl ?? 0,
+            senderFrame: actorData.statistics?.lvl ?? 0,
             type: "playlist_liked",
             playlistId: playlist.id,
             playlistName: playlist.name,

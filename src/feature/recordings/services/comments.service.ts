@@ -37,7 +37,7 @@ export const addComment = async (recordingId: string, userId: string, content: s
       userId,
       userName: userData.displayName,
       userAvatarUrl: userData.avatar || userData.photoURL || null,
-      userAvatarFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
+      userAvatarFrame: userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
       content,
       createdAt: serverTimestamp(),
     });
@@ -60,7 +60,7 @@ export const addComment = async (recordingId: string, userId: string, content: s
         senderId: userId,
         senderName: userData.displayName || "Someone",
         senderAvatarUrl: userData.avatar || userData.photoURL || null,
-        senderFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
+        senderFrame: userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
         type: "comment",
         recordingId: recordingId,
         recordingTitle: recordingData.title,

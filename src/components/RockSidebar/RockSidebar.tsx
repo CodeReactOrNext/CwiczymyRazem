@@ -261,7 +261,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               avatarURL={userAvatar}
               name={userName}
               lvl={userStats.lvl}
-              selectedFrame={userInfo?.selectedFrame}
               selectedGuitar={userInfo?.selectedGuitar}
               guitarYear={userInfo?.selectedGuitarYear}
               guitarCountry={userInfo?.selectedGuitarCountry}
@@ -283,7 +282,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             avatarURL={userAvatar}
             name={userName}
             lvl={userStats.lvl}
-            selectedFrame={userInfo?.selectedFrame}
             selectedGuitar={userInfo?.selectedGuitar as number}
             guitarYear={userInfo?.selectedGuitarYear}
             guitarCountry={userInfo?.selectedGuitarCountry}

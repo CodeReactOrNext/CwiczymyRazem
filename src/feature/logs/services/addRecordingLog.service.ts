@@ -42,7 +42,7 @@ export const firebaseAddRecordingLog = async (
     type: "recording_added",
     data: videoUrl,
     avatarUrl: userData.avatar || null,
-    userAvatarFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
+    userAvatarFrame: userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
   };
 
   await trackedSetDoc(logsDocRef, logData);
