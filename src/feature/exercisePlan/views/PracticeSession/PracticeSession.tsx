@@ -25,7 +25,12 @@ import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
-import { loadPracticeSessionSettings, savePracticeSessionSettings } from "./helpers/practiceSessionSettings";
+import {
+  loadGlobalMetronomeVolume,
+  loadPracticeSessionSettings,
+  saveGlobalMetronomeVolume,
+  savePracticeSessionSettings,
+} from "./helpers/practiceSessionSettings";
 import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
@@ -206,13 +211,19 @@ export const PracticeSession = ({
       if (persisted?.isMetronomeMuted !== undefined) nextMetronomeMuted = persisted.isMetronomeMuted;
       if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
       if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);
-      if (persisted?.metronomeVolume !== undefined) metronome.setVolume(persisted.metronomeVolume);
     }
 
     skipNextSettingsSaveRef.current = true;
     resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
+
+  // Metronome volume is a device-wide preference, not per-exercise — restore it once on mount.
+  useEffect(() => {
+    const persistedVolume = loadGlobalMetronomeVolume();
+    if (persistedVolume !== null) metronome.setVolume(persistedVolume);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeTablature = riddleMeasures
     || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
@@ -280,10 +291,15 @@ export const PracticeSession = ({
     if (skipNextSettingsSaveRef.current) { skipNextSettingsSaveRef.current = false; return; }
     savePracticeSessionSettings(currentExercise.id, {
       isAudioMuted, isMetronomeMuted, speedMultiplier,
-      metronomeBpm: metronome.bpm, metronomeVolume: metronome.volume,
+      metronomeBpm: metronome.bpm,
       isMicEnabled: _isMicEnabled,
     });
-  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, metronome.volume, _isMicEnabled]);
+  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, _isMicEnabled]);
+
+  // Metronome volume is a device-wide preference — persist it independently of the exercise.
+  useEffect(() => {
+    saveGlobalMetronomeVolume(metronome.volume);
+  }, [metronome.volume]);
 
   // ── Note matching ─────────────────────────────────────────────────────────
 

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { loadPracticeSessionSettings, savePracticeSessionSettings } from "./practiceSessionSettings";
+import {
+  loadGlobalMetronomeVolume,
+  loadPracticeSessionSettings,
+  saveGlobalMetronomeVolume,
+  savePracticeSessionSettings,
+} from "./practiceSessionSettings";
 
 describe("practiceSessionSettings", () => {
   beforeEach(() => {
@@ -16,7 +21,6 @@ describe("practiceSessionSettings", () => {
       isAudioMuted: false,
       isMetronomeMuted: true,
       metronomeBpm: 90,
-      metronomeVolume: 0.7,
       speedMultiplier: 0.75,
       isMicEnabled: true,
     });
@@ -25,7 +29,6 @@ describe("practiceSessionSettings", () => {
       isAudioMuted: false,
       isMetronomeMuted: true,
       metronomeBpm: 90,
-      metronomeVolume: 0.7,
       speedMultiplier: 0.75,
       isMicEnabled: true,
     });
@@ -47,5 +50,29 @@ describe("practiceSessionSettings", () => {
       metronomeBpm: 90,
       speedMultiplier: 0.5,
     });
+  });
+});
+
+describe("global metronome volume", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("returns null when nothing was persisted", () => {
+    expect(loadGlobalMetronomeVolume()).toBeNull();
+  });
+
+  it("persists and restores the volume regardless of exercise", () => {
+    saveGlobalMetronomeVolume(0.7);
+
+    expect(loadGlobalMetronomeVolume()).toBe(0.7);
+  });
+
+  it("is shared across exercises instead of being scoped per exercise", () => {
+    saveGlobalMetronomeVolume(0.4);
+    savePracticeSessionSettings("exercise-1", { metronomeBpm: 90 });
+    savePracticeSessionSettings("exercise-2", { metronomeBpm: 140 });
+
+    expect(loadGlobalMetronomeVolume()).toBe(0.4);
   });
 });
