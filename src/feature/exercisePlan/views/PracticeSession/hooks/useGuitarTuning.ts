@@ -51,9 +51,9 @@ export function useGuitarTuning({ isGpFile, isExamMode }: UseGuitarTuningOptions
   }, []);
 
   const lockReason = isGpFile
-    ? "Ten utwór pochodzi z importu Guitar Pro — strojenie jest zapisane w pliku i nie można go tu zmienić."
+    ? "This song comes from a Guitar Pro import — the tuning is stored in the file and can't be changed here."
     : isExamMode
-      ? "Strojenie jest zablokowane podczas egzaminu — zadania są przygotowane wyłącznie pod strojenie standardowe (E A D G B E)."
+      ? "Tuning is locked during the exam — tasks are prepared exclusively for standard tuning (E A D G B E)."
       : null;
   const isLocked = lockReason !== null;
 

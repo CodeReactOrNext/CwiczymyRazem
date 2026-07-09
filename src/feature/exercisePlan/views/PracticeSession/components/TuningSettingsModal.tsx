@@ -18,9 +18,9 @@ export const TuningSettingsModal = () => {
     <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) closeModal(); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Strojenie gitary</DialogTitle>
+          <DialogTitle>Guitar tuning</DialogTitle>
           <DialogDescription>
-            Wybierz, jak nastrojona jest twoja gitara — wykrywanie dźwięku i podkład będą dopasowane do tego strojenia.
+            Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning.
           </DialogDescription>
         </DialogHeader>
 
@@ -30,7 +30,7 @@ export const TuningSettingsModal = () => {
             <div className="space-y-1">
               <p className="text-sm text-amber-400">{lockReason}</p>
               <p className="text-xs text-zinc-500">
-                Aktywne strojenie: <span className="text-zinc-300">{tuning.name} ({tuning.notation})</span>
+                Active tuning: <span className="text-zinc-300">{tuning.name} ({tuning.notation})</span>
               </p>
             </div>
           </div>
