@@ -1,59 +1,16 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { LazyMotion, m, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
-
-const loadFeatures = () => import("framer-motion").then((res) => res.domAnimation);
 
 export const FinalCTASection = () => {
-  const sectionRef = useRef(null);
-  
-  // Keep very light parallax for background only if possible, or just remove motion
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, 50]);
-
   return (
-    <LazyMotion features={loadFeatures}>
-    <section ref={sectionRef} className="relative py-32 bg-black overflow-hidden border-t border-white/5">
-      {/* Background decoration - Dynamic Floating Glow */}
+    <section className="relative py-32 bg-black overflow-hidden border-t border-white/5">
+      {/* Background decoration - Floating Glow (pure CSS, no JS-driven animation) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <m.div 
-            animate={{ 
-                x: ['-5%', '5%'],
-                y: ['-2%', '8%'],
-                opacity: [0.1, 0.18, 0.1]
-            }}
-            transition={{ 
-                duration: 10, 
-                repeat: Infinity, 
-                repeatType: "mirror",
-                ease: "easeInOut" 
-            }}
-            className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500 rounded-full blur-[140px] pointer-events-none" 
-        />
-        <m.div 
-            animate={{ 
-                x: ['5%', '-5%'],
-                y: ['5%', '-5%'],
-                opacity: [0.08, 0.15, 0.08]
-            }}
-            transition={{ 
-                duration: 12, 
-                repeat: Infinity, 
-                repeatType: "mirror",
-                ease: "easeInOut",
-                delay: 1
-            }}
-            className="absolute bottom-1/4 right-1/4 w-[800px] h-[800px] bg-emerald-500 rounded-full blur-[140px] pointer-events-none" 
-        />
+        <div className="animate-glow-float-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="animate-glow-float-2 absolute bottom-1/4 right-1/4 w-[800px] h-[800px] bg-emerald-500/12 rounded-full blur-[140px] pointer-events-none" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
@@ -89,6 +46,5 @@ export const FinalCTASection = () => {
         </div>
       </div>
     </section>
-    </LazyMotion>
   );
 };
