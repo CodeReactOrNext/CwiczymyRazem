@@ -3,10 +3,10 @@ import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import React from "react";
-import { FaCheck, FaRedo, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
-import { STRINGS } from "../calibration.constants";
+import type { GuitarString } from "../calibration.constants";
 import { useTuningFrequency } from "../hooks/useTuningFrequency";
 import { ArcTuner } from "./ArcTuner";
 import { StringProgress } from "./StringProgress";
@@ -18,6 +18,8 @@ interface TuningStepProps {
   stringState:   "listening" | "done";
   currentOffset: number | null;
   audioRefs:     AudioRefs;
+  /** Reference pitches to tune to — follows the player's selected guitar tuning. */
+  strings:       GuitarString[];
   onRetry:       () => void;
   onAdvance:     () => void;
   onCancel:      () => void;
@@ -25,9 +27,9 @@ interface TuningStepProps {
 
 export const TuningStep = React.memo(function TuningStep({
   currentIndex, offsets, sampleCount, stringState, currentOffset,
-  audioRefs, onRetry, onAdvance, onCancel,
+  audioRefs, strings, onRetry, onAdvance, onCancel,
 }: TuningStepProps) {
-  const str = STRINGS[currentIndex];
+  const str = strings[currentIndex];
   const { cents, hasNote } = useTuningFrequency(audioRefs, str.hz);
 
   const abs          = Math.abs(cents);
@@ -55,7 +57,7 @@ export const TuningStep = React.memo(function TuningStep({
         <div>
           <h2 className="text-base font-bold tracking-tight">Tune Your Guitar</h2>
           <p className="text-[10px] text-zinc-600 font-bold tracking-widest mt-0.5">
-            String {currentIndex + 1} of {STRINGS.length}
+            String {currentIndex + 1} of {strings.length}
           </p>
         </div>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
@@ -67,12 +69,12 @@ export const TuningStep = React.memo(function TuningStep({
 
       <div className="h-0.5 w-full rounded-full bg-zinc-800 overflow-hidden mb-4">
         <motion.div className="h-full bg-cyan-500"
-          animate={{ width: `${(Object.keys(offsets).length / STRINGS.length) * 100}%` }}
+          animate={{ width: `${(Object.keys(offsets).length / strings.length) * 100}%` }}
           transition={{ type: "spring", stiffness: 200, damping: 28 }}
         />
       </div>
 
-      <div className="mb-3"><StringProgress currentIndex={currentIndex} offsets={offsets} /></div>
+      <div className="mb-3"><StringProgress currentIndex={currentIndex} offsets={offsets} strings={strings} /></div>
 
       <AnimatePresence mode="wait">
         <motion.p key={currentIndex} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
@@ -156,7 +158,7 @@ export const TuningStep = React.memo(function TuningStep({
               )}
             >
               {stringState === "done" 
-                ? (currentIndex < STRINGS.length - 1 ? "Next String" : "Finish Calibration")
+                ? (currentIndex < strings.length - 1 ? "Next String" : "Finish Calibration")
                 : "Skip String"
               }
             </Button>

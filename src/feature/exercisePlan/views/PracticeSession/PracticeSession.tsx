@@ -19,7 +19,9 @@ import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs"
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
+import { TuningSettingsModal } from "./components/TuningSettingsModal";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
+import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
 import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
@@ -35,6 +37,7 @@ import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
+import { useGuitarTuning } from "./hooks/useGuitarTuning";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
 import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
@@ -121,6 +124,12 @@ export const PracticeSession = ({
   const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks } = useGpFileLoader({
     rawGpFile, gpFileUrl: currentExercise.gpFileUrl, exerciseTitle: currentExercise.title,
   });
+
+  // ── Guitar tuning (pitch detection + background guitar match the player's own tuning) ──
+  // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
+  // and during exams (prepared only for standard tuning).
+  const isGpFile = !!effectiveRawGpFile || !!currentExercise.gpFileUrl;
+  const guitarTuning = useGuitarTuning({ isGpFile, isExamMode });
 
   useEffect(() => {
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
@@ -254,6 +263,7 @@ export const PracticeSession = ({
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
+    tuningOffsets: guitarTuning.tuning.offsets,
   });
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
@@ -344,6 +354,7 @@ export const PracticeSession = ({
     active: isMicEnabled && isListening && hasPlayedRiddleOnce && !isRiddleRevealed && !isPlaying && !metronome.isPlaying,
     frequencyRef: audioRefs.frequencyRef,
     volumeRef: audioRefs.volumeRef,
+    tuningOffsets: guitarTuning.tuning.offsets,
     onComplete: handleEarTrainingGuessed,
   });
 
@@ -378,12 +389,14 @@ export const PracticeSession = ({
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    <GuitarTuningProvider value={guitarTuning}>
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
-      getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
+      getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
+      activeStrumPattern={activeStrumPattern}
       customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
       customGoalRegion={huntTarget ? huntTarget.region : currentExercise.customGoalRegion}
       customGoalPrompt={huntTarget ? huntTarget.prompt : currentExercise.customGoalPrompt}
@@ -543,11 +556,14 @@ export const PracticeSession = ({
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}
       />
+
+      <TuningSettingsModal />
     </>
     </SessionUIProvider>
     </BpmProgressProvider>
     </TimerProvider>
     </NoteMatchingProvider>
+    </GuitarTuningProvider>
   );
 };
 
