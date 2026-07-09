@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -9,16 +8,8 @@ export const LibraryCTASection = () => {
   return (
     <section className="relative py-32 bg-black overflow-hidden border-t border-white/5">
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <motion.div
-          animate={{ x: ["-5%", "5%"], y: ["-2%", "8%"], opacity: [0.1, 0.18, 0.1] }}
-          transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500 rounded-full blur-[140px] pointer-events-none"
-        />
-        <motion.div
-          animate={{ x: ["5%", "-5%"], y: ["5%", "-5%"], opacity: [0.08, 0.15, 0.08] }}
-          transition={{ duration: 12, repeat: Infinity, repeatType: "mirror", ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-1/4 right-1/4 w-[800px] h-[800px] bg-sky-500 rounded-full blur-[140px] pointer-events-none"
-        />
+        <div className="animate-glow-float-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="animate-glow-float-2 absolute bottom-1/4 right-1/4 w-[800px] h-[800px] bg-sky-500/12 rounded-full blur-[140px] pointer-events-none" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">

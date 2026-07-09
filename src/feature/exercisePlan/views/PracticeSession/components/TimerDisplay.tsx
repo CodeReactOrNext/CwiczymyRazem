@@ -1,7 +1,7 @@
 import "react-circular-progressbar/dist/styles.css";
 
 import { cn } from "assets/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 
 interface TimerDisplayProps {
@@ -10,6 +10,12 @@ interface TimerDisplayProps {
   isPlaying: boolean;
   size?: "xs" | "sm" | "md" | "lg";
 }
+
+const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
+  y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
+  delay: i * 0.15,
+}));
 
 export const TimerDisplay = ({
   value,
@@ -53,55 +59,35 @@ export const TimerDisplay = ({
           "relative rounded-lg bg-zinc-900/50",
           sizeClasses[size]
         )}>
-        <AnimatePresence>
-          {isPlaying && (
-            <div className='absolute inset-0 overflow-hidden rounded-lg'>
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className='absolute h-1 w-1 rounded-lg bg-white'
-                  initial={{
-                    x: "50%",
-                    y: "50%",
-                    opacity: 0,
-                    scale: 0,
-                  }}
-                  animate={{
-                    x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
-                    y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
-                    opacity: [0, 0.8, 0],
-                    scale: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.15,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
+        {isPlaying && (
+          <div className='absolute inset-0 overflow-hidden rounded-lg'>
+            {PARTICLES.map((particle, i) => (
+              <div
+                key={i}
+                className='absolute h-1 w-1 rounded-lg bg-white animate-timer-particle'
+                style={{
+                  "--particle-x": particle.x,
+                  "--particle-y": particle.y,
+                  animationDelay: `${particle.delay}s`,
+                } as CSSProperties}
+              />
+            ))}
+          </div>
+        )}
 
-        <motion.div
-          className='absolute inset-[-2px] rounded-lg'
+        <div
+          className={cn(
+            "absolute inset-[-2px] rounded-lg",
+            isPlaying && "animate-[spin_8s_linear_infinite]"
+          )}
           style={{
             background: `conic-gradient(
-              from ${isPlaying ? 0 : 180}deg, 
-              transparent, 
-              ${glowColor}, 
+              from ${isPlaying ? 0 : 180}deg,
+              transparent,
+              ${glowColor},
               transparent
             )`,
             opacity: 0.6,
-          }}
-          animate={{
-            rotate: isPlaying ? 360 : 0,
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "linear",
           }}
         />
 
@@ -124,18 +110,9 @@ export const TimerDisplay = ({
         </div>
 
         {isPlaying && (
-          <motion.div
-            className='absolute inset-0 rounded-lg'
+          <div
+            className='absolute inset-0 rounded-lg animate-timer-pulse-glow'
             style={{ backgroundColor: progressColor + "20" }}
-            animate={{
-              scale: [1, 1.03, 1],
-              opacity: [0.2, 0.4, 0.2],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
           />
         )}
       </div>
