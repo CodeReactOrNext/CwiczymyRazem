@@ -27,7 +27,6 @@ import {
   rateSong,
   restartUserStats,
   updateEmailNotifications,
-  updateProfileCustomization,
   updateUserEmail,
   updateUserPassword,
   updateUserStats,
@@ -426,17 +425,6 @@ const userSlice = createSlice({
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
       })
-      .addCase(updateProfileCustomization.fulfilled, (state, { payload }) => {
-        state.isFetching = null;
-        if (state.userInfo) {
-          if (payload.selectedFrame !== undefined) {
-            state.userInfo.selectedFrame = payload.selectedFrame;
-          }
-          if (payload.selectedGuitar !== undefined) {
-            state.userInfo.selectedGuitar = payload.selectedGuitar;
-          }
-        }
-      })
       .addCase(updateEmailNotifications.fulfilled, (state, { payload }) => {
         state.isFetching = null;
         if (state.userInfo) {
@@ -460,7 +448,6 @@ const userSlice = createSlice({
           updateUserPassword.pending,
           updateUserEmail.pending,
           uploadUserSocialData.pending,
-          updateProfileCustomization.pending,
           updateEmailNotifications.pending
         ),
         (state) => {
@@ -484,7 +471,6 @@ const userSlice = createSlice({
           logInViaGoogleCredential.rejected,
           createAccount.rejected,
           uploadUserSocialData.rejected,
-          updateProfileCustomization.rejected,
           updateEmailNotifications.rejected
         ),
         (state) => {

@@ -160,7 +160,6 @@ export const LeadboardLayout = ({
                     userAvatar={user.avatar}
                     statistics={user.statistics}
                     currentUserId={currentUserId}
-                    selectedFrame={user.selectedFrame}
                     selectedGuitar={user.selectedGuitar}
                     selectedGuitarYear={user.selectedGuitarYear}
                     selectedGuitarCountry={user.selectedGuitarCountry}
