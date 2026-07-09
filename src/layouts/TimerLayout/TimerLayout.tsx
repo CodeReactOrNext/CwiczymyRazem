@@ -15,11 +15,11 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
-import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
@@ -29,6 +29,12 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
+
+const TIMER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
+  y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
+  delay: i * 0.15,
+}));
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -193,55 +199,35 @@ const AnimatedTimerDisplay = ({
           "relative rounded-full backdrop-blur-sm",
           sizeClasses[size]
         )}>
-        <AnimatePresence>
-          {isPlaying && (
-            <div className='absolute inset-0 z-20 overflow-hidden rounded-full'>
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className='absolute h-1 w-1 rounded-full bg-white'
-                  initial={{
-                    x: "50%",
-                    y: "50%",
-                    opacity: 0,
-                    scale: 0,
-                  }}
-                  animate={{
-                    x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
-                    y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
-                    opacity: [0, 0.8, 0],
-                    scale: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.15,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
+        {isPlaying && (
+          <div className='absolute inset-0 z-20 overflow-hidden rounded-full'>
+            {TIMER_PARTICLES.map((particle, i) => (
+              <div
+                key={i}
+                className='absolute h-1 w-1 rounded-full bg-white animate-timer-particle'
+                style={{
+                  "--particle-x": particle.x,
+                  "--particle-y": particle.y,
+                  animationDelay: `${particle.delay}s`,
+                } as CSSProperties}
+              />
+            ))}
+          </div>
+        )}
 
-        <motion.div
-          className='absolute inset-[-2px] z-0 rounded-full'
+        <div
+          className={cn(
+            "absolute inset-[-2px] z-0 rounded-full",
+            isPlaying && "animate-[spin_8s_linear_infinite]"
+          )}
           style={{
             background: `conic-gradient(
-              from ${isPlaying ? 0 : 180}deg, 
-              transparent, 
-              ${glowColor}, 
+              from ${isPlaying ? 0 : 180}deg,
+              transparent,
+              ${glowColor},
               transparent
             )`,
             opacity: 0.2,
-          }}
-          animate={{
-            rotate: isPlaying ? 360 : 0,
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "linear",
           }}
         />
 
@@ -262,21 +248,11 @@ const AnimatedTimerDisplay = ({
         </div>
 
         {isPlaying && (
-          <motion.div
-            className='absolute inset-0 z-10 rounded-full border-[3px]'
+          <div
+            className='absolute inset-0 z-10 rounded-full border-[3px] animate-timer-pulse-glow'
             style={{
               borderColor: progressColor,
-              opacity: 0.5,
               boxShadow: `0 0 5px ${progressColor}, inset 0 0 5px ${progressColor}`,
-            }}
-            animate={{
-              scale: [1, 1.02, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
             }}
           />
         )}
