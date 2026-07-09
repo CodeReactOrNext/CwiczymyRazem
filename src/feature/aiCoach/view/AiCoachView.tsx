@@ -1,5 +1,5 @@
-import { HeroBanner } from "components/UI/HeroBanner";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
+import { HeroBanner } from "components/UI/HeroBanner";
 import roadmaps from "data/roadmaps";
 import {
   firebaseGetAllUserProgress,
