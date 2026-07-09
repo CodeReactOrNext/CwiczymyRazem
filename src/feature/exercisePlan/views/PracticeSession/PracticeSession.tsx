@@ -25,6 +25,7 @@ import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
+import { loadPracticeSessionSettings, savePracticeSessionSettings } from "./helpers/practiceSessionSettings";
 import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
@@ -130,6 +131,10 @@ export const PracticeSession = ({
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
+  // Suppresses the settings-save effect's first run right after an exercise
+  // switch loads persisted values — otherwise it would immediately overwrite
+  // the just-loaded settings with the stale pre-load state.
+  const skipNextSettingsSaveRef = useRef(false);
 
   // ── Generated exercise ────────────────────────────────────────────────────
 
@@ -190,9 +195,23 @@ export const PracticeSession = ({
 
     // In exam mode with a backing track, the backing guides the tempo, so the
     // metronome click is redundant — mute it (it still runs to keep timing/sync).
-    const nextMetronomeMuted = isExamMode && !!currentExercise.examBacking;
+    let nextMetronomeMuted = isExamMode && !!currentExercise.examBacking;
+    let nextSpeedMultiplier = 1;
 
-    resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted });
+    // Exam mode has its own fixed rules above (and a locked BPM), so per-exercise
+    // persisted settings only apply to regular practice.
+    if (!isExamMode) {
+      const persisted = loadPracticeSessionSettings(currentExercise.id);
+      if (persisted?.isAudioMuted !== undefined) nextAudioMuted = persisted.isAudioMuted;
+      if (persisted?.isMetronomeMuted !== undefined) nextMetronomeMuted = persisted.isMetronomeMuted;
+      if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
+      if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);
+      if (persisted?.metronomeVolume !== undefined) metronome.setVolume(persisted.metronomeVolume);
+    }
+
+    skipNextSettingsSaveRef.current = true;
+    resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
 
   const activeTablature = riddleMeasures
@@ -242,6 +261,29 @@ export const PracticeSession = ({
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
   useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
   useEffect(() => { if (isMicEnabled && !isListening) initAudio(); }, [isMicEnabled]);
+
+  // Restore this exercise's persisted pitch-detection preference (exam mode
+  // manages mic enablement itself via the mic_prompt flow above).
+  useEffect(() => {
+    if (isExamMode) return;
+    const persisted = loadPracticeSessionSettings(currentExercise.id);
+    if (persisted?.isMicEnabled !== undefined && persisted.isMicEnabled !== _isMicEnabled) {
+      updateMicPersistence(persisted.isMicEnabled);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExercise.id]);
+
+  // Persist Practice Session settings per exercise, so reopening the same
+  // exercise restores its own metronome/playback/mic preferences.
+  useEffect(() => {
+    if (isExamMode) return;
+    if (skipNextSettingsSaveRef.current) { skipNextSettingsSaveRef.current = false; return; }
+    savePracticeSessionSettings(currentExercise.id, {
+      isAudioMuted, isMetronomeMuted, speedMultiplier,
+      metronomeBpm: metronome.bpm, metronomeVolume: metronome.volume,
+      isMicEnabled: _isMicEnabled,
+    });
+  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, metronome.volume, _isMicEnabled]);
 
   // ── Note matching ─────────────────────────────────────────────────────────
 
