@@ -4,6 +4,7 @@ import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { PracticeTable } from 'components/Blog/PracticeTable';
+import { StepList } from 'components/Blog/StepList';
 import { SongTierTable } from 'components/Blog/SongTierTable';
 import { YouTube } from 'components/Blog/YouTube';
 import { Footer } from 'feature/landing/components/Footer';
@@ -37,6 +38,7 @@ const components = {
   ActionCard,
   AppCard,
   PracticeTable,
+  StepList,
   SongTierTable,
   // Mapping h2 to include IDs for ToC
   h2: (props: any) => (
