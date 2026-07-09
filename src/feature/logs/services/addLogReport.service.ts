@@ -51,7 +51,7 @@ export const firebaseAddLogReport = async (
   const userData = userSnapshot.data();
   if (!userData) return;
   const userName = userData.displayName;
-  const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.lbl ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
+  const userAvatarFrame = userData.statistics?.lbl ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
 
   const logData = {
     data,

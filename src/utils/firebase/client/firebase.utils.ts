@@ -210,7 +210,6 @@ export interface UserTooltipData {
   displayName: string;
   avatar: string | null;
   band: string;
-  selectedFrame?: number;
   selectedGuitar?: number | string;
   selectedGuitarYear?: number;
   selectedGuitarCountry?: string;
@@ -252,7 +251,6 @@ export const firebaseGetUserTooltipData = async (
       displayName: userData.displayName,
       avatar: userData.avatar || null,
       band: userData.band,
-      selectedFrame: userData.selectedFrame,
       selectedGuitar: userData.selectedGuitar,
       selectedGuitarYear: userData.selectedGuitarYear,
       selectedGuitarCountry: userData.selectedGuitarCountry,

@@ -21,7 +21,6 @@ import {
   selectCurrentUserStats,
   selectIsFetching,
   selectUserAvatar,
-  selectUserInfo,
   selectUserName,
 } from "feature/user/store/userSlice";
 import {
@@ -42,7 +41,6 @@ const ProfileBasics = () => {
 
   const currentUserName = useAppSelector(selectUserName);
   const currentUserAvatar = useAppSelector(selectUserAvatar);
-  const userInfo = useAppSelector(selectUserInfo);
   const userStats = useAppSelector(selectCurrentUserStats);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -145,7 +143,6 @@ const ProfileBasics = () => {
                 name={displayName || "User"}
                 size="2xl"
                 lvl={userStats?.lvl}
-                selectedFrame={userInfo?.selectedFrame}
               />
               <div className="flex flex-col items-center">
                 <Label

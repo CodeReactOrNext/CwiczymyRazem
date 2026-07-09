@@ -3,7 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 // Challenges removed
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
-import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateProfileCustomization, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
+import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
@@ -198,19 +198,6 @@ export const updateUserPassword = createAsyncThunk(
       const userInfo = await firebaseGetUserProviderData();
       updateUserPasswordSuccess();
       return { userInfo };
-    } catch (error) {
-      udpateDataErrorHandler(error as SerializedError);
-      return Promise.reject();
-    }
-  }
-);
-
-export const updateProfileCustomization = createAsyncThunk(
-  "user/updateProfileCustomization",
-  async ({ selectedFrame, selectedGuitar }: { selectedFrame?: number; selectedGuitar?: number | string }) => {
-    try {
-      await firebaseUpdateProfileCustomization(selectedFrame, selectedGuitar);
-      return { selectedFrame, selectedGuitar };
     } catch (error) {
       udpateDataErrorHandler(error as SerializedError);
       return Promise.reject();

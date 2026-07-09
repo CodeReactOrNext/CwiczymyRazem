@@ -67,7 +67,6 @@ export interface UserDataInterface {
     soundCloudLink?: string;
     youTubeLink?: string;
     band?: string;
-    selectedFrame?: number;
     selectedGuitar?: number | string;
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
@@ -167,7 +166,6 @@ export interface userSliceInitialState {
     soundCloudLink?: string;
     youTubeLink?: string;
     band?: string;
-    selectedFrame?: number;
     selectedGuitar?: number | string;
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;

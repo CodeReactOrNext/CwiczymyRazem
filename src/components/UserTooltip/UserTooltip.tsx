@@ -137,7 +137,6 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     avatarURL={userData.avatar}
                     size='sm'
                     lvl={userData.statistics.level}
-                    selectedFrame={userData.selectedFrame}
                     selectedGuitar={userData.selectedGuitar}
                     guitarYear={userData.selectedGuitarYear}
                     guitarCountry={userData.selectedGuitarCountry}

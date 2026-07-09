@@ -77,7 +77,6 @@ export default async function handler(
           soundCloudLink: userData?.soundCloudLink ?? null,
           band: userData?.band ?? null,
           guitarStartDate: userData?.guitarStartDate ?? null,
-          selectedFrame: userData?.selectedFrame ?? null,
           selectedGuitar: userData?.selectedGuitar ?? null,
           selectedGuitarYear: userData?.selectedGuitarYear ?? null,
           selectedGuitarCountry: userData?.selectedGuitarCountry ?? null,
