@@ -54,7 +54,6 @@ const ProfileLayout = ({
     soundCloudLink,
     youTubeLink,
     guitarStartDate,
-    selectedFrame,
     selectedGuitar,
     selectedGuitarYear,
     selectedGuitarCountry,
@@ -201,7 +200,6 @@ const ProfileLayout = ({
                 name={displayName}
                 avatarURL={avatar}
                 lvl={statistics.lvl}
-                selectedFrame={selectedFrame}
                 selectedGuitar={selectedGuitar}
                 guitarYear={selectedGuitarYear}
                 guitarCountry={selectedGuitarCountry}

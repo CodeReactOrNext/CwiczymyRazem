@@ -145,7 +145,6 @@ const ProfileBasics = () => {
                 name={displayName || "User"}
                 size="2xl"
                 lvl={userStats?.lvl}
-                selectedFrame={userInfo?.selectedFrame}
               />
               <div className="flex flex-col items-center">
                 <Label
