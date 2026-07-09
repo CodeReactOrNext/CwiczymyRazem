@@ -237,7 +237,7 @@
     "description": "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
     "difficulty": "beginner",
     "category": "theory",
-    "customGoal": "F",
+    "customGoal": "E",
     "whyItMatters": "This exercise improves fretboard knowledge by training you to quickly locate the same note across different strings and octaves. It helps build faster note recognition and better navigation across the neck."
   },
   {
@@ -246,7 +246,7 @@
     "description": "Find every occurrence of a note across the neck — now with sharps and flats, on a faster clock.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "C#",
+    "customGoal": "G",
     "whyItMatters": "Adding accidentals forces full chromatic command of the neck, not just the natural notes. The faster rotation builds quick recall under mild time pressure — the bridge from knowing the fretboard to using it in real time."
   },
   {
@@ -255,7 +255,7 @@
     "description": "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",
     "difficulty": "hard",
     "category": "theory",
-    "customGoal": "G#",
+    "customGoal": "A",
     "whyItMatters": "Locating a note inside an arbitrary position box — rather than sliding to the open-string area — is exactly what real playing demands. The rotating region trains positional fretboard recall across the whole neck under time pressure."
   },
   {
@@ -264,7 +264,7 @@
     "description": "Read a root note and an interval, then find and play the target note anywhere on the neck.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "F#",
+    "customGoal": "D#",
     "whyItMatters": "Intervals are the building blocks of melody and harmony. Translating an interval into a note and finding it instantly on the neck trains the ear-to-hands link that underpins improvising and playing by ear."
   },
   {
