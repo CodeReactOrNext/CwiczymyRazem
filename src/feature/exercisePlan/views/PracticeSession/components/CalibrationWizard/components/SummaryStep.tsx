@@ -1,12 +1,10 @@
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { CheckCircle2, Music } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import React from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
-import { STRINGS } from "../calibration.constants";
 
 export const SummaryStep = React.memo(function SummaryStep({
   offsets, onConfirm, onCancel,

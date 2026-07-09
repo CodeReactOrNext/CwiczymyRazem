@@ -23,6 +23,8 @@ interface UseRiddleSequenceMatcherOptions {
   active: boolean;
   frequencyRef: FreqRef;
   volumeRef: FreqRef;
+  /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6). */
+  tuningOffsets?: readonly number[];
   /** Fired once per riddle when the full sequence has been played correctly. */
   onComplete: () => void;
 }
@@ -32,14 +34,14 @@ const CONFIRM_SAMPLES = 2;       // ~100ms of stable pitch before judging an att
 const VOLUME_THRESHOLD = 0.01;
 
 /** Expected pitch keys ("E4", "G#3", …) for the riddle, in playing order. */
-function expectedPitches(measures: TablatureMeasure[] | null): string[] {
+function expectedPitches(measures: TablatureMeasure[] | null, tuningOffsets?: readonly number[]): string[] {
   if (!measures) return [];
   const keys: string[] = [];
   for (const measure of measures) {
     for (const beat of measure.beats) {
       const note = beat.notes[0];
       if (!note) continue; // rest beat
-      const data = getNoteFromFrequency(getFrequencyFromTab(note.string, note.fret));
+      const data = getNoteFromFrequency(getFrequencyFromTab(note.string, note.fret, tuningOffsets));
       if (data) keys.push(`${data.note}${data.octave}`);
     }
   }
@@ -69,9 +71,10 @@ export function useRiddleSequenceMatcher({
   active,
   frequencyRef,
   volumeRef,
+  tuningOffsets,
   onComplete,
 }: UseRiddleSequenceMatcherOptions): RiddleProgress {
-  const expected = useMemo(() => expectedPitches(measures), [measures]);
+  const expected = useMemo(() => expectedPitches(measures, tuningOffsets), [measures, tuningOffsets]);
 
   const [snap, setSnap] = useState<ProgressSnap>({ tag: expected, matched: 0, heardNote: null, hitId: 0 });
 

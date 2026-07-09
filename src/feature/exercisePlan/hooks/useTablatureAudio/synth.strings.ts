@@ -77,6 +77,9 @@ export function playStringNote(
   trackId: string,
   activeNodes: Map<string, any>,
   players: StringPlayers,
+  /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6).
+   *  Only applies to guitar tracks without a real midiNote — GP imports and bass already carry their own pitch. */
+  tuningOffsets?: readonly number[],
 ): void {
   const t = Math.max(ctx.currentTime + 0.001, time);
 
@@ -93,8 +96,9 @@ export function playStringNote(
     const midiBase = trackType === "bass" ? BASS_STRING_MIDI[note.string - 1] : GUITAR_STRING_MIDI[note.string - 1];
     const freqBase = trackType === "bass" ? BASS_STRING_FREQS[note.string - 1] : GUITAR_STRING_FREQS[note.string - 1];
     if (midiBase === undefined || freqBase === undefined) return;
-    midiNote = midiBase + note.fret;
-    freq     = freqBase * Math.pow(2, note.fret / 12);
+    const offset = trackType === "guitar" ? (tuningOffsets?.[note.string - 1] ?? 0) : 0;
+    midiNote = midiBase + note.fret + offset;
+    freq     = freqBase * Math.pow(2, (note.fret + offset) / 12);
   }
 
   if (!isFinite(freq) || freq <= 0 || midiNote < 0 || midiNote > 127) return;

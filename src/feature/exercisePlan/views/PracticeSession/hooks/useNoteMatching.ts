@@ -22,13 +22,16 @@ interface UseNoteMatchingOptions {
   getLatencyMs: () => number;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
+  /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6).
+   *  Only applied to notes without a real `midiNote` — GP imports already carry their actual pitch. */
+  tuningOffsets?: readonly number[];
   onReset?: () => void;
 }
 
 export function useNoteMatching({
   isPlaying, startTime, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
-  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, onReset,
+  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset,
 }: UseNoteMatchingOptions) {
   const {
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState,
@@ -188,7 +191,7 @@ export function useNoteMatching({
                 // regular exercises, where midiNote is undefined.
                 const baseTargetFreq = typeof note.midiNote === "number"
                   ? midiToFrequency(note.midiNote + bendOffset)
-                  : getFrequencyFromTab(note.string, note.fret + bendOffset);
+                  : getFrequencyFromTab(note.string, note.fret + bendOffset, tuningOffsets);
                 const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
                 if (beat.notes.length > 1) {
                   const chroma = requiresOnset ? audioRefs.onsetChromaRef.current : getChromagram();
@@ -247,7 +250,7 @@ export function useNoteMatching({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, speedMultiplier, rawBpm]);
+  }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
 
   return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, resetGame };
 }

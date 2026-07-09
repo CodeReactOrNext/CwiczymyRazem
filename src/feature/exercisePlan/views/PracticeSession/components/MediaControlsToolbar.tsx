@@ -2,16 +2,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
-import { Check, ChevronDown, Snail, X } from "lucide-react";
+import { Check, ChevronDown, Lock, Snail, X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
-import { GiGuitar } from "react-icons/gi";
+import { GiGuitar, GiGuitarHead } from "react-icons/gi";
 
+import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
+import { useLiveTuner } from "../hooks/useLiveTuner";
 import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
 import { MicTroubleshooting } from "./MicTroubleshooting";
-import { useLiveTuner } from "../hooks/useLiveTuner";
 
 const SPEED_MODES: { value: number; label: string }[] = [
   { value: 1,    label: "100%" },
@@ -68,6 +69,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   showBackingInExam = false,
 }: MediaControlsToolbarProps) {
   const [isTunerOpen, setIsTunerOpen] = useState(false);
+  const { tuningId, preferredTuning, isLocked: isTuningLocked, openModal: openTuningSettings } = useGuitarTuningContext();
 
   // In exam mode the speed control is always hidden (tempo is fixed). The backing
   // track (guitar) toggle is hidden too, unless the exam explicitly keeps it
@@ -76,6 +78,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const showBacking = !examMode || showBackingInExam;
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
+
+  const isNonStandardTuning = tuningId !== "standard";
 
   const isSlowed = speedMultiplier < 1;
   const hasTuner = hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
@@ -86,7 +90,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
     return (
       <div className="flex flex-col gap-2">
-        {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
+        {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
           <div className="flex gap-2">
             {showSpeed && hasMetronome && (
               <SpeedDropdown
@@ -114,6 +118,22 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               >
                 <GiGuitar className="text-lg shrink-0" />
                 <span className="text-[10px] font-semibold tracking-wide">Backing</span>
+              </RippleButton>
+            )}
+
+            {(hasAudioTrack || hasMicControls) && (
+              <RippleButton
+                onClick={openTuningSettings}
+                title={isTuningLocked ? "Tuning is locked for this exercise" : "Guitar tuning"}
+                className={cn(
+                  gridBtn, "flex-1",
+                  isNonStandardTuning
+                    ? "bg-cyan-500/10 text-cyan-400"
+                    : "bg-zinc-800 text-zinc-400"
+                )}
+              >
+                {isTuningLocked ? <Lock className="h-3.5 w-3.5 shrink-0" /> : <GiGuitarHead className="h-4 w-4 shrink-0" />}
+                <span className="text-[10px] font-semibold tracking-wide">{preferredTuning.name}</span>
               </RippleButton>
             )}
           </div>
@@ -216,7 +236,22 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             </RippleButton>
           )}
 
-          {showBacking && hasAudioTrack && hasMicControls && (
+          {(hasAudioTrack || hasMicControls) && (
+            <RippleButton
+              onClick={openTuningSettings}
+              title={isTuningLocked ? "Tuning is locked for this exercise" : `Guitar tuning: ${preferredTuning.name}`}
+              className={cn(
+                "flex items-center justify-center h-8 w-8 rounded-lg transition-all active:scale-90",
+                isNonStandardTuning
+                  ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                  : "bg-zinc-800 text-zinc-400 hover:text-white"
+              )}
+            >
+              {isTuningLocked ? <Lock className="h-3.5 w-3.5" /> : <GiGuitarHead className="h-4 w-4" />}
+            </RippleButton>
+          )}
+
+          {hasMicControls && (
             <div className="h-8 w-px bg-white/10 self-center mx-0.5" aria-hidden />
           )}
 
@@ -286,8 +321,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-      {/* ── PLAYBACK zone: speed + backing track ── */}
-      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && (
+      {/* ── PLAYBACK zone: speed + backing track + tuning ── */}
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
         <div className="flex items-center gap-1.5">
           {showSpeed && hasMetronome && (
             <SpeedDropdown
@@ -319,6 +354,29 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 {isAudioMuted ? "Backing track off" : "Backing track on"}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {(hasAudioTrack || hasMicControls) && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RippleButton
+                  onClick={openTuningSettings}
+                  className={cn(
+                    "flex items-center gap-2 px-3 rounded-lg transition-all active:scale-95",
+                    h,
+                    isNonStandardTuning
+                      ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                      : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                  )}
+                >
+                  {isTuningLocked ? <Lock className="h-3.5 w-3.5 shrink-0" /> : <GiGuitarHead className="h-4 w-4 shrink-0" />}
+                  <span className="text-[10px] font-semibold tracking-wide">{preferredTuning.name}</span>
+                </RippleButton>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {isTuningLocked ? "Tuning is locked for this exercise" : "Guitar tuning"}
               </TooltipContent>
             </Tooltip>
           )}
