@@ -24,6 +24,9 @@ export interface UseTablatureAudioProps {
   disabled?:      boolean;
   /** Times to play the loop (0 = infinite) */
   repeatCount?:   number;
+  /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6),
+   *  applied to guitar-track notes so the background instrument matches the player's own tuning. */
+  tuningOffsets?: readonly number[];
 }
 
 export interface StringSynthOptions {
