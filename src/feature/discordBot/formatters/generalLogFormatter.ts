@@ -32,11 +32,11 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
     const embed: DiscordEmbed = {
       author: {
         name: displayName,
-        url: `https://www.riff.quest/user/${log.uid}`,
+        url: `https://riff.quest/user/${log.uid}`,
         ...(isEn && log.avatarUrl && { icon_url: log.avatarUrl }),
       },
       title: isEn ? "🎸 Session Report" : "🎸 Raport Sesji",
-      url: `https://www.riff.quest/user/${log.uid}`,
+      url: `https://riff.quest/user/${log.uid}`,
       color: 0x3498db, // Example Blue
       description: isEn
         ? `Finished a practice session!\n\n**🏆 ${log.points} PTS**   •   **⏱️ ${timeString}**`
@@ -46,7 +46,7 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
         text: isEn
           ? `🔥 Streak: ${log.streak || 0} days | Keep it up!`
           : `🔥 Seria: ${log.streak || 0} dni | Tak trzymaj!`,
-        // icon_url: "https://www.riff.quest/icons/fire-icon.png", 
+        // icon_url: "https://riff.quest/icons/fire-icon.png",
       },
       timestamp: new Date().toISOString(),
     };

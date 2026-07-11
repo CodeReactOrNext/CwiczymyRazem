@@ -53,7 +53,7 @@ export class RecordingAddedFormatter {
           description,
           color: 0x3498db,
           thumbnail: {
-            url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+            url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
           },
           fields,
           footer: {
