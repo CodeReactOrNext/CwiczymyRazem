@@ -1,4 +1,6 @@
-import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
+import type {
+  DragEndEvent,
+  DragStartEvent} from "@dnd-kit/core";
 import {
   closestCenter,
   defaultDropAnimationSideEffects,
@@ -9,7 +11,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
@@ -30,16 +32,9 @@ import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { Song } from "feature/songs/types/songs.type";
 import type { SongStatus } from "feature/songs/types/songs.type";
-import {
-  getGatedSkillPower,
-  getSongsUntilNextTier,
-} from "feature/songs/utils/difficulty.utils";
-import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
-import {
-  selectCurrentUserStats,
-  selectUserAuth,
-  selectUserInfo,
-} from "feature/user/store/userSlice";
+import { getGatedSkillPower, getSongsUntilNextTier } from "feature/songs/utils/difficulty.utils";
+import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
+import { selectCurrentUserStats, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Library as LibraryIcon,
@@ -55,33 +50,29 @@ import posthog from "posthog-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
+
 interface SongsViewProps {
   view?: "explore" | "management" | string;
   initialSongId?: string;
 }
 
-const SongsView = ({
-  view = "explore",
-  initialSongId = "",
-}: SongsViewProps) => {
+const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => {
   const router = useRouter();
   const { t } = useTranslation("songs");
   const isManagementView = view === "management";
 
+
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const userStats = useAppSelector(selectCurrentUserStats);
-  const isPremium =
-    userInfo?.role === "pro" ||
-    userInfo?.role === "master" ||
-    userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
 
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
     userAuth ?? null,
-    isPremium,
+    isPremium
   );
   const {
     page,
@@ -120,27 +111,14 @@ const SongsView = ({
     onTableStatusChange: refreshSongs,
   });
 
-  const skillPower = userSongs?.learned
-    ? getGatedSkillPower(userSongs.learned)
-    : 0;
-  const playerTier = getSongTier(skillPower > 0 ? skillPower : "?");
-  const nextTierProgress = userSongs?.learned
-    ? getSongsUntilNextTier(userSongs.learned)
-    : null;
+  const skillPower = userSongs?.learned ? getGatedSkillPower(userSongs.learned) : 0;
+  const playerTier = getSongTier(skillPower > 0 ? skillPower : '?');
+  const nextTierProgress = userSongs?.learned ? getSongsUntilNextTier(userSongs.learned) : null;
 
-  const totalSongsCount =
-    (userSongs?.wantToLearn?.length || 0) +
-    (userSongs?.learning?.length || 0) +
-    (userSongs?.learned?.length || 0);
+  const totalSongsCount = (userSongs?.wantToLearn?.length || 0) + (userSongs?.learning?.length || 0) + (userSongs?.learned?.length || 0);
   const learnedCount = userSongs?.learned?.length || 0;
-  const completionRate =
-    totalSongsCount > 0
-      ? Math.round((learnedCount / totalSongsCount) * 100)
-      : 0;
-  const totalPracticeMs = Object.values(progressMap).reduce(
-    (sum, p) => sum + (p?.totalPracticeMs || 0),
-    0,
-  );
+  const completionRate = totalSongsCount > 0 ? Math.round((learnedCount / totalSongsCount) * 100) : 0;
+  const totalPracticeMs = Object.values(progressMap).reduce((sum, p) => sum + (p?.totalPracticeMs || 0), 0);
 
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -158,9 +136,7 @@ const SongsView = ({
   // so by dragEnd findContainer(activeId) already returns the *new* list — we need the
   // original to know whether the status actually changed and must be persisted.
   const dragSourceContainer = useRef<SongStatus | null>(null);
-  const [mobileTab, setMobileTab] = useState<"explore" | "collection">(
-    "explore",
-  );
+  const [mobileTab, setMobileTab] = useState<'explore' | 'collection'>('explore');
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -173,18 +149,13 @@ const SongsView = ({
 
   useEffect(() => {
     if (initialSongId) {
-      const allSongs = [
-        ...userSongs.wantToLearn,
-        ...userSongs.learning,
-        ...userSongs.learned,
-      ];
-      const song = allSongs.find((s) => s.id === initialSongId);
+      const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
+      const song = allSongs.find(s => s.id === initialSongId);
       if (song) {
         setDetailsTarget(song);
       } else {
         const fetchSong = async () => {
-          const { getSongById } =
-            await import("feature/songs/services/getSongs");
+          const { getSongById } = await import("feature/songs/services/getSongs");
           const fetchedSong = await getSongById(initialSongId);
           if (fetchedSong) {
             setDetailsTarget(fetchedSong);
@@ -200,24 +171,23 @@ const SongsView = ({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
-      },
+         distance: 8,
+      }
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const activeSensors = disableDnd ? [] : sensors;
 
   const findContainer = (id: string): SongStatus | undefined => {
-    if (id === "wantToLearn" || id === "learning" || id === "learned")
-      return id as SongStatus;
-
+    if (id === "wantToLearn" || id === "learning" || id === "learned") return id as SongStatus;
+    
     if (userSongs.wantToLearn.find((s) => s.id === id)) return "wantToLearn";
     if (userSongs.learning.find((s) => s.id === id)) return "learning";
     if (userSongs.learned.find((s) => s.id === id)) return "learned";
-
+    
     return undefined;
   };
 
@@ -237,11 +207,7 @@ const SongsView = ({
     const activeContainer = findContainer(activeId);
     const overContainer = findContainer(overId);
 
-    if (
-      !activeContainer ||
-      !overContainer ||
-      activeContainer === overContainer
-    ) {
+    if (!activeContainer || !overContainer || activeContainer === overContainer) {
       return;
     }
 
@@ -304,7 +270,7 @@ const SongsView = ({
         finalContainer,
         activeSong.title,
         activeSong.artist,
-        { skipOptimisticUpdate: true, skipRefetch: true },
+        { skipOptimisticUpdate: true, skipRefetch: true }
       );
 
       await updateUserSongOrder(userAuth, userSongs[sourceContainer]);
@@ -328,11 +294,8 @@ const SongsView = ({
 
   const activeSong = useMemo(() => {
     // Search in userSongs
-    return [
-      ...userSongs.wantToLearn,
-      ...userSongs.learning,
-      ...userSongs.learned,
-    ].find((s) => s.id === activeId);
+    return [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned]
+        .find(s => s.id === activeId);
   }, [activeId, userSongs]);
 
   // ── Playlists ────────────────────────────────────────────────────────────
@@ -340,17 +303,15 @@ const SongsView = ({
 
   const collectionSongs = useMemo(() => {
     const map = new Map<string, Song>();
-    [
-      ...userSongs.learning,
-      ...userSongs.wantToLearn,
-      ...userSongs.learned,
-    ].forEach((s) => map.set(s.id, s));
+    [...userSongs.learning, ...userSongs.wantToLearn, ...userSongs.learned].forEach(
+      (s) => map.set(s.id, s)
+    );
     return Array.from(map.values());
   }, [userSongs]);
 
   const learnedSongIds = useMemo(
     () => new Set(userSongs.learned.map((s) => s.id)),
-    [userSongs.learned],
+    [userSongs.learned]
   );
 
   const handleOpenPlaylist = (playlistId: string | null) => {
@@ -384,48 +345,56 @@ const SongsView = ({
     if (song) setPracticeTarget(song);
   };
 
+
+
+
+
+
   return (
     <>
-      <div className='font-openSans flex h-[calc(100dvh-6rem)] flex-col overflow-hidden md:h-[calc(100dvh-8rem)]'>
+      <div className="flex flex-col h-[calc(100dvh-6rem)] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
         {/* Mobile View Switcher */}
         {!detailsTarget && (
-          <div className='flex bg-zinc-900/80 p-1.5 backdrop-blur-md xl:hidden'>
+          <div className="flex xl:hidden bg-zinc-900/80 p-1.5 backdrop-blur-md">
             <button
               onClick={() => {
-                setMobileTab("explore");
-                if (view === "playlists") handleSwitchView("explore");
+                setMobileTab('explore');
+                if (view === 'playlists') handleSwitchView('explore');
               }}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-[12px] font-medium transition-all duration-300",
-                mobileTab === "explore" && view !== "playlists"
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-400",
-              )}>
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'explore' && view !== 'playlists'
+                  ? "text-white bg-white/10"
+                  : "text-zinc-500 hover:text-zinc-400"
+              )}
+            >
               <Search size={14} />
               Explore
             </button>
             <button
               onClick={() => {
-                setMobileTab("explore");
-                if (view !== "playlists") handleSwitchView("playlists");
+                setMobileTab('explore');
+                if (view !== 'playlists') handleSwitchView('playlists');
               }}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-[12px] font-medium transition-all duration-300",
-                mobileTab === "explore" && view === "playlists"
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-400",
-              )}>
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'explore' && view === 'playlists'
+                  ? "text-white bg-white/10"
+                  : "text-zinc-500 hover:text-zinc-400"
+              )}
+            >
               <ListMusic size={14} />
               Playlists
             </button>
             <button
-              onClick={() => setMobileTab("collection")}
+              onClick={() => setMobileTab('collection')}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-[12px] font-medium transition-all duration-300",
-                mobileTab === "collection"
-                  ? "bg-white/10 text-white"
-                  : "text-zinc-500 hover:text-zinc-400",
-              )}>
+                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
+                mobileTab === 'collection'
+                  ? "text-white bg-white/10"
+                  : "text-zinc-500 hover:text-zinc-400"
+              )}
+            >
               <LibraryIcon size={14} />
               Board
             </button>
@@ -437,14 +406,14 @@ const SongsView = ({
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}>
-          <div className='relative flex flex-1 overflow-hidden'>
-            {/* Sidebar (Left) - Desktop only */}
-            <aside
-              id='sidebar-root'
-              className='hidden w-[300px] shrink-0 flex-col overflow-hidden border-r border-white/5 bg-zinc-900/30 xl:flex'>
-              <div className='no-scrollbar flex-1 overflow-y-auto px-3 py-3'>
+          onDragEnd={handleDragEnd}
+        >
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* Sidebar (Left) - Desktop only */}
+          <aside id="sidebar-root" className="hidden xl:flex w-[300px] shrink-0 bg-zinc-900/30 border-r border-white/5 flex-col overflow-hidden">
+             <div className="flex-1 overflow-y-auto no-scrollbar py-3 px-3">
                 <SongLearningSection
+
                   isLanding={false}
                   userSongs={userSongs}
                   onChange={updateUserSongsCache}
@@ -456,344 +425,304 @@ const SongsView = ({
                     setDetailsTarget(song);
                   }}
                   onExploreLibrary={handleSwitchView}
-                  isLibraryActive={view === "explore" && !detailsTarget}
-                  isPlaylistsActive={view === "playlists" && !detailsTarget}
+                  isLibraryActive={view === 'explore' && !detailsTarget}
+                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
+                  activeId={activeId}
+                  disableDnd={disableDnd}
+                  isMobile={isMobile}
+                />
+             </div>
+          </aside>
+
+          <main className={cn(
+            "flex-1 overflow-y-auto no-scrollbar relative bg-black/20",
+            // Playlists view manages its own padding so the header hue wash can bleed to the edges.
+            !detailsTarget && view !== 'playlists' ? "p-4 sm:p-6 md:p-10" : ""
+          )}>
+            {detailsTarget ? (
+              <div className="h-full flex flex-col">
+                <SongDetailView
+                  song={detailsTarget}
+                  progress={progressMap[detailsTarget.id] ?? null}
+                  status={getSongStatus(detailsTarget.id)}
+                  onPractice={(song) => setPracticeTarget(song)}
+                  onRemove={async (id) => {
+                      await handleSongRemoval(id);
+                      setDetailsTarget(null);
+                  }}
+                  onStatusChange={handleStatusChange}
+                  onBack={() => setDetailsTarget(null)}
+                  backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to Explore'}
+                  showBackOnDesktop={view === 'playlists'}
+                />
+              </div>
+            ) : view === 'board' ? (
+              <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
+                <SkillPowerHero
+                  skillPower={skillPower}
+                  playerTier={playerTier}
+                  learnedCount={learnedCount}
+                  totalCount={totalSongsCount}
+                  totalPracticeMs={totalPracticeMs}
+                  nextTierProgress={nextTierProgress}
+                />
+                
+                <div className="space-y-12">
+                  {userSongs.learning.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
+                           <Play size={16} className="fill-current" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-white">Currently learning</h2>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
+                        {userSongs.learning.map((song) => (
+                          <SongCard
+                            key={song.id}
+                            song={song}
+                            onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.wantToLearn.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
+                           <Music size={16} />
+                        </div>
+                        <h2 className="text-xl font-semibold text-white">Want to learn</h2>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
+                        {userSongs.wantToLearn.map((song) => (
+                          <SongCard
+                            key={song.id}
+                            song={song}
+                            onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.learned.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
+                           <Trophy size={16} />
+                        </div>
+                        <h2 className="text-xl font-semibold text-white">Mastered songs</h2>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
+                        {userSongs.learned.map((song) => (
+                          <SongCard
+                            key={song.id}
+                            song={song}
+                            onOpenDetails={() => setDetailsTarget(song)}
+                            onPlay={() => setPracticeTarget(song)}
+                            showPracticeStatus
+                            practiceMs={progressMap[song.id]?.totalPracticeMs}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userSongs.learned.length === 0 && userSongs.learning.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
+                      <div className="h-20 w-20 rounded-full bg-zinc-800 flex items-center justify-center mb-6">
+                        <Music size={32} className="text-zinc-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">No songs in your board yet</h3>
+                      <p className="text-sm max-w-xs">Start exploring the library and add songs to your collection to track your progress.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : mobileTab === 'collection' ? (
+              <div className="xl:hidden h-full overflow-y-auto p-4 bg-zinc-900/20 overscroll-none scroll-smooth">
+                 <SongLearningSection
+                  isLanding={false}
+                  userSongs={userSongs}
+                  onChange={updateUserSongsCache}
+                  onStatusChange={refreshSongs}
+                  progressMap={progressMap}
+                  isPremium={isPremium}
+                  onPracticeWithGp={(song) => setPracticeTarget(song)}
+                  onOpenDetails={(song) => {
+                    setDetailsTarget(song);
+                  }}
+                  onExploreLibrary={(v) => {
+                    handleSwitchView(v);
+                    if (v === 'explore' || v === 'playlists') setMobileTab('explore');
+                  }}
+                  isLibraryActive={view === 'explore' && !detailsTarget}
+                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
                   activeId={activeId}
                   disableDnd={disableDnd}
                   isMobile={isMobile}
                 />
               </div>
-            </aside>
-
-            <main
-              className={cn(
-                "no-scrollbar relative flex-1 overflow-y-auto bg-black/20",
-                // Playlists view manages its own padding so the header hue wash can bleed to the edges.
-                !detailsTarget && view !== "playlists"
-                  ? "p-4 sm:p-6 md:p-10"
-                  : "",
-              )}>
-              {detailsTarget ? (
-                <div className='flex h-full flex-col'>
-                  <SongDetailView
-                    song={detailsTarget}
-                    progress={progressMap[detailsTarget.id] ?? null}
-                    status={getSongStatus(detailsTarget.id)}
-                    onPractice={(song) => setPracticeTarget(song)}
-                    onRemove={async (id) => {
-                      await handleSongRemoval(id);
-                      setDetailsTarget(null);
-                    }}
-                    onStatusChange={handleStatusChange}
-                    onBack={() => setDetailsTarget(null)}
-                    backLabel={
-                      view === "playlists"
-                        ? "Back to playlist"
-                        : "Back to Explore"
-                    }
-                    showBackOnDesktop={view === "playlists"}
-                  />
-                </div>
-              ) : view === "board" ? (
-                <div className='space-y-10 duration-700 animate-in fade-in-50 slide-in-from-bottom-4'>
-                  <SkillPowerHero
-                    skillPower={skillPower}
-                    playerTier={playerTier}
-                    learnedCount={learnedCount}
-                    totalCount={totalSongsCount}
-                    totalPracticeMs={totalPracticeMs}
-                    nextTierProgress={nextTierProgress}
-                  />
-
-                  <div className='space-y-12'>
-                    {userSongs.learning.length > 0 && (
-                      <div className='space-y-6'>
-                        <div className='flex items-center gap-3'>
-                          <div className='flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300'>
-                            <Play size={16} className='fill-current' />
-                          </div>
-                          <h2 className='text-xl font-semibold text-white'>
-                            Currently learning
-                          </h2>
-                        </div>
-                        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
-                          {userSongs.learning.map((song) => (
-                            <SongCard
-                              key={song.id}
-                              song={song}
-                              onOpenDetails={() => setDetailsTarget(song)}
-                              onPlay={() => setPracticeTarget(song)}
-                              showPracticeStatus
-                              practiceMs={progressMap[song.id]?.totalPracticeMs}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {userSongs.wantToLearn.length > 0 && (
-                      <div className='space-y-6'>
-                        <div className='flex items-center gap-3'>
-                          <div className='flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300'>
-                            <Music size={16} />
-                          </div>
-                          <h2 className='text-xl font-semibold text-white'>
-                            Want to learn
-                          </h2>
-                        </div>
-                        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
-                          {userSongs.wantToLearn.map((song) => (
-                            <SongCard
-                              key={song.id}
-                              song={song}
-                              onOpenDetails={() => setDetailsTarget(song)}
-                              onPlay={() => setPracticeTarget(song)}
-                              showPracticeStatus
-                              practiceMs={progressMap[song.id]?.totalPracticeMs}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {userSongs.learned.length > 0 && (
-                      <div className='space-y-6'>
-                        <div className='flex items-center gap-3'>
-                          <div className='flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300'>
-                            <Trophy size={16} />
-                          </div>
-                          <h2 className='text-xl font-semibold text-white'>
-                            Mastered songs
-                          </h2>
-                        </div>
-                        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
-                          {userSongs.learned.map((song) => (
-                            <SongCard
-                              key={song.id}
-                              song={song}
-                              onOpenDetails={() => setDetailsTarget(song)}
-                              onPlay={() => setPracticeTarget(song)}
-                              showPracticeStatus
-                              practiceMs={progressMap[song.id]?.totalPracticeMs}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {userSongs.learned.length === 0 &&
-                      userSongs.learning.length === 0 && (
-                        <div className='flex flex-col items-center justify-center py-20 text-center opacity-40'>
-                          <div className='mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800'>
-                            <Music size={32} className='text-zinc-500' />
-                          </div>
-                          <h3 className='mb-2 text-xl font-bold text-white'>
-                            No songs in your board yet
-                          </h3>
-                          <p className='max-w-xs text-sm'>
-                            Start exploring the library and add songs to your
-                            collection to track your progress.
-                          </p>
-                        </div>
-                      )}
+            ) : view === 'playlists' ? (
+              <PlaylistsView
+                activePlaylistId={activePlaylistId}
+                onOpenPlaylist={handleOpenPlaylist}
+                collectionSongs={collectionSongs}
+                learnedSongIds={learnedSongIds}
+                onPracticeSong={practiceSongFromPlaylist}
+                onOpenSong={openSongFromPlaylist}
+              />
+            ) : (
+              <div className="space-y-6 animate-in fade-in-50 duration-300">
+                {/* Tier Selection Grid */}
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs font-bold text-zinc-400">Filter by Tier</p>
                   </div>
-                </div>
-              ) : mobileTab === "collection" ? (
-                <div className='h-full overflow-y-auto overscroll-none scroll-smooth bg-zinc-900/20 p-4 xl:hidden'>
-                  <SongLearningSection
-                    isLanding={false}
-                    userSongs={userSongs}
-                    onChange={updateUserSongsCache}
-                    onStatusChange={refreshSongs}
-                    progressMap={progressMap}
-                    isPremium={isPremium}
-                    onPracticeWithGp={(song) => setPracticeTarget(song)}
-                    onOpenDetails={(song) => {
-                      setDetailsTarget(song);
-                    }}
-                    onExploreLibrary={(v) => {
-                      handleSwitchView(v);
-                      if (v === "explore" || v === "playlists")
-                        setMobileTab("explore");
-                    }}
-                    isLibraryActive={view === "explore" && !detailsTarget}
-                    isPlaylistsActive={view === "playlists" && !detailsTarget}
-                    activeId={activeId}
-                    disableDnd={disableDnd}
-                    isMobile={isMobile}
-                  />
-                </div>
-              ) : view === "playlists" ? (
-                <PlaylistsView
-                  activePlaylistId={activePlaylistId}
-                  onOpenPlaylist={handleOpenPlaylist}
-                  collectionSongs={collectionSongs}
-                  learnedSongIds={learnedSongIds}
-                  onPracticeSong={practiceSongFromPlaylist}
-                  onOpenSong={openSongFromPlaylist}
-                />
-              ) : (
-                <div className='space-y-6 duration-300 animate-in fade-in-50'>
-                  {/* Tier Selection Grid */}
-                  <div className='space-y-4'>
-                    <div className='flex flex-col gap-1'>
-                      <p className='text-xs font-bold text-zinc-400'>
-                        Filter by Tier
-                      </p>
-                    </div>
-                    <div className='flex flex-wrap gap-2'>
-                      {getAllTiers().map((tier) => {
-                        const isActive = tierFilters.includes(tier.tier);
-                        return (
-                          <button
-                            key={tier.tier}
-                            onClick={() => {
-                              if (isActive) {
-                                setTierFilters(
-                                  tierFilters.filter(
-                                    (t: string) => t !== tier.tier,
-                                  ),
-                                );
-                              } else {
-                                posthog.capture("song_library_action", {
-                                  action: "filter_tier",
-                                  tier: tier.tier,
-                                });
-                                setTierFilters([...tierFilters, tier.tier]);
-                              }
-                            }}
-                            className={cn(
-                              "relative flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
-                              isActive
-                                ? "shadow-lg shadow-black/20"
-                                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white",
-                            )}
-                            style={{
-                              backgroundColor: isActive
-                                ? `${tier.color}25`
-                                : "",
-                              color: isActive ? tier.color : "",
-                            }}>
-                            <Ripple />
-                            {tier.tier}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Search & Filter Bar */}
-                  <div className='relative z-30 py-4'>
-                    <div className='flex flex-col gap-3 md:flex-row md:items-center'>
-                      <div className='group relative flex-1'>
-                        <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4'>
-                          <Music className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white' />
-                        </div>
-                        <Input
-                          placeholder={t("artist", "Artist...") as string}
-                          value={artistQuery}
-                          onChange={(e) => setArtistQuery(e.target.value)}
-                          className='h-12 w-full border-none bg-zinc-900/60 pl-11 font-medium text-white transition-all placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10'
-                        />
-                      </div>
-
-                      <div className='group relative flex-[1.2]'>
-                        <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4'>
-                          <Search className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white' />
-                        </div>
-                        <Input
-                          placeholder={t("title", "Title...") as string}
-                          value={titleQuery}
-                          onChange={(e) => setTitleQuery(e.target.value)}
-                          className='h-12 w-full border-none bg-zinc-900/60 pl-11 font-medium text-white transition-all placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10'
-                        />
-                      </div>
-
-                      <div className='flex items-center gap-2'>
-                        <Button
-                          variant='ghost'
-                          onClick={() => setIsFilterSheetOpen(true)}
+                  <div className="flex flex-wrap gap-2">
+                    {getAllTiers().map((tier) => {
+                      const isActive = tierFilters.includes(tier.tier);
+                      return (
+                        <button
+                          key={tier.tier}
+                          onClick={() => {
+                            if (isActive) {
+                              setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
+                            } else {
+                              posthog.capture("song_library_action", { action: "filter_tier", tier: tier.tier });
+                              setTierFilters([...tierFilters, tier.tier]);
+                            }
+                          }}
                           className={cn(
-                            "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 transition-all hover:bg-zinc-800 active:scale-95 md:flex-initial",
-                            hasFilters && "bg-cyan-500/5 text-cyan-400",
-                          )}>
-                          <SlidersHorizontal className='mr-2.5 h-4 w-4' />
-                          Filters & Sort
-                        </Button>
+                            "relative flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
+                            isActive
+                              ? "shadow-lg shadow-black/20"
+                              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                          )}
+                          style={{
+                            backgroundColor: isActive ? `${tier.color}25` : "",
+                            color: isActive ? tier.color : "",
+                          }}
+                        >
+                          <Ripple />
+                          {tier.tier}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Search & Filter Bar */}
+                <div className="relative z-30 py-4">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                    <div className="group relative flex-1">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
+                        <Music className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
                       </div>
+                      <Input
+                        placeholder={t("artist", "Artist...") as string}
+                        value={artistQuery}
+                        onChange={(e) => setArtistQuery(e.target.value)}
+                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                      />
+                    </div>
+
+                    <div className="group relative flex-[1.2]">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
+                        <Search className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
+                      </div>
+                      <Input
+                        placeholder={t("title", "Title...") as string}
+                        value={titleQuery}
+                        onChange={(e) => setTitleQuery(e.target.value)}
+                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setIsFilterSheetOpen(true)}
+                        className={cn(
+                          "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          hasFilters && "bg-cyan-500/5 text-cyan-400"
+                        )}
+                      >
+                        <SlidersHorizontal className="mr-2.5 h-4 w-4" />
+                        Filters & Sort
+                      </Button>
                     </div>
                   </div>
-
-                  <FilterSheet
-                    isOpen={isFilterSheetOpen}
-                    onClose={() => setIsFilterSheetOpen(false)}
-                    difficultyFilter={difficultyFilter}
-                    tierFilters={tierFilters}
-                    genreFilters={genreFilters}
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    availableGenres={availableGenres}
-                    onApply={applyFilters}
-                    onClearFilters={handleResetFilters}
-                    hasFilters={hasFilters}
-                  />
-
-                  {/* Grid Content */}
-                  <SongsGrid
-                    songs={filteredSongs}
-                    isLoading={isLoading}
-                    currentPage={page}
-                    hasMore={hasMore}
-                    onPageChange={handlePageChange}
-                    onAddSong={() => setIsModalOpen(true)}
-                    hasFilters={
-                      tierFilters.length > 0 || genreFilters.length > 0
-                    }
-                    onStatusChange={refreshSongs}
-                    onPractice={(song) => setPracticeTarget(song)}
-                    userSongs={userSongs}
-                    updateUserSongsCache={updateUserSongsCache}
-                  />
                 </div>
-              )}
-            </main>
-          </div>
-          <DragOverlay
-            dropAnimation={{
-              sideEffects: defaultDropAnimationSideEffects({
-                styles: {
-                  active: {
-                    opacity: "0.5",
-                  },
-                },
-              }),
-            }}>
-            {activeId && activeSong && (
-              <div className='w-[280px] cursor-grabbing'>
-                <div className='flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-zinc-900/90 p-3 shadow-2xl backdrop-blur-xl'>
-                  <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-800'>
-                    {activeSong.coverUrl ? (
-                      <img
-                        src={activeSong.coverUrl}
-                        alt=''
-                        className='h-full w-full object-cover'
-                      />
-                    ) : (
-                      <Music className='h-5 w-5 text-zinc-600' />
-                    )}
-                  </div>
-                  <div className='min-w-0 flex-1'>
-                    <p className='truncate text-xs font-bold text-white'>
-                      {activeSong.title}
-                    </p>
-                    <p className='truncate text-[10px] text-zinc-500'>
-                      {activeSong.artist}
-                    </p>
-                  </div>
-                </div>
+
+                <FilterSheet 
+                  isOpen={isFilterSheetOpen}
+                  onClose={() => setIsFilterSheetOpen(false)}
+                  difficultyFilter={difficultyFilter}
+                  tierFilters={tierFilters}
+                  genreFilters={genreFilters}
+                  sortBy={sortBy}
+                  sortDirection={sortDirection}
+                  availableGenres={availableGenres}
+                  onApply={applyFilters}
+                  onClearFilters={handleResetFilters}
+                  hasFilters={hasFilters}
+                />
+
+                {/* Grid Content */}
+                <SongsGrid
+                  songs={filteredSongs}
+                  isLoading={isLoading}
+                  currentPage={page}
+                  hasMore={hasMore}
+                  onPageChange={handlePageChange}
+                  onAddSong={() => setIsModalOpen(true)}
+                  hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
+                  onStatusChange={refreshSongs}
+                  onPractice={(song) => setPracticeTarget(song)}
+                  userSongs={userSongs}
+                  updateUserSongsCache={updateUserSongsCache}
+                />
               </div>
             )}
-          </DragOverlay>
+          </main>
+        </div>
+        <DragOverlay dropAnimation={{
+          sideEffects: defaultDropAnimationSideEffects({
+            styles: {
+              active: {
+                opacity: "0.5",
+              },
+            },
+          }),
+        }}>
+          {activeId && activeSong && (
+            <div className="w-[280px] cursor-grabbing">
+               <div className="flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-zinc-900/90 p-3 shadow-2xl backdrop-blur-xl">
+                 <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
+                   {activeSong.coverUrl ? (
+                     <img src={activeSong.coverUrl} alt="" className="h-full w-full object-cover" />
+                   ) : (
+                     <Music className="h-5 w-5 text-zinc-600" />
+                   )}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <p className="truncate text-xs font-bold text-white">{activeSong.title}</p>
+                   <p className="truncate text-[10px] text-zinc-500">{activeSong.artist}</p>
+                 </div>
+               </div>
+            </div>
+          )}
+        </DragOverlay>
         </DndContext>
       </div>
 
