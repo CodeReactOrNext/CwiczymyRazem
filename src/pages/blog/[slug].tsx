@@ -4,13 +4,19 @@ import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { PracticeTable } from 'components/Blog/PracticeTable';
-import { StepList } from 'components/Blog/StepList';
 import { SongTierTable } from 'components/Blog/SongTierTable';
+import { StepList } from 'components/Blog/StepList';
 import { YouTube } from 'components/Blog/YouTube';
+import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
+import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
+import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
+import { idToSlug } from 'feature/exercises/lib/slugUtils';
 import { Footer } from 'feature/landing/components/Footer';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs, getBlogBySlug } from 'lib/blog';
+import type { PracticeLink } from 'lib/internalLinks';
+import { CLUSTER_PRACTICE_LINK } from 'lib/internalLinks';
 import { ChevronRight, List } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -24,12 +30,24 @@ import remarkGfm from 'remark-gfm';
 
 
 
+interface PracticeExercise {
+  id: string;
+  title: string;
+  difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
+  category: string;
+  description: string;
+  timeInMinutes: number;
+  premium?: boolean;
+}
+
 interface BlogPostProps {
   frontmatter: BlogFrontmatter;
   mdxSource: MDXRemoteSerializeResult;
   relatedBlogs: BlogFrontmatter[];
   headings: { text: string; id: string }[];
   faqs: { question: string; answer: string }[];
+  practiceLink: PracticeLink | null;
+  practiceExercises: PracticeExercise[];
 }
 
 const components = {
@@ -58,7 +76,7 @@ const components = {
     ),
 };
 
-const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], faqs = [] }: BlogPostProps) => {
+const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], faqs = [], practiceLink = null, practiceExercises = [] }: BlogPostProps) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -264,6 +282,34 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
           </div>
         </article>
 
+        {practiceLink && (
+          <section className="container mx-auto px-4 py-16 border-t border-white/5">
+            <div className="mx-auto max-w-6xl">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                <h2 className="text-2xl font-bold text-white">Put It Into Practice</h2>
+                <Link
+                  href={practiceLink.href}
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
+                  {practiceLink.label} <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+
+              {practiceExercises.length > 0 && (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {practiceExercises.map((exercise) => (
+                    <ExerciseCard
+                      key={exercise.id}
+                      exercise={exercise}
+                      href={`/exercises/${idToSlug(exercise.id)}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {relatedBlogs.length > 0 && (
           <section className="container mx-auto px-4 py-16 border-t border-white/5">
             <div className="mx-auto max-w-6xl">
@@ -352,6 +398,31 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const rotatedFill = [...fill.slice(offset), ...fill.slice(0, offset)];
   const relatedBlogs = [...sameCluster, ...rotatedFill].slice(0, 3);
 
+  // Cross-link to the app: point the reader at the exercise category (or app
+  // page) the post's cluster is about, with a few sample exercises to start.
+  const practiceLink = current?.cluster ? CLUSTER_PRACTICE_LINK[current.cluster] ?? null : null;
+  const practiceExercises = practiceLink?.exerciseCategory
+    ? serializeExercises(exercisesAgregat)
+        .filter(
+          (ex) =>
+            ex.category === practiceLink.exerciseCategory &&
+            !ex.isHiddenFromLibrary &&
+            !ex.isHiddenFromLanding &&
+            !ex.isPlayalong &&
+            !ex.premium
+        )
+        .slice(0, 3)
+        .map((ex) => ({
+          id: ex.id,
+          title: ex.title,
+          difficulty: ex.difficulty,
+          category: ex.category,
+          description: ex.description,
+          timeInMinutes: ex.timeInMinutes,
+          premium: ex.premium,
+        }))
+    : [];
+
   return {
     props: {
       frontmatter,
@@ -359,6 +430,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       relatedBlogs,
       headings,
       faqs,
+      practiceLink,
+      practiceExercises,
     },
   };
 };
