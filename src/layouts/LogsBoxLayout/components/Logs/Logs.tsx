@@ -35,6 +35,7 @@ import type {
 import { calculateActivityFame, EXERCISE_PLAN_FAME } from "feature/logs/utils/activityFame";
 import {
   type AnyFirebaseLog,
+  getLogActivityType,
   groupConsecutiveLogs,
   type LogActivityType,
   type LogGroup,
@@ -927,7 +928,7 @@ const GroupedLogItem = ({
             <GroupedLogLine
               key={(log as { id?: string }).id ?? `${getLogTimestampMs(log)}-${index}`}
               log={log}
-              type={group.type}
+              type={getLogActivityType(log)}
               onPreviewPlan={onPreviewPlan}
               onPreviewExercise={onPreviewExercise}
               onViewRecording={onViewRecording}
