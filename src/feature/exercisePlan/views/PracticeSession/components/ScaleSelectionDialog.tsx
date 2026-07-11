@@ -116,7 +116,9 @@ export function ScaleSelectionDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       {/* z-index must beat the mobile session modal (z-[9999999]) or the setup
           dialog is invisible on phones. Flex column + capped height keeps the
-          header/footer on screen (middle scrolls) even on short landscape phones. */}
+          header/footer on screen (middle scrolls) even on short landscape phones.
+          Each Select's dropdown also needs a z-index above this dialog's, otherwise
+          it renders behind it (SelectContent defaults to z-50). */}
       <DialogContent
         overlayClassName="z-[99999998]"
         className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[500px]"
@@ -143,7 +145,7 @@ export function ScaleSelectionDialog({
               <SelectTrigger id="root-note">
                 <SelectValue placeholder="Select note" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100000000]">
                 {rootNotes.map((note) => (
                   <SelectItem key={note} value={note}>
                     {note}
@@ -165,7 +167,7 @@ export function ScaleSelectionDialog({
               <SelectTrigger id="scale-type">
                 <SelectValue placeholder="Select scale" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100000000]">
                 {scales.map((scale) => (
                   <SelectItem key={scale.value} value={scale.value}>
                     {scale.label}
@@ -192,7 +194,7 @@ export function ScaleSelectionDialog({
               <SelectTrigger id="pattern-type">
                 <SelectValue placeholder="Select pattern" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100000000]">
                 {patterns.map((pattern) => (
                   <SelectItem key={pattern.value} value={pattern.value}>
                     {pattern.label}
@@ -214,7 +216,7 @@ export function ScaleSelectionDialog({
               <SelectTrigger id="position">
                 <SelectValue placeholder="Select position" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100000000]">
                 {positions.map((pos) => (
                   <SelectItem key={pos.toString()} value={pos.toString()}>
                     {pos === 'all' ? 'Full Fretboard (All Positions)' : `Position ${pos} (frets ${pos}-${pos + 4})`}
