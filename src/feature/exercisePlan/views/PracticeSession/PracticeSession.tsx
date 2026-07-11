@@ -238,7 +238,12 @@ export const PracticeSession = ({
     }
 
     skipNextSettingsSaveRef.current = true;
-    resetForExercise({ isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier });
+    resetForExercise({
+      isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier,
+      // Exams never expose the notation toggle (see DesktopSessionView), but force it off here
+      // too in case it was left on from a prior non-exam exercise in the same session.
+      ...(isExamMode ? { showAlphaTabScore: false } : {}),
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
 

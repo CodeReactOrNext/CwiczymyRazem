@@ -162,7 +162,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
-            {(p.effectiveRawGpFile || (p.activeTablature && p.activeTablature.length > 0)) && (
+            {/* Exams are graded against the tab/backing-track flow only — notation is a
+                practice-only convenience, so hide the toggle entirely during an exam. */}
+            {!p.isExamMode && (p.effectiveRawGpFile || (p.activeTablature && p.activeTablature.length > 0)) && (
               <NotationToggleButton
                 showAlphaTabScore={p.showAlphaTabScore}
                 onToggle={p.handleToggleAlphaTabScore}
