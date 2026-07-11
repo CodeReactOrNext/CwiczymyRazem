@@ -1,5 +1,5 @@
-import { GETTING_STARTED_QUEST_DEFAULTS } from "../types";
 import type { GettingStartedQuestState } from "../types";
+import { GETTING_STARTED_QUEST_DEFAULTS } from "../types";
 
 export interface GettingStartedStep {
   id: "welcome" | "first_exercise" | "exercise_plan" | "custom_plan";
