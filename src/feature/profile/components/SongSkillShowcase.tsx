@@ -72,17 +72,21 @@ export const SongSkillShowcase = ({
 
         {playerTier && (
           <div className='flex shrink-0 flex-col items-center gap-1.5'>
-            <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Song tier</span>
+            <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>
+              Song tier
+            </span>
             <div
               className='flex h-14 w-14 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
               style={{
                 color: playerTier.color,
-                backgroundColor: 'rgba(10,10,10,0.9)',
+                backgroundColor: "rgba(10,10,10,0.9)",
                 borderColor: `${playerTier.color}40`,
               }}>
               {playerTier.tier}
             </div>
-            <span className='text-[11px] font-medium' style={{ color: playerTier.color }}>
+            <span
+              className='text-[11px] font-medium'
+              style={{ color: playerTier.color }}>
               {playerTier.label}
             </span>
           </div>
@@ -98,7 +102,7 @@ export const SongSkillShowcase = ({
               <div
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-black",
-                  tier.bgColor
+                  tier.bgColor,
                 )}
                 style={{ color: tier.color }}>
                 {tier.tier}
@@ -135,10 +139,14 @@ export const SongSkillShowcase = ({
                     </div>
                   )}
                   <div className='min-w-0 flex-1'>
-                    <p translate="no" className='truncate text-sm font-semibold text-white'>
+                    <p
+                      translate='no'
+                      className='truncate text-sm font-semibold text-white'>
                       {song.title}
                     </p>
-                    <p translate="no" className='truncate text-xs text-zinc-400'>
+                    <p
+                      translate='no'
+                      className='truncate text-xs text-zinc-400'>
                       {song.artist}
                     </p>
                   </div>
