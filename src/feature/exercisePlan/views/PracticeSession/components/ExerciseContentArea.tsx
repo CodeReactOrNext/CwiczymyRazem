@@ -30,6 +30,7 @@ interface ExerciseContentAreaProps {
   startTime: number | null;
   effectiveBpm: number;
   isAudioMuted: boolean;
+  isMetronomeMuted: boolean;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -86,6 +87,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   startTime,
   effectiveBpm,
   isAudioMuted,
+  isMetronomeMuted,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -191,6 +193,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         <TablatureSection
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
+          baseTempo={currentExercise.metronomeSpeed?.recommended ?? effectiveBpm}
           showAlphaTabScore={showAlphaTabScore}
           show3dHighway={show3dHighway}
           onSeek={onSeek}
@@ -198,6 +201,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           startTime={startTime}
           effectiveBpm={effectiveBpm}
           isAudioMuted={isAudioMuted}
+          isMetronomeMuted={isMetronomeMuted}
           isMetronomePlaying={isMetronomePlaying}
           countInRemaining={countInRemaining}
           frequencyRef={frequencyRef}

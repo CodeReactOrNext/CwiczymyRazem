@@ -10,6 +10,7 @@ interface UseDeviceMetronomeProps {
   maxBpm?: number;
   recommendedBpm?: number;
   isMuted?: boolean;
+  mutePlaybackClick?: boolean;
   speedMultiplier?: number;
   onTick?: () => void;
   /** Shared AudioContext — forwarded to the underlying metronome hook (e.g. AlphaTab's context). */

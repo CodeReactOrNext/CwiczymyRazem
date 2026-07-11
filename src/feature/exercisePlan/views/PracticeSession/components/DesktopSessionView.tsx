@@ -162,7 +162,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
-            {p.effectiveRawGpFile && (
+            {/* Exams are graded against the tab/backing-track flow only — notation is a
+                practice-only convenience, so hide the toggle entirely during an exam. */}
+            {!p.isExamMode && (p.effectiveRawGpFile || (p.activeTablature && p.activeTablature.length > 0)) && (
               <NotationToggleButton
                 showAlphaTabScore={p.showAlphaTabScore}
                 onToggle={p.handleToggleAlphaTabScore}
@@ -247,6 +249,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     show3dHighway={p.show3dHighway}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
+                    isMetronomeMuted={p.isMetronomeMuted}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
