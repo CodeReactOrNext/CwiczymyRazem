@@ -1,5 +1,5 @@
 import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { Music2, Star, Trophy } from "lucide-react";
@@ -26,7 +26,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
     ? ((userSongs?.learned?.length || 0) / totalSongs) * 100
     : 0;
 
-  const skillPower = calculateSkillPower(userSongs?.learned || []);
+  const skillPower = getGatedSkillPower(userSongs?.learned || []);
   const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
 
   return (

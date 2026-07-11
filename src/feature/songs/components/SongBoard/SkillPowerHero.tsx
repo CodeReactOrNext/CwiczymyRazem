@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import type { NextTierProgress } from "feature/songs/utils/difficulty.utils";
+import { MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { Clock, Music2, Star, TrendingUp } from "lucide-react";
 
@@ -8,6 +10,7 @@ interface SkillPowerHeroProps {
   learnedCount: number;
   totalCount: number;
   totalPracticeMs?: number;
+  nextTierProgress?: NextTierProgress | null;
   className?: string;
 }
 
@@ -19,14 +22,50 @@ const formatPracticeTime = (ms: number) => {
   return `${minutes}m`;
 };
 
+const TierUnlockTrack = ({ learnedCount }: { learnedCount: number }) => (
+  <div className="flex w-24 flex-col items-center gap-1.5">
+    <div className="flex w-full items-center gap-1">
+      {Array.from({ length: MIN_LEARNED_SONGS_FOR_TIER }).map((_, index) => (
+        <div
+          key={index}
+          className={cn(
+            "h-1 flex-1 rounded-full",
+            index < learnedCount ? "bg-cyan-400" : "bg-zinc-800"
+          )}
+        />
+      ))}
+    </div>
+    <span className="text-center text-[9px] font-bold leading-tight text-zinc-500">
+      {learnedCount}/{MIN_LEARNED_SONGS_FOR_TIER} songs to unlock
+    </span>
+  </div>
+);
+
+const NextTierHint = ({ nextTierProgress }: { nextTierProgress: NextTierProgress }) => {
+  const nextTier = getSongTier(nextTierProgress.nextTier);
+  return (
+    <div className="flex items-center gap-1.5 rounded bg-white/5 px-2 py-1">
+      <span className="text-[10px] font-bold text-zinc-500">
+        {nextTierProgress.songsNeeded} song{nextTierProgress.songsNeeded > 1 ? "s" : ""} to
+      </span>
+      <span className="text-[10px] font-black" style={{ color: nextTier.color }}>
+        {nextTier.label}
+      </span>
+    </div>
+  );
+};
+
 export const SkillPowerHero = ({
   skillPower,
   playerTier,
   learnedCount,
   totalCount,
   totalPracticeMs = 0,
+  nextTierProgress,
   className,
 }: SkillPowerHeroProps) => {
+  const isTierLocked = learnedCount < MIN_LEARNED_SONGS_FOR_TIER;
+
   return (
     <div className={cn("relative overflow-hidden rounded-lg bg-zinc-900/40 p-8 backdrop-blur-xl", className)}>
       {/* Background Decorative Elements */}
@@ -93,7 +132,14 @@ export const SkillPowerHero = ({
              >
                {playerTier.tier}
              </div>
-             <span className="text-[10px] font-bold tracking-wider text-zinc-500">Current tier</span>
+             {isTierLocked ? (
+               <TierUnlockTrack learnedCount={learnedCount} />
+             ) : (
+               <div className="flex flex-col items-center gap-2">
+                 <span className="text-[10px] font-bold tracking-wider text-zinc-500">Current tier</span>
+                 {nextTierProgress && <NextTierHint nextTierProgress={nextTierProgress} />}
+               </div>
+             )}
           </div>
         </div>
       </div>

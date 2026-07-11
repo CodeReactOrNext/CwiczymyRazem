@@ -20,9 +20,15 @@ export const getTierFromDifficulty = (difficulty: number): string => {
 };
 
 /**
- * Calculates a "Skill Power" score that rewards both peak difficulty 
+ * Minimum number of learned songs required before a skill tier is shown.
+ * Below this, a single hard song could otherwise produce a misleadingly high tier.
+ */
+export const MIN_LEARNED_SONGS_FOR_TIER = 5;
+
+/**
+ * Calculates a "Skill Power" score that rewards both peak difficulty
  * and repertoire volume.
- * 
+ *
  * Formula: [ Sum(Top10_Difficulty_i * Weight_i) / Sum(Weights) ] + (TotalSongs * 0.02)
  */
 export const calculateSkillPower = (learnedSongs: { avgDifficulty?: number }[]): number => {
@@ -60,7 +66,58 @@ export const calculateSkillPower = (learnedSongs: { avgDifficulty?: number }[]):
   else if (maxDiff < 7.5) gateCeiling = 7.5;
   else if (maxDiff < 9) gateCeiling = 9;
 
-  // We allow the score to reach the *threshold* of the next tier but not cross it 
+  // We allow the score to reach the *threshold* of the next tier but not cross it
   // without a song from that tier. We use a tiny epsilon to keep it visual.
   return Math.min(rawPower, gateCeiling - 0.01);
+};
+
+/**
+ * Skill power gated behind MIN_LEARNED_SONGS_FOR_TIER — below that, a tier
+ * shouldn't be shown yet (see calculateSkillPower for the raw formula).
+ */
+export const getGatedSkillPower = (learnedSongs: { avgDifficulty?: number }[]): number => {
+  if (learnedSongs.length < MIN_LEARNED_SONGS_FOR_TIER) return 0;
+  return calculateSkillPower(learnedSongs);
+};
+
+const TIER_THRESHOLDS: { tier: string; minDifficulty: number }[] = [
+  { tier: "D", minDifficulty: 0 },
+  { tier: "C", minDifficulty: 4 },
+  { tier: "B", minDifficulty: 6 },
+  { tier: "A", minDifficulty: 7.5 },
+  { tier: "S", minDifficulty: 9 },
+];
+
+const MAX_SIMULATED_SONGS = 20;
+
+export interface NextTierProgress {
+  nextTier: string;
+  songsNeeded: number;
+}
+
+/**
+ * How many more songs at the next tier's difficulty the player would need to
+ * learn to level up, simulated by re-running calculateSkillPower — this keeps
+ * the answer guaranteed consistent with the real formula instead of guessing.
+ */
+export const getSongsUntilNextTier = (
+  learnedSongs: { avgDifficulty?: number }[]
+): NextTierProgress | null => {
+  if (learnedSongs.length < MIN_LEARNED_SONGS_FOR_TIER) return null;
+
+  const currentTier = getTierFromDifficulty(calculateSkillPower(learnedSongs));
+  const currentIndex = TIER_THRESHOLDS.findIndex((t) => t.tier === currentTier);
+  if (currentIndex === -1 || currentIndex === TIER_THRESHOLDS.length - 1) return null;
+
+  const nextTier = TIER_THRESHOLDS[currentIndex + 1];
+  const simulatedSongs = [...learnedSongs];
+
+  for (let songsAdded = 1; songsAdded <= MAX_SIMULATED_SONGS; songsAdded++) {
+    simulatedSongs.push({ avgDifficulty: nextTier.minDifficulty });
+    if (getTierFromDifficulty(calculateSkillPower(simulatedSongs)) === nextTier.tier) {
+      return { nextTier: nextTier.tier, songsNeeded: songsAdded };
+    }
+  }
+
+  return { nextTier: nextTier.tier, songsNeeded: MAX_SIMULATED_SONGS };
 };

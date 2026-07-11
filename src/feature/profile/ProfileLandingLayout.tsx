@@ -17,7 +17,7 @@ import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWid
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getGatedSkillPower, MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
@@ -63,8 +63,10 @@ const ProfileLandingLayout = ({
 
 
 
-  const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
+  const learnedSongsCount = songs?.learned?.length ?? 0;
+  const skillPower = songs?.learned ? getGatedSkillPower(songs.learned) : 0;
   const songTier = getSongTier(skillPower > 0 ? skillPower : '?');
+  const songsUntilTierUnlocks = Math.max(0, MIN_LEARNED_SONGS_FOR_TIER - learnedSongsCount);
 
   const imgPath = userInfo?.selectedGuitar ?? (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
@@ -114,7 +116,11 @@ const ProfileLandingLayout = ({
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center gap-1.5 cursor-default">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/songs?view=board")}
+                    className="relative flex flex-col items-center gap-1.5 rounded-lg p-1 transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
                     <span className="text-[10px] font-semibold tracking-widest text-zinc-400">Song tier</span>
                     <div
                       className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg"
@@ -123,10 +129,17 @@ const ProfileLandingLayout = ({
                       {songTier.tier}
                     </div>
                     <span className="text-[11px] font-medium" style={{ color: songTier.color }}>{songTier.label}</span>
-                  </div>
+                  </button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[220px] text-center text-zinc-800 leading-relaxed">
-                  Your skill tier based on the difficulty of songs you've mastered. Ranges from D (beginner) to S (master).
+                <TooltipContent side="bottom" className="max-w-[240px] text-center text-zinc-800 leading-relaxed">
+                  {songsUntilTierUnlocks > 0 ? (
+                    <>
+                      Learn {songsUntilTierUnlocks} more song{songsUntilTierUnlocks > 1 ? "s" : ""} to unlock your tier.
+                      It's a weighted average of your hardest mastered songs, capped by the difficulty of your hardest one — so one hard song alone won't jump you to a high tier.
+                    </>
+                  ) : (
+                    "Your tier is a weighted average of your hardest mastered songs, capped by the difficulty of your hardest one — so one hard song alone won't jump you to a high tier. Click to see your song board."
+                  )}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
