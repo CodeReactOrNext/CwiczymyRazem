@@ -247,6 +247,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     show3dHighway={p.show3dHighway}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
+                    isMetronomeMuted={p.isMetronomeMuted}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}

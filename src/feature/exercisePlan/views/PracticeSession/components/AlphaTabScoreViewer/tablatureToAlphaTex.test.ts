@@ -65,8 +65,22 @@ describe("tablatureToAlphaTex", () => {
     ];
 
     expect(tablatureToAlphaTex(measures, 120)).toBe(
-      "\\tempo 120 \\ts 4 4 r.8 (5.3{h} 5.2).16 0.6{x}.4 12.1{b (0 4)}.2 7.1{pm v}.4 |",
+      "\\tempo 120 \\ts 4 4 r.8 (5.3{h} 5.2).16 0.6{x}.4 12.1{b (0 2)}.2 7.1{pm v}.4 |",
     );
+  });
+
+  it("maps a whole-tone bend to a 2-semitone pitch shift, not 4", () => {
+    // AlphaTab's bend `value` unit is half a semitone (playback shift = value / 2 semitones,
+    // see MidiFileGenerator.getPitchWheel) — a whole-tone (2 semitones) bend must emit value 4,
+    // NOT 8 (which would sound like a 2-tone/4-semitone bend).
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [{ duration: 1, notes: [{ string: 1, fret: 12, isBend: true, bendSemitones: 2 }] }],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{b (0 4)}.4 |");
   });
 
   it("renders a full bend curve as exact bend points", () => {
@@ -92,6 +106,6 @@ describe("tablatureToAlphaTex", () => {
       },
     ];
 
-    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{be (0 0 30 4 60 0)}.4 |");
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{be (0 0 30 2 60 0)}.4 |");
   });
 });

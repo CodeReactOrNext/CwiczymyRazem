@@ -23,6 +23,7 @@ export const AlphaTabScoreViewer = ({
   startTime,
   bpm,
   volume = 1,
+  isMetronomeMuted = false,
   className,
   hitNotes,
   missedNotes,
@@ -39,7 +40,6 @@ export const AlphaTabScoreViewer = ({
   useEffect(() => { volumeRef.current = volume; },       [volume]);
 
   const [isLooping,  setIsLooping]  = useState(false);
-  const [metronome,  setMetronome]  = useState(false);
 
   const {
     apiRef,
@@ -107,18 +107,20 @@ export const AlphaTabScoreViewer = ({
     if (apiRef.current && uiReady) apiRef.current.masterVolume = volume;
   }, [volume, uiReady]);
 
+  // ── Metronome: AlphaTab's own built-in click, driven by the session's mute
+  // toggle — the single metronome source while notation is shown (see
+  // useSessionAudio, which mutes the separate device-metronome click for this
+  // view) so the click can never drift from the notation playback's own clock.
+  useEffect(() => {
+    if (apiRef.current && uiReady) apiRef.current.metronomeVolume = isMetronomeMuted ? 0 : 1;
+  }, [isMetronomeMuted, uiReady]);
+
   // ── Extra controls ────────────────────────────────────────────────────────
   const handleLoopToggle = useCallback(() => {
     const next = !isLooping;
     if (apiRef.current) apiRef.current.isLooping = next;
     setIsLooping(next);
   }, [isLooping]);
-
-  const handleMetronomeToggle = useCallback(() => {
-    const next = !metronome;
-    if (apiRef.current) apiRef.current.metronomeVolume = next ? 1 : 0;
-    setMetronome(next);
-  }, [metronome]);
 
   return (
     <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
@@ -150,9 +152,7 @@ export const AlphaTabScoreViewer = ({
           uiReady={uiReady}
           uiPlaying={uiPlaying}
           isLooping={isLooping}
-          metronomeOn={metronome}
           onLoopToggle={handleLoopToggle}
-          onMetronomeToggle={handleMetronomeToggle}
         />
       </div>
     </div>
