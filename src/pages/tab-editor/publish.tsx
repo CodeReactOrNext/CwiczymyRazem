@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { createCommunityExercise, getCommunityExerciseById, updateCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
 import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
 import type { DifficultyLevel, ExerciseCategory, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
@@ -7,7 +8,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { AlertCircle, ArrowLeft, Check, ChevronDown, Globe, Lock, Plus, Trash2, X } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, Globe, Lock, Plus, Trash2, X } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
@@ -220,13 +221,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
           {/* Header */}
           <div className="space-y-4">
-            <button
-              onClick={() => router.push("/tab-editor")}
-              className="flex items-center gap-2 text-zinc-500 hover:text-white text-sm font-semibold transition-colors"
-            >
-              <ArrowLeft size={16} />
-              Back to Editor
-            </button>
+            <BackLink label="Back to Editor" onClick={() => router.push("/tab-editor")} />
             <div>
               <h1 className="text-3xl font-black tracking-tight text-white">{isEditing ? "Edit Exercise" : "Publish Exercise"}</h1>
               <p className="text-zinc-400 mt-1 text-sm leading-relaxed">

@@ -62,7 +62,7 @@ const PATHS: PathCard[] = [
     id: "exercises",
     path: "/profile/skills",
     icon: Dumbbell,
-    title: "Explore Exercises",
+    title: "Exercise Library",
     subtitle: `${EXERCISES_COUNT}+ exercises ready to play`,
     color: "amber",
   },

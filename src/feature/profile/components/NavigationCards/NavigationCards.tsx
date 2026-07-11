@@ -32,7 +32,7 @@ export const NavigationCards = () => {
             )}
           </div>
           <div>
-            <p className="text-base font-bold text-white">Start Practice</p>
+            <p className="text-base font-bold text-white">Practice</p>
             <p className="text-sm text-white/60">Choose your mode and begin today's session</p>
           </div>
         </div>

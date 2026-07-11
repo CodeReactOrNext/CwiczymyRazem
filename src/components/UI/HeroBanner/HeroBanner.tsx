@@ -11,6 +11,8 @@ interface HeroBannerProps {
   characterImage?: string;
   secondaryImage?: string;
   eyebrow?: string;
+  /** Replaces the eyebrow text with custom content (e.g. breadcrumbs). */
+  eyebrowContent?: ReactNode;
   eyebrowClassName?: string;
   onClick?: () => void;
   className?: string;
@@ -29,6 +31,7 @@ export const HeroBanner = ({
   characterImage,
   secondaryImage,
   eyebrow = "Daily practice",
+  eyebrowContent,
   eyebrowClassName = "text-orange-400/80",
   onClick,
   className = "",
@@ -102,10 +105,14 @@ export const HeroBanner = ({
         }`}
       >
         <div className="space-y-2 max-w-xl min-w-0 flex-1">
-          {eyebrow && (
-            <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
-              {eyebrow}
-            </p>
+          {eyebrowContent ? (
+            <div>{eyebrowContent}</div>
+          ) : (
+            eyebrow && (
+              <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
+                {eyebrow}
+              </p>
+            )
           )}
           <div className="inline-block !mb-4 md:!mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">

@@ -1,17 +1,12 @@
-import type { SidebarLinkInterface } from "components/RockSidebar";
 import { RockSidebar } from "components/RockSidebar";
-import { useTranslation } from "hooks/useTranslation";
-import { FileText,HelpCircle, Home, Music, Timer, Trophy } from "lucide-react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
-import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";
 import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {
-  navigation: LandingNavObjectInterface;
   userStats: StatisticsDataInterface;
   userName: string;
   userAvatar?: string;
@@ -22,7 +17,6 @@ interface LandingLayoutProps {
 }
 
 const MainLoggedLayout = ({
-  navigation,
   userStats,
   userName,
   userAvatar,
@@ -31,58 +25,6 @@ const MainLoggedLayout = ({
   variant,
   wide = false,
 }: LandingLayoutProps) => {
-  const { t } = useTranslation();
-
-  // Convert navigation to sidebar links
-  const sidebarLinks: SidebarLinkInterface[] = [
-    {
-      id: "profile" as NavPagesTypes,
-      name: (t as any)("nav.profile", "Profil"),
-      href: "/profile",
-      icon: <Home size={20} />,
-    },
-    {
-      id: "timer" as NavPagesTypes,
-      name: (t as any)("nav.practice", "Ćwicz"),
-      href: "/timer",
-      icon: <Timer size={20} />,
-    },
-    {
-      id: "report" as NavPagesTypes,
-      name: (t as any)("nav.report", "Raporty"),
-      href: "/report",
-      icon: <FileText size={20} />,
-    },
-    ...navigation.leftSideLinks.map((link) => ({
-      ...link,
-      icon:
-        link.name.toLowerCase().includes("utwory") ||
-        link.name.toLowerCase().includes("songs") ? (
-          <Music size={20} />
-        ) : link.name.toLowerCase().includes("leader") ? (
-          <Trophy size={20} />
-        ) : link.name.toLowerCase().includes("faq") ? (
-          <HelpCircle size={20} />
-        ) : (
-          <Home size={20} />
-        ),
-    })),
-    ...navigation.rightSideLinks.map((link) => ({
-      ...link,
-      icon:
-        link.name.toLowerCase().includes("utwory") ||
-        link.name.toLowerCase().includes("songs") ? (
-          <Music size={20} />
-        ) : link.name.toLowerCase().includes("leader") ? (
-          <Trophy size={20} />
-        ) : link.name.toLowerCase().includes("faq") ? (
-          <HelpCircle size={20} />
-        ) : (
-          <Home size={20} />
-        ),
-    })),
-  ];
-
   return (
     <main className='h-[100dvh] bg-zinc-950 font-sans overflow-hidden'>
       {/* Subtle background texture */}

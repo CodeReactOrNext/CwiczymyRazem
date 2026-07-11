@@ -1,4 +1,6 @@
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { PROGRESS_TABS } from "constants/navTabs";
 import { PracticeLogView } from "feature/practiceLog/view/PracticeLogView";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
@@ -20,6 +22,13 @@ const PracticeLogPage: NextPageWithLayout = () => {
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
       />
+      <div className="mb-6 px-4 md:px-6">
+        <PageTabs
+          tabs={PROGRESS_TABS}
+          activeHref="/practice-log"
+          ariaLabel="Progress sections"
+        />
+      </div>
       <PracticeLogView />
     </div>
   );

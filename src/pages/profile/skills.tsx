@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
@@ -27,7 +28,11 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
       <HeroBanner
         title="Skills"
         subtitle="Track and develop your guitar playing skills"
-        eyebrow="Skill Tree"
+        eyebrowContent={
+          <Breadcrumbs
+            items={[{ label: "Practice", href: "/timer" }, { label: "Skills" }]}
+          />
+        }
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />

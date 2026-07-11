@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner } from "components/UI/HeroBanner";
 import type {
   Exercise,
@@ -319,9 +320,16 @@ const GpTabsPage: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <HeroBanner
-        title="GP Tabs"
+        title="Guitar Pro Files"
         subtitle="Your Guitar Pro file library"
-        eyebrow="Practice Files"
+        eyebrowContent={
+          <Breadcrumbs
+            items={[
+              { label: "Practice", href: "/timer" },
+              { label: "Guitar Pro Files" },
+            ]}
+          />
+        }
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText="Upload File"
         onClick={() => fileInputRef.current?.click()}

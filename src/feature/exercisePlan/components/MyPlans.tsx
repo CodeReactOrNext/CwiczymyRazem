@@ -2,6 +2,16 @@
 import React from "react";
 import { Button } from "assets/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "assets/components/ui/alert-dialog";
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -34,6 +44,12 @@ import { deleteExercisePlan } from "feature/exercisePlan/services/deleteExercise
 import { logger } from "feature/logger/Logger";
 import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
+
+const getLocalizedTitle = (value: string | { en?: string; pl?: string } | undefined): string => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value.pl || value.en || '';
+};
 
 interface SectionHeaderProps {
   title: string;
@@ -170,9 +186,9 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     }
   };
 
-  const handleDeletePlan = async (planId: string) => {
-    if (!window.confirm(t("common:confirm_delete") as string)) return;
+  const [planPendingDelete, setPlanPendingDelete] = useState<ExercisePlan | null>(null);
 
+  const handleDeletePlan = async (planId: string) => {
     try {
       await deleteExercisePlan(planId);
       setPlans((prevPlans) => prevPlans.filter((p) => p.id !== planId));
@@ -180,6 +196,8 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     } catch (error) {
       logger.error(error, { context: "handleDeletePlan" });
       toast.error(t("common:error") as string);
+    } finally {
+      setPlanPendingDelete(null);
     }
   };
 
@@ -349,7 +367,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
                   onSelect={() => onPlanSelect(plan)}
                   onStart={() => onPlanSelect(plan)}
                   onEdit={() => setEditingPlan(plan)}
-                  onDelete={() => handleDeletePlan(plan.id)}
+                  onDelete={() => setPlanPendingDelete(plan)}
                   onTogglePublic={() => handleTogglePublic(plan.id)}
                 />
               ))}
@@ -359,7 +377,35 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       </Tabs>
   );
 
-  const modal = <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />;
+  const modal = (
+    <>
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <AlertDialog open={!!planPendingDelete} onOpenChange={(open) => !open && setPlanPendingDelete(null)}>
+        <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-zinc-50">Delete plan</AlertDialogTitle>
+            <AlertDialogDescription className="leading-relaxed text-zinc-400">
+              Are you sure you want to delete &quot;{getLocalizedTitle(planPendingDelete?.title)}&quot;? This can&apos;t be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                if (planPendingDelete) handleDeletePlan(planPendingDelete.id);
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-500"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 
   if (hideLayout) {
     return <>{<div className="px-3 md:px-6">{content}</div>}{modal}</>;

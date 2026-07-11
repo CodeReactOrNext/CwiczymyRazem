@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { HeroBanner } from "components/UI/HeroBanner";
 import roadmaps from "data/roadmaps";
@@ -143,7 +144,14 @@ const AiCoachView = () => {
       <HeroBanner
         title="Mastery Roadmaps"
         subtitle="Your personalized guitar mastery roadmaps."
-        eyebrow="AI Coach"
+        eyebrowContent={
+          <Breadcrumbs
+            items={[
+              { label: "Practice", href: "/timer" },
+              { label: "Mastery Roadmaps" },
+            ]}
+          />
+        }
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12">

@@ -1,11 +1,13 @@
 import { cn } from "assets/lib/utils";
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LIBRARY_TABS } from "constants/navTabs";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
+import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
@@ -138,11 +140,19 @@ const FavoritesPage: NextPageWithLayout = () => {
       <HeroBanner
         title="Favorites"
         subtitle="Your hearted plans, exercises and songs, all in one place"
-        eyebrow="My Favorites"
+        eyebrow="Favorites"
         eyebrowClassName="text-rose-400/80"
         backgroundContent={<HeroPattern withHeart />}
         className="mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]"
       />
+
+      <div className="px-3 md:px-6 lg:px-8">
+        <PageTabs
+          tabs={LIBRARY_TABS}
+          activeHref="/favorites"
+          ariaLabel="Library sections"
+        />
+      </div>
 
       <div className="space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8">
         {isEmpty ? (

@@ -1,4 +1,6 @@
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LIBRARY_TABS } from "constants/navTabs";
 import { MyPlans } from "feature/exercisePlan/components/MyPlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
@@ -23,7 +25,15 @@ const MyPlansPage: NextPageWithLayout = () => {
   // Show premium preview for non-premium users
   if (!isPremium && userInfo !== null) {
     return (
-      <PremiumFeaturePreview
+      <div className="flex min-h-screen flex-col">
+        <div className="px-4 pt-6 md:px-6">
+          <PageTabs
+            tabs={LIBRARY_TABS}
+            activeHref="/plans"
+            ariaLabel="Library sections"
+          />
+        </div>
+        <PremiumFeaturePreview
         eyebrow="Practice Plans"
         title="My Plans"
         description="Create and customize your own practice routines. Build structured practice plans from scratch or use templates, then execute them in focused practice sessions with progress tracking."
@@ -52,7 +62,8 @@ const MyPlansPage: NextPageWithLayout = () => {
         previewImagePath="/images/premium/my-plans.png"
         previewImageAlt="My Plans - Practice plan builder preview"
         availableIn="both"
-      />
+        />
+      </div>
     );
   }
 
@@ -68,6 +79,13 @@ const MyPlansPage: NextPageWithLayout = () => {
           buttonText="Create Plan"
           onClick={() => router.push('/plans/create')}
         />
+        <div className="mb-6 px-4 md:px-6">
+          <PageTabs
+            tabs={LIBRARY_TABS}
+            activeHref="/plans"
+            ariaLabel="Library sections"
+          />
+        </div>
         <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader />
       </div>
     </PremiumGate>

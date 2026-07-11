@@ -5,7 +5,9 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { PROGRESS_TABS } from "constants/navTabs";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
@@ -18,6 +20,7 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
+import Link from "next/link";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -58,6 +61,18 @@ const ProfileActivityPage = () => {
 
 
       <div className='p-4'>
+        <div className='mb-6 flex flex-wrap items-center gap-2'>
+          <PageTabs
+            tabs={PROGRESS_TABS}
+            activeHref='/profile/activity'
+            ariaLabel='Progress sections'
+          />
+          <Link
+            href='/scoring'
+            className='ml-auto rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+            How points work
+          </Link>
+        </div>
         <div className='font-openSans flex flex-col gap-6'>
 
           {/* 1. Overview stats with trends + radar + achievements */}
