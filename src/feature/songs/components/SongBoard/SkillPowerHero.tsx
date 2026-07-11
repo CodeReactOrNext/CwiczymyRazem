@@ -22,31 +22,41 @@ const formatPracticeTime = (ms: number) => {
   return `${minutes}m`;
 };
 
-const TierUnlockTrack = ({ learnedCount }: { learnedCount: number }) => (
-  <div className="flex w-24 flex-col items-center gap-1.5">
-    <div className="flex w-full items-center gap-1">
-      {Array.from({ length: MIN_LEARNED_SONGS_FOR_TIER }).map((_, index) => (
-        <div
-          key={index}
-          className={cn("h-1 flex-1 rounded-full", index < learnedCount ? "bg-cyan-400" : "bg-zinc-800")}
-        />
-      ))}
+const TierUnlockTrack = ({ learnedCount }: { learnedCount: number }) => {
+  const remaining = Math.max(0, MIN_LEARNED_SONGS_FOR_TIER - learnedCount);
+  return (
+    <div className="flex w-28 flex-col items-center gap-2">
+      <div className="flex w-full items-center gap-1">
+        {Array.from({ length: MIN_LEARNED_SONGS_FOR_TIER }).map((_, index) => (
+          <div
+            key={index}
+            className={cn("h-1.5 flex-1 rounded-full", index < learnedCount ? "bg-cyan-400" : "bg-zinc-800")}
+          />
+        ))}
+      </div>
+      <span className="text-center text-xs font-bold leading-tight text-zinc-300">
+        {learnedCount}/{MIN_LEARNED_SONGS_FOR_TIER} songs learned
+      </span>
+      <span className="text-center text-[11px] leading-tight text-zinc-500">
+        Master {remaining} more song{remaining === 1 ? "" : "s"} to reveal your tier
+      </span>
     </div>
-    <span className="text-center text-[9px] font-bold leading-tight text-zinc-500">
-      {learnedCount}/{MIN_LEARNED_SONGS_FOR_TIER} songs to unlock
-    </span>
-  </div>
-);
+  );
+};
 
 const NextTierHint = ({ nextTierProgress }: { nextTierProgress: NextTierProgress }) => {
   const nextTier = getSongTier(nextTierProgress.nextTier);
   return (
-    <div className="flex items-center gap-1.5 rounded bg-white/5 px-2 py-1">
-      <span className="text-[10px] font-bold text-zinc-500">
-        {nextTierProgress.songsNeeded} song{nextTierProgress.songsNeeded > 1 ? "s" : ""} to
+    <div className="flex flex-col items-center gap-1 rounded bg-white/5 px-3 py-1.5 text-center">
+      <span className="text-xs font-bold text-zinc-200">
+        {nextTierProgress.songsNeeded} more song{nextTierProgress.songsNeeded > 1 ? "s" : ""}
       </span>
-      <span className="text-[10px] font-black" style={{ color: nextTier.color }}>
-        {nextTier.label}
+      <span className="text-[11px] leading-tight text-zinc-500">
+        as hard as{" "}
+        <span className="font-black" style={{ color: nextTier.color }}>
+          {nextTier.label}
+        </span>{" "}
+        to level up
       </span>
     </div>
   );
@@ -133,7 +143,7 @@ export const SkillPowerHero = ({
                <TierUnlockTrack learnedCount={learnedCount} />
              ) : (
                <div className="flex flex-col items-center gap-2">
-                 <span className="text-[10px] font-bold tracking-wider text-zinc-500">Current tier</span>
+                 <span className="text-xs font-bold tracking-wider text-zinc-500">Current tier</span>
                  {nextTierProgress && <NextTierHint nextTierProgress={nextTierProgress} />}
                </div>
              )}
