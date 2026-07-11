@@ -34,6 +34,8 @@ const loadZoom = (): number => {
 interface TablatureSectionProps {
   activeTablature: TablatureMeasure[];
   rawGpFile?: File;
+  /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
+  baseTempo?: number;
   showAlphaTabScore: boolean;
   show3dHighway?: boolean;
   isAudioPlaying: boolean;
@@ -42,6 +44,7 @@ interface TablatureSectionProps {
   startTime: number | null;
   effectiveBpm: number;
   isAudioMuted: boolean;
+  isMetronomeMuted: boolean;
   isMetronomePlaying: boolean;
   countInRemaining: number;
   frequencyRef?: React.MutableRefObject<number>;
@@ -58,6 +61,7 @@ interface TablatureSectionProps {
 export const TablatureSection = memo(function TablatureSection({
   activeTablature,
   rawGpFile,
+  baseTempo,
   showAlphaTabScore,
   show3dHighway = false,
   isAudioPlaying,
@@ -66,6 +70,7 @@ export const TablatureSection = memo(function TablatureSection({
   startTime,
   effectiveBpm,
   isAudioMuted,
+  isMetronomeMuted,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -195,23 +200,46 @@ export const TablatureSection = memo(function TablatureSection({
   }, [tabResetKey]);
 
   const showMinimap = !showAlphaTabScore && !isExamMode && activeTablature.length > 3 && measureEndXs.length > 0;
+  const canShowAlphaTabScore = !!rawGpFile || activeTablature.length > 0;
+
+  // Once opened, keep AlphaTabScoreViewer mounted (just hidden) instead of tearing it down
+  // whenever the user flips back to the tab view. Fully unmounting/remounting the AlphaTab
+  // instance on every toggle raced its own async ready/teardown sequence — after a couple of
+  // rapid switches, playback silently stopped resuming. Hiding via CSS keeps the same
+  // AlphaTabApi instance alive, so toggling mid-playback is just a play()/stop() call, not a
+  // fresh load. Resets per exercise so we don't eagerly load notation the user never opens.
+  const [scoreEverShown, setScoreEverShown] = useState(showAlphaTabScore);
+  const [prevResetKey,   setPrevResetKey]   = useState(tabResetKey);
+  // Adjust state during render (React's documented pattern for "reset on prop change")
+  // rather than in an effect — avoids an extra render pass and the cascading-setState lint rule.
+  if (prevResetKey !== tabResetKey) {
+    setPrevResetKey(tabResetKey);
+    setScoreEverShown(showAlphaTabScore);
+  } else if (showAlphaTabScore && !scoreEverShown) {
+    setScoreEverShown(true);
+  }
 
   return (
     <div className="relative w-full mb-4 bg-[#0f0f12] rounded-lg">
-      {showAlphaTabScore && rawGpFile ? (
-        <AlphaTabScoreViewer
-          rawGpFile={rawGpFile}
-          measures={activeTablature}
-          mode="score"
-          isPlaying={isAudioPlaying}
-          startTime={startTime}
-          bpm={effectiveBpm}
-          volume={isAudioMuted ? 0 : 1}
-          className="w-full"
-          hitNotes={hitNotes}
-          missedNotes={missedNotes}
-        />
-      ) : (
+      {canShowAlphaTabScore && scoreEverShown && (
+        <div className={showAlphaTabScore ? undefined : "hidden"}>
+          <AlphaTabScoreViewer
+            rawGpFile={rawGpFile}
+            measures={activeTablature}
+            baseTempo={baseTempo}
+            mode="score"
+            isPlaying={isAudioPlaying && showAlphaTabScore}
+            startTime={startTime}
+            bpm={effectiveBpm}
+            volume={isAudioMuted ? 0 : 1}
+            isMetronomeMuted={isMetronomeMuted}
+            className="w-full"
+            hitNotes={hitNotes}
+            missedNotes={missedNotes}
+          />
+        </div>
+      )}
+      {!showAlphaTabScore && (
         <div className="px-2 pt-0">
           {showMinimap && (
             <TablatureMinimapBar

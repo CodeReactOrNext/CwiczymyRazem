@@ -33,6 +33,13 @@ interface UseMetronomeProps {
   maxBpm?: number;
   recommendedBpm?: number;
   isMuted?: boolean;
+  /**
+   * Mutes only the steady click *after* the count-in finishes (e.g. because another
+   * clock — AlphaTab's own built-in metronome — takes over once real playback starts).
+   * The count-in beeps themselves stay audible, since during count-in nothing else is
+   * playing yet to click in their place.
+   */
+  mutePlaybackClick?: boolean;
   speedMultiplier?: number;
   enabled?: boolean;
   onPlayStart?: () => void;
@@ -52,6 +59,7 @@ export const useMetronome = ({
   maxBpm = 208,
   recommendedBpm = 60,
   isMuted = false,
+  mutePlaybackClick = false,
   speedMultiplier = 1,
   enabled = true,
   onPlayStart,
@@ -78,6 +86,7 @@ export const useMetronome = ({
   const audioStartTimeRef    = useRef<number | null>(null);
   const beatCounterRef       = useRef<number>(0);
   const isMutedRef           = useRef(isMuted);
+  const mutePlaybackClickRef = useRef(mutePlaybackClick);
   const volumeRef            = useRef(volume);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef= useRef<number>(0);
@@ -101,6 +110,10 @@ export const useMetronome = ({
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
+
+  useEffect(() => {
+    mutePlaybackClickRef.current = mutePlaybackClick;
+  }, [mutePlaybackClick]);
 
   useEffect(() => {
     setBpm(initialBpm);
@@ -146,8 +159,8 @@ export const useMetronome = ({
    
   }, [enabled, externalAudioContext]);
 
-  const playSound = useCallback((time: number, isAccent: boolean = false) => {
-    if (!audioContextRef.current || isMutedRef.current) return;
+  const playSound = useCallback((time: number, isAccent: boolean = false, muted: boolean = false) => {
+    if (!audioContextRef.current || muted) return;
 
     const peak = 0.85 * volumeRef.current;
     if (peak <= 0.0001) return;
@@ -180,7 +193,10 @@ export const useMetronome = ({
 
     while (nextNoteTimeRef.current < ctx.currentTime + lookahead) {
       if (countInTargetRef.current > 0) {
-        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4);
+        // Count-in beeps stay audible even when `mutePlaybackClick` is set (e.g. AlphaTab
+        // notation is shown): AlphaTab itself hasn't started playing yet at this point
+        // (see PracticeSession's isAudioPlaying gate), so nothing else would click here.
+        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4, isMutedRef.current);
 
         const currentCount = countInTargetRef.current;
         setTimeout(() => setCountInRemaining(currentCount), 0);
@@ -209,7 +225,13 @@ export const useMetronome = ({
             setPlaybackAnchor({ wall, audio });
           }, 0);
         }
-        playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
+        // Once real playback has started, `mutePlaybackClick` hands the click over to
+        // another clock (e.g. AlphaTab's own built-in metronome) so the two can't drift.
+        playSound(
+          nextNoteTimeRef.current,
+          beatCounterRef.current % 4 === 0,
+          isMutedRef.current || mutePlaybackClickRef.current,
+        );
         beatCounterRef.current += 1;
       }
 
