@@ -1,10 +1,17 @@
 import * as alphaTabLib from "@coderline/alphatab";
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { useEffect, useRef, useState } from "react";
 
+import { tablatureToAlphaTex } from "./tablatureToAlphaTex";
 import type { Track } from "./types";
 
 interface UseAlphaTabApiOptions {
-  rawGpFile: File;
+  /** Real Guitar Pro file — takes priority when present. */
+  rawGpFile?: File;
+  /** Fallback for exercises with no Guitar Pro file: rendered via generated alphaTex. */
+  measures?: TablatureMeasure[];
+  /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
+  baseTempo?: number;
   mode: "score" | "tab";
   /** Ref — always current value of volume, safe to read inside async callbacks */
   volumeRef: React.MutableRefObject<number>;
@@ -32,6 +39,8 @@ interface UseAlphaTabApiReturn {
  */
 export function useAlphaTabApi({
   rawGpFile,
+  measures,
+  baseTempo = 120,
   mode,
   volumeRef,
   bpmRef,
@@ -52,6 +61,7 @@ export function useAlphaTabApi({
 
   useEffect(() => {
     if (!containerRef.current || !scrollRef.current || typeof window === "undefined") return;
+    if (!rawGpFile && (!measures || measures.length === 0)) return;
 
     const AlphaTabApi = (alphaTabLib as any).AlphaTabApi;
     if (!AlphaTabApi) return;
@@ -138,9 +148,15 @@ export function useAlphaTabApi({
       setCurrentMs(0);
     });
 
-    rawGpFile.arrayBuffer().then((buf) => {
-      if (apiRef.current === api) api.load(new Uint8Array(buf));
-    });
+    if (rawGpFile) {
+      rawGpFile.arrayBuffer().then((buf) => {
+        if (apiRef.current === api) api.load(new Uint8Array(buf));
+      });
+    } else if (measures && measures.length > 0) {
+      // No Guitar Pro file (built-in exercises never ship one) — render the score from
+      // our own tablature format by converting it to alphaTex instead of api.load().
+      api.tex(tablatureToAlphaTex(measures, baseTempo));
+    }
 
     return () => {
       try { api.stop();    } catch { /* ignore */ }
@@ -149,7 +165,7 @@ export function useAlphaTabApi({
       scoreRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawGpFile, mode]);
+  }, [rawGpFile, measures, mode]);
 
   const handleTrackSelect = (idx: number) => {
     const score = scoreRef.current;

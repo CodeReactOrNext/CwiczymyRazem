@@ -34,6 +34,8 @@ const loadZoom = (): number => {
 interface TablatureSectionProps {
   activeTablature: TablatureMeasure[];
   rawGpFile?: File;
+  /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
+  baseTempo?: number;
   showAlphaTabScore: boolean;
   show3dHighway?: boolean;
   isAudioPlaying: boolean;
@@ -58,6 +60,7 @@ interface TablatureSectionProps {
 export const TablatureSection = memo(function TablatureSection({
   activeTablature,
   rawGpFile,
+  baseTempo,
   showAlphaTabScore,
   show3dHighway = false,
   isAudioPlaying,
@@ -195,13 +198,15 @@ export const TablatureSection = memo(function TablatureSection({
   }, [tabResetKey]);
 
   const showMinimap = !showAlphaTabScore && !isExamMode && activeTablature.length > 3 && measureEndXs.length > 0;
+  const canShowAlphaTabScore = !!rawGpFile || activeTablature.length > 0;
 
   return (
     <div className="relative w-full mb-4 bg-[#0f0f12] rounded-lg">
-      {showAlphaTabScore && rawGpFile ? (
+      {showAlphaTabScore && canShowAlphaTabScore ? (
         <AlphaTabScoreViewer
           rawGpFile={rawGpFile}
           measures={activeTablature}
+          baseTempo={baseTempo}
           mode="score"
           isPlaying={isAudioPlaying}
           startTime={startTime}

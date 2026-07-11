@@ -6,9 +6,13 @@ export interface Track {
 import type { TablatureMeasure } from "../../../../types/exercise.types";
 
 export interface AlphaTabScoreViewerProps {
-  rawGpFile: File;
-  /** Parsed session tablature — maps scoring hit/miss keys to fret numbers for colouring. */
+  /** Real Guitar Pro file. When absent, `measures` is converted to alphaTex and rendered instead. */
+  rawGpFile?: File;
+  /** Session tablature — maps scoring hit/miss keys to fret numbers for colouring, and (when
+   *  there's no rawGpFile) is the source rendered via the alphaTex converter. */
   measures?: TablatureMeasure[];
+  /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
+  baseTempo?: number;
   /** "score" = standard notation, "tab" = guitar tablature */
   mode?: "score" | "tab";
   /** True only after count-in — mirrors session's isAudioPlaying */

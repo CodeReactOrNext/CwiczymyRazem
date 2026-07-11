@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { describe, expect, it } from "vitest";
 
 import { tablatureToAlphaTex } from "./tablatureToAlphaTex";
 
@@ -16,7 +15,8 @@ describe("tablatureToAlphaTex", () => {
       },
     ];
 
-    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 3.3.4 5.2.4 |");
+    // Our string 3 / string 2 (1 = high E) flip to alphaTex's 1 = low E convention: 4 / 5.
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 3.4.4 5.5.4 |");
   });
 
   it("only re-emits \\ts when the time signature actually changes", () => {
@@ -27,7 +27,7 @@ describe("tablatureToAlphaTex", () => {
     ];
 
     expect(tablatureToAlphaTex(measures, 100)).toBe(
-      "\\tempo 100 \\ts 4 4 0.1.4 |\n1.1.4 |\n\\ts 3 4 2.1.4 |",
+      "\\tempo 100 \\ts 4 4 0.6.4 |\n1.6.4 |\n\\ts 3 4 2.6.4 |",
     );
   });
 
@@ -41,7 +41,7 @@ describe("tablatureToAlphaTex", () => {
       },
     ];
 
-    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 0.1.4 |\n\\tempo 60 0.1.4 |");
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 0.6.4 |\n\\tempo 60 0.6.4 |");
   });
 
   it("maps rests, chords, durations and playing techniques", () => {
@@ -65,7 +65,7 @@ describe("tablatureToAlphaTex", () => {
     ];
 
     expect(tablatureToAlphaTex(measures, 120)).toBe(
-      "\\tempo 120 \\ts 4 4 r.8 (5.3{h} 5.2).16 0.6{x}.4 12.1{b (0 4)}.2 7.1{pm v}.4 |",
+      "\\tempo 120 \\ts 4 4 r.8 (5.4{h} 5.5).16 0.1{x}.4 12.6{b (0 4)}.2 7.6{pm v}.4 |",
     );
   });
 
@@ -92,6 +92,6 @@ describe("tablatureToAlphaTex", () => {
       },
     ];
 
-    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{be (0 0 30 4 60 0)}.4 |");
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.6{be (0 0 30 4 60 0)}.4 |");
   });
 });
