@@ -72,7 +72,7 @@ export type LogActivityType =
   | "exercisePlan"
   | "exercise";
 
-/** Classifies a log entry into a coarse activity type used for feed grouping and Fame rewards. */
+/** Classifies a log entry into a coarse activity type used for rendering and Fame rewards. */
 export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsSongs(log)) return "song";
   if (isFirebaseLogsTopPlayers(log)) return "topPlayers";
@@ -84,24 +84,33 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";
 };
 
+/** Coarser grouping category: case openings and marketplace listings are both guitar-arsenal
+ * activity, so they're bucketed together in the feed even though they render differently. */
+export type LogGroupType = Exclude<LogActivityType, "caseOpen" | "marketplace"> | "arsenal";
+
+export const getLogGroupType = (log: AnyFirebaseLog): LogGroupType => {
+  const type = getLogActivityType(log);
+  return type === "caseOpen" || type === "marketplace" ? "arsenal" : type;
+};
+
 const getLogUid = (log: AnyFirebaseLog): string | undefined => (log as { uid?: string }).uid;
 
 export interface LogGroup<T extends AnyFirebaseLog = AnyFirebaseLog> {
-  type: LogActivityType;
+  type: LogGroupType;
   uid?: string;
   logs: T[];
 }
 
 /**
- * Groups consecutive logs of the same activity type performed by the same user into a single
- * visual group. A different activity type or a different user's log breaks the group — logs
- * that have no owning user (e.g. season top-players digests) are never grouped together.
+ * Groups consecutive logs of the same activity category performed by the same user into a single
+ * visual group. A different category or a different user's log breaks the group — logs that have
+ * no owning user (e.g. season top-players digests) are never grouped together.
  */
 export const groupConsecutiveLogs = <T extends AnyFirebaseLog>(logs: T[]): LogGroup<T>[] => {
   const groups: LogGroup<T>[] = [];
 
   for (const log of logs) {
-    const type = getLogActivityType(log);
+    const type = getLogGroupType(log);
     const uid = getLogUid(log);
     const previousGroup = groups[groups.length - 1];
 
