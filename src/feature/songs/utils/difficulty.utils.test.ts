@@ -10,6 +10,14 @@ import {
 
 const song = (avgDifficulty: number) => ({ avgDifficulty });
 
+const TIER_MIN_DIFFICULTY: Record<string, number> = {
+  D: 0,
+  C: 4,
+  B: 6,
+  A: 7.5,
+  S: 9,
+};
+
 describe("getGatedSkillPower", () => {
   it("hides the tier (returns 0) below MIN_LEARNED_SONGS_FOR_TIER", () => {
     // Single A-tier song shouldn't be enough to claim an A-tier — the
@@ -50,20 +58,16 @@ describe("getSongsUntilNextTier", () => {
     for (let i = 0; i < progress!.songsNeeded; i++) {
       simulated.push(song(TIER_MIN_DIFFICULTY[progress!.nextTier]));
     }
-    expect(getTierFromDifficulty(calculateSkillPower(simulated))).toBe(progress!.nextTier);
+    expect(getTierFromDifficulty(calculateSkillPower(simulated))).toBe(
+      progress!.nextTier,
+    );
 
     // One fewer song must NOT be enough — songsNeeded should be the minimum.
     if (progress!.songsNeeded > 1) {
       simulated.pop();
-      expect(getTierFromDifficulty(calculateSkillPower(simulated))).not.toBe(progress!.nextTier);
+      expect(getTierFromDifficulty(calculateSkillPower(simulated))).not.toBe(
+        progress!.nextTier,
+      );
     }
   });
 });
-
-const TIER_MIN_DIFFICULTY: Record<string, number> = {
-  D: 0,
-  C: 4,
-  B: 6,
-  A: 7.5,
-  S: 9,
-};

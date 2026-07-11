@@ -2,7 +2,9 @@ interface DifficultyRating {
   rating: number;
 }
 
-export const calculateAverageDifficulty = (difficulties: DifficultyRating[]): number => {
+export const calculateAverageDifficulty = (
+  difficulties: DifficultyRating[],
+): number => {
   if (!difficulties?.length) return 0;
   return (
     difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
@@ -31,9 +33,11 @@ export const MIN_LEARNED_SONGS_FOR_TIER = 5;
  *
  * Formula: [ Sum(Top10_Difficulty_i * Weight_i) / Sum(Weights) ] + (TotalSongs * 0.02)
  */
-export const calculateSkillPower = (learnedSongs: { avgDifficulty?: number }[]): number => {
+export const calculateSkillPower = (
+  learnedSongs: { avgDifficulty?: number }[],
+): number => {
   const songsWithDifficulty = learnedSongs
-    .filter(s => (s.avgDifficulty || 0) > 0)
+    .filter((s) => (s.avgDifficulty || 0) > 0)
     .sort((a, b) => (b.avgDifficulty || 0) - (a.avgDifficulty || 0));
 
   if (songsWithDifficulty.length === 0) return 0;
@@ -75,7 +79,9 @@ export const calculateSkillPower = (learnedSongs: { avgDifficulty?: number }[]):
  * Skill power gated behind MIN_LEARNED_SONGS_FOR_TIER — below that, a tier
  * shouldn't be shown yet (see calculateSkillPower for the raw formula).
  */
-export const getGatedSkillPower = (learnedSongs: { avgDifficulty?: number }[]): number => {
+export const getGatedSkillPower = (
+  learnedSongs: { avgDifficulty?: number }[],
+): number => {
   if (learnedSongs.length < MIN_LEARNED_SONGS_FOR_TIER) return 0;
   return calculateSkillPower(learnedSongs);
 };
@@ -101,20 +107,24 @@ export interface NextTierProgress {
  * the answer guaranteed consistent with the real formula instead of guessing.
  */
 export const getSongsUntilNextTier = (
-  learnedSongs: { avgDifficulty?: number }[]
+  learnedSongs: { avgDifficulty?: number }[],
 ): NextTierProgress | null => {
   if (learnedSongs.length < MIN_LEARNED_SONGS_FOR_TIER) return null;
 
   const currentTier = getTierFromDifficulty(calculateSkillPower(learnedSongs));
   const currentIndex = TIER_THRESHOLDS.findIndex((t) => t.tier === currentTier);
-  if (currentIndex === -1 || currentIndex === TIER_THRESHOLDS.length - 1) return null;
+  if (currentIndex === -1 || currentIndex === TIER_THRESHOLDS.length - 1)
+    return null;
 
   const nextTier = TIER_THRESHOLDS[currentIndex + 1];
   const simulatedSongs = [...learnedSongs];
 
   for (let songsAdded = 1; songsAdded <= MAX_SIMULATED_SONGS; songsAdded++) {
     simulatedSongs.push({ avgDifficulty: nextTier.minDifficulty });
-    if (getTierFromDifficulty(calculateSkillPower(simulatedSongs)) === nextTier.tier) {
+    if (
+      getTierFromDifficulty(calculateSkillPower(simulatedSongs)) ===
+      nextTier.tier
+    ) {
       return { nextTier: nextTier.tier, songsNeeded: songsAdded };
     }
   }
