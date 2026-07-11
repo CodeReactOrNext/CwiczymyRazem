@@ -119,7 +119,6 @@ export function useAlphaTabApi({
     api.playerReady.on(() => {
       // volumeRef.current is always the latest value — no closure staleness
       api.masterVolume    = volumeRef.current;
-      api.metronomeVolume = 0;
       api.isLooping       = false;
       api.playbackSpeed   = bpmRef.current / (origBpmRef.current || 120);
 

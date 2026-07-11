@@ -1,5 +1,4 @@
 import { cn } from "assets/lib/utils";
-import { FaMusic } from "react-icons/fa";
 
 function formatTime(ms: number): string {
   const s = Math.floor(ms / 1000);
@@ -12,14 +11,12 @@ interface ScoreControlsProps {
   uiReady: boolean;
   uiPlaying: boolean;
   isLooping: boolean;
-  metronomeOn: boolean;
   onLoopToggle: () => void;
-  onMetronomeToggle: () => void;
 }
 
 /**
- * Progress bar + supplementary controls (loop, metronome).
- * Play/pause/BPM/speed are intentionally absent — those live in the session UI.
+ * Progress bar + supplementary controls (loop).
+ * Play/pause/BPM/speed/metronome are intentionally absent — those live in the session UI.
  */
 export const ScoreControls = ({
   currentMs,
@@ -27,9 +24,7 @@ export const ScoreControls = ({
   uiReady,
   uiPlaying,
   isLooping,
-  metronomeOn,
   onLoopToggle,
-  onMetronomeToggle,
 }: ScoreControlsProps) => {
   const progress = totalMs > 0 ? (currentMs / totalMs) * 100 : 0;
 
@@ -73,19 +68,6 @@ export const ScoreControls = ({
           )}
         >
           ↻
-        </button>
-
-        {/* Metronome */}
-        <button
-          onClick={onMetronomeToggle}
-          disabled={!uiReady}
-          title="Metronom"
-          className={cn(
-            "flex h-6 w-6 items-center justify-center rounded transition-colors disabled:opacity-40",
-            metronomeOn ? "bg-blue-600 text-white" : "bg-zinc-700 text-zinc-400 hover:bg-zinc-600",
-          )}
-        >
-          <FaMusic size={8} />
         </button>
       </div>
     </>

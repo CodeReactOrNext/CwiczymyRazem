@@ -17,21 +17,23 @@ function toDurationCode(duration: number): number {
   );
 }
 
-// AlphaTab bend points: offset is 0..60 across the note, value is 0..~12 in quarter-tone
-// units (25 cents each) — matches the Guitar Pro bend point encoding.
+// AlphaTab bend points: offset is 0..60 across the note. `value` is in half-semitone
+// (50 cents) units — confirmed against MidiFileGenerator.getPitchWheel, which derives the
+// actual playback pitch shift as `value / 2` semitones. Using 25-cents-per-unit (as if
+// `value` matched a semitone directly at *4) doubles every bend audibly.
 function bendEffect(note: TablatureNote): string | null {
   if (note.bendCurve && note.bendCurve.length > 0) {
     const points = note.bendCurve
       .map((point) => {
         const offset = Math.max(0, Math.min(60, Math.round(point.position * 60)));
-        const value = Math.max(0, Math.round(point.cents / 25));
+        const value = Math.max(0, Math.round(point.cents / 50));
         return `${offset} ${value}`;
       })
       .join(" ");
     return `be (${points})`;
   }
   if (note.isBend || note.bendSemitones || note.isPreBend || note.isRelease) {
-    const units = Math.max(1, Math.round((note.bendSemitones ?? 1) * 4));
+    const units = Math.max(1, Math.round((note.bendSemitones ?? 1) * 2));
     if (note.isPreBend && note.isRelease) return `b (${units} ${units} 0)`;
     if (note.isPreBend) return `b (${units} ${units})`;
     if (note.isRelease) return `b (${units} 0)`;

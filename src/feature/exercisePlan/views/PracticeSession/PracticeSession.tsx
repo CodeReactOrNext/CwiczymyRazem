@@ -175,7 +175,14 @@ export const PracticeSession = ({
     minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
     maxBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.max,
     recommendedBpm: lockedExamBpm ?? activeExercise.metronomeSpeed?.recommended,
-    isMuted:        isMetronomeMuted || audioSystem.isActive,
+    // While notation is shown, AlphaTab's own built-in metronome click is the single
+    // source of truth (see AlphaTabScoreViewer) — it's driven by the exact same clock
+    // as the notation playback, so it can't drift from it the way this separate
+    // device-metronome click (a different audio clock entirely) otherwise could.
+    // Keep this metronome's *scheduling* (bpm, startTime, count-in) running as-is —
+    // only its audible click is muted — so the rest of the session (timer, tab-view
+    // cursor, etc.) still ticks off the same shared clock as before.
+    isMuted:        isMetronomeMuted || audioSystem.isActive || showAlphaTabScore,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
