@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { Music } from "lucide-react";
@@ -31,7 +31,7 @@ export const SongSkillShowcase = ({
       return { skillPower: 0, playerTier: null, tierGroups: [] };
     }
 
-    const skillPower = calculateSkillPower(userSongs.learned);
+    const skillPower = getGatedSkillPower(userSongs.learned);
     const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
 
     const sortedLearned = [...userSongs.learned]
