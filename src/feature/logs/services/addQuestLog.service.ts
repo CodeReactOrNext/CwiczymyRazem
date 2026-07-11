@@ -40,7 +40,7 @@ export const firebaseAddQuestLog = async (uid: string) => {
         embeds: [{
           author: {
             name: userName,
-            url: `https://www.riff.quest/user/${uid}`,
+            url: `https://riff.quest/user/${uid}`,
             ...(avatarUrl && { icon_url: avatarUrl }),
           },
           title: "🌟 Daily Quests Completed!",
