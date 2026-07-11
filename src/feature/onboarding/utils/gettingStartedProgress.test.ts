@@ -9,6 +9,7 @@ describe("getGettingStartedProgress", () => {
       quest: undefined,
       sessionCount: 0,
       guitarCount: 0,
+      songCount: 0,
     });
 
     expect(progress.isVisible).toBe(true);
@@ -21,10 +22,24 @@ describe("getGettingStartedProgress", () => {
       quest: GETTING_STARTED_QUEST_DEFAULTS,
       sessionCount: 1,
       guitarCount: 0,
+      songCount: 0,
     });
 
     const firstExercise = progress.steps.find((s) => s.id === "first_exercise");
     expect(firstExercise?.isDone).toBe(true);
+    expect(progress.allStepsDone).toBe(false);
+  });
+
+  it("derives the first-song step from song count", () => {
+    const progress = getGettingStartedProgress({
+      quest: GETTING_STARTED_QUEST_DEFAULTS,
+      sessionCount: 0,
+      guitarCount: 0,
+      songCount: 1,
+    });
+
+    const firstSong = progress.steps.find((s) => s.id === "first_song");
+    expect(firstSong?.isDone).toBe(true);
     expect(progress.allStepsDone).toBe(false);
   });
 
@@ -39,6 +54,7 @@ describe("getGettingStartedProgress", () => {
       },
       sessionCount: 3,
       guitarCount: 0,
+      songCount: 2,
     });
 
     expect(progress.allStepsDone).toBe(true);
@@ -56,6 +72,7 @@ describe("getGettingStartedProgress", () => {
       },
       sessionCount: 3,
       guitarCount: 1,
+      songCount: 2,
     });
 
     expect(progress.isFullyComplete).toBe(true);
@@ -67,6 +84,7 @@ describe("getGettingStartedProgress", () => {
       quest: { ...GETTING_STARTED_QUEST_DEFAULTS, dismissed: true },
       sessionCount: 0,
       guitarCount: 0,
+      songCount: 0,
     });
 
     expect(progress.isVisible).toBe(false);

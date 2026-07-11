@@ -18,8 +18,8 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 font-openSans  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
+      "font-openSans fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className,
     )}
     {...props}
   />
@@ -31,25 +31,34 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     /** Extra classes for the backdrop, e.g. a z-index bump when the dialog must sit above a full-screen modal. */
     overlayClassName?: string;
+    /** Skip the default close button, e.g. when the caller renders its own. */
+    hideCloseButton?: boolean;
   }
->(({ className, overlayClassName, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay className={overlayClassName} />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed left-0 top-0 z-50 grid w-full h-[100dvh] overflow-y-auto gap-4 border bg-background p-6 font-openSans shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:left-[50%] sm:top-[50%] sm:h-auto sm:overflow-visible sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg",
-        className
-      )}
-      {...props}>
-      {children}
-      <DialogPrimitive.Close className='absolute right-4 top-4 z-[100] rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-md outline-none transition-all hover:bg-black/80 hover:text-white focus:ring-2 focus:ring-cyan-500/50 sm:right-6 sm:top-6'>
-        <X className='h-5 w-5' />
-        <span className='sr-only'>Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-));
+>(
+  (
+    { className, overlayClassName, hideCloseButton, children, ...props },
+    ref,
+  ) => (
+    <DialogPortal>
+      <DialogOverlay className={overlayClassName} />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "font-openSans fixed left-0 top-0 z-50 grid h-[100dvh] w-full gap-4 overflow-y-auto border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:left-[50%] sm:top-[50%] sm:h-auto sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-visible sm:rounded-lg",
+          className,
+        )}
+        {...props}>
+        {children}
+        {!hideCloseButton && (
+          <DialogPrimitive.Close className='absolute right-4 top-4 z-[100] rounded-full bg-black/50 p-2 text-white/70 outline-none backdrop-blur-md transition-all focus:ring-2 focus:ring-cyan-500/50 hover:bg-black/80 hover:text-white sm:right-6 sm:top-6'>
+            <X className='h-5 w-5' />
+            <span className='sr-only'>Close</span>
+          </DialogPrimitive.Close>
+        )}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  ),
+);
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
@@ -58,8 +67,8 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-1.5  text-center font-openSans sm:text-left",
-      className
+      "font-openSans flex flex-col space-y-1.5 text-center sm:text-left",
+      className,
     )}
     {...props}
   />
@@ -73,7 +82,7 @@ const DialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
@@ -88,7 +97,7 @@ const DialogTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "font-openSans text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />
