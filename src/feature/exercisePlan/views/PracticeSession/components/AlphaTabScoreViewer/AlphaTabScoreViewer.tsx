@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { useCallback,useEffect, useRef, useState } from "react";
 
-import { ScoreControls, SPEEDS } from "./ScoreControls";
+import { ScoreControls } from "./ScoreControls";
 import { TrackSelector } from "./TrackSelector";
 import type { AlphaTabScoreViewerProps } from "./types";
 import { useAlphaTabApi } from "./useAlphaTabApi";
@@ -31,7 +31,6 @@ export const AlphaTabScoreViewer = ({
   // Refs kept in sync so AT callbacks always read the latest values
   const origBpmRef         = useRef(120);
   const bpmRef             = useRef(bpm);
-  const speedMultiplierRef = useRef(1);
   const volumeRef          = useRef(volume);
   // Guards api.stop() — AlphaSynth throws if stopped before it has ever played.
   const hasStartedRef      = useRef(false);
@@ -41,7 +40,6 @@ export const AlphaTabScoreViewer = ({
 
   const [isLooping,  setIsLooping]  = useState(false);
   const [metronome,  setMetronome]  = useState(false);
-  const [speedIdx,   setSpeedIdx]   = useState<number>(SPEEDS.indexOf(1));
 
   const {
     apiRef,
@@ -62,7 +60,6 @@ export const AlphaTabScoreViewer = ({
     volumeRef,
     bpmRef,
     origBpmRef,
-    speedMultiplierRef,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.
@@ -96,12 +93,9 @@ export const AlphaTabScoreViewer = ({
   }, [isPlaying, startTime, uiReady]);
 
   // ── BPM: update speed without restarting playback ────────────────────────
-  // BUG-FIX: always combine session BPM ratio with the user's speed multiplier
-  // so neither source overwrites the other.
   useEffect(() => {
     if (apiRef.current && uiReady) {
-      apiRef.current.playbackSpeed =
-        (bpm / (origBpmRef.current || 120)) * speedMultiplierRef.current;
+      apiRef.current.playbackSpeed = bpm / (origBpmRef.current || 120);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bpm, uiReady]);
@@ -125,18 +119,6 @@ export const AlphaTabScoreViewer = ({
     if (apiRef.current) apiRef.current.metronomeVolume = next ? 1 : 0;
     setMetronome(next);
   }, [metronome]);
-
-  // BUG-FIX: speed buttons now compound with session BPM instead of
-  // overwriting it — both use the same (bpmRatio × multiplier) formula.
-  const handleSpeedChange = useCallback((dir: 1 | -1) => {
-    const next = Math.max(0, Math.min(SPEEDS.length - 1, speedIdx + dir));
-    speedMultiplierRef.current = SPEEDS[next];
-    if (apiRef.current && uiReady) {
-      apiRef.current.playbackSpeed =
-        (bpmRef.current / (origBpmRef.current || 120)) * SPEEDS[next];
-    }
-    setSpeedIdx(next);
-  }, [speedIdx, uiReady]);
 
   return (
     <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
@@ -169,10 +151,8 @@ export const AlphaTabScoreViewer = ({
           uiPlaying={uiPlaying}
           isLooping={isLooping}
           metronomeOn={metronome}
-          speedIdx={speedIdx}
           onLoopToggle={handleLoopToggle}
           onMetronomeToggle={handleMetronomeToggle}
-          onSpeedChange={handleSpeedChange}
         />
       </div>
     </div>

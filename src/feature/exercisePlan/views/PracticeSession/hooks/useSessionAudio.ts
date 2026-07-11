@@ -152,10 +152,13 @@ export function useSessionAudio({
 
   useEffect(() => { loopsCompletedRef.current = 0; }, [currentExerciseId]);
 
+  // Disabled whenever the AlphaTab score/notation view is shown — that view owns
+  // its own synth (either the GP file's or a generated-alphaTex render of the same
+  // tablature), so leaving this custom synth running too would double up the audio.
   const { soundfontsReady, schedulerTickRef: tabSchedulerTickRef } = useTablatureAudio({
     tracks:     audioTracks,
     bpm:        effectiveBpm,
-    isPlaying:  !effectiveRawGpFile && isAudioPlaying,
+    isPlaying:  !effectiveRawGpFile && !showAlphaTabScore && isAudioPlaying,
     startTime:  metronomeStartTime,
     onLoopComplete: () => {
       setHasPlayedRiddleOnce(true);
@@ -170,7 +173,7 @@ export function useSessionAudio({
     },
     audioContext:   metronomeAudioContext,
     audioStartTime: effectiveAudioStartTime,
-    disabled:       !!effectiveRawGpFile,
+    disabled:       !!effectiveRawGpFile || showAlphaTabScore,
     repeatCount:    tabRepeatCount,
     tuningOffsets,
   });
