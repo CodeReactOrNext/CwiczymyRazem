@@ -10,6 +10,8 @@ import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
+import type { LastSessionInfo } from "feature/practice/utils/lastSession";
+import { loadLastSession } from "feature/practice/utils/lastSession";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { getTrendData } from "feature/profile/utils/getTrendData";
@@ -17,7 +19,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -40,10 +42,15 @@ const ProfileLandingLayout = ({
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading, reportList } = useActivityLog(userAuth);
   const [songs, setSongs] = useState<{ wantToLearn: Song[]; learning: Song[]; learned: Song[] }>();
+  const [lastSession, setLastSession] = useState<LastSessionInfo | null>(null);
 
   useEffect(() => {
     getUserSongs(userAuth).then((s) => setSongs(s));
   }, [userAuth]);
+
+  useEffect(() => {
+    setLastSession(loadLastSession());
+  }, []);
 
   const todayStr = new Date().toDateString();
   const lastReportDate = userStats?.lastReportDate ? new Date(userStats.lastReportDate).toDateString() : null;
@@ -139,29 +146,49 @@ const ProfileLandingLayout = ({
                 onClick={() => router.push("/timer")}
                 className="group/btn rounded-[8px] bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
               >
-                Start practice
+                Practice
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
               </button>
             </div>
-            {(userStats?.fame ?? 0) >= 30 && (
+            {lastSession && (
               <button
-                onClick={() => router.push("/arsenal")}
-                className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-900 hover:bg-zinc-800 text-amber-300 px-4 py-2 text-sm font-normal transition-all duration-300 active:scale-95"
+                onClick={() => router.push(lastSession.href)}
+                className="group/last flex w-fit max-w-full items-center gap-2 rounded-[8px] bg-zinc-900 hover:bg-zinc-800 px-4 py-2 text-sm text-zinc-300 transition-all duration-300 active:scale-95"
               >
-                <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
-                {/* Mobile: compact */}
-                <AnimatedNumber value={userStats.fame ?? 0} className="md:hidden text-amber-300 font-bold" />
-                <span className="md:hidden text-amber-300/70 text-xs">pts</span>
-                <span className="md:hidden text-amber-300/40 text-xs">·</span>
-                <span className="md:hidden text-amber-300">Arsenal</span>
-                {/* Desktop: full */}
-                <span className="hidden md:inline text-amber-300">
-                  {(userStats.fame ?? 0).toLocaleString()} Fame Points
-                </span>
-                <span className="hidden md:inline text-amber-300/40 text-xs">·</span>
-                <span className="hidden md:inline text-amber-300">Spend in Arsenal</span>
-                <ArrowRight className="h-3.5 w-3.5 text-amber-300 transition-transform duration-300 group-hover/fame:translate-x-0.5 shrink-0" />
+                <History className="h-4 w-4 shrink-0 text-zinc-500" />
+                <span className="text-zinc-500">Last session:</span>
+                <span className="truncate font-semibold text-zinc-200">{lastSession.title}</span>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-zinc-500 transition-transform duration-300 group-hover/last:translate-x-0.5" />
               </button>
+            )}
+            {(userStats?.fame ?? 0) >= 30 && (
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => router.push("/arsenal")}
+                      className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-900 hover:bg-zinc-800 text-amber-300 px-4 py-2 text-sm font-normal transition-all duration-300 active:scale-95"
+                    >
+                      <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
+                      {/* Mobile: compact */}
+                      <AnimatedNumber value={userStats.fame ?? 0} className="md:hidden text-amber-300 font-bold" />
+                      <span className="md:hidden text-amber-300/70 text-xs">pts</span>
+                      <span className="md:hidden text-amber-300/40 text-xs">·</span>
+                      <span className="md:hidden text-amber-300">Arsenal</span>
+                      {/* Desktop: full */}
+                      <span className="hidden md:inline text-amber-300">
+                        {(userStats.fame ?? 0).toLocaleString()} Fame Points
+                      </span>
+                      <span className="hidden md:inline text-amber-300/40 text-xs">·</span>
+                      <span className="hidden md:inline text-amber-300">Arsenal</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-amber-300 transition-transform duration-300 group-hover/fame:translate-x-0.5 shrink-0" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[200px] text-center">
+                    <p>Fame points are awarded for likes received and community activity — spend them in the Arsenal.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
         }

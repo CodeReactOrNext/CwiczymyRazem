@@ -1,10 +1,13 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LEADERBOARD_TABS } from "constants/navTabs";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import type { LeaderboardViewType } from "feature/leadboard/hooks/useLeaderboard";
 import { useTranslation } from "hooks/useTranslation";
+import Link from "next/link";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
@@ -50,6 +53,11 @@ export const LeadboardLayout = ({
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const isSeasonalView = view === "seasonal";
   const isGearView = view === "gear";
+  const activeTabHref = isSeasonalView
+    ? "/seasons"
+    : isGearView
+    ? "/leaderboard/gear"
+    : "/leaderboard";
 
   const currentSeason = seasons.find(s => s.seasonId === selectedSeason) as SeasonDataInterface | undefined;
   const formatDate = (dateStr?: string) => {
@@ -108,16 +116,29 @@ export const LeadboardLayout = ({
       )}
 
       <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
-        <div className='flex flex-wrap items-center gap-6 mb-8'>
-          {isSeasonalView && (
+        <div className='flex flex-wrap items-center gap-2 mb-8'>
+          <PageTabs
+            tabs={LEADERBOARD_TABS}
+            activeHref={activeTabHref}
+            ariaLabel='Leaderboard sections'
+          />
+          <Link
+            href='/scoring'
+            className='ml-auto rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+            How points work
+          </Link>
+        </div>
+
+        {isSeasonalView && (
+          <div className='flex flex-wrap items-center gap-6 mb-8'>
             <SeasonSelect
               seasons={seasons}
               selectedSeason={selectedSeason}
               setSelectedSeason={setSelectedSeason}
               isLoading={isLoading}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Enhanced Content Container */}
         <div className='pb-20'>

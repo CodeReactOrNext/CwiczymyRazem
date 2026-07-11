@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -52,6 +53,14 @@ const TimerPlans: NextPageWithLayout = () => {
   const handleBack = () => {
     if (selectedPlan) {
       setSelectedPlan(null);
+      // The session may have been auto-opened from ?planId= (Last Session
+      // shortcut, favorites, daily quest). Drop the param on exit, otherwise
+      // a refresh or the next router event reopens the session immediately.
+      if (router.query.planId) {
+        const restQuery = { ...router.query };
+        delete restQuery.planId;
+        router.replace({ query: restQuery }, undefined, { shallow: true });
+      }
     } else {
       router.push("/timer");
     }
@@ -83,16 +92,12 @@ const TimerPlans: NextPageWithLayout = () => {
       <HeroBanner
         title="Practice Routines"
         subtitle="Build your skills with focused practice exercises"
-        eyebrow="Exercise Hub"
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
-        rightContent={
-          <button
-            onClick={() => router.push("/timer")}
-            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-background rounded-lg bg-white/5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            Back
-          </button>
+        eyebrowContent={
+          <Breadcrumbs
+            items={[{ label: "Practice", href: "/timer" }, { label: "Routines" }]}
+          />
         }
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       <PlanSelector onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
     </div>

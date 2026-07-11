@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { selectTimerData, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
@@ -74,18 +75,17 @@ const TimerPractice: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
       <HeroBanner
-        title="Exercises"
-        subtitle="Build your skills with focused practice exercises"
-        eyebrow="Exercise Hub"
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
-        rightContent={
-          <button
-            onClick={onBack}
-            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
-          >
-            Back
-          </button>
+        title="Free Timer"
+        subtitle="Open stopwatch for any skill"
+        eyebrowContent={
+          <Breadcrumbs
+            items={[
+              { label: "Practice", href: "/timer" },
+              { label: "Free Timer" },
+            ]}
+          />
         }
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       <TimerLayout
         timer={timer}

@@ -1049,7 +1049,7 @@ export const SummaryView = () => {
     <div className="flex w-full flex-col">
       <HeroBanner
         title="Milestones"
-        subtitle={subtitleDate}
+        subtitle={`Weekly rewards for hitting practice goals — ${subtitleDate}`}
         eyebrow="Practice"
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"

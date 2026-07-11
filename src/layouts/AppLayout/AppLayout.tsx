@@ -1,7 +1,5 @@
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { usePresence } from "hooks/usePresence";
-import { useTranslation } from "hooks/useTranslation";
-import type { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
@@ -27,7 +25,6 @@ const AppLayout = ({
   isPublic = false,
 }: AppLayoutProps) => {
   usePresence();
-  const { t } = useTranslation("common");
   const { status } = useSession();
   const router = useRouter();
 
@@ -51,28 +48,6 @@ const AppLayout = ({
       router.push("/");
     }
   }, [autoLogInFailed, isAuthenticated, isPublic, router]);
-
-  const navigation: LandingNavObjectInterface = {
-    leftSideLinks: [
-      {
-        id: "profile",
-        name: t("nav.profile"),
-        href: "/",
-      },
-      {
-        id: "exercise",
-        name: t("nav.exercise"),
-        href: "/timer",
-      },
-      { id: "report", name: t("nav.report"), href: "/report" },
-    ],
-    rightSideLinks: [
-      { id: "library", name: "Library", href: "/songs?view=library" },
-      { id: "my_songs", name: "My Songs", href: "/songs?view=management" },
-      { id: "leadboard", name: t("nav.leadboard"), href: "/leaderboard" },
-{ id: "faq", name: t("nav.faq"), href: "/faq" },
-    ],
-  };
 
   // Public pages must render their content (and <Head> tags) during SSR/SSG,
   // where session status is always "loading" — otherwise crawlers get an empty page.
@@ -102,7 +77,6 @@ const AppLayout = ({
       pageId={pageId}
       variant={variant}
       wide={wide}
-      navigation={navigation}
       userStats={userStats}
       userName={userName}
       userAvatar={userAvatar}>

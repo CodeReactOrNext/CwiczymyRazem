@@ -126,7 +126,7 @@ export function SongPracticePickerModal({
                 <PiCassetteTapeLight className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">Practice Session</p>
+                <p className="text-sm font-bold text-white">Free Practice</p>
                 <p className="text-[11px] text-zinc-500">Timer, YouTube player and section mapping</p>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />

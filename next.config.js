@@ -68,6 +68,34 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   async redirects() {
     return [
+      // Navigation redesign: /practice/plans and /practice/auto were duplicate
+      // routes of the canonical /timer/* pages; keep old deep links working.
+      {
+        source: '/practice/plans',
+        destination: '/timer/plans',
+        permanent: true,
+      },
+      {
+        source: '/practice/auto',
+        destination: '/timer/auto',
+        permanent: true,
+      },
+      // Navigation redesign: orphan pages with no nav entry, removed.
+      {
+        source: '/session-summary',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/recordings',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/profile/exercises',
+        destination: '/practice-log',
+        permanent: true,
+      },
       {
         source: '/guitar-practice-tracker',
         destination: '/blog/guitar-practice-tracker',

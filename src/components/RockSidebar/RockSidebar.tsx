@@ -1,5 +1,10 @@
 import { Button } from "assets/components/ui/button";
-import { Separator } from "assets/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { FeedbackModal } from "components/FeedbackBubble";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
@@ -18,19 +23,13 @@ import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
-  Calendar,
-  Guitar,
-  Heart,
-  History,
   Home,
-  ListChecks,
+  Library,
   LogOut,
   Map,
-  Medal,
   MessageSquarePlus,
   Milestone,
   Music,
-  Music2,
   Settings,
   Swords,
   Timer,
@@ -65,6 +64,8 @@ const SidebarNavLink = ({
   isActive,
   onClick,
   showBadge = false,
+  tooltip,
+  emphasized = false,
 }: {
   href: string;
   name: string;
@@ -72,16 +73,20 @@ const SidebarNavLink = ({
   isActive: boolean;
   onClick?: () => void;
   showBadge?: boolean;
+  tooltip?: string;
+  emphasized?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
-  return (
+  const link = (
     <Link
       href={href}
       onClick={(e) => {
         createRipple(e);
         onClick?.();
       }}
-      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 active:scale-[0.98] ${
+      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm border transition-all duration-200 active:scale-[0.98] ${
+        emphasized ? "font-semibold" : "font-medium"
+      } ${
         isActive
           ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
           : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
@@ -98,6 +103,19 @@ const SidebarNavLink = ({
         isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />
       )}
     </Link>
+  );
+
+  if (!tooltip) return link;
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side="right" className="max-w-[200px]">
+          <p>{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -178,22 +196,17 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/timer")) return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
-    if (pathname.startsWith("/seasons")) return "seasons";
-    
-    // Secondary matches
+    if (pathname.startsWith("/practice-log")) return "progress";
     if (pathname === "/summary") return "summary";
-    if (pathname.startsWith("/leaderboard/gear")) return "gear-leaderboard";
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
-    if (pathname.startsWith("/settings")) return "settings";
-    if (pathname.startsWith("/plans")) return "plans";
-    if (pathname.startsWith("/favorites")) return "favorites";
+    if (pathname.startsWith("/seasons")) return "leaderboard";
     if (pathname.startsWith("/arsenal")) return "arsenal";
-    if (pathname.startsWith("/recordings")) return "recordings";
-    if (pathname.startsWith("/scoring")) return "scoring";
-    if (pathname.startsWith("/my-exercises")) return "my-exercises";
-    if (pathname.startsWith("/tab-editor")) return "my-exercises";
+    if (pathname.startsWith("/plans")) return "library";
+    if (pathname.startsWith("/my-exercises")) return "library";
+    if (pathname.startsWith("/tab-editor")) return "library";
+    if (pathname.startsWith("/favorites")) return "library";
+    if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";
-    if (pathname.startsWith("/practice-log")) return "practice-log";
     return null;
   };
 
@@ -212,33 +225,40 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const mainNavigation = [
     { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
-    { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={18} /> },
-    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={18} /> },
+    { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={20} />, emphasized: true },
+    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={20} />, emphasized: true },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
-    { id: "seasons", name: "Seasons", href: "/seasons", icon: <Calendar size={18} /> },
+    {
+      id: "summary",
+      name: "Milestones",
+      href: "/summary",
+      icon: <Milestone size={18} />,
+      tooltip: "Weekly rewards for hitting practice goals",
+    },
     { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={18} /> },
-    { id: "gear-leaderboard", name: "Gear Ranking", href: "/leaderboard/gear", icon: <Guitar size={18} /> },
+    { id: "arsenal", name: "Arsenal", href: "/arsenal", icon: <Swords size={18} /> },
   ];
 
-  const toolsNavigation = [
-    { id: "practice-log", name: "Practice Log", href: "/practice-log", icon: <History size={16} /> },
-    { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
-    { id: "my-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
-    { id: "favorites", name: "Favorites", href: "/favorites", icon: <Heart size={16} /> },
-    { id: "arsenal", name: "Guitar Arsenal", href: "/arsenal", icon: <Swords size={16} /> },
-    { id: "summary", name: "Milestones", href: "/summary", icon: <Milestone size={16} /> },
+  const libraryNavigation = [
+    { id: "library", name: "Library", href: "/favorites", icon: <Library size={18} /> },
   ];
 
   const otherNavigation = [
-    { id: "scoring", name: "How Points Work", href: "/scoring", icon: <Medal size={16} /> },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
   ];
 
   const renderNavLinks = (
-    items: { id: string; name: string; href: string; icon: React.ReactNode }[],
+    items: {
+      id: string;
+      name: string;
+      href: string;
+      icon: React.ReactNode;
+      tooltip?: string;
+      emphasized?: boolean;
+    }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon }) => (
+    items.map(({ id, name, href, icon, tooltip, emphasized }) => (
       <SidebarNavLink
         key={id}
         href={href}
@@ -247,6 +267,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         isActive={isLinkActive(id, href)}
         onClick={onClick}
         showBadge={id === "summary" && hasUnclaimedMilestone}
+        tooltip={tooltip}
+        emphasized={emphasized}
       />
     ));
 
@@ -301,18 +323,14 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       className={`flex flex-1 flex-col overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent ${
         mobile ? "pb-20" : ""
       }`}>
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
           <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
         </div>
 
-        <Separator className="bg-white/10" />
-
         <div>
-          <div className="space-y-1">{renderNavLinks(toolsNavigation, mobile ? handleLinkClick : undefined)}</div>
+          <div className="space-y-1">{renderNavLinks(libraryNavigation, mobile ? handleLinkClick : undefined)}</div>
         </div>
-
-        <Separator className="bg-white/10" />
 
         <div className="space-y-1">
           {renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}
@@ -345,22 +363,21 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           <Map size={18} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-300">Help build Riff Quest</p>
+          <p className="text-sm font-semibold text-amber-300">Community Roadmap</p>
           <p className="mt-0.5 text-xs leading-snug text-amber-400/60">
-            See what your support unlocks
+            Help build Riff Quest
           </p>
         </div>
       </Link>
 
       {mobile && (
         <>
-          <Separator className="my-6 bg-white/10" />
           <button
             onClick={() => {
               handleLinkClick();
               dispatch(logUserOff());
             }}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
             <span className="text-zinc-500">
               <LogOut size={16} />
             </span>

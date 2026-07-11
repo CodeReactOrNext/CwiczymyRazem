@@ -1,12 +1,15 @@
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LIBRARY_TABS } from "constants/navTabs";
 import { deleteCommunityExercise, getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { ChevronLeft, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
+import { Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
@@ -101,13 +104,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
     return (
       <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
         <div className="px-4 pt-6 pb-2">
-          <button
-            onClick={() => setActiveExercise(null)}
-            className="flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200 text-sm font-semibold transition-colors"
-          >
-            <ChevronLeft size={16} />
-            Back to My Exercises
-          </button>
+          <BackLink label="Back to My Exercises" onClick={() => setActiveExercise(null)} />
         </div>
         <div className="flex-1 overflow-hidden rounded-lg mx-4 mb-4">
           <PracticeSession
@@ -132,6 +129,14 @@ const MyExercisesPage: NextPageWithLayout = () => {
         buttonText="Create Exercise"
         onClick={handleCreate}
       />
+
+      <div className="max-w-4xl mx-auto w-full px-4 lg:px-6 mb-6">
+        <PageTabs
+          tabs={LIBRARY_TABS}
+          activeHref="/my-exercises"
+          ariaLabel="Library sections"
+        />
+      </div>
 
       <div className="max-w-4xl mx-auto w-full px-4 lg:px-6 pb-24">
         {isLoading ? (
