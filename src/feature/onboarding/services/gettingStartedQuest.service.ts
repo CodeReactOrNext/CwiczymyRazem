@@ -1,8 +1,8 @@
 import { doc, getDoc, increment, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-import { GETTING_STARTED_QUEST_DEFAULTS } from "../types";
 import type { GettingStartedQuestState } from "../types";
+import { GETTING_STARTED_QUEST_DEFAULTS } from "../types";
 
 export const GETTING_STARTED_QUEST_COLLECTION = "onboardingQuests";
 
