@@ -23,7 +23,7 @@ export class LearnedSongFormatter implements SongFormatter {
           color: 0x2ecc71, // Green
           ...(isEn && {
             thumbnail: {
-              url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+              url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
             },
           }),
           footer: {
@@ -49,7 +49,7 @@ export class WantToLearnSongFormatter implements SongFormatter {
           color: 0xf1c40f, // Yellow
           ...(isEn && {
             thumbnail: {
-              url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+              url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
             },
           }),
           footer: {
@@ -75,7 +75,7 @@ export class LearningSongFormatter implements SongFormatter {
           color: 0xe67e22, // Orange
           ...(isEn && {
             thumbnail: {
-              url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+              url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
             },
           }),
           footer: {
@@ -101,7 +101,7 @@ export class AddedSongFormatter implements SongFormatter {
           color: 0x3498db, // Blue
           ...(isEn && {
             thumbnail: {
-              url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+              url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
             },
           }),
         },
@@ -124,7 +124,7 @@ export class DifficultyRateSongFormatter implements SongFormatter {
           color: 0x9b59b6, // Purple
           ...(isEn && {
             thumbnail: {
-              url: log.avatarUrl || "https://www.riff.quest/images/default-avatar.png",
+              url: log.avatarUrl || "https://riff.quest/images/default-avatar.png",
             },
           }),
           fields: [
