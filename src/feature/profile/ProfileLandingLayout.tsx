@@ -10,6 +10,7 @@ import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
+import { GettingStartedWidget } from "feature/onboarding/components/GettingStartedWidget/GettingStartedWidget";
 import type { LastSessionInfo } from "feature/practice/utils/lastSession";
 import { loadLastSession } from "feature/practice/utils/lastSession";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
@@ -197,6 +198,9 @@ const ProfileLandingLayout = ({
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
             <DashboardSection compact>
+              <div className="mb-6">
+                <GettingStartedWidget />
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <DailyQuestWidget />
                 <PracticeStatsWidget

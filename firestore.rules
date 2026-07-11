@@ -47,6 +47,16 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
+    // ─── Getting-started checklist (dashboard onboarding quest) ─────────────────
+    match /onboardingQuests/{userId} {
+      allow read:   if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
     // ─── Community exercises ──────────────────────────────────────────────────
     match /communityExercises/{exerciseId} {
       // Public exercises are readable by anyone logged in; private only by their author
