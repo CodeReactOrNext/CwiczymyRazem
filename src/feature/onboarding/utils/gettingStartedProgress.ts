@@ -2,7 +2,12 @@ import type { GettingStartedQuestState } from "../types";
 import { GETTING_STARTED_QUEST_DEFAULTS } from "../types";
 
 export interface GettingStartedStep {
-  id: "welcome" | "first_exercise" | "exercise_plan" | "custom_plan";
+  id:
+    | "welcome"
+    | "first_exercise"
+    | "first_song"
+    | "exercise_plan"
+    | "custom_plan";
   isDone: boolean;
 }
 
@@ -12,6 +17,8 @@ export interface GettingStartedProgressInput {
   sessionCount: number;
   /** Number of guitars already in the user's arsenal inventory. */
   guitarCount: number;
+  /** Number of songs already added to the user's library (any status). */
+  songCount: number;
 }
 
 export interface GettingStartedProgress {
@@ -30,12 +37,14 @@ export const getGettingStartedProgress = ({
   quest,
   sessionCount,
   guitarCount,
+  songCount,
 }: GettingStartedProgressInput): GettingStartedProgress => {
   const state = quest ?? GETTING_STARTED_QUEST_DEFAULTS;
 
   const steps: GettingStartedStep[] = [
     { id: "welcome", isDone: state.welcomeSeen },
     { id: "first_exercise", isDone: sessionCount > 0 },
+    { id: "first_song", isDone: songCount > 0 },
     { id: "exercise_plan", isDone: state.planIntroSeen },
     { id: "custom_plan", isDone: state.customPlanClicked },
   ];
