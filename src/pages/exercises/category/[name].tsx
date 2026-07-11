@@ -1,8 +1,12 @@
-import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
-import { idToSlug } from 'feature/exercises/lib/slugUtils';
-import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
+import { BlogCard } from 'components/Blog/BlogCard';
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
+import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
+import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
+import { idToSlug } from 'feature/exercises/lib/slugUtils';
 import { Footer } from 'feature/landing/components/Footer';
+import type { BlogFrontmatter } from 'lib/blog';
+import { getAllBlogs } from 'lib/blog';
+import { CATEGORY_TO_BLOG_CLUSTERS } from 'lib/internalLinks';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -22,6 +26,7 @@ interface ExerciseCategoryPageProps {
     timeInMinutes: number;
     premium?: boolean;
   }>;
+  relatedBlogs: BlogFrontmatter[];
 }
 
 const categoryInfo: Record<
@@ -58,6 +63,7 @@ const ExerciseCategoryPage: React.FC<ExerciseCategoryPageProps> = ({
   category,
   categoryLabel,
   exercises,
+  relatedBlogs,
 }) => {
   const info = categoryInfo[category];
 
@@ -185,6 +191,18 @@ const ExerciseCategoryPage: React.FC<ExerciseCategoryPageProps> = ({
           )}
         </section>
 
+        {/* From the blog */}
+        {relatedBlogs.length > 0 && (
+          <section className="px-6 mx-auto max-w-6xl pb-16 border-t border-white/5 pt-12">
+            <h2 className="text-2xl font-bold text-white mb-8">From the Blog</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedBlogs.map((blog) => (
+                <BlogCard key={blog.slug} blog={blog} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Other categories */}
         <section className="px-6 mx-auto max-w-6xl pb-16 border-t border-white/5 pt-12">
           <h2 className="text-2xl font-bold text-white mb-8">Other Categories</h2>
@@ -244,12 +262,21 @@ export const getStaticProps: GetStaticProps<ExerciseCategoryPageProps> = async (
       premium: ex.premium,
     }));
 
+  const relevantClusters = CATEGORY_TO_BLOG_CLUSTERS[category as keyof typeof CATEGORY_TO_BLOG_CLUSTERS] ?? [];
+  const relatedBlogs = relevantClusters.length
+    ? getAllBlogs()
+        .filter((blog) => !!blog.cluster && relevantClusters.includes(blog.cluster))
+        .sort((a, b) => Number(b.pillar ?? false) - Number(a.pillar ?? false))
+        .slice(0, 3)
+    : [];
+
   return {
     props: {
       category,
       categoryLabel: categoryInfo[category].label,
       categoryDescription: categoryInfo[category].description,
       exercises,
+      relatedBlogs,
     },
   };
 };
