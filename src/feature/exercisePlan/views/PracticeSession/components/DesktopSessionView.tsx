@@ -162,7 +162,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
-            {p.effectiveRawGpFile && (
+            {(p.effectiveRawGpFile || (p.activeTablature && p.activeTablature.length > 0)) && (
               <NotationToggleButton
                 showAlphaTabScore={p.showAlphaTabScore}
                 onToggle={p.handleToggleAlphaTabScore}

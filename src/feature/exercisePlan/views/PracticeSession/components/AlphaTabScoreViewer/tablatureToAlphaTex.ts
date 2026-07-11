@@ -59,8 +59,17 @@ function noteEffects(note: TablatureNote): string {
   return effects.length > 0 ? `{${effects.join(" ")}}` : "";
 }
 
+// Our TablatureNote.string uses "1 = high E" (musician-friendly, top line of the tab).
+// AlphaTab's alphaTex string numbering is the opposite — 1 = lowest string — so it must
+// be flipped, same as the existing GP-file note matching in useNoteHeadFeedback.
+const GUITAR_STRING_COUNT = 6;
+
+function toAlphaTexString(ourString: number): number {
+  return GUITAR_STRING_COUNT - ourString + 1;
+}
+
 function noteTex(note: TablatureNote): string {
-  return `${note.fret}.${note.string}${noteEffects(note)}`;
+  return `${note.fret}.${toAlphaTexString(note.string)}${noteEffects(note)}`;
 }
 
 function beatTex(beat: TablatureBeat): string {

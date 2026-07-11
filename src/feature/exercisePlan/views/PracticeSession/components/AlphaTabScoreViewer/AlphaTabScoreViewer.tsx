@@ -17,6 +17,7 @@ import { useNoteHeadFeedback } from "./useNoteHeadFeedback";
 export const AlphaTabScoreViewer = ({
   rawGpFile,
   measures,
+  baseTempo,
   mode = "score",
   isPlaying,
   startTime,
@@ -55,6 +56,8 @@ export const AlphaTabScoreViewer = ({
     handleTrackSelect,
   } = useAlphaTabApi({
     rawGpFile,
+    measures,
+    baseTempo,
     mode,
     volumeRef,
     bpmRef,

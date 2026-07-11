@@ -191,6 +191,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         <TablatureSection
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
+          baseTempo={currentExercise.metronomeSpeed?.recommended ?? effectiveBpm}
           showAlphaTabScore={showAlphaTabScore}
           show3dHighway={show3dHighway}
           onSeek={onSeek}
