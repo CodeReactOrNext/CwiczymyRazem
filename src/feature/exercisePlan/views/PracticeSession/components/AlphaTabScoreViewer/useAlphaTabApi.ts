@@ -17,7 +17,6 @@ interface UseAlphaTabApiOptions {
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
   origBpmRef: React.MutableRefObject<number>;
-  speedMultiplierRef: React.MutableRefObject<number>;
 }
 
 interface UseAlphaTabApiReturn {
@@ -45,7 +44,6 @@ export function useAlphaTabApi({
   volumeRef,
   bpmRef,
   origBpmRef,
-  speedMultiplierRef,
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -123,8 +121,7 @@ export function useAlphaTabApi({
       api.masterVolume    = volumeRef.current;
       api.metronomeVolume = 0;
       api.isLooping       = false;
-      // BUG-FIX: apply combined speed (session BPM × user multiplier) at startup
-      api.playbackSpeed   = (bpmRef.current / (origBpmRef.current || 120)) * speedMultiplierRef.current;
+      api.playbackSpeed   = bpmRef.current / (origBpmRef.current || 120);
 
       // Single play path: the caller's isPlaying effect starts playback (with a
       // seek to the current session position). Auto-playing here too caused a
