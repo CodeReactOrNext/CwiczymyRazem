@@ -17,6 +17,13 @@
   }
 }
 
+html {
+  /* Always reserve space for the vertical scrollbar so navigating between
+     pages of different content height (e.g. library tabs) doesn't shift
+     the layout horizontally when the scrollbar appears/disappears. */
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   padding: 0;
