@@ -175,14 +175,16 @@ export const PracticeSession = ({
     minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
     maxBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.max,
     recommendedBpm: lockedExamBpm ?? activeExercise.metronomeSpeed?.recommended,
-    // While notation is shown, AlphaTab's own built-in metronome click is the single
-    // source of truth (see AlphaTabScoreViewer) — it's driven by the exact same clock
-    // as the notation playback, so it can't drift from it the way this separate
-    // device-metronome click (a different audio clock entirely) otherwise could.
-    // Keep this metronome's *scheduling* (bpm, startTime, count-in) running as-is —
-    // only its audible click is muted — so the rest of the session (timer, tab-view
-    // cursor, etc.) still ticks off the same shared clock as before.
-    isMuted:        isMetronomeMuted || audioSystem.isActive || showAlphaTabScore,
+    isMuted:        isMetronomeMuted || audioSystem.isActive,
+    // While notation is shown, AlphaTab's own built-in metronome click takes over as the
+    // single source of truth (see AlphaTabScoreViewer) once it actually starts playing —
+    // it's driven by the exact same clock as the notation playback, so it can't drift
+    // from it the way this separate device-metronome click (a different audio clock
+    // entirely) otherwise could. But AlphaTab only starts playing *after* the count-in
+    // finishes (see isAudioPlaying below), so muting this metronome's click unconditionally
+    // for the whole `showAlphaTabScore` duration left the count-in completely silent.
+    // Only mute the *steady* click post-count-in; count-in beeps stay on this metronome.
+    mutePlaybackClick: showAlphaTabScore,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,

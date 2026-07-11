@@ -83,6 +83,46 @@ describe("tablatureToAlphaTex", () => {
     expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{b (0 4)}.4 |");
   });
 
+  it("maps a dotted-half-note duration (3 quarter notes) to a dotted half, not a whole note", () => {
+    // 3 quarter notes = half note (base 2) * 1.5 — a dotted half. The previous
+    // nearest-power-of-2 rounding picked a whole note (4 quarters), overshooting the
+    // bar by 1 beat and desyncing every following measure.
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 3, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+          { duration: 1, notes: [{ string: 1, fret: 0 }] },
+        ],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 7.2{v}.2 {d} 0.1.4 |");
+  });
+
+  it("un-compresses a triplet's real sounding duration back to its notated base + {tu 3}", () => {
+    // Real sounding duration of a triplet eighth is 1/3 of a quarter (3 fit in the time
+    // of 2 eighths = 1 quarter). The previous conversion fed that real fraction straight
+    // into the nearest-power-of-2 lookup (ignoring `tuplet` entirely), picking a
+    // sixteenth note — 3 sixteenths only fill 3/4 of a quarter, not a full one, so a bar
+    // of triplet-eighths silently came up short and desynced from its declared meter.
+    const third = 1 / 3;
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: third, tuplet: 3, notes: [{ string: 6, fret: 5 }] },
+          { duration: third, tuplet: 3, notes: [{ string: 6, fret: 7 }] },
+          { duration: third, tuplet: 3, notes: [{ string: 6, fret: 5 }] },
+        ],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 4 4 5.6.8 {tu 3} 7.6.8 {tu 3} 5.6.8 {tu 3} |",
+    );
+  });
+
   it("renders a full bend curve as exact bend points", () => {
     const measures: TablatureMeasure[] = [
       {
