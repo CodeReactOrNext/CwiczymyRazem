@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -53,18 +54,17 @@ const TimerAuto: NextPageWithLayout = () => {
       ) : (
         <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
           <HeroBanner
-            title="Exercises"
-            subtitle="Build your skills with focused practice exercises"
-            eyebrow="Exercise Hub"
-            className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
-            rightContent={
-              <button
-                onClick={handleBack}
-                className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
-              >
-                Back
-              </button>
+            title="Auto Plan"
+            subtitle="Automatically generated practice session"
+            eyebrowContent={
+              <Breadcrumbs
+                items={[
+                  { label: "Practice", href: "/timer" },
+                  { label: "Auto Plan" },
+                ]}
+              />
             }
+            className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
           />
           <AutoPlanGenerator
             onBack={handleBack}

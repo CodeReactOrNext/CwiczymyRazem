@@ -395,7 +395,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
               )}
             >
               <LibraryIcon size={14} />
-              Collection
+              Board
             </button>
           </div>
         )}
@@ -451,7 +451,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   }}
                   onStatusChange={handleStatusChange}
                   onBack={() => setDetailsTarget(null)}
-                  backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to library'}
+                  backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to Explore'}
                   showBackOnDesktop={view === 'playlists'}
                 />
               </div>

@@ -206,7 +206,7 @@ export const SongLearningSection = ({
           >
             <Ripple />
             <Search size={14} className={isLibraryActive ? "text-white" : ""} />
-            Library
+            Explore
           </button>
           <button
             onClick={() => onExploreLibrary?.('playlists')}

@@ -1,3 +1,4 @@
+import { BackLink } from "components/BackLink/BackLink";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -125,12 +126,7 @@ export default function SongPracticePage() {
         <div className="flex flex-col items-center gap-4 text-zinc-500">
           <Music className="h-8 w-8 opacity-40" />
           <p className="text-sm font-bold">{pageState.message}</p>
-          <button
-            onClick={handleClose}
-            className="text-xs font-bold uppercase tracking-widest text-cyan-500 hover:text-cyan-400"
-          >
-            Back to songs
-          </button>
+          <BackLink label="Back to songs" onClick={handleClose} />
         </div>
       </div>
     );

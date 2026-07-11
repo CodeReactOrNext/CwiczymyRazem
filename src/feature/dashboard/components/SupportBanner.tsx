@@ -1,39 +1,108 @@
 import { cn } from "assets/lib/utils";
+import { HeroPattern } from "components/UI/HeroBanner";
 import {
   MONTHLY_RUNNING_COST,
   ROADMAP_TIERS,
 } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
-import { ArrowRight, Heart, Unlock } from "lucide-react";
+import { ArrowRight, Check, Heart } from "lucide-react";
 import Link from "next/link";
 
 export const SupportBanner = () => {
-  const { totalRaised, supporters, raisedThisMonth, isLoading } =
-    useBuyMeACoffeeFunding();
+  const { totalRaised, raisedThisMonth, isLoading } = useBuyMeACoffeeFunding();
 
   const covered = Math.min(raisedThisMonth, MONTHLY_RUNNING_COST);
   const isCovered = raisedThisMonth >= MONTHLY_RUNNING_COST;
-  const pct = Math.min(100, (raisedThisMonth / MONTHLY_RUNNING_COST) * 100);
-  const nextTier = ROADMAP_TIERS.find((t) => totalRaised < t.goal) ?? null;
+
+  const nextTierIndex = ROADMAP_TIERS.findIndex((t) => totalRaised < t.goal);
+  const nextTier = nextTierIndex === -1 ? null : ROADMAP_TIERS[nextTierIndex];
+  const prevGoal =
+    nextTierIndex > 0 ? ROADMAP_TIERS[nextTierIndex - 1].goal : 0;
+  const tierPct = nextTier
+    ? Math.min(
+        100,
+        Math.max(
+          0,
+          ((totalRaised - prevGoal) / (nextTier.goal - prevGoal)) * 100,
+        ),
+      )
+    : 100;
+  const NextTierIcon = nextTier?.icon;
 
   return (
     <Link
       href='/roadmap'
-      className='group block rounded-lg bg-zinc-800/40 p-4 transition-background hover:bg-zinc-800/60 sm:p-5'>
-      <div className='flex items-center gap-4'>
-        <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400'>
-          <Heart size={20} fill='currentColor' />
-        </span>
-
-        <div className='min-w-0 flex-1'>
-          <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
-            Help build Riff Quest
-          </p>
-          <p className='mt-0.5 text-xs leading-snug text-zinc-400 sm:text-sm'>
-            Riff Quest is free and built in the open. See what your support
-            unlocks next on the roadmap.
-          </p>
+      className='group relative block overflow-hidden rounded-lg bg-zinc-800/40 p-5 transition-background hover:bg-zinc-800/60 sm:p-7'>
+      <HeroPattern
+        className='opacity-[0.03]'
+        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
+      />
+      <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
+        <div className='flex min-w-0 flex-1 items-start gap-3.5'>
+          <Heart size={18} className='mt-0.5 shrink-0 text-zinc-500' />
+          <div className='min-w-0'>
+            <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
+              Help build Riff Quest
+            </p>
+            <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
+              Riff Quest is free and built in the open. See what your support
+              unlocks next on the roadmap.
+            </p>
+          </div>
         </div>
+
+        {/* Compact progress block: full-width row when stacked, fixed column on desktop */}
+        {!isLoading && (
+          <div className='order-last w-full min-w-0 lg:order-none lg:w-80'>
+            {nextTier && (
+              <>
+                <div className='flex items-center justify-between gap-4 text-xs'>
+                  <span className='flex min-w-0 items-center gap-1.5 text-zinc-400'>
+                    {NextTierIcon && (
+                      <NextTierIcon size={13} className='shrink-0' />
+                    )}
+                    <span className='truncate'>
+                      Next unlock{" "}
+                      <span className='font-medium text-zinc-200'>
+                        {nextTier.label}
+                      </span>
+                    </span>
+                  </span>
+                  <span className='shrink-0 font-semibold text-cyan-300'>
+                    ${nextTier.goal - totalRaised} to go
+                  </span>
+                </div>
+
+                <div className='mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
+                  <div
+                    className='h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all'
+                    style={{ width: `${tierPct}%` }}
+                  />
+                </div>
+              </>
+            )}
+
+            <p
+              className={cn(
+                "flex items-center gap-1.5 text-xs text-zinc-500",
+                nextTier && "mt-3",
+              )}>
+              {isCovered ? (
+                <>
+                  <Check size={13} className='text-emerald-400' />
+                  <span>Server cost this month covered</span>
+                </>
+              ) : (
+                <span>
+                  Server cost this month ·{" "}
+                  <span className='font-medium text-zinc-300'>
+                    ${covered} / ${MONTHLY_RUNNING_COST}
+                  </span>
+                </span>
+              )}
+            </p>
+          </div>
+        )}
 
         <span className='flex shrink-0 items-center gap-1.5 rounded-lg bg-amber-500/20 px-3 py-2 text-xs font-semibold text-amber-200 transition-background group-hover:bg-amber-500/30 sm:text-sm'>
           <span className='hidden sm:inline'>View roadmap</span>
@@ -43,57 +112,6 @@ export const SupportBanner = () => {
           />
         </span>
       </div>
-
-      {!isLoading && (
-        <div className='mt-4 flex flex-col gap-3 border-t border-zinc-700/50 pt-4 sm:flex-row sm:items-center sm:gap-6'>
-          {/* Lifetime raised — the headline number */}
-          <div className='flex shrink-0 items-baseline gap-2'>
-            <span className='text-xl font-bold tracking-tight text-zinc-100'>
-              ${totalRaised}
-            </span>
-            <span className='text-xs text-zinc-500'>
-              raised so far
-              {supporters > 0 &&
-                ` · ${supporters} supporter${supporters === 1 ? "" : "s"}`}
-            </span>
-          </div>
-
-          {/* Next goal on the roadmap and how much is left to reach it */}
-          {nextTier && (
-            <div className='flex min-w-0 items-center gap-2 rounded-md bg-cyan-500/10 px-2.5 py-1.5 text-xs'>
-              <Unlock size={13} className='shrink-0 text-cyan-300' />
-              <span className='shrink-0 font-semibold text-cyan-200'>
-                ${nextTier.goal - totalRaised} to go
-              </span>
-              <span className='truncate text-zinc-400'>{nextTier.label}</span>
-            </div>
-          )}
-
-          {/* Mini server-cost bar for the current month */}
-          <div className='w-full min-w-0 sm:ml-auto sm:w-56'>
-            <div className='flex items-center justify-between gap-2 text-xs'>
-              <span className='text-zinc-400'>Server cost this month</span>
-              <span
-                className={cn(
-                  "shrink-0 font-medium",
-                  isCovered ? "text-emerald-400" : "text-zinc-300"
-                )}>
-                ${covered} / ${MONTHLY_RUNNING_COST}
-                {isCovered && " · covered"}
-              </span>
-            </div>
-            <div className='mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all",
-                  isCovered ? "bg-emerald-500" : "bg-cyan-500"
-                )}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </Link>
   );
 };

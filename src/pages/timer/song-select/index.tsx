@@ -6,6 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
@@ -15,7 +16,7 @@ import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { ArrowRight, Music, Play, Search, X, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown,Music, Play, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
@@ -154,18 +155,17 @@ const SongSelectPage: NextPageWithLayout = () => {
     return (
         <div className="flex flex-col min-h-screen rounded-lg bg-zinc-900/40 lg:mt-16">
             <HeroBanner
-              title="Practice Song"
+              title="Song Practice"
               subtitle="Select a song to start practicing"
-              eyebrow="Song Select"
-              className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
-              rightContent={
-                <button
-                  onClick={() => router.push("/timer")}
-                  className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded hover:bg-white/5"
-                >
-                  Back
-                </button>
+              eyebrowContent={
+                <Breadcrumbs
+                  items={[
+                    { label: "Practice", href: "/timer" },
+                    { label: "Song Practice" },
+                  ]}
+                />
               }
+              className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
             />
             <div className="container mx-auto px-4 sm:px-8 py-2">
                 {isLibraryMode ? (

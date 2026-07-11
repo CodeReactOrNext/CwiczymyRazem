@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
+import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
@@ -14,15 +15,14 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, ChevronRight, Ear, Lock,Mic, Network, Search, Star, Trophy, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, Ear, Lock,Mic, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect,useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
-import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
-import { ExerciseCheckmark } from "./ExerciseCheckmark";
 import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
+import { ExerciseCheckmark } from "./ExerciseCheckmark";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
 export interface DashboardExercise {
@@ -211,6 +211,11 @@ export const SkillDashboard = ({
       router.push(returnTo);
     } else {
       setSelectedChallenge(null);
+      if (router.query.exerciseId) {
+        const restQuery = { ...router.query };
+        delete restQuery.exerciseId;
+        router.replace({ query: restQuery }, undefined, { shallow: true });
+      }
     }
   };
 
@@ -224,7 +229,7 @@ export const SkillDashboard = ({
             onClick={handleClose}
             className="text-zinc-500 hover:text-white hover:bg-white/10"
            >
-              <ChevronLeft size={16} className="mr-2" />
+              <ArrowLeft size={16} className="mr-2" />
               {returnTo ? "Back to Roadmap" : "Back to Skills"}
            </Button>
         </div>
