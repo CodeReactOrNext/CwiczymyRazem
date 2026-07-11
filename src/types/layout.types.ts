@@ -12,7 +12,6 @@ export type NavPagesTypes =
   | "seasons"
   | "timer"
   | "settings"
-  | "recordings"
   | "about"
   | "privacy-policy"
   | "contact"

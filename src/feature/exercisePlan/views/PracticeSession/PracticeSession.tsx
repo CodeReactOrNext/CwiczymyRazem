@@ -1,5 +1,6 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
@@ -133,6 +134,11 @@ export const PracticeSession = ({
 
   useEffect(() => {
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
+    // Feed the "Last Session" shortcuts (dashboard + practice hub). Exams are
+    // deliberately excluded — re-entering an exam is not "practicing again".
+    if (!isExamMode) {
+      saveLastSession({ title: planTitleString, href: router.asPath });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

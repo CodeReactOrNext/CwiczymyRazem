@@ -1,12 +1,12 @@
-import { Menu, X } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, Menu, X } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ScaleNodeModal } from './ScaleNodeModal';
-import { ScaleTreeSidebar } from './ScaleTreeSidebar';
-import { ScaleTreeGrid } from './ScaleTreeGrid';
 import { useScaleTree } from '../hooks/useScaleTree';
+import { ScaleNodeModal } from './ScaleNodeModal';
+import { ScaleTreeGrid } from './ScaleTreeGrid';
+import { ScaleTreeSidebar } from './ScaleTreeSidebar';
 
 const PREFIX_TO_SCALE: Record<string, string> = {
   min_pent: 'minor_pentatonic',
@@ -143,6 +143,17 @@ export function ScaleTreeView() {
         <Menu className="h-4 w-4 text-zinc-300" />
         <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-300">
           Scales
+        </span>
+      </button>
+
+      <button
+        onClick={() => router.push('/timer')}
+        className="absolute right-3 top-3 z-10 flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900/80 px-2.5 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        aria-label="Back to Practice"
+      >
+        <ArrowLeft className="h-4 w-4 text-zinc-300" />
+        <span className="text-[10px] font-bold tracking-wider text-zinc-300">
+          Practice
         </span>
       </button>
 

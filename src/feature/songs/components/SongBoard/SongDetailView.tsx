@@ -1,45 +1,55 @@
-import { useEffect, useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { rateSong } from "feature/user/store/userSlice.asyncThunk";
-import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
-import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
-import type { SongSection, MasteryLevel } from "feature/songs/types/songSection.type";
-import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
-import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "assets/components/ui/alert-dialog";
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import type { Song } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
-import { collection, documentId, getDocs, query, where } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import Avatar from "components/UI/Avatar/Avatar";
 import { 
   Tooltip, 
   TooltipContent, 
   TooltipProvider, 
   TooltipTrigger 
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar/Avatar";
+import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
+import type { Song } from "feature/songs/types/songs.type";
+import type { MasteryLevel,SongSection } from "feature/songs/types/songSection.type";
+import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { rateSong } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
+import { collection, documentId, getDocs, query, where } from "firebase/firestore";
+import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { 
+  ArrowLeft,
   Check,
   Clock,
+  FileText,
+  MessageSquare,
   Music,
   Play,
+  Save,
   Star, 
   Target, 
   Trash2,
   TrendingUp,
-  ArrowLeft,
-  FileText,
-  Users,
-  Save,
-  MessageSquare
-} from "lucide-react";
-import { motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import { SpotifyPlayer } from "../SpotifyPlayer";
+  Users} from "lucide-react";
+import { useEffect, useMemo,useState } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { db } from "utils/firebase/client/firebase.utils";
+
 import { TierBadge } from "../SongsGrid/TierBadge";
+import { SpotifyPlayer } from "../SpotifyPlayer";
 
 interface SongDetailViewProps {
   song: Song;
@@ -121,6 +131,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const queryClient = useQueryClient();
   const userAuth = useAppSelector(selectUserAuth);
   const [isRating, setIsRating] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const [sections, setSections] = useState<SongSection[]>([]);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -397,17 +408,39 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
                <div className="w-px h-8 bg-white/10" />
 
-               <Button 
-                 onClick={() => {
-                   if (window.confirm("Are you sure you want to remove this song from your board?")) {
-                     onRemove(song.id);
-                   }
-                 }}
+               <Button
+                 onClick={() => setShowRemoveConfirm(true)}
                  variant="ghost"
                  className="h-11 w-11 rounded-lg text-zinc-600 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-95 p-0"
                >
                  <Trash2 size={16} />
                </Button>
+
+               <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
+                 <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
+                   <AlertDialogHeader>
+                     <AlertDialogTitle className="font-display text-zinc-50">Remove song</AlertDialogTitle>
+                     <AlertDialogDescription className="leading-relaxed text-zinc-400">
+                       Are you sure you want to remove this song from your board?
+                     </AlertDialogDescription>
+                   </AlertDialogHeader>
+                   <AlertDialogFooter>
+                     <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100">
+                       Cancel
+                     </AlertDialogCancel>
+                     <AlertDialogAction
+                       onClick={(event) => {
+                         event.preventDefault();
+                         setShowRemoveConfirm(false);
+                         onRemove(song.id);
+                       }}
+                       className="bg-rose-600 text-white hover:bg-rose-500"
+                     >
+                       Remove
+                     </AlertDialogAction>
+                   </AlertDialogFooter>
+                 </AlertDialogContent>
+               </AlertDialog>
             </div>
          </div>
       </div>

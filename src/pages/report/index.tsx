@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner } from "components/UI/HeroBanner";
 import ReportView from "feature/user/view/ReportView";
 import AppLayout from "layouts/AppLayout";
@@ -10,9 +11,16 @@ const ReportPage: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
       <HeroBanner
-        title="Log Session"
+        title="Manual Log"
         subtitle="Record and review your practice session"
-        eyebrow="Practice Log"
+        eyebrowContent={
+          <Breadcrumbs
+            items={[
+              { label: "Practice", href: "/timer" },
+              { label: "Manual Log" },
+            ]}
+          />
+        }
         compact
         className="w-full !rounded-none !shadow-none"
       />

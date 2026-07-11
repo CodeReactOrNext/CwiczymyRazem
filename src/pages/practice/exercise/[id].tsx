@@ -44,7 +44,7 @@ export default function PracticeExercisePage() {
       };
       setPlan(dummyPlan);
     } else {
-      router.push("/practice/plans");
+      router.push("/timer/plans");
     }
   }, [id, userAuth, router]);
 
@@ -76,7 +76,7 @@ export default function PracticeExercisePage() {
         } else if (typeof window !== "undefined" && window.history.length > 1) {
           router.back();
         } else {
-          router.push("/practice/plans");
+          router.push("/timer/plans");
         }
       }}
       onFinish={() => {

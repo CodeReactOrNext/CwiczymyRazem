@@ -4,6 +4,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -32,14 +38,16 @@ const RippleTabsTrigger = ({
   icon,
   label,
   isActive,
+  tooltip,
 }: {
   value: string;
   icon: React.ReactNode;
   label: string;
   isActive: boolean;
+  tooltip?: string;
 }) => {
   const { createRipple, ripple } = useRipple();
-  return (
+  const trigger = (
     <TabsTrigger
       value={value}
       onClick={createRipple}
@@ -51,6 +59,19 @@ const RippleTabsTrigger = ({
           visible at once; from sm up every label is shown. */}
       <span className={isActive ? "inline" : "hidden sm:inline"}>{label}</span>
     </TabsTrigger>
+  );
+
+  if (!tooltip) return trigger;
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+        <TooltipContent className="max-w-[200px] text-center">
+          <p>{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -264,7 +285,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
                 <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" isActive={activeTab === "routines"} />
-                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} />
+                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} tooltip="Practice along with a real song at your own pace" />
                 <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" isActive={activeTab === "my_plans"} />
                 <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" isActive={activeTab === "community"} />
               </TabsList>

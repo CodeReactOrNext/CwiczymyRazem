@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -13,7 +13,6 @@ import { cn } from "assets/lib/utils";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
 import { LogOut } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -35,12 +34,6 @@ const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"
       }`}>
-      {!showOnlyLogout && (
-        <Link href='/settings' className={buttonVariants({ size: "sm" })}>
-          {t("button.edit")}
-        </Link>
-      )}
-
       <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
         <DialogTrigger asChild>
           <Button

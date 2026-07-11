@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { ArrowLeft, Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
@@ -318,12 +319,7 @@ const StepPageContent: React.FC<StepPageContentProps> = ({
     <div className="flex flex-col gap-8 px-5 py-6 md:px-8 md:py-8">
       {/* ── Top bar ── */}
       <div className="flex flex-col gap-4">
-        <button
-          onClick={onBack}
-          className="flex w-fit items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-200"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to roadmap
-        </button>
+        <BackLink label="Back to roadmap" onClick={onBack} />
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
             <span className="w-fit rounded bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-zinc-500">
