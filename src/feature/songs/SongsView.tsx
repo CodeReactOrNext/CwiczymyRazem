@@ -32,7 +32,7 @@ import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { Song } from "feature/songs/types/songs.type";
 import type { SongStatus } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getGatedSkillPower, getSongsUntilNextTier } from "feature/songs/utils/difficulty.utils";
 import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
 import { selectCurrentUserStats, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
@@ -111,8 +111,9 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
     onTableStatusChange: refreshSongs,
   });
 
-  const skillPower = userSongs?.learned ? calculateSkillPower(userSongs.learned) : 0;
+  const skillPower = userSongs?.learned ? getGatedSkillPower(userSongs.learned) : 0;
   const playerTier = getSongTier(skillPower > 0 ? skillPower : '?');
+  const nextTierProgress = userSongs?.learned ? getSongsUntilNextTier(userSongs.learned) : null;
 
   const totalSongsCount = (userSongs?.wantToLearn?.length || 0) + (userSongs?.learning?.length || 0) + (userSongs?.learned?.length || 0);
   const learnedCount = userSongs?.learned?.length || 0;
@@ -463,6 +464,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   learnedCount={learnedCount}
                   totalCount={totalSongsCount}
                   totalPracticeMs={totalPracticeMs}
+                  nextTierProgress={nextTierProgress}
                 />
                 
                 <div className="space-y-12">

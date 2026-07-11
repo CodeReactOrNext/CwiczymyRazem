@@ -14,7 +14,7 @@ import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
@@ -88,7 +88,7 @@ const ProfileLayout = ({
   const arcC = 2 * Math.PI * arcR;
   const arcOffset = arcC * (1 - xpPercent / 100);
 
-  const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
+  const skillPower = songs?.learned ? getGatedSkillPower(songs.learned) : 0;
   const songTier = getSongTier(skillPower);
 
   useEffect(() => {
