@@ -34,7 +34,10 @@ const AppLayout = ({
   const userAvatar = useAppSelector(selectUserAvatar);
   const autoLogInFailed = useAppSelector(selectAutoLogInFailed);
 
-  const isAuthenticated = !!(userAuth && userStats && userName);
+  // userName intentionally NOT required here: accounts with a null displayName
+  // in their users doc would otherwise be stuck on the loading screen forever
+  // (auth + stats loaded, no redirect fires, nothing ever fills the name).
+  const isAuthenticated = !!(userAuth && userStats);
 
   useEffect(() => {
     if (status === "unauthenticated" && !isPublic) {
@@ -78,7 +81,7 @@ const AppLayout = ({
       variant={variant}
       wide={wide}
       userStats={userStats}
-      userName={userName}
+      userName={userName ?? ""}
       userAvatar={userAvatar}>
       {children}
     </MainLoggedLayout>
