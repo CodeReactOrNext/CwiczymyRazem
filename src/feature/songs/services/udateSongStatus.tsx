@@ -88,16 +88,21 @@ export const updateSongStatus = async (
       lastUpdated: Timestamp.now(),
     }, { merge: true });
 
-    firebaseAddSongsLog(
-      userId,
-      new Date().toISOString(),
-      title,
-      artist,
-      status,
-      avatarUrl,
-      undefined,
-      songId
-    );
+    // Only log an activity entry when the status actually changed — re-selecting
+    // the same song (e.g. re-opening it from the "learning" tab) shouldn't spam
+    // the Activity feed with identical "learning" entries.
+    if (oldStatus !== status) {
+      firebaseAddSongsLog(
+        userId,
+        new Date().toISOString(),
+        title,
+        artist,
+        status,
+        avatarUrl,
+        undefined,
+        songId
+      );
+    }
     return { success: true, pointsAdded, insufficientPracticeTime };
   } catch (error) {
     console.error("Error updating song status:", error);
