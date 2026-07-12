@@ -1,7 +1,7 @@
 import { Ripple } from "components/Ripple/Ripple";
 import { HeroPattern } from "components/UI/HeroBanner";
 import type { LastSessionInfo } from "feature/practice/utils/lastSession";
-import { loadLastSession } from "feature/practice/utils/lastSession";
+import { loadLastSessions } from "feature/practice/utils/lastSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import { useRipple } from "hooks/useRipple";
@@ -96,12 +96,12 @@ const ModeCard = ({
 
   return (
     <div
-      className={`group relative flex gap-3 overflow-hidden rounded-lg transition-background duration-300 ${
+      className={`group relative flex gap-3 overflow-hidden rounded-xl transition-background duration-300 ${
         hero || isGroup ? "items-start" : "items-center"
       } ${
         hero
-          ? `${c.cardBg} p-[18px] backdrop-blur-md`
-          : `${c.cardBg} p-3.5 backdrop-blur-sm`
+          ? `${c.cardBg} bg-gradient-to-br from-white/[0.03] to-transparent p-[18px] backdrop-blur-md`
+          : `${c.cardBg} bg-gradient-to-br from-white/[0.02] to-transparent p-3.5 backdrop-blur-sm`
       } ${
         isGroup
           ? ""
@@ -129,12 +129,12 @@ const ModeCard = ({
         {loading ? (
           <div
             className={`${
-              hero ? "h-7 w-7" : "h-6 w-6"
+              hero ? "h-8 w-8" : "h-7 w-7"
             } animate-spin rounded-full border-[3px] border-white border-t-transparent`}
           />
         ) : (
           <Icon
-            className={`${hero ? "h-7 w-7" : "h-6 w-6"} ${
+            className={`${hero ? "h-8 w-8" : "h-7 w-7"} ${
               c.iconText
             } transition-colors duration-300`}
           />
@@ -145,8 +145,8 @@ const ModeCard = ({
           <h3
             className={
               hero
-                ? "truncate text-[16px] font-black tracking-wide text-white"
-                : "truncate text-[14px] font-bold text-zinc-100 transition-colors group-hover:text-white"
+                ? "truncate text-[17px] font-black tracking-wide text-white"
+                : "truncate text-[14px] font-bold text-white transition-colors group-hover:text-white"
             }>
             {title}
           </h3>
@@ -165,13 +165,13 @@ const ModeCard = ({
         <p
           className={
             hero
-              ? "text-[13px] font-medium leading-relaxed text-zinc-400"
+              ? "text-[13px] font-medium leading-relaxed text-zinc-500"
               : "truncate text-[12px] text-zinc-500 transition-colors group-hover:text-zinc-400"
           }>
           {description}
         </p>
         {links && links.length > 0 && (
-          <div className='relative z-10 mt-3 flex flex-col gap-1.5'>
+          <div className='relative z-10 mt-4 flex flex-col gap-1.5'>
             {links.map((link) => (
               <button
                 key={link.label}
@@ -180,10 +180,10 @@ const ModeCard = ({
                   e.stopPropagation();
                   link.onClick();
                 }}
-                className='group/link relative flex min-h-[40px] items-center justify-between overflow-hidden rounded-lg bg-white/[0.02] px-3 py-2.5 text-left text-[13px] font-semibold text-zinc-200 transition-background duration-200 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]'>
+                className='group/link relative flex min-h-[42px] items-center justify-between overflow-hidden rounded-lg bg-white/[0.05] px-3 py-2 text-left text-[13px] font-semibold text-zinc-100 transition-background duration-200 hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]'>
                 <Ripple className='bg-white/20' />
                 <span>{link.label}</span>
-                <ArrowRight className='h-4 w-4 shrink-0 text-zinc-300 transition-all group-hover/link:translate-x-0.5 group-hover/link:text-white' />
+                <ArrowRight className='h-4 w-4 shrink-0 text-zinc-400 transition-all group-hover/link:translate-x-0.5 group-hover/link:text-white' />
               </button>
             ))}
           </div>
@@ -211,11 +211,11 @@ export const PracticeModeSelector = () => {
 
   const [loadingMode, setLoadingMode] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [lastSession, setLastSession] = useState<LastSessionInfo | null>(null);
+  const [lastSessions, setLastSessions] = useState<LastSessionInfo[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    setLastSession(loadLastSession());
+    setLastSessions(loadLastSessions());
   }, []);
 
   const nav = (href: string, id: string, locked?: boolean) => {
@@ -266,75 +266,46 @@ export const PracticeModeSelector = () => {
           maskImage='linear-gradient(to bottom, black 0%, black 20%, transparent 80%)'
         />
         <div className='container relative z-10 mx-auto max-w-6xl px-4 py-12 font-sans sm:px-6'>
-          <div className='flex flex-col gap-16'>
-            <div>
-              <div className='mb-6 flex items-center gap-3'>
-                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600' />
-                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Continue or Start</h2>
-              </div>
+          <div className='flex flex-col gap-12'>
+            {lastSessions.length > 0 && (
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
-                {lastSession && (
+                {lastSessions.map((session) => (
                   <button
+                    key={session.at}
                     type='button'
-                    onClick={() => nav(lastSession.href, "resume")}
-                    className='group relative flex items-start gap-3 overflow-hidden rounded-lg bg-zinc-800/60 px-4 py-4 text-left transition-background duration-200 hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                    onClick={() => nav(session.href, `resume-${session.at}`)}
+                    className='group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-zinc-800/60 bg-gradient-to-br from-white/[0.02] to-transparent px-4 py-4 text-left transition-background duration-200 hover:bg-white/[0.06] backdrop-blur-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
                     <Ripple className='bg-white/15' />
-                    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5'>
-                      {loadingMode === "resume" ? (
-                        <div className='h-5 w-5 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
-                      ) : (
-                        <History className='h-5 w-5 text-indigo-400' />
-                      )}
+                    <div className='flex items-center gap-3 min-w-0 flex-1'>
+                      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5'>
+                        {loadingMode === `resume-${session.at}` ? (
+                          <div className='h-7 w-7 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
+                        ) : (
+                          <History className='h-7 w-7 text-indigo-400' />
+                        )}
+                      </div>
+                      <div className='min-w-0 flex-1'>
+                        <p className='text-[10px] font-semibold tracking-wide text-zinc-500 mb-1'>
+                          Last Session
+                        </p>
+                        <p className='truncate text-sm font-bold text-white'>
+                          {session.title}
+                        </p>
+                      </div>
                     </div>
-                    <div className='min-w-0 flex-1'>
-                      <p className='text-[10px] font-semibold tracking-wide text-zinc-500 mb-1'>
-                        Last Session
-                      </p>
-                      <p className='truncate text-sm font-bold text-white'>
-                        {lastSession.title}
-                      </p>
-                    </div>
+                    <ArrowRight className='h-5 w-5 shrink-0 text-zinc-400 transition-all group-hover:translate-x-1 group-hover:text-white' />
                   </button>
-                )}
-                {modeItem(
-                  "manual-log",
-                  ClipboardList,
-                  "Manual Log",
-                  "Log by hand",
-                  "/report",
-                  "indigo"
-                )}
-                {modeItem(
-                  "timer",
-                  PiCassetteTapeLight,
-                  "Free Timer",
-                  "Use stopwatch",
-                  "/timer/practice",
-                  "indigo"
-                )}
+                ))}
               </div>
-            </div>
+            )}
 
             <div>
-              <div className='mb-6 flex items-center gap-3'>
-                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600' />
-                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Choose Your Practice</h2>
-              </div>
               <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
-                {modeItem(
-                  "song",
-                  PiCassetteTapeLight,
-                  "Songs",
-                  "Pick from library",
-                  "/songs?view=board",
-                  "indigo",
-                  { hero: true }
-                )}
                 {modeItem(
                   "routine",
                   ListChecks,
                   "Practice Routines",
-                  "Guided routines",
+                  "Follow daily guided routine",
                   "/timer/plans",
                   "indigo",
                   {
@@ -348,10 +319,38 @@ export const PracticeModeSelector = () => {
                   }
                 )}
                 {modeItem(
+                  "log",
+                  ClipboardList,
+                  "Log",
+                  "Track a session by hand or with a stopwatch",
+                  "/report",
+                  "indigo",
+                  {
+                    hero: true,
+                    links: [
+                      { label: "Manual Log", href: "/report" },
+                      { label: "Free Timer", href: "/timer/practice" },
+                    ],
+                  }
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
+                {modeItem(
+                  "song",
+                  PiCassetteTapeLight,
+                  "Songs",
+                  "Track practice time for your repertoire",
+                  "/songs?view=board",
+                  "amber"
+                )}
+                {modeItem(
                   "smart",
                   PiMagicWandDuotone,
                   "Auto Plan",
-                  "AI generated",
+                  "Automatically generated session",
                   "/timer/auto",
                   "amber",
                   { locked: !isMaster, lockLabel: "Master" }
@@ -360,7 +359,7 @@ export const PracticeModeSelector = () => {
                   "gp",
                   SiGuitarpro,
                   "Guitar Pro Files",
-                  "Imported tabs",
+                  "Practice your imported Guitar Pro tabs",
                   "/gp-tabs",
                   "amber",
                   { locked: !isPremium, lockLabel: "Premium" }
@@ -368,17 +367,46 @@ export const PracticeModeSelector = () => {
               </div>
             </div>
 
+            <div className='h-px bg-white/5' />
+
             <div>
-              <div className='mb-6 flex items-center gap-3'>
-                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600' />
-                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Skills & Learning</h2>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
+                {modeItem(
+                  "learning-path",
+                  Brain,
+                  "Learning Path",
+                  "Step-by-step progress",
+                  "/profile/skills",
+                  "rose"
+                )}
+                {modeItem(
+                  "roadmaps",
+                  ClipboardList,
+                  "Mastery Roadmaps",
+                  "Goal-based practice roadmaps",
+                  "/profile/skills",
+                  "rose"
+                )}
+                {modeItem(
+                  "scales",
+                  PiTreeView,
+                  "Scale Map",
+                  "Interactive scale fretboard tree",
+                  "/scale-tree",
+                  "rose"
+                )}
               </div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6'>
+            </div>
+
+            <div className='h-px bg-white/5' />
+
+            <div>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
                 {modeItem(
                   "skills",
                   Brain,
                   "Skills",
-                  "Focused skill practice",
+                  "Specific skill focus",
                   "/profile/skills",
                   "emerald"
                 )}
@@ -391,18 +419,10 @@ export const PracticeModeSelector = () => {
                   "emerald"
                 )}
                 {modeItem(
-                  "scales",
-                  PiTreeView,
-                  "Scale Map",
-                  "Interactive fretboard",
-                  "/scale-tree",
-                  "rose"
-                )}
-                {modeItem(
                   "community-exercises",
                   Users,
                   "Community Exercises",
-                  "Shared by users",
+                  "Exercises shared by the community",
                   "/profile/skills?tab=community",
                   "emerald"
                 )}
