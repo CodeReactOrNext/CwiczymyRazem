@@ -25,15 +25,17 @@ const EMPTY: UseUserSongProgressReturn = {
   refresh: async () => {},
 };
 
+// Progress (sessions, play time, accuracy) is written for every user — free
+// practice records sessions too — so reads are not premium-gated. Premium only
+// gates GP file attach/detach at the UI level (SongPracticePickerModal).
 export const useUserSongProgress = (
-  userId: string | null,
-  isPremium: boolean
+  userId: string | null
 ): UseUserSongProgressReturn => {
   const [progressMap, setProgressMap] = useState<Record<string, UserSongProgress>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!userId || !isPremium) return;
+    if (!userId) return;
     setIsLoading(true);
     try {
       const all = await getAllUserSongProgress(userId);
@@ -43,7 +45,7 @@ export const useUserSongProgress = (
     } finally {
       setIsLoading(false);
     }
-  }, [userId, isPremium]);
+  }, [userId]);
 
   useEffect(() => {
     load();
@@ -121,7 +123,7 @@ export const useUserSongProgress = (
     [userId, progressMap]
   );
 
-  if (!userId || !isPremium) return EMPTY;
+  if (!userId) return EMPTY;
 
   return { progressMap, isLoading, attachGpFile, detachGpFile, recordSession, refresh: load };
 };
