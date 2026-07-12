@@ -126,6 +126,12 @@ export function useNoteHeadFeedback({
     }
 
     for (const [k, color] of desired) {
+      // Hit/miss state is final once resolved (never flips mid-pass), so a marker
+      // already placed for this key needs no re-matching. Without this guard the
+      // nearest-note search below re-runs for every note hit so far on every
+      // single flush — cost (and therefore visual lag) grows with song length.
+      if (markers.has(k)) continue;
+
       const our = ourNotes.get(k);
       if (!our) continue;
       const bucket = byFret.get(our.fret);
