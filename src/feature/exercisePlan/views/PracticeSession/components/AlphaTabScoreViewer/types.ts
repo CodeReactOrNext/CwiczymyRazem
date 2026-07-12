@@ -3,6 +3,8 @@ export interface Track {
   idx: number;
 }
 
+import type { GpPlaybackPosition } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
+
 import type { TablatureMeasure } from "../../../../types/exercise.types";
 
 export interface AlphaTabScoreViewerProps {
@@ -32,4 +34,7 @@ export interface AlphaTabScoreViewerProps {
   hitNotes?: Record<string, boolean | number>;
   /** Session scoring miss map — drives the green/red pulse on the notation cursor. */
   missedNotes?: Record<string, boolean>;
+  /** Live playback position sink — while this viewer plays the audio, note matching
+   *  follows it so hit/miss windows track the audible playback exactly. */
+  positionRef?: React.MutableRefObject<GpPlaybackPosition | null>;
 }

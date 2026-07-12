@@ -27,6 +27,7 @@ export const AlphaTabScoreViewer = ({
   className,
   hitNotes,
   missedNotes,
+  positionRef,
 }: AlphaTabScoreViewerProps) => {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
@@ -60,6 +61,7 @@ export const AlphaTabScoreViewer = ({
     volumeRef,
     bpmRef,
     origBpmRef,
+    positionRef,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.
@@ -88,6 +90,8 @@ export const AlphaTabScoreViewer = ({
       hasStartedRef.current = true;
     } else if (hasStartedRef.current) {
       try { api.stop(); } catch { /* ignore */ }
+      // Stale position samples must not leak into the next play (possible seek).
+      if (positionRef) positionRef.current = null;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, startTime, uiReady]);

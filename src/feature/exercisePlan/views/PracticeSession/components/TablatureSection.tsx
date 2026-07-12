@@ -83,7 +83,7 @@ export const TablatureSection = memo(function TablatureSection({
   volumeRef,
   isExamMode = false,
 }: TablatureSectionProps) {
-  const { hitNotes, missedNotes } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, gpPositionRef } = useNoteMatchingContext();
   const renderData = useTablatureRenderData(activeTablature);
   const { measureEndXs, totalBeats } = renderData;
 
@@ -236,6 +236,7 @@ export const TablatureSection = memo(function TablatureSection({
             className="w-full"
             hitNotes={hitNotes}
             missedNotes={missedNotes}
+            positionRef={gpPositionRef}
           />
         </div>
       )}

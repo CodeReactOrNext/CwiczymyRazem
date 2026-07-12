@@ -1,3 +1,4 @@
+import type { GpPlaybackPosition } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { createContext, type MutableRefObject, type ReactNode,useContext, useEffect, useMemo, useRef } from "react";
 
@@ -37,6 +38,9 @@ interface NoteMatchingContextValue {
   huntTarget: string | null;
   /** Live mic volume (0..1) for the detection waveform. */
   volumeRef: MutableRefObject<number>;
+  /** Live AlphaTab playback position sink. The notation viewer writes into it while
+   *  it owns the audio; note matching reads it as the ground-truth clock. */
+  gpPositionRef: MutableRefObject<GpPlaybackPosition | null>;
   /** Manually advance the hunt to the next target (for no-mic practice). */
   advanceHunt: () => void;
   /** Enable the microphone / pitch detection from inside the hunt UI. */
@@ -67,6 +71,7 @@ export interface NoteMatchingHandle {
 const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
 
 const _fallbackRef = { current: 0 } as MutableRefObject<number>;
+const _fallbackGpPositionRef = { current: null } as MutableRefObject<GpPlaybackPosition | null>;
 
 const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   hitNotes: {},
@@ -83,6 +88,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   customGoalPrompt: null,
   huntTarget: null,
   volumeRef: _fallbackRef,
+  gpPositionRef: _fallbackGpPositionRef,
   advanceHunt: () => { /* no-op default */ },
   onEnableMic: () => { /* no-op default */ },
   markNoteHuntOctave: () => { /* no-op default */ },
@@ -101,6 +107,9 @@ interface NoteMatchingProviderProps {
    *  clock (what the user hears) instead of the drifting wall clock. */
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
+  /** Live AlphaTab playback position (GP / notation audio) — the ground-truth clock
+   *  for matching whenever it's fresh; the anchor clock above is the fallback. */
+  gpPositionRef: MutableRefObject<GpPlaybackPosition | null>;
   effectiveBpm: number;
   rawBpm: number;
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -141,6 +150,7 @@ export function NoteMatchingProvider({
   startTime,
   audioContext,
   audioStartTime,
+  gpPositionRef,
   effectiveBpm,
   rawBpm,
   activeTablature,
@@ -176,6 +186,7 @@ export function NoteMatchingProvider({
     startTime,
     audioContext,
     audioStartTime,
+    gpPositionRef,
     effectiveBpm,
     rawBpm,
     activeTablature,
@@ -309,6 +320,7 @@ export function NoteMatchingProvider({
       customGoalPrompt: isHunt ? (customGoalPrompt ?? null) : null,
       huntTarget: isHunt ? (customGoal ?? null) : null,
       volumeRef: audioRefs.volumeRef,
+      gpPositionRef,
       advanceHunt: onAdvanceHunt,
       onEnableMic,
       markNoteHuntOctave,

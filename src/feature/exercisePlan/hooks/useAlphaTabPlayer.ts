@@ -7,6 +7,18 @@ import { useCallback, useEffect, useRef } from 'react';
 // so a RQ beat position maps to an AlphaTab tick with beat * 960.
 const TICKS_PER_QUARTER = 960;
 
+/** Live AlphaTab playback position — the ground truth for "where the audio is".
+ *  Written by whichever AlphaTab instance currently owns the audio (this hidden
+ *  player or the notation view) and read by note matching, so hit/miss windows
+ *  can never drift from the audible playback (tempo automation, seeks, synth
+ *  startup latency and loop restarts are all baked into the reported tick). */
+export interface GpPlaybackPosition {
+  /** Position in quarter-note beats (currentTick / 960 — matches the parser's grid). */
+  beats: number;
+  /** Date.now() when the position event fired — for staleness checks + extrapolation. */
+  sampledAtMs: number;
+}
+
 interface AlphaTabTrackConfig {
   isMuted: boolean;
   volume: number;
@@ -49,6 +61,8 @@ interface UseAlphaTabPlayerProps {
    * Consumed (reset to null) once applied. Null → start/resume normally.
    */
   pendingSeekBeatRef?: MutableRefObject<number | null>;
+  /** Live playback position sink — updated on every playerPositionChanged event. */
+  positionRef?: MutableRefObject<GpPlaybackPosition | null>;
 }
 
 /**
@@ -74,6 +88,7 @@ export const useAlphaTabPlayer = ({
   backingTrackIds = [],
   resetKey,
   pendingSeekBeatRef,
+  positionRef,
 }: UseAlphaTabPlayerProps) => {
   const apiRef             = useRef<any>(null);
   const playRef            = useRef<AlphaTabPlayerHandle['play'] | null>(null);
@@ -172,6 +187,12 @@ export const useAlphaTabPlayer = ({
       }
     });
 
+    api.playerPositionChanged.on((args: any) => {
+      if (positionRef && typeof args?.currentTick === "number") {
+        positionRef.current = { beats: args.currentTick / TICKS_PER_QUARTER, sampledAtMs: Date.now() };
+      }
+    });
+
     api.playerFinished.on(() => {
       onLoopCompleteRef.current?.();
       if (isPlayingRef.current) {
@@ -197,11 +218,13 @@ export const useAlphaTabPlayer = ({
       playRef.current  = null;
       apiRef.current   = null;
       scoreRef.current = null;
+      if (positionRef) positionRef.current = null;
     };
   // rawGpFile in deps: effect re-evaluates when file arrives (null→File transition).
   // The apiRef.current guard prevents double-creation if deps fire again with same state.
-  // applyPendingSeek is stable (memoized on the stable seek ref) so it never re-creates the API.
-  }, [rawGpFile, applyPendingSeek]);
+  // applyPendingSeek is stable (memoized on the stable seek ref) so it never re-creates
+  // the API; positionRef is a stable useRef object from the caller for the same reason.
+  }, [rawGpFile, applyPendingSeek, positionRef]);
 
   // Load file into existing API.
   useEffect(() => {
@@ -285,10 +308,13 @@ export const useAlphaTabPlayer = ({
           try { api.pause(); } catch { /* ignore */ }
           wasPausedRef.current = true;
         }
+        // Position samples from before the pause must not leak into the next
+        // play (which may resume somewhere else after a seek).
+        if (positionRef) positionRef.current = null;
       }
       // startTime changed while already stopped — no-op.
     }
-  }, [isPlaying, startTime, applyPendingSeek]);
+  }, [isPlaying, startTime, applyPendingSeek, positionRef, pendingSeekBeatRef]);
 
   // Explicit restart (e.g. restart button, speed change).
   // Clears the paused state and stops AlphaTab so the next play() starts from beat 0.

@@ -1,11 +1,17 @@
+import type { GpPlaybackPosition } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import type { MutableRefObject } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import { computeChromagram, freqToPitchClass, getCentsDistance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { getFeedbackForCombo } from "./noteMatchingFeedback";
-import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
+
+/** How old an AlphaTab position sample may be and still count as "the player is
+ *  actively reporting". AlphaSynth emits playerPositionChanged every ~50–100ms
+ *  while playing, so anything older means the GP player isn't the audio source. */
+const GP_POSITION_FRESH_MS = 500;
 
 const CENTS_TOLERANCE      = 45;
 const CHORD_CHROMA_THRESHOLD = 0.55;
@@ -20,6 +26,11 @@ interface UseNoteMatchingOptions {
   audioContext?: AudioContext | null;
   /** AudioContext.currentTime of the first scheduled beat (same instant as startTime). */
   audioStartTime?: number | null;
+  /** Live AlphaTab playback position. Fresh samples override the anchor clocks above:
+   *  ticks are the ground truth for GP/notation audio (tempo automation, bar-click
+   *  seeks and synth startup latency are all baked in), while the anchor math assumes
+   *  a constant BPM from playback start. */
+  gpPositionRef?: MutableRefObject<GpPlaybackPosition | null>;
   effectiveBpm: number;
   /** raw metronome BPM — used for score bonus calculation */
   rawBpm: number;
@@ -37,7 +48,7 @@ interface UseNoteMatchingOptions {
 }
 
 export function useNoteMatching({
-  isPlaying, startTime, audioContext, audioStartTime, effectiveBpm, rawBpm,
+  isPlaying, startTime, audioContext, audioStartTime, gpPositionRef, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
   speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset,
 }: UseNoteMatchingOptions) {
@@ -78,29 +89,31 @@ export function useNoteMatching({
   const beatsPerSecond = effectiveBpm / 60;
   const currentBeatsElapsedRef = useRef(0);
 
-  // Tempo-aware clock shared by the cursor ref and the matching loop. GP imports
-  // carry tempo automation that the audio playback and the visual cursor follow;
-  // matching must follow the same curve or it drifts progressively into the song.
-  const beatClock = useMemo(() => {
-    if (!activeTablature || !totalExerciseBeats) return null;
-    return createBeatClock(buildTempoMap(activeTablature), totalExerciseBeats, effectiveBpm);
-  }, [activeTablature, totalExerciseBeats, effectiveBpm]);
-
   useEffect(() => {
     if (!isPlaying || !startTime || !totalExerciseBeats) { currentBeatsElapsedRef.current = 0; return; }
     let rafId: number;
     const tick = () => {
-      // Prefer the audio clock (what the user actually hears) over Date.now().
-      const elapsedSec = audioContext && audioStartTime != null
-        ? audioContext.currentTime - audioStartTime
-        : (Date.now() - startTime) / 1000;
-      const beats = beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSecond;
+      const now = Date.now();
+      const gp = gpPositionRef?.current;
+      let beats: number;
+      if (gp && now - gp.sampledAtMs < GP_POSITION_FRESH_MS) {
+        // AlphaTab is the audio source — follow its reported position, extrapolated
+        // over the short gap since the last playerPositionChanged event.
+        beats = gp.beats + ((now - gp.sampledAtMs) / 1000) * beatsPerSecond;
+      } else {
+        // Synth/metronome-driven playback runs at a constant BPM from the anchor.
+        // Prefer the audio clock (what the user actually hears) over Date.now().
+        const elapsedSec = audioContext && audioStartTime != null
+          ? audioContext.currentTime - audioStartTime
+          : (now - startTime) / 1000;
+        beats = elapsedSec * beatsPerSecond;
+      }
       currentBeatsElapsedRef.current = beats % totalExerciseBeats;
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, beatsPerSecond, totalExerciseBeats]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, gpPositionRef, beatsPerSecond, totalExerciseBeats]);
 
   // ── RAF note-matching loop ────────────────────────────────────────────────────
 
@@ -153,15 +166,21 @@ export function useNoteMatching({
       const windowBeats      = (windowMs / 1000) * beatsPerSec;
       const earlyWindowBeats = (Math.max(16, Math.min(50, beatDurationMs * 0.05)) / 1000) * beatsPerSec;
 
-      // Position on the clock the user hears (audio context), tempo-map-aware,
-      // shifted back by the input latency so windows line up with the played note.
-      const rawElapsedSec = audioContext && audioStartTime != null
-        ? audioContext.currentTime - audioStartTime
-        : (now - startTime) / 1000;
-      const elapsedSec = rawElapsedSec - getLatencyMs() / 1000;
-      const beatsTotal = beatClock
-        ? beatClock.toBeats(elapsedSec)
-        : elapsedSec * beatsPerSec;
+      // Playback position, shifted back by the input latency so hit windows line
+      // up with the note the user actually played. Fresh AlphaTab ticks are the
+      // ground truth (GP/notation audio — tempo automation, seeks and synth start
+      // latency included); otherwise fall back to constant-BPM math on the audio
+      // clock (the synth/metronome grid), with Date.now() as the last resort.
+      const gp = gpPositionRef?.current;
+      let beatsTotal: number;
+      if (gp && now - gp.sampledAtMs < GP_POSITION_FRESH_MS) {
+        beatsTotal = gp.beats + ((now - gp.sampledAtMs - getLatencyMs()) / 1000) * beatsPerSec;
+      } else {
+        const rawElapsedSec = audioContext && audioStartTime != null
+          ? audioContext.currentTime - audioStartTime
+          : (now - startTime) / 1000;
+        beatsTotal = (rawElapsedSec - getLatencyMs() / 1000) * beatsPerSec;
+      }
       const loopedBeatsElapsed = beatsTotal % totalExBeats;
       const hasRecentOnset     = (now - lastOnsetTime) < onsetRecencyMs;
       const hasRecentTick      = (now - lastTickTime)  < onsetRecencyMs;
@@ -278,7 +297,7 @@ export function useNoteMatching({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, gpPositionRef, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
 
   return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, resetGame };
 }

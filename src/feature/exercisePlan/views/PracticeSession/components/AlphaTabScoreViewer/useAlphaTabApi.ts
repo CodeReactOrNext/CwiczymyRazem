@@ -1,9 +1,14 @@
 import * as alphaTabLib from "@coderline/alphatab";
+import type { GpPlaybackPosition } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { useEffect, useRef, useState } from "react";
 
 import { tablatureToAlphaTex } from "./tablatureToAlphaTex";
 import type { Track } from "./types";
+
+// AlphaTab reports playback position in MIDI ticks; 960 ticks = one quarter note,
+// which is exactly the parser's beat unit.
+const TICKS_PER_QUARTER = 960;
 
 interface UseAlphaTabApiOptions {
   /** Real Guitar Pro file — takes priority when present. */
@@ -17,6 +22,9 @@ interface UseAlphaTabApiOptions {
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
   origBpmRef: React.MutableRefObject<number>;
+  /** Live playback position sink — while this viewer owns the audio, note matching
+   *  follows it instead of a parallel clock (see GpPlaybackPosition). */
+  positionRef?: React.MutableRefObject<GpPlaybackPosition | null>;
 }
 
 interface UseAlphaTabApiReturn {
@@ -44,6 +52,7 @@ export function useAlphaTabApi({
   volumeRef,
   bpmRef,
   origBpmRef,
+  positionRef,
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -137,6 +146,9 @@ export function useAlphaTabApi({
     api.playerPositionChanged.on((args: any) => {
       if (args?.currentTime !== undefined) setCurrentMs(args.currentTime);
       if (args?.endTime > 0)              setTotalMs(args.endTime);
+      if (positionRef && typeof args?.currentTick === "number") {
+        positionRef.current = { beats: args.currentTick / TICKS_PER_QUARTER, sampledAtMs: Date.now() };
+      }
     });
 
     api.playerFinished.on(() => {
@@ -159,6 +171,7 @@ export function useAlphaTabApi({
       try { api.destroy(); } catch { /* ignore */ }
       apiRef.current   = null;
       scoreRef.current = null;
+      if (positionRef) positionRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawGpFile, measures, mode]);

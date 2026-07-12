@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
+import type { GpPlaybackPosition } from "../../hooks/useAlphaTabPlayer";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
@@ -164,6 +165,10 @@ export const PracticeSession = ({
   // ── AlphaTab AudioContext + metronome bridge ───────────────────────────────
 
   const tabTickBridgeRef = useRef<(() => void) | null>(null);
+  // Live AlphaTab playback position (ticks → beats), written by whichever AlphaTab
+  // instance currently owns the audio (hidden GP player or the notation viewer).
+  // Note matching reads it as the ground-truth clock — see useNoteMatching.
+  const gpPositionRef = useRef<GpPlaybackPosition | null>(null);
   const [audioSystem, setAudioSystem] = useState<{ context: AudioContext | null; isActive: boolean }>({
     context: null,
     isActive: false,
@@ -283,6 +288,7 @@ export const PracticeSession = ({
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
+    gpPositionRef,
     tuningOffsets: guitarTuning.tuning.offsets,
   });
 
@@ -413,6 +419,7 @@ export const PracticeSession = ({
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       audioContext={metronome.audioContext} audioStartTime={metronome.audioStartTime}
+      gpPositionRef={gpPositionRef}
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
