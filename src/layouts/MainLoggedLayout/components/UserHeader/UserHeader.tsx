@@ -5,6 +5,7 @@ import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/componen
 import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
 import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
 import Image from "next/image";
+import Link from "next/link";
 import type { StatisticsDataInterface } from "types/api.types";
 
 interface UserHeaderProps {
@@ -34,15 +35,15 @@ const UserHeader = ({
         <div className='flex items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8'>
           {/* Left Section - Level & Progress */}
           <div className='flex items-center gap-3 pl-0'>
-            <div className="flex sm:hidden h-8 w-8 items-center justify-center">
-              <Image 
-                src="/images/logolight.svg" 
-                alt="Logo" 
-                width={28} 
-                height={28} 
+            <Link href="/dashboard" className="flex sm:hidden h-8 w-8 items-center justify-center">
+              <Image
+                src="/images/logolight.svg"
+                alt="Logo"
+                width={28}
+                height={28}
                 className="h-7 w-7"
               />
-            </div>
+            </Link>
    
           </div>
 
