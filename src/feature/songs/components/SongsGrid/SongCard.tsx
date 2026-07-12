@@ -1,10 +1,4 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "assets/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -12,34 +6,19 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
-import { AddToPlaylistSub } from "feature/songs/components/Playlists/AddToPlaylistSub";
+import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { toggleFavoriteSong } from "feature/user/store/userSlice.favoriteActions";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import {
-  BookOpen,
-  CheckCircle2,
   Clock,
-  Eye,
-  Heart,
-  ListMusic,
-  MoreVertical,
   Music,
   Play,
   Star,
-  Trash2,
   Users,
 } from "lucide-react";
-import { useRouter } from "next/router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-
-const STATUS_META = {
-  wantToLearn: { label: "Want to Learn", icon: ListMusic, color: "text-zinc-300", ring: "ring-zinc-400/40" },
-  learning: { label: "Learning", icon: BookOpen, color: "text-amber-400", ring: "ring-amber-400/50" },
-  learned: { label: "Learned", icon: CheckCircle2, color: "text-green-400", ring: "ring-green-400/50" },
-} as const;
+import { useAppSelector } from "store/hooks";
 
 function formatPracticeMs(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
@@ -72,11 +51,7 @@ export const SongCard = ({
   showPracticeStatus,
   practiceMs,
 }: SongCardProps) => {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUserAuth);
-  const userInfo = useAppSelector(selectUserInfo);
-  const isFavorite = (userInfo?.favoriteSongIds ?? []).includes(song.id);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
   const isRated = song.difficulties?.some(d => d.userId === userId);
@@ -178,86 +153,15 @@ export const SongCard = ({
             </button>
           )}
 
-          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <button
-                aria-label="Song actions"
-                className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 data-[state=open]:bg-zinc-900"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 space-y-1 rounded-lg bg-zinc-950 p-2 text-zinc-400 shadow-2xl backdrop-blur-xl"
-            >
-              <DropdownMenuItem
-                onClick={() => router.push(`/songs?view=board&songId=${song.id}`)}
-                className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
-              >
-                <Eye className="h-3.5 w-3.5" />
-                Open in board
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => (onPlay ? onPlay() : router.push(`/timer/song/${song.id}`))}
-                className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
-              >
-                <Play className="h-3 w-3 fill-current" />
-                Practice
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  dispatch(toggleFavoriteSong({ songId: song.id, isFavorite: !isFavorite }))
-                }
-                className={cn(
-                  "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isFavorite ? "text-rose-400 hover:bg-zinc-800" : "hover:bg-zinc-800 hover:text-white"
-                )}
-              >
-                <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
-                {isFavorite ? "Remove from favorites" : "Add to favorites"}
-              </DropdownMenuItem>
-              <AddToPlaylistSub song={song} />
-
-              <div className="my-1 h-px bg-white/5" />
-
-              {(["wantToLearn", "learning", "learned"] as const).map((status) => {
-                const meta = STATUS_META[status];
-                const Icon = meta.icon;
-                const isActive = status === userStatus;
-                return (
-                  <DropdownMenuItem
-                    key={status}
-                    onClick={() => onStatusChange?.(status)}
-                    className={cn(
-                      "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                      isActive ? "bg-zinc-800/50 text-white" : "hover:bg-zinc-800 hover:text-white"
-                    )}
-                  >
-                    <Icon className={cn("h-3.5 w-3.5", meta.color)} />
-                    <span className="flex-1">
-                      {isActive ? meta.label : `Move to ${meta.label}`}
-                    </span>
-                    {isActive && <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />}
-                  </DropdownMenuItem>
-                );
-              })}
-
-              {userStatus && (
-                <>
-                  <div className="my-1 h-px bg-white/5" />
-                  <DropdownMenuItem
-                    onClick={() => onStatusChange?.(undefined)}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Remove from collection
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SongCardMenu
+            song={song}
+            userStatus={userStatus}
+            onStatusChange={onStatusChange}
+            onPlay={onPlay}
+            open={isMenuOpen}
+            onOpenChange={setIsMenuOpen}
+            triggerClassName="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 data-[state=open]:bg-zinc-900"
+          />
         </div>
       </div>
 

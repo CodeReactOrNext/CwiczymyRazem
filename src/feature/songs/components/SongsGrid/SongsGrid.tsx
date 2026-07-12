@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { SongCardRow, SongRowSkeleton } from "feature/songs/components/SongsGrid/SongCardRow";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
@@ -80,48 +81,81 @@ export const SongsGrid = ({
     return <div>Loading...</div>;
   }
 
+  const getUserStatus = (song: Song): SongStatus | undefined => {
+    if (userSongs.wantToLearn.some((s) => s.id === song.id)) return "wantToLearn";
+    if (userSongs.learning.some((s) => s.id === song.id)) return "learning";
+    if (userSongs.learned.some((s) => s.id === song.id)) return "learned";
+    return undefined;
+  };
+
+  const openDetails = (song: Song) => {
+    posthog.capture("song_library_action", { action: "open_details", song_id: song.id });
+    setSelectedSong(song);
+    setIsDetailsOpen(true);
+  };
+
+  const changeStatus = (song: Song, status: SongStatus | undefined) => {
+    if (status) handleAddOrMove(song, status);
+    else handleSongRemoval(song.id);
+  };
+
   return (
     <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
       {isLoading ? (
-        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
-          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <SongCardSkeleton key={i} />
-          ))}
-        </div>
+        <>
+          {/* Phones: Spotify-style list */}
+          <div className='space-y-1 sm:hidden'>
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <SongRowSkeleton key={i} />
+            ))}
+          </div>
+          {/* Tablet / desktop: card grid */}
+          <div className='hidden gap-x-6 gap-y-8 sm:grid sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <SongCardSkeleton key={i} />
+            ))}
+          </div>
+        </>
       ) : songs.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
         </div>
       ) : (
-        <div className='grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 animate-in fade-in duration-500'>
-          {songs.map((song) => {
-            let userStatus: SongStatus | undefined;
-            if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
-            else if (userSongs.learning.some(s => s.id === song.id)) userStatus = "learning";
-            else if (userSongs.learned.some(s => s.id === song.id)) userStatus = "learned";
+        <>
+          {/* Phones: Spotify-style list — the 2-col card grid is too cramped to read. */}
+          <div className='space-y-1 sm:hidden animate-in fade-in duration-500'>
+            {songs.map((song) => {
+              const userStatus = getUserStatus(song);
+              return (
+                <SongCardRow
+                  key={song.id}
+                  song={song}
+                  userStatus={userStatus}
+                  onOpenDetails={() => openDetails(song)}
+                  onStatusChange={(status) => changeStatus(song, status)}
+                  onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
+                />
+              );
+            })}
+          </div>
 
-            return (
-              <SongCard
-                key={song.id}
-                song={song}
-                userStatus={userStatus}
-                onOpenDetails={() => {
-                  posthog.capture("song_library_action", { action: "open_details", song_id: song.id });
-                  setSelectedSong(song);
-                  setIsDetailsOpen(true);
-                }}
-                onStatusChange={(status) => {
-                  if (status) {
-                    handleAddOrMove(song, status);
-                  } else {
-                    handleSongRemoval(song.id);
-                  }
-                }}
-                onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
-              />
-            );
-          })}
-        </div>
+          {/* Tablet / desktop: card grid */}
+          <div className='hidden gap-x-6 gap-y-8 sm:grid sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 animate-in fade-in duration-500'>
+            {songs.map((song) => {
+              const userStatus = getUserStatus(song);
+              return (
+                <SongCard
+                  key={song.id}
+                  song={song}
+                  userStatus={userStatus}
+                  onOpenDetails={() => openDetails(song)}
+                  onStatusChange={(status) => changeStatus(song, status)}
+                  onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
+                />
+              );
+            })}
+          </div>
+        </>
       )}
 
       <SongSheet

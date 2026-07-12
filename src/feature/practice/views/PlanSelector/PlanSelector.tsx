@@ -284,7 +284,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               )}
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
-                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Routines" isActive={activeTab === "routines"} />
+                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Featured" isActive={activeTab === "routines"} />
                 <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} tooltip="Practice along with a real song at your own pace" />
                 <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" isActive={activeTab === "my_plans"} />
                 <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" isActive={activeTab === "community"} />
