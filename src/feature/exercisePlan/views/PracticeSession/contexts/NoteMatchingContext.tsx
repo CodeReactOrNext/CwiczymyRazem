@@ -97,6 +97,10 @@ interface NoteMatchingProviderProps {
   // inputs for useNoteMatching
   isPlaying: boolean;
   startTime: number | null;
+  /** Playback AudioContext + its start anchor — lets matching follow the audio
+   *  clock (what the user hears) instead of the drifting wall clock. */
+  audioContext?: AudioContext | null;
+  audioStartTime?: number | null;
   effectiveBpm: number;
   rawBpm: number;
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -135,6 +139,8 @@ export function NoteMatchingProvider({
   handleRef,
   isPlaying,
   startTime,
+  audioContext,
+  audioStartTime,
   effectiveBpm,
   rawBpm,
   activeTablature,
@@ -168,6 +174,8 @@ export function NoteMatchingProvider({
   } = useNoteMatching({
     isPlaying,
     startTime,
+    audioContext,
+    audioStartTime,
     effectiveBpm,
     rawBpm,
     activeTablature,

@@ -412,6 +412,7 @@ export const PracticeSession = ({
     <GuitarTuningProvider value={guitarTuning}>
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
+      audioContext={metronome.audioContext} audioStartTime={metronome.audioStartTime}
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
