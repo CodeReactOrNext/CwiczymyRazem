@@ -337,15 +337,15 @@ const UserLink = ({
       <Link
         className='flex items-center gap-2 text-white hover:underline'
         href={`/user/${uid}`}>
-        <div className="scale-75 origin-left">
-          <Avatar 
-            size="sm" 
-            name={userName} 
-            avatarURL={avatarUrl || undefined} 
-            lvl={lvl} 
+        <div className="scale-75 sm:scale-100 origin-left sm:mr-2">
+          <Avatar
+            size="sm"
+            name={userName}
+            avatarURL={avatarUrl || undefined}
+            lvl={lvl}
           />
         </div>
-        <span className="-ml-2">{userName}</span>
+        <span>{userName}</span>
       </Link>
     </UserTooltip>
   );
@@ -359,7 +359,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg px-4 py-5 sm:px-6 transition-all duration-300 rounded-xl ${
+    className={`my-8 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg px-4 py-5 sm:px-6 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -487,7 +487,10 @@ const NoTopPlayersData = ({
   isNew: boolean;
   t: (key: string) => string;
 }) => (
-  <LogItem isNew={isNew}>
+  <div
+    className={`my-6 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg px-4 py-5 sm:px-6 transition-all duration-300 rounded-xl ${
+      isNew ? "border border-white/30" : ""
+    }`}>
     <TimeStamp date={date} />
     <div className='flex w-full flex-col gap-2 sm:w-[80%]'>
       <h3 className='flex items-center gap-2 text-sm font-bold text-tertiary'>
@@ -496,7 +499,7 @@ const NoTopPlayersData = ({
       </h3>
       <p className='text-secondText'>No top players data available.</p>
     </div>
-  </LogItem>
+  </div>
 );
 
 const FirebaseLogsTopPlayersItem = ({
@@ -542,14 +545,14 @@ const FirebaseLogsTopPlayersItem = ({
 };
 /** Compact per-line timestamp used inside a grouped feed row, where the group header already owns the full date. */
 const LineTimeStamp = ({ date }: { date: Date }) => (
-  <span className="w-9 shrink-0 text-[11px] leading-5 tabular-nums text-secondText opacity-50">
+  <span className="hidden sm:block w-9 shrink-0 text-[11px] leading-5 tabular-nums text-secondText opacity-50">
     {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
   </span>
 );
 
 /** One activity line: fixed time column + content that wraps in its own column (never under the time). */
 const GroupedLine = ({ date, children }: { date: Date; children: React.ReactNode }) => (
-  <div className="flex items-start gap-2">
+  <div className="flex items-center gap-2">
     <LineTimeStamp date={date} />
     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2">{children}</div>
   </div>
@@ -906,7 +909,7 @@ const GroupedLogItem = ({
           <span className="inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary">
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl ?? undefined} lvl={userAvatarFrame} />
           </span>
-          <span className="shrink-0 text-[11px] text-secondText opacity-50 tabular-nums">
+          <span className="hidden sm:flex sm:items-center shrink-0 text-[11px] text-secondText opacity-50 tabular-nums">
             {date.toLocaleDateString()}
           </span>
 
