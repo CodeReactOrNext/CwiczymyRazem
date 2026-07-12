@@ -234,23 +234,23 @@ export const LeadboardRow = ({
 
           {/* User Info */}
           <div className='min-w-0 flex-1'>
-            <div className='mb-1.5 flex items-center gap-4'>
-              <Link href={`/user/${profileId}`} className="flex items-center gap-2 group/link">
+            <div className='mb-1.5 flex flex-wrap items-center gap-x-4 gap-y-1'>
+              <Link href={`/user/${profileId}`} className="flex min-w-0 items-center gap-2 group/link">
                 <h3
                   translate="no"
-                  className={`text-lg font-bold tracking-tight transition-colors lg:text-xl group-hover/link:underline ${
+                  className={`truncate text-lg font-bold tracking-tight transition-colors lg:text-xl group-hover/link:underline ${
                     profileId === currentUserId
                       ? "text-cyan-300"
                       : "text-zinc-200 group-hover:text-white"
                   }`}>
                   {shortenNick(nick)}
                 </h3>
-                <FaExternalLinkAlt className='text-xs opacity-30 transition-all duration-300 group-hover/link:opacity-100 sm:text-sm' />
+                <FaExternalLinkAlt className='flex-shrink-0 text-xs opacity-30 transition-all duration-300 group-hover/link:opacity-100 sm:text-sm' />
               </Link>
 
               <div
                 translate="no"
-                className={`flex w-fit items-center gap-1.5 rounded-sm px-3 py-1 ${
+                className={`flex w-fit flex-shrink-0 items-center gap-1.5 rounded-sm px-3 py-1 ${
                   profileId === currentUserId
                     ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
                     : "bg-zinc-800 text-zinc-400 ring-1 ring-white/5"
@@ -350,11 +350,11 @@ export const LeadboardRow = ({
 
           {/* Rig Guitars / Achievements - Desktop */}
           {variant === "gear" ? (
-            <div className='flex-shrink-0 hidden lg:block opacity-90 transition-opacity duration-300 group-hover:opacity-100'>
+            <div className='flex-shrink-0 hidden xl:block opacity-90 transition-opacity duration-300 group-hover:opacity-100'>
               <RigGuitarsPreview arsenal={arsenal} />
             </div>
           ) : (
-            <div className='flex-shrink-0 hidden lg:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
+            <div className='flex-shrink-0 hidden xl:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
               <AchievementsCarousel achievements={statistics.achievements} />
             </div>
           )}
