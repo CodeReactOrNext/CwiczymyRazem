@@ -1,10 +1,10 @@
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
-import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Music, Play, Star } from "lucide-react";
+import { Music, Star } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -32,6 +32,8 @@ export const SongCardRow = ({
   const isRated = song.difficulties?.some((d) => d.userId === userId);
   const statusMeta = userStatus ? STATUS_META[userStatus] : null;
   const StatusIcon = statusMeta?.icon;
+  const avgDifficulty = song.avgDifficulty || 0;
+  const tier = getSongTier(avgDifficulty === 0 ? "?" : song.tier || avgDifficulty);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -59,8 +61,15 @@ export const SongCardRow = ({
             <Music className="h-6 w-6" />
           </div>
         )}
+        {/* Tier pinned to the cover so it never squeezes the title */}
+        <span
+          className="absolute right-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-[4px] bg-black/70 px-1 text-[10px] font-black leading-none backdrop-blur-sm"
+          style={{ color: tier.color }}
+        >
+          {tier.tier}
+        </span>
         {statusMeta && StatusIcon && (
-          <div className="absolute inset-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
             <StatusIcon className={cn("h-3.5 w-3.5 drop-shadow", statusMeta.color)} />
           </div>
         )}
@@ -80,22 +89,7 @@ export const SongCardRow = ({
       </div>
 
       {/* Actions */}
-      <div className="flex shrink-0 items-center gap-3" onClick={(e) => e.stopPropagation()}>
-        <TierBadge song={song} className="h-8 w-8 text-xs" />
-
-        {onPlay && (
-          <button
-            aria-label="Practice"
-            onClick={(e) => {
-              e.stopPropagation();
-              onPlay();
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black transition-transform active:scale-90"
-          >
-            <Play className="h-4 w-4 fill-current" />
-          </button>
-        )}
-
+      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
         <SongCardMenu
           song={song}
           userStatus={userStatus}
