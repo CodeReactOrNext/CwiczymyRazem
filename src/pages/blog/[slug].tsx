@@ -3,6 +3,7 @@ import { AppCard } from 'components/Blog/AppCard';
 import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
+import { ExercisePromo } from 'components/Blog/ExercisePromo';
 import { PracticeTable } from 'components/Blog/PracticeTable';
 import { SongTierTable } from 'components/Blog/SongTierTable';
 import { StepList } from 'components/Blog/StepList';
@@ -55,6 +56,7 @@ const components = {
   BlogAlert,
   ActionCard,
   AppCard,
+  ExercisePromo,
   PracticeTable,
   StepList,
   SongTierTable,
