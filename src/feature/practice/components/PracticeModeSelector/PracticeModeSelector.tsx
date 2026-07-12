@@ -13,8 +13,6 @@ import {
   History,
   ListChecks,
   Lock,
-  Map,
-  Route,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -33,24 +31,28 @@ const colorMap = {
     iconBorder:
       "border border-white/5 border-t-amber-500/40 border-l-amber-500/20",
     iconText: "text-amber-400",
+    cardBg: "bg-zinc-800/60",
   },
   rose: {
     iconBg: "bg-gradient-to-br from-rose-500/20 to-rose-500/5",
     iconBorder:
       "border border-white/5 border-t-rose-500/40 border-l-rose-500/20",
     iconText: "text-rose-400",
+    cardBg: "bg-zinc-800/60",
   },
   emerald: {
     iconBg: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5",
     iconBorder:
       "border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20",
     iconText: "text-emerald-400",
+    cardBg: "bg-zinc-800/60",
   },
   indigo: {
     iconBg: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
     iconBorder:
       "border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20",
     iconText: "text-indigo-400",
+    cardBg: "bg-zinc-800/60",
   },
 } as const;
 
@@ -98,8 +100,8 @@ const ModeCard = ({
         hero || isGroup ? "items-start" : "items-center"
       } ${
         hero
-          ? "bg-zinc-800/60 p-[18px] backdrop-blur-md"
-          : "bg-zinc-800/60 p-3.5 backdrop-blur-sm"
+          ? `${c.cardBg} p-[18px] backdrop-blur-md`
+          : `${c.cardBg} p-3.5 backdrop-blur-sm`
       } ${
         isGroup
           ? ""
@@ -258,98 +260,98 @@ export const PracticeModeSelector = () => {
 
   return (
     <>
-      <div className='relative mb-8 w-full'>
+      <div className='relative w-full'>
         <HeroPattern
           className='opacity-[0.04]'
           maskImage='linear-gradient(to bottom, black 0%, black 20%, transparent 80%)'
         />
-        <div className='container relative z-10 mx-auto max-w-6xl px-4 py-8 font-sans sm:px-6'>
-          <div className='flex flex-col gap-12'>
-            {lastSession && (
-              <button
-                type='button'
-                onClick={() => nav(lastSession.href, "resume")}
-                className='group relative flex w-full items-center gap-4 overflow-hidden rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-5 py-4 text-left transition-background duration-200 hover:bg-indigo-500/15 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-                <Ripple className='bg-white/15' />
-                <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-white/5 border-l-indigo-500/20 border-t-indigo-500/40 bg-gradient-to-br from-indigo-500/20 to-indigo-500/5'>
-                  {loadingMode === "resume" ? (
-                    <div className='h-6 w-6 animate-spin rounded-full border-[3px] border-white border-t-transparent' />
-                  ) : (
-                    <History className='h-6 w-6 text-indigo-400' />
-                  )}
-                </div>
-                <div className='min-w-0 flex-1'>
-                  <p className='text-[11px] font-semibold tracking-wide text-indigo-300/80'>
-                    Last Session
-                  </p>
-                  <p className='truncate text-[15px] font-black text-white'>
-                    {lastSession.title}
-                  </p>
-                </div>
-                <ArrowRight className='h-4 w-4 shrink-0 text-indigo-300/70 transition-transform duration-300 group-hover:translate-x-1' />
-              </button>
-            )}
+        <div className='container relative z-10 mx-auto max-w-6xl px-4 py-12 font-sans sm:px-6'>
+          <div className='flex flex-col gap-16'>
+            <div>
+              <div className='mb-6 flex items-center gap-3'>
+                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600' />
+                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Continue or Start</h2>
+              </div>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
+                {lastSession && (
+                  <button
+                    type='button'
+                    onClick={() => nav(lastSession.href, "resume")}
+                    className='group relative flex items-start gap-3 overflow-hidden rounded-lg bg-zinc-800/60 px-4 py-4 text-left transition-background duration-200 hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                    <Ripple className='bg-white/15' />
+                    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5'>
+                      {loadingMode === "resume" ? (
+                        <div className='h-5 w-5 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
+                      ) : (
+                        <History className='h-5 w-5 text-indigo-400' />
+                      )}
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <p className='text-[10px] font-semibold tracking-wide text-zinc-500 mb-1'>
+                        Last Session
+                      </p>
+                      <p className='truncate text-sm font-bold text-white'>
+                        {lastSession.title}
+                      </p>
+                    </div>
+                  </button>
+                )}
+                {modeItem(
+                  "manual-log",
+                  ClipboardList,
+                  "Manual Log",
+                  "Log by hand",
+                  "/report",
+                  "indigo"
+                )}
+                {modeItem(
+                  "timer",
+                  PiCassetteTapeLight,
+                  "Free Timer",
+                  "Use stopwatch",
+                  "/timer/practice",
+                  "indigo"
+                )}
+              </div>
+            </div>
 
             <div>
-              <h2 className='mb-4 text-lg font-bold text-white'>Practice</h2>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6'>
+              <div className='mb-6 flex items-center gap-3'>
+                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600' />
+                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Choose Your Practice</h2>
+              </div>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
+                {modeItem(
+                  "song",
+                  PiCassetteTapeLight,
+                  "Songs",
+                  "Pick from library",
+                  "/songs?view=board",
+                  "indigo",
+                  { hero: true }
+                )}
                 {modeItem(
                   "routine",
                   ListChecks,
                   "Practice Routines",
-                  "Follow daily guided routine",
+                  "Guided routines",
                   "/timer/plans",
                   "indigo",
                   {
                     hero: true,
                     links: [
                       { label: "All Routines", href: "/timer/plans" },
-                      {
-                        label: "Playalongs",
-                        href: "/timer/plans?tab=playalongs",
-                      },
+                      { label: "Playalongs", href: "/timer/plans?tab=playalongs" },
                       { label: "My Plans", href: "/timer/plans?tab=my_plans" },
                       { label: "Community", href: "/timer/plans?tab=community" },
                     ],
                   }
                 )}
                 {modeItem(
-                  "song",
-                  PiCassetteTapeLight,
-                  "Songs",
-                  "Track practice time for your repertoire",
-                  "/timer/song-select",
-                  "indigo",
-                  {
-                    hero: true,
-                    links: [
-                      { label: "Song Practice", href: "/timer/song-select" },
-                      { label: "Board", href: "/songs?view=board" },
-                    ],
-                  }
-                )}
-                {modeItem(
-                  "log",
-                  ClipboardList,
-                  "Log",
-                  "Track a session by hand or with a stopwatch",
-                  "/report",
-                  "indigo",
-                  {
-                    hero: true,
-                    links: [
-                      { label: "Manual Log", href: "/report" },
-                      { label: "Free Timer", href: "/timer/practice" },
-                    ],
-                  }
-                )}
-              </div>
-              <div className='mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:mt-6 lg:grid-cols-3 lg:gap-6'>
-                {modeItem(
                   "smart",
                   PiMagicWandDuotone,
                   "Auto Plan",
-                  "Automatically generated session",
+                  "AI generated",
                   "/timer/auto",
                   "amber",
                   { locked: !isMaster, lockLabel: "Master" }
@@ -358,7 +360,7 @@ export const PracticeModeSelector = () => {
                   "gp",
                   SiGuitarpro,
                   "Guitar Pro Files",
-                  "Practice your imported Guitar Pro tabs",
+                  "Imported tabs",
                   "/gp-tabs",
                   "amber",
                   { locked: !isPremium, lockLabel: "Premium" }
@@ -367,44 +369,16 @@ export const PracticeModeSelector = () => {
             </div>
 
             <div>
-              <h2 className='mb-4 text-lg font-bold text-white'>Learn</h2>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6'>
-                {modeItem(
-                  "journey",
-                  Route,
-                  "Learning Path",
-                  "Step-by-step progress",
-                  "/journey",
-                  "rose"
-                )}
-                {modeItem(
-                  "roadmap",
-                  Map,
-                  "Mastery Roadmaps",
-                  "Goal-based practice roadmaps",
-                  "/ai-coach",
-                  "rose",
-                  { locked: !isMaster, lockLabel: "Master" }
-                )}
-                {modeItem(
-                  "scales",
-                  PiTreeView,
-                  "Scale Map",
-                  "Interactive scale fretboard tree",
-                  "/scale-tree",
-                  "rose"
-                )}
+              <div className='mb-6 flex items-center gap-3'>
+                <div className='h-1 w-1 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600' />
+                <h2 className='text-sm font-semibold uppercase tracking-widest text-zinc-300'>Skills & Learning</h2>
               </div>
-            </div>
-
-            <div>
-              <h2 className='mb-4 text-lg font-bold text-white'>Discover</h2>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6'>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6'>
                 {modeItem(
                   "skills",
                   Brain,
                   "Skills",
-                  "Specific skill focus",
+                  "Focused skill practice",
                   "/profile/skills",
                   "emerald"
                 )}
@@ -417,10 +391,18 @@ export const PracticeModeSelector = () => {
                   "emerald"
                 )}
                 {modeItem(
+                  "scales",
+                  PiTreeView,
+                  "Scale Map",
+                  "Interactive fretboard",
+                  "/scale-tree",
+                  "rose"
+                )}
+                {modeItem(
                   "community-exercises",
                   Users,
                   "Community Exercises",
-                  "Exercises shared by the community",
+                  "Shared by users",
                   "/profile/skills?tab=community",
                   "emerald"
                 )}

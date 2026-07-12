@@ -121,8 +121,7 @@ const FavoritesPage: NextPageWithLayout = () => {
   // Practice/GP picker — same chooser you get when clicking a song on /songs.
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
-    userAuth ?? null,
-    isPremium
+    userAuth ?? null
   );
   const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
     userSongs: songLists,

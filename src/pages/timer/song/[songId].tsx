@@ -9,7 +9,6 @@ import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import { doc, getDoc } from "firebase/firestore";
 import useTimer from "hooks/useTimer";
-import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import { SongTimerLayout } from "layouts/TimerLayout/SongTimerLayout";
@@ -35,7 +34,6 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     const previousUserStats = useAppSelector(selectPreviousUserStats);
     const raitingData = useAppSelector(selectRaitingData);
     const { reportList } = useActivityLog(userId as string);
-    const { t } = useTranslation(["timer", "common", "report"]);
     
     const [song, setSong] = useState<Song | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +51,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                     setSong({ id: docSnap.id, ...docSnap.data() } as Song);
                 } else {
                     toast.error("Song not found");
-                    router.push("/timer/song-select");
+                    router.push("/songs?view=board");
                 }
             } catch (error) {
                 console.error("Error fetching song:", error);
@@ -172,12 +170,12 @@ const SongPracticeTimer: NextPageWithLayout = () => {
 
     const handleBack = () => {
         // Return to wherever the user came from (favorites, songs board, …);
-        // only fall back to song-select when there's no history to go back to.
+        // only fall back to the songs board when there's no history to go back to.
         const leave = () => {
             if (typeof window !== "undefined" && window.history.length > 1) {
                 router.back();
             } else {
-                router.push("/timer/song-select");
+                router.push("/songs?view=board");
             }
         };
         if (timer.getTime() > 0) {

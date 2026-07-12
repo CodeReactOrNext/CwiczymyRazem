@@ -20,10 +20,10 @@ import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { PlaylistsView } from "feature/songs/components/Playlists/PlaylistsView";
 import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
+import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
-import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
@@ -34,7 +34,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import type { SongStatus } from "feature/songs/types/songs.type";
 import { getGatedSkillPower, getSongsUntilNextTier } from "feature/songs/utils/difficulty.utils";
 import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
-import { selectCurrentUserStats, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Library as LibraryIcon,
@@ -59,20 +59,16 @@ interface SongsViewProps {
 const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => {
   const router = useRouter();
   const { t } = useTranslation("songs");
-  const isManagementView = view === "management";
-
 
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
-  const userStats = useAppSelector(selectCurrentUserStats);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
 
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
-    userAuth ?? null,
-    isPremium
+    userAuth ?? null
   );
   const {
     page,
@@ -88,16 +84,13 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
     setIsModalOpen,
     difficultyFilter,
     handlePageChange,
-    handleClearFilters,
     tierFilters,
     setTierFilters,
     hasMore,
     handleStatusUpdate,
     refreshSongs,
-    refreshSongsWithoutLoading,
     sortBy,
     sortDirection,
-    debounceLoading,
     genreFilters,
     applyFilters,
     handleResetFilters,
@@ -117,7 +110,6 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
   const totalSongsCount = (userSongs?.wantToLearn?.length || 0) + (userSongs?.learning?.length || 0) + (userSongs?.learned?.length || 0);
   const learnedCount = userSongs?.learned?.length || 0;
-  const completionRate = totalSongsCount > 0 ? Math.round((learnedCount / totalSongsCount) * 100) : 0;
   const totalPracticeMs = Object.values(progressMap).reduce((sum, p) => sum + (p?.totalPracticeMs || 0), 0);
 
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
@@ -396,7 +388,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
               )}
             >
               <LibraryIcon size={14} />
-              Board
+              My Songs
             </button>
           </div>
         )}
@@ -467,83 +459,68 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   nextTierProgress={nextTierProgress}
                 />
                 
-                <div className="space-y-12">
-                  {userSongs.learning.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
-                           <Play size={16} className="fill-current" />
+                <div className="space-y-10">
+                  {(
+                    [
+                      {
+                        key: "learning",
+                        title: "Currently learning",
+                        icon: <Play size={16} className="fill-current" />,
+                        songs: userSongs.learning,
+                      },
+                      {
+                        key: "wantToLearn",
+                        title: "Want to learn",
+                        icon: <Music size={16} />,
+                        songs: userSongs.wantToLearn,
+                      },
+                      {
+                        key: "learned",
+                        title: "Mastered songs",
+                        icon: <Trophy size={16} />,
+                        songs: userSongs.learned,
+                      },
+                    ] as const
+                  ).map(
+                    (section) =>
+                      section.songs.length > 0 && (
+                        <div key={section.key} className="space-y-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300">
+                              {section.icon}
+                            </div>
+                            <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+                          </div>
+                          <div className="space-y-2">
+                            {section.songs.map((song) => (
+                              <SongBoardRow
+                                key={song.id}
+                                song={song}
+                                progress={progressMap[song.id] ?? null}
+                                onOpenDetails={() => setDetailsTarget(song)}
+                                onPractice={() => setPracticeTarget(song)}
+                              />
+                            ))}
+                          </div>
                         </div>
-                        <h2 className="text-xl font-semibold text-white">Currently learning</h2>
-                      </div>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
-                        {userSongs.learning.map((song) => (
-                          <SongCard
-                            key={song.id}
-                            song={song}
-                            onOpenDetails={() => setDetailsTarget(song)}
-                            onPlay={() => setPracticeTarget(song)}
-                            showPracticeStatus
-                            practiceMs={progressMap[song.id]?.totalPracticeMs}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                      )
                   )}
 
-                  {userSongs.wantToLearn.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
-                           <Music size={16} />
-                        </div>
-                        <h2 className="text-xl font-semibold text-white">Want to learn</h2>
-                      </div>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
-                        {userSongs.wantToLearn.map((song) => (
-                          <SongCard
-                            key={song.id}
-                            song={song}
-                            onOpenDetails={() => setDetailsTarget(song)}
-                            onPlay={() => setPracticeTarget(song)}
-                            showPracticeStatus
-                            practiceMs={progressMap[song.id]?.totalPracticeMs}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {userSongs.learned.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300">
-                           <Trophy size={16} />
-                        </div>
-                        <h2 className="text-xl font-semibold text-white">Mastered songs</h2>
-                      </div>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5">
-                        {userSongs.learned.map((song) => (
-                          <SongCard
-                            key={song.id}
-                            song={song}
-                            onOpenDetails={() => setDetailsTarget(song)}
-                            onPlay={() => setPracticeTarget(song)}
-                            showPracticeStatus
-                            practiceMs={progressMap[song.id]?.totalPracticeMs}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {userSongs.learned.length === 0 && userSongs.learning.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
-                      <div className="h-20 w-20 rounded-full bg-zinc-800 flex items-center justify-center mb-6">
+                  {totalSongsCount === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
                         <Music size={32} className="text-zinc-500" />
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2">No songs in your board yet</h3>
-                      <p className="text-sm max-w-xs">Start exploring the library and add songs to your collection to track your progress.</p>
+                      <h3 className="mb-2 text-xl font-bold text-white">No songs in your board yet</h3>
+                      <p className="max-w-xs text-sm text-zinc-400">
+                        Add songs from the library to practice them and track your progress here.
+                      </p>
+                      <Button
+                        onClick={() => handleSwitchView("explore")}
+                        className="mt-8 h-11 rounded-lg bg-white px-8 font-bold text-black hover:bg-zinc-100"
+                      >
+                        Explore library
+                      </Button>
                     </div>
                   )}
                 </div>
