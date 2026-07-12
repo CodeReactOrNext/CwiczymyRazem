@@ -1,15 +1,19 @@
+import { BlogCard } from 'components/Blog/BlogCard';
+import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { StaticStrumPattern } from 'feature/exercises/components/StaticTablature/StaticStrumPattern';
-import dynamic from 'next/dynamic';
-import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
-import { Footer } from 'feature/landing/components/Footer';
+import type { RelatedExerciseCard } from 'feature/exercises/lib/getRelatedExercises';
 import { getRelatedExercises } from 'feature/exercises/lib/getRelatedExercises';
+import type { SerializedExercise } from 'feature/exercises/lib/serializeExercise';
 import { serializeExercise, serializeExercises } from 'feature/exercises/lib/serializeExercise';
 import { idToSlug, slugToId } from 'feature/exercises/lib/slugUtils';
-import type { SerializedExercise } from 'feature/exercises/lib/serializeExercise';
-import type { RelatedExerciseCard } from 'feature/exercises/lib/getRelatedExercises';
-import { ChevronRight, Clock, Music, Lock, BarChart3, Zap, Activity, Headphones } from 'lucide-react';
+import { Footer } from 'feature/landing/components/Footer';
+import type { BlogFrontmatter } from 'lib/blog';
+import { getAllBlogs } from 'lib/blog';
+import { CATEGORY_TO_BLOG_CLUSTERS } from 'lib/internalLinks';
+import { Activity, BarChart3, ChevronRight, Clock, Headphones,Lock, Music, Zap } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,6 +26,7 @@ const TablatureViewer = dynamic(
 interface ExerciseDetailPageProps {
   exercise: SerializedExercise;
   related: RelatedExerciseCard[];
+  relatedBlogs: BlogFrontmatter[];
 }
 
 const categoryLabels: Record<string, string> = {
@@ -47,7 +52,7 @@ const difficultyColors: Record<string, { label: string; color: string }> = {
   hard: { label: 'Hard', color: 'bg-rose-500/10 text-rose-300' },
 };
 
-const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, related }) => {
+const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, related, relatedBlogs }) => {
   const categoryLabel = categoryLabels[exercise.category];
   const categoryColor = categoryColors[exercise.category];
   const difficultyInfo = difficultyColors[exercise.difficulty];
@@ -486,6 +491,18 @@ const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = ({ exercise, relat
           </section>
         )}
 
+        {/* From the blog */}
+        {relatedBlogs.length > 0 && (
+          <section className="px-6 mx-auto max-w-6xl py-12 border-t border-white/5">
+            <h2 className="text-2xl font-bold text-white mb-8">From the Blog</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedBlogs.map((blog) => (
+                <BlogCard key={blog.slug} blog={blog} />
+              ))}
+            </div>
+          </section>
+        )}
+
         <Footer />
       </main>
     </>
@@ -519,8 +536,18 @@ export const getStaticProps: GetStaticProps<ExerciseDetailPageProps> = async ({ 
     4
   );
 
+  // Further reading: blog posts from the clusters most relevant to this
+  // exercise's category, pillar posts prioritised.
+  const relevantClusters = CATEGORY_TO_BLOG_CLUSTERS[exercise.category] ?? [];
+  const relatedBlogs = relevantClusters.length
+    ? getAllBlogs()
+        .filter((blog) => !!blog.cluster && relevantClusters.includes(blog.cluster))
+        .sort((a, b) => Number(b.pillar ?? false) - Number(a.pillar ?? false))
+        .slice(0, 3)
+    : [];
+
   return {
-    props: { exercise, related },
+    props: { exercise, related, relatedBlogs },
   };
 };
 
