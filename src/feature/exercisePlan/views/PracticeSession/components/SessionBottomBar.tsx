@@ -9,7 +9,6 @@ import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } 
 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
-import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
@@ -36,7 +35,7 @@ interface SessionBottomBarProps {
 /**
  * Fixed bottom navigation bar: exit button, timer, back/next controls.
  */
-export const SessionBottomBar = memo(({
+const SessionBottomBarComponent = ({
   onClose,
   exerciseKey,
   currentExercise,
@@ -166,7 +165,7 @@ export const SessionBottomBar = memo(({
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
-            Your progress won't be saved if you exit now. Would you like to finish the session and save your practice time instead?
+            Your progress won&apos;t be saved if you exit now. Would you like to finish the session and save your practice time instead?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
@@ -227,4 +226,7 @@ export const SessionBottomBar = memo(({
 
     </>
   );
-});
+};
+
+export const SessionBottomBar = memo(SessionBottomBarComponent);
+SessionBottomBar.displayName = "SessionBottomBar";
