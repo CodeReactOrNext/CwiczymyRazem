@@ -1,7 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { todayKey } from "lib/email/cooldown";
 import { markCooldown } from "lib/email/cooldownStore";
 import { sendWelcomeEmail } from "lib/email/send";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 const statisticsInitial = {
@@ -65,13 +65,19 @@ export default async function handler(
       const userSnapshotFresh = await userDocRef.get();
       const userData = userSnapshotFresh.data();
 
-      if (userData && !userData.email && user.email) {
-        await userDocRef.update({ email: user.email });
+      if (userData) {
+        const backfill: Record<string, string> = {};
+        if (!userData.email && user.email) backfill.email = user.email;
+        if (!userData.displayName && user.displayName)
+          backfill.displayName = user.displayName;
+        if (Object.keys(backfill).length > 0) {
+          await userDocRef.update(backfill);
+        }
       }
 
       return res.status(200).json({
         userInfo: {
-          displayName: userData?.displayName ?? null,
+          displayName: userData?.displayName ?? user.displayName ?? null,
           avatar: userData?.avatar ?? null,
           youTubeLink: userData?.youTubeLink ?? null,
           soundCloudLink: userData?.soundCloudLink ?? null,
