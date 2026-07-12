@@ -49,6 +49,8 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector } = detectors;
 
   let lastFrequencies: number[] = [];
+  // Per-hop pitch estimates of the current window, reused across calls.
+  const hopFrequencies: number[] = [];
   let prevTickRms = 0;
   let lastTickFire = 0;
   let lastStateUpdate = 0;
@@ -115,14 +117,15 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     // 3. Detect onset & pitch in hop-size chunks (512 samples)
     let isOnset = false;
     let isTick = false;
-    let frequency = 0;
     let pitchConfidence = 0;
+    hopFrequencies.length = 0;
     for (let offset = 0; offset < len; offset += HOP) {
       const chunk = normalizedBuf.subarray(offset, offset + HOP);
       if (onsetDetector.do(chunk)) isOnset = true;
       if (tickDetector.do(chunk)) isTick = true;
-      frequency = pitchDetector.do(chunk);
+      const hopFreq = pitchDetector.do(chunk);
       pitchConfidence = pitchDetector.getConfidence();
+      if (hopFreq > 20) hopFrequencies.push(hopFreq);
     }
 
     if (isOnset) {
@@ -140,9 +143,16 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     // Ignore attack phase for pitch (transients cause random pitch jumps)
     const isAttackPhase = isOnset || nowMs - targets.lastOnsetTimeRef.current < 30;
 
-    if (rms > VOLUME_THRESHOLD && frequency > 20 && !isAttackPhase) {
-      lastFrequencies.push(frequency);
-      if (lastFrequencies.length > 5) lastFrequencies.shift();
+    if (rms > VOLUME_THRESHOLD && hopFrequencies.length > 0 && !isAttackPhase) {
+      // Feed every hop's estimate into the median, not just the window's last one.
+      // The 5-slot median then spans ~53ms of history instead of ~213ms, so a new
+      // note dominates it within a single window (~43ms) rather than after ~3
+      // windows — cutting ~90ms off the felt detection latency. A lone glitchy
+      // hop still gets rejected by the median.
+      for (const hopFreq of hopFrequencies) {
+        lastFrequencies.push(hopFreq);
+        if (lastFrequencies.length > 5) lastFrequencies.shift();
+      }
       const sorted = [...lastFrequencies].sort((a, b) => a - b);
       stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
     } else {

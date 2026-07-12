@@ -4,6 +4,7 @@ import { computeChromagram, freqToPitchClass, getCentsDistance, getFrequencyFrom
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { getFeedbackForCombo } from "./noteMatchingFeedback";
+import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
 const CENTS_TOLERANCE      = 45;
@@ -12,6 +13,13 @@ const CHORD_CHROMA_THRESHOLD = 0.55;
 interface UseNoteMatchingOptions {
   isPlaying: boolean;
   startTime: number | null;
+  /** Playback AudioContext (metronome/GP/synth clock). When provided together with
+   *  audioStartTime, matching follows this clock instead of Date.now() — the wall
+   *  clock drifts away from the audio hardware clock over a session, which made
+   *  hit windows (and the green marks) lag more and more the longer playback ran. */
+  audioContext?: AudioContext | null;
+  /** AudioContext.currentTime of the first scheduled beat (same instant as startTime). */
+  audioStartTime?: number | null;
   effectiveBpm: number;
   /** raw metronome BPM — used for score bonus calculation */
   rawBpm: number;
@@ -29,7 +37,7 @@ interface UseNoteMatchingOptions {
 }
 
 export function useNoteMatching({
-  isPlaying, startTime, effectiveBpm, rawBpm,
+  isPlaying, startTime, audioContext, audioStartTime, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
   speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset,
 }: UseNoteMatchingOptions) {
@@ -70,17 +78,29 @@ export function useNoteMatching({
   const beatsPerSecond = effectiveBpm / 60;
   const currentBeatsElapsedRef = useRef(0);
 
+  // Tempo-aware clock shared by the cursor ref and the matching loop. GP imports
+  // carry tempo automation that the audio playback and the visual cursor follow;
+  // matching must follow the same curve or it drifts progressively into the song.
+  const beatClock = useMemo(() => {
+    if (!activeTablature || !totalExerciseBeats) return null;
+    return createBeatClock(buildTempoMap(activeTablature), totalExerciseBeats, effectiveBpm);
+  }, [activeTablature, totalExerciseBeats, effectiveBpm]);
+
   useEffect(() => {
     if (!isPlaying || !startTime || !totalExerciseBeats) { currentBeatsElapsedRef.current = 0; return; }
     let rafId: number;
     const tick = () => {
-      const elapsed = ((Date.now() - startTime) / 1000) * beatsPerSecond;
-      currentBeatsElapsedRef.current = elapsed % totalExerciseBeats;
+      // Prefer the audio clock (what the user actually hears) over Date.now().
+      const elapsedSec = audioContext && audioStartTime != null
+        ? audioContext.currentTime - audioStartTime
+        : (Date.now() - startTime) / 1000;
+      const beats = beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSecond;
+      currentBeatsElapsedRef.current = beats % totalExerciseBeats;
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, startTime, beatsPerSecond, totalExerciseBeats]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, beatsPerSecond, totalExerciseBeats]);
 
   // ── RAF note-matching loop ────────────────────────────────────────────────────
 
@@ -112,8 +132,7 @@ export function useNoteMatching({
     const bpmBonus         = 1 + (rawBpm - 100) * 0.001;
 
     const tick = () => {
-      const now            = Date.now();
-      const compensatedNow = now - getLatencyMs();
+      const now = Date.now();
 
       const currentFreq   = audioRefs.frequencyRef.current;
       const currentVolume = audioRefs.rawVolumeRef.current;
@@ -134,7 +153,16 @@ export function useNoteMatching({
       const windowBeats      = (windowMs / 1000) * beatsPerSec;
       const earlyWindowBeats = (Math.max(16, Math.min(50, beatDurationMs * 0.05)) / 1000) * beatsPerSec;
 
-      const loopedBeatsElapsed = ((compensatedNow - startTime) / 1000 * beatsPerSec) % totalExBeats;
+      // Position on the clock the user hears (audio context), tempo-map-aware,
+      // shifted back by the input latency so windows line up with the played note.
+      const rawElapsedSec = audioContext && audioStartTime != null
+        ? audioContext.currentTime - audioStartTime
+        : (now - startTime) / 1000;
+      const elapsedSec = rawElapsedSec - getLatencyMs() / 1000;
+      const beatsTotal = beatClock
+        ? beatClock.toBeats(elapsedSec)
+        : elapsedSec * beatsPerSec;
+      const loopedBeatsElapsed = beatsTotal % totalExBeats;
       const hasRecentOnset     = (now - lastOnsetTime) < onsetRecencyMs;
       const hasRecentTick      = (now - lastTickTime)  < onsetRecencyMs;
 
@@ -250,7 +278,7 @@ export function useNoteMatching({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
 
   return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, resetGame };
 }
