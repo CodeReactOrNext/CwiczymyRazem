@@ -28,6 +28,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
+import FreeTimerMetronome from "./components/FreeTimerMetronome";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 const TIMER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -386,6 +387,10 @@ const TimerLayout = ({
             </div>
           </div>
         </Card>
+
+        <div className='px-3 sm:px-4'>
+          <FreeTimerMetronome />
+        </div>
 
         <div className='px-3 sm:px-4'>
           <div className='grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6'>
