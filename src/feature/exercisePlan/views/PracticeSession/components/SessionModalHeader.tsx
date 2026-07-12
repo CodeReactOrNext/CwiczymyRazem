@@ -46,23 +46,23 @@ export const SessionModalHeader = ({
         }}
       />
 
-      <div className='relative z-10 flex h-[68px] items-center justify-between'>
+      <div className='relative z-10 flex h-14 items-center justify-between'>
         <Button
           variant='ghost'
           size='icon'
           onClick={onClose}
-          className='relative z-10 ml-6 mr-2 transition-all duration-200 hover:bg-background/80 hover:shadow-md'>
+          className='relative z-10 ml-2 mr-1 shrink-0 transition-all duration-200 hover:bg-background/80 hover:shadow-md'>
           <X className='h-5 w-5' />
         </Button>
 
-        <div className='relative z-10 flex min-w-0 items-center gap-2'>
+        <div className='relative z-10 flex min-w-0 flex-1 items-center justify-center gap-2'>
           <h1 className='truncate text-[14px] font-bold tracking-tight text-foreground drop-shadow-md'>
             {exerciseTitle}
           </h1>
           {exerciseId && <FavoriteExerciseButton exerciseId={exerciseId} compact />}
         </div>
 
-        <div className='relative z-10 mr-6 flex min-w-[52px] items-center gap-2'>
+        <div className='relative z-10 mr-3 flex shrink-0 items-center gap-2'>
           <Badge variant='outline' className='shadow-sm'>
             {currentExerciseIndex + 1} of {totalExercises}
           </Badge>

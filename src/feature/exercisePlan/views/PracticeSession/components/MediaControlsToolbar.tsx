@@ -86,30 +86,37 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const h = compact ? "h-8" : "h-12";
 
   if (mobile) {
-    const gridBtn = "flex h-11 w-full items-center justify-center gap-2 rounded-lg transition-all active:scale-95";
+    // min-w-0 + truncated labels: the toolbar renders both full-width in
+    // portrait and inside the narrow (264px) landscape drawer, so no row may
+    // ever depend on label width for its layout.
+    const gridBtn = "flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg transition-all active:scale-95";
+    const showSpeedBtn = showSpeed && hasMetronome;
+    const showBackingBtn = showBacking && hasAudioTrack;
+    const showTuningBtn = hasAudioTrack || hasMicControls;
 
     return (
       <div className="flex flex-col gap-2">
-        {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
-          <div className="flex gap-2">
-            {showSpeed && hasMetronome && (
+        {(showSpeedBtn || showBackingBtn) && (
+          <div className="grid grid-cols-2 gap-2">
+            {showSpeedBtn && (
               <SpeedDropdown
                 speedMultiplier={speedMultiplier}
                 onSpeedMultiplierChange={onSpeedMultiplierChange}
                 baseBpm={baseBpm}
                 isSlowed={isSlowed}
                 h="h-11"
-                className="flex-1 justify-center"
+                className={cn("w-full min-w-0 justify-center", !showBackingBtn && "col-span-2")}
               />
             )}
 
-            {showBacking && hasAudioTrack && (
+            {showBackingBtn && (
               <RippleButton
                 onClick={onAudioToggle}
                 disabled={isRiddleMode}
                 title={isAudioMuted ? "Backing track off" : "Backing track on"}
                 className={cn(
-                  gridBtn, "flex-1",
+                  gridBtn,
+                  !showSpeedBtn && "col-span-2",
                   isAudioMuted
                     ? "bg-zinc-800 text-zinc-400"
                     : "bg-white/15 text-white",
@@ -117,26 +124,28 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}
               >
                 <GiGuitar className="text-lg shrink-0" />
-                <span className="text-[10px] font-semibold tracking-wide">Backing</span>
-              </RippleButton>
-            )}
-
-            {(hasAudioTrack || hasMicControls) && (
-              <RippleButton
-                onClick={openTuningSettings}
-                title={isTuningLocked ? "Tuning is locked for this exercise" : "Guitar tuning"}
-                className={cn(
-                  gridBtn, "flex-1",
-                  isNonStandardTuning
-                    ? "bg-cyan-500/10 text-cyan-400"
-                    : "bg-zinc-800 text-zinc-400"
-                )}
-              >
-                {isTuningLocked ? <Lock className="h-3.5 w-3.5 shrink-0" /> : <GiGuitarHead className="h-4 w-4 shrink-0" />}
-                <span className="text-[10px] font-semibold tracking-wide">{preferredTuning.name}</span>
+                <span className="truncate text-[10px] font-semibold tracking-wide">Backing</span>
               </RippleButton>
             )}
           </div>
+        )}
+
+        {/* Tuning gets its own full-width row — tuning names ("Half-step
+            down", "DADGAD") are too long to share a row in the drawer. */}
+        {showTuningBtn && (
+          <RippleButton
+            onClick={openTuningSettings}
+            title={isTuningLocked ? "Tuning is locked for this exercise" : "Guitar tuning"}
+            className={cn(
+              gridBtn,
+              isNonStandardTuning
+                ? "bg-cyan-500/10 text-cyan-400"
+                : "bg-zinc-800 text-zinc-400"
+            )}
+          >
+            {isTuningLocked ? <Lock className="h-3.5 w-3.5 shrink-0" /> : <GiGuitarHead className="h-4 w-4 shrink-0" />}
+            <span className="truncate text-[10px] font-semibold tracking-wide">{preferredTuning.name}</span>
+          </RippleButton>
         )}
 
         {hasMicControls && (
@@ -154,7 +163,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               )}
             >
               <FaMicrophone className="h-3.5 w-3.5 shrink-0" />
-              <span className="text-[10px] font-semibold tracking-wide">Pitch Detect</span>
+              <span className="truncate text-[10px] font-semibold tracking-wide">Pitch Detect</span>
             </RippleButton>
 
             {hasTuner && (
@@ -167,7 +176,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}
               >
                 <TuningForkIcon className="h-4 w-4 shrink-0" />
-                <span className="text-[10px] font-semibold tracking-wide">Tuner</span>
+                <span className="truncate text-[10px] font-semibold tracking-wide">Tuner</span>
               </RippleButton>
             )}
 
@@ -178,7 +187,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 className={cn(gridBtn, "bg-zinc-800 text-zinc-400")}
               >
                 <FaSync className="h-3.5 w-3.5 shrink-0" />
-                <span className="text-[10px] font-semibold tracking-wide">Recalibrate</span>
+                <span className="truncate text-[10px] font-semibold tracking-wide">Recalibrate</span>
               </RippleButton>
             )}
 

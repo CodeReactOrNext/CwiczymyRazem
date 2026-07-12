@@ -130,6 +130,11 @@ export function MobileExerciseContent({
             missedNotes={missedNotes}
             currentBeatsElapsed={0}
             resetKey={tabResetKey}
+            // Phones hit the 120px/beat floor of the beat-width formula, which
+            // shows barely ~1 measure. 0.75 fits ~a third more tab while 16th
+            // notes (0.25 beat) still get their 22px minimum pill without
+            // overlapping.
+            zoom={0.75}
           />
         </div>
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (

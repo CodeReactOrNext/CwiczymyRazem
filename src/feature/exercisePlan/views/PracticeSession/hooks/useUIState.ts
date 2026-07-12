@@ -8,7 +8,11 @@ export const useUIState = () => {
 
   useEffect(() => {
     const checkMobile = () => {
-      const isMobile = window.innerWidth < 768;
+      // Phones in landscape (e.g. iPhone XR: 896×414) are wider than the
+      // desktop breakpoint but far too short for the desktop session view —
+      // treat any short viewport as mobile. The 500px height matches
+      // useIsLandscape, so these land in the landscape session modal.
+      const isMobile = window.innerWidth < 768 || window.innerHeight <= 500;
       setIsMobileView(isMobile);
 
       if (isMobile && !isFullSessionModalOpen) {

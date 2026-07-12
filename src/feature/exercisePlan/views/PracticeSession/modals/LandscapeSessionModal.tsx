@@ -134,33 +134,39 @@ export function LandscapeSessionModal({
           >
             {/* Left panel: exercise content + timer underneath */}
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden p-2">
-              <div className="flex min-h-0 w-full flex-1 items-center justify-center">
-                <MobileExerciseContent
-                  currentExercise={currentExercise}
-                  activeTablature={activeTablature}
-                  effectiveBpm={effectiveBpm}
-                  metronome={metronome}
-                  isRiddleRevealed={isRiddleRevealed}
-                  isRiddleGuessed={isRiddleGuessed}
-                  hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-                  isPlaying={isPlaying}
-                  isListening={isListening}
-                  isMicEnabled={isMicEnabled}
-                  frequencyRef={frequencyRef}
-                  tabResetKey={tabResetKey}
-                  setVideoDuration={setVideoDuration}
-                  setTimerTime={setTimerTime}
-                  startTimer={startTimer}
-                  stopTimer={stopTimer}
-                  onVideoEnd={handleNextExerciseClick}
-                  earTrainingScore={earTrainingScore}
-                  earTrainingHighScore={earTrainingHighScore}
-                  handleRevealRiddle={handleRevealRiddle}
-                  handleNextRiddle={handleNextRiddle}
-                  onEarTrainingGuessed={onEarTrainingGuessed}
-                  riddleProgress={riddleProgress}
-                  onPlayRiddle={handleToggleTimer}
-                />
+              {/* Scroll container + min-h-full inner wrapper: short content
+                  (tablature) stays vertically centered, while tall exercises
+                  (chord hunt, ear training) scroll instead of being clipped
+                  top/bottom under the timer. */}
+              <div className="min-h-0 w-full flex-1 overflow-y-auto overscroll-contain">
+                <div className="flex min-h-full w-full items-center justify-center">
+                  <MobileExerciseContent
+                    currentExercise={currentExercise}
+                    activeTablature={activeTablature}
+                    effectiveBpm={effectiveBpm}
+                    metronome={metronome}
+                    isRiddleRevealed={isRiddleRevealed}
+                    isRiddleGuessed={isRiddleGuessed}
+                    hasPlayedRiddleOnce={hasPlayedRiddleOnce}
+                    isPlaying={isPlaying}
+                    isListening={isListening}
+                    isMicEnabled={isMicEnabled}
+                    frequencyRef={frequencyRef}
+                    tabResetKey={tabResetKey}
+                    setVideoDuration={setVideoDuration}
+                    setTimerTime={setTimerTime}
+                    startTimer={startTimer}
+                    stopTimer={stopTimer}
+                    onVideoEnd={handleNextExerciseClick}
+                    earTrainingScore={earTrainingScore}
+                    earTrainingHighScore={earTrainingHighScore}
+                    handleRevealRiddle={handleRevealRiddle}
+                    handleNextRiddle={handleNextRiddle}
+                    onEarTrainingGuessed={onEarTrainingGuessed}
+                    riddleProgress={riddleProgress}
+                    onPlayRiddle={handleToggleTimer}
+                  />
+                </div>
               </div>
 
               {/* Timer — always visible, even with the details drawer collapsed */}
