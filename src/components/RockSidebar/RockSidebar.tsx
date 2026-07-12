@@ -12,6 +12,7 @@ import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaime
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import {
   selectCurrentUserStats,
+  selectUserAuth,
   selectUserAvatar,
   selectUserInfo,
   selectUserName,
@@ -188,6 +189,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
   const userInfo = useAppSelector(selectUserInfo);
+  const userAuth = useAppSelector(selectUserAuth);
   const hasUnclaimedMilestone = useHasUnclaimedMilestone();
 
   const getActiveProfileSection = () => {
@@ -277,7 +279,10 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
     if (mobile) {
       return (
-        <div className="border-b border-white/10 p-4">
+        <Link
+          href={`/user/${userAuth}`}
+          onClick={handleLinkClick}
+          className="block border-b border-white/10 p-4 transition-colors duration-200 hover:bg-white/5">
           <div className="flex items-center gap-3">
             <Avatar
               avatarURL={userAvatar}
@@ -293,12 +298,14 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               </span>
             </div>
           </div>
-        </div>
+        </Link>
       );
     }
 
     return (
-      <div className="p-4">
+      <Link
+        href={`/user/${userAuth}`}
+        className="block rounded-lg p-4 transition-colors duration-200 hover:bg-white/5">
         <div className="flex items-center gap-3">
           <Avatar
             avatarURL={userAvatar}
@@ -314,7 +321,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             </span>
           </div>
         </div>
-      </div>
+      </Link>
     );
   };
 
@@ -396,12 +403,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       <aside className="hidden h-full bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col">
         <div className="p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center">
-              <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
-            </div>
-            <div>
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center">
+                <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
+              </div>
               <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
-            </div>
+            </Link>
             <div className="ml-auto">
               <NotificationsBell />
             </div>
@@ -431,14 +438,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden">
               <div className="flex items-center justify-between border-b border-white/10 p-4">
-                <div className="flex items-center gap-3">
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMobileOpen(false)}
+                  className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center">
                     <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
                   </div>
-                  <div>
-                    <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
-                  </div>
-                </div>
+                  <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
+                </Link>
                 <div className="flex items-center gap-2">
                   <NotificationsBell />
                   <Button
