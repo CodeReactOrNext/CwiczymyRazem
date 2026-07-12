@@ -46,7 +46,41 @@ const ProfileLandingLayout = ({
   const [lastSession, setLastSession] = useState<LastSessionInfo | null>(null);
 
   useEffect(() => {
-    getUserSongs(userAuth).then((s) => setSongs(s));
+    let cancelled = false;
+
+    // getUserSongs reads directly from the client Firestore SDK (WebChannel).
+    // On networks where that transport stalls (some proxies / ISPs) the fetch
+    // never settles, which would leave the song-tier data stuck forever. Bound
+    // each attempt with a timeout, retry once, then fall back to empty lists so
+    // the dashboard renders (tier shows "?") instead of hanging — mirroring the
+    // activity-log fetch guard.
+    const FETCH_TIMEOUT = 10000;
+    const MAX_ATTEMPTS = 2;
+
+    const loadSongs = async () => {
+      if (!userAuth) return;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS && !cancelled; attempt++) {
+        try {
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("getUserSongs timeout")), FETCH_TIMEOUT)
+          );
+          const result = await Promise.race([getUserSongs(userAuth), timeout]);
+          if (!cancelled) setSongs(result);
+          return;
+        } catch (error) {
+          if (attempt === MAX_ATTEMPTS && !cancelled) {
+            console.error("Failed to load user songs:", error);
+            setSongs({ wantToLearn: [], learning: [], learned: [] });
+          }
+        }
+      }
+    };
+
+    loadSongs();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userAuth]);
 
   useEffect(() => {
