@@ -396,7 +396,7 @@ export const GettingStartedWidget = () => {
             step: "first_exercise",
           });
           setOpenModal(null);
-          Router.push("/exercises");
+          Router.push("/profile/skills?tab=browse");
         }}
       />
 
