@@ -98,8 +98,8 @@ const ModeCard = ({
         hero || isGroup ? "items-start" : "items-center"
       } ${
         hero
-          ? "border border-white/[0.02] bg-white/[0.03] p-[18px] backdrop-blur-md"
-          : "border border-white/[0.02] bg-white/[0.02] p-3.5 backdrop-blur-sm"
+          ? "bg-zinc-800/60 p-[18px] backdrop-blur-md"
+          : "bg-zinc-800/60 p-3.5 backdrop-blur-sm"
       } ${
         isGroup
           ? ""
