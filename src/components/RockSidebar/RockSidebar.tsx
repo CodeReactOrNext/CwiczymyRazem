@@ -142,13 +142,8 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
   { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
   { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <FileMusic size={16} /> },
-  {
-    id: "practice-skill-tree",
-    name: "Skill Tree",
-    href: "/profile/skills?tab=skill-tree",
-    icon: <Network size={16} />,
-  },
-  { id: "practice-ai-coach", name: "Mastery Roadmap", href: "/ai-coach", icon: <Compass size={16} /> },
+  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Network size={16} /> },
+  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/profile/skills", icon: <Compass size={16} /> },
   { id: "practice-journey", name: "Guitar Journey", href: "/journey", icon: <Route size={16} /> },
 ];
 
