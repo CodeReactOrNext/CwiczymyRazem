@@ -1,16 +1,62 @@
+import { Button } from 'assets/components/ui/button';
 import { cn } from 'assets/lib/utils';
+import { BackLink } from 'components/BackLink/BackLink';
 import { useTablatureAudio } from 'feature/exercisePlan/hooks/useTablatureAudio';
 import type { TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
 import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
 import { ImportTablature } from 'feature/songs/components/ImportTablature/ImportTablature';
 import { AnimatePresence,motion } from 'framer-motion';
-import { LucideChevronLeft, LucideCopy, LucideEraser, LucideFileMusic, LucideMonitor, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
+import { LucideChevronsRight,LucideEraser, LucideFileMusic, LucideMinus, LucideMonitor, LucidePlay, LucidePlus, LucideRedo2, LucideSquare, LucideTrash2, LucideUndo2, LucideVolume2, LucideVolumeX } from 'lucide-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useCallback,useEffect, useState } from 'react';
 
-
 type ArticulationType = 'isHammerOn' | 'isPullOff' | 'isAccented' | 'isDead' | 'isVibrato' | 'isTap' | 'isPalmMute';
+
+const ARTICULATIONS: { type: ArticulationType; letter: string; label: string; activeClass: string }[] = [
+  { type: 'isHammerOn', letter: 'H', label: 'Hammer-on', activeClass: 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40' },
+  { type: 'isPullOff', letter: 'P', label: 'Pull-off', activeClass: 'bg-red-500/20 text-red-400 ring-1 ring-red-500/40' },
+  { type: 'isAccented', letter: 'A', label: 'Accent', activeClass: 'bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40' },
+  { type: 'isDead', letter: 'D', label: 'Dead note', activeClass: 'bg-zinc-500/20 text-zinc-300 ring-1 ring-zinc-500/40' },
+  { type: 'isVibrato', letter: 'V', label: 'Vibrato', activeClass: 'bg-cyan-300/20 text-cyan-300 ring-1 ring-cyan-300/40' },
+  { type: 'isTap', letter: 'T', label: 'Tap', activeClass: 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/40' },
+  { type: 'isPalmMute', letter: 'M', label: 'Palm mute', activeClass: 'bg-amber-600/20 text-amber-500 ring-1 ring-amber-600/40' },
+];
+
+const QUICK_FRETS = [0, 1, 2, 3, 5, 7, 9, 12, 15, 17, 19, 22];
+
+const DURATION_LABELS: Record<number, string> = { 1: '1/4', 0.5: '1/8', 0.25: '1/16', 0.125: '1/32' };
+
+function ToolbarIconButton({
+  icon: Icon,
+  label,
+  onClick,
+  disabled,
+  active,
+  hoverClass = 'hover:bg-zinc-800 hover:text-zinc-100',
+}: {
+  icon: React.ComponentType<{ size?: number }>;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  active?: boolean;
+  hoverClass?: string;
+}) {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      title={label}
+      className={cn(
+        'flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 disabled:pointer-events-none disabled:opacity-30',
+        active ? 'bg-cyan-500 text-zinc-950' : hoverClass
+      )}>
+      <Icon size={14} />
+    </button>
+  );
+}
 
 export default function TabEditor() {
   const router = useRouter();
@@ -25,9 +71,7 @@ export default function TabEditor() {
   const [isMuted, setIsMuted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [selectedCell, setSelectedCell] = useState<{ measureIdx: number; beatIdx: number; stringIdx: number } | null>(null);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isGpModalOpen, setIsGpModalOpen] = useState(false);
-  const [importText, setImportText] = useState("");
   const selectionStartRef = React.useRef<{ mIdx: number; bIdx: number; sIdx: number; x: number; y: number } | null>(null);
   const [activeSelection, setActiveSelection] = useState<{ measureIdx: number; startBeat: number; endBeat: number; startString: number; endString: number } | null>(null);
   const [clipboard, setClipboard] = useState<{ beats: TablatureBeat[], baseStringIdx: number } | null>(null);
@@ -38,17 +82,6 @@ export default function TabEditor() {
   const [isDragging, setIsDragging] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'info' | 'success' | 'error' } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null);
-  const [isSpiderModalOpen, setIsSpiderModalOpen] = useState(false);
-  const [spiderConfig, setSpiderConfig] = useState({
-    permutation: "1234",
-    startFret: 1,
-    endFret: 12,
-    strings: [6, 5, 4, 3, 2, 1],
-    includeReturn: true,
-    returnStrings: true,
-    duration: 0.25
-  });
-
 
   const showToast = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info') => {
     setToast({ message, type });
@@ -204,19 +237,6 @@ export default function TabEditor() {
     }
   }, []);
 
-  const importCode = () => {
-    const processed = processImportText(importText);
-    if (processed) {
-        setMeasures(processed);
-        saveHistory(processed);
-        setIsImportModalOpen(false);
-        setImportText("");
-        showToast("Import successful!", "success");
-    } else {
-        showToast("Invalid code format.", "error");
-    }
-  };
-
   const handleGpImported = useCallback((
     importedMeasures: TablatureMeasure[],
     fileName: string,
@@ -356,82 +376,14 @@ export default function TabEditor() {
     setMeasures(newMeasures);
   };
 
-  const generateSpider = () => {
-    const { permutation, startFret, endFret, strings, includeReturn, duration } = spiderConfig;
-    const fingerDelta = permutation.split('').map(char => parseInt(char) - 1);
-    const newMeasures: TablatureMeasure[] = [];
-
-    const frets = [];
-    for (let f = startFret; f <= endFret; f++) frets.push(f);
-    if (includeReturn) {
-      for (let f = endFret - 1; f >= startFret; f--) frets.push(f);
-    }
-
-    let currentMeasure: TablatureMeasure = {
-      timeSignature: [4, 4],
-      beats: []
-    };
-
-    frets.forEach(baseFret => {
-      strings.forEach(stringIdx => {
-        fingerDelta.forEach(delta => {
-          currentMeasure.beats.push({
-            duration,
-            notes: [{ string: stringIdx, fret: baseFret + delta }]
-          });
-
-          if (currentMeasure.beats.length === 16) {
-            newMeasures.push(currentMeasure);
-            currentMeasure = { timeSignature: [4, 4], beats: [] };
-          }
-        });
-      });
-
-      if (spiderConfig.returnStrings) {
-        const returnStringsList = [...strings].reverse().slice(1);
-        returnStringsList.forEach(stringIdx => {
-          fingerDelta.forEach(delta => {
-            currentMeasure.beats.push({
-              duration,
-              notes: [{ string: stringIdx, fret: baseFret + delta }]
-            });
-
-            if (currentMeasure.beats.length === 16) {
-              newMeasures.push(currentMeasure);
-              currentMeasure = { timeSignature: [4, 4], beats: [] };
-            }
-          });
-        });
-      }
-    });
-
-    if (currentMeasure.beats.length > 0) {
-      while (currentMeasure.beats.length < 16) {
-        currentMeasure.beats.push({ duration: 0.25, notes: [] });
-      }
-      newMeasures.push(currentMeasure);
-    }
-
+  const clearSelectedNote = useCallback(() => {
+    if (!selectedCell) return;
+    const newMeasures = [...measures];
+    const beat = newMeasures[selectedCell.measureIdx].beats[selectedCell.beatIdx];
+    beat.notes = beat.notes.filter(n => n.string !== selectedCell.stringIdx + 1);
     setMeasures(newMeasures);
     saveHistory(newMeasures);
-    setIsSpiderModalOpen(false);
-    showToast("Spider patterns generated!", "success");
-  };
-
-  const copyCode = () => {
-    const cleanMeasures = measures.map(m => ({
-      ...m,
-      beats: m.beats.filter(b => b.notes.length > 0)
-    })).filter(m => m.beats.length > 0);
-
-    const formattedCode = `tablature: ${JSON.stringify(cleanMeasures, (key, value) => {
-      if (key === 'isHammerOn' || key === 'isPullOff') return value || undefined;
-      return value;
-    }, 2)},`;
-
-    navigator.clipboard.writeText(formattedCode);
-    showToast("Full tablature code exported to clipboard!", "success");
-  };
+  }, [selectedCell, measures, saveHistory]);
 
   const handlePasteAtCursor = useCallback((rightClickCell?: { measureIdx: number; beatIdx: number; stringIdx: number } | null) => {
     const target = rightClickCell || selectedCell;
@@ -519,7 +471,7 @@ export default function TabEditor() {
   }, [activeSelection, measures, saveHistory, showToast, setMeasures, setContextMenu]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (isImportModalOpen || isGpModalOpen) return;
+    if (isGpModalOpen) return;
 
     if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -630,10 +582,10 @@ export default function TabEditor() {
     } else if (e.key.toLowerCase() === 'v' && (e.ctrlKey || e.metaKey)) {
         handlePasteAtCursor();
     }
-  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isImportModalOpen, isGpModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
+  }, [selectedCell, measures, activeSelection, clipboard, handlePasteAtCursor, handleCopySelection, handleDeleteSelection, showToast, isGpModalOpen, undo, redo, toggleEffect, updateFret, autoAdvance, setSelectedCell, setMeasures, saveHistory]);
 
   const handlePaste = useCallback((e: ClipboardEvent) => {
-    if (isImportModalOpen || isGpModalOpen) return;
+    if (isGpModalOpen) return;
     const text = e.clipboardData?.getData('text');
     if (text) {
         const processed = processImportText(text);
@@ -668,7 +620,7 @@ export default function TabEditor() {
             }
         }
     }
-  }, [isImportModalOpen, isGpModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
+  }, [isGpModalOpen, saveHistory, selectedCell, measures, showToast, processImportText, setMeasures]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -767,202 +719,139 @@ export default function TabEditor() {
     };
   }, [handleKeyDown, handlePaste, isDragging]);
 
+  const selectedBeat = selectedCell ? measures[selectedCell.measureIdx]?.beats[selectedCell.beatIdx] : undefined;
+  const selectedNote = selectedCell ? selectedBeat?.notes.find(n => n.string === selectedCell.stringIdx + 1) : undefined;
+
+  const setSelectedFret = (fret: number) => {
+    if (!selectedCell) return;
+    updateFret(selectedCell.measureIdx, selectedCell.beatIdx, selectedCell.stringIdx, fret);
+    saveHistory(measures);
+  };
+
+  const toggleSelectedArticulation = (type: ArticulationType) => {
+    if (!selectedCell || !selectedNote) return;
+    toggleEffect(selectedCell.measureIdx, selectedCell.beatIdx, selectedCell.stringIdx, type);
+    saveHistory(measures);
+  };
+
   return (
     <>
       {/* Mobile blocker */}
-      <div className="md:hidden fixed inset-0 z-[200] bg-[#050505] flex flex-col items-center justify-center p-8 text-center gap-6">
-        <div className="w-16 h-16 bg-zinc-900 border border-white/10 rounded-lg flex items-center justify-center">
-          <LucideMonitor className="text-white/30" size={32} />
+      <div className='fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-zinc-950 p-8 text-center md:hidden'>
+        <div className='flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-900'>
+          <LucideMonitor className='text-zinc-500' size={32} />
         </div>
-        <div className="space-y-3">
-          <h2 className="text-xl font-black tracking-tight text-white">Desktop Only</h2>
-          <p className="text-sm text-white/40 max-w-xs leading-relaxed">
+        <div className='space-y-3'>
+          <h2 className='text-xl font-black tracking-tight text-zinc-100'>Desktop Only</h2>
+          <p className='max-w-xs text-sm leading-relaxed text-zinc-500'>
             Tab Editor requires a keyboard and larger screen. Please open it on a desktop or laptop computer.
           </p>
         </div>
       </div>
 
-      <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-cyan-500/30">
+      <div className='min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30'>
         <Head>
           <title>Tablature Editor | Riff Quest</title>
         </Head>
 
         {/* Fixed Header/Toolbar */}
-        <div className="fixed top-0 left-0 right-0 z-[60] bg-[#050505]/80 backdrop-blur-2xl border-b border-white/10 p-4 md:px-8">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => router.back()}
-                    className="p-1.5 text-white/30 hover:text-white transition-colors"
-                    title="Go back"
-                  >
-                    <LucideChevronLeft size={20} />
-                  </button>
-                  <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center rotate-3">
-                      <LucideWand2 className="text-zinc-950" size={18} />
-                  </div>
-                  <h1 className="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">
-                  Tab Editor
-                  </h1>
+        <div className='fixed left-0 right-0 top-0 z-[60] bg-zinc-950/85 p-4 backdrop-blur-2xl md:px-8'>
+          <div className='mx-auto flex max-w-[1700px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+            <div className='flex items-center gap-4'>
+              <BackLink label='Back' onClick={() => router.back()} />
+              <div>
+                <h1 className='text-xl font-black italic tracking-tighter text-zinc-100'>Tab Editor</h1>
+                <p className='text-[11px] font-bold text-zinc-500'>
+                  {measures.length} measure{measures.length !== 1 ? 's' : ''} · {editId ? 'Editing exercise' : 'New exercise'}
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 bg-white/5 p-1.5 rounded-lg border border-white/10">
-              <button
-                onClick={() => setIsGpModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-black text-cyan-400 group"
-              >
-                <LucideFileMusic size={12} />
-                <span>Import GP</span>
-              </button>
-              <button
-                onClick={() => setIsImportModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-lg transition-all text-[10px] font-black group"
-              >
-                <span>Paste code</span>
-              </button>
-              <button
-                onClick={copyCode}
-                className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg transition-all text-[10px] font-black group"
-              >
-                <LucideCopy size={14} />
-                <span>Copy export</span>
-              </button>
-              <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
-              <button
-                onClick={() => setIsSpiderModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-lg transition-all text-[10px] font-bold text-cyan-400"
-              >
-                <LucideWand2 size={12} />
-                <span>Spider gen</span>
-              </button>
-              <button
-                onClick={() => {
-                  localStorage.setItem('tab-editor-draft', JSON.stringify(measures));
-                  router.push(editId ? `/tab-editor/publish?edit=${editId}` : '/tab-editor/publish');
-                }}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg transition-all text-[10px] font-bold text-emerald-400"
-              >
-                <LucidePlus size={12} />
-                <span>{editId ? 'Save changes' : 'Publish'}</span>
-              </button>
-              <button
-                onClick={clearAll}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 rounded-lg transition-all text-[10px] font-bold text-white/40 hover:text-red-400"
-              >
-                <LucideEraser size={12} />
-                <span>Clear</span>
-              </button>
-              <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
-              <div className="flex items-center gap-1 bg-black rounded-lg border border-white/10 p-1">
+            <div className='flex flex-wrap items-center gap-3'>
+              <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
+                <button
+                  onClick={() => setIsGpModalOpen(true)}
+                  className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-cyan-400 transition-colors hover:bg-cyan-500/10'>
+                  <LucideFileMusic size={13} />
+                  <span>Import GP</span>
+                </button>
+                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                <ToolbarIconButton icon={LucideUndo2} label='Undo' onClick={undo} disabled={historyIdx <= 0} />
+                <ToolbarIconButton icon={LucideRedo2} label='Redo' onClick={redo} disabled={historyIdx >= history.length - 1} />
+                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                <ToolbarIconButton
+                  icon={LucideEraser}
+                  label='Clear all measures'
+                  onClick={clearAll}
+                  hoverClass='hover:bg-red-500/10 hover:text-red-400'
+                />
+              </div>
+
+              <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
                 <button
                   onClick={() => isPlaying ? stopPlayback() : startPlayback()}
+                  aria-label={isPlaying ? 'Stop playback' : 'Start playback'}
                   className={cn(
-                    "p-2 w-8 h-8 flex items-center justify-center rounded transition-all",
-                    isPlaying ? "bg-red-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
-                  )}
-                >
-                  {isPlaying ? <LucideSquare size={14} fill="currentColor" /> : <LucidePlay size={14} fill="currentColor" className="ml-0.5" />}
+                    'flex h-8 w-8 items-center justify-center rounded transition-colors',
+                    isPlaying ? 'bg-red-500 text-white' : 'bg-zinc-800 text-zinc-100 hover:bg-zinc-700'
+                  )}>
+                  {isPlaying ? <LucideSquare size={13} fill='currentColor' /> : <LucidePlay size={13} fill='currentColor' className='ml-0.5' />}
                 </button>
-                <button
+                <ToolbarIconButton
+                  icon={isMuted ? LucideVolumeX : LucideVolume2}
+                  label={isMuted ? 'Unmute' : 'Mute'}
                   onClick={() => setIsMuted(!isMuted)}
-                  className={cn(
-                      "p-2 w-8 h-8 flex items-center justify-center rounded transition-all",
-                      isMuted ? "text-red-400 bg-red-400/10" : "text-white/40 hover:text-white"
-                  )}
-                >
-                  {isMuted ? <LucideVolumeX size={14} /> : <LucideVolume2 size={14} />}
-                </button>
-                <div className="px-2 py-1 flex flex-col justify-center min-w-[40px]">
-                  <span className="text-[7px] font-black text-white/20 leading-tight">BPM</span>
+                  active={isMuted}
+                  hoverClass={isMuted ? '' : 'hover:bg-zinc-800 hover:text-zinc-100'}
+                />
+                <div className='flex flex-col justify-center px-2 py-1'>
+                  <span className='text-[7px] font-black leading-tight text-zinc-600'>BPM</span>
                   <input
-                      type="number"
+                      type='number'
                       value={bpm}
                       onChange={(e) => setBpm(parseInt(e.target.value) || 80)}
-                      className="bg-transparent text-[11px] font-black w-8 outline-none text-cyan-400"
+                      className='w-8 bg-transparent text-[11px] font-black text-cyan-400 outline-none'
                   />
                 </div>
-                <div className="flex items-center gap-1 bg-black/40 rounded border border-white/10 p-0.5">
+                <div className='flex items-center gap-1 rounded bg-zinc-950/60 p-0.5'>
                     {[1, 0.5, 0.25, 0.125].map(d => (
                         <button
                             key={d}
                             onClick={() => setGlobalDuration(d)}
                             className={cn(
-                                "px-2 h-7 flex items-center justify-center rounded transition-all text-[8px] font-black whitespace-nowrap",
-                                d === (measures[0]?.beats[0]?.duration) ? "bg-cyan-500 text-zinc-950" : "text-white/40 hover:text-white hover:bg-white/5"
-                            )}
-                        >
-                            {d === 1 && "1/4"}
-                            {d === 0.5 && "1/8"}
-                            {d === 0.25 && "1/16"}
-                            {d === 0.125 && "1/32"}
+                                'flex h-7 items-center justify-center whitespace-nowrap rounded px-2 text-[8px] font-black transition-colors',
+                                d === (measures[0]?.beats[0]?.duration) ? 'bg-cyan-500 text-zinc-950' : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200'
+                            )}>
+                            {DURATION_LABELS[d]}
                         </button>
                     ))}
                 </div>
-                <div className="h-6 w-px bg-white/10 mx-1" />
+                <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <button
                     onClick={() => setAutoAdvance(!autoAdvance)}
                     className={cn(
-                        "px-2 h-8 flex items-center justify-center rounded transition-all text-[8px] font-black tracking-widest gap-2",
-                        autoAdvance ? "bg-cyan-500 text-zinc-950" : "bg-white/5 text-white/40 hover:text-white"
-                    )}
-                >
-                    <div className={cn("w-1 h-1 rounded-full", autoAdvance ? "bg-black animate-pulse" : "bg-white/20")} />
+                        'flex h-8 items-center justify-center gap-2 rounded px-2 text-[8px] font-black tracking-widest transition-colors',
+                        autoAdvance ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800/60 text-zinc-500 hover:text-zinc-200'
+                    )}>
+                    <div className={cn('h-1 w-1 rounded-full', autoAdvance ? 'animate-pulse bg-black' : 'bg-zinc-600')} />
                     Next
                 </button>
               </div>
+
+              <Button
+                onClick={() => {
+                  localStorage.setItem('tab-editor-draft', JSON.stringify(measures));
+                  router.push(editId ? `/tab-editor/publish?edit=${editId}` : '/tab-editor/publish');
+                }}
+                className='gap-2 bg-cyan-500 text-zinc-950 shadow-none hover:bg-cyan-400'>
+                <span>{editId ? 'Save changes' : 'Publish exercise'}</span>
+                <LucideChevronsRight size={14} />
+              </Button>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto space-y-12 pt-32 pb-24 px-4 md:px-8">
-
-          {/* Import Modal */}
-          <AnimatePresence>
-            {isImportModalOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
-              >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
-                >
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Tablature</h3>
-                    <p className="text-sm text-white/40 font-medium">Paste your exercise code snippet or JSON array here.</p>
-                  </div>
-
-                  <textarea
-                    value={importText}
-                    onChange={(e) => setImportText(e.target.value)}
-                    placeholder="tablature: [ ... ]"
-                    className="w-full h-64 bg-black/50 border border-white/10 rounded-lg p-4 font-mono text-[11px] text-cyan-100/70 outline-none focus:border-cyan-500/50 transition-all resize-none custom-scrollbar"
-                  />
-
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => { setIsImportModalOpen(false); setImportText(""); }}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={importCode}
-                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
-                    >
-                      Import & Load
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <div className='mx-auto max-w-[1700px] space-y-10 px-4 pb-24 pt-32 md:px-8 lg:pr-80'>
 
           {/* GP Import Modal */}
           <AnimatePresence>
@@ -971,25 +860,22 @@ export default function TabEditor() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
-              >
+                className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md'>
                 <motion.div
                   initial={{ scale: 0.9, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Import Guitar Pro</h3>
-                      <p className="text-sm text-white/40 font-medium">
+                  className='custom-scrollbar max-h-[90vh] w-full max-w-2xl space-y-6 overflow-y-auto rounded-lg bg-zinc-900 p-8'>
+                  <div className='flex items-start justify-between gap-4'>
+                    <div className='space-y-2'>
+                      <h3 className='text-xl font-black italic tracking-tighter text-cyan-400'>Import Guitar Pro</h3>
+                      <p className='text-sm font-medium text-zinc-500'>
                         Drop a GP3/GP4/GP5/GPX/GP file, then pick a track to load it into the editor.
                       </p>
                     </div>
                     <button
                       onClick={() => setIsGpModalOpen(false)}
-                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-black tracking-widest transition-all shrink-0"
-                    >
+                      className='shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-[10px] font-black tracking-widest text-zinc-300 transition-colors hover:bg-zinc-700'>
                       Done
                     </button>
                   </div>
@@ -1004,134 +890,25 @@ export default function TabEditor() {
             )}
           </AnimatePresence>
 
-          {/* Spider Generator Modal */}
-          <AnimatePresence>
-            {isSpiderModalOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
-              >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-lg p-8 max-w-2xl w-full space-y-6 shadow-2xl"
-                >
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-black tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
-                    <p className="text-sm text-white/40 font-medium">Configure your spider pattern parameters.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-white/40">Finger Permutation</label>
-                        <input
-                          type="text"
-                          value={spiderConfig.permutation}
-                          onChange={(e) => setSpiderConfig({...spiderConfig, permutation: e.target.value})}
-                          placeholder="e.g. 1234, 1324"
-                          className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-black text-white/40">Start Fret</label>
-                          <input
-                            type="number"
-                            value={spiderConfig.startFret}
-                            onChange={(e) => setSpiderConfig({...spiderConfig, startFret: parseInt(e.target.value) || 1})}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-black text-white/40">End Fret</label>
-                          <input
-                            type="number"
-                            value={spiderConfig.endFret}
-                            onChange={(e) => setSpiderConfig({...spiderConfig, endFret: parseInt(e.target.value) || 12})}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-white/40">Rhythm (Duration)</label>
-                        <select
-                          value={spiderConfig.duration}
-                          onChange={(e) => setSpiderConfig({...spiderConfig, duration: parseFloat(e.target.value)})}
-                          className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
-                        >
-                          <option value={0.5}>1/8 (Eighth)</option>
-                          <option value={0.25}>1/16 (Sixteenth)</option>
-                          <option value={0.125}>1/32 (Thirty-second)</option>
-                        </select>
-                      </div>
-                      <div className="flex items-center gap-3 py-2">
-                        <input
-                          type="checkbox"
-                          id="includeReturn"
-                          checked={spiderConfig.includeReturn}
-                          onChange={(e) => setSpiderConfig({...spiderConfig, includeReturn: e.target.checked})}
-                          className="w-5 h-5 accent-cyan-500"
-                        />
-                        <label htmlFor="includeReturn" className="text-sm font-bold text-white/60">Fret Return (Loop Down)</label>
-                      </div>
-                      <div className="flex items-center gap-3 py-2">
-                        <input
-                          type="checkbox"
-                          id="returnStrings"
-                          checked={spiderConfig.returnStrings}
-                          onChange={(e) => setSpiderConfig({...spiderConfig, returnStrings: e.target.checked})}
-                          className="w-5 h-5 accent-cyan-500"
-                        />
-                        <label htmlFor="returnStrings" className="text-sm font-bold text-white/60">Return Across Strings</label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <button
-                      onClick={() => setIsSpiderModalOpen(false)}
-                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-black transition-all tracking-widest"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={generateSpider}
-                      className="flex-1 py-3 bg-cyan-500 text-zinc-950 hover:bg-cyan-400 rounded-lg text-xs font-black transition-all tracking-widest"
-                    >
-                      Generate Spider
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Live Preview Section */}
-          <section className="space-y-4">
-              <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                  <h2 className="text-[10px] font-black tracking-[0.3em] text-white/40">Real-time Visualization</h2>
+          <section className='space-y-4'>
+              <div className='flex items-center gap-2'>
+                  <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-500' />
+                  <h2 className='text-[10px] font-black tracking-[0.3em] text-zinc-500'>Real-time Visualization</h2>
               </div>
-              <div className="relative">
+              <div className='relative'>
                   <TablatureViewer
                       measures={measures}
                       bpm={bpm}
                       isPlaying={isPlaying}
                       startTime={startTime}
-                      className="h-[280px] relative z-10 backdrop-blur-3xl"
+                      className='relative z-10 h-[280px] rounded-lg backdrop-blur-3xl'
                   />
               </div>
           </section>
 
           {/* Editor Grid Container */}
-          <section className="space-y-6">
+          <section className='space-y-6'>
             <AnimatePresence>
               {measures.map((measure, mIdx) => (
                 <motion.div
@@ -1139,29 +916,27 @@ export default function TabEditor() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden relative"
-                >
-                  <div className="bg-white/[0.02] p-4 flex items-center justify-between border-b border-white/10">
-                    <div className="flex items-center gap-6">
-                        <div className="bg-white/5 px-3 py-1 rounded-full">
-                          <span className="text-[10px] font-black text-white/40 tracking-tighter">Measure #{mIdx + 1}</span>
+                  className='relative overflow-hidden rounded-lg bg-zinc-900/40'>
+                  <div className='flex items-center justify-between bg-zinc-900/60 p-4'>
+                    <div className='flex items-center gap-6'>
+                        <div className='rounded-full bg-zinc-800/60 px-3 py-1'>
+                          <span className='text-[10px] font-black tracking-tighter text-zinc-400'>Measure #{mIdx + 1}</span>
                         </div>
-                          <div className="flex items-center gap-4 text-[10px] font-bold text-white/20">
-                            <span>4 / 4 TIME</span>
-                            <span className="w-1 h-1 rounded-full bg-white/10" />
-                            <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded">
+                          <div className='flex items-center gap-4 text-[10px] font-bold text-zinc-600'>
+                            <span>4 / 4 time</span>
+                            <span className='h-1 w-1 rounded-full bg-zinc-700' />
+                            <div className='flex items-center gap-1.5 rounded bg-zinc-950/60 p-1'>
                                 {[8, 12, 16, 24, 32].map(s => (
                                     <button
                                         key={s}
                                         onClick={() => updateMeasureSteps(mIdx, s)}
                                         className={cn(
-                                            "px-2 py-0.5 rounded transition-all whitespace-nowrap",
+                                            'whitespace-nowrap rounded px-2 py-0.5 transition-colors',
                                             measure.beats.length === s
-                                                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                                                : "hover:bg-white/5 text-white/20"
-                                        )}
-                                    >
-                                        {s === 12 ? "Triplet (12)" : s === 24 ? "Sextuplet (24)" : `${s} steps`}
+                                                ? 'bg-cyan-500/10 text-cyan-400'
+                                                : 'text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300'
+                                        )}>
+                                        {s === 12 ? 'Triplet (12)' : s === 24 ? 'Sextuplet (24)' : `${s} steps`}
                                     </button>
                                 ))}
                             </div>
@@ -1169,17 +944,17 @@ export default function TabEditor() {
                     </div>
                     <button
                       onClick={() => removeMeasure(mIdx)}
-                      className="p-2.5 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded transition-all"
-                    >
+                      aria-label='Delete measure'
+                      className='rounded p-2.5 text-zinc-600 transition-colors hover:bg-red-500/10 hover:text-red-400'>
                       <LucideTrash2 size={18} />
                     </button>
                   </div>
 
-                    <div className="p-8 overflow-x-auto custom-scrollbar relative">
-                      <div className="min-w-max">
+                    <div className='custom-scrollbar relative overflow-x-auto p-8'>
+                      <div className='min-w-max'>
                           <div
                               id={`measure-grid-${mIdx}`}
-                              className="flex gap-4 relative"
+                              className='relative flex gap-4'
                               onMouseDown={(e) => {
                                   if (e.button !== 0) return;
                                   const target = (e.target as HTMLElement).closest('.group-cell');
@@ -1243,19 +1018,19 @@ export default function TabEditor() {
                               {/* Selection Rect Overlay */}
                               <div
                                 id={`selection-box-${mIdx}`}
-                                className="absolute z-20 pointer-events-none border border-cyan-400 bg-cyan-400/20 hidden"
+                                className='absolute z-20 hidden bg-cyan-400/20 ring-1 ring-cyan-400 pointer-events-none'
                               />
                             {/* String Labels */}
-                            <div className="flex flex-col justify-between py-2 mb-10 text-[10px] font-black text-white/20 w-4">
+                            <div className='mb-10 flex w-4 flex-col justify-between py-2 text-[10px] font-black text-zinc-600'>
                               {[1, 2, 3, 4, 5, 6].map(s => (
                                 <span key={s}>{s}</span>
                               ))}
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className='flex gap-2'>
                               {measure.beats.map((beat, bIdx) => (
-                                <div key={bIdx} className="space-y-4">
-                                  <div className="space-y-2">
+                                <div key={bIdx} className='space-y-4'>
+                                  <div className='space-y-2'>
                                       {[0, 1, 2, 3, 4, 5].map(sIdx => {
                                         const note = beat.notes.find(n => n.string === sIdx + 1);
                                         const isSelected = selectedCell?.measureIdx === mIdx && selectedCell?.beatIdx === bIdx && selectedCell?.stringIdx === sIdx;
@@ -1278,74 +1053,66 @@ export default function TabEditor() {
                                           onMouseLeave={() => setHoveredCell(null)}
                                           onWheel={(e) => handleWheel(e, mIdx, bIdx, sIdx)}
                                           className={cn(
-                                            "w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-all border-2 relative group-cell",
+                                            'group-cell relative flex h-10 w-10 cursor-pointer items-center justify-center rounded transition-background',
                                             isSelected
-                                              ? "border-cyan-500 bg-cyan-500/20"
+                                              ? 'bg-cyan-500/25 ring-1 ring-cyan-500'
                                               : isInActiveSelection
-                                                ? "border-cyan-500/40 bg-cyan-500/10"
+                                                ? 'bg-cyan-500/10 ring-1 ring-cyan-500/40'
                                                 : isCrosshair
-                                                  ? "border-white/5 bg-white/[0.02]"
+                                                  ? 'bg-zinc-800/30'
                                                   : isBeatMark
-                                                    ? "border-white/10 bg-white/[0.03] hover:bg-white/10"
-                                                    : "border-white/5 bg-transparent hover:bg-white/5",
-                                            note ? "text-white" : "text-white/10",
-                                            note?.isPalmMute ? "border-b-amber-500/40" : ""
+                                                    ? 'bg-zinc-800/50 hover:bg-zinc-700/60'
+                                                    : 'bg-zinc-900/40 hover:bg-zinc-800/50',
+                                            note ? 'text-zinc-100' : 'text-zinc-700'
                                           )}
                                         >
                                           {note ? (
-                                            <div className="flex flex-col items-center justify-center leading-none relative">
+                                            <div className='relative flex flex-col items-center justify-center leading-none'>
                                               <span className={cn(
-                                                "text-sm font-black tracking-tighter",
-                                                note.isDead ? "text-zinc-500" : ""
+                                                'text-sm font-black tracking-tighter',
+                                                note.isDead ? 'text-zinc-500' : ''
                                               )}>
-                                                {note.isDead ? "×" : note.fret}
+                                                {note.isDead ? '×' : note.fret}
                                               </span>
                                               {(note.isHammerOn || note.isPullOff) && (
                                                 <span className={cn(
-                                                  "text-[9px] font-black mt-0.5",
-                                                  note.isHammerOn ? "text-amber-400" : "text-red-400"
+                                                  'mt-0.5 text-[9px] font-black',
+                                                  note.isHammerOn ? 'text-amber-400' : 'text-red-400'
                                                 )}>
                                                   {note.isHammerOn ? 'H' : 'P'}
                                                 </span>
                                               )}
                                               {note.isTap && (
-                                                <span className="text-[9px] font-black mt-0.5 text-purple-400">T</span>
+                                                <span className='mt-0.5 text-[9px] font-black text-purple-400'>T</span>
                                               )}
                                               {note.isVibrato && (
-                                                <span className="text-[9px] font-black mt-0.5 text-cyan-300">~</span>
-                                              )}
-                                              {note.isPalmMute && (
-                                                <span className="text-[8px] font-black mt-0.5 text-amber-500/70 leading-none">PM</span>
+                                                <span className='mt-0.5 text-[9px] font-black text-cyan-300'>~</span>
                                               )}
                                               {note.isAccented && (
-                                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-cyan-400 rounded-full" />
+                                                <div className='absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full bg-cyan-400' />
+                                              )}
+                                              {note.isPalmMute && (
+                                                <div className='absolute inset-x-1 bottom-0 h-0.5 rounded-full bg-amber-500/70' />
                                               )}
                                             </div>
                                           ) : (
-                                            <span className="text-[14px] opacity-20">·</span>
-                                          )}
-                                          {isBeatMark && !note && !isSelected && (
-                                              <div className="absolute inset-0 bg-white/[0.02] rounded pointer-events-none" />
+                                            <span className='text-[14px] opacity-20'>·</span>
                                           )}
                                         </button>
                                       );
                                     })}
                                   </div>
 
-                                  <div className="grid grid-cols-2 gap-1 p-1 bg-white/[0.02] rounded">
+                                  <div className='grid grid-cols-2 gap-1 rounded bg-zinc-950/40 p-1'>
                                     {[1, 0.5, 0.25, 0.125].map(d => (
                                         <button
                                             key={d}
                                             onClick={() => updateDuration(mIdx, bIdx, d)}
                                             className={cn(
-                                                "h-4 px-1 rounded flex items-center justify-center transition-all whitespace-nowrap",
-                                                beat.duration === d ? "bg-cyan-500 text-[7px] text-zinc-950 font-black" : "text-[7px] font-black text-white/20 hover:text-white/40"
-                                            )}
-                                        >
-                                            {d === 1 && "1/4"}
-                                            {d === 0.5 && "1/8"}
-                                            {d === 0.25 && "1/16"}
-                                            {d === 0.125 && "1/32"}
+                                                'flex h-4 items-center justify-center whitespace-nowrap rounded px-1 transition-colors',
+                                                beat.duration === d ? 'bg-cyan-500 text-[7px] font-black text-zinc-950' : 'text-[7px] font-black text-zinc-600 hover:text-zinc-400'
+                                            )}>
+                                            {DURATION_LABELS[d]}
                                         </button>
                                     ))}
                                   </div>
@@ -1361,92 +1128,132 @@ export default function TabEditor() {
 
             <button
               onClick={addMeasure}
-              className="w-full py-10 border-2 border-dashed border-white/5 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02] rounded-lg flex flex-col items-center justify-center gap-3 group transition-all"
-            >
-              <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-cyan-500/20 group-hover:text-cyan-400 group-hover:rotate-90 transition-all duration-500">
+              className='group flex w-full flex-col items-center justify-center gap-3 rounded-lg bg-zinc-900/20 py-10 transition-background hover:bg-cyan-500/[0.03]'>
+              <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-800/60 transition-colors group-hover:bg-cyan-500/20 group-hover:text-cyan-400'>
                   <LucidePlus size={24} />
               </div>
-              <div className="flex flex-col items-center">
-                  <span className="text-xs font-black tracking-[0.2em] text-white/30 group-hover:text-cyan-400 transition-all">Add New Measure</span>
-                  <span className="text-[10px] font-bold text-white/10 mt-1">Append more steps to your pattern</span>
+              <div className='flex flex-col items-center'>
+                  <span className='text-xs font-black tracking-[0.2em] text-zinc-500 transition-colors group-hover:text-cyan-400'>Add New Measure</span>
+                  <span className='mt-1 text-[10px] font-bold text-zinc-700'>Append more steps to your pattern</span>
               </div>
             </button>
           </section>
 
         </div>
 
-        {/* Floating Shortcuts Sidebar */}
-        <div className="fixed top-1/2 -translate-y-1/2 right-6 z-40 hidden xl:flex flex-col gap-4 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-lg shadow-2xl">
-            <div className="flex flex-col items-center gap-1 border-b border-white/5 pb-4 mb-2">
-                <span className="text-[10px] font-black tracking-widest text-white/40 italic">Shortcuts</span>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↑</kbd>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">←</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">↓</kbd>
-                        <kbd className="w-[28px] h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">→</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20 mt-1">Navigate</span>
+        {/* Note Inspector — mouse-friendly fret & articulation editor for the selected cell */}
+        <div className='fixed right-6 top-1/2 z-40 hidden w-72 -translate-y-1/2 flex-col gap-5 rounded-lg bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
+            {selectedCell ? (
+              <>
+                <div className='space-y-1'>
+                  <span className='text-[10px] font-black italic tracking-widest text-cyan-400'>Note Editor</span>
+                  <p className='text-[11px] font-bold text-zinc-500'>
+                    Measure {selectedCell.measureIdx + 1} · Beat {selectedCell.beatIdx + 1} · String {selectedCell.stringIdx + 1}
+                  </p>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
-                    <kbd className="px-3 h-7 flex items-center justify-center bg-white/10 rounded text-[11px] font-black border border-white/10">0-9</kbd>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret</span>
+                <div className='space-y-2'>
+                  <span className='text-[10px] font-bold text-zinc-500'>Fret</span>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      onClick={() => setSelectedFret(Math.max(0, (selectedNote?.fret ?? 0) - 1))}
+                      disabled={!selectedNote}
+                      aria-label='Decrease fret'
+                      className='flex h-10 w-10 items-center justify-center rounded bg-zinc-800/60 text-zinc-300 transition-colors hover:bg-zinc-700 disabled:pointer-events-none disabled:opacity-30'>
+                      <LucideMinus size={16} />
+                    </button>
+                    <input
+                      type='number'
+                      min={0}
+                      max={24}
+                      value={selectedNote?.fret ?? ''}
+                      placeholder='—'
+                      onChange={(e) => setSelectedFret(Math.max(0, Math.min(24, parseInt(e.target.value) || 0)))}
+                      className='h-10 w-full rounded bg-zinc-950/60 text-center text-xl font-black text-cyan-400 outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'
+                    />
+                    <button
+                      onClick={() => setSelectedFret(Math.min(24, (selectedNote?.fret ?? -1) + 1))}
+                      aria-label='Increase fret'
+                      className='flex h-10 w-10 items-center justify-center rounded bg-zinc-800/60 text-zinc-300 transition-colors hover:bg-zinc-700'>
+                      <LucidePlus size={16} />
+                    </button>
+                  </div>
+                  <div className='grid grid-cols-6 gap-1.5'>
+                    {QUICK_FRETS.map(f => (
+                      <button
+                        key={f}
+                        onClick={() => setSelectedFret(f)}
+                        className={cn(
+                          'flex h-7 items-center justify-center rounded text-[11px] font-bold transition-colors',
+                          selectedNote?.fret === f ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'
+                        )}>
+                        {f}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2 text-center">
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-400/20 text-amber-400 rounded text-[11px] font-black border border-amber-400/20">H</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-red-400/20 text-red-400 rounded text-[11px] font-black border border-red-400/20">P</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Legato</span>
+                <div className='space-y-2'>
+                  <span className='text-[10px] font-bold text-zinc-500'>Articulation</span>
+                  <div className='grid grid-cols-4 gap-1.5'>
+                    {ARTICULATIONS.map(a => (
+                      <button
+                        key={a.type}
+                        onClick={() => toggleSelectedArticulation(a.type)}
+                        disabled={!selectedNote}
+                        title={a.label}
+                        aria-label={a.label}
+                        className={cn(
+                          'flex h-9 items-center justify-center rounded text-xs font-black transition-colors disabled:pointer-events-none disabled:opacity-30',
+                          selectedNote?.[a.type] ? a.activeClass : 'bg-zinc-800/40 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'
+                        )}>
+                        {a.letter}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
-                    <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-400/20 text-cyan-400 rounded text-[11px] font-black border border-cyan-400/20">A</kbd>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Accent</span>
+                <button
+                  onClick={clearSelectedNote}
+                  disabled={!selectedNote}
+                  className='flex items-center justify-center gap-2 rounded bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors hover:bg-red-500/20 disabled:pointer-events-none disabled:opacity-30'>
+                  <LucideTrash2 size={13} />
+                  Clear note
+                </button>
+              </>
+            ) : (
+              <>
+                <div className='space-y-1'>
+                  <span className='text-[10px] font-black italic tracking-widest text-zinc-400'>Note Editor</span>
+                  <p className='text-[11px] font-bold leading-relaxed text-zinc-600'>
+                    Click a cell in the grid to set its fret and articulations here.
+                  </p>
                 </div>
-
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-zinc-400/20 text-zinc-400 rounded text-[11px] font-black border border-zinc-400/20">D</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-cyan-300/20 text-cyan-300 rounded text-[11px] font-black border border-cyan-300/20">V</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Dead / Vib</span>
+                <div className='space-y-3 text-[10px] font-bold text-zinc-600'>
+                  <div className='flex items-center justify-between'>
+                    <span>Navigate</span>
+                    <span className='text-zinc-400'>↑ ↓ ← →</span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span>Set fret</span>
+                    <span className='text-zinc-400'>0–9</span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span>Clear note</span>
+                    <span className='text-zinc-400'>Del</span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span>Undo / Redo</span>
+                    <span className='text-zinc-400'>Ctrl+Z / Ctrl+Y</span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span>Fret +/-</span>
+                    <span className='text-zinc-400'>Scroll</span>
+                  </div>
                 </div>
-
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-purple-400/20 text-purple-400 rounded text-[11px] font-black border border-purple-400/20">T</kbd>
-                        <kbd className="w-8 h-8 flex items-center justify-center bg-amber-500/20 text-amber-500 rounded text-[11px] font-black border border-amber-500/20">M</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Tap / PM</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/5">
-                    <kbd className="px-2 h-7 flex items-center justify-center bg-red-500/10 text-red-500 rounded text-[9px] font-black border border-red-500/20">DEL</kbd>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Clear</span>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-cyan-500/10 text-cyan-400 rounded text-[9px] font-black border border-cyan-500/20">CTRL+Z</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Undo</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <kbd className="px-2 h-7 flex items-center justify-center bg-white/10 rounded text-[10px] font-black border border-white/10">SCROLL</kbd>
-                    </div>
-                    <span className="text-[9px] font-bold tracking-widest text-white/20">Fret +/-</span>
-                </div>
-            </div>
-      </div>
+              </>
+            )}
+        </div>
 
         <AnimatePresence>
             {toast && (
@@ -1455,11 +1262,10 @@ export default function TabEditor() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     className={cn(
-                        "fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-lg font-black text-xs tracking-widest shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl",
-                        toast.type === 'success' ? "bg-cyan-500 text-zinc-950" : "bg-red-500 text-white"
-                    )}
-                >
-                    <div className={cn("w-2 h-2 rounded-full", toast.type === 'success' ? "bg-black animate-pulse" : "bg-white animate-bounce")} />
+                        'fixed bottom-8 left-1/2 z-[100] flex -translate-x-1/2 items-center gap-3 rounded-lg px-6 py-3 text-xs font-black tracking-widest backdrop-blur-xl',
+                        toast.type === 'success' ? 'bg-cyan-500 text-zinc-950' : 'bg-red-500 text-white'
+                    )}>
+                    <div className={cn('h-2 w-2 rounded-full', toast.type === 'success' ? 'animate-pulse bg-black' : 'animate-bounce bg-white')} />
                     {toast.message}
                 </motion.div>
             )}
@@ -1472,38 +1278,31 @@ export default function TabEditor() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     style={{ left: contextMenu.x, top: contextMenu.y }}
-                    className="fixed z-[110] bg-[#0f0f0f] border border-white/10 rounded shadow-2xl overflow-hidden p-1 min-w-[140px]"
-                    onClick={(e) => e.stopPropagation()}
-                >
+                    className='fixed z-[110] min-w-[140px] overflow-hidden rounded-lg bg-zinc-900 p-1'
+                    onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={handleCopySelection}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
-                    >
+                        className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-black tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-cyan-400'>
                         <span>Copy</span>
-                        <span className="text-[10px] opacity-30">CTRL+C</span>
+                        <span className='text-[10px] opacity-40'>Ctrl+C</span>
                     </button>
                     <button
                         onClick={() => { handlePasteAtCursor(); setContextMenu(null); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
-                    >
+                        className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-black tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-cyan-400'>
                         <span>Paste</span>
-                        <span className="text-[10px] opacity-30">CTRL+V</span>
+                        <span className='text-[10px] opacity-40'>Ctrl+V</span>
                     </button>
-                    <div className="h-px bg-white/5 my-1" />
                     <button
                         onClick={() => { handleCopySelection(); handleDeleteSelection(); }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 rounded text-xs font-black tracking-widest text-white/60 hover:text-cyan-400 flex items-center justify-between transition-all"
-                    >
+                        className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-black tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-cyan-400'>
                         <span>Cut</span>
-                        <span className="text-[10px] opacity-30">CTRL+X</span>
+                        <span className='text-[10px] opacity-40'>Ctrl+X</span>
                     </button>
-                    <div className="h-px bg-white/5 my-1" />
                     <button
                         onClick={handleDeleteSelection}
-                        className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded text-xs font-black tracking-widest text-red-400/60 hover:text-red-400 flex items-center justify-between transition-all"
-                    >
+                        className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-black tracking-widest text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400'>
                         <span>Clear Area</span>
-                        <span className="text-[10px] opacity-30">DEL</span>
+                        <span className='text-[10px] opacity-40'>Del</span>
                     </button>
                 </motion.div>
             )}
