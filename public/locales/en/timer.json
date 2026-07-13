@@ -62,5 +62,10 @@
     "description": "This will clear all tracked time for every skill in this session. This action cannot be undone.",
     "cancel": "Cancel",
     "confirm": "Reset"
+  },
+  "metronome": {
+    "title": "Metronome",
+    "start": "Start metronome",
+    "stop": "Stop metronome"
   }
 }
