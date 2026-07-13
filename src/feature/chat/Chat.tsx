@@ -50,12 +50,12 @@ const Chat = () => {
             return (
               <div
                 key={msg.id}
-                className={`flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
+                className={`group flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
                 <div
                   className={`flex max-w-[90%] gap-3 ${
                     isMe ? "flex-row-reverse" : "flex-row"
                   }`}>
-                  
+
                   {/* Avatar Section - Only show if not a follow-up */}
                   <div className='flex w-10 flex-shrink-0 justify-center'>
                     {!isFollowUp && (
@@ -81,28 +81,51 @@ const Chat = () => {
                         </span>
                       </UserTooltip>
                     )}
-                    
-                    <Card
-                      className={`relative border-none px-3 py-2 text-sm transition-all sm:px-4 ${
-                        isMe
-                          ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
-                          : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
-                      }`}>
-                      {msg.message}
-                    </Card>
 
-                    <button
-                      type='button'
-                      onClick={() => msg.id && toggleLike(msg.id)}
+                    <div
                       className={cn(
-                        "mt-1 flex items-center gap-1 px-1 text-xs text-zinc-500 transition-colors hover:text-red-400",
-                        hasLiked && "text-red-500 hover:text-red-400"
+                        "flex items-center gap-1",
+                        isMe && "flex-row-reverse",
+                        likes.length > 0 && "mb-2.5"
                       )}>
-                      <Heart className={cn("h-3 w-3", hasLiked && "fill-current")} />
-                      {likes.length > 0 && (
-                        <span className='font-semibold'>{likes.length}</span>
-                      )}
-                    </button>
+                      <div className='relative'>
+                        <Card
+                          className={`border-none px-3 py-2 text-sm transition-all sm:px-4 ${
+                            isMe
+                              ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
+                              : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
+                          }`}>
+                          {msg.message}
+                        </Card>
+
+                        {likes.length > 0 && (
+                          <button
+                            type='button'
+                            aria-label={t("like")}
+                            onClick={() => msg.id && toggleLike(msg.id)}
+                            className={cn(
+                              "absolute -bottom-2.5 flex items-center gap-1 rounded-full bg-zinc-800 px-1.5 py-0.5 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700",
+                              isMe ? "left-1" : "right-1"
+                            )}>
+                            <Heart className='h-3 w-3 fill-red-500 text-red-500' />
+                            {likes.length > 1 && <span>{likes.length}</span>}
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        type='button'
+                        aria-label={t("like")}
+                        onClick={() => msg.id && toggleLike(msg.id)}
+                        className={cn(
+                          "rounded-full p-1.5 text-zinc-500 opacity-0 transition-opacity hover:bg-white/5 hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100",
+                          hasLiked && "text-red-500 hover:text-red-400"
+                        )}>
+                        <Heart
+                          className={cn("h-3.5 w-3.5", hasLiked && "fill-current")}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
