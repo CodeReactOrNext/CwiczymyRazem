@@ -412,8 +412,10 @@ const GpTabsPage: NextPageWithLayout = () => {
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
     setIsDraggingOver(false);
+    // Internal file-row drag (move to folder) — not an OS file upload.
+    if (e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+    e.preventDefault();
     const dropped = Array.from(e.dataTransfer.files ?? []);
     if (dropped.length > 0) handleFilesSelected(dropped);
   };
@@ -596,6 +598,10 @@ const GpTabsPage: NextPageWithLayout = () => {
       <div
         className="px-4 md:px-8 pb-8 space-y-4"
         onDragOver={(e) => {
+          // Only react to OS file drags — internal file-row drags (move to
+          // folder) must not trigger the upload backdrop.
+          if (e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+          if (!e.dataTransfer.types.includes("Files")) return;
           e.preventDefault();
           setIsDraggingOver(true);
         }}
@@ -636,16 +642,27 @@ const GpTabsPage: NextPageWithLayout = () => {
             ))}
           </div>
 
-          {canCreateFolderHere && (
-            <Button
-              onClick={() => setShowNewFolderDialog(true)}
-              variant="ghost"
-              className="h-9 px-3 rounded-lg text-[10px] font-bold capitalize tracking-wider text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+          <div className="flex items-center gap-4">
+            <span
+              className={cn(
+                "text-xs font-medium",
+                atFileCap ? "text-amber-400" : "text-zinc-400"
+              )}
             >
-              <FolderPlus className="h-3.5 w-3.5 mr-1.5" />
-              New folder
-            </Button>
-          )}
+              {files.length}/{MAX_USER_GP_FILES} files · max{" "}
+              {formatSize(MAX_GP_FILE_SIZE_BYTES)} per file
+            </span>
+            {canCreateFolderHere && (
+              <Button
+                onClick={() => setShowNewFolderDialog(true)}
+                variant="ghost"
+                className="h-9 px-4 rounded-lg text-xs font-bold bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
+              >
+                <FolderPlus className="h-4 w-4 mr-2" />
+                New folder
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Drag & drop overlay hint */}
@@ -732,7 +749,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                     <div
                       key={folder.id}
                       className={cn(
-                        "group relative flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-4 transition-colors cursor-pointer hover:bg-zinc-800/40",
+                        "group relative flex flex-col gap-2 rounded-lg bg-zinc-800/40 p-4 transition-colors cursor-pointer hover:bg-zinc-700/40",
                         isDropTarget && "bg-cyan-500/10 hover:bg-cyan-500/10"
                       )}
                       onClick={() => setCurrentFolderId(folder.id)}
@@ -756,7 +773,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                         </button>
                       </div>
                       <p className="text-sm font-bold text-white truncate">{folder.name}</p>
-                      <p className="text-[10px] text-zinc-600 capitalize tracking-wider">
+                      <p className="text-xs text-zinc-400">
                         {childFolderCount > 0 && `${childFolderCount} folder${childFolderCount > 1 ? "s" : ""} · `}
                         {childFileCount} file{childFileCount === 1 ? "" : "s"}
                       </p>
@@ -782,7 +799,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                     e.dataTransfer.setData(DRAG_FILE_MIME, file.id);
                     e.dataTransfer.effectAllowed = "move";
                   }}
-                  className="flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-4 transition-colors hover:bg-zinc-800/40"
+                  className="flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4 transition-colors hover:bg-zinc-700/40"
                 >
                   <div className="flex items-center gap-3">
                     {/* Icon */}
@@ -805,7 +822,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       <p className="text-sm font-bold text-white truncate">
                         {file.name}
                       </p>
-                      <p className="text-[10px] text-zinc-600 capitalize tracking-wider">
+                      <p className="text-xs text-zinc-400">
                         {ext.replace(".", "").toUpperCase()} · {formatSize(file.size)} ·{" "}
                         {formatDate(file.uploadedAt)}
                       </p>
