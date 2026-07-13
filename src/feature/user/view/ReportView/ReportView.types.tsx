@@ -31,6 +31,7 @@ export interface ReportFormikInterface {
   earTrainingPerformance?: { score: number };
   clientTodayISO?: string;
   clientNowISO?: string;
+  clientDisplayStreak?: number;
 }
 
 export interface ReportDataInterface {

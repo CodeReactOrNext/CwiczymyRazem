@@ -42,7 +42,7 @@ import {
   getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
-import { getDailyStreakMultiplier } from "utils/gameLogic";
+import { getDailyStreakMultiplier, getStreakFromActivityLog } from "utils/gameLogic";
 import { i18n } from "utils/translation";
 
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
@@ -246,6 +246,10 @@ const ReportView = () => {
       ...inputData,
       clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
       clientNowISO: new Date().toISOString(),
+      clientDisplayStreak: getStreakFromActivityLog(
+        (reportList ?? []).map((report: { date: Date | string }) => report.date),
+        { includeToday: true }
+      ),
     };
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));
