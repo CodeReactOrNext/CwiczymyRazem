@@ -9,6 +9,7 @@ import { FaCheck, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons
 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
+import { ShortcutsLegend } from "./ShortcutsLegend";
 import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
@@ -56,6 +57,7 @@ export const SessionBottomBar = memo(({
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const hasTempoControl = !!currentExercise.metronomeSpeed;
 
   return (
     <>
@@ -72,6 +74,7 @@ export const SessionBottomBar = memo(({
             <FaSignOutAlt />
             {t("common:practice.exit")}
           </Button>
+          <ShortcutsLegend hasTempoControl={hasTempoControl} />
         </div>
 
         {/* Center: Timer */}
