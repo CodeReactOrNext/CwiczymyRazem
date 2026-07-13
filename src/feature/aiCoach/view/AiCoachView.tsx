@@ -6,6 +6,7 @@ import {
   firebaseGetAllUserProgress,
   firebaseUpdateUserProgress,
   type UserRoadmapProgress,
+  type UserRoadmapStepResourceProgress,
 } from "feature/aiCoach/services/userProgress.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { ArrowLeft, Lightbulb, Loader2, Map } from "lucide-react";
@@ -42,6 +43,8 @@ function mergeWithProgress(
       steps: phase.steps.map((step) => ({
         ...step,
         sessionsCompleted: progress?.stepProgress[step.id] ?? 0,
+        exerciseCompleted: progress?.resourceProgress?.[step.id]?.exerciseCompleted ?? false,
+        completedLessonIds: progress?.resourceProgress?.[step.id]?.completedLessonIds ?? [],
       })),
     })),
   };
@@ -96,13 +99,23 @@ const AiCoachView = () => {
   const handlePersist = async (phases: RoadmapPhase[]) => {
     if (!userAuth || !selectedId) return;
     const stepProgress: Record<string, number> = {};
-    phases.forEach((p) => p.steps.forEach((s) => { stepProgress[s.id] = s.sessionsCompleted; }));
-    await firebaseUpdateUserProgress(userAuth as string, selectedId, stepProgress);
+    const resourceProgress: Record<string, UserRoadmapStepResourceProgress> = {};
+    phases.forEach((p) =>
+      p.steps.forEach((s) => {
+        stepProgress[s.id] = s.sessionsCompleted;
+        resourceProgress[s.id] = {
+          exerciseCompleted: s.exerciseCompleted,
+          completedLessonIds: s.completedLessonIds,
+        };
+      })
+    );
+    await firebaseUpdateUserProgress(userAuth as string, selectedId, stepProgress, resourceProgress);
     setProgressMap((prev) => ({
       ...prev,
       [selectedId]: {
         ...(prev[selectedId] ?? { roadmapId: selectedId, userId: userAuth as string, startedAt: new Date().toISOString() }),
         stepProgress,
+        resourceProgress,
         updatedAt: new Date().toISOString(),
       },
     }));
