@@ -13,8 +13,11 @@ import {
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { auth,db, storage } from "utils/firebase/client/firebase.utils";
 
-/** Maximum number of GP files a user may keep in their library. */
+/** Maximum number of GP files a user may keep in their library (root + all folders combined). */
 export const MAX_USER_GP_FILES = 50;
+
+/** Maximum size (bytes) allowed for a single GP file upload. */
+export const MAX_GP_FILE_SIZE_BYTES = 1.5 * 1024 * 1024;
 
 export interface UserGpFile {
   id: string;

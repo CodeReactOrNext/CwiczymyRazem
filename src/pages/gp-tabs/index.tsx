@@ -32,6 +32,7 @@ import {
   deleteUserGpFile,
   fetchGpFileAsFile,
   getUserGpFiles,
+  MAX_GP_FILE_SIZE_BYTES,
   MAX_USER_GP_FILES,
   moveUserGpFile,
   uploadUserGpFile,
@@ -104,6 +105,9 @@ interface UploadQueueItem {
 }
 
 const TIME_PRESETS = [5, 10, 15, 20, 30];
+
+/** Custom DataTransfer type used to drag a file row onto a folder card/breadcrumb to move it. */
+const DRAG_FILE_MIME = "application/x-gp-file-id";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -186,6 +190,8 @@ const GpTabsPage: NextPageWithLayout = () => {
   const [showNewFolderDialog, setShowNewFolderDialog] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+  const [dragOverRoot, setDragOverRoot] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -248,6 +254,17 @@ const GpTabsPage: NextPageWithLayout = () => {
   const visibleFolders = folders.filter((f) => (f.parentId ?? null) === currentFolderId);
   const visibleFiles = files.filter((f) => (f.folderId ?? null) === currentFolderId);
   const moveTargets = useMemo(() => flattenFoldersForMove(folders), [folders]);
+  const atFileCap = files.length >= MAX_USER_GP_FILES;
+
+  const openFilePicker = () => {
+    if (atFileCap) {
+      toast.error(
+        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+      );
+      return;
+    }
+    fileInputRef.current?.click();
+  };
 
   const handleLoadForPractice = async (file: UserGpFile) => {
     setLoadingFileId(file.id);
@@ -301,9 +318,15 @@ const GpTabsPage: NextPageWithLayout = () => {
 
     const validFiles: File[] = [];
     const invalidNames: string[] = [];
+    const oversizedNames: string[] = [];
     incoming.forEach((file) => {
-      if (isGpFile(file.name)) validFiles.push(file);
-      else invalidNames.push(file.name);
+      if (!isGpFile(file.name)) {
+        invalidNames.push(file.name);
+      } else if (file.size > MAX_GP_FILE_SIZE_BYTES) {
+        oversizedNames.push(file.name);
+      } else {
+        validFiles.push(file);
+      }
     });
 
     if (invalidNames.length > 0) {
@@ -311,11 +334,18 @@ const GpTabsPage: NextPageWithLayout = () => {
         `Unsupported format: ${invalidNames.join(", ")}. Supported: ${GP_EXTENSIONS.join(", ")}`
       );
     }
+    if (oversizedNames.length > 0) {
+      toast.error(
+        `File too large (max ${formatSize(MAX_GP_FILE_SIZE_BYTES)}): ${oversizedNames.join(", ")}`
+      );
+    }
     if (validFiles.length === 0) return;
 
     const remainingSlots = MAX_USER_GP_FILES - files.length;
     if (remainingSlots <= 0) {
-      toast.error(`You've reached the limit of ${MAX_USER_GP_FILES} GP files. Delete some to upload more.`);
+      toast.error(
+        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+      );
       return;
     }
 
@@ -413,6 +443,32 @@ const GpTabsPage: NextPageWithLayout = () => {
       toast.error("Failed to move file");
     }
   };
+
+  /** Drag & drop handlers so a file row can be dropped onto a folder card/breadcrumb to move it. */
+  const makeFolderDropHandlers = (targetFolderId: string | null) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (targetFolderId === null) setDragOverRoot(true);
+      else setDragOverFolderId(targetFolderId);
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      if (e.currentTarget !== e.target) return;
+      if (targetFolderId === null) setDragOverRoot(false);
+      else setDragOverFolderId((id) => (id === targetFolderId ? null : id));
+    },
+    onDrop: (e: React.DragEvent) => {
+      const fileId = e.dataTransfer.getData(DRAG_FILE_MIME);
+      setDragOverRoot(false);
+      setDragOverFolderId(null);
+      if (!fileId) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const draggedFile = files.find((f) => f.id === fileId);
+      if (draggedFile) handleMoveFile(draggedFile, targetFolderId);
+    },
+  });
 
   const handleCreateFolder = async () => {
     if (!userId) return;
@@ -523,7 +579,7 @@ const GpTabsPage: NextPageWithLayout = () => {
         }
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText="Upload Files"
-        onClick={() => fileInputRef.current?.click()}
+        onClick={openFilePicker}
       />
 
       <input
@@ -553,9 +609,11 @@ const GpTabsPage: NextPageWithLayout = () => {
           <div className="flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide">
             <button
               onClick={() => setCurrentFolderId(null)}
+              {...makeFolderDropHandlers(null)}
               className={cn(
-                "rounded transition-colors hover:text-white",
-                currentFolder ? "text-zinc-400" : "text-cyan-400"
+                "rounded px-1.5 py-0.5 transition-colors hover:text-white",
+                currentFolder ? "text-zinc-400" : "text-cyan-400",
+                dragOverRoot && "bg-cyan-500/10 text-cyan-400"
               )}
             >
               All files
@@ -565,9 +623,11 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
                 <button
                   onClick={() => setCurrentFolderId(folder.id)}
+                  {...makeFolderDropHandlers(folder.id)}
                   className={cn(
-                    "rounded transition-colors hover:text-white",
-                    currentFolder?.id === folder.id ? "text-cyan-400" : "text-zinc-400"
+                    "rounded px-1.5 py-0.5 transition-colors hover:text-white",
+                    currentFolder?.id === folder.id ? "text-cyan-400" : "text-zinc-400",
+                    dragOverFolderId === folder.id && "bg-cyan-500/10 text-cyan-400"
                   )}
                 >
                   {folder.name}
@@ -580,7 +640,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             <Button
               onClick={() => setShowNewFolderDialog(true)}
               variant="ghost"
-              className="h-9 px-3 rounded-lg text-[10px] font-bold capitalize tracking-wider text-zinc-400 hover:text-white hover:bg-white/5"
+              className="h-9 px-3 rounded-lg text-[10px] font-bold capitalize tracking-wider text-zinc-400 hover:text-white hover:bg-zinc-800/50"
             >
               <FolderPlus className="h-3.5 w-3.5 mr-1.5" />
               New folder
@@ -637,19 +697,22 @@ const GpTabsPage: NextPageWithLayout = () => {
             </span>
           </div>
         ) : visibleFolders.length === 0 && visibleFiles.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg border border-white/5 bg-white/[0.02]">
+          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg bg-zinc-900/40">
             <FolderOpen className="h-12 w-12 text-zinc-600 opacity-40" />
             <div className="text-center space-y-1">
               <p className="text-sm font-bold capitalize tracking-widest text-zinc-500">
                 {currentFolder ? "This folder is empty" : "No GP files yet"}
               </p>
               <p className="text-xs text-zinc-600">
-                Upload Guitar Pro files or drag & drop them here to get started
+                {atFileCap
+                  ? `You've reached the ${MAX_USER_GP_FILES}-file limit. Delete some to upload more.`
+                  : "Upload Guitar Pro files or drag & drop them here to get started"}
               </p>
             </div>
             <Button
-              onClick={() => fileInputRef.current?.click()}
-              className="mt-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
+              onClick={openFilePicker}
+              disabled={atFileCap}
+              className="mt-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
             >
               <Upload className="h-3.5 w-3.5 mr-2" />
               Upload GP files
@@ -664,11 +727,16 @@ const GpTabsPage: NextPageWithLayout = () => {
                   const childFileCount = files.filter((f) => f.folderId === folder.id).length;
                   const childFolderCount = folders.filter((f) => f.parentId === folder.id).length;
                   const isDeleting = deletingFolderId === folder.id;
+                  const isDropTarget = dragOverFolderId === folder.id;
                   return (
                     <div
                       key={folder.id}
-                      className="group relative flex flex-col gap-2 rounded-lg border border-white/5 bg-white/[0.02] p-4 hover:bg-white/[0.04] transition-colors cursor-pointer"
+                      className={cn(
+                        "group relative flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-4 transition-colors cursor-pointer hover:bg-zinc-800/40",
+                        isDropTarget && "bg-cyan-500/10 hover:bg-cyan-500/10"
+                      )}
                       onClick={() => setCurrentFolderId(folder.id)}
+                      {...makeFolderDropHandlers(folder.id)}
                     >
                       <div className="flex items-start justify-between">
                         <Folder className="h-8 w-8 text-cyan-400/80" />
@@ -709,7 +777,12 @@ const GpTabsPage: NextPageWithLayout = () => {
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                  draggable={folders.length > 0}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData(DRAG_FILE_MIME, file.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  className="flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-4 transition-colors hover:bg-zinc-800/40"
                 >
                   <div className="flex items-center gap-3">
                     {/* Icon */}
@@ -867,7 +940,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
 
           {/* Card */}
-          <div className="relative z-10 w-full max-w-md rounded-lg border border-white/10 bg-zinc-900 shadow-2xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="relative z-10 w-full max-w-md rounded-lg bg-zinc-900 p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
@@ -901,10 +974,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={idx}
                       onClick={() => handleTrackSelect(idx)}
                       className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold capitalize tracking-wider transition-all",
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold capitalize tracking-wider transition-colors",
                         staged.selectedTrackIndex === idx
-                          ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                          : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
                       <TrackTypeIcon type={track.trackType} />
@@ -924,10 +997,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => setConfigFreeMode(false)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     !configFreeMode
-                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                      : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
                   <Clock className="h-5 w-5" />
@@ -936,10 +1009,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => setConfigFreeMode(true)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     configFreeMode
-                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                      : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
                   <Infinity className="h-5 w-5" />
@@ -960,10 +1033,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={min}
                       onClick={() => setConfigTimeMinutes(min)}
                       className={cn(
-                        "px-4 py-2 rounded-lg border text-xs font-bold capitalize tracking-wider transition-all",
+                        "px-4 py-2 rounded-lg text-xs font-bold capitalize tracking-wider transition-colors",
                         configTimeMinutes === min
-                          ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                          : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
                       {min} min
@@ -979,10 +1052,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
               loading={isStarting}
-              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.3)] transition-all group"
+              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
             >
               <span>Start Practice</span>
-              <Zap className={cn("h-4 w-4 ml-2 fill-current group-hover:scale-125 transition-transform", isStarting && "hidden")} />
+              <Zap className={cn("h-4 w-4 ml-2 fill-current", isStarting && "hidden")} />
             </Button>
           </div>
         </div>
