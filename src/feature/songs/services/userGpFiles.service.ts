@@ -8,10 +8,16 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { auth,db, storage } from "utils/firebase/client/firebase.utils";
 
+/** Maximum number of GP files a user may keep in their library (root + all folders combined). */
+export const MAX_USER_GP_FILES = 50;
+
+/** Maximum size (bytes) allowed for a single GP file upload. */
+export const MAX_GP_FILE_SIZE_BYTES = 1.5 * 1024 * 1024;
 
 export interface UserGpFile {
   id: string;
@@ -20,12 +26,18 @@ export interface UserGpFile {
   storagePath: string;
   uploadedAt: Date;
   size: number;
+  folderId: string | null;
+}
+
+export interface UploadUserGpFileOptions {
+  folderId?: string | null;
+  onProgress?: (p: { progress: number }) => void;
 }
 
 export const uploadUserGpFile = async (
   userId: string,
   file: File,
-  onProgress?: (p: { progress: number }) => void
+  { folderId = null, onProgress }: UploadUserGpFileOptions = {}
 ): Promise<UserGpFile> => {
   const fileId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const storagePath = `gp5-files/${userId}/${fileId}/${file.name}`;
@@ -46,11 +58,11 @@ export const uploadUserGpFile = async (
 
   const docRef = await addDoc(
     collection(db, "users", userId, "gpFiles"),
-    { name: file.name, downloadUrl, storagePath, uploadedAt: serverTimestamp(), size: file.size }
+    { name: file.name, downloadUrl, storagePath, uploadedAt: serverTimestamp(), size: file.size, folderId }
   );
 
   onProgress?.({ progress: 100 });
-  return { id: docRef.id, name: file.name, downloadUrl, storagePath, uploadedAt: new Date(), size: file.size };
+  return { id: docRef.id, name: file.name, downloadUrl, storagePath, uploadedAt: new Date(), size: file.size, folderId };
 };
 
 export const getUserGpFiles = async (userId: string): Promise<UserGpFile[]> => {
@@ -68,8 +80,17 @@ export const getUserGpFiles = async (userId: string): Promise<UserGpFile[]> => {
       storagePath: data.storagePath,
       uploadedAt: data.uploadedAt?.toDate?.() ?? new Date(),
       size: data.size ?? 0,
+      folderId: data.folderId ?? null,
     };
   });
+};
+
+export const moveUserGpFile = async (
+  userId: string,
+  fileId: string,
+  folderId: string | null
+): Promise<void> => {
+  await updateDoc(doc(db, "users", userId, "gpFiles", fileId), { folderId });
 };
 
 export const deleteUserGpFile = async (
