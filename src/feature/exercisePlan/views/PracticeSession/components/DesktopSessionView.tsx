@@ -296,6 +296,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     canFinishSession={p.canFinishSession}
                     isSkillExercise={p.isSkillExercise}
                     currentExerciseIndex={p.currentExerciseIndex}
+                    totalExercises={p.plan.exercises.length}
                     onGoToPreviousExercise={() => {
                       p.stopTimer(); p.metronome.restartMetronome(); p.jumpToExercise(p.currentExerciseIndex - 1);
                     }}
