@@ -558,6 +558,32 @@ const GroupedLine = ({ date, children }: { date: Date; children: React.ReactNode
   </div>
 );
 
+/** Purple "Song" chip shared by every feed row that references a song, so artist/title are always formatted the same way. */
+const SongBadge = ({
+  songId,
+  songArtist,
+  songTitle,
+}: {
+  songId?: string;
+  songArtist: string;
+  songTitle: string;
+}) =>
+  songId ? (
+    <Link
+      href={`/songs?view=management&songId=${songId}`}
+      title="Click to open this song"
+      className="group inline-flex items-center text-left text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-full whitespace-normal break-words align-middle">
+      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+      <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
+      <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+    </Link>
+  ) : (
+    <span className="inline-block text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 max-w-full whitespace-normal break-words align-middle">
+      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+      <span className="font-medium">{songArtist} - {songTitle}</span>
+    </span>
+  );
+
 /** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
 const GroupedLogLine = ({
   log,
@@ -583,22 +609,8 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine date={date}>
-        <p className="text-secondText text-sm">
-          {message}{" "}
-          {songLog.songId ? (
-            <Link
-              href={`/songs?view=management&songId=${songLog.songId}`}
-              className="inline-flex items-center gap-1 text-white hover:text-cyan-400 hover:underline transition-colors">
-              {songLog.songArtist} {songLog.songTitle}
-              <ExternalLink className="h-3 w-3 opacity-60" />
-            </Link>
-          ) : (
-            <span className="text-white">
-              {songLog.songArtist} {songLog.songTitle}
-            </span>
-          )}
-          {songLog.status !== "difficulty_rate" && "."}
-        </p>
+        <span className="text-secondText text-sm">{message}</span>
+        <SongBadge songId={songLog.songId} songArtist={songLog.songArtist} songTitle={songLog.songTitle} />
         {showRating && ratingTier && (
           <span
             className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold"
@@ -862,21 +874,7 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.songTitle && genericLog.songArtist && (
-        genericLog.songId ? (
-          <Link
-            href={`/songs?view=management&songId=${genericLog.songId}`}
-            title="Click to open this song"
-            className="group inline-flex items-center text-left text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-            <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{genericLog.songArtist} - {genericLog.songTitle}</span>
-            <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
-          </Link>
-        ) : (
-          <span className="inline-block text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-            <span className="font-medium">{genericLog.songArtist} - {genericLog.songTitle}</span>
-          </span>
-        )
+        <SongBadge songId={genericLog.songId} songArtist={genericLog.songArtist} songTitle={genericLog.songTitle} />
       )}
     </GroupedLine>
   );
