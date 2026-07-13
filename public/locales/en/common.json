@@ -116,12 +116,13 @@
     "move_to": "Move to",
     "remove": "Remove",
     "add": "Add",
-    "learned": "mastered the song",
-    "learning": "started learning the song",
-    "wantToLearn": "added the song to their want-to-learn list",
-    "added": "added the song to their list of songs",
-    "difficulty_rate": "rated the difficulty of the song",
-    "updated": "updated their song progress"
+    "learned": "learned the song",
+    "learning": "learning the song",
+    "wantToLearn": "added the song to his list of songs to learn",
+    "added": "added the song to his list of songs",
+    "difficulty_rate": "rated the song difficulty",
+    "practiced": "practiced the song",
+    "updated": "updated his song progress"
   },
   "chart": {
     "activity_overview": "Activity overview",
