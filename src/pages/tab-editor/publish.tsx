@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { createCommunityExercise, getCommunityExerciseById, updateCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
@@ -8,10 +9,10 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { AlertCircle, Check, ChevronDown, Globe, Lock, Plus, Trash2, X } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, Globe, Lock, Plus, Trash2 } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
@@ -30,6 +31,27 @@ const DIFFICULTIES: { value: DifficultyLevel; label: string; color: string }[] =
   { value: "medium", label: "Medium", color: "text-amber-400" },
   { value: "hard", label: "Hard", color: "text-rose-400" },
 ];
+
+const fieldClass = (hasError?: boolean) =>
+  cn(
+    "w-full rounded-lg bg-zinc-950/60 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-cyan-500/60",
+    hasError && "ring-1 ring-rose-500/60"
+  );
+
+const labelClass = "text-xs font-bold tracking-wide text-zinc-500";
+
+function FormSection({ title, description, children, error }: { title: string; description?: string; children: ReactNode; error?: string }) {
+  return (
+    <section className="space-y-3 rounded-lg bg-zinc-900/40 p-6">
+      <div className="space-y-1">
+        <h2 className="text-sm font-bold text-zinc-100">{title}</h2>
+        {description && <p className="text-xs text-zinc-500">{description}</p>}
+      </div>
+      {children}
+      {error && <p className="text-xs text-rose-400">{error}</p>}
+    </section>
+  );
+}
 
 const PublishExercisePage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -165,21 +187,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center p-8">
-        <div className="max-w-md w-full text-center space-y-6">
+      <div className="flex min-h-[70vh] items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-6 text-center">
           <div className={cn(
-            "w-16 h-16 rounded-lg flex items-center justify-center mx-auto border",
-            isPublic
-              ? "bg-emerald-500/20 border-emerald-500/30"
-              : "bg-cyan-500/20 border-cyan-500/30"
+            "mx-auto flex h-16 w-16 items-center justify-center rounded-lg",
+            isPublic ? "bg-emerald-500/20" : "bg-cyan-500/20"
           )}>
             {isPublic ? <Check className="text-emerald-400" size={32} /> : <Lock className="text-cyan-400" size={32} />}
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-white tracking-tight">
+            <h2 className="text-2xl font-black tracking-tight text-zinc-100">
               {isEditing ? "Changes Saved!" : isPublic ? "Exercise Published!" : "Exercise Saved Privately!"}
             </h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-zinc-400">
               {isEditing
                 ? "Your exercise has been updated."
                 : isPublic
@@ -187,24 +207,15 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 : "Your exercise is saved privately. Only you can see and practice it. You can make it public at any time."}
             </p>
           </div>
-          <div className="flex gap-3 justify-center">
-            <button
+          <div className="flex justify-center gap-3">
+            <Button
               onClick={() => router.push(isEditing ? "/my-exercises" : "/profile/skills?tab=community")}
-              className={cn(
-                "px-5 py-2.5 text-sm font-bold rounded-lg transition-all",
-                isPublic
-                  ? "bg-emerald-500 text-black hover:bg-emerald-400"
-                  : "bg-cyan-500 text-black hover:bg-cyan-400"
-              )}
-            >
+              className={cn("shadow-none", isPublic ? "bg-emerald-500 text-black hover:bg-emerald-400" : "bg-cyan-500 text-black hover:bg-cyan-400")}>
               {isEditing ? "Back to My Exercises" : isPublic ? "View in Library" : "View My Exercises"}
-            </button>
-            <button
-              onClick={() => router.push("/tab-editor")}
-              className="px-5 py-2.5 bg-white/5 border border-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/10 transition-all"
-            >
+            </Button>
+            <Button variant="secondary" onClick={() => router.push("/tab-editor")}>
               Back to Editor
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -216,27 +227,26 @@ const PublishExercisePage: NextPageWithLayout = () => {
       <Head>
         <title>Publish Exercise | Riff Quest</title>
       </Head>
-      <div className="min-h-screen bg-[#050505] text-white">
-        <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
+      <div className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8">
 
-          {/* Header */}
-          <div className="space-y-4">
-            <BackLink label="Back to Editor" onClick={() => router.push("/tab-editor")} />
-            <div>
-              <h1 className="text-3xl font-black tracking-tight text-white">{isEditing ? "Edit Exercise" : "Publish Exercise"}</h1>
-              <p className="text-zinc-400 mt-1 text-sm leading-relaxed">
-                {isEditing
-                  ? "Update the details of your exercise below. Changes are saved immediately."
-                  : "Share your exercise with the community. Fill in the details below so others know how to practice it."}
-              </p>
-            </div>
+        {/* Header */}
+        <div className="space-y-4">
+          <BackLink label="Back to Editor" onClick={() => router.push("/tab-editor")} />
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-zinc-100">{isEditing ? "Edit Exercise" : "Publish Exercise"}</h1>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-400">
+              {isEditing
+                ? "Update the details of your exercise below. Changes are saved immediately."
+                : "Share your exercise with the community. Fill in the details below so others know how to practice it."}
+            </p>
           </div>
+        </div>
 
-          {/* Tablature preview */}
+        {/* Tablature preview */}
+        <FormSection title="Tablature Preview">
           {tablature.length > 0 ? (
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Tablature Preview</label>
-              <div className="border border-zinc-800 rounded-lg overflow-hidden">
+              <div className="overflow-hidden rounded-lg">
                 <TablatureViewer
                   measures={tablature}
                   bpm={80}
@@ -250,17 +260,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
               </p>
             </div>
           ) : (
-            <div className={cn("border rounded-lg p-4 flex items-start gap-3", errors.tablature ? "border-rose-500/40 bg-rose-500/5" : "border-zinc-800 bg-zinc-900/40")}>
-              <AlertCircle size={16} className="text-rose-400 mt-0.5 shrink-0" />
+            <div className={cn("flex items-start gap-3 rounded-lg p-4", errors.tablature ? "bg-rose-500/5" : "bg-zinc-950/40")}>
+              <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-400" />
               <p className="text-sm text-zinc-400">
                 {errors.tablature || "No tablature found. Please go back to the Tab Editor and click Publish from there."}
               </p>
             </div>
           )}
+        </FormSection>
 
-          {/* Title */}
+        {/* Title & Description */}
+        <FormSection title="Basics">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+            <label className={labelClass}>
               Title <span className="text-rose-500">*</span>
             </label>
             <input
@@ -268,17 +280,13 @@ const PublishExercisePage: NextPageWithLayout = () => {
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Spider Exercise — 1-2-3-4 Permutation"
               maxLength={100}
-              className={cn(
-                "w-full bg-zinc-900 border rounded-lg px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-cyan-500/50 transition-colors",
-                errors.title ? "border-rose-500/60" : "border-zinc-800"
-              )}
+              className={fieldClass(!!errors.title)}
             />
             {errors.title && <p className="text-xs text-rose-400">{errors.title}</p>}
           </div>
 
-          {/* Description */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+            <label className={labelClass}>
               Description <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -287,278 +295,242 @@ const PublishExercisePage: NextPageWithLayout = () => {
               placeholder="Briefly explain what this exercise trains and who it's for."
               rows={3}
               maxLength={500}
-              className={cn(
-                "w-full bg-zinc-900 border rounded-lg px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-cyan-500/50 transition-colors resize-none",
-                errors.description ? "border-rose-500/60" : "border-zinc-800"
-              )}
+              className={cn(fieldClass(!!errors.description), "resize-none")}
             />
             {errors.description && <p className="text-xs text-rose-400">{errors.description}</p>}
           </div>
 
-          {/* Category + Difficulty */}
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Category</label>
+              <label className={labelClass}>Category</label>
               <div className="relative">
                 <select
                   value={category}
                   onChange={e => setCategory(e.target.value as ExerciseCategory)}
-                  className="w-full appearance-none bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-cyan-500/50 transition-colors"
-                >
+                  className={cn(fieldClass(), "appearance-none")}>
                   {CATEGORIES.map(c => (
                     <option key={c.value} value={c.value}>{c.label}</option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+                <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Difficulty</label>
+              <label className={labelClass}>Difficulty</label>
               <div className="flex gap-2">
                 {DIFFICULTIES.map(d => (
                   <button
                     key={d.value}
                     onClick={() => setDifficulty(d.value)}
                     className={cn(
-                      "flex-1 py-3 rounded-lg text-xs font-bold border transition-all",
-                      difficulty === d.value
-                        ? `border-current ${d.color} bg-white/5`
-                        : "border-zinc-800 text-zinc-500 hover:text-zinc-300"
-                    )}
-                  >
+                      "flex-1 rounded-lg py-3 text-xs font-bold transition-colors",
+                      difficulty === d.value ? `bg-zinc-800 ${d.color}` : "bg-zinc-950/60 text-zinc-500 hover:text-zinc-300"
+                    )}>
                     {d.label}
                   </button>
                 ))}
               </div>
             </div>
           </div>
+        </FormSection>
 
-          {/* Time */}
+        {/* Time & tempo */}
+        <FormSection title="Timing" description="Set the tempo range users should practice this exercise at." error={errors.bpm}>
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
-              Estimated Practice Time (minutes)
-            </label>
+            <label className={labelClass}>Estimated Practice Time (minutes)</label>
             <input
               type="number"
               min={1}
               max={60}
               value={timeInMinutes}
               onChange={e => setTimeInMinutes(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-32 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white outline-none focus:border-cyan-500/50 transition-colors"
+              className={cn(fieldClass(), "w-32")}
             />
           </div>
 
-          {/* Metronome speed */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+            <label className={labelClass}>
               BPM Range <span className="text-rose-500">*</span>
             </label>
-            <p className="text-xs text-zinc-600">Set the tempo range users should practice this exercise at.</p>
-            <div className={cn("grid grid-cols-3 gap-4", errors.bpm ? "ring-1 ring-rose-500/40 rounded-lg p-3" : "")}>
+            <div className="grid grid-cols-3 gap-4">
               {([
                 { label: "Min BPM", value: bpmMin, set: setBpmMin },
                 { label: "Recommended", value: bpmRecommended, set: setBpmRecommended },
                 { label: "Max BPM", value: bpmMax, set: setBpmMax },
               ] as const).map(f => (
                 <div key={f.label} className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase text-zinc-600">{f.label}</label>
+                  <label className="text-[10px] font-bold text-zinc-600">{f.label}</label>
                   <input
                     type="number"
                     min={20}
                     max={300}
                     value={f.value}
                     onChange={e => f.set(parseInt(e.target.value) || 60)}
-                    className={cn(
-                      "w-full bg-zinc-900 border rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50 transition-colors",
-                      errors.bpm ? "border-rose-500/60" : "border-zinc-800"
-                    )}
+                    className={cn(fieldClass(!!errors.bpm), "py-2")}
                   />
                 </div>
               ))}
             </div>
-            {errors.bpm && <p className="text-xs text-rose-400">{errors.bpm}</p>}
           </div>
+        </FormSection>
 
-          {/* Related skills */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Related Skills</label>
-            <div className="flex flex-wrap gap-2">
-              {guitarSkills.map(skill => {
-                const isSelected = selectedSkills.includes(skill.id);
-                return (
-                  <button
-                    key={skill.id}
-                    onClick={() => toggleSkill(skill.id)}
-                    className={cn(
-                      "px-3 py-1.5 rounded text-xs font-semibold border transition-all capitalize",
-                      isSelected
-                        ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
-                    )}
-                  >
-                    {skill.id.replace(/_/g, " ")}
-                  </button>
-                );
-              })}
-            </div>
+        {/* Related skills */}
+        <FormSection title="Related Skills">
+          <div className="flex flex-wrap gap-2">
+            {guitarSkills.map(skill => {
+              const isSelected = selectedSkills.includes(skill.id);
+              return (
+                <button
+                  key={skill.id}
+                  onClick={() => toggleSkill(skill.id)}
+                  className={cn(
+                    "rounded px-3 py-1.5 text-xs font-semibold capitalize transition-colors",
+                    isSelected ? "bg-cyan-500/15 text-cyan-300" : "bg-zinc-950/60 text-zinc-400 hover:text-zinc-200"
+                  )}>
+                  {skill.id.replace(/_/g, " ")}
+                </button>
+              );
+            })}
           </div>
+        </FormSection>
 
-          {/* Instructions */}
+        {/* Instructions */}
+        <FormSection title="Step-by-step Instructions" description="Tell the user exactly how to perform this exercise." error={errors.instructions}>
           <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
-              Step-by-step Instructions <span className="text-rose-500">*</span>
-            </label>
-            <p className="text-xs text-zinc-600">Tell the user exactly how to perform this exercise.</p>
             {instructions.map((inst, idx) => (
-              <div key={idx} className="flex gap-2 items-start">
-                <span className="mt-3 text-xs font-bold text-zinc-600 w-5 text-center">{idx + 1}.</span>
+              <div key={idx} className="flex items-start gap-2">
+                <span className="mt-3 w-5 text-center text-xs font-bold text-zinc-600">{idx + 1}.</span>
                 <input
                   value={inst}
                   onChange={e => updateListItem(instructions, setInstructions, idx, e.target.value)}
                   placeholder={`Step ${idx + 1}…`}
-                  className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-cyan-500/50 transition-colors"
+                  className={cn(fieldClass(), "flex-1 py-2.5")}
                 />
                 <button
                   onClick={() => removeListItem(instructions, setInstructions, idx)}
-                  className="mt-2 p-1.5 text-zinc-600 hover:text-rose-400 transition-colors"
-                  disabled={instructions.length === 1}
-                >
+                  aria-label="Remove step"
+                  className="mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400"
+                  disabled={instructions.length === 1}>
                   <Trash2 size={14} />
                 </button>
               </div>
             ))}
-            {errors.instructions && <p className="text-xs text-rose-400">{errors.instructions}</p>}
-            <button
-              onClick={() => addListItem(instructions, setInstructions)}
-              className="flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-cyan-400 transition-colors"
-            >
-              <Plus size={14} />
-              Add step
-            </button>
           </div>
+          <button
+            onClick={() => addListItem(instructions, setInstructions)}
+            className="flex items-center gap-2 text-xs font-semibold text-zinc-500 transition-colors hover:text-cyan-400">
+            <Plus size={14} />
+            Add step
+          </button>
+        </FormSection>
 
-          {/* Tips */}
+        {/* Tips */}
+        <FormSection title="Practice Tips (optional)" description="Share helpful hints, common mistakes to avoid, or variations to try.">
           <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Practice Tips (optional)</label>
-            <p className="text-xs text-zinc-600">Share helpful hints, common mistakes to avoid, or variations to try.</p>
             {tips.map((tip, idx) => (
-              <div key={idx} className="flex gap-2 items-start">
-                <span className="mt-3 text-xs font-bold text-zinc-600 w-5 text-center">·</span>
+              <div key={idx} className="flex items-start gap-2">
+                <span className="mt-3 w-5 text-center text-xs font-bold text-zinc-600">·</span>
                 <input
                   value={tip}
                   onChange={e => updateListItem(tips, setTips, idx, e.target.value)}
                   placeholder={`Tip ${idx + 1}…`}
-                  className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-cyan-500/50 transition-colors"
+                  className={cn(fieldClass(), "flex-1 py-2.5")}
                 />
                 <button
                   onClick={() => removeListItem(tips, setTips, idx)}
-                  className="mt-2 p-1.5 text-zinc-600 hover:text-rose-400 transition-colors"
-                  disabled={tips.length === 1}
-                >
+                  aria-label="Remove tip"
+                  className="mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400"
+                  disabled={tips.length === 1}>
                   <Trash2 size={14} />
                 </button>
               </div>
             ))}
-            <button
-              onClick={() => addListItem(tips, setTips)}
-              className="flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-cyan-400 transition-colors"
-            >
-              <Plus size={14} />
-              Add tip
-            </button>
           </div>
+          <button
+            onClick={() => addListItem(tips, setTips)}
+            className="flex items-center gap-2 text-xs font-semibold text-zinc-500 transition-colors hover:text-cyan-400">
+            <Plus size={14} />
+            Add tip
+          </button>
+        </FormSection>
 
-          {/* Visibility picker */}
-          <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Visibility</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setIsPublic(true)}
-                className={cn(
-                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
-                  isPublic
-                    ? "border-emerald-500/50 bg-emerald-500/10"
-                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Globe size={16} className={isPublic ? "text-emerald-400" : "text-zinc-500"} />
-                  <span className={cn("text-sm font-bold", isPublic ? "text-white" : "text-zinc-400")}>Public</span>
-                  {isPublic && <Check size={12} className="text-emerald-400 ml-auto" />}
-                </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  Visible to all users in the Community library. Others can practice and rate it.
-                </p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsPublic(false)}
-                className={cn(
-                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
-                  !isPublic
-                    ? "border-cyan-500/50 bg-cyan-500/10"
-                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Lock size={16} className={!isPublic ? "text-cyan-400" : "text-zinc-500"} />
-                  <span className={cn("text-sm font-bold", !isPublic ? "text-white" : "text-zinc-400")}>Private</span>
-                  {!isPublic && <Check size={12} className="text-cyan-400 ml-auto" />}
-                </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  Only visible to you. Saved to your personal library. You can make it public later.
-                </p>
-              </button>
-            </div>
-            {isPublic && (
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                By publishing publicly, you agree that this exercise will be visible to all users under your username{" "}
-                <span className="text-cyan-400 font-semibold">{userInfo?.displayName || "your account"}</span>.
-                The community may rate it. Moderators may remove exercises that violate community guidelines.
-              </p>
-            )}
-          </div>
-
-          {/* Auth error */}
-          {errors.auth && (
-            <div className="border border-rose-500/40 bg-rose-500/5 rounded-lg p-4 flex items-center gap-3">
-              <AlertCircle size={16} className="text-rose-400 shrink-0" />
-              <p className="text-sm text-rose-400">{errors.auth}</p>
-            </div>
-          )}
-          {errors.submit && (
-            <div className="border border-rose-500/40 bg-rose-500/5 rounded-lg p-4 flex items-center gap-3">
-              <AlertCircle size={16} className="text-rose-400 shrink-0" />
-              <p className="text-sm text-rose-400">{errors.submit}</p>
-            </div>
-          )}
-
-          {/* Submit */}
-          <div className="flex gap-4 pb-16">
+        {/* Visibility picker */}
+        <FormSection title="Visibility">
+          <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={() => router.push("/tab-editor")}
-              className="flex items-center gap-2 px-5 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 text-sm font-bold rounded-lg hover:bg-zinc-800 hover:text-white transition-all"
-            >
-              <X size={16} />
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
+              type="button"
+              onClick={() => setIsPublic(true)}
               className={cn(
-                "flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed text-black text-sm font-bold rounded-lg transition-all",
-                isPublic
-                  ? "bg-emerald-500 hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                  : "bg-cyan-500 hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
-              )}
-            >
-              {isSubmitting
-                ? (isEditing ? "Saving…" : isPublic ? "Publishing…" : "Saving…")
-                : (isEditing ? "Save Changes" : isPublic ? "Publish Exercise" : "Save Privately")}
+                "flex flex-col items-start gap-2 rounded-lg p-4 text-left transition-colors",
+                isPublic ? "bg-emerald-500/10" : "bg-zinc-950/40 hover:bg-zinc-900/60"
+              )}>
+              <div className="flex items-center gap-2">
+                <Globe size={16} className={isPublic ? "text-emerald-400" : "text-zinc-500"} />
+                <span className={cn("text-sm font-bold", isPublic ? "text-zinc-100" : "text-zinc-400")}>Public</span>
+                {isPublic && <Check size={12} className="ml-auto text-emerald-400" />}
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-500">
+                Visible to all users in the Community library. Others can practice and rate it.
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPublic(false)}
+              className={cn(
+                "flex flex-col items-start gap-2 rounded-lg p-4 text-left transition-colors",
+                !isPublic ? "bg-cyan-500/10" : "bg-zinc-950/40 hover:bg-zinc-900/60"
+              )}>
+              <div className="flex items-center gap-2">
+                <Lock size={16} className={!isPublic ? "text-cyan-400" : "text-zinc-500"} />
+                <span className={cn("text-sm font-bold", !isPublic ? "text-zinc-100" : "text-zinc-400")}>Private</span>
+                {!isPublic && <Check size={12} className="ml-auto text-cyan-400" />}
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-500">
+                Only visible to you. Saved to your personal library. You can make it public later.
+              </p>
             </button>
           </div>
+          {isPublic && (
+            <p className="text-xs leading-relaxed text-zinc-500">
+              By publishing publicly, you agree that this exercise will be visible to all users under your username{" "}
+              <span className="font-semibold text-cyan-400">{userInfo?.displayName || "your account"}</span>.
+              The community may rate it. Moderators may remove exercises that violate community guidelines.
+            </p>
+          )}
+        </FormSection>
+
+        {/* Auth / submit errors */}
+        {errors.auth && (
+          <div className="flex items-center gap-3 rounded-lg bg-rose-500/5 p-4">
+            <AlertCircle size={16} className="shrink-0 text-rose-400" />
+            <p className="text-sm text-rose-400">{errors.auth}</p>
+          </div>
+        )}
+        {errors.submit && (
+          <div className="flex items-center gap-3 rounded-lg bg-rose-500/5 p-4">
+            <AlertCircle size={16} className="shrink-0 text-rose-400" />
+            <p className="text-sm text-rose-400">{errors.submit}</p>
+          </div>
+        )}
+
+        {/* Submit */}
+        <div className="flex gap-4 pb-16">
+          <Button variant="secondary" onClick={() => router.push("/tab-editor")} className="gap-2">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            className={cn(
+              "flex-1 shadow-none",
+              isPublic ? "bg-emerald-500 text-black hover:bg-emerald-400" : "bg-cyan-500 text-black hover:bg-cyan-400"
+            )}>
+            {isSubmitting
+              ? (isEditing ? "Saving…" : isPublic ? "Publishing…" : "Saving…")
+              : (isEditing ? "Save Changes" : isPublic ? "Publish Exercise" : "Save Privately")}
+          </Button>
         </div>
       </div>
     </>
@@ -567,7 +539,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
 PublishExercisePage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId="profile" subtitle="Publish Exercise" variant="secondary">
+    <AppLayout pageId="my-exercises" subtitle="Publish Exercise" variant="secondary">
       {page}
     </AppLayout>
   );
