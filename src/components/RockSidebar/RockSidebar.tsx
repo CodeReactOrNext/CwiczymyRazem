@@ -24,13 +24,19 @@ import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
+  Brain,
+  ChevronDown,
+  ClipboardList,
+  Clock,
   Home,
   Library,
+  ListChecks,
   LogOut,
   Map,
   MessageSquarePlus,
   Milestone,
-  Music,
+  NotebookPen,
+  Route,
   Settings,
   Swords,
   Timer,
@@ -42,6 +48,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa";
+import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
+import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -67,6 +75,7 @@ const SidebarNavLink = ({
   showBadge = false,
   tooltip,
   emphasized = false,
+  muted = false,
 }: {
   href: string;
   name: string;
@@ -76,6 +85,7 @@ const SidebarNavLink = ({
   showBadge?: boolean;
   tooltip?: string;
   emphasized?: boolean;
+  muted?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   const link = (
@@ -90,10 +100,14 @@ const SidebarNavLink = ({
       } ${
         isActive
           ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
+          : emphasized
+          ? "border-transparent text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
+          : muted
+          ? "border-transparent text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
           : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
-      <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+      <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
       <span className="flex-1">{name}</span>
       {showBadge ? (
         <span
@@ -120,9 +134,112 @@ const SidebarNavLink = ({
   );
 };
 
+interface SidebarSubLink {
+  id: string;
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+const PRACTICE_SUB_NAV: SidebarSubLink[] = [
+  { id: "practice-plans", name: "Practice Routines", href: "/timer/plans", icon: <ListChecks size={16} /> },
+  { id: "practice-auto", name: "Auto Plan", href: "/timer/auto", icon: <PiMagicWandDuotone size={16} /> },
+  { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
+  { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
+  { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <SiGuitarpro size={16} /> },
+  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Brain size={16} /> },
+  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
+  { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
+];
+
+const SidebarExpandableNavLink = ({
+  href,
+  name,
+  icon,
+  isActive,
+  isExpanded,
+  onToggle,
+  onLinkClick,
+  subLinks,
+  isSubLinkActive,
+}: {
+  href: string;
+  name: string;
+  icon: React.ReactNode;
+  isActive: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onLinkClick?: () => void;
+  subLinks: SidebarSubLink[];
+  isSubLinkActive: (href: string) => boolean;
+}) => {
+  const { createRipple, ripple } = useRipple();
+
+  return (
+    <div>
+      <div
+        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-semibold transition-all duration-200 ${
+          isActive
+            ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
+            : "text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
+        }`}>
+        <Link
+          href={href}
+          onClick={(e) => {
+            createRipple(e);
+            onLinkClick?.();
+          }}
+          className="relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]">
+          {ripple}
+          <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
+          <span className="flex-1">{name}</span>
+        </Link>
+        <button
+          type="button"
+          aria-label={isExpanded ? `Collapse ${name}` : `Expand ${name}`}
+          aria-expanded={isExpanded}
+          onClick={(e) => {
+            e.preventDefault();
+            onToggle();
+          }}
+          className="flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300">
+          <ChevronDown
+            size={20}
+            className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+          />
+        </button>
+      </div>
+
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden">
+            <div className="mt-1 space-y-0.5 rounded-lg bg-black/20 p-1">
+              {subLinks.map((subLink) => (
+                <SidebarNavLink
+                  key={subLink.id}
+                  href={subLink.href}
+                  name={subLink.name}
+                  icon={subLink.icon}
+                  isActive={isSubLinkActive(subLink.href)}
+                  onClick={onLinkClick}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const SidebarActionButton = ({
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -138,7 +255,7 @@ const SidebarActionButton = ({
         createRipple(e);
         onClick();
       }}
-      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
       <span className={iconClass}>{icon}</span>
       <span>{label}</span>
@@ -149,7 +266,7 @@ const SidebarActionButton = ({
 const SidebarExternalLink = ({
   href,
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -169,7 +286,7 @@ const SidebarExternalLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
       <span className={iconClass}>{icon}</span>
       <span>{label}</span>
@@ -196,6 +313,11 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     const { pathname } = router;
     if (pathname === "/dashboard" || pathname === "/profile") return "home";
     if (pathname.startsWith("/timer")) return "practice";
+    if (pathname === "/report") return "practice";
+    if (pathname.startsWith("/gp-tabs")) return "practice";
+    if (pathname.startsWith("/profile/skills")) return "practice";
+    if (pathname === "/ai-coach") return "practice";
+    if (pathname === "/journey") return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
@@ -214,6 +336,24 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const activeId = getActiveProfileSection();
 
+  const [practiceExpandedOverride, setPracticeExpandedOverride] = useState<boolean | null>(null);
+  const [lastActiveId, setLastActiveId] = useState(activeId);
+
+  if (activeId !== lastActiveId) {
+    setLastActiveId(activeId);
+    if (activeId === "practice") setPracticeExpandedOverride(null);
+  }
+
+  const isPracticeExpanded = practiceExpandedOverride ?? activeId === "practice";
+
+  const isSubLinkActive = (href: string) => {
+    const [path, query] = href.split("?");
+    if (router.pathname !== path) return false;
+    if (!query) return true;
+    const params = new URLSearchParams(query);
+    return Array.from(params.entries()).every(([key, value]) => router.query[key] === value);
+  };
+
   const isLinkActive = (id: string | null, href: string) => {
     if (activeId) return activeId === id;
     if (id === pageId && pageId !== null) return true;
@@ -227,8 +367,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const mainNavigation = [
     { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
-    { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={20} />, emphasized: true },
-    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={20} />, emphasized: true },
+    {
+      id: "practice",
+      name: "Practice",
+      href: "/timer",
+      icon: <Timer size={20} />,
+      emphasized: true,
+      children: PRACTICE_SUB_NAV,
+    },
+    { id: "songs", name: "Songs", href: "/songs", icon: <PiCassetteTapeLight size={20} />, emphasized: true },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     {
       id: "summary",
@@ -246,7 +393,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
+    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} />, muted: true },
   ];
 
   const renderNavLinks = (
@@ -257,22 +404,44 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: React.ReactNode;
       tooltip?: string;
       emphasized?: boolean;
+      muted?: boolean;
+      children?: SidebarSubLink[];
     }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon, tooltip, emphasized }) => (
-      <SidebarNavLink
-        key={id}
-        href={href}
-        name={name}
-        icon={icon}
-        isActive={isLinkActive(id, href)}
-        onClick={onClick}
-        showBadge={id === "summary" && hasUnclaimedMilestone}
-        tooltip={tooltip}
-        emphasized={emphasized}
-      />
-    ));
+    items.map(({ id, name, href, icon, tooltip, emphasized, muted, children }) => {
+      if (children) {
+        return (
+          <SidebarExpandableNavLink
+            key={id}
+            href={href}
+            name={name}
+            icon={icon}
+            isActive={isLinkActive(id, href)}
+            isExpanded={isPracticeExpanded}
+            onToggle={() => setPracticeExpandedOverride(!isPracticeExpanded)}
+            onLinkClick={onClick}
+            subLinks={children}
+            isSubLinkActive={isSubLinkActive}
+          />
+        );
+      }
+
+      return (
+        <SidebarNavLink
+          key={id}
+          href={href}
+          name={name}
+          icon={icon}
+          isActive={isLinkActive(id, href)}
+          onClick={onClick}
+          showBadge={id === "summary" && hasUnclaimedMilestone}
+          tooltip={tooltip}
+          emphasized={emphasized}
+          muted={muted}
+        />
+      );
+    });
 
   const userProfileSection = (mobile?: boolean) => {
     if (!userStats || !userName) return null;
@@ -384,8 +553,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               handleLinkClick();
               dispatch(logUserOff());
             }}
-            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
-            <span className="text-zinc-500">
+            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-500 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            <span className="text-zinc-600">
               <LogOut size={16} />
             </span>
             <span>Sign Out</span>
