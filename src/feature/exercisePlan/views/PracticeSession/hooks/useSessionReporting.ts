@@ -5,6 +5,7 @@ import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getStreakFromActivityLog } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
 
@@ -95,6 +96,10 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           })(),
           clientNowISO: new Date().toISOString(),
+          clientDisplayStreak: getStreakFromActivityLog(
+            ((reportList as any[]) ?? []).map((report) => report.date),
+            { includeToday: true }
+          ),
         };
 
         const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
