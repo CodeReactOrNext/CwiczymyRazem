@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
 DialogHeader, DialogTitle, } from "assets/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { memo, useState } from "react";
@@ -107,19 +108,32 @@ const SessionBottomBarComponent = ({
             </Button>
           )}
           {canFinishEarly && (
-            <Button
-              size="sm"
-              variant="ghost"
-              loading={isFinishing || isSubmittingReport}
-              className={cn(
-                "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2",
-                !canFinishSession && "opacity-50 cursor-not-allowed"
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span tabIndex={canFinishSession ? -1 : 0}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    loading={isFinishing || isSubmittingReport}
+                    className={cn(
+                      "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2",
+                      !canFinishSession && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={!canFinishSession}
+                    onClick={() => setShowFinishEarlyDialog(true)}
+                  >
+                    <FaFlagCheckered className="mr-2" /> {t("common:practice.finish_plan_early")}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!canFinishSession && (
+                <TooltipContent side="top">
+                  {isSkillExercise
+                    ? t("common:practice.finish_plan_early_disabled_skill")
+                    : t("common:practice.finish_plan_early_disabled_time")}
+                </TooltipContent>
               )}
-              disabled={!canFinishSession}
-              onClick={() => setShowFinishEarlyDialog(true)}
-            >
-              <FaFlagCheckered /> {t("common:practice.finish_plan_early")}
-            </Button>
+            </Tooltip>
           )}
           {!examMode && (
             <div className="flex flex-col items-end gap-1">
