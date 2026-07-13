@@ -2,10 +2,11 @@ import { Button } from "assets/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
 DialogHeader, DialogTitle, } from "assets/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { memo, useState } from "react";
-import { FaCheck, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
@@ -26,6 +27,7 @@ interface SessionBottomBarProps {
   canFinishSession: boolean;
   isSkillExercise: boolean;
   currentExerciseIndex: number;
+  totalExercises: number;
   onGoToPreviousExercise: () => void;
   isFinishing?: boolean;
   isSubmittingReport: boolean;
@@ -36,7 +38,7 @@ interface SessionBottomBarProps {
 /**
  * Fixed bottom navigation bar: exit button, timer, back/next controls.
  */
-export const SessionBottomBar = memo(({
+const SessionBottomBarComponent = ({
   onClose,
   exerciseKey,
   currentExercise,
@@ -48,6 +50,7 @@ export const SessionBottomBar = memo(({
   canFinishSession,
   isSkillExercise,
   currentExerciseIndex,
+  totalExercises,
   onGoToPreviousExercise,
   isFinishing,
   isSubmittingReport,
@@ -58,6 +61,10 @@ export const SessionBottomBar = memo(({
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const hasTempoControl = !!currentExercise.metronomeSpeed;
+  const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
+  // Only meaningful mid-plan: the last exercise already has its own "Finish
+  // Session" action, and a single-exercise plan has nothing to skip ahead of.
+  const canFinishEarly = !examMode && !isLastExercise && totalExercises > 1;
 
   return (
     <>
@@ -104,6 +111,34 @@ export const SessionBottomBar = memo(({
               <FaStepBackward /> {t("common:back") || "Back"}
             </Button>
           )}
+          {canFinishEarly && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span tabIndex={canFinishSession ? -1 : 0}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    loading={isFinishing || isSubmittingReport}
+                    className={cn(
+                      "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2",
+                      !canFinishSession && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={!canFinishSession}
+                    onClick={() => setShowFinishEarlyDialog(true)}
+                  >
+                    <FaFlagCheckered className="mr-2" /> {t("common:practice.finish_plan_early")}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!canFinishSession && (
+                <TooltipContent side="top">
+                  {isSkillExercise
+                    ? t("common:practice.finish_plan_early_disabled_skill")
+                    : t("common:practice.finish_plan_early_disabled_time")}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          )}
           {!examMode && (
             <div className="flex flex-col items-end gap-1">
               <Button
@@ -148,7 +183,7 @@ export const SessionBottomBar = memo(({
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
-            Your progress won't be saved if you exit now. Would you like to finish the session and save your practice time instead?
+            Your progress won&apos;t be saved if you exit now. Would you like to finish the session and save your practice time instead?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
@@ -178,6 +213,38 @@ export const SessionBottomBar = memo(({
       </DialogContent>
     </Dialog>
 
+    <Dialog open={showFinishEarlyDialog} onOpenChange={setShowFinishEarlyDialog}>
+      <DialogContent className="max-w-md bg-zinc-900 text-white">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold tracking-tight">{t("common:practice.finish_plan_early_title")}</DialogTitle>
+          <DialogDescription className="text-zinc-400 text-sm mt-1">
+            {t("common:practice.finish_plan_early_description")}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 font-semibold text-sm"
+            onClick={() => setShowFinishEarlyDialog(false)}
+          >
+            {t("common:cancel")}
+          </Button>
+          <Button
+            className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
+            loading={isFinishing || isSubmittingReport}
+            disabled={!canFinishSession}
+            onClick={async () => { setShowFinishEarlyDialog(false); await onFinishSession(); }}
+          >
+            <FaFlagCheckered className="mr-2" />
+            {t("common:practice.finish_plan_early_action")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     </>
   );
-});
+};
+
+export const SessionBottomBar = memo(SessionBottomBarComponent);
+SessionBottomBar.displayName = "SessionBottomBar";
