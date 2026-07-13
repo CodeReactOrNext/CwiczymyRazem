@@ -111,6 +111,17 @@ export default async function handler(
     ));
 
     if (!report.isDateBackReport) {
+      // The stored `actualDayWithoutBreak` counter can drift from reality after a
+      // timezone slip, while the client's activity-log-derived streak (same source
+      // of truth as the header widget) self-heals. Prefer it for the Discord log
+      // when the client sent a sane value.
+      const discordStreak =
+        typeof inputData.clientDisplayStreak === "number" &&
+        Number.isInteger(inputData.clientDisplayStreak) &&
+        inputData.clientDisplayStreak >= 0
+          ? inputData.clientDisplayStreak
+          : report.raitingData.bonusPoints.streak;
+
       writePromises.push(firebaseAddLogReport(
         userUid,
         report.currentUserStats.lastReportDate,
@@ -128,7 +139,7 @@ export default async function handler(
           ...(inputData.songTitle && { songTitle: inputData.songTitle }),
           ...(inputData.songArtist && { songArtist: inputData.songArtist })
         } : undefined,
-        report.raitingData.bonusPoints.streak,
+        discordStreak,
         inputData.skillPointsGained,
         report.newRecords,
         inputData.exerciseRecords,

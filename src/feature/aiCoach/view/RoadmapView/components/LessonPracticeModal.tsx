@@ -1,5 +1,6 @@
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
-import { selectUserAvatar } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
@@ -14,6 +15,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { DailyQuestTaskType } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
+import { getStreakFromActivityLog } from "utils/gameLogic";
 
 const SKILL_OPTIONS: { id: SkillsType; label: string; Icon: typeof MdSchool }[] = [
   { id: "technique", label: "Technique", Icon: IoMdHand },
@@ -54,7 +56,9 @@ interface LessonPracticeModalProps {
  */
 const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalProps) => {
   const dispatch = useAppDispatch();
+  const userAuth = useAppSelector(selectUserAuth);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const { reportList } = useActivityLog(userAuth || "");
   const timer = useTimer();
   const [elapsed, setElapsed] = useState(0);
   const [skill, setSkill] = useState<SkillsType>("technique");
@@ -116,6 +120,10 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
       avatarUrl: userAvatar ?? null,
       clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
       clientNowISO: new Date().toISOString(),
+      clientDisplayStreak: getStreakFromActivityLog(
+        ((reportList as any[]) ?? []).map((report) => report.date),
+        { includeToday: true }
+      ),
     };
 
     try {
