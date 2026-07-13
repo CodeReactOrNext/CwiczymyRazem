@@ -53,6 +53,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     kind: "feature",
     description:
       "Build your own song collections, like a list of top songs with easy solos, and share them with the rest of the community to practice through.",
+    done: true,
   },
   {
     id: "t60",
@@ -62,6 +63,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     kind: "feature",
     description:
       "A Guitar Pro style view that shows the sheet music notation and the tablature together, on every single exercise, so you can read whichever you prefer.",
+    done: true,
   },
   { id: "t70", goal: 70, icon: Target, label: "+5 New Exercises", kind: "content" },
   {
