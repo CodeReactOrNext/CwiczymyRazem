@@ -68,14 +68,21 @@ export const SongTimerLayout = ({
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isInitialMount = useRef(true);
+  const metaLoadedRef = useRef(false);
+  const latestMetaRef = useRef({ youtubeUrl, sections, notes });
 
   useEffect(() => {
     getUserSongMeta(userId, songId).then((meta) => {
       setYoutubeUrl(meta.youtubeUrl ?? null);
       setSections(meta.sections ?? []);
       setNotes(meta.notes ?? "");
+      metaLoadedRef.current = true;
     });
   }, [userId, songId]);
+
+  useEffect(() => {
+    latestMetaRef.current = { youtubeUrl, sections, notes };
+  }, [youtubeUrl, sections, notes]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -97,6 +104,21 @@ export const SongTimerLayout = ({
     }, 1000);
     return () => clearTimeout(timeout);
   }, [youtubeUrl, sections, notes, userId, songId]);
+
+  // Leaving the page (back button, navigating to another song, …) unmounts
+  // this component, which cancels the debounce timeout above — without this,
+  // any edit made in the last second before navigating away is silently lost.
+  useEffect(() => {
+    return () => {
+      if (!metaLoadedRef.current) return;
+      const latest = latestMetaRef.current;
+      saveUserSongMeta(userId, songId, {
+        youtubeUrl: latest.youtubeUrl ?? undefined,
+        sections: latest.sections,
+        notes: latest.notes,
+      });
+    };
+  }, [userId, songId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
