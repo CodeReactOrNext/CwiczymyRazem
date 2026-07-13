@@ -10,6 +10,8 @@ import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } 
 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
+import { ShortcutsLegend } from "./ShortcutsLegend";
+import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
@@ -58,6 +60,7 @@ const SessionBottomBarComponent = ({
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const hasTempoControl = !!currentExercise.metronomeSpeed;
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
   // Only meaningful mid-plan: the last exercise already has its own "Finish
   // Session" action, and a single-exercise plan has nothing to skip ahead of.
@@ -78,6 +81,7 @@ const SessionBottomBarComponent = ({
             <FaSignOutAlt />
             {t("common:practice.exit")}
           </Button>
+          <ShortcutsLegend hasTempoControl={hasTempoControl} />
         </div>
 
         {/* Center: Timer */}
