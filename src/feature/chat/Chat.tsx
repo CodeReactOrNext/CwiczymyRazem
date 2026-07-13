@@ -2,11 +2,12 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { ScrollArea } from "assets/components/ui/scroll-area";
+import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { useTranslation } from "hooks/useTranslation";
-import { SendHorizontal } from "lucide-react";
+import { Heart, SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const Chat = () => {
@@ -16,6 +17,7 @@ const Chat = () => {
     newMessage,
     sendMessage,
     setNewMessage,
+    toggleLike,
     currentUserId,
   } = useChat();
 
@@ -40,7 +42,11 @@ const Chat = () => {
             const isMe = msg.userId === currentUserId;
             const prevMsg = index > 0 ? messages[index - 1] : null;
             const isFollowUp = prevMsg && prevMsg.userId === msg.userId;
-            
+            const likes = msg.likes ?? [];
+            const hasLiked = currentUserId
+              ? likes.includes(currentUserId)
+              : false;
+
             return (
               <div
                 key={msg.id}
@@ -84,6 +90,19 @@ const Chat = () => {
                       }`}>
                       {msg.message}
                     </Card>
+
+                    <button
+                      type='button'
+                      onClick={() => msg.id && toggleLike(msg.id)}
+                      className={cn(
+                        "mt-1 flex items-center gap-1 px-1 text-xs text-zinc-500 transition-colors hover:text-red-400",
+                        hasLiked && "text-red-500 hover:text-red-400"
+                      )}>
+                      <Heart className={cn("h-3 w-3", hasLiked && "fill-current")} />
+                      {likes.length > 0 && (
+                        <span className='font-semibold'>{likes.length}</span>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
