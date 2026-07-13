@@ -41,6 +41,8 @@ import {
   type LogGroup,
 } from "feature/logs/utils/groupConsecutiveLogs";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
+import { type SongTierInfo, useSongTiers } from "feature/songs/hooks/useSongTiers";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
@@ -370,6 +372,22 @@ const getSongStatusMessage = (status: string, t: any): string => {
   return t(`song_status.${status}`);
 };
 
+/** Compact tier square shown next to a song reference in the feed. Hidden while
+ * the lookup is loading and for unrated/deleted songs. */
+const SongTierChip = ({ info }: { info?: SongTierInfo }) => {
+  if (!info) return null;
+  const tier = getSongTier(
+    !info.avgDifficulty ? "?" : info.tier || info.avgDifficulty
+  );
+  if (tier.tier === "?") return null;
+
+  return (
+    <span title={tier.label} className="inline-flex shrink-0">
+      <TierBadge song={info} className="h-5 w-5 rounded text-[10px]" />
+    </span>
+  );
+};
+
 // Podkomponenty dla FirebaseLogsTopPlayersItem
 
 
@@ -588,12 +606,14 @@ const SongBadge = ({
 const GroupedLogLine = ({
   log,
   type,
+  songTiers,
   onPreviewPlan,
   onPreviewExercise,
   onViewRecording,
 }: {
   log: AnyFirebaseLog;
   type: LogActivityType;
+  songTiers: Record<string, SongTierInfo>;
   onPreviewPlan: (plan: ExercisePlan) => void;
   onPreviewExercise: (exercise: Exercise) => void;
   onViewRecording: (id: string) => void;
@@ -609,8 +629,21 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine date={date}>
-        <span className="text-secondText text-sm">{message}</span>
-        <SongBadge songId={songLog.songId} songArtist={songLog.songArtist} songTitle={songLog.songTitle} />
+        <p className="text-secondText text-sm">
+          {message}{" "}
+          {songLog.songId ? (
+            <Link
+              href={`/songs?view=management&songId=${songLog.songId}`}
+              className="text-white underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60">
+              {songLog.songArtist} - {songLog.songTitle}
+            </Link>
+          ) : (
+            <span className="text-white">
+              {songLog.songArtist} - {songLog.songTitle}
+            </span>
+          )}
+        </p>
+        {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
         {showRating && ratingTier && (
           <span
             className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold"
@@ -874,7 +907,23 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.songTitle && genericLog.songArtist && (
-        <SongBadge songId={genericLog.songId} songArtist={genericLog.songArtist} songTitle={genericLog.songTitle} />
+        <>
+          <p className="text-secondText text-sm">
+            {t("common:song_status.practiced")}{" "}
+            {genericLog.songId ? (
+              <Link
+                href={`/songs?view=management&songId=${genericLog.songId}`}
+                className="text-white underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60">
+                {genericLog.songArtist} - {genericLog.songTitle}
+              </Link>
+            ) : (
+              <span className="text-white">
+                {genericLog.songArtist} - {genericLog.songTitle}
+              </span>
+            )}
+          </p>
+          {genericLog.songId && <SongTierChip info={songTiers[genericLog.songId]} />}
+        </>
       )}
     </GroupedLine>
   );
@@ -884,6 +933,7 @@ const GroupedLogItem = ({
   group,
   isNew,
   currentUserId,
+  songTiers,
   onPreviewPlan,
   onPreviewExercise,
   onViewRecording,
@@ -891,6 +941,7 @@ const GroupedLogItem = ({
   group: LogGroup;
   isNew: boolean;
   currentUserId: string;
+  songTiers: Record<string, SongTierInfo>;
   onPreviewPlan: (plan: ExercisePlan) => void;
   onPreviewExercise: (exercise: Exercise) => void;
   onViewRecording: (id: string) => void;
@@ -930,6 +981,7 @@ const GroupedLogItem = ({
               key={(log as { id?: string }).id ?? `${getLogTimestampMs(log)}-${index}`}
               log={log}
               type={getLogActivityType(log)}
+              songTiers={songTiers}
               onPreviewPlan={onPreviewPlan}
               onPreviewExercise={onPreviewExercise}
               onViewRecording={onViewRecording}
@@ -976,6 +1028,15 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
 
   const groups = useMemo(() => groupConsecutiveLogs(logs), [logs]);
 
+  const songIds = useMemo(
+    () =>
+      logs
+        .map((log) => (log as { songId?: string }).songId)
+        .filter((id): id is string => Boolean(id)),
+    [logs]
+  );
+  const songTiers = useSongTiers(songIds);
+
   return (
     <>
       <div className="mt-4 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 px-3">
@@ -1002,6 +1063,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
                 group={group}
                 isNew={isNew}
                 currentUserId={currentUserId}
+                songTiers={songTiers}
                 onPreviewPlan={setPreviewPlan}
                 onPreviewExercise={setPreviewExercise}
                 onViewRecording={setActiveRecordingId}
