@@ -164,7 +164,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setIsSubmittingReport(false);
       }
     },
-    [plan, avatar, completedExercises, dispatch]
+    [plan, avatar, completedExercises, dispatch, reportList]
   );
 
   const activityDataToUse = useMemo(() => {
