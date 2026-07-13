@@ -109,6 +109,17 @@ const AiCoachView = () => {
   };
 
   // ─── Detail view ───
+  if (selectedStaticRoadmap && loadingProgress) {
+    // Wait for saved progress to load before mounting RoadmapView — it only
+    // reads its initial progress once, so mounting it with progressMap still
+    // empty would make already-completed steps look forgotten.
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-7 w-7 animate-spin text-cyan-500" />
+      </div>
+    );
+  }
+
   if (mergedRoadmap && selectedStaticRoadmap) {
     return (
       <div className="flex w-full flex-col">
@@ -129,6 +140,7 @@ const AiCoachView = () => {
         />
         <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12">
           <RoadmapView
+            key={selectedStaticRoadmap.id}
             roadmap={mergedRoadmap}
             onDelete={() => {}}
             onPersist={handlePersist}
