@@ -138,10 +138,10 @@ export function useSessionControls({
   const handleNoteMatchingReset = useCallback(() => setEarTrainingScore(0), [setEarTrainingScore]);
 
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
-  // ← → are already claimed for exercise navigation, so tempo lives on ↑ ↓
-  // (±1 bpm) and Shift+↑ Shift+↓ (±5 bpm), with Enter resetting to the
-  // exercise's recommended (baseline) tempo. See ShortcutsLegend for the
-  // full, user-facing list.
+  // ↑ ↓ (and Shift+↑ Shift+↓) are reserved for tempo, with Enter resetting to
+  // the exercise's recommended (baseline) tempo. Exercise navigation lives on
+  // J/K (vim-style) instead, so the two groups never share a key. See
+  // ShortcutsLegend for the full, user-facing list.
 
   const hasTempoControl = !!currentExercise.metronomeSpeed;
 
@@ -155,8 +155,8 @@ export function useSessionControls({
       if (e.code === "Space") {
         e.preventDefault(); handleToggleTimer(); return;
       }
-      if (e.key === "ArrowRight" && !isLastExercise) handleNextExerciseClick();
-      if (e.key === "ArrowLeft" && currentExerciseIndex > 0) {
+      if (e.key === "j" && !isLastExercise) handleNextExerciseClick();
+      if (e.key === "k" && currentExerciseIndex > 0) {
         stopTimer(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1);
       }
       if (!hasTempoControl) return;
