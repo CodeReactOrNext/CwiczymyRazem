@@ -44,7 +44,7 @@ import {
   Trash2,
   TrendingUp,
   Users} from "lucide-react";
-import { useEffect, useMemo,useState } from "react";
+import { useEffect, useMemo,useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -135,6 +135,14 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const [sections, setSections] = useState<SongSection[]>([]);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  // Guards the autosave effect below: without it, the debounced save (which
+  // reacts to every `sections`/`notes` change) can fire with stale/empty data
+  // before the meta for the *current* song has finished loading — either
+  // wiping previously saved sections/notes on a slow connection, or, when
+  // switching songs quickly, writing the previous song's sections onto the
+  // new song's document. Only allow saving once we know the loaded state
+  // actually belongs to `song.id`.
+  const metaLoadedForSongRef = useRef<string | null>(null);
   const [raterProfiles, setRaterProfiles] = useState<Record<string, { displayName: string; avatar: string; lvl: number }>>({});
   
   const [optimisticRating, setOptimisticRating] = useState<number | null>(null);
@@ -188,17 +196,27 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   };
 
   useEffect(() => {
+    metaLoadedForSongRef.current = null;
     if (userAuth && song.id) {
+      let cancelled = false;
       getUserSongMeta(userAuth, song.id).then(meta => {
+        if (cancelled) return;
         setSections(meta.sections || []);
         setNotes(meta.notes || "");
+        metaLoadedForSongRef.current = song.id;
       });
+      return () => {
+        cancelled = true;
+      };
     }
   }, [userAuth, song.id]);
 
   useEffect(() => {
-    if (!userAuth || !song.id) return;
-    
+    // Don't autosave until the sections/notes state above actually reflects
+    // what's stored for this song — otherwise we'd overwrite it with stale
+    // or empty data (see comment on metaLoadedForSongRef).
+    if (!userAuth || !song.id || metaLoadedForSongRef.current !== song.id) return;
+
     const timeout = setTimeout(async () => {
       setIsSaving(true);
       try {
