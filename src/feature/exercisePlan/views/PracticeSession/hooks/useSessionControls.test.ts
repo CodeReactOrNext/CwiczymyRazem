@@ -110,14 +110,25 @@ describe("useSessionControls — tempo hotkeys", () => {
     expect(metronome.handleSetRecommendedBpm).not.toHaveBeenCalled();
   });
 
-  it("still navigates exercises on plain ArrowLeft/ArrowRight", async () => {
+  it("navigates exercises on J/K instead of arrow keys", async () => {
+    const { options } = buildOptions({ metronomeSpeed: { min: 40, max: 208, recommended: 100 } } as any);
+    renderHook(() => useSessionControls(options));
+
+    fireKeyDown({ key: "k" });
+    expect(options.jumpToExercise).toHaveBeenCalledWith(0);
+
+    fireKeyDown({ key: "j" });
+    await vi.waitFor(() => expect(options.handleNextExercise).toHaveBeenCalled());
+  });
+
+  it("ignores ArrowLeft/ArrowRight for exercise navigation", () => {
     const { options } = buildOptions({ metronomeSpeed: { min: 40, max: 208, recommended: 100 } } as any);
     renderHook(() => useSessionControls(options));
 
     fireKeyDown({ key: "ArrowLeft" });
-    expect(options.jumpToExercise).toHaveBeenCalledWith(0);
-
     fireKeyDown({ key: "ArrowRight" });
-    await vi.waitFor(() => expect(options.handleNextExercise).toHaveBeenCalled());
+
+    expect(options.jumpToExercise).not.toHaveBeenCalled();
+    expect(options.handleNextExercise).not.toHaveBeenCalled();
   });
 });

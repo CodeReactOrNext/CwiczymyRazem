@@ -13,8 +13,8 @@ interface ShortcutRow {
 
 const NAV_SHORTCUTS: ShortcutRow[] = [
   { keys: ["Space"], label: "Play / pause" },
-  { keys: ["←"], label: "Previous exercise" },
-  { keys: ["→"], label: "Next exercise" },
+  { keys: ["K"], label: "Previous exercise" },
+  { keys: ["J"], label: "Next exercise" },
 ];
 
 const TEMPO_SHORTCUTS: ShortcutRow[] = [
