@@ -28,7 +28,7 @@ const FreeTimerMetronome = () => {
   };
 
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex h-full flex-col gap-3'>
       <div className='flex items-center gap-2 px-1'>
         <GiMetronome className='h-4 w-4 text-zinc-400' />
         <span className='text-sm font-medium text-zinc-300'>
@@ -47,26 +47,32 @@ const FreeTimerMetronome = () => {
         />
       </div>
 
-      <div className='flex flex-col items-stretch gap-3 sm:flex-row sm:items-center'>
+      <div className='flex flex-1 flex-col justify-between gap-4 rounded-lg bg-zinc-900/40 p-4'>
+        <div className='flex flex-1 flex-col justify-center [&>div]:bg-transparent [&>div]:p-0 [&>div]:shadow-none [&>div]:backdrop-blur-none'>
+          <Metronome metronome={metronome} isMuted={isMuted} onMuteToggle={setIsMuted} />
+        </div>
+
         <Button
           onClick={handleTogglePlay}
           className={cn(
-            "h-14 w-14 shrink-0 self-center rounded-full p-0 transition-colors sm:self-auto",
+            "h-11 w-full rounded-lg text-sm font-medium transition-colors",
             metronome.isPlaying
-              ? "bg-cyan-500 text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:bg-cyan-400"
+              ? "bg-cyan-500 text-black hover:bg-cyan-400"
               : "bg-zinc-800 text-white hover:bg-zinc-700"
           )}
           aria-label={metronome.isPlaying ? t("metronome.stop") : t("metronome.start")}>
           {metronome.isPlaying ? (
-            <Pause className='h-6 w-6' fill='currentColor' />
+            <>
+              <Pause className='mr-2 h-4 w-4' fill='currentColor' />
+              {t("metronome.stop")}
+            </>
           ) : (
-            <Play className='ml-0.5 h-6 w-6' fill='currentColor' />
+            <>
+              <Play className='mr-2 h-4 w-4' fill='currentColor' />
+              {t("metronome.start")}
+            </>
           )}
         </Button>
-
-        <div className='flex-1'>
-          <Metronome metronome={metronome} isMuted={isMuted} onMuteToggle={setIsMuted} />
-        </div>
       </div>
     </div>
   );
