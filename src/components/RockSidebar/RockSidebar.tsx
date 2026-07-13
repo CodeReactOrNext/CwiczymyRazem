@@ -195,7 +195,7 @@ const SidebarExpandableNavLink = ({
           <span className="flex-1">{name}</span>
         </Link>
         <button
-          type='button'
+          type="button"
           aria-label={isExpanded ? `Collapse ${name}` : `Expand ${name}`}
           aria-expanded={isExpanded}
           onClick={(e) => {
