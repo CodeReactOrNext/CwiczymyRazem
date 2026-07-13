@@ -24,26 +24,23 @@ import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
-  CalendarCheck,
+  Brain,
   ChevronDown,
+  ClipboardList,
   Clock,
-  Compass,
-  FileMusic,
   Home,
   Library,
+  ListChecks,
   LogOut,
   Map,
   MessageSquarePlus,
   Milestone,
-  Music,
-  Network,
   NotebookPen,
   Route,
   Settings,
   Swords,
   Timer,
   Trophy,
-  Wand2,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -51,6 +48,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa";
+import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
+import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -76,6 +75,7 @@ const SidebarNavLink = ({
   showBadge = false,
   tooltip,
   emphasized = false,
+  muted = false,
 }: {
   href: string;
   name: string;
@@ -85,6 +85,7 @@ const SidebarNavLink = ({
   showBadge?: boolean;
   tooltip?: string;
   emphasized?: boolean;
+  muted?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   const link = (
@@ -99,10 +100,14 @@ const SidebarNavLink = ({
       } ${
         isActive
           ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
+          : emphasized
+          ? "border-transparent text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
+          : muted
+          ? "border-transparent text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
           : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
-      <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+      <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
       <span className="flex-1">{name}</span>
       {showBadge ? (
         <span
@@ -137,14 +142,14 @@ interface SidebarSubLink {
 }
 
 const PRACTICE_SUB_NAV: SidebarSubLink[] = [
-  { id: "practice-plans", name: "Practice Routines", href: "/timer/plans", icon: <CalendarCheck size={16} /> },
-  { id: "practice-auto", name: "Auto Plan", href: "/timer/auto", icon: <Wand2 size={16} /> },
+  { id: "practice-plans", name: "Practice Routines", href: "/timer/plans", icon: <ListChecks size={16} /> },
+  { id: "practice-auto", name: "Auto Plan", href: "/timer/auto", icon: <PiMagicWandDuotone size={16} /> },
   { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
   { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
-  { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <FileMusic size={16} /> },
-  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Network size={16} /> },
-  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/profile/skills", icon: <Compass size={16} /> },
-  { id: "practice-journey", name: "Guitar Journey", href: "/journey", icon: <Route size={16} /> },
+  { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <SiGuitarpro size={16} /> },
+  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Brain size={16} /> },
+  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
+  { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
 ];
 
 const SidebarExpandableNavLink = ({
@@ -176,7 +181,7 @@ const SidebarExpandableNavLink = ({
         className={`relative flex items-center overflow-hidden rounded-lg text-sm font-semibold transition-all duration-200 ${
           isActive
             ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
-            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+            : "text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
         }`}>
         <Link
           href={href}
@@ -186,7 +191,7 @@ const SidebarExpandableNavLink = ({
           }}
           className="relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]">
           {ripple}
-          <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+          <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
           <span className="flex-1">{name}</span>
         </Link>
         <button
@@ -197,9 +202,9 @@ const SidebarExpandableNavLink = ({
             e.preventDefault();
             onToggle();
           }}
-          className="flex items-center px-2.5 py-2.5 text-zinc-500 transition-colors duration-200 hover:text-zinc-300">
+          className="flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300">
           <ChevronDown
-            size={16}
+            size={20}
             className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
           />
         </button>
@@ -234,7 +239,7 @@ const SidebarExpandableNavLink = ({
 
 const SidebarActionButton = ({
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -250,7 +255,7 @@ const SidebarActionButton = ({
         createRipple(e);
         onClick();
       }}
-      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
       <span className={iconClass}>{icon}</span>
       <span>{label}</span>
@@ -261,7 +266,7 @@ const SidebarActionButton = ({
 const SidebarExternalLink = ({
   href,
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -281,7 +286,7 @@ const SidebarExternalLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
       <span className={iconClass}>{icon}</span>
       <span>{label}</span>
@@ -370,7 +375,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       emphasized: true,
       children: PRACTICE_SUB_NAV,
     },
-    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={20} />, emphasized: true },
+    { id: "songs", name: "Songs", href: "/songs", icon: <PiCassetteTapeLight size={20} />, emphasized: true },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     {
       id: "summary",
@@ -388,7 +393,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
+    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} />, muted: true },
   ];
 
   const renderNavLinks = (
@@ -399,11 +404,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: React.ReactNode;
       tooltip?: string;
       emphasized?: boolean;
+      muted?: boolean;
       children?: SidebarSubLink[];
     }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon, tooltip, emphasized, children }) => {
+    items.map(({ id, name, href, icon, tooltip, emphasized, muted, children }) => {
       if (children) {
         return (
           <SidebarExpandableNavLink
@@ -432,6 +438,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           showBadge={id === "summary" && hasUnclaimedMilestone}
           tooltip={tooltip}
           emphasized={emphasized}
+          muted={muted}
         />
       );
     });
@@ -546,8 +553,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               handleLinkClick();
               dispatch(logUserOff());
             }}
-            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
-            <span className="text-zinc-500">
+            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-500 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            <span className="text-zinc-600">
               <LogOut size={16} />
             </span>
             <span>Sign Out</span>
