@@ -1,4 +1,18 @@
 import { Button } from "assets/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "assets/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
+import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner } from "components/UI/HeroBanner";
@@ -18,20 +32,34 @@ import {
   deleteUserGpFile,
   fetchGpFileAsFile,
   getUserGpFiles,
+  MAX_GP_FILE_SIZE_BYTES,
+  MAX_USER_GP_FILES,
+  moveUserGpFile,
   uploadUserGpFile,
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
+import {
+  createGpFolder,
+  deleteGpFolder,
+  getFolderDepth,
+  getUserGpFolders,
+  type GpFolder,
+  MAX_FOLDER_DEPTH,
+} from "feature/songs/services/userGpFolders.service";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
 import AppLayout from "layouts/AppLayout";
-import {  Gauge,Music } from "lucide-react";
+import { Gauge, Music } from "lucide-react";
 import {
+  ChevronRight,
   Clock,
   Drum,
   ExternalLink,
   FileMusic,
+  Folder,
   FolderOpen,
+  FolderPlus,
   Infinity,
   Loader2,
   Music2,
@@ -44,7 +72,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page.d";
@@ -69,7 +97,17 @@ interface SessionConfig {
   timeInMinutes: number;
 }
 
+interface UploadQueueItem {
+  id: string;
+  name: string;
+  status: "pending" | "uploading" | "done" | "error";
+  progress: number;
+}
+
 const TIME_PRESETS = [5, 10, 15, 20, 30];
+
+/** Custom DataTransfer type used to drag a file row onto a folder card/breadcrumb to move it. */
+const DRAG_FILE_MIME = "application/x-gp-file-id";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -109,6 +147,19 @@ function buildExercise(fileName: string, tempo: number, trackName: string): Exer
   };
 }
 
+/** Flattens folders into a move-target list: top-level folders followed by their direct subfolders. */
+function flattenFoldersForMove(folders: GpFolder[]): { folder: GpFolder; depth: number }[] {
+  const roots = folders.filter((f) => !f.parentId);
+  const result: { folder: GpFolder; depth: number }[] = [];
+  roots.forEach((root) => {
+    result.push({ folder: root, depth: 1 });
+    folders
+      .filter((f) => f.parentId === root.id)
+      .forEach((child) => result.push({ folder: child, depth: 2 }));
+  });
+  return result;
+}
+
 const GpTabsPage: NextPageWithLayout = () => {
   const userId = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
@@ -117,11 +168,15 @@ const GpTabsPage: NextPageWithLayout = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<UserGpFile[]>([]);
+  const [folders, setFolders] = useState<GpFolder[]>([]);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [linkedSongs, setLinkedSongs] = useState<Record<string, LinkedSong[]>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [loadingFileId, setLoadingFileId] = useState<string | null>(null);
   const [staged, setStaged] = useState<StagedFile | null>(null);
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -132,6 +187,11 @@ const GpTabsPage: NextPageWithLayout = () => {
   const [sessionFreeMode, setSessionFreeMode] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [showNewFolderDialog, setShowNewFolderDialog] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+  const [dragOverRoot, setDragOverRoot] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -139,11 +199,13 @@ const GpTabsPage: NextPageWithLayout = () => {
     const load = async () => {
       setIsLoading(true);
       try {
-        const [gpFiles, progress] = await Promise.all([
+        const [gpFiles, gpFolders, progress] = await Promise.all([
           getUserGpFiles(userId),
+          getUserGpFolders(userId),
           getAllUserSongProgress(userId),
         ]);
         setFiles(gpFiles);
+        setFolders(gpFolders);
 
         const linked = progress.filter((p) => p.gpFileId);
         const gpToSongs: Record<string, LinkedSong[]> = {};
@@ -171,6 +233,38 @@ const GpTabsPage: NextPageWithLayout = () => {
 
     load();
   }, [userId]);
+
+  const currentFolder = useMemo(
+    () => folders.find((f) => f.id === currentFolderId) ?? null,
+    [folders, currentFolderId]
+  );
+  const currentDepth = currentFolder ? getFolderDepth(currentFolder, folders) : 0;
+  const canCreateFolderHere = currentDepth < MAX_FOLDER_DEPTH;
+
+  const breadcrumbTrail = useMemo(() => {
+    const trail: GpFolder[] = [];
+    let cursor = currentFolder;
+    while (cursor) {
+      trail.unshift(cursor);
+      cursor = folders.find((f) => f.id === cursor!.parentId) ?? null;
+    }
+    return trail;
+  }, [currentFolder, folders]);
+
+  const visibleFolders = folders.filter((f) => (f.parentId ?? null) === currentFolderId);
+  const visibleFiles = files.filter((f) => (f.folderId ?? null) === currentFolderId);
+  const moveTargets = useMemo(() => flattenFoldersForMove(folders), [folders]);
+  const atFileCap = files.length >= MAX_USER_GP_FILES;
+
+  const openFilePicker = () => {
+    if (atFileCap) {
+      toast.error(
+        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+      );
+      return;
+    }
+    fileInputRef.current?.click();
+  };
 
   const handleLoadForPractice = async (file: UserGpFile) => {
     setLoadingFileId(file.id);
@@ -219,32 +313,111 @@ const GpTabsPage: NextPageWithLayout = () => {
     }, 100);
   };
 
-  const handleUpload = async (file: File) => {
-    if (!userId) return;
-    if (!isGpFile(file.name)) {
-      toast.error(`Unsupported format. Supported: ${GP_EXTENSIONS.join(", ")}`);
+  const handleFilesSelected = async (incoming: File[]) => {
+    if (!userId || incoming.length === 0) return;
+
+    const validFiles: File[] = [];
+    const invalidNames: string[] = [];
+    const oversizedNames: string[] = [];
+    incoming.forEach((file) => {
+      if (!isGpFile(file.name)) {
+        invalidNames.push(file.name);
+      } else if (file.size > MAX_GP_FILE_SIZE_BYTES) {
+        oversizedNames.push(file.name);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (invalidNames.length > 0) {
+      toast.error(
+        `Unsupported format: ${invalidNames.join(", ")}. Supported: ${GP_EXTENSIONS.join(", ")}`
+      );
+    }
+    if (oversizedNames.length > 0) {
+      toast.error(
+        `File too large (max ${formatSize(MAX_GP_FILE_SIZE_BYTES)}): ${oversizedNames.join(", ")}`
+      );
+    }
+    if (validFiles.length === 0) return;
+
+    const remainingSlots = MAX_USER_GP_FILES - files.length;
+    if (remainingSlots <= 0) {
+      toast.error(
+        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+      );
       return;
     }
-    setIsUploading(true);
-    setUploadProgress(0);
-    try {
-      const uploaded = await uploadUserGpFile(userId, file, ({ progress }) =>
-        setUploadProgress(progress)
+
+    const toUpload = validFiles.slice(0, remainingSlots);
+    if (validFiles.length > toUpload.length) {
+      toast.warning(
+        `Only ${toUpload.length} of ${validFiles.length} files will be uploaded — the ${MAX_USER_GP_FILES}-file limit was reached.`
       );
-      setFiles((prev) => [uploaded, ...prev]);
-      toast.success(`"${file.name}" uploaded!`);
-    } catch {
-      toast.error("Upload failed");
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
     }
+
+    setIsUploading(true);
+    setUploadQueue(
+      toUpload.map((file, i) => ({
+        id: `${Date.now()}-${i}`,
+        name: file.name,
+        status: "pending" as const,
+        progress: 0,
+      }))
+    );
+
+    const uploaded: UserGpFile[] = [];
+    for (let i = 0; i < toUpload.length; i++) {
+      const file = toUpload[i];
+      setUploadQueue((prev) =>
+        prev.map((item, idx) => (idx === i ? { ...item, status: "uploading" } : item))
+      );
+      try {
+        const uploadedFile = await uploadUserGpFile(userId, file, {
+          folderId: currentFolderId,
+          onProgress: ({ progress }) =>
+            setUploadQueue((prev) =>
+              prev.map((item, idx) => (idx === i ? { ...item, progress } : item))
+            ),
+        });
+        uploaded.push(uploadedFile);
+        setUploadQueue((prev) =>
+          prev.map((item, idx) => (idx === i ? { ...item, status: "done", progress: 100 } : item))
+        );
+      } catch {
+        setUploadQueue((prev) =>
+          prev.map((item, idx) => (idx === i ? { ...item, status: "error" } : item))
+        );
+      }
+    }
+
+    if (uploaded.length > 0) {
+      setFiles((prev) => [...uploaded, ...prev]);
+      toast.success(
+        uploaded.length === 1 ? `"${uploaded[0].name}" uploaded!` : `${uploaded.length} files uploaded!`
+      );
+    }
+    if (uploaded.length < toUpload.length) {
+      toast.error("Some files failed to upload.");
+    }
+
+    setIsUploading(false);
+    setUploadQueue([]);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleUpload(file);
+    const selected = Array.from(e.target.files ?? []);
+    if (selected.length > 0) handleFilesSelected(selected);
     e.target.value = "";
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    setIsDraggingOver(false);
+    // Internal file-row drag (move to folder) — not an OS file upload.
+    if (e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+    e.preventDefault();
+    const dropped = Array.from(e.dataTransfer.files ?? []);
+    if (dropped.length > 0) handleFilesSelected(dropped);
   };
 
   const handleDelete = async (file: UserGpFile) => {
@@ -259,6 +432,82 @@ const GpTabsPage: NextPageWithLayout = () => {
       toast.error("Failed to delete file");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleMoveFile = async (file: UserGpFile, folderId: string | null) => {
+    if (!userId || file.folderId === folderId) return;
+    try {
+      await moveUserGpFile(userId, file.id, folderId);
+      setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, folderId } : f)));
+      toast.success(`"${file.name}" moved`);
+    } catch {
+      toast.error("Failed to move file");
+    }
+  };
+
+  /** Drag & drop handlers so a file row can be dropped onto a folder card/breadcrumb to move it. */
+  const makeFolderDropHandlers = (targetFolderId: string | null) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (targetFolderId === null) setDragOverRoot(true);
+      else setDragOverFolderId(targetFolderId);
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      if (e.currentTarget !== e.target) return;
+      if (targetFolderId === null) setDragOverRoot(false);
+      else setDragOverFolderId((id) => (id === targetFolderId ? null : id));
+    },
+    onDrop: (e: React.DragEvent) => {
+      const fileId = e.dataTransfer.getData(DRAG_FILE_MIME);
+      setDragOverRoot(false);
+      setDragOverFolderId(null);
+      if (!fileId) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const draggedFile = files.find((f) => f.id === fileId);
+      if (draggedFile) handleMoveFile(draggedFile, targetFolderId);
+    },
+  });
+
+  const handleCreateFolder = async () => {
+    if (!userId) return;
+    const name = newFolderName.trim();
+    if (!name) return;
+    setIsCreatingFolder(true);
+    try {
+      const folder = await createGpFolder(userId, name, currentFolderId);
+      setFolders((prev) => [...prev, folder]);
+      toast.success(`Folder "${name}" created`);
+      setShowNewFolderDialog(false);
+      setNewFolderName("");
+    } catch {
+      toast.error("Failed to create folder");
+    } finally {
+      setIsCreatingFolder(false);
+    }
+  };
+
+  const handleDeleteFolder = async (folder: GpFolder) => {
+    if (!userId) return;
+    const hasChildren =
+      folders.some((f) => f.parentId === folder.id) ||
+      files.some((f) => f.folderId === folder.id);
+    if (hasChildren) {
+      toast.error("Move or delete the folder's contents first");
+      return;
+    }
+    setDeletingFolderId(folder.id);
+    try {
+      await deleteGpFolder(userId, folder.id);
+      setFolders((prev) => prev.filter((f) => f.id !== folder.id));
+      toast.success(`Folder "${folder.name}" deleted`);
+    } catch {
+      toast.error("Failed to delete folder");
+    } finally {
+      setDeletingFolderId(null);
     }
   };
 
@@ -331,40 +580,132 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
         }
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        buttonText="Upload File"
-        onClick={() => fileInputRef.current?.click()}
+        buttonText="Upload Files"
+        onClick={openFilePicker}
       />
 
       <input
         ref={fileInputRef}
         type="file"
         accept={GP_EXTENSIONS.join(",")}
+        multiple
         className="hidden"
         onChange={handleFileInput}
       />
 
       <div>
 
-      <div className="px-4 md:px-8 pb-8 space-y-4">
-        {/* Upload progress */}
-        {isUploading && (
-          <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-              <span className="text-sm font-bold text-cyan-400">
-                Uploading... {uploadProgress}%
+      <div
+        className="px-4 md:px-8 pb-8 space-y-4"
+        onDragOver={(e) => {
+          // Only react to OS file drags — internal file-row drags (move to
+          // folder) must not trigger the upload backdrop.
+          if (e.dataTransfer.types.includes(DRAG_FILE_MIME)) return;
+          if (!e.dataTransfer.types.includes("Files")) return;
+          e.preventDefault();
+          setIsDraggingOver(true);
+        }}
+        onDragLeave={(e) => {
+          if (e.currentTarget === e.target) setIsDraggingOver(false);
+        }}
+        onDrop={handleDrop}
+      >
+        {/* Folder navigation */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide">
+            <button
+              onClick={() => setCurrentFolderId(null)}
+              {...makeFolderDropHandlers(null)}
+              className={cn(
+                "rounded px-1.5 py-0.5 transition-colors hover:text-white",
+                currentFolder ? "text-zinc-400" : "text-cyan-400",
+                dragOverRoot && "bg-cyan-500/10 text-cyan-400"
+              )}
+            >
+              All files
+            </button>
+            {breadcrumbTrail.map((folder) => (
+              <span key={folder.id} className="flex items-center gap-2">
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                <button
+                  onClick={() => setCurrentFolderId(folder.id)}
+                  {...makeFolderDropHandlers(folder.id)}
+                  className={cn(
+                    "rounded px-1.5 py-0.5 transition-colors hover:text-white",
+                    currentFolder?.id === folder.id ? "text-cyan-400" : "text-zinc-400",
+                    dragOverFolderId === folder.id && "bg-cyan-500/10 text-cyan-400"
+                  )}
+                >
+                  {folder.name}
+                </button>
               </span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              />
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span
+              className={cn(
+                "text-xs font-medium",
+                atFileCap ? "text-amber-400" : "text-zinc-400"
+              )}
+            >
+              {files.length}/{MAX_USER_GP_FILES} files · max{" "}
+              {formatSize(MAX_GP_FILE_SIZE_BYTES)} per file
+            </span>
+            {canCreateFolderHere && (
+              <Button
+                onClick={() => setShowNewFolderDialog(true)}
+                variant="ghost"
+                className="h-9 px-4 rounded-lg text-xs font-bold bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
+              >
+                <FolderPlus className="h-4 w-4 mr-2" />
+                New folder
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Drag & drop overlay hint */}
+        {isDraggingOver && (
+          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-cyan-500/30 bg-zinc-900 px-10 py-8">
+              <Upload className="h-8 w-8 text-cyan-400" />
+              <p className="text-sm font-bold text-cyan-400">Drop your GP files here</p>
             </div>
           </div>
         )}
 
-        {/* File list */}
+        {/* Upload progress */}
+        {isUploading && (
+          <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
+              <span className="text-sm font-bold text-cyan-400">
+                Uploading {uploadQueue.filter((i) => i.status === "done").length}/{uploadQueue.length} files...
+              </span>
+            </div>
+            <div className="space-y-2">
+              {uploadQueue.map((item) => (
+                <div key={item.id} className="flex items-center gap-3">
+                  <span className="min-w-0 flex-1 truncate text-xs text-zinc-400">{item.name}</span>
+                  <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-800">
+                    <div
+                      className={cn(
+                        "h-full transition-all duration-300",
+                        item.status === "error"
+                          ? "bg-red-500"
+                          : "bg-gradient-to-r from-cyan-600 to-cyan-400"
+                      )}
+                      style={{ width: `${item.status === "error" ? 100 : item.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Folders + file list */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center gap-3 py-24 text-zinc-600">
             <Loader2 className="h-6 w-6 animate-spin" />
@@ -372,28 +713,78 @@ const GpTabsPage: NextPageWithLayout = () => {
               Loading your files...
             </span>
           </div>
-        ) : files.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg border border-white/5 bg-white/[0.02]">
+        ) : visibleFolders.length === 0 && visibleFiles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg bg-zinc-900/40">
             <FolderOpen className="h-12 w-12 text-zinc-600 opacity-40" />
             <div className="text-center space-y-1">
               <p className="text-sm font-bold capitalize tracking-widest text-zinc-500">
-                No GP files yet
+                {currentFolder ? "This folder is empty" : "No GP files yet"}
               </p>
               <p className="text-xs text-zinc-600">
-                Upload a Guitar Pro file to get started
+                {atFileCap
+                  ? `You've reached the ${MAX_USER_GP_FILES}-file limit. Delete some to upload more.`
+                  : "Upload Guitar Pro files or drag & drop them here to get started"}
               </p>
             </div>
             <Button
-              onClick={() => fileInputRef.current?.click()}
-              className="mt-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
+              onClick={openFilePicker}
+              disabled={atFileCap}
+              className="mt-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
             >
               <Upload className="h-3.5 w-3.5 mr-2" />
-              Upload GP file
+              Upload GP files
             </Button>
           </div>
         ) : (
           <div className="space-y-3">
-            {files.map((file) => {
+            {/* Folders */}
+            {visibleFolders.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {visibleFolders.map((folder) => {
+                  const childFileCount = files.filter((f) => f.folderId === folder.id).length;
+                  const childFolderCount = folders.filter((f) => f.parentId === folder.id).length;
+                  const isDeleting = deletingFolderId === folder.id;
+                  const isDropTarget = dragOverFolderId === folder.id;
+                  return (
+                    <div
+                      key={folder.id}
+                      className={cn(
+                        "group relative flex flex-col gap-2 rounded-lg bg-zinc-800/40 p-4 transition-colors cursor-pointer hover:bg-zinc-700/40",
+                        isDropTarget && "bg-cyan-500/10 hover:bg-cyan-500/10"
+                      )}
+                      onClick={() => setCurrentFolderId(folder.id)}
+                      {...makeFolderDropHandlers(folder.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <Folder className="h-8 w-8 text-cyan-400/80" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteFolder(folder);
+                          }}
+                          disabled={isDeleting}
+                          className="opacity-0 group-hover:opacity-100 rounded p-1 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                        >
+                          {isDeleting ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-sm font-bold text-white truncate">{folder.name}</p>
+                      <p className="text-xs text-zinc-400">
+                        {childFolderCount > 0 && `${childFolderCount} folder${childFolderCount > 1 ? "s" : ""} · `}
+                        {childFileCount} file{childFileCount === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Files */}
+            {visibleFiles.map((file) => {
               const ext =
                 GP_EXTENSIONS.find((e) => file.name.toLowerCase().endsWith(e)) ?? ".gp";
               const linked = linkedSongs[file.id] ?? [];
@@ -403,7 +794,12 @@ const GpTabsPage: NextPageWithLayout = () => {
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                  draggable={folders.length > 0}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData(DRAG_FILE_MIME, file.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  className="flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4 transition-colors hover:bg-zinc-700/40"
                 >
                   <div className="flex items-center gap-3">
                     {/* Icon */}
@@ -426,7 +822,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       <p className="text-sm font-bold text-white truncate">
                         {file.name}
                       </p>
-                      <p className="text-[10px] text-zinc-600 capitalize tracking-wider">
+                      <p className="text-xs text-zinc-400">
                         {ext.replace(".", "").toUpperCase()} · {formatSize(file.size)} ·{" "}
                         {formatDate(file.uploadedAt)}
                       </p>
@@ -443,6 +839,36 @@ const GpTabsPage: NextPageWithLayout = () => {
                         <Play className="h-3.5 w-3.5 mr-1.5 fill-current" />
                         <span>Practice</span>
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            disabled={folders.length === 0}
+                            className="h-9 w-9 p-0 rounded-lg text-zinc-600 hover:text-cyan-400 hover:bg-cyan-400/10"
+                            aria-label="Move to folder"
+                          >
+                            <FolderOpen className="h-3.5 w-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {file.folderId !== null && (
+                            <DropdownMenuItem onClick={() => handleMoveFile(file, null)}>
+                              All files (no folder)
+                            </DropdownMenuItem>
+                          )}
+                          {moveTargets
+                            .filter(({ folder }) => folder.id !== file.folderId)
+                            .map(({ folder, depth }) => (
+                              <DropdownMenuItem
+                                key={folder.id}
+                                onClick={() => handleMoveFile(file, folder.id)}
+                              >
+                                {depth === 2 ? `↳ ${folder.name}` : folder.name}
+                              </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -492,6 +918,35 @@ const GpTabsPage: NextPageWithLayout = () => {
 
       </div>
 
+      {/* ── New folder dialog ────────────────────────────────────────────── */}
+      <Dialog open={showNewFolderDialog} onOpenChange={setShowNewFolderDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>New folder</DialogTitle>
+          </DialogHeader>
+          <Input
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            placeholder="Folder name"
+            maxLength={60}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleCreateFolder();
+            }}
+          />
+          <DialogFooter>
+            <Button
+              onClick={handleCreateFolder}
+              loading={isCreatingFolder}
+              disabled={!newFolderName.trim()}
+              className="bg-cyan-500 text-black font-bold hover:bg-cyan-400"
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* ── Session config modal ─────────────────────────────────────────── */}
       {showConfigModal && staged && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -502,7 +957,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
 
           {/* Card */}
-          <div className="relative z-10 w-full max-w-md rounded-lg border border-white/10 bg-zinc-900 shadow-2xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="relative z-10 w-full max-w-md rounded-lg bg-zinc-900 p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
@@ -536,10 +991,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={idx}
                       onClick={() => handleTrackSelect(idx)}
                       className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold capitalize tracking-wider transition-all",
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold capitalize tracking-wider transition-colors",
                         staged.selectedTrackIndex === idx
-                          ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                          : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
                       <TrackTypeIcon type={track.trackType} />
@@ -559,10 +1014,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => setConfigFreeMode(false)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     !configFreeMode
-                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                      : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
                   <Clock className="h-5 w-5" />
@@ -571,10 +1026,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => setConfigFreeMode(true)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg border text-sm font-bold transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     configFreeMode
-                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                      : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
                   <Infinity className="h-5 w-5" />
@@ -595,10 +1050,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                       key={min}
                       onClick={() => setConfigTimeMinutes(min)}
                       className={cn(
-                        "px-4 py-2 rounded-lg border text-xs font-bold capitalize tracking-wider transition-all",
+                        "px-4 py-2 rounded-lg text-xs font-bold capitalize tracking-wider transition-colors",
                         configTimeMinutes === min
-                          ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                          : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
                       {min} min
@@ -614,10 +1069,10 @@ const GpTabsPage: NextPageWithLayout = () => {
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
               loading={isStarting}
-              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 hover:shadow-[0_0_24px_rgba(6,182,212,0.3)] transition-all group"
+              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
             >
               <span>Start Practice</span>
-              <Zap className={cn("h-4 w-4 ml-2 fill-current group-hover:scale-125 transition-transform", isStarting && "hidden")} />
+              <Zap className={cn("h-4 w-4 ml-2 fill-current", isStarting && "hidden")} />
             </Button>
           </div>
         </div>
