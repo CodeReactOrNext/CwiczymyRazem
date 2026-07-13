@@ -576,6 +576,32 @@ const GroupedLine = ({ date, children }: { date: Date; children: React.ReactNode
   </div>
 );
 
+/** Purple "Song" chip shared by every feed row that references a song, so artist/title are always formatted the same way. */
+const SongBadge = ({
+  songId,
+  songArtist,
+  songTitle,
+}: {
+  songId?: string;
+  songArtist: string;
+  songTitle: string;
+}) =>
+  songId ? (
+    <Link
+      href={`/songs?view=management&songId=${songId}`}
+      title="Click to open this song"
+      className="group inline-flex items-center text-left text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-full whitespace-normal break-words align-middle">
+      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+      <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
+      <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+    </Link>
+  ) : (
+    <span className="inline-block text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 max-w-full whitespace-normal break-words align-middle">
+      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
+      <span className="font-medium">{songArtist} - {songTitle}</span>
+    </span>
+  );
+
 /** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
 const GroupedLogLine = ({
   log,
