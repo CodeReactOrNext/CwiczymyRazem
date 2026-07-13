@@ -121,6 +121,7 @@
     "wantToLearn": "added the song to his list of songs to learn",
     "added": "added the song to his list of songs",
     "difficulty_rate": "rated the song difficulty",
+    "practiced": "practiced the song",
     "updated": "updated his song progress"
   },
   "chart": {

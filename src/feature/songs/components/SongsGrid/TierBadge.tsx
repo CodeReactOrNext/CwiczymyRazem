@@ -3,7 +3,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 
 interface TierBadgeProps {
-    song?: Song;
+    song?: Pick<Song, "tier" | "avgDifficulty">;
     difficulty?: number;
     className?: string;
     style?: React.CSSProperties;
