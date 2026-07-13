@@ -376,7 +376,7 @@ export const PracticeModeSelector = () => {
                   Brain,
                   "Learning Path",
                   "Step-by-step progress",
-                  "/profile/skills",
+                  "/journey",
                   "rose"
                 )}
                 {modeItem(
@@ -384,7 +384,7 @@ export const PracticeModeSelector = () => {
                   ClipboardList,
                   "Mastery Roadmaps",
                   "Goal-based practice roadmaps",
-                  "/profile/skills",
+                  "/ai-coach",
                   "rose"
                 )}
                 {modeItem(
