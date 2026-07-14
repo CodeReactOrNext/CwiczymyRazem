@@ -4,7 +4,7 @@ import type { SongStatus } from "feature/songs/types/songs.type";
 import { arrayUnion, doc, getDoc, increment,setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-const LEARNED_POINTS = 40;
+export const LEARNED_POINTS = 40;
 // Minimum accumulated practice time on a song before marking it as
 // "learned" awards points. Prevents gaming points by flipping the status.
 const MIN_PRACTICE_MS_FOR_POINTS = 10 * 60 * 1000;
