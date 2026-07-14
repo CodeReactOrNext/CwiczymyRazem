@@ -261,13 +261,13 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
 
   return (
     <DashboardSection compact>
-      <div className='space-y-3'>
+      <div className='space-y-5'>
         {changelog.entries.map((entry) => {
           const unread = isEntryUnread(entry.date, lastViewedDate);
 
           return (
-            <div key={entry.date} className='rounded-lg bg-zinc-900/40 p-4'>
-              <div className='mb-3 flex items-center gap-2'>
+            <div key={entry.date} className='rounded-lg bg-zinc-900/40 p-5'>
+              <div className='mb-4 flex items-center gap-2'>
                 {unread && (
                   <span
                     className='h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-400'
@@ -276,20 +276,20 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                 )}
                 <p
                   className={cn(
-                    "text-sm font-semibold",
+                    "font-display text-sm font-semibold tabular-nums tracking-wide",
                     unread ? "text-cyan-400" : "text-zinc-500",
                   )}>
                   {entry.date}
                 </p>
               </div>
-              <div className='space-y-3'>
+              <div className='space-y-4'>
                 {entry.groups.map((group, groupIdx) => {
                   const CategoryIcon = getCategoryIcon(group.category);
 
                   return (
                     <div key={groupIdx}>
                       {group.category && (
-                        <p className='mb-1 flex items-center gap-1.5 text-xs font-medium text-zinc-300'>
+                        <p className='mb-1.5 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-300'>
                           <CategoryIcon
                             className='h-3.5 w-3.5 flex-shrink-0 text-zinc-500'
                             aria-hidden
@@ -297,21 +297,21 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                           {group.category}
                         </p>
                       )}
-                      <ul className='space-y-1'>
+                      <ul className='space-y-1.5'>
                         {group.items.map((item, itemIdx) => {
                           const isBug = isBugFixItem(item);
 
                           return (
                             <li
                               key={itemIdx}
-                              className='flex items-start gap-2 text-sm leading-relaxed text-zinc-400'>
+                              className='flex items-start gap-2 text-sm leading-relaxed text-zinc-300'>
                               {isBug ? (
                                 <Bug
                                   className='mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
                                   aria-label='Bug fix'
                                 />
                               ) : (
-                                <span className='flex-shrink-0 text-zinc-600'>
+                                <span className='mt-0.5 flex-shrink-0 text-zinc-600'>
                                   •
                                 </span>
                               )}
