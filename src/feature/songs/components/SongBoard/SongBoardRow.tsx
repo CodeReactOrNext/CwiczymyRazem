@@ -3,7 +3,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
-import { Music, Play } from "lucide-react";
+import { Heart, Music, Play } from "lucide-react";
 
 const formatPracticeTime = (ms: number) => {
   const totalMinutes = Math.floor(ms / 60000);
@@ -41,6 +41,9 @@ interface SongBoardRowProps {
   progress: UserSongProgress | null;
   onOpenDetails: () => void;
   onPractice: () => void;
+  /** Favorites page: shows a heart toggle instead of relying on the card menu. */
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 /**
@@ -52,6 +55,8 @@ export const SongBoardRow = ({
   progress,
   onOpenDetails,
   onPractice,
+  isFavorite,
+  onToggleFavorite,
 }: SongBoardRowProps) => {
   const sessionCount = progress?.sessionCount ?? 0;
   const totalPracticeMs = progress?.totalPracticeMs ?? 0;
@@ -151,6 +156,25 @@ export const SongBoardRow = ({
       </div>
 
       <TierBadge song={song} className="h-9 w-9 shrink-0 text-sm" />
+
+      {onToggleFavorite && (
+        <button
+          type="button"
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+          className={cn(
+            "click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            isFavorite
+              ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
+              : "bg-white/5 text-zinc-200 hover:bg-white/15 hover:text-white"
+          )}
+        >
+          <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
+        </button>
+      )}
 
       <button
         type="button"

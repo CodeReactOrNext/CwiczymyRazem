@@ -6,16 +6,16 @@ import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
-import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
-import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import {
   toggleFavoriteExercise,
   toggleFavoritePlan,
+  toggleFavoriteSong,
 } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
@@ -97,22 +97,16 @@ const FavoritesPage: NextPageWithLayout = () => {
     loadSongs();
   }, [loadSongs]);
 
-  // Flatten the library and remember which list each song lives in, so the card
-  // can show its status badge and offer the same "move to…" actions as /songs.
-  const { librarySongs, statusById } = useMemo(() => {
-    const status: Record<string, SongStatus> = {};
-    songLists.wantToLearn.forEach((s) => (status[s.id] = "wantToLearn"));
-    songLists.learning.forEach((s) => (status[s.id] = "learning"));
-    songLists.learned.forEach((s) => (status[s.id] = "learned"));
-    return {
-      librarySongs: [
-        ...songLists.wantToLearn,
-        ...songLists.learning,
-        ...songLists.learned,
-      ],
-      statusById: status,
-    };
-  }, [songLists]);
+  // Flatten the library so favorited songs can be looked up regardless of
+  // which status list they currently live in.
+  const librarySongs = useMemo(
+    () => [
+      ...songLists.wantToLearn,
+      ...songLists.learning,
+      ...songLists.learned,
+    ],
+    [songLists]
+  );
 
   const favoriteSongs = favoriteSongIds
     .map((id) => librarySongs.find((s) => s.id === id))
@@ -123,11 +117,6 @@ const FavoritesPage: NextPageWithLayout = () => {
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
     userAuth ?? null
   );
-  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
-    userSongs: songLists,
-    onChange: setSongLists,
-    onTableStatusChange: loadSongs,
-  });
 
   const isEmpty =
     favoritePlans.length === 0 &&
@@ -339,23 +328,19 @@ const FavoritesPage: NextPageWithLayout = () => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+                <div className="space-y-2">
                   {favoriteSongs.map((song) => (
-                    <SongCard
+                    <SongBoardRow
                       key={song.id}
                       song={song}
-                      userStatus={statusById[song.id]}
+                      progress={progressMap[song.id] ?? null}
                       onOpenDetails={() => setPracticeTarget(song)}
-                      onPlay={() => setPracticeTarget(song)}
-                      onStatusChange={(status) =>
-                        status
-                          ? handleStatusChange(
-                              song.id,
-                              status,
-                              song.title,
-                              song.artist
-                            )
-                          : handleSongRemoval(song.id)
+                      onPractice={() => setPracticeTarget(song)}
+                      isFavorite
+                      onToggleFavorite={() =>
+                        dispatch(
+                          toggleFavoriteSong({ songId: song.id, isFavorite: false })
+                        )
                       }
                     />
                   ))}
