@@ -10,7 +10,7 @@ export const SpotifyPlayer = ({ trackId, className, height = 152 }: SpotifyPlaye
   if (!trackId) return null;
 
   return (
-    <div className={cn("w-full overflow-hidden rounded-xl bg-zinc-900/50 border border-white/5", className)}>
+    <div className={cn("w-full overflow-hidden rounded-lg bg-zinc-900/50", className)}>
       <iframe
         src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator`}
         width="100%"

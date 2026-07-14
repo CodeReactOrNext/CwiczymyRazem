@@ -32,6 +32,9 @@ interface AddSongModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  /** Pre-fills the form with whatever the user already searched for before opening the modal. */
+  initialTitle?: string;
+  initialArtist?: string;
 }
 
 type ModalStep = "info" | "category";
@@ -42,7 +45,13 @@ const STATUS_LABELS: Record<string, string> = {
   learned: "Learned",
 };
 
-const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
+const AddSongModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  initialTitle = "",
+  initialArtist = "",
+}: AddSongModalProps) => {
   const [step, setStep] = useState<ModalStep>("info");
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -52,6 +61,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [addedSongId, setAddedSongId] = useState<string | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Song | null>(null);
   const [importedTab, setImportedTab] = useState<TablatureMeasure[] | null>(null);
+  const [wasOpen, setWasOpen] = useState(isOpen);
 
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -92,6 +102,18 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       setMatches([]);
     }
   }, [title, artist, searchSongs]);
+
+  // Carries over whatever the user already searched for on the songs page,
+  // so they don't have to retype it inside the modal. Adjusted during render
+  // (React's recommended pattern) rather than in an effect, since it reacts
+  // to the isOpen prop flipping rather than syncing an external system.
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setTitle(initialTitle);
+      setArtist(initialArtist);
+    }
+  }
 
   const handleReset = () => {
     setStep("info");
@@ -181,11 +203,11 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-none sm:max-w-lg border-white/5 bg-zinc-950 p-0 overflow-hidden h-full sm:h-auto sm:rounded-2xl">
+      <DialogContent className="max-w-none sm:max-w-lg bg-zinc-950 p-0 overflow-hidden h-full sm:h-auto">
         <div className="p-6 pb-24 sm:pb-6 overflow-y-auto h-full sm:max-h-[85vh]">
           <DialogHeader className="mb-6">
-            <DialogTitle className='font-openSans text-2xl font-bold text-white flex items-center gap-3'>
-              <div className="p-2 rounded-xl bg-cyan-500/10">
+            <DialogTitle className='font-sans text-2xl font-bold text-white flex items-center gap-3'>
+              <div className="p-2 rounded-lg bg-cyan-500/10">
                 <Music className="h-6 w-6 text-cyan-400" />
               </div>
               {step === "info" ? 'Add new song' : 'Set status'}
@@ -203,7 +225,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     onChange={(e) => setArtist(e.target.value)}
                     required
                     placeholder="e.g. Led Zeppelin"
-                    className="h-12 border-white/5 bg-white/5 focus:border-cyan-500/50 transition-all font-medium"
+                    className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
                 <div className='space-y-2'>
@@ -214,16 +236,15 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder="e.g. Stairway to Heaven"
-                    className="h-12 border-white/5 bg-white/5 focus:border-cyan-500/50 transition-all font-medium"
+                    className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
               </div>
 
-  
               {currentMatch?.spotifyId && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label className="text-xs font-bold uppercase tracking-widest text-cyan-500 ml-1">
-                    Spotify Preview
+                  <Label className="text-xs font-bold tracking-wide text-cyan-500 ml-1">
+                    Spotify preview
                   </Label>
                   <SpotifyPlayer trackId={currentMatch.spotifyId} height={80} />
                 </div>
@@ -232,32 +253,41 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
               {/* Match Results */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between ml-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                  <span className="text-xs font-bold tracking-wide text-zinc-500 flex items-center gap-2">
                     {isSearching ? <Search className="h-3 w-3 animate-pulse" /> : <Check className="h-3 w-3" />}
-                    {matches.length > 0 ? "Possible matches found" : isSearching ? "Searching..." : "Library Check"}
+                    {matches.length > 0 ? "Possible matches found" : isSearching ? "Searching..." : "Library check"}
                   </span>
                 </div>
-                
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+
+                <div className="space-y-1 max-h-56 overflow-y-auto pr-2 custom-scrollbar">
                   {matches.map((song) => (
                     <button
                       key={song.id}
                       type="button"
                       onClick={() => handleSelectMatch(song)}
-                      className="w-full flex items-center justify-between p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all group"
+                      className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-zinc-900/60 hover:bg-cyan-500/10 transition-background group"
                     >
-                      <div className="text-left">
-                        <div className="font-bold text-white group-hover:text-cyan-400 transition-colors">{song.title}</div>
-                        <div className="text-xs text-zinc-500">{song.artist}</div>
+                      {song.coverUrl ? (
+                        <img
+                          src={song.coverUrl}
+                          alt=""
+                          className="h-11 w-11 shrink-0 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
+                          <Music className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="truncate font-bold text-white group-hover:text-cyan-400 transition-colors">{song.title}</div>
+                        <div className="truncate text-xs text-zinc-500">{song.artist}</div>
                       </div>
-                      <div className="h-8 w-8 rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
+                      <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
                     </button>
                   ))}
-                  
+
                   {!isSearching && matches.length === 0 && (artist.trim() && title.trim()) && (
-                    <div className="p-8 text-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02]">
+                    <div className="p-6 text-center rounded-lg bg-zinc-900/40">
                       <div className="text-sm font-medium text-zinc-500 italic">No exact matches in library yet - yours will be the first!</div>
                     </div>
                   )}
@@ -296,8 +326,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 <div className="text-2xl font-bold text-white">{title}</div>
                 <div className="text-zinc-400 font-bold">{artist}</div>
                 <div className="pt-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold uppercase tracking-widest border border-green-500/20">
-                    Song Added to Library
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold tracking-wide">
+                    Song added to library
                   </span>
                 </div>
               </div>
@@ -319,14 +349,12 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     disabled={isLoading}
                     onClick={() => handleSelectCategory(status)}
                     className={cn(
-                      "flex items-center gap-4 p-4 rounded-2xl border-2 transition-all active:scale-95 text-left group",
-                      config.borderColor,
+                      "flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40 transition-background active:scale-[0.98] text-left group",
                       config.bgHover,
-                      "bg-white/[0.02] hover:shadow-lg",
                       isLoading && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <div className={cn("p-3 rounded-xl", config.bgColor, config.color)}>
+                    <div className={cn("p-3 rounded-lg", config.bgColor, config.color)}>
                       {isLoading ? (
                         <div className="h-6 w-6 flex items-center justify-center">
                           <span className="loading loading-spinner loading-xs" />
@@ -351,9 +379,9 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 <button
                   onClick={() => handleSelectCategory("skip")}
                   disabled={isLoading}
-                  className="flex items-center gap-4 p-4 rounded-2xl border-2 border-white/5 bg-white/[0.02] hover:bg-zinc-900 transition-all active:scale-95 group disabled:opacity-50"
+                  className="flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40 hover:bg-zinc-900 transition-background active:scale-[0.98] group disabled:opacity-50"
                 >
-                  <div className="p-3 rounded-xl bg-zinc-800 text-zinc-400">
+                  <div className="p-3 rounded-lg bg-zinc-800 text-zinc-400">
                     <SkipForward className="h-6 w-6" />
                   </div>
                   <div>

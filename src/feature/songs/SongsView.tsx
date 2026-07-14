@@ -66,6 +66,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
+  const [addSongInitialQuery, setAddSongInitialQuery] = useState({ title: "", artist: "" });
 
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
     userAuth ?? null
@@ -656,7 +657,10 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   currentPage={page}
                   hasMore={hasMore}
                   onPageChange={handlePageChange}
-                  onAddSong={() => setIsModalOpen(true)}
+                  onAddSong={() => {
+                    setAddSongInitialQuery({ title: titleQuery, artist: artistQuery });
+                    setIsModalOpen(true);
+                  }}
                   hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
                   onStatusChange={refreshSongs}
                   onPractice={(song) => setPracticeTarget(song)}
@@ -701,6 +705,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleStatusUpdate}
+        initialTitle={addSongInitialQuery.title}
+        initialArtist={addSongInitialQuery.artist}
       />
 
       {practiceTarget && userAuth && (

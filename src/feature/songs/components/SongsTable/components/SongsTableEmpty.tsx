@@ -1,8 +1,6 @@
 import { Button } from "assets/components/ui/button";
-import { TableCell, TableRow } from "assets/components/ui/table";
 import { useTranslation } from "hooks/useTranslation";
-import { Music } from "lucide-react";
-import { FaPlusCircle } from "react-icons/fa";
+import { Music, Plus } from "lucide-react";
 
 interface SongsTableEmptyProps {
   hasFilters: boolean;
@@ -15,27 +13,23 @@ export const SongsTableEmpty = ({
 }: SongsTableEmptyProps) => {
   const { t } = useTranslation("songs");
   return (
-    <TableRow>
-      <TableCell colSpan={5} className='h-40 text-center'>
-        <div className='flex flex-col items-center justify-center space-y-4 border border-dashed p-12'>
-          <p className='text-lg font-medium '>
-            <Music
-              size={40}
-              className='mx-auto mb-2 text-2xl text-muted-foreground'
-            />
-            {hasFilters
-              ? t("no_songs_found_with_filters")
-              : t("no_songs_found")}
-          </p>
-          <p className='text-muted-foreground'>{t("no_song_add_song")}</p>
-          <div className='flex items-center space-x-4'>
-            <Button onClick={onAddSong} className='flex items-center space-x-2'>
-              <FaPlusCircle className='h-4 w-4' />
-              <span>{t("add_new_song")}</span>
-            </Button>
-          </div>
-        </div>
-      </TableCell>
-    </TableRow>
+    <div className='flex flex-col items-center justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
+      <div className='mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800'>
+        <Music size={32} className='text-zinc-500' />
+      </div>
+      <h3 className='mb-2 text-xl font-bold text-white'>
+        {hasFilters
+          ? t("no_songs_found_with_filters")
+          : t("no_songs_found")}
+      </h3>
+      <p className='max-w-xs text-sm text-zinc-400'>{t("no_song_add_song")}</p>
+      <Button
+        onClick={onAddSong}
+        className='mt-8 h-11 rounded-lg bg-white px-8 font-bold text-black hover:bg-zinc-100'
+      >
+        <Plus className='mr-2 h-4 w-4' />
+        {t("add_new_song")}
+      </Button>
+    </div>
   );
 };
