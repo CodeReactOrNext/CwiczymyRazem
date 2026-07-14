@@ -1,6 +1,13 @@
+import { ClipboardList, Guitar, Sparkles, Target } from "lucide-react";
 import { describe, expect, it } from "vitest";
 
-import { hasRecentChanges, isEntryUnread, parseChangelog } from "./Changelog";
+import {
+  getCategoryIcon,
+  hasRecentChanges,
+  isBugFixItem,
+  isEntryUnread,
+  parseChangelog,
+} from "./Changelog";
 
 describe("parseChangelog", () => {
   it("groups items by their category label and strips emoji", () => {
@@ -78,5 +85,35 @@ describe("isEntryUnread", () => {
 describe("hasRecentChanges", () => {
   it("returns false for an empty changelog", () => {
     expect(hasRecentChanges([])).toBe(false);
+  });
+});
+
+describe("getCategoryIcon", () => {
+  it("returns a matching icon for known category keywords", () => {
+    expect(getCategoryIcon("Daily Quests")).toBe(Target);
+    expect(getCategoryIcon("Guitar Arsenal")).toBe(Guitar);
+    expect(getCategoryIcon("Practice Plans")).toBe(ClipboardList);
+  });
+
+  it("falls back to the default icon for unknown or missing categories", () => {
+    expect(getCategoryIcon("Something Unmapped")).toBe(Sparkles);
+    expect(getCategoryIcon(null)).toBe(Sparkles);
+  });
+});
+
+describe("isBugFixItem", () => {
+  it("flags entries starting with Fixed/Fix", () => {
+    expect(isBugFixItem("Fixed a lag in the correct-note detection")).toBe(
+      true,
+    );
+    expect(isBugFixItem("Fix Google Translator issue")).toBe(true);
+  });
+
+  it("flags entries mentioning bug(s)", () => {
+    expect(isBugFixItem("Numerous bug and UI fixes")).toBe(true);
+  });
+
+  it("does not flag regular feature entries", () => {
+    expect(isBugFixItem("Added a metronome to the free timer")).toBe(false);
   });
 });

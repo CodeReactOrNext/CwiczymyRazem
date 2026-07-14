@@ -1,5 +1,27 @@
 import { cn } from "assets/lib/utils";
 import { DashboardSection } from "components/Layout";
+import type { LucideIcon } from "lucide-react";
+import {
+  Bug,
+  ClipboardList,
+  Dumbbell,
+  Flame,
+  Guitar,
+  History,
+  Mail,
+  Map as MapIcon,
+  Music2,
+  Music4,
+  Palette,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Target,
+  Timer,
+  Trophy,
+  Upload,
+  Users,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface ChangelogGroup {
@@ -18,6 +40,40 @@ interface ParsedChangelog {
 }
 
 const MAX_CATEGORY_WORDS = 4;
+
+const DEFAULT_CATEGORY_ICON: LucideIcon = Sparkles;
+
+// Ordered by specificity — first matching keyword wins, so e.g. "guitar"
+// is checked before the generic "ui" rule (which "Guitar" also contains).
+const CATEGORY_ICON_RULES: Array<{ test: RegExp; icon: LucideIcon }> = [
+  { test: /quest/i, icon: Target },
+  { test: /roadmap/i, icon: MapIcon },
+  { test: /guitar|arsenal|equipment|pedal/i, icon: Guitar },
+  { test: /song|playlist|rating/i, icon: Music4 },
+  { test: /session/i, icon: Music2 },
+  { test: /plan/i, icon: ClipboardList },
+  { test: /log|activity/i, icon: History },
+  { test: /exercise/i, icon: Dumbbell },
+  { test: /marketplace|shop|case/i, icon: ShoppingBag },
+  { test: /email|notification/i, icon: Mail },
+  { test: /community/i, icon: Users },
+  { test: /milestone/i, icon: Trophy },
+  { test: /streak/i, icon: Flame },
+  { test: /point/i, icon: Star },
+  { test: /metronome|timer/i, icon: Timer },
+  { test: /import/i, icon: Upload },
+  { test: /ui/i, icon: Palette },
+];
+
+export const getCategoryIcon = (category: string | null): LucideIcon => {
+  if (!category) return DEFAULT_CATEGORY_ICON;
+
+  const rule = CATEGORY_ICON_RULES.find(({ test }) => test.test(category));
+  return rule ? rule.icon : DEFAULT_CATEGORY_ICON;
+};
+
+export const isBugFixItem = (text: string): boolean =>
+  /^fix(ed)?\b/i.test(text) || /\bbugs?\b/i.test(text);
 
 const parseItem = (raw: string): { category: string | null; text: string } => {
   const withoutEmoji = raw.replace(/^[^\p{L}0-9]+/u, "").trim();
@@ -227,25 +283,46 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                 </p>
               </div>
               <div className='space-y-3'>
-                {entry.groups.map((group, groupIdx) => (
-                  <div key={groupIdx}>
-                    {group.category && (
-                      <p className='mb-1 text-xs font-medium text-zinc-300'>
-                        {group.category}
-                      </p>
-                    )}
-                    <ul className='space-y-1'>
-                      {group.items.map((item, itemIdx) => (
-                        <li
-                          key={itemIdx}
-                          className='flex items-start gap-2 text-sm leading-relaxed text-zinc-400'>
-                          <span className='flex-shrink-0 text-zinc-600'>•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                {entry.groups.map((group, groupIdx) => {
+                  const CategoryIcon = getCategoryIcon(group.category);
+
+                  return (
+                    <div key={groupIdx}>
+                      {group.category && (
+                        <p className='mb-1 flex items-center gap-1.5 text-xs font-medium text-zinc-300'>
+                          <CategoryIcon
+                            className='h-3.5 w-3.5 flex-shrink-0 text-zinc-500'
+                            aria-hidden
+                          />
+                          {group.category}
+                        </p>
+                      )}
+                      <ul className='space-y-1'>
+                        {group.items.map((item, itemIdx) => {
+                          const isBug = isBugFixItem(item);
+
+                          return (
+                            <li
+                              key={itemIdx}
+                              className='flex items-start gap-2 text-sm leading-relaxed text-zinc-400'>
+                              {isBug ? (
+                                <Bug
+                                  className='mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
+                                  aria-label='Bug fix'
+                                />
+                              ) : (
+                                <span className='flex-shrink-0 text-zinc-600'>
+                                  •
+                                </span>
+                              )}
+                              <span>{item}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
