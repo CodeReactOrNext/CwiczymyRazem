@@ -1,5 +1,8 @@
 import { Card } from "assets/components/ui/card";
-import Changelog, { hasRecentChanges, markChangelogAsViewed,useChangelogData } from "components/Changelog/Changelog";
+import Changelog, {
+  hasRecentChanges,
+  useChangelogData,
+} from "components/Changelog/Changelog";
 import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
@@ -12,7 +15,7 @@ import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
-import { useEffect,useState } from "react";
+import { useState } from "react";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatboxEllipses } from "react-icons/io5";
@@ -32,11 +35,16 @@ interface LogsBoxLayoutProps {
   className?: string; // Allow custom styles
 }
 
-const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }: LogsBoxLayoutProps) => {
+const LogsBoxLayout = ({
+  logs,
+  userAchievements,
+  currentUserId,
+  className = "",
+}: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "achievements" | "discord" | "excerise" | "chat" | "changelog"
   >("logs");
-  const [hasNewChangelog, setHasNewChangelog] = useState(false);
+  const [changelogDotHidden, setChangelogDotHidden] = useState(false);
 
   const {
     unreadCount: unreadChats,
@@ -52,11 +60,13 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
 
   const { changelog } = useChangelogData("2026-05");
 
-  useEffect(() => {
-    if (changelog?.entries) {
-      setHasNewChangelog(hasRecentChanges(changelog.entries));
-    }
-  }, [changelog?.entries]);
+  // Wyliczane w renderze: na serwerze i przed dociągnięciem changeloga jest
+  // false, więc nie ma hydration mismatch (fetch i tak kończy się po mount).
+  const hasNewChangelog =
+    !changelogDotHidden &&
+    typeof window !== "undefined" &&
+    !!changelog?.entries &&
+    hasRecentChanges(changelog.entries);
 
   const { t } = useTranslation("common");
 
@@ -65,9 +75,10 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
       markChatsAsRead();
     } else if (category === "logs") {
       markLogsAsRead();
-    } else if (category === "changelog" && changelog?.entries) {
-      markChangelogAsViewed(changelog.entries);
-      setHasNewChangelog(false);
+    } else if (category === "changelog") {
+      // Zapis "przeczytane" robi sam <Changelog/> po zamontowaniu — dzięki temu
+      // przy tym otwarciu wpisy są jeszcze podświetlone, a znikną od następnego.
+      setChangelogDotHidden(true);
     }
     setShowedCategory(category);
   };
@@ -75,11 +86,13 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
   return (
     <Card
       className={`relative m-auto flex ${
-        showedCategory !== "achievements" && !className.includes("h-") ? "h-[800px]" : ""
-      } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} text-xs leading-5 rounded-xl xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
-      <div className=' left-0 top-0 flex flex-row  justify-around gap-4 mb-2  font-bold'>
+        showedCategory !== "achievements" && !className.includes("h-")
+          ? "h-[800px]"
+          : ""
+      } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
+      <div className='left-0 top-0 mb-2 flex flex-row justify-around gap-4 font-bold'>
         <LogsBoxButton
-          title="Activity"
+          title='Activity'
           active={showedCategory === "logs"}
           onClick={() => handleCategoryChange("logs")}
           Icon={FaGuitar}
@@ -103,7 +116,7 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
               Icon={FaMedal}
             />
             <LogsBoxButton
-              title="Changelog"
+              title='Changelog'
               active={showedCategory === "changelog"}
               onClick={() => handleCategoryChange("changelog")}
               Icon={FiBook}
@@ -112,10 +125,10 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
           </>
         )}
       </div>
-      <AnimatePresence mode="wait" initial={false}>
+      <AnimatePresence mode='wait' initial={false}>
         {showedCategory === "achievements" && (
           <m.div
-            key="achievements"
+            key='achievements'
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
@@ -125,13 +138,13 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
         )}
         {showedCategory === "changelog" && (
           <m.div
-            key="changelog"
+            key='changelog'
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent p-4'>
-            <Changelog month="2026-05" />
+            className='mb-2 h-full overflow-y-auto p-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600'>
+            <Changelog month='2026-05' />
           </m.div>
         )}
         {(showedCategory === "logs" || showedCategory === "chat") && (
@@ -141,7 +154,7 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className='h-full overflow-y-auto scrollbar scrollbar-thumb-zinc-600 mb-2 scrollbar-track-transparent'>
+            className='mb-2 h-full overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600'>
             {showedCategory === "logs" && logs && (
               <div onClick={markLogsAsRead}>
                 <Logs
