@@ -21,13 +21,19 @@ const checkSongExists = async (title: string, artist: string) => {
 
 
 
+interface SpotifyMeta {
+  coverUrl?: string | null;
+  spotifyId?: string | null;
+}
+
 export const addSong = async (
   title: string,
   artist: string,
   userId: string,
   avatarUrl: string | undefined,
   difficulty_rate: number | undefined,
-  tablature?: any[]
+  tablature?: any[],
+  spotifyMeta?: SpotifyMeta
 ) => {
   try {
     const exists = await checkSongExists(title, artist);
@@ -46,8 +52,11 @@ export const addSong = async (
       difficulties: [],
       avgDifficulty: 0,
       tier: "?",
-      isVerified: false,
-      coverUrl: null,
+      // Picking a Spotify suggestion in AddSongModal gives us verified cover art
+      // and a spotifyId immediately, instead of waiting for background enrichment.
+      isVerified: !!spotifyMeta?.spotifyId,
+      coverUrl: spotifyMeta?.coverUrl || null,
+      spotifyId: spotifyMeta?.spotifyId || null,
       tablature: tablature || null,
     };
 

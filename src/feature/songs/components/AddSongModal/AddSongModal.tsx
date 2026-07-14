@@ -14,15 +14,17 @@ import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { addSong } from "feature/songs/services/addSong";
 import { enrichSong } from "feature/songs/services/enrichment.service";
 import { getSongs } from "feature/songs/services/getSongs";
+import type { SpotifySongSuggestion } from "feature/songs/services/searchSpotifySongs";
+import { searchSpotifySongs } from "feature/songs/services/searchSpotifySongs";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
-import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
+import { ArrowRight, Check, Loader2, Music, Search, SkipForward } from "lucide-react";
 import posthog from "posthog-js";
-import { useCallback,useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -59,9 +61,13 @@ const AddSongModal = ({
   const [matches, setMatches] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedSongId, setAddedSongId] = useState<string | null>(null);
+  const [addedSongSpotifyId, setAddedSongSpotifyId] = useState<string | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Song | null>(null);
   const [importedTab, setImportedTab] = useState<TablatureMeasure[] | null>(null);
   const [wasOpen, setWasOpen] = useState(isOpen);
+  const [spotifySuggestions, setSpotifySuggestions] = useState<SpotifySongSuggestion[]>([]);
+  const [isSpotifySearching, setIsSpotifySearching] = useState(false);
+  const [selectedSpotify, setSelectedSpotify] = useState<SpotifySongSuggestion | null>(null);
 
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -72,25 +78,38 @@ const AddSongModal = ({
     debounce(async (t: string, a: string) => {
       if (t.length < 2 && a.length < 2) {
         setMatches([]);
+        setSpotifySuggestions([]);
         return;
       }
       setIsSearching(true);
-      try {
-        const result = await getSongs("popularity", "desc", t, a, 1, 5);
-        setMatches(result.songs);
-        
+      setIsSpotifySearching(true);
+
+      const [libraryResult, spotifyResult] = await Promise.allSettled([
+        getSongs("popularity", "desc", t, a, 1, 5),
+        searchSpotifySongs([a, t].filter(Boolean).join(" ")),
+      ]);
+
+      if (libraryResult.status === "fulfilled") {
+        const { songs } = libraryResult.value;
+        setMatches(songs);
+
         // Try to find a high-quality match with spotifyId to show player
-        const bestMatch = result.songs.find((s: Song) => 
-          s.spotifyId && 
-          s.title.toLowerCase() === t.toLowerCase() && 
+        const bestMatch = songs.find((s: Song) =>
+          s.spotifyId &&
+          s.title.toLowerCase() === t.toLowerCase() &&
           s.artist.toLowerCase() === a.toLowerCase()
         );
         setCurrentMatch(bestMatch || null);
-      } catch (error) {
-        console.error("Error searching for matches:", error);
-      } finally {
-        setIsSearching(false);
+      } else {
+        console.error("Error searching for matches:", libraryResult.reason);
       }
+
+      if (spotifyResult.status === "fulfilled") {
+        setSpotifySuggestions(spotifyResult.value);
+      }
+
+      setIsSearching(false);
+      setIsSpotifySearching(false);
     }, 300),
     []
   );
@@ -100,8 +119,25 @@ const AddSongModal = ({
       searchSongs(title.trim(), artist.trim());
     } else {
       setMatches([]);
+      setSpotifySuggestions([]);
     }
   }, [title, artist, searchSongs]);
+
+  // Suggestions that are already in the library are shown (and actionable) in the
+  // library matches list above, so drop them here to avoid duplicate/confusing entries.
+  const librarySignatures = useMemo(
+    () => new Set(matches.map((m) => `${m.title.toLowerCase()}|${m.artist.toLowerCase()}`)),
+    [matches]
+  );
+  const newSpotifySuggestions = useMemo(
+    () =>
+      spotifySuggestions.filter(
+        (s) => !librarySignatures.has(`${s.title.toLowerCase()}|${s.artist.toLowerCase()}`)
+      ),
+    [spotifySuggestions, librarySignatures]
+  );
+
+  const previewTrackId = selectedSpotify?.spotifyId || currentMatch?.spotifyId;
 
   // Carries over whatever the user already searched for on the songs page,
   // so they don't have to retype it inside the modal. Adjusted during render
@@ -120,7 +156,10 @@ const AddSongModal = ({
     setTitle("");
     setArtist("");
     setMatches([]);
+    setSpotifySuggestions([]);
+    setSelectedSpotify(null);
     setAddedSongId(null);
+    setAddedSongSpotifyId(null);
   };
 
   const handleClose = () => {
@@ -142,15 +181,33 @@ const AddSongModal = ({
 
     try {
       setIsLoading(true);
-      posthog.capture("song_addition_flow", { action: "submit_info", title: title.trim(), artist: artist.trim(), has_tab: !!importedTab });
-      const songId = await addSong(title.trim(), artist.trim(), userId, avatar, undefined, importedTab || undefined);
-      
-      // Trigger enrichment in the background (no await)
+      posthog.capture("song_addition_flow", {
+        action: "submit_info",
+        title: title.trim(),
+        artist: artist.trim(),
+        has_tab: !!importedTab,
+        from_spotify_suggestion: !!selectedSpotify,
+      });
+      const songId = await addSong(
+        title.trim(),
+        artist.trim(),
+        userId,
+        avatar,
+        undefined,
+        importedTab || undefined,
+        selectedSpotify
+          ? { coverUrl: selectedSpotify.coverUrl, spotifyId: selectedSpotify.spotifyId }
+          : undefined
+      );
+
+      // Trigger enrichment in the background (no await) — fills in genres, and
+      // covers the case where the song wasn't picked from a Spotify suggestion.
       enrichSong(songId, artist.trim(), title.trim()).catch((err) => {
         console.error("Background enrichment failed:", err);
       });
 
       setAddedSongId(songId);
+      setAddedSongSpotifyId(selectedSpotify?.spotifyId || null);
       setStep("category");
     } catch (error) {
       if (error instanceof Error && error.message === "song_already_exists") {
@@ -166,9 +223,17 @@ const AddSongModal = ({
   const handleSelectMatch = (song: Song) => {
     posthog.capture("song_addition_flow", { action: "select_match", song_id: song.id });
     setAddedSongId(song.id);
+    setAddedSongSpotifyId(song.spotifyId || null);
     setTitle(song.title);
     setArtist(song.artist);
     setStep("category");
+  };
+
+  const handleSelectSpotify = (song: SpotifySongSuggestion) => {
+    posthog.capture("song_addition_flow", { action: "select_spotify_suggestion", spotify_id: song.spotifyId });
+    setTitle(song.title);
+    setArtist(song.artist);
+    setSelectedSpotify(song);
   };
 
   const handleSelectCategory = async (status: SongStatus | "skip") => {
@@ -222,7 +287,10 @@ const AddSongModal = ({
                   <Input
                     id='artist'
                     value={artist}
-                    onChange={(e) => setArtist(e.target.value)}
+                    onChange={(e) => {
+                      setArtist(e.target.value);
+                      setSelectedSpotify(null);
+                    }}
                     required
                     placeholder="e.g. Led Zeppelin"
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
@@ -233,7 +301,10 @@ const AddSongModal = ({
                   <Input
                     id='title'
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      setSelectedSpotify(null);
+                    }}
                     required
                     placeholder="e.g. Stairway to Heaven"
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
@@ -241,56 +312,122 @@ const AddSongModal = ({
                 </div>
               </div>
 
-              {currentMatch?.spotifyId && (
+              {previewTrackId && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label className="text-xs font-bold tracking-wide text-cyan-500 ml-1">
                     Spotify preview
                   </Label>
-                  <SpotifyPlayer trackId={currentMatch.spotifyId} height={80} />
+                  <SpotifyPlayer trackId={previewTrackId} height={80} />
                 </div>
               )}
 
-              {/* Match Results */}
+              {/* Library dedup check */}
+              {matches.length > 0 && (
+                <div className="space-y-2">
+                  <span className="ml-1 flex items-center gap-2 text-xs font-bold tracking-wide text-zinc-500">
+                    <Check className="h-3 w-3" />
+                    Already in your library
+                  </span>
+
+                  <div className="space-y-1">
+                    {matches.map((song) => (
+                      <button
+                        key={song.id}
+                        type="button"
+                        onClick={() => handleSelectMatch(song)}
+                        className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-zinc-900/60 hover:bg-cyan-500/10 transition-background group"
+                      >
+                        {song.coverUrl ? (
+                          <img
+                            src={song.coverUrl}
+                            alt=""
+                            className="h-11 w-11 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
+                            <Music className="h-4 w-4" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 text-left">
+                          <div className="truncate font-bold text-white group-hover:text-cyan-400 transition-colors">{song.title}</div>
+                          <div className="truncate text-xs text-zinc-500">{song.artist}</div>
+                        </div>
+                        <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Spotify suggestions — pick one to add with verified cover art right away */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between ml-1">
                   <span className="text-xs font-bold tracking-wide text-zinc-500 flex items-center gap-2">
-                    {isSearching ? <Search className="h-3 w-3 animate-pulse" /> : <Check className="h-3 w-3" />}
-                    {matches.length > 0 ? "Possible matches found" : isSearching ? "Searching..." : "Library check"}
+                    {isSpotifySearching ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Search className="h-3 w-3" />
+                    )}
+                    {newSpotifySuggestions.length > 0
+                      ? "Suggestions from Spotify"
+                      : isSpotifySearching
+                        ? "Searching Spotify..."
+                        : "Spotify check"}
                   </span>
                 </div>
 
-                <div className="space-y-1 max-h-56 overflow-y-auto pr-2 custom-scrollbar">
-                  {matches.map((song) => (
-                    <button
-                      key={song.id}
-                      type="button"
-                      onClick={() => handleSelectMatch(song)}
-                      className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-zinc-900/60 hover:bg-cyan-500/10 transition-background group"
-                    >
-                      {song.coverUrl ? (
-                        <img
-                          src={song.coverUrl}
-                          alt=""
-                          className="h-11 w-11 shrink-0 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
-                          <Music className="h-4 w-4" />
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {newSpotifySuggestions.map((song) => {
+                    const isSelected = selectedSpotify?.spotifyId === song.spotifyId;
+                    return (
+                      <button
+                        key={song.spotifyId}
+                        type="button"
+                        onClick={() => handleSelectSpotify(song)}
+                        className={cn(
+                          "w-full flex items-center gap-3 p-2.5 rounded-lg transition-background group",
+                          isSelected ? "bg-cyan-500/10" : "bg-zinc-900/60 hover:bg-zinc-900"
+                        )}
+                      >
+                        {song.coverUrl ? (
+                          <img
+                            src={song.coverUrl}
+                            alt=""
+                            className="h-11 w-11 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
+                            <Music className="h-4 w-4" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 text-left">
+                          <div className={cn("truncate font-bold transition-colors", isSelected ? "text-cyan-400" : "text-white group-hover:text-cyan-400")}>
+                            {song.title}
+                          </div>
+                          <div className="truncate text-xs text-zinc-500">
+                            {song.artist}
+                            {song.year ? ` · ${song.year}` : ""}
+                          </div>
                         </div>
-                      )}
-                      <div className="flex-1 min-w-0 text-left">
-                        <div className="truncate font-bold text-white group-hover:text-cyan-400 transition-colors">{song.title}</div>
-                        <div className="truncate text-xs text-zinc-500">{song.artist}</div>
-                      </div>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
-                    </button>
-                  ))}
+                        {isSelected ? (
+                          <Check className="h-4 w-4 shrink-0 text-cyan-400" />
+                        ) : (
+                          <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
+                        )}
+                      </button>
+                    );
+                  })}
 
-                  {!isSearching && matches.length === 0 && (artist.trim() && title.trim()) && (
-                    <div className="p-6 text-center rounded-lg bg-zinc-900/40">
-                      <div className="text-sm font-medium text-zinc-500 italic">No exact matches in library yet - yours will be the first!</div>
-                    </div>
-                  )}
+                  {!isSpotifySearching &&
+                    !isSearching &&
+                    matches.length === 0 &&
+                    newSpotifySuggestions.length === 0 &&
+                    artist.trim() &&
+                    title.trim() && (
+                      <div className="p-6 text-center rounded-lg bg-zinc-900/40">
+                        <div className="text-sm font-medium text-zinc-500 italic">No matches found anywhere - yours will be the first!</div>
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -333,11 +470,11 @@ const AddSongModal = ({
               </div>
 
               {/* Show player in status step if we have a spotifyId */}
-              {(matches.find(m => m.id === addedSongId)?.spotifyId) && (
+              {addedSongSpotifyId && (
                 <div className="mb-6">
-                  <SpotifyPlayer 
-                    trackId={matches.find(m => m.id === addedSongId)!.spotifyId!} 
-                    height={152} 
+                  <SpotifyPlayer
+                    trackId={addedSongSpotifyId}
+                    height={152}
                   />
                 </div>
               )}
