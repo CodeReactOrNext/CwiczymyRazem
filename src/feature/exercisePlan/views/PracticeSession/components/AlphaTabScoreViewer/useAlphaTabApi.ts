@@ -17,6 +17,8 @@ interface UseAlphaTabApiOptions {
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
   origBpmRef: React.MutableRefObject<number>;
+  /** Ref — playback-only pitch shift in semitones (audio only, does not affect notation). */
+  pitchRef?: React.MutableRefObject<number>;
 }
 
 interface UseAlphaTabApiReturn {
@@ -44,6 +46,7 @@ export function useAlphaTabApi({
   volumeRef,
   bpmRef,
   origBpmRef,
+  pitchRef,
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -113,6 +116,8 @@ export function useAlphaTabApi({
         setSelectedTrackIdx(0);
         // Render first track only; user can switch via handleTrackSelect
         api.renderTracks([score.tracks[0]]);
+        // Re-apply any pitch shift set before this (re)load — audio only, never affects notation.
+        if (pitchRef?.current) api.changeTrackTranspositionPitch(score.tracks, pitchRef.current);
       }
     });
 

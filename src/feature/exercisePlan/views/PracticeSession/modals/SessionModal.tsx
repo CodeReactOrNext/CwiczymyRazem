@@ -48,6 +48,9 @@ interface SessionModalProps {
   setIsMetronomeMuted: (bool: boolean) => void;
   speedMultiplier?: number;
   onSpeedMultiplierChange?: (value: number) => void;
+  hasGpFile?: boolean;
+  pitchSemitones?: number;
+  onPitchChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
@@ -75,6 +78,7 @@ const SessionModal = ({
   isAudioMuted, setIsAudioMuted,
   isMetronomeMuted, setIsMetronomeMuted,
   speedMultiplier, onSpeedMultiplierChange,
+  hasGpFile, pitchSemitones, onPitchChange,
   activeTablature,
   isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
   handleNextRiddle, handleRevealRiddle,
@@ -131,6 +135,7 @@ const SessionModal = ({
         isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
         isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
         speedMultiplier={speedMultiplier} onSpeedMultiplierChange={onSpeedMultiplierChange}
+        hasGpFile={hasGpFile} pitchSemitones={pitchSemitones} onPitchChange={onPitchChange}
         activeTablature={activeTablature}
         isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce}
@@ -210,6 +215,8 @@ const SessionModal = ({
             hasMicControls={hasMicControls}
             speedMultiplier={speedMultiplier ?? 1}
             onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
+            hasPitchControl={hasGpFile} pitchSemitones={pitchSemitones ?? 0}
+            onPitchChange={onPitchChange}
             isAudioMuted={isAudioMuted}
             isRiddleMode={isRiddleMode}
             onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}

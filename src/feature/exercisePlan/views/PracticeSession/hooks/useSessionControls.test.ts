@@ -44,6 +44,7 @@ const buildOptions = (overrides: Partial<Exercise> = {}) => {
       setIsAudioMuted: vi.fn(),
       speedMultiplier: 1,
       setSpeedMultiplier: vi.fn(),
+      setPitchSemitones: vi.fn(),
       setEarTrainingScore: vi.fn(),
       setIsRiddleGuessed: vi.fn(),
       handleRevealRiddle: vi.fn(),

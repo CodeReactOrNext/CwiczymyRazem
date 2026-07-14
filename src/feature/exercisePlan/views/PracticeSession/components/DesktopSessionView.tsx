@@ -81,6 +81,8 @@ interface DesktopSessionViewProps {
   onRecalibrate:            () => void;
   speedMultiplier:              number;
   handleSpeedMultiplierChange:    (v: number) => void;
+  pitchSemitones:               number;
+  handlePitchChange:             (v: number) => void;
   metronome:                any;
   isMetronomeMuted:         boolean;
   setIsMetronomeMuted:      (v: boolean) => void;
@@ -141,6 +143,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   const hasAudioTrack =
     !!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) &&
     !p.currentExercise.disableBackingTrack;
+  // Pitch shift relies on AlphaTab's synth (changeTrackTranspositionPitch) — only
+  // available when this exercise actually plays a real Guitar Pro file.
+  const hasGpFile = !!p.effectiveRawGpFile || !!p.currentExercise.gpFileUrl;
   const hasMicControls =
     (p.planHasTablature || p.planHasGpFile || p.planHasStrumming || !!p.currentExercise.customGoal) && !p.currentExercise.disableMic;
   const hasPlaybackControls = hasMetronome || hasAudioTrack || hasMicControls;
@@ -152,6 +157,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         hasAudioTrack={hasAudioTrack}
         hasMicControls={hasMicControls}
         speedMultiplier={p.speedMultiplier} onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
+        hasPitchControl={hasGpFile} pitchSemitones={p.pitchSemitones} onPitchChange={p.handlePitchChange}
         isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
         onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
         onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
@@ -249,6 +255,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     show3dHighway={p.show3dHighway}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
+                    pitchSemitones={p.pitchSemitones}
                     isMetronomeMuted={p.isMetronomeMuted}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}

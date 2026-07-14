@@ -145,8 +145,8 @@ export const PracticeSession = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, show3dHighway, selectedGpTrackIdx,
-    setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, pitchSemitones, showAlphaTabScore, show3dHighway, selectedGpTrackIdx,
+    setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setPitchSemitones, setSelectedGpTrackIdx,
     toggleAlphaTabScore, toggle3dHighway, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
@@ -226,6 +226,7 @@ export const PracticeSession = ({
     // metronome click is redundant — mute it (it still runs to keep timing/sync).
     let nextMetronomeMuted = isExamMode && !!currentExercise.examBacking;
     let nextSpeedMultiplier = 1;
+    let nextPitchSemitones = 0;
 
     // Exam mode has its own fixed rules above (and a locked BPM), so per-exercise
     // persisted settings only apply to regular practice.
@@ -234,12 +235,14 @@ export const PracticeSession = ({
       if (persisted?.isAudioMuted !== undefined) nextAudioMuted = persisted.isAudioMuted;
       if (persisted?.isMetronomeMuted !== undefined) nextMetronomeMuted = persisted.isMetronomeMuted;
       if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
+      if (persisted?.pitchSemitones !== undefined) nextPitchSemitones = persisted.pitchSemitones;
       if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);
     }
 
     skipNextSettingsSaveRef.current = true;
     resetForExercise({
-      isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier,
+      isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted,
+      speedMultiplier: nextSpeedMultiplier, pitchSemitones: nextPitchSemitones,
       // Exams never expose the notation toggle (see DesktopSessionView), but force it off here
       // too in case it was left on from a prior non-exam exercise in the same session.
       ...(isExamMode ? { showAlphaTabScore: false } : {}),
@@ -272,7 +275,7 @@ export const PracticeSession = ({
 
   const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
-    isAudioMuted, isAudioPlaying, effectiveBpm,
+    isAudioMuted, isAudioPlaying, effectiveBpm, pitchSemitones,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
     isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
@@ -320,11 +323,11 @@ export const PracticeSession = ({
     if (isExamMode) return;
     if (skipNextSettingsSaveRef.current) { skipNextSettingsSaveRef.current = false; return; }
     savePracticeSessionSettings(currentExercise.id, {
-      isAudioMuted, isMetronomeMuted, speedMultiplier,
+      isAudioMuted, isMetronomeMuted, speedMultiplier, pitchSemitones,
       metronomeBpm: metronome.bpm,
       isMicEnabled: _isMicEnabled,
     });
-  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, _isMicEnabled]);
+  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, pitchSemitones, metronome.bpm, _isMicEnabled]);
 
   // Metronome volume is a device-wide preference — persist it independently of the exercise.
   useEffect(() => {
@@ -351,7 +354,7 @@ export const PracticeSession = ({
   // ── Controls & handlers ───────────────────────────────────────────────────
 
   const {
-    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange, handlePitchChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
@@ -359,7 +362,7 @@ export const PracticeSession = ({
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
     isMicEnabled, closeAudio, updateMicPersistence,
-    isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
+    isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier, setPitchSemitones,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
     tabRestartKey, setTabRestartKey,
@@ -503,6 +506,7 @@ export const PracticeSession = ({
           isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
           isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
+          hasGpFile={isGpFile} pitchSemitones={pitchSemitones} onPitchChange={handlePitchChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
           isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
           handleNextRiddle={handleNextRiddleClick} handleRevealRiddle={handleRevealRiddle}
@@ -548,6 +552,7 @@ export const PracticeSession = ({
         onAudioToggle={handleAudioToggle} onMicToggle={handleMicToggle}
         onRecalibrate={handleRecalibrate} speedMultiplier={speedMultiplier}
         handleSpeedMultiplierChange={handleSpeedMultiplierChange}
+        pitchSemitones={pitchSemitones} handlePitchChange={handlePitchChange}
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}

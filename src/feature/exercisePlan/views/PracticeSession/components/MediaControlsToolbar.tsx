@@ -2,7 +2,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
-import { Check, ChevronDown, Lock, Snail, X } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Lock, Snail, X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
@@ -10,6 +10,7 @@ import { GiGuitar, GiGuitarHead } from "react-icons/gi";
 
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useLiveTuner } from "../hooks/useLiveTuner";
+import { PITCH_SEMITONES_MAX, PITCH_SEMITONES_MIN } from "../hooks/usePlaybackReducer";
 import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
 import { MicTroubleshooting } from "./MicTroubleshooting";
@@ -27,6 +28,10 @@ interface MediaControlsToolbarProps {
   hasMicControls: boolean;
   speedMultiplier: number;
   onSpeedMultiplierChange: (value: number) => void;
+  /** Only meaningful for real Guitar Pro file playback (AlphaTab's synth). */
+  hasPitchControl?: boolean;
+  pitchSemitones?: number;
+  onPitchChange?: (value: number) => void;
   isAudioMuted: boolean;
   isRiddleMode: boolean;
   onAudioToggle: () => void;
@@ -46,12 +51,91 @@ interface MediaControlsToolbarProps {
   showBackingInExam?: boolean;
 }
 
+function TuningForkIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {/* two prongs */}
+      <path d="M5 2 C5 2 5 7 5 8 C5 9.5 6.5 10.5 8 10.5 C9.5 10.5 11 9.5 11 8 C11 7 11 2 11 2" />
+      {/* stem */}
+      <line x1="8" y1="10.5" x2="8" y2="15" />
+    </svg>
+  );
+}
+
+/** Playback-only pitch (transpose) control for GP file audio — mirrors the ±N
+ *  semitone "pitchfork" stepper found in Guitar Pro / Ultimate Guitar. Clicking
+ *  the value resets it to 0; the up/down arrows step by a semitone. */
+function PitchControl({
+  pitchSemitones,
+  onPitchChange,
+  h,
+  compact = false,
+  className,
+}: {
+  pitchSemitones: number;
+  onPitchChange: (value: number) => void;
+  h: string;
+  compact?: boolean;
+  className?: string;
+}) {
+  const isShifted = pitchSemitones !== 0;
+  const label = pitchSemitones > 0 ? `+${pitchSemitones}` : `${pitchSemitones}`;
+  const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
+  const stepSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
+
+  return (
+    <div
+      className={cn(
+        "flex items-center rounded-lg transition-all",
+        h,
+        compact ? "gap-1.5 pl-2" : "gap-2 pl-3",
+        isShifted
+          ? "bg-white/15 text-white"
+          : "bg-zinc-800 text-zinc-300",
+        className
+      )}
+    >
+      <RippleButton
+        onClick={() => onPitchChange(0)}
+        title="Pitch — click to reset"
+        className="flex items-center gap-1.5 hover:text-white active:scale-95"
+      >
+        <TuningForkIcon className={cn("shrink-0", iconSize)} />
+        <span className={cn("w-6 font-mono font-bold text-center", compact ? "text-[10px]" : "text-sm")}>{label}</span>
+      </RippleButton>
+      <div className="flex flex-col">
+        <button
+          type="button"
+          onClick={() => onPitchChange(Math.min(PITCH_SEMITONES_MAX, pitchSemitones + 1))}
+          disabled={pitchSemitones >= PITCH_SEMITONES_MAX}
+          title="Pitch up a semitone"
+          className="flex items-center justify-center px-1.5 text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+        >
+          <ChevronUp className={stepSize} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onPitchChange(Math.max(PITCH_SEMITONES_MIN, pitchSemitones - 1))}
+          disabled={pitchSemitones <= PITCH_SEMITONES_MIN}
+          title="Pitch down a semitone"
+          className="flex items-center justify-center px-1.5 text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+        >
+          <ChevronDown className={stepSize} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   hasMetronome,
   hasAudioTrack,
   hasMicControls,
   speedMultiplier,
   onSpeedMultiplierChange,
+  hasPitchControl = false,
+  pitchSemitones = 0,
+  onPitchChange,
   isAudioMuted,
   isRiddleMode,
   onAudioToggle,
@@ -76,6 +160,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   // (e.g. scale exams, where hearing the reference scale is allowed).
   const showSpeed   = !examMode;
   const showBacking = !examMode || showBackingInExam;
+  const showPitch   = hasPitchControl && !examMode && !!onPitchChange;
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
@@ -128,6 +213,15 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               </RippleButton>
             )}
           </div>
+        )}
+
+        {showPitch && (
+          <PitchControl
+            pitchSemitones={pitchSemitones}
+            onPitchChange={onPitchChange!}
+            h="h-11"
+            className="w-full"
+          />
         )}
 
         {/* Tuning gets its own full-width row — tuning names ("Half-step
@@ -223,6 +317,15 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             onSpeedMultiplierChange={onSpeedMultiplierChange}
             baseBpm={baseBpm}
             isSlowed={isSlowed}
+            h="h-8"
+          />
+        )}
+
+        {showPitch && (
+          <PitchControl
+            compact
+            pitchSemitones={pitchSemitones}
+            onPitchChange={onPitchChange!}
             h="h-8"
           />
         )}
@@ -330,8 +433,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-      {/* ── PLAYBACK zone: speed + backing track + tuning ── */}
-      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
+      {/* ── PLAYBACK zone: speed + pitch + backing track + tuning ── */}
+      {((showSpeed && hasMetronome) || showPitch || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
         <div className="flex items-center gap-1.5">
           {showSpeed && hasMetronome && (
             <SpeedDropdown
@@ -339,6 +442,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               onSpeedMultiplierChange={onSpeedMultiplierChange}
               baseBpm={baseBpm}
               isSlowed={isSlowed}
+              h={h}
+            />
+          )}
+
+          {showPitch && (
+            <PitchControl
+              pitchSemitones={pitchSemitones}
+              onPitchChange={onPitchChange!}
               h={h}
             />
           )}
@@ -393,7 +504,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
       )}
 
       {/* ── Divider between playback and input zones ── */}
-      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack)) && hasMicControls && (
+      {((showSpeed && hasMetronome) || showPitch || (showBacking && hasAudioTrack)) && hasMicControls && (
         <div className="h-7 w-px bg-white/10 self-center" aria-hidden />
       )}
 
@@ -549,17 +660,6 @@ function SpeedDropdown({
         })}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function TuningForkIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {/* two prongs */}
-      <path d="M5 2 C5 2 5 7 5 8 C5 9.5 6.5 10.5 8 10.5 C9.5 10.5 11 9.5 11 8 C11 7 11 2 11 2" />
-      {/* stem */}
-      <line x1="8" y1="10.5" x2="8" y2="15" />
-    </svg>
   );
 }
 

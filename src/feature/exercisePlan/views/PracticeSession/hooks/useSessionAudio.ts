@@ -15,6 +15,8 @@ interface UseSessionAudioOptions {
   isAudioMuted:            boolean;
   isAudioPlaying:          boolean;
   effectiveBpm:            number;
+  /** Playback-only pitch shift (semitones) applied to GP file audio — does not affect notation. */
+  pitchSemitones:          number;
   currentExerciseId:       string;
   selectedGpTrackIdx:      number;
   tabRepeatCount:          number;
@@ -42,7 +44,7 @@ interface UseSessionAudioOptions {
 
 export function useSessionAudio({
   activeTablature, dynamicBackingTracks, effectiveRawGpFile,
-  isAudioMuted, isAudioPlaying, effectiveBpm,
+  isAudioMuted, isAudioPlaying, effectiveBpm, pitchSemitones,
   currentExerciseId, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
   isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
@@ -118,6 +120,7 @@ export function useSessionAudio({
   useAlphaTabPlayer({
     rawGpFile:  effectiveRawGpFile ?? null,
     bpm:        effectiveBpm,
+    pitchSemitones,
     isPlaying:  !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
     startTime:  metronomeStartTime,
     onLoopComplete: () => { setHasPlayedRiddleOnce(true); },

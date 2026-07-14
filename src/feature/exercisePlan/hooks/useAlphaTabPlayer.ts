@@ -16,6 +16,8 @@ interface UseAlphaTabPlayerProps {
   rawGpFile: File | null;
   /** User-set BPM (from metronome). AlphaTab playbackSpeed = bpm / originalBpm */
   bpm: number;
+  /** Playback-only pitch shift in semitones (audio only — does not affect notation). */
+  pitchSemitones?: number;
   /** True only when audio should play (after count-in) */
   isPlaying: boolean;
   /** startTime changes on each new play session — used only to detect count-in end; not a restart signal */
@@ -64,6 +66,7 @@ interface AlphaTabPlayerHandle {
 export const useAlphaTabPlayer = ({
   rawGpFile,
   bpm,
+  pitchSemitones = 0,
   isPlaying,
   startTime,
   onLoopComplete,
@@ -84,6 +87,7 @@ export const useAlphaTabPlayer = ({
   const currentFileRef     = useRef<File | null>(null);
   const isPlayingRef       = useRef(isPlaying);
   const bpmRef             = useRef(bpm);
+  const pitchRef           = useRef(pitchSemitones);
   const onLoopCompleteRef       = useRef(onLoopComplete);
   const onLoopRestartRef        = useRef(onLoopRestart);
   const onAudioContextReadyRef  = useRef(onAudioContextReady);
@@ -96,6 +100,7 @@ export const useAlphaTabPlayer = ({
 
   useEffect(() => { isPlayingRef.current             = isPlaying;            }, [isPlaying]);
   useEffect(() => { bpmRef.current                   = bpm;                  }, [bpm]);
+  useEffect(() => { pitchRef.current                 = pitchSemitones;       }, [pitchSemitones]);
   useEffect(() => { onLoopCompleteRef.current        = onLoopComplete;       }, [onLoopComplete]);
   useEffect(() => { onLoopRestartRef.current         = onLoopRestart;        }, [onLoopRestart]);
   useEffect(() => { onAudioContextReadyRef.current   = onAudioContextReady;  }, [onAudioContextReady]);
@@ -151,6 +156,9 @@ export const useAlphaTabPlayer = ({
     api.scoreLoaded.on((score: any) => {
       scoreRef.current = score;
       if (score?.tempo > 0) originalBpmRef.current = score.tempo;
+      // Re-apply any pitch shift set before this (re)load — e.g. reopening an
+      // exercise that persisted a non-zero pitch from a previous session.
+      if (score?.tracks && pitchRef.current) api.changeTrackTranspositionPitch(score.tracks, pitchRef.current);
     });
 
     api.playerReady.on(() => {
@@ -233,6 +241,14 @@ export const useAlphaTabPlayer = ({
     const api = apiRef.current;
     if (api) api.metronomeVolume = metronomeVolume;
   }, [metronomeVolume]);
+
+  // Playback-only pitch shift — changeTrackTranspositionPitch only affects the
+  // synthesized audio, never the rendered notation/tab (unlike settings.notation.transpositionPitches).
+  useEffect(() => {
+    const api   = apiRef.current;
+    const score = scoreRef.current;
+    if (api && score?.tracks) api.changeTrackTranspositionPitch(score.tracks, pitchSemitones);
+  }, [pitchSemitones]);
 
   // Playback control — pause/resume without losing position.
   //

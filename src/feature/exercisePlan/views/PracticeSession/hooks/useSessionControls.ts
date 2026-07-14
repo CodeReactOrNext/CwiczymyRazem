@@ -36,6 +36,7 @@ interface UseSessionControlsOptions {
   setIsAudioMuted:        Dispatch<SetStateAction<boolean>>;
   speedMultiplier:        number;
   setSpeedMultiplier:     (payload: number | ((prev: number) => number)) => void;
+  setPitchSemitones:      (payload: number | ((prev: number) => number)) => void;
   setEarTrainingScore:    Dispatch<SetStateAction<number>>;
   setIsRiddleGuessed:     (v: boolean) => void;
   handleRevealRiddle:     () => void;
@@ -51,7 +52,7 @@ export function useSessionControls({
   currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
   handleNextExercise, restartFullSession,
   isMicEnabled, closeAudio, updateMicPersistence,
-  isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
+  isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier, setPitchSemitones,
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
   tabRestartKey, setTabRestartKey,
@@ -108,6 +109,12 @@ export function useSessionControls({
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metronome, currentExercise]);
+
+  // Pitch shift is a live audio-only transpose (no re-render/restart needed —
+  // unlike speed, it doesn't touch the playback clock or cursor position).
+  const handlePitchChange = useCallback((value: number) => {
+    setPitchSemitones(value);
+  }, [setPitchSemitones]);
 
   const handleNextExerciseClick = useCallback(async () => {
     stopTimer(); metronome.restartMetronome();
@@ -170,12 +177,12 @@ export function useSessionControls({
 
   return useMemo(() => ({
     tabRestartKey, isPlayingRef,
-    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange, handlePitchChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleRepeatCountChange, handleNoteMatchingReset,
   }), [
     tabRestartKey, isPlayingRef,
-    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange, handlePitchChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleRepeatCountChange, handleNoteMatchingReset,
   ]);

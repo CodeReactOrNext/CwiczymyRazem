@@ -23,6 +23,8 @@ export interface AlphaTabScoreViewerProps {
   bpm: number;
   /** 0 = muted, 1 = full. Mirrors session's audio mute toggle */
   volume?: number;
+  /** Playback-only pitch shift in semitones — audio only, never affects the rendered notation. */
+  pitchSemitones?: number;
   /** Drives AlphaTab's own built-in metronome click — kept as the single metronome
    *  source while notation is shown (the session's separate device-metronome click is
    *  muted for this view), so the click can never drift from the notation playback. */

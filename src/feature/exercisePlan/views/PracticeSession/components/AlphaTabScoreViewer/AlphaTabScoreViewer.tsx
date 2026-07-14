@@ -23,6 +23,7 @@ export const AlphaTabScoreViewer = ({
   startTime,
   bpm,
   volume = 1,
+  pitchSemitones = 0,
   isMetronomeMuted = false,
   className,
   hitNotes,
@@ -33,11 +34,13 @@ export const AlphaTabScoreViewer = ({
   const origBpmRef         = useRef(120);
   const bpmRef             = useRef(bpm);
   const volumeRef          = useRef(volume);
+  const pitchRef           = useRef(pitchSemitones);
   // Guards api.stop() — AlphaSynth throws if stopped before it has ever played.
   const hasStartedRef      = useRef(false);
 
   useEffect(() => { bpmRef.current = bpm; },             [bpm]);
   useEffect(() => { volumeRef.current = volume; },       [volume]);
+  useEffect(() => { pitchRef.current = pitchSemitones; }, [pitchSemitones]);
 
   const [isLooping,  setIsLooping]  = useState(false);
 
@@ -60,6 +63,7 @@ export const AlphaTabScoreViewer = ({
     volumeRef,
     bpmRef,
     origBpmRef,
+    pitchRef,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.
@@ -106,6 +110,13 @@ export const AlphaTabScoreViewer = ({
   useEffect(() => {
     if (apiRef.current && uiReady) apiRef.current.masterVolume = volume;
   }, [volume, uiReady]);
+
+  // ── Pitch: playback-only transpose, applied to every track (never touches notation) ──
+  useEffect(() => {
+    const api   = apiRef.current;
+    const score = api?.score;
+    if (api && uiReady && score?.tracks) api.changeTrackTranspositionPitch(score.tracks, pitchSemitones);
+  }, [pitchSemitones, uiReady]);
 
   // ── Metronome: AlphaTab's own built-in click, driven by the session's mute
   // toggle — the single metronome source while notation is shown (see

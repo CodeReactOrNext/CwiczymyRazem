@@ -30,6 +30,8 @@ interface ExerciseContentAreaProps {
   startTime: number | null;
   effectiveBpm: number;
   isAudioMuted: boolean;
+  /** Playback-only pitch shift (semitones) — audio only, never affects notation. */
+  pitchSemitones?: number;
   isMetronomeMuted: boolean;
 
   // Tablature
@@ -87,6 +89,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   startTime,
   effectiveBpm,
   isAudioMuted,
+  pitchSemitones = 0,
   isMetronomeMuted,
   isMetronomePlaying,
   countInRemaining,
@@ -201,6 +204,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           startTime={startTime}
           effectiveBpm={effectiveBpm}
           isAudioMuted={isAudioMuted}
+          pitchSemitones={pitchSemitones}
           isMetronomeMuted={isMetronomeMuted}
           isMetronomePlaying={isMetronomePlaying}
           countInRemaining={countInRemaining}

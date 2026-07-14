@@ -6,6 +6,7 @@ export interface PracticeSessionSettings {
   isMetronomeMuted?: boolean;
   metronomeBpm?: number;
   speedMultiplier?: number;
+  pitchSemitones?: number;
   isMicEnabled?: boolean;
 }
 

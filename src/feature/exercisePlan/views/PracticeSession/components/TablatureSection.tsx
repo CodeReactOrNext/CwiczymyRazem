@@ -44,6 +44,8 @@ interface TablatureSectionProps {
   startTime: number | null;
   effectiveBpm: number;
   isAudioMuted: boolean;
+  /** Playback-only pitch shift (semitones) — audio only, never affects notation. */
+  pitchSemitones?: number;
   isMetronomeMuted: boolean;
   isMetronomePlaying: boolean;
   countInRemaining: number;
@@ -70,6 +72,7 @@ export const TablatureSection = memo(function TablatureSection({
   startTime,
   effectiveBpm,
   isAudioMuted,
+  pitchSemitones = 0,
   isMetronomeMuted,
   isMetronomePlaying,
   countInRemaining,
@@ -232,6 +235,7 @@ export const TablatureSection = memo(function TablatureSection({
             startTime={startTime}
             bpm={effectiveBpm}
             volume={isAudioMuted ? 0 : 1}
+            pitchSemitones={pitchSemitones}
             isMetronomeMuted={isMetronomeMuted}
             className="w-full"
             hitNotes={hitNotes}

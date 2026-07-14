@@ -37,6 +37,9 @@ interface LandscapeSessionModalProps {
   setIsMetronomeMuted: (v: boolean) => void;
   speedMultiplier?: number;
   onSpeedMultiplierChange?: (value: number) => void;
+  hasGpFile?: boolean;
+  pitchSemitones?: number;
+  onPitchChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
@@ -85,6 +88,9 @@ export function LandscapeSessionModal({
   setIsMetronomeMuted,
   speedMultiplier,
   onSpeedMultiplierChange,
+  hasGpFile,
+  pitchSemitones,
+  onPitchChange,
   activeTablature,
   isRiddleRevealed,
   isRiddleGuessed,
@@ -225,6 +231,8 @@ export function LandscapeSessionModal({
                         hasMicControls={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic}
                         speedMultiplier={speedMultiplier ?? 1}
                         onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
+                        hasPitchControl={hasGpFile} pitchSemitones={pitchSemitones ?? 0}
+                        onPitchChange={onPitchChange}
                         isAudioMuted={isAudioMuted}
                         isRiddleMode={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
                         onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}

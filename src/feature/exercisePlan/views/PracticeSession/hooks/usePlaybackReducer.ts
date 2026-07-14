@@ -4,6 +4,8 @@ export type PlaybackState = {
   isAudioMuted: boolean;
   isMetronomeMuted: boolean;
   speedMultiplier: number;
+  /** Playback-only pitch shift (semitones) for GP file audio — does not affect notation. */
+  pitchSemitones: number;
   showAlphaTabScore: boolean;
   /** Rocksmith-style 3D note highway. Mutually exclusive with showAlphaTabScore. */
   show3dHighway: boolean;
@@ -14,6 +16,7 @@ type PlaybackAction =
   | { type: 'SET_AUDIO_MUTED'; payload: boolean | ((prev: boolean) => boolean) }
   | { type: 'SET_METRONOME_MUTED'; payload: boolean | ((prev: boolean) => boolean) }
   | { type: 'SET_SPEED_MULTIPLIER'; payload: number | ((prev: number) => number) }
+  | { type: 'SET_PITCH_SEMITONES'; payload: number | ((prev: number) => number) }
   | { type: 'SET_SHOW_ALPHATAB_SCORE'; payload: boolean | ((prev: boolean) => boolean) }
   | { type: 'TOGGLE_ALPHATAB_SCORE' }
   | { type: 'SET_SHOW_3D_HIGHWAY'; payload: boolean | ((prev: boolean) => boolean) }
@@ -25,10 +28,16 @@ const initialState: PlaybackState = {
   isAudioMuted: true,
   isMetronomeMuted: false,
   speedMultiplier: 1,
+  pitchSemitones: 0,
   showAlphaTabScore: false,
   show3dHighway: false,
   selectedGpTrackIdx: 0,
 };
+
+/** Matches the ±12 semitone (one octave) range exposed by the pitch control UI. */
+export const PITCH_SEMITONES_MIN = -12;
+export const PITCH_SEMITONES_MAX = 12;
+const clampPitch = (v: number) => Math.min(PITCH_SEMITONES_MAX, Math.max(PITCH_SEMITONES_MIN, v));
 
 function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
   switch (action.type) {
@@ -38,6 +47,10 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
       return { ...state, isMetronomeMuted: typeof action.payload === 'function' ? action.payload(state.isMetronomeMuted) : action.payload };
     case 'SET_SPEED_MULTIPLIER':
       return { ...state, speedMultiplier: typeof action.payload === 'function' ? action.payload(state.speedMultiplier) : action.payload };
+    case 'SET_PITCH_SEMITONES': {
+      const next = typeof action.payload === 'function' ? action.payload(state.pitchSemitones) : action.payload;
+      return { ...state, pitchSemitones: clampPitch(next) };
+    }
     case 'SET_SHOW_ALPHATAB_SCORE': {
       const next = typeof action.payload === 'function' ? action.payload(state.showAlphaTabScore) : action.payload;
       return { ...state, showAlphaTabScore: next, show3dHighway: next ? false : state.show3dHighway };
@@ -66,6 +79,7 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
         ...state,
         isMetronomeMuted: false,
         speedMultiplier: 1,
+        pitchSemitones: 0,
         selectedGpTrackIdx: 0,
         ...action.payload,
       };
@@ -80,6 +94,7 @@ export function usePlaybackReducer() {
   const setIsAudioMuted = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_AUDIO_MUTED', payload }), []);
   const setIsMetronomeMuted = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_METRONOME_MUTED', payload }), []);
   const setSpeedMultiplier = useCallback((payload: number | ((prev: number) => number)) => dispatch({ type: 'SET_SPEED_MULTIPLIER', payload }), []);
+  const setPitchSemitones = useCallback((payload: number | ((prev: number) => number)) => dispatch({ type: 'SET_PITCH_SEMITONES', payload }), []);
   const setShowAlphaTabScore = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_SHOW_ALPHATAB_SCORE', payload }), []);
   const toggleAlphaTabScore = useCallback(() => dispatch({ type: 'TOGGLE_ALPHATAB_SCORE' }), []);
   const setShow3dHighway = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_SHOW_3D_HIGHWAY', payload }), []);
@@ -93,6 +108,7 @@ export function usePlaybackReducer() {
     setIsAudioMuted,
     setIsMetronomeMuted,
     setSpeedMultiplier,
+    setPitchSemitones,
     setShowAlphaTabScore,
     toggleAlphaTabScore,
     setShow3dHighway,
