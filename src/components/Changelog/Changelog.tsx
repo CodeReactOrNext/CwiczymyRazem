@@ -266,54 +266,63 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
           const unread = isEntryUnread(entry.date, lastViewedDate);
 
           return (
-            <div key={entry.date} className='rounded-lg bg-zinc-900/40 p-5'>
-              <div className='mb-4 flex items-center gap-2'>
-                {unread && (
-                  <span
-                    className='h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-400'
-                    aria-hidden
-                  />
-                )}
+            <div
+              key={entry.date}
+              className={cn(
+                "rounded-lg bg-zinc-900/40 p-5 sm:p-6",
+                unread && "bg-cyan-500/5 ring-1 ring-cyan-500/15",
+              )}>
+              <div className='mb-5 flex items-center gap-2.5'>
                 <p
                   className={cn(
                     "font-display text-sm font-semibold tabular-nums tracking-wide",
-                    unread ? "text-cyan-400" : "text-zinc-500",
+                    unread ? "text-cyan-400" : "text-zinc-400",
                   )}>
                   {entry.date}
                 </p>
+                {unread && (
+                  <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[11px] font-medium text-cyan-400'>
+                    New
+                  </span>
+                )}
               </div>
-              <div className='space-y-4'>
+              <div className='space-y-6'>
                 {entry.groups.map((group, groupIdx) => {
                   const CategoryIcon = getCategoryIcon(group.category);
 
                   return (
                     <div key={groupIdx}>
                       {group.category && (
-                        <p className='mb-1.5 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-300'>
-                          <CategoryIcon
-                            className='h-3.5 w-3.5 flex-shrink-0 text-zinc-500'
-                            aria-hidden
-                          />
-                          {group.category}
-                        </p>
+                        <div className='mb-2.5 flex items-center gap-3'>
+                          <span className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded bg-zinc-800/60'>
+                            <CategoryIcon
+                              className='h-3.5 w-3.5 text-zinc-400'
+                              aria-hidden
+                            />
+                          </span>
+                          <p className='text-sm font-semibold text-zinc-100'>
+                            {group.category}
+                          </p>
+                        </div>
                       )}
-                      <ul className='space-y-1.5'>
+                      <ul className={cn("space-y-2", group.category && "pl-9")}>
                         {group.items.map((item, itemIdx) => {
                           const isBug = isBugFixItem(item);
 
                           return (
                             <li
                               key={itemIdx}
-                              className='flex items-start gap-2 text-sm leading-relaxed text-zinc-300'>
+                              className='flex items-start gap-2.5 text-sm leading-relaxed text-zinc-300'>
                               {isBug ? (
                                 <Bug
-                                  className='mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
+                                  className='mt-1 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
                                   aria-label='Bug fix'
                                 />
                               ) : (
-                                <span className='mt-0.5 flex-shrink-0 text-zinc-600'>
-                                  •
-                                </span>
+                                <span
+                                  className='mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-600'
+                                  aria-hidden
+                                />
                               )}
                               <span>{item}</span>
                             </li>
