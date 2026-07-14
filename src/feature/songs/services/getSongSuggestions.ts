@@ -12,6 +12,27 @@ export type SongSuggestion = Pick<
 >;
 
 const MAX_SUGGESTIONS = 6;
+// When searching by artist, many docs can share the same artist — fetch a
+// wider window so deduping still leaves us with MAX_SUGGESTIONS distinct
+// artists instead of collapsing down to just one or two.
+const ARTIST_SCAN_LIMIT = 30;
+
+// Keeps only the first song per distinct artist (results are already
+// ordered by artist_lowercase, so same-artist docs are contiguous).
+const dedupeByArtist = (suggestions: SongSuggestion[]): SongSuggestion[] => {
+  const seen = new Set<string>();
+  const deduped: SongSuggestion[] = [];
+
+  for (const suggestion of suggestions) {
+    const key = suggestion.artist.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(suggestion);
+    if (deduped.length >= MAX_SUGGESTIONS) break;
+  }
+
+  return deduped;
+};
 
 export const getSongSuggestions = async (
   field: SongSuggestionField,
@@ -31,11 +52,11 @@ export const getSongSuggestions = async (
     where(fieldName, ">=", value),
     where(fieldName, "<=", value + ""),
     orderBy(fieldName, "asc"),
-    limit(MAX_SUGGESTIONS),
+    limit(field === "artist" ? ARTIST_SCAN_LIMIT : MAX_SUGGESTIONS),
   );
 
   const snapshot = await trackedGetDocs(q);
-  const suggestions = snapshot.docs.map((doc) => {
+  const mapped = snapshot.docs.map((doc) => {
     const data = doc.data() as Song;
     return {
       id: doc.id,
@@ -45,6 +66,9 @@ export const getSongSuggestions = async (
       tier: data.tier,
     };
   });
+
+  const suggestions =
+    field === "artist" ? dedupeByArtist(mapped) : mapped.slice(0, MAX_SUGGESTIONS);
 
   memoryCache.set(cacheKey, suggestions, 5 * 60 * 1000);
   return suggestions;

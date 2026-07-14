@@ -144,18 +144,20 @@ export const SongSearchAutocomplete = ({
                   </div>
                 )}
                 <div className='min-w-0 flex-1'>
-                  <p className='truncate text-sm font-semibold text-zinc-100'>
-                    {highlightMatch(
-                      suggestion.title,
-                      field === "title" ? value : "",
-                    )}
-                  </p>
-                  <p className='truncate text-xs text-zinc-400'>
-                    {highlightMatch(
-                      suggestion.artist,
-                      field === "artist" ? value : "",
-                    )}
-                  </p>
+                  {field === "artist" ? (
+                    <p className='truncate text-sm font-semibold text-zinc-100'>
+                      {highlightMatch(suggestion.artist, value)}
+                    </p>
+                  ) : (
+                    <>
+                      <p className='truncate text-sm font-semibold text-zinc-100'>
+                        {highlightMatch(suggestion.title, value)}
+                      </p>
+                      <p className='truncate text-xs text-zinc-400'>
+                        {suggestion.artist}
+                      </p>
+                    </>
+                  )}
                 </div>
               </button>
             ))
