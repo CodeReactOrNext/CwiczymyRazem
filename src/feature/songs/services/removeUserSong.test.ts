@@ -6,8 +6,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn(() => ({})),
   getDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
+  updateDoc: vi.fn(() => Promise.resolve()),
+  deleteDoc: vi.fn(() => Promise.resolve()),
   arrayRemove: vi.fn(),
   increment: vi.fn((n: number) => ({ __increment: n })),
 }));
