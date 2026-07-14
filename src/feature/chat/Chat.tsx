@@ -84,9 +84,9 @@ const Chat = () => {
 
                     <div
                       className={cn(
-                        "flex items-center gap-1",
+                        "flex items-center gap-1.5",
                         isMe && "flex-row-reverse",
-                        likes.length > 0 && "mb-2.5"
+                        likes.length > 0 && "mb-4"
                       )}>
                       <div className='relative'>
                         <Card
@@ -104,27 +104,27 @@ const Chat = () => {
                             aria-label={t("like")}
                             onClick={() => msg.id && toggleLike(msg.id)}
                             className={cn(
-                              "absolute -bottom-2.5 flex items-center gap-1 rounded-full bg-zinc-800 px-1.5 py-0.5 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700",
-                              isMe ? "left-1" : "right-1"
+                              "absolute -bottom-3.5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-background active:click-behavior",
+                              hasLiked
+                                ? "bg-red-500/20 text-red-300 hover:bg-red-500/30"
+                                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
+                              isMe ? "left-2" : "right-2"
                             )}>
-                            <Heart className='h-3 w-3 fill-red-500 text-red-500' />
-                            {likes.length > 1 && <span>{likes.length}</span>}
+                            <Heart className='h-4 w-4 fill-red-500 text-red-500' />
+                            <span className='leading-none'>{likes.length}</span>
                           </button>
                         )}
                       </div>
 
-                      <button
-                        type='button'
-                        aria-label={t("like")}
-                        onClick={() => msg.id && toggleLike(msg.id)}
-                        className={cn(
-                          "rounded-full p-1.5 text-zinc-500 opacity-0 transition-opacity hover:bg-white/5 hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100",
-                          hasLiked && "text-red-500 hover:text-red-400"
-                        )}>
-                        <Heart
-                          className={cn("h-3.5 w-3.5", hasLiked && "fill-current")}
-                        />
-                      </button>
+                      {likes.length === 0 && (
+                        <button
+                          type='button'
+                          aria-label={t("like")}
+                          onClick={() => msg.id && toggleLike(msg.id)}
+                          className='rounded-full p-2 text-zinc-500 opacity-0 transition-opacity hover:bg-white/5 hover:text-red-400 focus-visible:opacity-100 active:click-behavior group-hover:opacity-100'>
+                          <Heart className='h-5 w-5' />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

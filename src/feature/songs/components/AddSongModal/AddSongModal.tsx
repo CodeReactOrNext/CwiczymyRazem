@@ -1,8 +1,6 @@
-import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
@@ -22,7 +20,7 @@ import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
-import { ArrowRight, Check, Loader2, Music, Search, SkipForward } from "lucide-react";
+import { ArrowRight, Loader2, Music, Plus, Search, SkipForward } from "lucide-react";
 import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -47,6 +45,65 @@ const STATUS_LABELS: Record<string, string> = {
   learned: "Learned",
 };
 
+interface SongResultRowProps {
+  title: string;
+  subtitle: string;
+  action: React.ReactNode;
+  onClick: () => void;
+  coverUrl?: string;
+  badge?: string;
+  isActive?: boolean;
+  disabled?: boolean;
+}
+
+/** Every row in the results box is a one-click add — same shape for library, search and manual. */
+const SongResultRow = ({
+  title,
+  subtitle,
+  action,
+  onClick,
+  coverUrl,
+  badge,
+  isActive,
+  disabled,
+}: SongResultRowProps) => (
+  <button
+    type='button'
+    disabled={disabled}
+    onClick={onClick}
+    className={cn(
+      "transition-background group flex w-full items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5",
+      isActive ? "bg-cyan-500/10" : "hover:bg-cyan-500/10",
+      disabled && !isActive && "opacity-50"
+    )}>
+    {coverUrl ? (
+      <img src={coverUrl} alt='' className='h-11 w-11 shrink-0 rounded-lg object-cover' />
+    ) : (
+      <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500'>
+        <Music className='h-4 w-4' />
+      </div>
+    )}
+    <div className='min-w-0 flex-1 text-left'>
+      <div className='flex items-center gap-2'>
+        <span
+          className={cn(
+            "truncate font-bold transition-colors",
+            isActive ? "text-cyan-400" : "text-white group-hover:text-cyan-400"
+          )}>
+          {title}
+        </span>
+        {badge && (
+          <span className='shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400'>
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className='truncate text-xs text-zinc-500'>{subtitle}</div>
+    </div>
+    {action}
+  </button>
+);
+
 const AddSongModal = ({
   isOpen,
   onClose,
@@ -62,12 +119,12 @@ const AddSongModal = ({
   const [isSearching, setIsSearching] = useState(false);
   const [addedSongId, setAddedSongId] = useState<string | null>(null);
   const [addedSongSpotifyId, setAddedSongSpotifyId] = useState<string | null>(null);
-  const [currentMatch, setCurrentMatch] = useState<Song | null>(null);
   const [importedTab, setImportedTab] = useState<TablatureMeasure[] | null>(null);
   const [wasOpen, setWasOpen] = useState(isOpen);
   const [spotifySuggestions, setSpotifySuggestions] = useState<SpotifySongSuggestion[]>([]);
   const [isSpotifySearching, setIsSpotifySearching] = useState(false);
-  const [selectedSpotify, setSelectedSpotify] = useState<SpotifySongSuggestion | null>(null);
+  // The result row the user just clicked — drives the spinner on that row while it's added.
+  const [pendingSuggestionId, setPendingSuggestionId] = useState<string | null>(null);
 
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -90,16 +147,7 @@ const AddSongModal = ({
       ]);
 
       if (libraryResult.status === "fulfilled") {
-        const { songs } = libraryResult.value;
-        setMatches(songs);
-
-        // Try to find a high-quality match with spotifyId to show player
-        const bestMatch = songs.find((s: Song) =>
-          s.spotifyId &&
-          s.title.toLowerCase() === t.toLowerCase() &&
-          s.artist.toLowerCase() === a.toLowerCase()
-        );
-        setCurrentMatch(bestMatch || null);
+        setMatches(libraryResult.value.songs);
       } else {
         console.error("Error searching for matches:", libraryResult.reason);
       }
@@ -123,8 +171,8 @@ const AddSongModal = ({
     }
   }, [title, artist, searchSongs]);
 
-  // Suggestions that are already in the library are shown (and actionable) in the
-  // library matches list above, so drop them here to avoid duplicate/confusing entries.
+  // Suggestions that are already in the library are listed (and actionable) as library
+  // rows at the top of the box, so drop them here to avoid duplicate/confusing entries.
   const librarySignatures = useMemo(
     () => new Set(matches.map((m) => `${m.title.toLowerCase()}|${m.artist.toLowerCase()}`)),
     [matches]
@@ -137,7 +185,10 @@ const AddSongModal = ({
     [spotifySuggestions, librarySignatures]
   );
 
-  const previewTrackId = selectedSpotify?.spotifyId || currentMatch?.spotifyId;
+  const hasQuery = artist.trim().length >= 2 || title.trim().length >= 2;
+  const isBusySearching = hasQuery && (isSearching || isSpotifySearching);
+  const canAddManually =
+    hasQuery && !isBusySearching && !!artist.trim() && !!title.trim();
 
   // Carries over whatever the user already searched for on the songs page,
   // so they don't have to retype it inside the modal. Adjusted during render
@@ -157,7 +208,7 @@ const AddSongModal = ({
     setArtist("");
     setMatches([]);
     setSpotifySuggestions([]);
-    setSelectedSpotify(null);
+    setPendingSuggestionId(null);
     setAddedSongId(null);
     setAddedSongSpotifyId(null);
   };
@@ -167,47 +218,53 @@ const AddSongModal = ({
     onClose();
   };
 
-  const handleSubmitInfo = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitSong = async (
+    songTitle: string,
+    songArtist: string,
+    suggestion: SpotifySongSuggestion | null
+  ) => {
     if (!userId) {
       toast.error(t("must_be_logged_in"));
       return;
     }
 
-    if (!title.trim() || !artist.trim()) {
+    if (!songTitle || !songArtist) {
       toast.error(t("all_fields_required"));
       return;
     }
 
     try {
       setIsLoading(true);
+      setPendingSuggestionId(suggestion?.spotifyId ?? null);
       posthog.capture("song_addition_flow", {
-        action: "submit_info",
-        title: title.trim(),
-        artist: artist.trim(),
+        action: suggestion ? "select_search_result" : "submit_info",
+        title: songTitle,
+        artist: songArtist,
         has_tab: !!importedTab,
-        from_spotify_suggestion: !!selectedSpotify,
+        from_spotify_suggestion: !!suggestion,
       });
       const songId = await addSong(
-        title.trim(),
-        artist.trim(),
+        songTitle,
+        songArtist,
         userId,
         avatar,
         undefined,
         importedTab || undefined,
-        selectedSpotify
-          ? { coverUrl: selectedSpotify.coverUrl, spotifyId: selectedSpotify.spotifyId }
+        suggestion
+          ? { coverUrl: suggestion.coverUrl, spotifyId: suggestion.spotifyId }
           : undefined
       );
 
       // Trigger enrichment in the background (no await) — fills in genres, and
-      // covers the case where the song wasn't picked from a Spotify suggestion.
-      enrichSong(songId, artist.trim(), title.trim()).catch((err) => {
+      // covers the case where the song wasn't picked from a search result.
+      enrichSong(songId, songArtist, songTitle).catch((err) => {
         console.error("Background enrichment failed:", err);
       });
 
+      setTitle(songTitle);
+      setArtist(songArtist);
       setAddedSongId(songId);
-      setAddedSongSpotifyId(selectedSpotify?.spotifyId || null);
+      setAddedSongSpotifyId(suggestion?.spotifyId || null);
       setStep("category");
     } catch (error) {
       if (error instanceof Error && error.message === "song_already_exists") {
@@ -217,7 +274,13 @@ const AddSongModal = ({
       }
     } finally {
       setIsLoading(false);
+      setPendingSuggestionId(null);
     }
+  };
+
+  const handleSubmitInfo = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitSong(title.trim(), artist.trim(), null);
   };
 
   const handleSelectMatch = (song: Song) => {
@@ -227,13 +290,6 @@ const AddSongModal = ({
     setTitle(song.title);
     setArtist(song.artist);
     setStep("category");
-  };
-
-  const handleSelectSpotify = (song: SpotifySongSuggestion) => {
-    posthog.capture("song_addition_flow", { action: "select_spotify_suggestion", spotify_id: song.spotifyId });
-    setTitle(song.title);
-    setArtist(song.artist);
-    setSelectedSpotify(song);
   };
 
   const handleSelectCategory = async (status: SongStatus | "skip") => {
@@ -287,10 +343,7 @@ const AddSongModal = ({
                   <Input
                     id='artist'
                     value={artist}
-                    onChange={(e) => {
-                      setArtist(e.target.value);
-                      setSelectedSpotify(null);
-                    }}
+                    onChange={(e) => setArtist(e.target.value)}
                     required
                     placeholder="e.g. Led Zeppelin"
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
@@ -301,10 +354,7 @@ const AddSongModal = ({
                   <Input
                     id='title'
                     value={title}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                      setSelectedSpotify(null);
-                    }}
+                    onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder="e.g. Stairway to Heaven"
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
@@ -312,150 +362,98 @@ const AddSongModal = ({
                 </div>
               </div>
 
-              {previewTrackId && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label className="text-xs font-bold tracking-wide text-cyan-500 ml-1">
-                    Spotify preview
-                  </Label>
-                  <SpotifyPlayer trackId={previewTrackId} height={80} />
-                </div>
-              )}
-
-              {/* Library dedup check */}
-              {matches.length > 0 && (
-                <div className="space-y-2">
-                  <span className="ml-1 flex items-center gap-2 text-xs font-bold tracking-wide text-zinc-500">
-                    <Check className="h-3 w-3" />
-                    Already in your library
-                  </span>
-
-                  <div className="space-y-1">
-                    {matches.map((song) => (
-                      <button
-                        key={song.id}
-                        type="button"
-                        onClick={() => handleSelectMatch(song)}
-                        className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-zinc-900/60 hover:bg-cyan-500/10 transition-background group"
-                      >
-                        {song.coverUrl ? (
-                          <img
-                            src={song.coverUrl}
-                            alt=""
-                            className="h-11 w-11 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
-                            <Music className="h-4 w-4" />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className="truncate font-bold text-white group-hover:text-cyan-400 transition-colors">{song.title}</div>
-                          <div className="truncate text-xs text-zinc-500">{song.artist}</div>
-                        </div>
-                        <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Spotify suggestions — pick one to add with verified cover art right away */}
+              {/* One results box of a fixed height, always rendered: library matches,
+                  then search results, then the "add as typed" row. Its contents swap
+                  in place so the modal never grows or shrinks while typing. */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between ml-1">
-                  <span className="text-xs font-bold tracking-wide text-zinc-500 flex items-center gap-2">
-                    {isSpotifySearching ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Search className="h-3 w-3" />
-                    )}
-                    {newSpotifySuggestions.length > 0
-                      ? "Suggestions from Spotify"
-                      : isSpotifySearching
-                        ? "Searching Spotify..."
-                        : "Spotify check"}
-                  </span>
-                </div>
+                <span className="ml-1 flex h-4 items-center gap-2 text-xs font-bold tracking-wide text-zinc-500">
+                  {isBusySearching ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Search className="h-3 w-3" />
+                  )}
+                  {isBusySearching ? "Searching..." : "Search results"}
+                </span>
 
-                <div className="space-y-1 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                  {newSpotifySuggestions.map((song) => {
-                    const isSelected = selectedSpotify?.spotifyId === song.spotifyId;
-                    return (
-                      <button
-                        key={song.spotifyId}
-                        type="button"
-                        onClick={() => handleSelectSpotify(song)}
-                        className={cn(
-                          "w-full flex items-center gap-3 p-2.5 rounded-lg transition-background group",
-                          isSelected ? "bg-cyan-500/10" : "bg-zinc-900/60 hover:bg-zinc-900"
-                        )}
+                <div className="custom-scrollbar h-64 space-y-1 overflow-y-auto pr-2">
+                  {!hasQuery ? (
+                    <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium text-zinc-500">
+                      Type an artist and a title to search
+                    </div>
+                  ) : isBusySearching ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex animate-pulse items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5"
                       >
-                        {song.coverUrl ? (
-                          <img
-                            src={song.coverUrl}
-                            alt=""
-                            className="h-11 w-11 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
-                            <Music className="h-4 w-4" />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className={cn("truncate font-bold transition-colors", isSelected ? "text-cyan-400" : "text-white group-hover:text-cyan-400")}>
-                            {song.title}
-                          </div>
-                          <div className="truncate text-xs text-zinc-500">
-                            {song.artist}
-                            {song.year ? ` · ${song.year}` : ""}
-                          </div>
+                        <div className="h-11 w-11 shrink-0 rounded-lg bg-zinc-800" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3.5 w-2/5 rounded bg-zinc-800" />
+                          <div className="h-2.5 w-1/4 rounded bg-zinc-800" />
                         </div>
-                        {isSelected ? (
-                          <Check className="h-4 w-4 shrink-0 text-cyan-400" />
-                        ) : (
-                          <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
-                        )}
-                      </button>
-                    );
-                  })}
-
-                  {!isSpotifySearching &&
-                    !isSearching &&
-                    matches.length === 0 &&
-                    newSpotifySuggestions.length === 0 &&
-                    artist.trim() &&
-                    title.trim() && (
-                      <div className="p-6 text-center rounded-lg bg-zinc-900/40">
-                        <div className="text-sm font-medium text-zinc-500 italic">No matches found anywhere - yours will be the first!</div>
                       </div>
-                    )}
+                    ))
+                  ) : (
+                    <>
+                      {matches.map((song) => (
+                        <SongResultRow
+                          key={song.id}
+                          coverUrl={song.coverUrl}
+                          title={song.title}
+                          subtitle={song.artist}
+                          badge="In your library"
+                          disabled={isLoading}
+                          onClick={() => handleSelectMatch(song)}
+                          action={
+                            <ArrowRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-cyan-400" />
+                          }
+                        />
+                      ))}
+
+                      {newSpotifySuggestions.map((song) => {
+                        const isPending = pendingSuggestionId === song.spotifyId;
+                        return (
+                          <SongResultRow
+                            key={song.spotifyId}
+                            coverUrl={song.coverUrl}
+                            title={song.title}
+                            subtitle={`${song.artist}${song.year ? ` · ${song.year}` : ""}`}
+                            isActive={isPending}
+                            disabled={isLoading}
+                            onClick={() => submitSong(song.title, song.artist, song)}
+                            action={
+                              isPending ? (
+                                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-cyan-400" />
+                              ) : (
+                                <Plus className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-cyan-400" />
+                              )
+                            }
+                          />
+                        );
+                      })}
+
+                      {/* The track isn't always out there (or the search misses it) —
+                          this row adds exactly what was typed, just without cover art. */}
+                      {canAddManually && (
+                        <SongResultRow
+                          title={title.trim()}
+                          subtitle={`${artist.trim()} · add as typed, no cover art`}
+                          isActive={isLoading && !pendingSuggestionId}
+                          disabled={isLoading}
+                          onClick={() => submitSong(title.trim(), artist.trim(), null)}
+                          action={
+                            isLoading && !pendingSuggestionId ? (
+                              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-cyan-400" />
+                            ) : (
+                              <Plus className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-cyan-400" />
+                            )
+                          }
+                        />
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
-
-              <DialogFooter className="pt-4">
-                <Button
-                  type='button'
-                  variant='ghost'
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className="text-zinc-400 hover:text-white hover:bg-white/5"
-                >
-                  {t("cancel")}
-                </Button>
-                <Button
-                  type='submit'
-                  disabled={isLoading || !title.trim() || !artist.trim()}
-                  className="h-12 px-8"
-                >
-                  {isLoading ? (
-                    <span className='loading loading-spinner loading-sm' />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      {t("add")}
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  )}
-                </Button>
-              </DialogFooter>
             </form>
           ) : (
             <div className="space-y-6">
@@ -479,6 +477,11 @@ const AddSongModal = ({
                 </div>
               )}
 
+              <p className="mx-auto max-w-sm text-center text-sm leading-relaxed text-zinc-400">
+                Pick how far along you are with this song — it decides which of
+                your lists it lands on. You can change it anytime.
+              </p>
+
               <div className="grid grid-cols-1 gap-3">
                 {(Object.entries(STATUS_CONFIG) as [SongStatus, typeof STATUS_CONFIG.learning][]).map(([status, config]) => (
                   <button
@@ -486,7 +489,7 @@ const AddSongModal = ({
                     disabled={isLoading}
                     onClick={() => handleSelectCategory(status)}
                     className={cn(
-                      "flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40 transition-background active:scale-[0.98] text-left group",
+                      "flex items-center gap-4 p-4 rounded-lg bg-zinc-800/40 transition-background active:scale-[0.98] text-left group",
                       config.bgHover,
                       isLoading && "opacity-50 cursor-not-allowed"
                     )}
@@ -516,7 +519,7 @@ const AddSongModal = ({
                 <button
                   onClick={() => handleSelectCategory("skip")}
                   disabled={isLoading}
-                  className="flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40 hover:bg-zinc-900 transition-background active:scale-[0.98] group disabled:opacity-50"
+                  className="flex items-center gap-4 p-4 rounded-lg bg-zinc-800/40 hover:bg-zinc-800/60 transition-background active:scale-[0.98] group disabled:opacity-50"
                 >
                   <div className="p-3 rounded-lg bg-zinc-800 text-zinc-400">
                     <SkipForward className="h-6 w-6" />

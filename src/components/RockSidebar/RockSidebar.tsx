@@ -29,14 +29,17 @@ import {
   ClipboardList,
   Clock,
   Home,
+  LayoutDashboard,
   Library,
   ListChecks,
+  ListMusic,
   LogOut,
   Map,
   MessageSquarePlus,
   Milestone,
   NotebookPen,
   Route,
+  Search,
   Settings,
   Swords,
   Timer,
@@ -62,6 +65,11 @@ export interface SidebarLinkInterface {
   external?: boolean;
 }
 
+/** Fixed-size slot so icons of different sizes keep the labels on one line. */
+const NAV_ICON_SLOT = "flex h-5 w-5 shrink-0 items-center justify-center";
+/** Same width as the chevron slot, so the dot and the arrow share a center. */
+const NAV_INDICATOR_SLOT = "flex w-5 shrink-0 items-center justify-center";
+
 interface RockSidebarProps {
   pageId: NavPagesTypes;
 }
@@ -74,7 +82,6 @@ const SidebarNavLink = ({
   onClick,
   showBadge = false,
   tooltip,
-  emphasized = false,
   muted = false,
 }: {
   href: string;
@@ -84,7 +91,6 @@ const SidebarNavLink = ({
   onClick?: () => void;
   showBadge?: boolean;
   tooltip?: string;
-  emphasized?: boolean;
   muted?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
@@ -95,27 +101,29 @@ const SidebarNavLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm border transition-all duration-200 active:scale-[0.98] ${
-        emphasized ? "font-semibold" : "font-medium"
-      } ${
+      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
         isActive
-          ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
-          : emphasized
-          ? "border-transparent text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
+          ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
           : muted
-          ? "border-transparent text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
-          : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+          ? "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
-      <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+        {icon}
+      </span>
       <span className="flex-1">{name}</span>
-      {showBadge ? (
-        <span
-          aria-label="Unclaimed reward"
-          className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
-        />
-      ) : (
-        isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />
+      {(showBadge || isActive) && (
+        <span className={NAV_INDICATOR_SLOT}>
+          {showBadge ? (
+            <span
+              aria-label="Unclaimed reward"
+              className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
+            />
+          ) : (
+            <span className="h-2 w-2 rounded-full bg-cyan-400" />
+          )}
+        </span>
       )}
     </Link>
   );
@@ -152,6 +160,17 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
 ];
 
+const SONGS_SUB_NAV: SidebarSubLink[] = [
+  { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
+  { id: "songs-explore", name: "Explore", href: "/songs?view=explore", icon: <Search size={16} /> },
+  { id: "songs-playlists", name: "Playlists", href: "/songs?view=playlists", icon: <ListMusic size={16} /> },
+];
+
+/** Views a page falls back to when its query param is absent (bare /songs renders Explore). */
+const DEFAULT_QUERY_BY_PATH: Record<string, Record<string, string>> = {
+  "/songs": { view: "explore" },
+};
+
 const SidebarExpandableNavLink = ({
   href,
   name,
@@ -178,10 +197,10 @@ const SidebarExpandableNavLink = ({
   return (
     <div>
       <div
-        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-semibold transition-all duration-200 ${
+        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-medium transition-all duration-200 ${
           isActive
             ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
-            : "text-zinc-200 hover:bg-white/5 hover:text-zinc-100"
+            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
         }`}>
         <Link
           href={href}
@@ -191,7 +210,9 @@ const SidebarExpandableNavLink = ({
           }}
           className="relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]">
           {ripple}
-          <span className={isActive ? "text-cyan-400" : "text-zinc-600"}>{icon}</span>
+          <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+            {icon}
+          </span>
           <span className="flex-1">{name}</span>
         </Link>
         <button
@@ -203,10 +224,12 @@ const SidebarExpandableNavLink = ({
             onToggle();
           }}
           className="flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300">
-          <ChevronDown
-            size={20}
-            className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-          />
+          <span className={NAV_INDICATOR_SLOT}>
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+            />
+          </span>
         </button>
       </div>
 
@@ -255,9 +278,9 @@ const SidebarActionButton = ({
         createRipple(e);
         onClick();
       }}
-      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
-      <span className={iconClass}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
       <span>{label}</span>
     </button>
   );
@@ -286,9 +309,9 @@ const SidebarExternalLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
-      <span className={iconClass}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
       <span>{label}</span>
     </a>
   );
@@ -336,22 +359,36 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const activeId = getActiveProfileSection();
 
-  const [practiceExpandedOverride, setPracticeExpandedOverride] = useState<boolean | null>(null);
+  // A section auto-expands while you are inside it; a manual toggle overrides that until
+  // you navigate into the section again.
+  const [expandedOverride, setExpandedOverride] = useState<Record<string, boolean>>({});
   const [lastActiveId, setLastActiveId] = useState(activeId);
 
   if (activeId !== lastActiveId) {
     setLastActiveId(activeId);
-    if (activeId === "practice") setPracticeExpandedOverride(null);
+    if (activeId) {
+      setExpandedOverride((prev) => {
+        if (!(activeId in prev)) return prev;
+        const next = { ...prev };
+        delete next[activeId];
+        return next;
+      });
+    }
   }
 
-  const isPracticeExpanded = practiceExpandedOverride ?? activeId === "practice";
+  const isSectionExpanded = (id: string) => expandedOverride[id] ?? activeId === id;
+
+  const toggleSection = (id: string) =>
+    setExpandedOverride((prev) => ({ ...prev, [id]: !isSectionExpanded(id) }));
 
   const isSubLinkActive = (href: string) => {
     const [path, query] = href.split("?");
     if (router.pathname !== path) return false;
     if (!query) return true;
     const params = new URLSearchParams(query);
-    return Array.from(params.entries()).every(([key, value]) => router.query[key] === value);
+    return Array.from(params.entries()).every(
+      ([key, value]) => (router.query[key] ?? DEFAULT_QUERY_BY_PATH[path]?.[key]) === value
+    );
   };
 
   const isLinkActive = (id: string | null, href: string) => {
@@ -371,11 +408,16 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       id: "practice",
       name: "Practice",
       href: "/timer",
-      icon: <Timer size={20} />,
-      emphasized: true,
+      icon: <Timer size={18} />,
       children: PRACTICE_SUB_NAV,
     },
-    { id: "songs", name: "Songs", href: "/songs", icon: <PiCassetteTapeLight size={20} />, emphasized: true },
+    {
+      id: "songs",
+      name: "Songs",
+      href: "/songs",
+      icon: <PiCassetteTapeLight size={18} />,
+      children: SONGS_SUB_NAV,
+    },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     {
       id: "summary",
@@ -403,13 +445,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       href: string;
       icon: React.ReactNode;
       tooltip?: string;
-      emphasized?: boolean;
       muted?: boolean;
       children?: SidebarSubLink[];
     }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon, tooltip, emphasized, muted, children }) => {
+    items.map(({ id, name, href, icon, tooltip, muted, children }) => {
       if (children) {
         return (
           <SidebarExpandableNavLink
@@ -418,8 +459,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             name={name}
             icon={icon}
             isActive={isLinkActive(id, href)}
-            isExpanded={isPracticeExpanded}
-            onToggle={() => setPracticeExpandedOverride(!isPracticeExpanded)}
+            isExpanded={isSectionExpanded(id)}
+            onToggle={() => toggleSection(id)}
             onLinkClick={onClick}
             subLinks={children}
             isSubLinkActive={isSubLinkActive}
@@ -437,7 +478,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           onClick={onClick}
           showBadge={id === "summary" && hasUnclaimedMilestone}
           tooltip={tooltip}
-          emphasized={emphasized}
           muted={muted}
         />
       );
@@ -554,7 +594,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               dispatch(logUserOff());
             }}
             className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-500 hover:bg-red-500/10 hover:text-red-500 mb-12">
-            <span className="text-zinc-600">
+            <span className={`${NAV_ICON_SLOT} text-zinc-600`}>
               <LogOut size={16} />
             </span>
             <span>Sign Out</span>
