@@ -283,7 +283,9 @@ export const importPlaylist = async (
     likes: [],
     importedFrom: {
       playlistId: source.id,
+      ownerId: source.ownerId,
       ownerName: source.ownerName ?? "",
+      ownerAvatar: source.ownerAvatar ?? "",
     },
     createdAt: now,
     updatedAt: now,

@@ -1,8 +1,10 @@
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { Playlist } from "feature/songs/types/playlist.types";
 import { getPlaylistPopularity } from "feature/songs/types/playlist.types";
-import { Flame, Globe, Heart } from "lucide-react";
+import { Flame, GitFork, Globe, Heart } from "lucide-react";
+import Link from "next/link";
 
 import { PlaylistCover } from "./PlaylistCover";
 import { KIND_META } from "./playlistVisuals";
@@ -77,20 +79,61 @@ export const PlaylistCard = ({
           {showOwner && playlist.ownerName ? (
             <>
               <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
-              <span className="flex min-w-0 items-center gap-1.5">
-                {playlist.ownerAvatar ? (
-                  <img
-                    src={playlist.ownerAvatar}
-                    alt=""
-                    className="h-4 w-4 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-300">
-                    {playlist.ownerName.charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <span className="truncate">{playlist.ownerName}</span>
-              </span>
+              <UserTooltip userId={playlist.ownerId}>
+                <Link
+                  href={`/user/${playlist.ownerId}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex min-w-0 items-center gap-1.5 hover:text-zinc-200"
+                >
+                  {playlist.ownerAvatar ? (
+                    <img
+                      src={playlist.ownerAvatar}
+                      alt=""
+                      className="h-4 w-4 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-300">
+                      {playlist.ownerName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="truncate">{playlist.ownerName}</span>
+                </Link>
+              </UserTooltip>
+            </>
+          ) : playlist.importedFrom?.ownerName ? (
+            <>
+              <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+              <UserTooltip userId={playlist.importedFrom.ownerId ?? null}>
+                <Link
+                  href={
+                    playlist.importedFrom.ownerId
+                      ? `/user/${playlist.importedFrom.ownerId}`
+                      : "#"
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!playlist.importedFrom?.ownerId) e.preventDefault();
+                  }}
+                  className={cn(
+                    "flex min-w-0 items-center gap-1.5 text-zinc-500",
+                    playlist.importedFrom.ownerId && "hover:text-zinc-300"
+                  )}
+                >
+                  <GitFork className="h-3 w-3 shrink-0" />
+                  {playlist.importedFrom.ownerAvatar ? (
+                    <img
+                      src={playlist.importedFrom.ownerAvatar}
+                      alt=""
+                      className="h-4 w-4 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-400">
+                      {playlist.importedFrom.ownerName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="truncate">from {playlist.importedFrom.ownerName}</span>
+                </Link>
+              </UserTooltip>
             </>
           ) : (
             playlist.isPublic && (
