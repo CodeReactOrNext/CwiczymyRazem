@@ -51,7 +51,9 @@
       "Bash(echo \"keywords refs: $?\")",
       "Bash(sed -n '25,31p' practice-guitar-every-day-simple-steps.mdx)",
       "Bash(sed -n '37,52p' guitar-learning-without-a-teacher.mdx)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(git stash *)",
+      "Bash(npx prettier *)"
     ],
     "additionalDirectories": [
       "\\tmp",
