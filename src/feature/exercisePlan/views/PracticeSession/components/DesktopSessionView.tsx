@@ -87,6 +87,8 @@ interface DesktopSessionViewProps {
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  masterVolume:             number;
+  setMasterVolume:          (v: number) => void;
   examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
   isExamMode:               boolean;
   isScaleExam:              boolean;
@@ -155,6 +157,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
         onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
         onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
+        // Master volume only boosts the AlphaTab (Guitar Pro) synth — no GP file, no control.
+        masterVolume={p.effectiveRawGpFile ? p.masterVolume : undefined}
+        onMasterVolumeChange={p.effectiveRawGpFile ? p.setMasterVolume : undefined}
         frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
         disableTuner={p.currentExercise.disableTuner}
         baseBpm={p.metronome?.bpm}
@@ -250,6 +255,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
                     isMetronomeMuted={p.isMetronomeMuted}
+                    masterVolume={p.masterVolume}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}

@@ -29,8 +29,10 @@ import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import {
+  loadGlobalMasterVolume,
   loadGlobalMetronomeVolume,
   loadPracticeSessionSettings,
+  saveGlobalMasterVolume,
   saveGlobalMetronomeVolume,
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
@@ -254,6 +256,10 @@ export const PracticeSession = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Master volume boosts the Guitar Pro (MIDI) playback above its normal 100% level —
+  // a device-wide preference, so it's lazily restored from storage on the first render.
+  const [masterVolume, setMasterVolume] = useState(() => loadGlobalMasterVolume() ?? 1);
+
   const activeTablature = riddleMeasures
     || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
     || activeExercise.tablature;
@@ -272,7 +278,7 @@ export const PracticeSession = ({
 
   const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
-    isAudioMuted, isAudioPlaying, effectiveBpm,
+    isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
     isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
@@ -330,6 +336,11 @@ export const PracticeSession = ({
   useEffect(() => {
     saveGlobalMetronomeVolume(metronome.volume);
   }, [metronome.volume]);
+
+  // Master volume is a device-wide preference — persist it independently of the exercise.
+  useEffect(() => {
+    saveGlobalMasterVolume(masterVolume);
+  }, [masterVolume]);
 
   // ── Note matching ─────────────────────────────────────────────────────────
 
@@ -551,6 +562,7 @@ export const PracticeSession = ({
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
+        masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart}
         canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
