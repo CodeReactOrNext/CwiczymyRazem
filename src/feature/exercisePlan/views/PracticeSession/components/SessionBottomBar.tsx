@@ -11,7 +11,6 @@ import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
 import { ShortcutsLegend } from "./ShortcutsLegend";
-import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
