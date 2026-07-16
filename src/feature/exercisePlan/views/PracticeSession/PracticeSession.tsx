@@ -257,12 +257,8 @@ export const PracticeSession = ({
   }, []);
 
   // Master volume boosts the Guitar Pro (MIDI) playback above its normal 100% level —
-  // a device-wide preference restored once on mount, same as the metronome volume.
-  const [masterVolume, setMasterVolume] = useState(1);
-  useEffect(() => {
-    const persistedVolume = loadGlobalMasterVolume();
-    if (persistedVolume !== null) setMasterVolume(persistedVolume);
-  }, []);
+  // a device-wide preference, so it's lazily restored from storage on the first render.
+  const [masterVolume, setMasterVolume] = useState(() => loadGlobalMasterVolume() ?? 1);
 
   const activeTablature = riddleMeasures
     || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
