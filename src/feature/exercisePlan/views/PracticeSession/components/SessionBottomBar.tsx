@@ -11,7 +11,6 @@ import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
 import { ShortcutsLegend } from "./ShortcutsLegend";
-import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
@@ -179,7 +178,8 @@ const SessionBottomBarComponent = ({
     </div>
 
     <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-      <DialogContent className="max-w-md bg-zinc-900 text-white">
+      {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
+      <DialogContent className="max-w-md bg-zinc-900 text-white z-[99999999]">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
@@ -214,7 +214,8 @@ const SessionBottomBarComponent = ({
     </Dialog>
 
     <Dialog open={showFinishEarlyDialog} onOpenChange={setShowFinishEarlyDialog}>
-      <DialogContent className="max-w-md bg-zinc-900 text-white">
+      {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
+      <DialogContent className="max-w-md bg-zinc-900 text-white z-[99999999]">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">{t("common:practice.finish_plan_early_title")}</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
