@@ -40,6 +40,7 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import {
   deletePlaylist,
   importPlaylist,
@@ -82,6 +83,7 @@ import {
   Share2,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import posthog from "posthog-js";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -594,20 +596,25 @@ export const PlaylistDetailView = ({
             <p className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-zinc-400">
               {playlist.ownerName && (
                 <>
-                  <span className="flex items-center gap-1.5">
-                    {playlist.ownerAvatar ? (
-                      <img
-                        src={playlist.ownerAvatar}
-                        alt=""
-                        className="h-5 w-5 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-[9px] font-bold text-zinc-300">
-                        {playlist.ownerName.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                    <span className="font-bold text-white">{playlist.ownerName}</span>
-                  </span>
+                  <UserTooltip userId={playlist.ownerId}>
+                    <Link
+                      href={`/user/${playlist.ownerId}`}
+                      className="flex items-center gap-1.5 hover:opacity-80"
+                    >
+                      {playlist.ownerAvatar ? (
+                        <img
+                          src={playlist.ownerAvatar}
+                          alt=""
+                          className="h-5 w-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-[9px] font-bold text-zinc-300">
+                          {playlist.ownerName.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="font-bold text-white">{playlist.ownerName}</span>
+                    </Link>
+                  </UserTooltip>
                   <span className="h-1 w-1 rounded-full bg-zinc-600" />
                 </>
               )}
@@ -632,10 +639,36 @@ export const PlaylistDetailView = ({
               {playlist.importedFrom?.ownerName && (
                 <>
                   <span className="h-1 w-1 rounded-full bg-zinc-600" />
-                  <span className="flex items-center gap-1 text-zinc-500">
-                    <GitFork className="h-3 w-3" />
-                    from {playlist.importedFrom.ownerName}
-                  </span>
+                  <UserTooltip userId={playlist.importedFrom.ownerId ?? null}>
+                    <Link
+                      href={
+                        playlist.importedFrom.ownerId
+                          ? `/user/${playlist.importedFrom.ownerId}`
+                          : "#"
+                      }
+                      onClick={(e) => {
+                        if (!playlist.importedFrom?.ownerId) e.preventDefault();
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 text-zinc-500",
+                        playlist.importedFrom.ownerId && "hover:text-zinc-300"
+                      )}
+                    >
+                      <GitFork className="h-3 w-3" />
+                      {playlist.importedFrom.ownerAvatar ? (
+                        <img
+                          src={playlist.importedFrom.ownerAvatar}
+                          alt=""
+                          className="h-4 w-4 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-400">
+                          {playlist.importedFrom.ownerName.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      from {playlist.importedFrom.ownerName}
+                    </Link>
+                  </UserTooltip>
                 </>
               )}
             </p>
