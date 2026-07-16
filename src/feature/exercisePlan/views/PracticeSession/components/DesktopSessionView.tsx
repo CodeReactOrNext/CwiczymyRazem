@@ -87,6 +87,8 @@ interface DesktopSessionViewProps {
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  masterVolume:             number;
+  setMasterVolume:          (v: number) => void;
   examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
   isExamMode:               boolean;
   isScaleExam:              boolean;
@@ -281,6 +283,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     setIsMetronomeMuted={p.setIsMetronomeMuted}
                     audioTracks={p.audioTracks}
                     trackConfigs={p.trackConfigs} setTrackConfigs={p.setTrackConfigs}
+                    masterVolume={p.masterVolume} setMasterVolume={p.setMasterVolume}
+                    hasGpFile={!!p.effectiveRawGpFile}
                     examMode={!!p.examMode}
                   />
                 </ExerciseInfoGrid>
