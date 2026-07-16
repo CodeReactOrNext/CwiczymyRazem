@@ -16,6 +16,15 @@ interface ReconciledStreakInput {
   lastReportDate: string;
   /** Practice instants from the activity log (`report.date`). */
   reportDates: Array<Date | string | null | undefined>;
+  /**
+   * Set when the caller knows for a fact today was just practiced (e.g. the
+   * post-submission summary screen, rendered immediately after a report was
+   * sent). The activity log is fetched once and patched locally afterwards, so
+   * it can still be missing today's report — without this the log-derived
+   * streak silently drops back to whatever it was before the just-submitted
+   * session, which only "fixes itself" on a hard page refresh.
+   */
+  assumePracticedToday?: boolean;
 }
 
 export interface ReconciledStreak {
@@ -50,7 +59,12 @@ export interface ReconciledStreak {
  * available signal.
  */
 export const getReconciledStreak = (
-  { actualDayWithoutBreak, lastReportDate, reportDates }: ReconciledStreakInput,
+  {
+    actualDayWithoutBreak,
+    lastReportDate,
+    reportDates,
+    assumePracticedToday = false,
+  }: ReconciledStreakInput,
   now: Date = new Date()
 ): ReconciledStreak => {
   const validDates = reportDates
@@ -58,17 +72,26 @@ export const getReconciledStreak = (
     .filter((d): d is Date => d !== null);
 
   // No activity log yet (still loading): the stored counter is all we have.
+  // It is trustworthy here regardless of `assumePracticedToday` — the caller
+  // passes that flag right after a submission, and the stored counter was
+  // already updated by that very submission (see reportUpdateUserState).
   if (validDates.length === 0) {
     return getDisplayStreak({ actualDayWithoutBreak, lastReportDate }, now);
   }
 
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayKey = localDayKey(today);
-  const didPracticeToday = validDates.some((d) => localDayKey(d) === todayKey);
+  const didPracticeToday =
+    assumePracticedToday || validDates.some((d) => localDayKey(d) === todayKey);
 
   // The log already contains today's report when present, so the streak walk
-  // counts it without any optimistic nudge from the stored state.
-  const dayWithoutBreak = getStreakFromActivityLog(validDates, {}, now);
+  // counts it without any optimistic nudge from the stored state — unless the
+  // caller already knows today was just practiced and the log hasn't caught up.
+  const dayWithoutBreak = getStreakFromActivityLog(
+    validDates,
+    { includeToday: assumePracticedToday },
+    now
+  );
 
   return { didPracticeToday, dayWithoutBreak };
 };
