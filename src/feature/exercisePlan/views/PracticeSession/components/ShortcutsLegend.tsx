@@ -72,7 +72,8 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-sm bg-zinc-900 text-white">
+        {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
+        <DialogContent className="max-w-sm bg-zinc-900 text-white z-[99999999]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
               <Keyboard className="h-5 w-5 text-zinc-400" />

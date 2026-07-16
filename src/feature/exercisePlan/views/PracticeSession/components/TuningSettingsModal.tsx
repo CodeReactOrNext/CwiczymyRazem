@@ -16,7 +16,11 @@ export const TuningSettingsModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) closeModal(); }}>
-      <DialogContent className="max-w-md">
+      {/* z-index must beat the session view (z-[999999] desktop / z-[9999999] mobile modal)
+          or this dialog opens invisibly behind it — and since Radix disables pointer
+          events on the rest of the page while a dialog is open, the whole session
+          becomes unresponsive with no visible way to close it. */}
+      <DialogContent className="max-w-md z-[99999999]">
         <DialogHeader>
           <DialogTitle>Guitar tuning</DialogTitle>
           <DialogDescription>
