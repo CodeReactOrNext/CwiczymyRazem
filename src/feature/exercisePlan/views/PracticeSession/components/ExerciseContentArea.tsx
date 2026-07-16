@@ -31,6 +31,8 @@ interface ExerciseContentAreaProps {
   effectiveBpm: number;
   isAudioMuted: boolean;
   isMetronomeMuted: boolean;
+  /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
+  masterVolume?: number;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -88,6 +90,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   effectiveBpm,
   isAudioMuted,
   isMetronomeMuted,
+  masterVolume,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -202,6 +205,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           effectiveBpm={effectiveBpm}
           isAudioMuted={isAudioMuted}
           isMetronomeMuted={isMetronomeMuted}
+          masterVolume={masterVolume}
           isMetronomePlaying={isMetronomePlaying}
           countInRemaining={countInRemaining}
           frequencyRef={frequencyRef}
