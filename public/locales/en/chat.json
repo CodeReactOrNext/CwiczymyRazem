@@ -1,6 +1,7 @@
 {
   "send": "Send",
   "send_placeholder": "Type a message...",
+  "like": "Like",
   "validation_too_long": "Message cannot exceed 2000 characters.",
   "error": "Error sending message"
 }

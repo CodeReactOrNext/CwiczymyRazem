@@ -1,4 +1,5 @@
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
+import { LEARNED_POINTS } from "feature/songs/services/udateSongStatus";
 import { arrayRemove, deleteDoc, doc, getDoc, increment, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -9,18 +10,23 @@ export const removeUserSong = async (userId: string, songId: string) => {
 
     const songRef = doc(db, "songs", songId);
 
-    // 1. Fetch current status to handle point changes
+    // 1. Fetch current status to handle point changes. Points are only reversed
+    // when they were actually awarded (see udateSongStatus.tsx) — a song can be
+    // "learned" without points if the practice-time threshold wasn't met, and
+    // subtracting unconditionally on delete would push the user's total negative.
     const currentStatusSnap = await getDoc(userSongRef);
-    const oldStatus = currentStatusSnap.exists() ? currentStatusSnap.data().status : null;
+    const currentData = currentStatusSnap.exists() ? currentStatusSnap.data() : null;
+    const oldStatus = currentData?.status ?? null;
+    const pointsPreviouslyAwarded = currentData?.pointsAwarded === true;
 
     // 2. Handle Points
     let pointsAdded = 0;
-    if (oldStatus === "learned") {
+    if (oldStatus === "learned" && pointsPreviouslyAwarded) {
       await updateDoc(userDocRef, {
-        "statistics.points": increment(-40)
+        "statistics.points": increment(-LEARNED_POINTS)
       });
-      pointsAdded = -40;
-      await updateSeasonalPoints(userId, -40);
+      pointsAdded = -LEARNED_POINTS;
+      await updateSeasonalPoints(userId, -LEARNED_POINTS);
     }
 
     await updateDoc(songRef, {

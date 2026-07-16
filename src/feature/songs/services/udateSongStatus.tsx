@@ -4,7 +4,7 @@ import type { SongStatus } from "feature/songs/types/songs.type";
 import { arrayUnion, doc, getDoc, increment,setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-const LEARNED_POINTS = 40;
+export const LEARNED_POINTS = 40;
 // Minimum accumulated practice time on a song before marking it as
 // "learned" awards points. Prevents gaming points by flipping the status.
 const MIN_PRACTICE_MS_FOR_POINTS = 10 * 60 * 1000;
@@ -108,4 +108,25 @@ export const updateSongStatus = async (
     console.error("Error updating song status:", error);
     throw error;
   }
+};
+
+// Called when a user finishes practicing a song. Songs that aren't tracked yet
+// or are still sitting in "want to learn" move to "learning" — songs already
+// "learning" or "learned" are left untouched so this never downgrades progress.
+export const ensureSongIsLearning = async (
+  userId: string,
+  songId: string,
+  title: string,
+  artist: string,
+  avatarUrl: string | undefined
+) => {
+  const userSongsRef = doc(db, "users", userId, "userSongs", songId);
+  const userSongsSnap = await getDoc(userSongsRef);
+  const currentStatus = userSongsSnap.exists()
+    ? (userSongsSnap.data().status as SongStatus | undefined)
+    : undefined;
+
+  if (currentStatus === "learning" || currentStatus === "learned") return;
+
+  await updateSongStatus(userId, songId, title, artist, "learning", avatarUrl);
 };

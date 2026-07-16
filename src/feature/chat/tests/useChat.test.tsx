@@ -2,7 +2,11 @@ import { act,renderHook } from "@testing-library/react";
 import { beforeEach,describe, expect, it, vi } from "vitest";
 
 import { useChat } from "../hooks/useChat";
-import { sendChatMessage } from "../services/chatService";
+import {
+  fetchChatMessages,
+  sendChatMessage,
+  toggleLikeChatMessage,
+} from "../services/chatService";
 
 vi.mock("../services/chatService");
 vi.mock("store/hooks", () => ({
@@ -54,5 +58,33 @@ describe("useChat Hook", () => {
 
     expect(sendChatMessage).toHaveBeenCalled();
     expect(result.current.error).toBeNull();
+  });
+
+  it("should toggle like on a message", async () => {
+    (fetchChatMessages as any).mockImplementation((callback: any) => {
+      callback([
+        {
+          id: "msg1",
+          userId: "someoneElse",
+          username: "Other User",
+          message: "Hi",
+          timestamp: new Date(),
+          likes: [],
+        },
+      ]);
+      return () => {};
+    });
+
+    const { result } = renderHook(() => useChat());
+
+    await act(async () => {
+      await result.current.toggleLike("msg1");
+    });
+
+    expect(toggleLikeChatMessage).toHaveBeenCalledWith(
+      "msg1",
+      "user123",
+      false
+    );
   });
 });

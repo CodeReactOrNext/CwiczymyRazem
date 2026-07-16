@@ -2,6 +2,7 @@ import { CHAT_LIMIT_MESSAGE_LENGTH } from "feature/chat/chat.setting";
 import {
   fetchChatMessages,
   sendChatMessage,
+  toggleLikeChatMessage,
 } from "feature/chat/services/chatService";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import {
@@ -61,12 +62,28 @@ export const useChat = () => {
     [newMessage, currentUserId, currentUserName, avatar, userStats]
   );
 
+  const toggleLike = useCallback(
+    async (messageId: string) => {
+      if (!currentUserId) return;
+
+      const message = messages.find((msg) => msg.id === messageId);
+      const hasLiked = message?.likes?.includes(currentUserId) ?? false;
+
+      try {
+        await toggleLikeChatMessage(messageId, currentUserId, hasLiked);
+      } catch {
+        toast.error(t("error"));
+      }
+    },
+    [messages, currentUserId, t]
+  );
 
   return {
     messages,
     newMessage,
     setNewMessage,
     sendMessage,
+    toggleLike,
     currentUserId,
     error,
   };

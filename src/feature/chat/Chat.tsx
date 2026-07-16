@@ -2,11 +2,12 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { ScrollArea } from "assets/components/ui/scroll-area";
+import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { useTranslation } from "hooks/useTranslation";
-import { SendHorizontal } from "lucide-react";
+import { Heart, SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const Chat = () => {
@@ -16,6 +17,7 @@ const Chat = () => {
     newMessage,
     sendMessage,
     setNewMessage,
+    toggleLike,
     currentUserId,
   } = useChat();
 
@@ -40,16 +42,20 @@ const Chat = () => {
             const isMe = msg.userId === currentUserId;
             const prevMsg = index > 0 ? messages[index - 1] : null;
             const isFollowUp = prevMsg && prevMsg.userId === msg.userId;
-            
+            const likes = msg.likes ?? [];
+            const hasLiked = currentUserId
+              ? likes.includes(currentUserId)
+              : false;
+
             return (
               <div
                 key={msg.id}
-                className={`flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
+                className={`group flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
                 <div
                   className={`flex max-w-[90%] gap-3 ${
                     isMe ? "flex-row-reverse" : "flex-row"
                   }`}>
-                  
+
                   {/* Avatar Section - Only show if not a follow-up */}
                   <div className='flex w-10 flex-shrink-0 justify-center'>
                     {!isFollowUp && (
@@ -75,15 +81,51 @@ const Chat = () => {
                         </span>
                       </UserTooltip>
                     )}
-                    
-                    <Card
-                      className={`relative border-none px-3 py-2 text-sm transition-all sm:px-4 ${
-                        isMe
-                          ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
-                          : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
-                      }`}>
-                      {msg.message}
-                    </Card>
+
+                    <div
+                      className={cn(
+                        "flex items-center gap-1.5",
+                        isMe && "flex-row-reverse",
+                        likes.length > 0 && "mb-4"
+                      )}>
+                      <div className='relative'>
+                        <Card
+                          className={`border-none px-3 py-2 text-sm transition-all sm:px-4 ${
+                            isMe
+                              ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
+                              : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
+                          }`}>
+                          {msg.message}
+                        </Card>
+
+                        {likes.length > 0 && (
+                          <button
+                            type='button'
+                            aria-label={t("like")}
+                            onClick={() => msg.id && toggleLike(msg.id)}
+                            className={cn(
+                              "absolute -bottom-3.5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-background active:click-behavior",
+                              hasLiked
+                                ? "bg-red-500/20 text-red-300 hover:bg-red-500/30"
+                                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
+                              isMe ? "left-2" : "right-2"
+                            )}>
+                            <Heart className='h-4 w-4 fill-red-500 text-red-500' />
+                            <span className='leading-none'>{likes.length}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {likes.length === 0 && (
+                        <button
+                          type='button'
+                          aria-label={t("like")}
+                          onClick={() => msg.id && toggleLike(msg.id)}
+                          className='rounded-full p-2 text-zinc-500 opacity-0 transition-opacity hover:bg-white/5 hover:text-red-400 focus-visible:opacity-100 active:click-behavior group-hover:opacity-100'>
+                          <Heart className='h-5 w-5' />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

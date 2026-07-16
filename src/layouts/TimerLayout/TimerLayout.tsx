@@ -13,14 +13,13 @@ import {
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
@@ -28,6 +27,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
+import FreeTimerMetronome from "./components/FreeTimerMetronome";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 const TIMER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -115,7 +115,7 @@ const AnimatedTimerDisplay = ({
   };
 
   return (
-    <div className='relative mb-6 h-64 w-64'>
+    <div className='relative h-64 w-64'>
       {/* Ciemne tło timera z kolorowym gradientem */}
       <div
         className='absolute inset-0 rounded-full bg-black/80'
@@ -267,7 +267,6 @@ const TimerLayout = ({
   timerSubmitHandler,
   chosenSkill,
   choseSkillHandler,
-  onBack,
   onResetTimer,
   isFinishing
 }: TimerLayoutProps) => {
@@ -275,6 +274,12 @@ const TimerLayout = ({
   const { startTimer, stopTimer, timerEnabled } = timer;
   const [time, setTime] = useState(() => timer.getTime());
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+  const formatTime = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
   useEffect(() => {
     setTime(timer.getTime());
@@ -338,18 +343,12 @@ const TimerLayout = ({
     },
   ];
 
-  const formatTime = (ms: number) => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
   return (
     <MainContainer noBorder>
-      <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
+      <div className='font-openSans mx-auto h-full w-full max-w-6xl space-y-6 px-3 pb-8 pt-4 sm:space-y-8 sm:px-4 sm:pb-12 md:p-8'>
         <Card>
-          <div className='flex flex-col sm:flex-row'>
-            <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
+          <div className='flex flex-col gap-8 p-2 sm:p-4 lg:flex-row lg:items-center lg:gap-10'>
+            <div className='flex shrink-0 justify-center'>
               <AnimatedTimerDisplay
                 value={100 - (time / (30 * 60 * 1000)) * 100}
                 text={formatTime(time)}
@@ -359,54 +358,54 @@ const TimerLayout = ({
               />
             </div>
 
-            <div className='flex flex-row p-4 sm:flex-1 sm:flex-col sm:p-6'>
-              <div className='flex-1 rounded-md bg-second-400/50 p-3 sm:mb-4 sm:p-4'>
-                <span className='mb-3 hidden text-second-50 md:block'>
+            <div className='grid flex-1 grid-cols-2 gap-6 lg:grid-cols-1 lg:content-center lg:gap-10'>
+              <div className='space-y-2'>
+                <p className='text-sm text-zinc-500'>
                   {t("currently_exercising")}
-                </span>
+                </p>
                 <div className='flex items-center gap-2'>
                   <BlinkingDot isActive={timerEnabled} />
-                  <span translate="no" className=' font-medium text-white sm:text-base'>
+                  <span translate="no" className='font-medium text-white sm:text-lg'>
                     {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
                   </span>
                 </div>
               </div>
 
-              <div className='ml-3 flex-1 rounded-md bg-second-400/50 p-3  sm:ml-0 sm:mt-4 sm:p-4'>
-                <span className='mb-3 hidden  text-second-50 sm:text-sm md:block'>
-                  {t("total_time")}
-                </span>
-                <div className='flex items-center'>
-                  <IconBox Icon={MdAccessTime} small />
-                  <span translate="no" className='ml-1  text-base font-medium text-white sm:text-lg'>
+              <div className='space-y-2'>
+                <p className='text-sm text-zinc-500'>{t("total_time")}</p>
+                <div className='flex items-center gap-2'>
+                  <MdAccessTime className='h-5 w-5 text-zinc-500' />
+                  <span translate="no" className='font-medium text-white sm:text-lg'>
                     {convertMsToHMS(sumTime)}
                   </span>
                 </div>
               </div>
             </div>
+
+            <div className='lg:w-[320px] lg:shrink-0 lg:self-stretch'>
+              <FreeTimerMetronome />
+            </div>
           </div>
         </Card>
 
-        <div className='px-3 sm:px-4'>
-          <div className='grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6'>
-            {skillsData.map((skill) => (
-              <CategoryBox
-                key={skill.id}
-                skillId={skill.id}
-                title={skill.title}
-                time={skill.time}
-                skillColor={skill.color}
-                timerEnabled={timerEnabled}
-                onStart={() => {
-                  choseSkillHandler(skill.id);
-                  startTimer();
-                }}
-                onStop={stopTimer}
-                percent={skill.percent}
-                chosen={chosenSkill === skill.id}
-              />
-            ))}
-          </div>
+        <div className='grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6'>
+          {skillsData.map((skill) => (
+            <CategoryBox
+              key={skill.id}
+              skillId={skill.id}
+              title={skill.title}
+              time={skill.time}
+              skillColor={skill.color}
+              timerEnabled={timerEnabled}
+              onStart={() => {
+                choseSkillHandler(skill.id);
+                startTimer();
+              }}
+              onStop={stopTimer}
+              percent={skill.percent}
+              chosen={chosenSkill === skill.id}
+            />
+          ))}
         </div>
 
         <div className='mx-auto mt-4 w-full max-w-3xl space-y-6 px-4 sm:mt-6 sm:space-y-8'>

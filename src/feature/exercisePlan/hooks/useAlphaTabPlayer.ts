@@ -31,6 +31,11 @@ interface UseAlphaTabPlayerProps {
    * Our custom metronome should be muted during GP playback so AlphaTab's click is the only source.
    */
   metronomeVolume?: number;
+  /**
+   * Overall boost applied on top of every track's own volume (1 = normal, up to 2 = +100%).
+   * Lets users compensate for Guitar Pro soundfonts that render quieter than the rest of the site.
+   */
+  masterVolume?: number;
   /** Per-track mute/volume — MUST be memoized by the caller to avoid effect loops */
   trackConfigs?: Record<string, AlphaTabTrackConfig>;
   /** MUST be memoized by the caller */
@@ -70,6 +75,7 @@ export const useAlphaTabPlayer = ({
   onLoopRestart,
   onAudioContextReady,
   metronomeVolume = 1,
+  masterVolume = 1,
   trackConfigs = {},
   backingTrackIds = [],
   resetKey,
@@ -233,6 +239,13 @@ export const useAlphaTabPlayer = ({
     const api = apiRef.current;
     if (api) api.metronomeVolume = metronomeVolume;
   }, [metronomeVolume]);
+
+  // Master volume — a global boost on top of the per-track volumes below (accepts > 1
+  // to amplify quiet Guitar Pro soundfonts beyond their normal 100% level).
+  useEffect(() => {
+    const api = apiRef.current;
+    if (api) api.masterVolume = masterVolume;
+  }, [masterVolume]);
 
   // Playback control — pause/resume without losing position.
   //

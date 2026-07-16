@@ -15,6 +15,8 @@ interface UseSessionAudioOptions {
   isAudioMuted:            boolean;
   isAudioPlaying:          boolean;
   effectiveBpm:            number;
+  /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
+  masterVolume:            number;
   currentExerciseId:       string;
   selectedGpTrackIdx:      number;
   tabRepeatCount:          number;
@@ -42,7 +44,7 @@ interface UseSessionAudioOptions {
 
 export function useSessionAudio({
   activeTablature, dynamicBackingTracks, effectiveRawGpFile,
-  isAudioMuted, isAudioPlaying, effectiveBpm,
+  isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
   currentExerciseId, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
   isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
@@ -129,6 +131,7 @@ export function useSessionAudio({
       onAlphaTabAudioContextReady(ctx);
     }, [onAlphaTabAudioContextReady]),
     metronomeVolume: isMetronomeMuted ? 0 : 1,
+    masterVolume,
     trackConfigs:    alphaTabTrackConfigs,
     backingTrackIds: alphaTabBackingTrackIds,
     resetKey:        tabRestartKey,

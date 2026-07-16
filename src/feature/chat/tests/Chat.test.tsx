@@ -17,6 +17,7 @@ describe("Chat Component", () => {
   const mockSendMessage = vi.fn((e) => {
     e?.preventDefault();
   });
+  const mockToggleLike = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -28,11 +29,13 @@ describe("Chat Component", () => {
           username: "Test User",
           message: "Test Message",
           timestamp: new Date(),
+          likes: [],
         },
       ],
       newMessage: "Some message",
       sendMessage: mockSendMessage,
       setNewMessage: vi.fn(),
+      toggleLike: mockToggleLike,
       currentUserId: "user1",
       error: null,
     });
@@ -59,11 +62,46 @@ describe("Chat Component", () => {
       newMessage: "",
       sendMessage: mockSendMessage,
       setNewMessage: vi.fn(),
+      toggleLike: mockToggleLike,
       currentUserId: "user1",
       error: "Error message",
     });
 
     render(<Chat />);
     expect(screen.getByText("Error message")).toBeDefined();
+  });
+
+  it("should toggle like when the like button is clicked", () => {
+    const { container } = render(<Chat />);
+    const likeButton = container.querySelector('button[type="button"]');
+    if (!likeButton) throw new Error("Like button not found");
+
+    fireEvent.click(likeButton);
+
+    expect(mockToggleLike).toHaveBeenCalledWith("1");
+  });
+
+  it("should show the like count when the message has likes", () => {
+    (useChat as any).mockReturnValue({
+      messages: [
+        {
+          id: "1",
+          userId: "user1",
+          username: "Test User",
+          message: "Test Message",
+          timestamp: new Date(),
+          likes: ["user1", "user2"],
+        },
+      ],
+      newMessage: "",
+      sendMessage: mockSendMessage,
+      setNewMessage: vi.fn(),
+      toggleLike: mockToggleLike,
+      currentUserId: "user1",
+      error: null,
+    });
+
+    render(<Chat />);
+    expect(screen.getByText("2")).toBeDefined();
   });
 });
