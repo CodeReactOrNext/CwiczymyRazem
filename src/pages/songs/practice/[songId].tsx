@@ -89,6 +89,7 @@ export default function SongPracticePage() {
           exercises: [exercise],
           userId: "system",
           image: null,
+          song: { id: song.id, title: song.title, artist: song.artist },
         };
 
         setPageState({ status: "ready", plan, rawGpFile, progress });

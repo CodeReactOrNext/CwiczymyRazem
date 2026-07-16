@@ -229,4 +229,12 @@ export interface ExercisePlan {
    *  When absent, PlanCard falls back to the category-derived style. */
   icon?: string;
   color?: string;
+  /** Set when this plan is a synthetic wrapper around a single song (e.g. GP-file/tab
+   *  practice from `/songs/practice/[songId]`), so the session report is logged and
+   *  scored as a song practice instead of a generic exercise. */
+  song?: {
+    id: string;
+    title: string;
+    artist: string;
+  };
 }
