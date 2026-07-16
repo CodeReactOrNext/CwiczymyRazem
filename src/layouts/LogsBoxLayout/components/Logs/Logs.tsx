@@ -629,8 +629,9 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine date={date}>
-        <p className="text-secondText text-sm">
-          {message}{" "}
+        <p className="text-secondText text-sm flex flex-wrap items-center gap-1.5">
+          {message}
+          {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
           {songLog.songId ? (
             <Link
               href={`/songs?view=management&songId=${songLog.songId}`}
@@ -643,7 +644,6 @@ const GroupedLogLine = ({
             </span>
           )}
         </p>
-        {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
         {showRating && ratingTier && (
           <span
             className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold"
@@ -907,23 +907,21 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.songTitle && genericLog.songArtist && (
-        <>
-          <p className="text-secondText text-sm">
-            {t("common:song_status.practiced")}{" "}
-            {genericLog.songId ? (
-              <Link
-                href={`/songs?view=management&songId=${genericLog.songId}`}
-                className="text-white underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60">
-                {genericLog.songArtist} - {genericLog.songTitle}
-              </Link>
-            ) : (
-              <span className="text-white">
-                {genericLog.songArtist} - {genericLog.songTitle}
-              </span>
-            )}
-          </p>
+        <p className="text-secondText text-sm flex flex-wrap items-center gap-1.5">
+          {t("common:song_status.practiced")}
           {genericLog.songId && <SongTierChip info={songTiers[genericLog.songId]} />}
-        </>
+          {genericLog.songId ? (
+            <Link
+              href={`/songs?view=management&songId=${genericLog.songId}`}
+              className="text-white underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60">
+              {genericLog.songArtist} - {genericLog.songTitle}
+            </Link>
+          ) : (
+            <span className="text-white">
+              {genericLog.songArtist} - {genericLog.songTitle}
+            </span>
+          )}
+        </p>
       )}
     </GroupedLine>
   );
