@@ -3,6 +3,7 @@ import { cn } from "assets/lib/utils";
 import { memo } from "react";
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
+import { HiOutlineSpeakerWave } from "react-icons/hi2";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { Exercise } from "../../../types/exercise.types";
@@ -16,6 +17,11 @@ interface SessionSidebarProps {
   audioTracks: AudioTrackConfig[];
   trackConfigs: Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs: React.Dispatch<React.SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
+  masterVolume: number;
+  setMasterVolume: (v: number) => void;
+  /** Whether the current exercise plays back a Guitar Pro (MIDI) file. */
+  hasGpFile?: boolean;
   examMode?: boolean;
 }
 
@@ -23,15 +29,43 @@ export const SessionSidebar = memo(function SessionSidebar({
   activeExercise,
   audioTracks,
   setTrackConfigs,
+  masterVolume,
+  setMasterVolume,
+  hasGpFile,
 }: SessionSidebarProps) {
   const hasAudioMixer = activeExercise.backingTracks && activeExercise.backingTracks.length > 0;
 
   // Support Author links are now rendered inside the Exercise Instructions panel
   // (see ExerciseInstructionsInline) to keep them grouped with the exercise info.
-  if (!hasAudioMixer) return null;
+  if (!hasAudioMixer && !hasGpFile) return null;
 
   return (
     <div className="space-y-6 flex flex-col w-full max-w-xs">
+      {hasGpFile && (
+        <div className="rounded-lg bg-zinc-900/40 p-6 backdrop-blur-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <HiOutlineSpeakerWave className="text-cyan-400" />
+              <h4 className="text-[10px] font-bold tracking-widest text-zinc-500">Master Volume</h4>
+            </div>
+            <span className={cn(
+              "text-[9px] font-mono w-9 text-right",
+              masterVolume > 1 ? "text-cyan-400" : "text-zinc-600"
+            )}>
+              {Math.round(masterVolume * 100)}%
+            </span>
+          </div>
+          <Slider
+            value={[masterVolume * 100]}
+            max={200}
+            step={5}
+            onValueChange={([val]) => setMasterVolume(val / 100)}
+          />
+          <p className="text-[9px] text-zinc-600">
+            Boost the Guitar Pro playback above 100% if it sounds too quiet.
+          </p>
+        </div>
+      )}
       {hasAudioMixer && (
         <div className="rounded-lg bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
           <div className="flex items-center gap-2 mb-2">
