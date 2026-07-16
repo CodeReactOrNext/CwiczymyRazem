@@ -110,10 +110,14 @@ const RatingPopUpLayout = ({
   // ── derived data ──
   // Same source of truth as the header / user tooltip: reconcile the stored
   // counter against the local-time activity log (getReconciledStreak).
+  // `assumePracticedToday` is safe here — this popup only ever renders right
+  // after a report was just submitted, so today's practice is a given even if
+  // the (fetched-once, locally-patched) activity log hasn't caught up yet.
   const { dayWithoutBreak: streak, didPracticeToday } = getReconciledStreak({
     actualDayWithoutBreak: currentUserStats.actualDayWithoutBreak ?? 0,
     lastReportDate: currentUserStats.lastReportDate ?? "",
     reportDates: activityData.map((d) => d.date),
+    assumePracticedToday: true,
   });
   const streakBonusPct = Math.round(getDailyStreakMultiplier(streak) * 100);
 
