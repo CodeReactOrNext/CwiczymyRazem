@@ -5,6 +5,7 @@ import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getStreakFromActivityLog } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
 
@@ -65,10 +66,15 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           creativityHours: Math.floor(creatMin / 60).toString(),
           creativityMinutes: (creatMin % 60).toString(),
           countBackDays: 0,
-          reportTitle: planTitle,
+          reportTitle: plan.song ? `Song: ${plan.song.artist} - ${plan.song.title}` : planTitle,
           habbits: ['exercise_plan'],
           avatarUrl: avatar || null,
           planId: plan.id,
+          ...(plan.song && {
+            songId: plan.song.id,
+            songTitle: plan.song.title,
+            songArtist: plan.song.artist,
+          }),
           skillPointsGained: plan.exercises.reduce((acc, exercise, index) => {
             if (!completedExercises.includes(index)) {
               return acc;
@@ -95,6 +101,10 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           })(),
           clientNowISO: new Date().toISOString(),
+          clientDisplayStreak: getStreakFromActivityLog(
+            ((reportList as any[]) ?? []).map((report) => report.date),
+            { includeToday: true }
+          ),
         };
 
         const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
@@ -110,9 +120,19 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
         dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: plan.id }));
 
-        // "Practice any Song" is completed only via the song timer (/timer/song,
-        // route songs). Practice-plan sessions — including auto plans and playalong
-        // exercises — must not complete it, so there is no practice_any_song dispatch here.
+        // "Practice any Song" is completed via the song timer (/timer/song) and via
+        // GP-file/tab song practice (this plan carries `song` metadata in that case).
+        // Regular practice-plan sessions — auto plans and playalong exercises —
+        // must not complete it.
+        if (plan.song) {
+          dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+
+          const totalMs = timerData.technique + timerData.theory + timerData.hearing + timerData.creativity;
+          if (totalMs > 0) {
+            const { recordPracticeSession } = await import('feature/songs/services/userSongProgress.service');
+            await recordPracticeSession(userAuth as string, plan.song.id, totalMs, null, null);
+          }
+        }
 
         const totalMin = techMin + theoryMin + hearMin + creatMin;
         if (totalMin > 0) {
@@ -159,7 +179,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setIsSubmittingReport(false);
       }
     },
-    [plan, avatar, completedExercises, dispatch]
+    [plan, avatar, completedExercises, dispatch, reportList, userAuth]
   );
 
   const activityDataToUse = useMemo(() => {

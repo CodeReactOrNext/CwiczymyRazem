@@ -45,6 +45,8 @@ interface TablatureSectionProps {
   effectiveBpm: number;
   isAudioMuted: boolean;
   isMetronomeMuted: boolean;
+  /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
+  masterVolume?: number;
   isMetronomePlaying: boolean;
   countInRemaining: number;
   frequencyRef?: React.MutableRefObject<number>;
@@ -71,6 +73,7 @@ export const TablatureSection = memo(function TablatureSection({
   effectiveBpm,
   isAudioMuted,
   isMetronomeMuted,
+  masterVolume = 1,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -231,7 +234,7 @@ export const TablatureSection = memo(function TablatureSection({
             isPlaying={isAudioPlaying && showAlphaTabScore}
             startTime={startTime}
             bpm={effectiveBpm}
-            volume={isAudioMuted ? 0 : 1}
+            volume={isAudioMuted ? 0 : masterVolume}
             isMetronomeMuted={isMetronomeMuted}
             className="w-full"
             hitNotes={hitNotes}

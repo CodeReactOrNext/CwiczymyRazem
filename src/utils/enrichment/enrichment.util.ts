@@ -1,5 +1,88 @@
 import axios from "axios";
 
+export interface SpotifyTrackSuggestion {
+  spotifyId: string;
+  title: string;
+  artist: string;
+  album?: string;
+  coverUrl?: string;
+  year?: number;
+  popularity?: number;
+}
+
+async function getSpotifyAccessToken(): Promise<string> {
+  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Spotify credentials not configured");
+  }
+
+  const authString = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+  const tokenResponse = await axios.post(
+    "https://accounts.spotify.com/api/token",
+    "grant_type=client_credentials",
+    {
+      headers: {
+        Authorization: `Basic ${authString}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+
+  return tokenResponse.data.access_token;
+}
+
+/**
+ * Free-text Spotify track search used for "add song" suggestions — lets the user
+ * pick a song straight out of Spotify (with cover art + spotifyId) instead of
+ * typing plain text and waiting for background enrichment after the fact.
+ */
+export async function searchSpotifyTracks(
+  query: string,
+  limit = 5
+): Promise<SpotifyTrackSuggestion[]> {
+  const accessToken = await getSpotifyAccessToken();
+
+  const runSearch = async (market: string) =>
+    axios.get(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}&market=${market}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+  let response = await runSearch("PL");
+  let tracks = response.data.tracks?.items || [];
+
+  if (tracks.length === 0) {
+    response = await runSearch("US");
+    tracks = response.data.tracks?.items || [];
+  }
+
+  const seen = new Set<string>();
+  const suggestions: SpotifyTrackSuggestion[] = [];
+
+  for (const track of tracks) {
+    if (seen.has(track.id)) continue;
+    seen.add(track.id);
+
+    suggestions.push({
+      spotifyId: track.id,
+      title: track.name,
+      artist: track.artists.map((a: any) => a.name).join(", "),
+      album: track.album?.name,
+      coverUrl: track.album?.images?.[0]?.url,
+      year: track.album?.release_date
+        ? new Date(track.album.release_date).getFullYear()
+        : undefined,
+      popularity: track.popularity,
+    });
+
+    if (suggestions.length >= limit) break;
+  }
+
+  return suggestions;
+}
+
 export async function fetchEnrichmentData(artist: string, title: string) {
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;

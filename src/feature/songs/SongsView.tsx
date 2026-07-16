@@ -13,7 +13,6 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
@@ -24,6 +23,7 @@ import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
+import { SongSearchAutocomplete } from "feature/songs/components/SongSearch/SongSearchAutocomplete";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
@@ -66,6 +66,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
+  const [addSongInitialQuery, setAddSongInitialQuery] = useState({ title: "", artist: "" });
 
   const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
     userAuth ?? null
@@ -601,29 +602,23 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                 {/* Search & Filter Bar */}
                 <div className="relative z-30 py-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                    <div className="group relative flex-1">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
-                        <Music className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
-                      </div>
-                      <Input
-                        placeholder={t("artist", "Artist...") as string}
-                        value={artistQuery}
-                        onChange={(e) => setArtistQuery(e.target.value)}
-                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
-                      />
-                    </div>
+                    <SongSearchAutocomplete
+                      field="artist"
+                      icon={Music}
+                      placeholder={t("artist", "Artist...") as string}
+                      value={artistQuery}
+                      onChange={setArtistQuery}
+                      className="flex-1"
+                    />
 
-                    <div className="group relative flex-[1.2]">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
-                        <Search className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
-                      </div>
-                      <Input
-                        placeholder={t("title", "Title...") as string}
-                        value={titleQuery}
-                        onChange={(e) => setTitleQuery(e.target.value)}
-                        className="h-12 w-full border-none bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
-                      />
-                    </div>
+                    <SongSearchAutocomplete
+                      field="title"
+                      icon={Search}
+                      placeholder={t("title", "Title...") as string}
+                      value={titleQuery}
+                      onChange={setTitleQuery}
+                      className="flex-[1.2]"
+                    />
 
                     <div className="flex items-center gap-2">
                       <Button
@@ -662,7 +657,10 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   currentPage={page}
                   hasMore={hasMore}
                   onPageChange={handlePageChange}
-                  onAddSong={() => setIsModalOpen(true)}
+                  onAddSong={() => {
+                    setAddSongInitialQuery({ title: titleQuery, artist: artistQuery });
+                    setIsModalOpen(true);
+                  }}
                   hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
                   onStatusChange={refreshSongs}
                   onPractice={(song) => setPracticeTarget(song)}
@@ -707,6 +705,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleStatusUpdate}
+        initialTitle={addSongInitialQuery.title}
+        initialArtist={addSongInitialQuery.artist}
       />
 
       {practiceTarget && userAuth && (

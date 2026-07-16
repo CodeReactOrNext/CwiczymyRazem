@@ -19,6 +19,16 @@ service cloud.firestore {
 
       // role / stripe fields are written only by the backend (Firebase Admin SDK)
       // Admin SDK bypasses these rules entirely — no extra rule needed
+
+      // Uploaded Guitar Pro files (gp-tabs library) — owner only
+      match /gpFiles/{fileId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Folders organizing the gp-tabs library — owner only
+      match /gpFolders/{folderId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // ─── Exercise plans ───────────────────────────────────────────────────────
@@ -147,6 +157,26 @@ service cloud.firestore {
 
       allow delete: if request.auth != null
         && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ─── Global chat ──────────────────────────────────────────────────────────
+    match /chats/{messageId} {
+      // Any signed-in user can read and post messages
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+
+      // Author edits their own message (author fields immutable). Any other
+      // signed-in user may update ONLY the "likes" field, to like/unlike it.
+      allow update: if request.auth != null && (
+        (
+          resource.data.userId == request.auth.uid
+          && !("userId" in request.resource.data.diff(resource.data).affectedKeys())
+        )
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+      );
+
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // ─── Arsenal marketplace ──────────────────────────────────────────────────

@@ -114,4 +114,60 @@ describe("getReconciledStreak", () => {
     expect(result.dayWithoutBreak).toBe(0);
     expect(result.didPracticeToday).toBe(false);
   });
+
+  describe("assumePracticedToday (post-submission summary screen)", () => {
+    it("counts today even though the fetched-once log hasn't caught up yet", () => {
+      // Yesterday's log loaded fine, but the just-submitted report for today
+      // hasn't made it back into the (locally patched) activity log — the exact
+      // "first practice of the day" summary-screen glitch.
+      const result = getReconciledStreak(
+        {
+          actualDayWithoutBreak: 6,
+          lastReportDate: storedDate(2026, 5, 4),
+          reportDates: [localDate(2026, 5, 3), localDate(2026, 5, 2)],
+          assumePracticedToday: true,
+        },
+        now
+      );
+
+      expect(result.didPracticeToday).toBe(true);
+      expect(result.dayWithoutBreak).toBe(3);
+    });
+
+    it("still counts today on a second same-day submission when the log is stale", () => {
+      // The activity log was fetched once at page load and never refreshed, so
+      // it still reflects the state from before *any* session today.
+      const result = getReconciledStreak(
+        {
+          actualDayWithoutBreak: 1,
+          lastReportDate: storedDate(2026, 5, 4),
+          reportDates: [localDate(2026, 4, 20)],
+          assumePracticedToday: true,
+        },
+        now
+      );
+
+      expect(result.didPracticeToday).toBe(true);
+      expect(result.dayWithoutBreak).toBe(1);
+    });
+
+    it("does not change the result when the log already contains today", () => {
+      const result = getReconciledStreak(
+        {
+          actualDayWithoutBreak: 1,
+          lastReportDate: storedDate(2026, 5, 4),
+          reportDates: [
+            localDate(2026, 5, 4),
+            localDate(2026, 5, 3),
+            localDate(2026, 5, 2),
+          ],
+          assumePracticedToday: true,
+        },
+        now
+      );
+
+      expect(result.didPracticeToday).toBe(true);
+      expect(result.dayWithoutBreak).toBe(3);
+    });
+  });
 });

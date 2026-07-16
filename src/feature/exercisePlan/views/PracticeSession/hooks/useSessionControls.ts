@@ -6,10 +6,15 @@ import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 import { saveGuitarPlaybackPreference } from "../helpers/guitarPlaybackPreference";
 
 interface Metronome {
-  isPlaying:         boolean;
-  startMetronome:    () => void;
-  stopMetronome:     () => void;
-  restartMetronome:  () => void;
+  isPlaying:              boolean;
+  startMetronome:         () => void;
+  stopMetronome:          () => void;
+  restartMetronome:       () => void;
+  bpm:                    number;
+  setBpm:                 (bpm: number) => void;
+  minBpm:                 number;
+  maxBpm:                 number;
+  handleSetRecommendedBpm: () => void;
 }
 
 interface UseSessionControlsOptions {
@@ -133,6 +138,16 @@ export function useSessionControls({
   const handleNoteMatchingReset = useCallback(() => setEarTrainingScore(0), [setEarTrainingScore]);
 
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  // ↑ ↓ (and Shift+↑ Shift+↓) are reserved for tempo, with Enter resetting to
+  // the exercise's recommended (baseline) tempo. Exercise navigation lives on
+  // J/K (vim-style) instead, so the two groups never share a key. See
+  // ShortcutsLegend for the full, user-facing list.
+
+  const hasTempoControl = !!currentExercise.metronomeSpeed;
+
+  const handleTempoStep = useCallback((delta: number) => {
+    metronome.setBpm(Math.min(metronome.maxBpm, Math.max(metronome.minBpm, metronome.bpm + delta)));
+  }, [metronome]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -140,14 +155,18 @@ export function useSessionControls({
       if (e.code === "Space") {
         e.preventDefault(); handleToggleTimer(); return;
       }
-      if (e.key === "ArrowRight" && !isLastExercise) handleNextExerciseClick();
-      if (e.key === "ArrowLeft" && currentExerciseIndex > 0) {
+      if (e.key === "j" && !isLastExercise) handleNextExerciseClick();
+      if (e.key === "k" && currentExerciseIndex > 0) {
         stopTimer(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1);
       }
+      if (!hasTempoControl) return;
+      if (e.key === "ArrowUp") { e.preventDefault(); handleTempoStep(e.shiftKey ? 5 : 1); }
+      if (e.key === "ArrowDown") { e.preventDefault(); handleTempoStep(e.shiftKey ? -5 : -1); }
+      if (e.key === "Enter") { e.preventDefault(); metronome.handleSetRecommendedBpm(); }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLastExercise, currentExerciseIndex, handleToggleTimer, handleNextExerciseClick, stopTimer, metronome, jumpToExercise]);
+  }, [isLastExercise, currentExerciseIndex, handleToggleTimer, handleNextExerciseClick, stopTimer, metronome, jumpToExercise, hasTempoControl, handleTempoStep]);
 
   return useMemo(() => ({
     tabRestartKey, isPlayingRef,

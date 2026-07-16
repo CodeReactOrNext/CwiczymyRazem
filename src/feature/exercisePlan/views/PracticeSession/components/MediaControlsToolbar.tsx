@@ -12,6 +12,7 @@ import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useLiveTuner } from "../hooks/useLiveTuner";
 import { AmpSimButton } from "./AmpSimButton";
 import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
+import { MasterVolumeButton } from "./MasterVolumeButton";
 import { MicTroubleshooting } from "./MicTroubleshooting";
 
 const SPEED_MODES: { value: number; label: string }[] = [
@@ -33,6 +34,10 @@ interface MediaControlsToolbarProps {
   isMicEnabled: boolean;
   onMicToggle: () => void;
   onRecalibrate: () => void;
+  /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%).
+   *  Omit (together with the setter) to hide the control — it only affects Guitar Pro playback. */
+  masterVolume?: number;
+  onMasterVolumeChange?: (v: number) => void;
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
@@ -58,6 +63,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   isMicEnabled,
   onMicToggle,
   onRecalibrate,
+  masterVolume,
+  onMasterVolumeChange,
   frequencyRef,
   volumeRef,
   compact = false,
@@ -76,6 +83,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   // (e.g. scale exams, where hearing the reference scale is allowed).
   const showSpeed   = !examMode;
   const showBacking = !examMode || showBackingInExam;
+  const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
@@ -245,6 +253,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             </RippleButton>
           )}
 
+          {showMasterVolume && (
+            <MasterVolumeButton compact volume={masterVolume!} onVolumeChange={onMasterVolumeChange!} />
+          )}
+
           {(hasAudioTrack || hasMicControls) && (
             <RippleButton
               onClick={openTuningSettings}
@@ -331,7 +343,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   return (
     <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
       {/* ── PLAYBACK zone: speed + backing track + tuning ── */}
-      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls) && (
+      {((showSpeed && hasMetronome) || (showBacking && hasAudioTrack) || hasAudioTrack || hasMicControls || showMasterVolume) && (
         <div className="flex items-center gap-1.5">
           {showSpeed && hasMetronome && (
             <SpeedDropdown
@@ -365,6 +377,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 {isAudioMuted ? "Backing track off" : "Backing track on"}
               </TooltipContent>
             </Tooltip>
+          )}
+
+          {showMasterVolume && (
+            <MasterVolumeButton volume={masterVolume!} onVolumeChange={onMasterVolumeChange!} h={h} />
           )}
 
           {(hasAudioTrack || hasMicControls) && (

@@ -2,13 +2,14 @@ import { BackLink } from "components/BackLink/BackLink";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
 import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
 import {
   getUserSongProgress,
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
 import { Music } from "lucide-react";
 import Head from "next/head";
@@ -20,15 +21,14 @@ import { db } from "utils/firebase/client/firebase.utils";
 
 type PageState =
   | { status: "loading" }
-  | { status: "ready"; plan: ExercisePlan; rawGpFile: File | undefined; progress: UserSongProgress | null }
+  | { status: "ready"; song: Song; plan: ExercisePlan; rawGpFile: File | undefined; progress: UserSongProgress | null }
   | { status: "error"; message: string };
 
 export default function SongPracticePage() {
   const router = useRouter();
   const { songId } = router.query;
   const userId = useAppSelector(selectUserAuth);
-  const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+  const userAvatar = useAppSelector(selectUserAvatar);
 
   const [pageState, setPageState] = useState<PageState>({ status: "loading" });
   const [isFinishing, setIsFinishing] = useState(false);
@@ -89,9 +89,10 @@ export default function SongPracticePage() {
           exercises: [exercise],
           userId: "system",
           image: null,
+          song: { id: song.id, title: song.title, artist: song.artist },
         };
 
-        setPageState({ status: "ready", plan, rawGpFile, progress });
+        setPageState({ status: "ready", song, plan, rawGpFile, progress });
       } catch {
         setPageState({ status: "error", message: "Failed to load practice session." });
       }
@@ -102,8 +103,24 @@ export default function SongPracticePage() {
 
   const handleFinish = async () => {
     setIsFinishing(true);
-    // recordPracticeSession is called by PracticeSession internally via onFinish;
-    // we just navigate to the report page.
+
+    // Practising a song here moves it out of "want to learn" (or starts tracking
+    // it) just like the free-practice timer does. PracticeSession has no songId,
+    // so this session's time is not written to songProgress — only the status.
+    if (pageState.status === "ready" && userId) {
+      try {
+        await ensureSongIsLearning(
+          userId,
+          pageState.song.id,
+          pageState.song.title,
+          pageState.song.artist,
+          userAvatar || ""
+        );
+      } catch (error) {
+        console.error("Failed to auto-update song status to learning", error);
+      }
+    }
+
     router.push("/report");
   };
 

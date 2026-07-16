@@ -1,6 +1,6 @@
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
-import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectCurrentUserStats, selectPreviousUserStats, selectRaitingData,selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { setActivity } from "feature/user/store/userSlice";
@@ -153,6 +153,14 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 } catch (error) {
                     console.error("Failed to update song status", error);
                     toast.error("Failed to mark as learned");
+                }
+            } else if (userId) {
+                // Practicing a song that's still "want to learn" (or not tracked at
+                // all) automatically moves it into "learning".
+                try {
+                    await ensureSongIsLearning(userId, song.id, song.title, song.artist, userAvatar || "");
+                } catch (error) {
+                    console.error("Failed to auto-update song status to learning", error);
                 }
             }
 

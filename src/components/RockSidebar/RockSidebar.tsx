@@ -24,13 +24,22 @@ import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
+  Brain,
+  ChevronDown,
+  ClipboardList,
+  Clock,
   Home,
+  LayoutDashboard,
   Library,
+  ListChecks,
+  ListMusic,
   LogOut,
   Map,
   MessageSquarePlus,
   Milestone,
-  Music,
+  NotebookPen,
+  Route,
+  Search,
   Settings,
   Swords,
   Timer,
@@ -42,6 +51,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa";
+import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
+import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -53,6 +64,11 @@ export interface SidebarLinkInterface {
   icon: React.ReactNode;
   external?: boolean;
 }
+
+/** Fixed-size slot so icons of different sizes keep the labels on one line. */
+const NAV_ICON_SLOT = "flex h-5 w-5 shrink-0 items-center justify-center";
+/** Same width as the chevron slot, so the dot and the arrow share a center. */
+const NAV_INDICATOR_SLOT = "flex w-5 shrink-0 items-center justify-center";
 
 interface RockSidebarProps {
   pageId: NavPagesTypes;
@@ -66,7 +82,7 @@ const SidebarNavLink = ({
   onClick,
   showBadge = false,
   tooltip,
-  emphasized = false,
+  muted = false,
 }: {
   href: string;
   name: string;
@@ -75,7 +91,7 @@ const SidebarNavLink = ({
   onClick?: () => void;
   showBadge?: boolean;
   tooltip?: string;
-  emphasized?: boolean;
+  muted?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   const link = (
@@ -85,23 +101,29 @@ const SidebarNavLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm border transition-all duration-200 active:scale-[0.98] ${
-        emphasized ? "font-semibold" : "font-medium"
-      } ${
+      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
         isActive
-          ? "border-transparent bg-cyan-500/10 text-cyan-300 shadow-sm"
-          : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+          ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
+          : muted
+          ? "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
-      <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+        {icon}
+      </span>
       <span className="flex-1">{name}</span>
-      {showBadge ? (
-        <span
-          aria-label="Unclaimed reward"
-          className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
-        />
-      ) : (
-        isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />
+      {(showBadge || isActive) && (
+        <span className={NAV_INDICATOR_SLOT}>
+          {showBadge ? (
+            <span
+              aria-label="Unclaimed reward"
+              className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
+            />
+          ) : (
+            <span className="h-2 w-2 rounded-full bg-cyan-400" />
+          )}
+        </span>
       )}
     </Link>
   );
@@ -120,9 +142,127 @@ const SidebarNavLink = ({
   );
 };
 
+interface SidebarSubLink {
+  id: string;
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+const PRACTICE_SUB_NAV: SidebarSubLink[] = [
+  { id: "practice-plans", name: "Practice Routines", href: "/timer/plans", icon: <ListChecks size={16} /> },
+  { id: "practice-auto", name: "Auto Plan", href: "/timer/auto", icon: <PiMagicWandDuotone size={16} /> },
+  { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
+  { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
+  { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <SiGuitarpro size={16} /> },
+  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Brain size={16} /> },
+  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
+  { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
+];
+
+const SONGS_SUB_NAV: SidebarSubLink[] = [
+  { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
+  { id: "songs-explore", name: "Explore", href: "/songs?view=explore", icon: <Search size={16} /> },
+  { id: "songs-playlists", name: "Playlists", href: "/songs?view=playlists", icon: <ListMusic size={16} /> },
+];
+
+/** Views a page falls back to when its query param is absent (bare /songs renders Explore). */
+const DEFAULT_QUERY_BY_PATH: Record<string, Record<string, string>> = {
+  "/songs": { view: "explore" },
+};
+
+const SidebarExpandableNavLink = ({
+  href,
+  name,
+  icon,
+  isActive,
+  isExpanded,
+  onToggle,
+  onLinkClick,
+  subLinks,
+  isSubLinkActive,
+}: {
+  href: string;
+  name: string;
+  icon: React.ReactNode;
+  isActive: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onLinkClick?: () => void;
+  subLinks: SidebarSubLink[];
+  isSubLinkActive: (href: string) => boolean;
+}) => {
+  const { createRipple, ripple } = useRipple();
+
+  return (
+    <div>
+      <div
+        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-medium transition-all duration-200 ${
+          isActive
+            ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
+            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+        }`}>
+        <Link
+          href={href}
+          onClick={(e) => {
+            createRipple(e);
+            onLinkClick?.();
+          }}
+          className="relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]">
+          {ripple}
+          <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+            {icon}
+          </span>
+          <span className="flex-1">{name}</span>
+        </Link>
+        <button
+          type="button"
+          aria-label={isExpanded ? `Collapse ${name}` : `Expand ${name}`}
+          aria-expanded={isExpanded}
+          onClick={(e) => {
+            e.preventDefault();
+            onToggle();
+          }}
+          className="flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300">
+          <span className={NAV_INDICATOR_SLOT}>
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+            />
+          </span>
+        </button>
+      </div>
+
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden">
+            <div className="mt-1 space-y-0.5 rounded-lg bg-black/20 p-1">
+              {subLinks.map((subLink) => (
+                <SidebarNavLink
+                  key={subLink.id}
+                  href={subLink.href}
+                  name={subLink.name}
+                  icon={subLink.icon}
+                  isActive={isSubLinkActive(subLink.href)}
+                  onClick={onLinkClick}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const SidebarActionButton = ({
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -138,9 +278,9 @@ const SidebarActionButton = ({
         createRipple(e);
         onClick();
       }}
-      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
-      <span className={iconClass}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
       <span>{label}</span>
     </button>
   );
@@ -149,7 +289,7 @@ const SidebarActionButton = ({
 const SidebarExternalLink = ({
   href,
   icon,
-  iconClass = "text-zinc-500",
+  iconClass = "text-zinc-600",
   label,
   onClick,
 }: {
@@ -169,9 +309,9 @@ const SidebarExternalLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+      className="relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
       {ripple}
-      <span className={iconClass}>{icon}</span>
+      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
       <span>{label}</span>
     </a>
   );
@@ -196,6 +336,11 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     const { pathname } = router;
     if (pathname === "/dashboard" || pathname === "/profile") return "home";
     if (pathname.startsWith("/timer")) return "practice";
+    if (pathname === "/report") return "practice";
+    if (pathname.startsWith("/gp-tabs")) return "practice";
+    if (pathname.startsWith("/profile/skills")) return "practice";
+    if (pathname === "/ai-coach") return "practice";
+    if (pathname === "/journey") return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
@@ -214,6 +359,38 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const activeId = getActiveProfileSection();
 
+  // A section auto-expands while you are inside it; a manual toggle overrides that until
+  // you navigate into the section again.
+  const [expandedOverride, setExpandedOverride] = useState<Record<string, boolean>>({});
+  const [lastActiveId, setLastActiveId] = useState(activeId);
+
+  if (activeId !== lastActiveId) {
+    setLastActiveId(activeId);
+    if (activeId) {
+      setExpandedOverride((prev) => {
+        if (!(activeId in prev)) return prev;
+        const next = { ...prev };
+        delete next[activeId];
+        return next;
+      });
+    }
+  }
+
+  const isSectionExpanded = (id: string) => expandedOverride[id] ?? activeId === id;
+
+  const toggleSection = (id: string) =>
+    setExpandedOverride((prev) => ({ ...prev, [id]: !isSectionExpanded(id) }));
+
+  const isSubLinkActive = (href: string) => {
+    const [path, query] = href.split("?");
+    if (router.pathname !== path) return false;
+    if (!query) return true;
+    const params = new URLSearchParams(query);
+    return Array.from(params.entries()).every(
+      ([key, value]) => (router.query[key] ?? DEFAULT_QUERY_BY_PATH[path]?.[key]) === value
+    );
+  };
+
   const isLinkActive = (id: string | null, href: string) => {
     if (activeId) return activeId === id;
     if (id === pageId && pageId !== null) return true;
@@ -227,8 +404,20 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const mainNavigation = [
     { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
-    { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={20} />, emphasized: true },
-    { id: "songs", name: "Songs", href: "/songs", icon: <Music size={20} />, emphasized: true },
+    {
+      id: "practice",
+      name: "Practice",
+      href: "/timer",
+      icon: <Timer size={18} />,
+      children: PRACTICE_SUB_NAV,
+    },
+    {
+      id: "songs",
+      name: "Songs",
+      href: "/songs",
+      icon: <PiCassetteTapeLight size={18} />,
+      children: SONGS_SUB_NAV,
+    },
     { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
     {
       id: "summary",
@@ -246,7 +435,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const otherNavigation = [
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
+    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} />, muted: true },
   ];
 
   const renderNavLinks = (
@@ -256,23 +445,43 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       href: string;
       icon: React.ReactNode;
       tooltip?: string;
-      emphasized?: boolean;
+      muted?: boolean;
+      children?: SidebarSubLink[];
     }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon, tooltip, emphasized }) => (
-      <SidebarNavLink
-        key={id}
-        href={href}
-        name={name}
-        icon={icon}
-        isActive={isLinkActive(id, href)}
-        onClick={onClick}
-        showBadge={id === "summary" && hasUnclaimedMilestone}
-        tooltip={tooltip}
-        emphasized={emphasized}
-      />
-    ));
+    items.map(({ id, name, href, icon, tooltip, muted, children }) => {
+      if (children) {
+        return (
+          <SidebarExpandableNavLink
+            key={id}
+            href={href}
+            name={name}
+            icon={icon}
+            isActive={isLinkActive(id, href)}
+            isExpanded={isSectionExpanded(id)}
+            onToggle={() => toggleSection(id)}
+            onLinkClick={onClick}
+            subLinks={children}
+            isSubLinkActive={isSubLinkActive}
+          />
+        );
+      }
+
+      return (
+        <SidebarNavLink
+          key={id}
+          href={href}
+          name={name}
+          icon={icon}
+          isActive={isLinkActive(id, href)}
+          onClick={onClick}
+          showBadge={id === "summary" && hasUnclaimedMilestone}
+          tooltip={tooltip}
+          muted={muted}
+        />
+      );
+    });
 
   const userProfileSection = (mobile?: boolean) => {
     if (!userStats || !userName) return null;
@@ -384,8 +593,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               handleLinkClick();
               dispatch(logUserOff());
             }}
-            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
-            <span className="text-zinc-500">
+            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-500 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            <span className={`${NAV_ICON_SLOT} text-zinc-600`}>
               <LogOut size={16} />
             </span>
             <span>Sign Out</span>
