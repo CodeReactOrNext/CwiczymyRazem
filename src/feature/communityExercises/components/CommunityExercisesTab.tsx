@@ -1,19 +1,22 @@
 import { cn } from "assets/lib/utils";
-import type { CommunityExercise } from "feature/communityExercises/types";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import {
   getCommunityExercises,
   getUserRatingForExercise,
+  getUserThanksForExercise,
+  incrementExercisePlayCount,
   rateExercise,
+  thankExercise,
 } from "feature/communityExercises/services/communityExerciseService";
+import type { CommunityExercise } from "feature/communityExercises/types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { UserTooltip } from "components/UserTooltip/UserTooltip";
-import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
-import { ChevronLeft, ChevronRight, ChevronRight as StartIcon, Search, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronRight as StartIcon, Guitar, HandHeart, Search, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
+import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
 
 const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
   id: ex.id,
@@ -43,6 +46,8 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
   accentColor: "#ffffff",
   difficulty: ex.difficulty,
   tablature: ex.tablature,
+  communityExerciseId: ex.id,
+  communityExerciseAuthorId: ex.authorId,
 });
 
 const PAGE_SIZE = 10;
@@ -119,9 +124,26 @@ interface ExerciseRowProps {
   onExpand: (id: string) => void;
   isExpanded: boolean;
   onStart: (exercise: CommunityExercise) => void;
+  isOwnExercise: boolean;
+  hasThanked: boolean;
+  isThanksLoading: boolean;
+  onThank: (exerciseId: string) => void;
 }
 
-const ExerciseRow = ({ exercise, authorAvatar, userRating, onRate, isRatingLoading, onExpand, isExpanded, onStart }: ExerciseRowProps) => {
+const ExerciseRow = ({
+  exercise,
+  authorAvatar,
+  userRating,
+  onRate,
+  isRatingLoading,
+  onExpand,
+  isExpanded,
+  onStart,
+  isOwnExercise,
+  hasThanked,
+  isThanksLoading,
+  onThank,
+}: ExerciseRowProps) => {
   const authorInitial = exercise.authorUsername?.[0]?.toUpperCase() ?? "?";
   return (
     <>
@@ -197,14 +219,23 @@ const ExerciseRow = ({ exercise, authorAvatar, userRating, onRate, isRatingLoadi
 
         {/* Rating */}
         <td className="px-3 py-3.5" onClick={e => e.stopPropagation()}>
-          <StarRating
-            exerciseId={exercise.id}
-            currentAverage={exercise.averageRating}
-            ratingCount={exercise.ratingCount}
-            userRating={userRating}
-            onRate={onRate}
-            isLoading={isRatingLoading}
-          />
+          <div className="flex items-center justify-end gap-3">
+            <span
+              className="flex items-center gap-1 text-[10px] text-zinc-600"
+              title={`Practiced ${exercise.playCount || 0} times`}
+            >
+              <Guitar size={12} />
+              {exercise.playCount || 0}
+            </span>
+            <StarRating
+              exerciseId={exercise.id}
+              currentAverage={exercise.averageRating}
+              ratingCount={exercise.ratingCount}
+              userRating={userRating}
+              onRate={onRate}
+              isLoading={isRatingLoading}
+            />
+          </div>
         </td>
 
         {/* Start */}
@@ -224,6 +255,28 @@ const ExerciseRow = ({ exercise, authorAvatar, userRating, onRate, isRatingLoadi
         <tr className="border-b border-zinc-800">
           <td colSpan={6} className="px-4 py-5 bg-zinc-950/60">
             <div className="space-y-4">
+
+              {/* Thanks */}
+              <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
+                {exercise.thanksCount > 0 && (
+                  <span className="text-xs text-zinc-500">
+                    {exercise.thanksCount} {exercise.thanksCount === 1 ? "person thanked" : "people thanked"} the author
+                  </span>
+                )}
+                <button
+                  onClick={() => onThank(exercise.id)}
+                  disabled={isOwnExercise || hasThanked || isThanksLoading}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-colors disabled:cursor-not-allowed",
+                    hasThanked
+                      ? "bg-amber-500/15 text-amber-300"
+                      : "bg-zinc-800/70 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 disabled:hover:bg-zinc-800/70"
+                  )}
+                >
+                  <HandHeart size={13} />
+                  {hasThanked ? "Thanked" : "Thank the author"}
+                </button>
+              </div>
 
               {/* Tablature preview */}
               {exercise.tablature?.length > 0 && (
@@ -296,6 +349,8 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
   const [userRatings, setUserRatings] = useState<Record<string, number | null>>({});
   const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});
   const [ratingLoading, setRatingLoading] = useState<Record<string, boolean>>({});
+  const [userThanks, setUserThanks] = useState<Record<string, boolean>>({});
+  const [thanksLoading, setThanksLoading] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
@@ -323,6 +378,22 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
       setUserRatings(map);
     };
     fetchRatings();
+  }, [userAuth, exercises]);
+
+  useEffect(() => {
+    if (!userAuth || exercises.length === 0) return;
+    const fetchThanks = async () => {
+      const pairs = await Promise.all(
+        exercises.map(async ex => ({
+          id: ex.id,
+          thanked: await getUserThanksForExercise(ex.id, userAuth),
+        }))
+      );
+      const map: Record<string, boolean> = {};
+      pairs.forEach(p => { map[p.id] = p.thanked; });
+      setUserThanks(map);
+    };
+    fetchThanks();
   }, [userAuth, exercises]);
 
   const filteredExercises = useMemo(() => {
@@ -380,6 +451,31 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
       }));
     }
     setRatingLoading(prev => ({ ...prev, [exerciseId]: false }));
+  };
+
+  const handleStart = (exercise: CommunityExercise) => {
+    if (userAuth && userAuth !== exercise.authorId) {
+      incrementExercisePlayCount(exercise.id, exercise.authorId, userAuth);
+      setExercises(prev => prev.map(ex =>
+        ex.id === exercise.id ? { ...ex, playCount: (ex.playCount || 0) + 1 } : ex
+      ));
+    }
+    onStartExercise(buildChallenge(exercise));
+  };
+
+  const handleThank = async (exerciseId: string) => {
+    if (!userAuth) return;
+    setThanksLoading(prev => ({ ...prev, [exerciseId]: true }));
+    const result = await thankExercise(exerciseId);
+    if (result.ok) {
+      setUserThanks(prev => ({ ...prev, [exerciseId]: true }));
+      setExercises(prev => prev.map(ex =>
+        ex.id === exerciseId ? { ...ex, thanksCount: (ex.thanksCount || 0) + 1 } : ex
+      ));
+    } else if (result.alreadyThanked) {
+      setUserThanks(prev => ({ ...prev, [exerciseId]: true }));
+    }
+    setThanksLoading(prev => ({ ...prev, [exerciseId]: false }));
   };
 
   const filterPill = (active: boolean) =>
@@ -474,7 +570,11 @@ export const CommunityExercisesTab = ({ onStartExercise }: CommunityExercisesTab
                     isRatingLoading={!!ratingLoading[ex.id]}
                     onExpand={id => setExpandedId(expandedId === id ? null : id)}
                     isExpanded={expandedId === ex.id}
-                    onStart={ex => onStartExercise(buildChallenge(ex))}
+                    onStart={handleStart}
+                    isOwnExercise={!!userAuth && userAuth === ex.authorId}
+                    hasThanked={!!userThanks[ex.id]}
+                    isThanksLoading={!!thanksLoading[ex.id]}
+                    onThank={handleThank}
                   />
                 ))
               )}
