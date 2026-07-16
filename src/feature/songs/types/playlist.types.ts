@@ -41,7 +41,12 @@ export interface Playlist {
   likeCount?: number;
   /** User ids who liked it — drives the toggle and prevents double-liking. */
   likes?: string[];
-  importedFrom?: { playlistId: string; ownerName?: string };
+  importedFrom?: {
+    playlistId: string;
+    ownerId?: string;
+    ownerName?: string;
+    ownerAvatar?: string;
+  };
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
