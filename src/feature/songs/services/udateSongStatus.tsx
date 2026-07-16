@@ -109,3 +109,24 @@ export const updateSongStatus = async (
     throw error;
   }
 };
+
+// Called when a user finishes practicing a song. Songs that aren't tracked yet
+// or are still sitting in "want to learn" move to "learning" — songs already
+// "learning" or "learned" are left untouched so this never downgrades progress.
+export const ensureSongIsLearning = async (
+  userId: string,
+  songId: string,
+  title: string,
+  artist: string,
+  avatarUrl: string | undefined
+) => {
+  const userSongsRef = doc(db, "users", userId, "userSongs", songId);
+  const userSongsSnap = await getDoc(userSongsRef);
+  const currentStatus = userSongsSnap.exists()
+    ? (userSongsSnap.data().status as SongStatus | undefined)
+    : undefined;
+
+  if (currentStatus === "learning" || currentStatus === "learned") return;
+
+  await updateSongStatus(userId, songId, title, artist, "learning", avatarUrl);
+};
