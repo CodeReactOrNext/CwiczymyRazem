@@ -1,4 +1,9 @@
 import { Button } from "assets/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { useTablatureAudio } from "feature/exercisePlan/hooks/useTablatureAudio";
@@ -7,6 +12,18 @@ import type {
   TablatureMeasure,
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
+import {
+  beatsDurationInQuarters,
+  isMeasureComplete,
+  measureDurationInQuarters,
+  stepsForDuration,
+} from "feature/exercisePlan/utils/measureDuration";
+import {
+  createMeasure,
+  DEFAULT_STEPS,
+  DEFAULT_TIME_SIGNATURE,
+  regridMeasure,
+} from "feature/exercisePlan/utils/measureGrid";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { AnimatePresence, motion } from "framer-motion";
@@ -21,6 +38,7 @@ import {
   LucideRedo2,
   LucideSquare,
   LucideTrash2,
+  LucideTriangleAlert,
   LucideUndo2,
   LucideVolume2,
   LucideVolumeX,
@@ -106,6 +124,35 @@ const STEP_OPTIONS: { value: number; title: string }[] = [
   { value: 32, title: "32 steps — thirty-second notes" },
 ];
 
+const TIME_SIGNATURES: [number, number][] = [
+  [4, 4],
+  [3, 4],
+  [2, 4],
+  [5, 4],
+  [6, 8],
+  [7, 8],
+];
+
+const FRET_MAX = 24;
+const HISTORY_LIMIT = 50;
+
+// Same range the metronome offers (see Metronome/hooks/useMetronome).
+const BPM_MIN = 40;
+const BPM_MAX = 208;
+const BPM_FALLBACK = 80;
+
+const clampBpm = (value: number) => Math.max(BPM_MIN, Math.min(BPM_MAX, value));
+
+// A wheel gesture fires a tick every few ms. Ticks on the same cell within this
+// window collapse into a single history entry, so one flick of the wheel costs
+// one undo instead of flooding the whole buffer.
+const HISTORY_COALESCE_MS = 600;
+
+/** Trims float noise from triplet grids: 3.9999999999999982 → "4". */
+function formatQuarters(quarters: number): string {
+  return String(Number(quarters.toFixed(2)));
+}
+
 // String 1 (top row) = high e, string 6 = low E — standard tuning labels.
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
 
@@ -187,17 +234,31 @@ function ToolbarIconButton({
   );
 }
 
+type HistoryState = {
+  entries: string[];
+  idx: number;
+  /** Identifies the gesture that wrote the newest entry, for coalescing. */
+  lastKey: string | null;
+  lastAt: number;
+};
+
+const EMPTY_HISTORY: HistoryState = {
+  entries: [],
+  idx: -1,
+  lastKey: null,
+  lastAt: 0,
+};
+
 export default function TabEditor() {
   const router = useRouter();
   const [measures, setMeasures] = useState<TablatureMeasure[]>([
-    {
-      timeSignature: [4, 4],
-      beats: Array(16)
-        .fill(null)
-        .map(() => ({ duration: 0.25, notes: [] })),
-    },
+    createMeasure(),
   ]);
-  const [bpm, setBpm] = useState(80);
+  const [bpm, setBpm] = useState(BPM_FALLBACK);
+  // Holds what's literally in the BPM field while it's being typed, so the box
+  // can sit empty or half-typed ("12" on the way to "120") instead of snapping
+  // to a fallback on every keystroke. Null = not editing, show `bpm`.
+  const [bpmDraft, setBpmDraft] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -207,6 +268,7 @@ export default function TabEditor() {
     stringIdx: number;
   } | null>(null);
   const [isGpModalOpen, setIsGpModalOpen] = useState(false);
+  const gridRef = React.useRef<HTMLDivElement>(null);
   const selectionStartRef = React.useRef<{
     mIdx: number;
     bIdx: number;
@@ -225,8 +287,7 @@ export default function TabEditor() {
     beats: TablatureBeat[];
     baseStringIdx: number;
   } | null>(null);
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIdx, setHistoryIdx] = useState(-1);
+  const [history, setHistory] = useState<HistoryState>(EMPTY_HISTORY);
   const [autoAdvance, setAutoAdvance] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [toast, setToast] = useState<{
@@ -246,36 +307,80 @@ export default function TabEditor() {
     [setToast],
   );
 
+  // Mirrors `measures` for callers that run outside React's render cycle — the
+  // native wheel listener fires faster than we re-render, so consecutive ticks
+  // have to build on each other's result rather than on a stale closure.
+  const measuresRef = React.useRef(measures);
+  useEffect(() => {
+    measuresRef.current = measures;
+  }, [measures]);
+
+  /**
+   * Records a snapshot. `coalesceKey` folds a burst of edits from one gesture
+   * into a single entry: repeated calls with the same key inside
+   * HISTORY_COALESCE_MS overwrite the newest entry instead of appending.
+   */
   const saveHistory = useCallback(
-    (newMeasures: TablatureMeasure[]) => {
+    (newMeasures: TablatureMeasure[], coalesceKey?: string) => {
       const serialized = JSON.stringify(newMeasures);
-      if (history[historyIdx] === serialized) return;
+      const now = Date.now();
 
-      const newHistory = history.slice(0, historyIdx + 1);
-      newHistory.push(serialized);
-      if (newHistory.length > 50) newHistory.shift();
+      setHistory((prev) => {
+        if (prev.entries[prev.idx] === serialized) return prev;
 
-      setHistory(newHistory);
-      setHistoryIdx(newHistory.length - 1);
+        const entries = prev.entries.slice(0, prev.idx + 1);
+        const canCoalesce =
+          coalesceKey != null &&
+          coalesceKey === prev.lastKey &&
+          entries.length > 1 &&
+          now - prev.lastAt < HISTORY_COALESCE_MS;
+
+        if (canCoalesce) entries[entries.length - 1] = serialized;
+        else entries.push(serialized);
+        if (entries.length > HISTORY_LIMIT) entries.shift();
+
+        return {
+          entries,
+          idx: entries.length - 1,
+          lastKey: coalesceKey ?? null,
+          lastAt: now,
+        };
+      });
     },
-    [history, historyIdx, setHistory, setHistoryIdx],
+    [],
   );
 
+  /**
+   * The single write path for the tablature: state, the ref mirror and history
+   * always move together, so no edit can silently skip undo.
+   */
+  const commit = useCallback(
+    (newMeasures: TablatureMeasure[], coalesceKey?: string) => {
+      measuresRef.current = newMeasures;
+      setMeasures(newMeasures);
+      saveHistory(newMeasures, coalesceKey);
+    },
+    [saveHistory],
+  );
+
+  const canUndo = history.idx > 0;
+  const canRedo = history.idx < history.entries.length - 1;
+
   const undo = useCallback(() => {
-    if (historyIdx > 0) {
-      const prev = history[historyIdx - 1];
-      setMeasures(JSON.parse(prev));
-      setHistoryIdx(historyIdx - 1);
-    }
-  }, [history, historyIdx, setMeasures, setHistoryIdx]);
+    if (history.idx <= 0) return;
+    const previous = JSON.parse(history.entries[history.idx - 1]);
+    measuresRef.current = previous;
+    setMeasures(previous);
+    setHistory((prev) => ({ ...prev, idx: prev.idx - 1, lastKey: null }));
+  }, [history]);
 
   const redo = useCallback(() => {
-    if (historyIdx < history.length - 1) {
-      const next = history[historyIdx + 1];
-      setMeasures(JSON.parse(next));
-      setHistoryIdx(historyIdx + 1);
-    }
-  }, [history, historyIdx, setMeasures, setHistoryIdx]);
+    if (history.idx >= history.entries.length - 1) return;
+    const next = JSON.parse(history.entries[history.idx + 1]);
+    measuresRef.current = next;
+    setMeasures(next);
+    setHistory((prev) => ({ ...prev, idx: prev.idx + 1, lastKey: null }));
+  }, [history]);
 
   const editId =
     typeof router.query.edit === "string" ? router.query.edit : null;
@@ -285,23 +390,29 @@ export default function TabEditor() {
   // round-trip to the publish page) doesn't wipe the editor. Works for both
   // edit mode (draft holds the exercise's tablature) and create mode.
   useEffect(() => {
+    const seed = (initial: TablatureMeasure[]) => {
+      measuresRef.current = initial;
+      setMeasures(initial);
+      setHistory({
+        entries: [JSON.stringify(initial)],
+        idx: 0,
+        lastKey: null,
+        lastAt: 0,
+      });
+    };
+
     let restored = false;
     try {
       const raw = localStorage.getItem("tab-editor-draft");
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setMeasures(parsed);
-          setHistory([JSON.stringify(parsed)]);
-          setHistoryIdx(0);
+          seed(parsed);
           restored = true;
         }
       }
     } catch {}
-    if (!restored) {
-      setHistory([JSON.stringify(measures)]);
-      setHistoryIdx(0);
-    }
+    if (!restored) seed(measures);
     setIsDraftLoaded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -328,6 +439,17 @@ export default function TabEditor() {
   const startPlayback = () => {
     setStartTime(Date.now());
     setIsPlaying(true);
+  };
+
+  const commitBpmDraft = () => {
+    const parsed = parseInt(bpmDraft ?? "", 10);
+    if (!Number.isNaN(parsed)) setBpm(clampBpm(parsed));
+    setBpmDraft(null);
+  };
+
+  const nudgeBpm = (delta: number) => {
+    setBpmDraft(null);
+    setBpm((current) => clampBpm(current + delta));
   };
 
   const processImportText = useCallback((text: string) => {
@@ -412,14 +534,13 @@ export default function TabEditor() {
         showToast("This track has no tablature notes.", "error");
         return;
       }
-      setMeasures(importedMeasures);
-      saveHistory(importedMeasures);
+      commit(importedMeasures);
       if (tempo > 0) setBpm(Math.round(tempo));
       setSelectedCell(null);
       setActiveSelection(null);
       showToast(`Loaded "${trackName}" from ${fileName}`, "success");
     },
-    [saveHistory, showToast],
+    [commit, showToast],
   );
 
   const stopPlayback = () => {
@@ -428,43 +549,55 @@ export default function TabEditor() {
   };
 
   const addMeasure = () => {
-    setMeasures([
+    // Inherit the last measure's signature and grid — a 3/4 piece shouldn't
+    // sprout a 4/4 bar at the end.
+    const last = measures[measures.length - 1];
+    commit([
       ...measures,
-      {
-        timeSignature: [4, 4],
-        beats: Array(16)
-          .fill(null)
-          .map(() => ({ duration: 0.25, notes: [] })),
-      },
+      createMeasure(
+        last?.timeSignature ?? DEFAULT_TIME_SIGNATURE,
+        last?.beats.length ?? DEFAULT_STEPS,
+      ),
     ]);
   };
 
-  const updateMeasureSteps = (mIdx: number, steps: number) => {
-    const newMeasures = [...measures];
-    const currentBeats = newMeasures[mIdx].beats;
-    const duration = 4 / steps;
-
-    const newBeats = Array(steps)
-      .fill(null)
-      .map((_, i) => {
-        if (i < currentBeats.length) {
-          return { ...currentBeats[i], duration };
-        }
-        return { duration, notes: [] };
-      });
-
-    newMeasures[mIdx].beats = newBeats;
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
+  const regridAt = (
+    mIdx: number,
+    timeSignature: [number, number],
+    steps: number,
+  ) => {
+    commit(
+      measures.map((m, i) =>
+        i === mIdx ? regridMeasure(m, timeSignature, steps) : m,
+      ),
+    );
     if (selectedCell?.measureIdx === mIdx && selectedCell.beatIdx >= steps) {
       setSelectedCell({ ...selectedCell, beatIdx: steps - 1 });
     }
+  };
+
+  const updateMeasureSteps = (mIdx: number, steps: number) => {
+    regridAt(mIdx, measures[mIdx].timeSignature, steps);
     showToast(`Measure #${mIdx + 1}: ${steps} steps`, "info");
+  };
+
+  const updateTimeSignature = (
+    mIdx: number,
+    timeSignature: [number, number],
+  ) => {
+    const current = measures[mIdx].timeSignature;
+    if (current[0] === timeSignature[0] && current[1] === timeSignature[1])
+      return;
+    regridAt(mIdx, timeSignature, measures[mIdx].beats.length);
+    showToast(
+      `Measure #${mIdx + 1}: ${timeSignature[0]}/${timeSignature[1]}`,
+      "info",
+    );
   };
 
   const removeMeasure = (index: number) => {
     if (measures.length > 1) {
-      setMeasures(measures.filter((_, i) => i !== index));
+      commit(measures.filter((_, i) => i !== index));
       setSelectedCell(null);
       setActiveSelection(null);
     }
@@ -472,14 +605,9 @@ export default function TabEditor() {
 
   const clearAll = () => {
     if (confirm("Clear all measures?")) {
-      setMeasures([
-        {
-          timeSignature: [4, 4],
-          beats: Array(16)
-            .fill(null)
-            .map(() => ({ duration: 0.25, notes: [] })),
-        },
-      ]);
+      commit([createMeasure()]);
+      setSelectedCell(null);
+      setActiveSelection(null);
     }
   };
 
@@ -494,33 +622,22 @@ export default function TabEditor() {
     saveHistory(newMeasures);
   };
 
-  const setGlobalDuration = (duration: number) => {
-    const newMeasures = measures.map((m) => ({
-      ...m,
-      beats: m.beats.map((b) => ({ ...b, duration })),
-    }));
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
-  };
-
-  const handleWheel = (
-    e: React.WheelEvent,
-    mIdx: number,
-    bIdx: number,
-    sIdx: number,
-  ) => {
-    e.preventDefault();
-    const string = sIdx + 1;
-    const newMeasures = [...measures];
-    const beat = newMeasures[mIdx].beats[bIdx];
-    const note = beat.notes.find((n) => n.string === string);
-
-    if (note) {
-      const delta = e.deltaY < 0 ? 1 : -1;
-      note.fret = Math.max(0, Math.min(24, note.fret + delta));
-      setMeasures(newMeasures);
-      saveHistory(newMeasures);
-    }
+  /**
+   * Re-grid every measure so one step equals `duration`. The step count is
+   * derived per measure from its own signature, which is what keeps each bar the
+   * right length — setting the duration alone (the old behaviour) turned a
+   * 16-step 4/4 bar into 16 quarter notes, i.e. four bars of material.
+   */
+  const applyGridResolution = (duration: number) => {
+    commit(
+      measures.map((m) =>
+        regridMeasure(
+          m,
+          m.timeSignature,
+          stepsForDuration(m.timeSignature, duration),
+        ),
+      ),
+    );
   };
 
   const updateFret = (
@@ -576,6 +693,66 @@ export default function TabEditor() {
 
     setMeasures(newMeasures);
   };
+
+  // Fret nudging with the wheel. React registers `wheel` as a passive listener
+  // at the root, so an onWheel prop can never preventDefault the page scroll —
+  // it has to be a native listener with { passive: false }. One listener on the
+  // grid container covers every cell via event delegation.
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return undefined;
+
+    const onWheel = (e: WheelEvent) => {
+      // Horizontal gesture: that's the tab strip being scrolled, not a fret nudge.
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+      const cell = (e.target as HTMLElement).closest<HTMLElement>(
+        "[data-bidx]",
+      );
+      const measureEl = cell?.closest<HTMLElement>("[data-midx]");
+      if (!cell || !measureEl) return;
+
+      const mIdx = Number(measureEl.dataset.midx);
+      const bIdx = Number(cell.dataset.bidx);
+      const sIdx = Number(cell.dataset.sidx);
+
+      const current = measuresRef.current;
+      const note = current[mIdx]?.beats[bIdx]?.notes.find(
+        (n) => n.string === sIdx + 1,
+      );
+      // Empty cell: leave the wheel alone so the page still scrolls over it.
+      if (!note) return;
+
+      const fret = Math.max(
+        0,
+        Math.min(FRET_MAX, note.fret + (e.deltaY < 0 ? 1 : -1)),
+      );
+      e.preventDefault();
+      if (fret === note.fret) return;
+
+      const next = current.map((m, i) =>
+        i !== mIdx
+          ? m
+          : {
+              ...m,
+              beats: m.beats.map((b, j) =>
+                j !== bIdx
+                  ? b
+                  : {
+                      ...b,
+                      notes: b.notes.map((n) =>
+                        n.string === sIdx + 1 ? { ...n, fret } : n,
+                      ),
+                    },
+              ),
+            },
+      );
+      commit(next, `wheel:${mIdx}:${bIdx}:${sIdx}`);
+    };
+
+    grid.addEventListener("wheel", onWheel, { passive: false });
+    return () => grid.removeEventListener("wheel", onWheel);
+  }, [commit]);
 
   const clearSelectedNote = useCallback(() => {
     if (!selectedCell) return;
@@ -715,23 +892,52 @@ export default function TabEditor() {
     (e: KeyboardEvent) => {
       if (isGpModalOpen) return;
 
-      if (e.key.toLowerCase() === "z" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
+      // Text fields own their keystrokes. This listener lives on window, so
+      // without the guard the digits typed into BPM (or the fret box) would
+      // *also* be written into the selected cell, and Backspace would wipe the
+      // note instead of a character.
+      const target = e.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      )
         return;
+
+      // Every Ctrl/Cmd chord is handled here and nowhere else. Without this
+      // gate the single-letter branches below would swallow them — Ctrl+V used
+      // to toggle vibrato instead of pasting, Ctrl+A set an accent while the
+      // browser selected the page, and so on for Ctrl+P/D/T.
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case "z":
+            e.preventDefault();
+            if (e.shiftKey) redo();
+            else undo();
+            return;
+          case "y":
+            e.preventDefault();
+            redo();
+            return;
+          case "x":
+            e.preventDefault();
+            handleCopySelection();
+            handleDeleteSelection();
+            return;
+          case "c":
+            handleCopySelection();
+            return;
+          case "v":
+            // No preventDefault: the window `paste` listener still needs the
+            // event to import tablature sitting in the system clipboard.
+            handlePasteAtCursor();
+            return;
+          default:
+            // Leave the rest to the browser (Ctrl+A, Ctrl+P, Ctrl+T, …).
+            return;
+        }
       }
-      if (e.key.toLowerCase() === "y" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        redo();
-        return;
-      }
-      if (e.key.toLowerCase() === "x" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        handleCopySelection();
-        handleDeleteSelection();
-        return;
-      }
+
       if (e.key === "Escape") {
         setSelectedCell(null);
         setActiveSelection(null);
@@ -891,10 +1097,6 @@ export default function TabEditor() {
         e.preventDefault();
         if (stringIdx < 5)
           setSelectedCell({ ...selectedCell, stringIdx: stringIdx + 1 });
-      } else if (e.key.toLowerCase() === "c" && (e.ctrlKey || e.metaKey)) {
-        handleCopySelection();
-      } else if (e.key.toLowerCase() === "v" && (e.ctrlKey || e.metaKey)) {
-        handlePasteAtCursor();
       }
     },
     [
@@ -1070,6 +1272,25 @@ export default function TabEditor() {
     };
   }, [handleKeyDown, handlePaste, isDragging]);
 
+  // The grid resolution only counts as "active" when every beat in the piece
+  // actually sits on it. Reading measures[0].beats[0] used to light a button up
+  // even after the rest of the tab had been re-gridded by hand.
+  const uniformDuration = React.useMemo(() => {
+    const durations = new Set(
+      measures.flatMap((m) => m.beats.map((b) => b.duration)),
+    );
+    return durations.size === 1 ? [...durations][0] : null;
+  }, [measures]);
+
+  const incompleteMeasures = React.useMemo(
+    () => measures.map((m) => !isMeasureComplete(m)),
+    [measures],
+  );
+  const incompleteCount = incompleteMeasures.filter(Boolean).length;
+
+  const selectedMeasure = selectedCell
+    ? measures[selectedCell.measureIdx]
+    : undefined;
   const selectedBeat = selectedCell
     ? measures[selectedCell.measureIdx]?.beats[selectedCell.beatIdx]
     : undefined;
@@ -1140,9 +1361,7 @@ export default function TabEditor() {
             <div className='flex items-center gap-4'>
               <BackLink label='Back' onClick={() => router.back()} />
               <div>
-                <h1 className='text-xl font-black italic tracking-tighter text-zinc-100'>
-                  Tab Editor
-                </h1>
+                <h1 className='text-xl font-bold text-zinc-100'>Tab Editor</h1>
                 <p className='text-[11px] font-bold text-zinc-500'>
                   {measures.length} measure{measures.length !== 1 ? "s" : ""} ·{" "}
                   {editId ? "Editing exercise" : "New exercise"}
@@ -1163,13 +1382,13 @@ export default function TabEditor() {
                   icon={LucideUndo2}
                   label='Undo'
                   onClick={undo}
-                  disabled={historyIdx <= 0}
+                  disabled={!canUndo}
                 />
                 <ToolbarIconButton
                   icon={LucideRedo2}
                   label='Redo'
                   onClick={redo}
-                  disabled={historyIdx >= history.length - 1}
+                  disabled={!canRedo}
                 />
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <ToolbarIconButton
@@ -1210,29 +1429,56 @@ export default function TabEditor() {
                   }
                 />
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
-                <label className='flex flex-col justify-center px-2 py-1'>
-                  <span className='text-[9px] font-bold leading-tight text-zinc-500'>
+                <ToolbarIconButton
+                  icon={LucideMinus}
+                  label='Decrease tempo'
+                  onClick={() => nudgeBpm(-1)}
+                  disabled={bpm <= BPM_MIN}
+                />
+                <label
+                  className='flex items-baseline gap-1 px-1'
+                  title={`Tempo in beats per minute (${BPM_MIN}–${BPM_MAX})`}>
+                  <input
+                    type='text'
+                    inputMode='numeric'
+                    value={bpmDraft ?? String(bpm)}
+                    aria-label='Tempo in beats per minute'
+                    onChange={(e) =>
+                      setBpmDraft(e.target.value.replace(/\D/g, "").slice(0, 3))
+                    }
+                    onFocus={(e) => e.target.select()}
+                    onBlur={commitBpmDraft}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.currentTarget.blur();
+                      if (e.key === "Escape") {
+                        setBpmDraft(null);
+                        e.currentTarget.blur();
+                      }
+                    }}
+                    className='w-10 rounded bg-transparent text-right text-lg font-bold tabular-nums text-zinc-100 outline-none transition-colors focus-visible:bg-zinc-800/60'
+                  />
+                  <span className='text-[10px] font-bold text-zinc-500'>
                     BPM
                   </span>
-                  <input
-                    type='number'
-                    value={bpm}
-                    onChange={(e) => setBpm(parseInt(e.target.value) || 80)}
-                    className='w-9 bg-transparent text-xs font-bold text-zinc-100 outline-none'
-                  />
                 </label>
+                <ToolbarIconButton
+                  icon={LucidePlus}
+                  label='Increase tempo'
+                  onClick={() => nudgeBpm(1)}
+                  disabled={bpm >= BPM_MAX}
+                />
               </div>
 
               <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
                 {DURATIONS.map((d) => (
                   <button
                     key={d.value}
-                    onClick={() => setGlobalDuration(d.value)}
-                    title={`${d.label} (${d.short}) — apply to all beats`}
-                    aria-label={`${d.label} — apply to all beats`}
+                    onClick={() => applyGridResolution(d.value)}
+                    title={`Grid resolution: ${d.short} (${d.label.toLowerCase()}) — re-grids every measure and replaces the current rhythm`}
+                    aria-label={`Set grid resolution to ${d.label}`}
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                      d.value === measures[0]?.beats[0]?.duration
+                      uniformDuration === d.value
                         ? "bg-zinc-700 text-zinc-100"
                         : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
                     )}>
@@ -1240,25 +1486,45 @@ export default function TabEditor() {
                   </button>
                 ))}
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
-                <button
-                  onClick={() => setAutoAdvance(!autoAdvance)}
-                  title='Auto-advance to the next beat after typing a fret'
-                  className={cn(
-                    "flex h-8 items-center justify-center gap-2 rounded px-2.5 text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                    autoAdvance
-                      ? "bg-zinc-700 text-zinc-100"
-                      : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
-                  )}>
-                  <div
-                    className={cn(
-                      "h-1 w-1 rounded-full",
-                      autoAdvance
-                        ? "animate-pulse bg-emerald-400"
-                        : "bg-zinc-600",
-                    )}
-                  />
-                  Auto next
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setAutoAdvance(!autoAdvance)}
+                      aria-pressed={autoAdvance}
+                      className={cn(
+                        "flex h-8 items-center justify-center gap-2 rounded px-2.5 text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        autoAdvance
+                          ? "bg-zinc-700 text-zinc-100"
+                          : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
+                      )}>
+                      <div
+                        className={cn(
+                          "h-1 w-1 rounded-full",
+                          autoAdvance
+                            ? "animate-pulse bg-emerald-400"
+                            : "bg-zinc-600",
+                        )}
+                      />
+                      Auto next
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side='bottom' className='max-w-[260px]'>
+                    <p className='font-bold'>
+                      Auto next — {autoAdvance ? "on" : "off"}
+                    </p>
+                    <p className='mt-1 font-normal leading-relaxed'>
+                      Type a fret and the cursor jumps to the next beat on the
+                      same string, so you can enter a run without arrowing
+                      across. It wraps into the following measure and stops at
+                      the end of the tab.
+                    </p>
+                    <p className='mt-1.5 font-normal leading-relaxed'>
+                      Turn it off to type frets above 9: two-digit frets need
+                      both digits in the same cell (1 then 2 → 12), and
+                      auto-advance moves the cursor after the first one.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <Button
@@ -1354,9 +1620,16 @@ export default function TabEditor() {
             <div className='flex items-center gap-3 border-b border-zinc-800 bg-zinc-900/60 px-4 py-2.5'>
               <h2 className='text-xs font-bold text-zinc-300'>Tablature</h2>
               <span className='text-[11px] font-semibold text-zinc-500'>
-                4/4 · {measures.length} measure
-                {measures.length !== 1 ? "s" : ""}
+                {measures.length} measure{measures.length !== 1 ? "s" : ""}
               </span>
+              {incompleteCount > 0 && (
+                <span className='flex items-center gap-1.5 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400'>
+                  <LucideTriangleAlert size={11} />
+                  {incompleteCount} measure{incompleteCount !== 1 ? "s" : ""}{" "}
+                  {incompleteCount !== 1 ? "don't" : "doesn't"} fill{" "}
+                  {incompleteCount !== 1 ? "their" : "its"} time signature
+                </span>
+              )}
             </div>
             <div className='p-5'>
               <div className='flex'>
@@ -1372,17 +1645,27 @@ export default function TabEditor() {
                 </div>
 
                 <div className='custom-scrollbar flex-1 overflow-x-auto pb-2'>
-                  <div className='flex min-w-max'>
+                  <div className='flex min-w-max' ref={gridRef}>
                     <div className='flex overflow-hidden rounded-lg border border-zinc-800'>
                       {measures.map((measure, mIdx) => {
                         // Group columns per beat (e.g. 16 steps in 4/4 → 4 columns per beat)
                         // so vertical separators land on musical beats, like real tab.
                         const groupSize = Math.max(
                           1,
-                          Math.round(measure.beats.length / 4),
+                          Math.round(
+                            measure.beats.length / measure.timeSignature[0],
+                          ),
                         );
                         const isSelectedMeasure =
                           selectedCell?.measureIdx === mIdx;
+                        const isIncomplete = incompleteMeasures[mIdx];
+                        // Show the signature on the first bar and wherever it changes.
+                        const showSignature =
+                          mIdx === 0 ||
+                          measures[mIdx - 1].timeSignature[0] !==
+                            measure.timeSignature[0] ||
+                          measures[mIdx - 1].timeSignature[1] !==
+                            measure.timeSignature[1];
 
                         return (
                           <div
@@ -1391,7 +1674,7 @@ export default function TabEditor() {
                               "flex flex-col",
                               mIdx > 0 && "border-l-2 border-zinc-600",
                             )}>
-                            <div className='flex h-6 items-center border-b border-zinc-800 bg-zinc-900/60 px-1.5'>
+                            <div className='flex h-6 items-center gap-1.5 border-b border-zinc-800 bg-zinc-900/60 px-1.5'>
                               <span
                                 className={cn(
                                   "text-[10px] font-bold",
@@ -1401,9 +1684,23 @@ export default function TabEditor() {
                                 )}>
                                 {mIdx + 1}
                               </span>
+                              {showSignature && (
+                                <span className='text-[10px] font-bold text-cyan-400'>
+                                  {measure.timeSignature[0]}/
+                                  {measure.timeSignature[1]}
+                                </span>
+                              )}
+                              {isIncomplete && (
+                                <LucideTriangleAlert
+                                  size={10}
+                                  className='text-rose-400'
+                                  aria-label={`Measure ${mIdx + 1} does not fill ${measure.timeSignature[0]}/${measure.timeSignature[1]}`}
+                                />
+                              )}
                             </div>
                             <div
                               id={`measure-grid-${mIdx}`}
+                              data-midx={mIdx}
                               className='relative flex'
                               onMouseDown={(e) => {
                                 if (e.button !== 0) return;
@@ -1556,9 +1853,6 @@ export default function TabEditor() {
                                           key={sIdx}
                                           data-bidx={bIdx}
                                           data-sidx={sIdx}
-                                          onWheel={(e) =>
-                                            handleWheel(e, mIdx, bIdx, sIdx)
-                                          }
                                           className={cn(
                                             "group-cell relative flex h-8 w-8 cursor-pointer items-center justify-center transition-colors",
                                             isSelected
@@ -1777,6 +2071,31 @@ export default function TabEditor() {
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
+                  Time signature
+                </span>
+                <div className='grid grid-cols-6 gap-1'>
+                  {TIME_SIGNATURES.map((ts) => (
+                    <button
+                      key={`${ts[0]}/${ts[1]}`}
+                      onClick={() =>
+                        updateTimeSignature(selectedCell.measureIdx, ts)
+                      }
+                      title={`${ts[0]}/${ts[1]} — re-grids measure #${selectedCell.measureIdx + 1}`}
+                      className={cn(
+                        "flex h-7 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        selectedMeasure?.timeSignature[0] === ts[0] &&
+                          selectedMeasure?.timeSignature[1] === ts[1]
+                          ? "bg-zinc-700 text-zinc-100"
+                          : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                      )}>
+                      {ts[0]}/{ts[1]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+                <span className='text-[11px] font-semibold text-zinc-500'>
                   Measure steps
                 </span>
                 <div className='flex gap-1'>
@@ -1798,6 +2117,26 @@ export default function TabEditor() {
                     </button>
                   ))}
                 </div>
+                {selectedMeasure && !isMeasureComplete(selectedMeasure) && (
+                  <p className='flex items-start gap-2 rounded bg-rose-500/10 p-2 text-[11px] font-semibold leading-relaxed text-rose-400'>
+                    <LucideTriangleAlert size={13} className='mt-px shrink-0' />
+                    <span>
+                      Beats add up to{" "}
+                      {formatQuarters(
+                        beatsDurationInQuarters(selectedMeasure.beats),
+                      )}{" "}
+                      of the{" "}
+                      {formatQuarters(
+                        measureDurationInQuarters(
+                          selectedMeasure.timeSignature,
+                        ),
+                      )}{" "}
+                      quarter notes in {selectedMeasure.timeSignature[0]}/
+                      {selectedMeasure.timeSignature[1]}. Pick a step count to
+                      re-grid it.
+                    </span>
+                  </p>
+                )}
               </div>
 
               <div className='flex gap-1.5 border-t border-zinc-800 pt-4'>
