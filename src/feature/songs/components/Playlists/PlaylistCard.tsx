@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import type { Playlist } from "feature/songs/types/playlist.types";
 import { getPlaylistPopularity } from "feature/songs/types/playlist.types";
-import { Flame, Globe, Heart } from "lucide-react";
+import { Flame, GitFork, Globe, Heart } from "lucide-react";
 
 import { PlaylistCover } from "./PlaylistCover";
 import { KIND_META } from "./playlistVisuals";
@@ -90,6 +90,14 @@ export const PlaylistCard = ({
                   </span>
                 )}
                 <span className="truncate">{playlist.ownerName}</span>
+              </span>
+            </>
+          ) : playlist.importedFrom?.ownerName ? (
+            <>
+              <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+              <span className="flex min-w-0 items-center gap-1 text-zinc-500">
+                <GitFork className="h-3 w-3 shrink-0" />
+                <span className="truncate">from {playlist.importedFrom.ownerName}</span>
               </span>
             </>
           ) : (

@@ -69,6 +69,7 @@ import {
   Check,
   Flag,
   Flame,
+  GitFork,
   Globe,
   GripVertical,
   Heart,
@@ -631,7 +632,10 @@ export const PlaylistDetailView = ({
               {playlist.importedFrom?.ownerName && (
                 <>
                   <span className="h-1 w-1 rounded-full bg-zinc-600" />
-                  <span className="text-zinc-500">from {playlist.importedFrom.ownerName}</span>
+                  <span className="flex items-center gap-1 text-zinc-500">
+                    <GitFork className="h-3 w-3" />
+                    from {playlist.importedFrom.ownerName}
+                  </span>
                 </>
               )}
             </p>
