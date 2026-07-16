@@ -264,7 +264,7 @@
     "description": "Read a root note and an interval, then find and play the target note anywhere on the neck.",
     "difficulty": "medium",
     "category": "theory",
-    "customGoal": "F#",
+    "customGoal": "F",
     "whyItMatters": "Intervals are the building blocks of melody and harmony. Translating an interval into a note and finding it instantly on the neck trains the ear-to-hands link that underpins improvising and playing by ear."
   },
   {

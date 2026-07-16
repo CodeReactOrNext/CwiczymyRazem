@@ -80,7 +80,10 @@ service cloud.firestore {
       // Author can update their own exercise (but cannot change authorId).
       // Any signed-in user may update ONLY the rating aggregate fields, so
       // people can rate exercises they don't own (rateExercise writes the new
-      // average/count onto the exercise doc inside its transaction).
+      // average/count onto the exercise doc inside its transaction). Any
+      // signed-in user may also bump playCount by starting the exercise —
+      // it's a low-stakes, self-serve counter (unlike thanksCount, which
+      // gates a fame reward and is only written by the backend below).
       allow update: if request.auth != null && (
         (
           resource.data.authorId == request.auth.uid
@@ -94,6 +97,11 @@ service cloud.firestore {
           && request.resource.data.ratingCount is int
           && request.resource.data.ratingCount >= 0
         )
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playCount'])
+          && request.resource.data.playCount is int
+          && request.resource.data.playCount >= 0
+        )
       );
 
       allow delete: if request.auth != null
@@ -103,6 +111,23 @@ service cloud.firestore {
       match /ratings/{userId} {
         allow read:  if request.auth != null;
         allow write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Thanks subcollection — awards the author fame, so it's only ever
+      // written by the backend (Admin SDK, see /api/community-exercises/thank),
+      // which also bypasses the read rule below. Clients may only read it,
+      // e.g. to show whether the current user already thanked the exercise.
+      match /thanks/{userId} {
+        allow read:  if request.auth != null;
+        allow write: if false;
+      }
+
+      // Completions subcollection — dedupes the "first completion" fame
+      // reward (see /api/community-exercises/complete). Backend-only, same
+      // reasoning as thanks above.
+      match /completions/{userId} {
+        allow read:  if request.auth != null;
+        allow write: if false;
       }
     }
 

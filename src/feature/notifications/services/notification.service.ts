@@ -7,7 +7,7 @@ import {
   serverTimestamp,
   updateDoc,
   where,
-  writeBatch
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -19,7 +19,9 @@ type NotificationType =
   | "season_start"
   | "marketplace_sold"
   | "playlist_saved"
-  | "playlist_liked";
+  | "playlist_liked"
+  | "exercise_thanked"
+  | "exercise_completed";
 
 export interface AppNotification {
   id: string;
@@ -43,18 +45,23 @@ export interface AppNotification {
   // Playlist save/like fields
   playlistId?: string;
   playlistName?: string;
+  // Community exercise thank/completion fields
+  exerciseId?: string;
+  exerciseTitle?: string;
   timestamp: any;
   isRead: boolean;
 }
 
-const addNotification = async (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
+const addNotification = async (
+  notification: Omit<AppNotification, "id" | "timestamp" | "isRead">,
+) => {
   // Basic avoid self-notification
   if (notification.userId === notification.senderId) return;
 
   await addDoc(collection(db, "notifications"), {
     ...notification,
     isRead: false,
-    timestamp: serverTimestamp()
+    timestamp: serverTimestamp(),
   });
 };
 
@@ -67,7 +74,7 @@ export const markAllNotificationsAsRead = async (userId: string) => {
   const q = query(
     collection(db, "notifications"),
     where("userId", "==", userId),
-    where("isRead", "==", false)
+    where("isRead", "==", false),
   );
   const snapshot = await getDocs(q);
 

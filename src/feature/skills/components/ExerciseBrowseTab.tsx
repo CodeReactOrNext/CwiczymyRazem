@@ -30,18 +30,18 @@ interface ExerciseBrowseTabProps {
 const PAGE_SIZE = 15;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  technique: "bg-blue-500/[0.12] text-blue-400 border-blue-500/30",
-  theory: "bg-violet-500/[0.12] text-violet-400 border-violet-500/30",
-  hearing: "bg-cyan-500/[0.12] text-cyan-400 border-cyan-500/30",
-  creativity: "bg-green-500/[0.12] text-green-400 border-green-500/30",
-  mixed: "bg-zinc-500/[0.12] text-zinc-400 border-zinc-500/30",
+  technique: "bg-blue-500/[0.12] text-blue-400",
+  theory: "bg-violet-500/[0.12] text-violet-400",
+  hearing: "bg-cyan-500/[0.12] text-cyan-400",
+  creativity: "bg-green-500/[0.12] text-green-400",
+  mixed: "bg-zinc-500/[0.12] text-zinc-400",
 };
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: "bg-sky-500/[0.12] text-sky-400 border-sky-500/30",
-  easy: "bg-emerald-500/[0.12] text-emerald-400 border-emerald-500/30",
-  medium: "bg-amber-500/[0.12] text-amber-400 border-amber-500/30",
-  hard: "bg-rose-500/[0.12] text-rose-400 border-rose-500/30",
+  beginner: "bg-sky-500/[0.12] text-sky-400",
+  easy: "bg-emerald-500/[0.12] text-emerald-400",
+  medium: "bg-amber-500/[0.12] text-amber-400",
+  hard: "bg-rose-500/[0.12] text-rose-400",
 };
 
 const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
@@ -54,7 +54,7 @@ const exTitle = (ex: { title: unknown; id: string }): string =>
 
 const filterPill = (active: boolean) =>
   cn(
-    "px-3 py-1 rounded text-[11px] font-semibold transition-colors capitalize whitespace-nowrap",
+    "px-3 py-1 rounded text-[11px] font-semibold transition-colors capitalize whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     active
       ? "bg-cyan-500/15 text-cyan-300"
       : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
@@ -92,6 +92,27 @@ export const ExerciseBrowseTab = ({
       setSortKey(key);
       setSortDir("asc");
     }
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setPage(1);
+  };
+
+  const handleDifficultyChange = (difficulty: string) => {
+    setSelectedDifficulty(difficulty);
+    setPage(1);
+  };
+
+  const handleSkillChange = (skill: string) => {
+    setSelectedSkill(skill);
+    setPage(1);
   };
 
   const availableSkills = useMemo(() => {
@@ -151,9 +172,6 @@ export const ExerciseBrowseTab = ({
   const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageExercises = filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  // reset to page 1 whenever filters change
-  useEffect(() => { setPage(1); }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, sortKey, sortDir]);
 
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -231,10 +249,11 @@ export const ExerciseBrowseTab = ({
     col: Exclude<SortKey, "default">,
     label: string,
     align: "left" | "right" = "left",
+    widthClass?: string,
   ) => {
     const active = sortKey === col;
     return (
-      <th className={cn("px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500", align === "right" ? "text-right" : "text-left")}>
+      <th className={cn("px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500", widthClass, align === "right" ? "text-right" : "text-left")}>
         <button
           onClick={() => toggleSort(col)}
           className={cn(
@@ -258,29 +277,29 @@ export const ExerciseBrowseTab = ({
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-6 pb-24 flex flex-col gap-5">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-6 pb-24 flex flex-col gap-6">
 
       {/* ── Filters bar ── */}
-      <div className="flex flex-col gap-3 bg-zinc-900/60 rounded-lg px-5 py-4">
+      <div className="flex flex-col gap-4 bg-zinc-900/60 rounded-lg p-5">
 
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
           <input
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             placeholder="Search exercises…"
             className="w-full pl-9 pr-4 h-9 rounded-lg bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-colors"
           />
         </div>
 
         {/* Category */}
-        <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-600 mr-1">Category</span>
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Category</span>
           {CATEGORIES.map(cat => (
             <button
               key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => handleCategoryChange(cat)}
               className={filterPill(selectedCategory === cat)}
             >
               {cat === "all" ? "All" : cat}
@@ -290,12 +309,12 @@ export const ExerciseBrowseTab = ({
 
         {/* Difficulty + Skill row */}
         <div className="flex flex-wrap gap-4">
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-600 mr-1">Difficulty</span>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Difficulty</span>
             {DIFFICULTIES.map(diff => (
               <button
                 key={diff}
-                onClick={() => setSelectedDifficulty(diff)}
+                onClick={() => handleDifficultyChange(diff)}
                 className={filterPill(selectedDifficulty === diff)}
               >
                 {diff === "all" ? "All" : diff}
@@ -303,10 +322,10 @@ export const ExerciseBrowseTab = ({
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-600 mr-1">Skill</span>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Skill</span>
             <button
-              onClick={() => setSelectedSkill("all")}
+              onClick={() => handleSkillChange("all")}
               className={filterPill(selectedSkill === "all")}
             >
               All
@@ -317,7 +336,7 @@ export const ExerciseBrowseTab = ({
               return (
                 <button
                   key={skillId}
-                  onClick={() => setSelectedSkill(skillId)}
+                  onClick={() => handleSkillChange(skillId)}
                   className={cn(filterPill(selectedSkill === skillId), "flex items-center gap-1")}
                 >
                   {Icon && <Icon className="h-3 w-3 shrink-0" />}
@@ -334,15 +353,15 @@ export const ExerciseBrowseTab = ({
         <div className="flex items-center justify-between">
           <p className="text-xs text-zinc-500">
             {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
-            {totalPages > 1 && <span className="ml-1 text-zinc-600">— page {safePage} / {totalPages}</span>}
+            {totalPages > 1 && <span className="ml-1">— page {safePage} / {totalPages}</span>}
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-zinc-800">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[980px] table-fixed border-separate border-spacing-y-3 text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900/80">
-                <th className="text-left px-4 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">
+              <tr>
+                <th className="text-left px-4 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">
                   <button
                     onClick={() => toggleSort("name")}
                     className={cn(
@@ -360,12 +379,12 @@ export const ExerciseBrowseTab = ({
                     )}
                   </button>
                 </th>
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Category</th>
-                {renderSortHead("difficulty", "Difficulty")}
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
-                {renderSortHead("time", "Time", "right")}
-                <th className="text-left px-3 py-3 text-[11px] font-bold capitalize tracking-wider text-zinc-500 min-w-[120px]">Result</th>
-                <th className="px-3 py-3 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
+                <th className="w-28 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Category</th>
+                {renderSortHead("difficulty", "Difficulty", "left", "w-28")}
+                <th className="w-36 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
+                {renderSortHead("time", "Time", "right", "w-20")}
+                <th className="w-32 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Result</th>
+                <th className="w-56 px-3 pb-2 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -403,19 +422,21 @@ export const ExerciseBrowseTab = ({
                       ? `${earScore} pts`
                       : null;
 
+                const cellBg = cn(
+                  "border-y border-zinc-800 transition-colors",
+                  hasBeenAttempted
+                    ? "bg-zinc-900/60 group-hover:bg-zinc-800/60"
+                    : "bg-zinc-950/40 group-hover:bg-zinc-900/60"
+                );
+
                 return (
                   <tr
                     key={exercise.id}
                     onClick={() => setPreviewExercise(exercise as Exercise)}
-                    className={cn(
-                      "border-b border-zinc-800/50 cursor-pointer transition-colors",
-                      hasBeenAttempted
-                        ? "bg-zinc-900/60 hover:bg-zinc-800/80"
-                        : "bg-zinc-950/40 hover:bg-zinc-900/60"
-                    )}
+                    className="group cursor-pointer"
                   >
                     {/* Name */}
-                    <td className="px-4 py-3.5">
+                    <td className={cn(cellBg, "rounded-l-lg border-l py-4 pl-4 pr-3")}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-2 cursor-pointer">
@@ -430,7 +451,7 @@ export const ExerciseBrowseTab = ({
                             {isNew && (
                               <span className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-2 py-0.5 ring-1 ring-inset ring-sky-500/20">
                                 <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-                                <span className="text-[9px] font-semibold uppercase tracking-wider text-sky-300">New</span>
+                                <span className="text-[9px] font-semibold tracking-wider text-sky-300">New</span>
                               </span>
                             )}
                             {isLocked && (
@@ -452,33 +473,33 @@ export const ExerciseBrowseTab = ({
                     </td>
 
                     {/* Category */}
-                    <td className="px-3 py-3.5">
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium capitalize tracking-wider border", CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed)}>
+                    <td className={cn(cellBg, "px-3 py-4")}>
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider", CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed)}>
                         {exercise.category}
                       </span>
                     </td>
 
                     {/* Difficulty */}
-                    <td className="px-3 py-3.5">
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium capitalize tracking-wider border", DIFFICULTY_COLORS[exercise.difficulty])}>
+                    <td className={cn(cellBg, "px-3 py-4")}>
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider", DIFFICULTY_COLORS[exercise.difficulty])}>
                         {exercise.difficulty}
                       </span>
                     </td>
 
                     {/* Skill */}
-                    <td className="px-3 py-3.5">
+                    <td className={cn(cellBg, "px-3 py-4")}>
                       {SkillIcon ? (
                         <span className="flex items-center gap-1.5 text-zinc-400 text-xs">
                           <SkillIcon className="h-3.5 w-3.5 shrink-0" />
                           <span className="truncate max-w-[90px]">{t(`skills:skills.${skillId}.name` as any)}</span>
                         </span>
                       ) : (
-                        <span className="text-zinc-600 text-xs">—</span>
+                        <span className="text-zinc-500 text-xs">—</span>
                       )}
                     </td>
 
                     {/* Time */}
-                    <td className="px-3 py-3.5 text-right text-zinc-500 text-xs tabular-nums whitespace-nowrap">
+                    <td className={cn(cellBg, "px-3 py-4 text-right text-zinc-400 text-xs tabular-nums whitespace-nowrap")}>
                       {exercise.timeInMinutes < 1
                         ? `${Math.round(exercise.timeInMinutes * 60)} s`
                         : `${exercise.timeInMinutes} min`
@@ -486,7 +507,7 @@ export const ExerciseBrowseTab = ({
                     </td>
 
                     {/* Result (best score + leaderboard rank) */}
-                    <td className="px-3 py-3.5">
+                    <td className={cn(cellBg, "px-3 py-4")}>
                       {hasBeenAttempted && resultText != null ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -526,12 +547,12 @@ export const ExerciseBrowseTab = ({
                           )}
                         </Tooltip>
                       ) : (
-                        <span className="text-zinc-700 text-xs ml-1">—</span>
+                        <span className="text-zinc-500 text-xs ml-1">—</span>
                       )}
                     </td>
 
                     {/* Actions */}
-                    <td className="px-3 py-3.5">
+                    <td className={cn(cellBg, "rounded-r-lg border-r py-4 pl-3 pr-4")}>
                       <div className="flex items-center justify-end gap-1.5">
                         {userAuth && (
                           <button
@@ -569,7 +590,7 @@ export const ExerciseBrowseTab = ({
                         {isLocked ? (
                           <button
                             onClick={(e) => { e.stopPropagation(); onShowUpgrade(); }}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-500/10 text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
                           >
                             <Lock size={10} />
                             Pro
@@ -577,7 +598,7 @@ export const ExerciseBrowseTab = ({
                         ) : (
                           <button
                             onClick={(e) => { e.stopPropagation(); onStartExercise(buildChallenge(exercise)); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
                             <ChevronRight size={12} strokeWidth={2.5} />
                             Start
@@ -591,7 +612,7 @@ export const ExerciseBrowseTab = ({
 
               {filteredExercises.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-600 text-sm">
+                  <td colSpan={7} className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-12 text-center text-zinc-500 text-sm">
                     No exercises match the current filters.
                   </td>
                 </tr>
@@ -606,7 +627,7 @@ export const ExerciseBrowseTab = ({
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={safePage === 1}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-800 bg-zinc-900 text-zinc-400 text-xs font-semibold disabled:opacity-30 hover:enabled:border-zinc-700 hover:enabled:text-zinc-200 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
             >
               <ChevronLeft size={13} />
               Previous
@@ -619,7 +640,7 @@ export const ExerciseBrowseTab = ({
                 if (!isNear) {
                   const isGap = Math.abs(p - safePage) === 3;
                   return isGap ? (
-                    <span key={p} className="text-zinc-600 text-xs px-1">…</span>
+                    <span key={p} className="text-zinc-500 text-xs px-1">…</span>
                   ) : null;
                 }
                 return (
@@ -627,7 +648,7 @@ export const ExerciseBrowseTab = ({
                     key={p}
                     onClick={() => setPage(p)}
                     className={cn(
-                      "h-7 min-w-[28px] px-2 rounded text-xs font-semibold transition-all",
+                      "h-7 min-w-[28px] px-2 rounded text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       isActive
                         ? "bg-zinc-700 text-white"
                         : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
@@ -642,7 +663,7 @@ export const ExerciseBrowseTab = ({
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={safePage === totalPages}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-800 bg-zinc-900 text-zinc-400 text-xs font-semibold disabled:opacity-30 hover:enabled:border-zinc-700 hover:enabled:text-zinc-200 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
             >
               Next
               <ChevronRight size={13} />

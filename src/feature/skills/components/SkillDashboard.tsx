@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
+import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
@@ -41,6 +42,10 @@ export interface DashboardExercise {
   accentColor: string;
   difficulty: string;
   tablature?: import("feature/exercisePlan/types/exercise.types").TablatureMeasure[];
+  /** Set when this challenge was launched from a community exercise, so its
+   * completion can be recorded for the "played"/fame tracking on that exercise. */
+  communityExerciseId?: string;
+  communityExerciseAuthorId?: string;
 }
 
 interface SkillDashboardProps {
@@ -203,6 +208,11 @@ export const SkillDashboard = ({
 
   const handleFinish = () => {
     setIsFinishing(true);
+    if (selectedChallenge?.communityExerciseId) {
+      // Fire-and-forget: awards the author fame the first time this user
+      // completes their exercise. Never blocks navigating to the report.
+      recordExerciseCompletion(selectedChallenge.communityExerciseId);
+    }
     router.push(returnTo ? `/report?returnTo=${encodeURIComponent(returnTo)}` : "/report");
   };
 
