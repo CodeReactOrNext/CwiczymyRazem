@@ -1,5 +1,5 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
-import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -84,5 +84,51 @@ describe("updateSongStatus", () => {
       expect.anything(),
       expect.objectContaining({ "statistics.points": expect.anything() })
     );
+  });
+});
+
+describe("ensureSongIsLearning", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("moves an untracked song to learning", async () => {
+    mockUserSongsSnapshot(null);
+
+    await ensureSongIsLearning("user1", "song1", "Title", "Artist", undefined);
+
+    expect(setDoc).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ status: "learning" }),
+      { merge: true }
+    );
+  });
+
+  it("moves a 'want to learn' song to learning", async () => {
+    mockUserSongsSnapshot({ status: "wantToLearn", pointsAwarded: false });
+
+    await ensureSongIsLearning("user1", "song1", "Title", "Artist", undefined);
+
+    expect(setDoc).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ status: "learning" }),
+      { merge: true }
+    );
+  });
+
+  it("does not touch a song that is already learning", async () => {
+    mockUserSongsSnapshot({ status: "learning", pointsAwarded: false });
+
+    await ensureSongIsLearning("user1", "song1", "Title", "Artist", undefined);
+
+    expect(setDoc).not.toHaveBeenCalled();
+  });
+
+  it("does not downgrade a song that is already learned", async () => {
+    mockUserSongsSnapshot({ status: "learned", pointsAwarded: true });
+
+    await ensureSongIsLearning("user1", "song1", "Title", "Artist", undefined);
+
+    expect(setDoc).not.toHaveBeenCalled();
   });
 });
