@@ -327,7 +327,7 @@ const SongSheet = ({
                     <TooltipContent className="bg-zinc-900 text-zinc-300">
                       <p>Rate how difficult this song is to play for you.</p>
                       <p className="mt-1 flex items-center gap-1">
-                        You'll receive +{RATE_SONG_FAME_REWARD}
+                        You&apos;ll receive +{RATE_SONG_FAME_REWARD}
                         <img
                           src="/images/coin.png"
                           alt="fame"
