@@ -1,6 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { statisticsInitial } from "constants/userStatisticsInitialData";
+import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants";
 import type { RootState } from "store/store";
 import type {
   DailyQuest,
@@ -322,12 +323,12 @@ const userSlice = createSlice({
     builder
       .addCase(rateSong.pending, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) + 3;
+          state.currentUserStats.fame = (state.currentUserStats.fame || 0) + RATE_SONG_FAME_REWARD;
         }
       })
       .addCase(rateSong.rejected, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) - 3;
+          state.currentUserStats.fame = (state.currentUserStats.fame || 0) - RATE_SONG_FAME_REWARD;
         }
       })
       // Challenges removed
