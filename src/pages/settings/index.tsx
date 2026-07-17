@@ -1,12 +1,21 @@
 import SettingsView from "feature/settings/SettingsView";
 import AppLayout from "layouts/AppLayout";
+import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const Settings: NextPageWithLayout = () => {
 
-  return <SettingsView />;
+  return (
+    <>
+      <Head>
+        <title>Settings | Riff Quest</title>
+        <meta name='robots' content='noindex' />
+      </Head>
+      <SettingsView />
+    </>
+  );
 };
 
 Settings.getLayout = function getLayout(page: ReactElement) {
