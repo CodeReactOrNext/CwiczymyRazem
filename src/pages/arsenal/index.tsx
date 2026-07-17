@@ -18,6 +18,7 @@ const ArsenalPage: NextPageWithLayout = () => {
       <Head>
         <title>Guitar Arsenal | Riff Quest</title>
         <meta name="description" content="Collect and equip guitars with your Fame Points." />
+        <meta name='robots' content='noindex' />
       </Head>
       {isLoggedIn ? <ArsenalView /> : <PageLoadingLayout />}
     </>
