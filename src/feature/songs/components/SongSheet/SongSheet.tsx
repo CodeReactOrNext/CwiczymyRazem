@@ -11,6 +11,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
+import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
@@ -325,6 +326,15 @@ const SongSheet = ({
                     </TooltipTrigger>
                     <TooltipContent className="bg-zinc-900 text-zinc-300">
                       <p>Rate how difficult this song is to play for you.</p>
+                      <p className="mt-1 flex items-center gap-1">
+                        You&apos;ll receive +{RATE_SONG_FAME_REWARD}
+                        <img
+                          src="/images/coin.png"
+                          alt="fame"
+                          className="h-4 w-4 object-contain"
+                        />
+                        Fame Points.
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

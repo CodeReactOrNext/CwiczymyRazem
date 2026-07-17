@@ -1,5 +1,5 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
-import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
+import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants";
 import type { Song } from "feature/songs/types/songs.type";
 import { doc, getDoc, increment, Timestamp, updateDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -104,15 +104,14 @@ export default async function handler(
       tier: finalTier
     });
 
-    // Update User Points (+5) ONLY if new rating (remains same)
-    let addedPoints = 0;
+    // Award Fame ONLY if new rating
+    let addedFame = 0;
     if (isNewRating) {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        "statistics.points": increment(3)
+        "statistics.fame": increment(RATE_SONG_FAME_REWARD)
       });
-      addedPoints = 3;
-      await updateSeasonalPoints(userId, 3);
+      addedFame = RATE_SONG_FAME_REWARD;
     }
 
     // Add Log ...
@@ -132,7 +131,7 @@ export default async function handler(
       difficulties: newDifficulties,
       avgDifficulty,
       tier: finalTier,
-      addedPoints
+      addedFame
     });
 
   } catch (error) {
