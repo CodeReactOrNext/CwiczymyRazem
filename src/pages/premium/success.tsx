@@ -59,6 +59,7 @@ export default function PremiumSuccessPage() {
     <>
       <Head>
         <title>Premium activated | Riff Quest</title>
+        <meta name='robots' content='noindex' />
       </Head>
 
       <div className="min-h-screen bg-[#020202] flex items-center justify-center px-4">
