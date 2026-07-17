@@ -5,7 +5,8 @@ export default function ForgotPassword() {
   return (
     <>
       <Head>
-        <title>Forgot Password | CwiczymyRazem</title>
+        <title>Forgot Password | Riff Quest</title>
+        <meta name='robots' content='noindex' />
       </Head>
       <ForgotPasswordView />
     </>

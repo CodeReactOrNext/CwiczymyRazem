@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   beginner: "bg-sky-500/15 text-sky-400 border-sky-500/20",
@@ -285,3 +286,7 @@ MyExercisesPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default MyExercisesPage;
+
+export const getServerSideProps = withAuth({
+  redirectIfUnauthenticated: "/login",
+});
