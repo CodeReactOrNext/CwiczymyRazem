@@ -19,6 +19,8 @@ interface ViewConfig {
   trigger: string;
   /** Accent colour for the icon / check inside the menu. */
   accent: string;
+  /** Marks the view as experimental — shows a Beta badge and a warning line. */
+  beta?: boolean;
 }
 
 const VIEWS: Record<ViewMode, ViewConfig> = {
@@ -35,6 +37,7 @@ const VIEWS: Record<ViewMode, ViewConfig> = {
     Icon: Box,
     trigger: "bg-emerald-950 text-emerald-300 hover:bg-emerald-900",
     accent: "text-emerald-400",
+    beta: true,
   },
   notation: {
     label: "Notation",
@@ -105,6 +108,11 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
           {!compact && (
             <span className="text-[10px] font-semibold tracking-wide">{label}</span>
           )}
+          {!compact && VIEWS[current].beta && (
+            <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400">
+              Beta
+            </span>
+          )}
           <ChevronDown className={cn("shrink-0 opacity-60", compact ? "h-2.5 w-2.5" : "h-3 w-3")} />
         </button>
       </DropdownMenuTrigger>
@@ -119,7 +127,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
           View
         </div>
         {options.map((mode) => {
-          const { label: itemLabel, desc, Icon, accent } = VIEWS[mode];
+          const { label: itemLabel, desc, Icon, accent, beta } = VIEWS[mode];
           const active = mode === current;
           return (
             <DropdownMenuItem
@@ -131,10 +139,24 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
               )}>
               <Icon className={cn("h-4 w-4 shrink-0", active ? accent : "text-zinc-400")} />
               <div className="min-w-0 flex-1">
-                <div className={cn("text-xs font-semibold", active ? "text-white" : "text-zinc-200")}>
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5 text-xs font-semibold",
+                    active ? "text-white" : "text-zinc-200",
+                  )}>
                   {itemLabel}
+                  {beta && (
+                    <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400">
+                      Beta
+                    </span>
+                  )}
                 </div>
                 <div className="text-[10px] text-zinc-500">{desc}</div>
+                {beta && (
+                  <div className="text-[10px] text-amber-400/80">
+                    May be buggy
+                  </div>
+                )}
               </div>
               {active && <Check className={cn("h-4 w-4 shrink-0", accent)} />}
             </DropdownMenuItem>

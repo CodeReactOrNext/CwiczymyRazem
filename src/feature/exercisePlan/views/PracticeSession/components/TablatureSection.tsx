@@ -423,6 +423,7 @@ export const TablatureSection = memo(function TablatureSection({
                 tuningLabel={tuningLabel}
                 bpm={Math.round(effectiveBpm)}
                 countInRemaining={countInRemaining}
+                onSeek={handleSeek}
               />
               <TablatureResizeHandle height={height} onChange={setHeight} />
             </div>

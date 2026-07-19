@@ -7,7 +7,6 @@ import type { GemShapeKey, Highway3DThemeKey } from "./highway3dSettings";
 import {
   GEM_SHAPE_ORDER,
   GEM_SHAPES,
-  HIGHWAY3D_SETTING_SECTIONS,
   HIGHWAY3D_THEME_ORDER,
   HIGHWAY3D_THEMES,
   useHighway3DSettings,
@@ -214,6 +213,7 @@ const DEFAULT_VIEW_OPTIONS: {
   label: string;
   desc: string;
   Icon: LucideIcon;
+  beta?: boolean;
 }[] = [
   {
     key: "tab",
@@ -224,8 +224,9 @@ const DEFAULT_VIEW_OPTIONS: {
   {
     key: "highway",
     label: "3D Highway",
-    desc: "Scrolling 3D note lane",
+    desc: "Beta — may be buggy",
     Icon: Box,
+    beta: true,
   },
   {
     key: "notation",
@@ -362,7 +363,7 @@ export function TablatureSettingsPanel() {
         title='Default view'
         hint='Which view opens automatically when you start a practice session.'>
         <div className='grid grid-cols-3 gap-2'>
-          {DEFAULT_VIEW_OPTIONS.map(({ key, label, desc, Icon }) => (
+          {DEFAULT_VIEW_OPTIONS.map(({ key, label, desc, Icon, beta }) => (
             <OptionCard
               key={key}
               active={settings.defaultViewMode === key}
@@ -370,8 +371,13 @@ export function TablatureSettingsPanel() {
               <span className='flex h-8 items-center'>
                 <Icon className='h-5 w-5 text-zinc-200' />
               </span>
-              <span className='text-xs font-semibold text-zinc-100'>
+              <span className='flex items-center gap-1.5 text-xs font-semibold text-zinc-100'>
                 {label}
+                {beta && (
+                  <span className='rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400'>
+                    Beta
+                  </span>
+                )}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
                 {desc}
@@ -526,7 +532,6 @@ export function TablatureSettingsPanel() {
  */
 export function Highway3DSettingsPanel() {
   const settings = useHighway3DSettings((s) => s.settings);
-  const setSetting = useHighway3DSettings((s) => s.setSetting);
   const setGemShape = useHighway3DSettings((s) => s.setGemShape);
   const setPalette = useHighway3DSettings((s) => s.setPalette);
   const setTheme = useHighway3DSettings((s) => s.setTheme);
@@ -603,25 +608,6 @@ export function Highway3DSettingsPanel() {
           ))}
         </div>
       </Section>
-
-      {HIGHWAY3D_SETTING_SECTIONS.map((section) => (
-        <Section key={section.title} title={section.title}>
-          <div className='grid gap-x-8 gap-y-4 sm:grid-cols-2'>
-            {section.items.map((item) => (
-              <SliderRow
-                key={item.key}
-                label={item.label}
-                value={settings[item.key]}
-                min={item.min}
-                max={item.max}
-                step={item.step}
-                display={item.fmt(settings[item.key])}
-                onChange={(v) => setSetting(item.key, v)}
-              />
-            ))}
-          </div>
-        </Section>
-      ))}
 
       <ResetButton onClick={reset} label='Reset 3D view' />
     </div>

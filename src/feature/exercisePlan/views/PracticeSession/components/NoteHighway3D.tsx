@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
-import { Maximize2, Minimize2, Music2, SlidersHorizontal } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2, Music2 } from "lucide-react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import {
@@ -42,6 +42,8 @@ interface NoteHighway3DProps {
   bpm?: number;
   /** Remaining metronome count-in beats before playback starts (4 → 0). Drives the get-ready HUD. */
   countInRemaining?: number;
+  /** Seek playback to a beat — clicking the full-screen waveform nav jumps to a measure. */
+  onSeek?: (beat: number) => void;
 }
 
 // ── Highway projection ────────────────────────────────────────────────────────
@@ -414,7 +416,6 @@ function buildThemeScenery(
   shear: number,
 ): ThemeScenery {
   const BAND = 170; // depth of the recycling band (world units)
-  const wrapZ = (z: number) => ((((z + 6) % BAND) + BAND) % BAND) - BAND + 6;
 
   // ── Particle Waves: a rolling sea of glowing dots flanking the highway ────
   // Two interfering sine waves ripple a flat XZ grid of points below the board,
@@ -691,267 +692,6 @@ function buildThemeScenery(
     };
   }
 
-  // ── Void: fly through a tunnel of neon rings ─────────────────────────────
-  if (themeKey === "void") {
-    const RINGS = 12;
-    const ringGeo = track(new THREE.TorusGeometry(13.5, 0.07, 8, 72));
-    const rings = Array.from({ length: RINGS }, (_, i) => {
-      const mat = trackM(
-        new THREE.MeshBasicMaterial({
-          color: new THREE.Color(theme.hitLight),
-          transparent: true,
-          opacity: 0.4,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          fog: false,
-        }),
-      );
-      const mesh = new THREE.Mesh(ringGeo, mat);
-      mesh.position.set(0, 4.5, -i * (BAND / RINGS));
-      scene.add(mesh);
-      return { mesh, mat, base: -i * (BAND / RINGS) };
-    });
-
-    // Warp dust — tiny streaks that sell the speed as they rush past.
-    const DN = 220;
-    const dArr = new Float32Array(DN * 3);
-    for (let i = 0; i < DN; i++) {
-      dArr[i * 3] = (Math.random() - 0.5) * 90;
-      dArr[i * 3 + 1] = Math.random() * 24;
-      dArr[i * 3 + 2] = -Math.random() * BAND + 6;
-    }
-    const dustGeo = track(new THREE.BufferGeometry());
-    dustGeo.setAttribute("position", new THREE.BufferAttribute(dArr, 3));
-    const dustMat = trackM(
-      new THREE.PointsMaterial({
-        size: 0.22,
-        map: glowTex,
-        transparent: true,
-        opacity: 0.5,
-        color: new THREE.Color(theme.hitLight),
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: true,
-      }),
-    );
-    const dust = new THREE.Points(dustGeo, dustMat);
-    scene.add(dust);
-    let lastScroll = 0;
-
-    return {
-      update(_dt, scrollZ, panX, pulse) {
-        for (const r of rings) {
-          const z = wrapZ(r.base + scrollZ);
-          r.mesh.position.z = z;
-          // Rings sit on the sheared ribbon's visual centre at their depth.
-          r.mesh.position.x = panX + shear * -z * 0.43;
-          // Fade in from the far end AND back out well before the camera — a
-          // near ring would otherwise slash across the whole frame as a giant
-          // arc instead of reading as part of the tunnel.
-          const born = THREE.MathUtils.clamp((z + BAND - 6) / 30, 0, 1);
-          const gone = THREE.MathUtils.clamp((-z - 12) / 30, 0, 1);
-          r.mat.opacity = born * gone * (0.25 + 0.4 * pulse);
-        }
-        const dz = scrollZ - lastScroll;
-        lastScroll = scrollZ;
-        const p = dustGeo.getAttribute("position") as THREE.BufferAttribute;
-        const a = p.array as Float32Array;
-        for (let i = 0; i < DN; i++) {
-          a[i * 3 + 2] += dz;
-          if (a[i * 3 + 2] > 6) a[i * 3 + 2] -= BAND;
-        }
-        p.needsUpdate = true;
-        dust.position.x = panX;
-      },
-    };
-  }
-
-  // ── Ice: slow-tumbling crystal shards drifting past ──────────────────────
-  if (themeKey === "ice") {
-    const N = 44;
-    const geo = track(new THREE.OctahedronGeometry(0.9, 0));
-    const mat = trackM(
-      new THREE.MeshBasicMaterial({
-        color: 0x9adcff,
-        transparent: true,
-        opacity: 0.32,
-        depthWrite: false,
-      }),
-    );
-    const mesh = new THREE.InstancedMesh(geo, mat, N);
-    scene.add(mesh);
-    const items = Array.from({ length: N }, () => ({
-      // Flank the highway — keep the centre strip clear of the notes.
-      x: (14 + Math.random() * 46) * (Math.random() < 0.5 ? -1 : 1),
-      y: 2 + Math.random() * 26,
-      z: -Math.random() * BAND + 6,
-      s: 0.5 + Math.random() * 1.6,
-      rx: Math.random() * 0.7,
-      ry: 0.2 + Math.random() * 0.8,
-      a: Math.random() * Math.PI * 2,
-    }));
-    const dummy = new THREE.Object3D();
-    let t = 0;
-
-    return {
-      update(dt, scrollZ, panX) {
-        t += dt;
-        for (let i = 0; i < N; i++) {
-          const it = items[i];
-          dummy.position.set(panX + it.x, it.y, wrapZ(it.z + scrollZ));
-          dummy.rotation.set(it.a + t * it.rx, t * it.ry, 0);
-          dummy.scale.setScalar(it.s);
-          dummy.updateMatrix();
-          mesh.setMatrixAt(i, dummy.matrix);
-        }
-        mesh.instanceMatrix.needsUpdate = true;
-      },
-    };
-  }
-
-  // ── Black hole: a gravitationally-lensed accretion disk around a dark event
-  // horizon, painted by a fragment shader on a single billboard far out on the
-  // horizon (idea from vlwkaos/threejs-blackhole, reworked as a cheap 2D lens).
-  // A hot rotating disk seen nearly edge-on, the far side arcing up over the
-  // top; a bright Einstein photon ring hugs the horizon; the black core + a
-  // soft gravitational-darkening halo carve a real void into the sky behind. ─
-  if (themeKey === "blackhole") {
-    const HOLE_Y = 7;
-    const HOLE_Z = -138;
-    const uniforms = {
-      uTime: { value: 0 },
-      uPulse: { value: 0 },
-      uHot: { value: new THREE.Color(0xfff0cf) }, // white-hot inner disk
-      uMid: { value: new THREE.Color(0xff9a3c) }, // orange mid disk
-      uEdge: { value: new THREE.Color(0xc4380f) }, // deep red-orange rim
-    };
-    const holeMat = trackM(
-      new THREE.ShaderMaterial({
-        uniforms,
-        transparent: true,
-        depthWrite: false,
-        fog: false,
-        blending: THREE.NormalBlending,
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          precision highp float;
-          varying vec2 vUv;
-          uniform float uTime;
-          uniform float uPulse;
-          uniform vec3 uHot;
-          uniform vec3 uMid;
-          uniform vec3 uEdge;
-
-          float hash(vec2 p) {
-            return fract(sin(dot(p, vec2(41.23, 289.17))) * 43758.5453);
-          }
-          float vnoise(vec2 p) {
-            vec2 i = floor(p);
-            vec2 f = fract(p);
-            f = f * f * (3.0 - 2.0 * f);
-            float a = hash(i);
-            float b = hash(i + vec2(1.0, 0.0));
-            float c = hash(i + vec2(0.0, 1.0));
-            float d = hash(i + vec2(1.0, 1.0));
-            return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-          }
-          float fbm(vec2 p) {
-            float v = 0.0;
-            float a = 0.6;
-            for (int i = 0; i < 3; i++) {
-              v += a * vnoise(p);
-              p *= 2.0;
-              a *= 0.5;
-            }
-            return v;
-          }
-
-          void main() {
-            vec2 p = vUv - 0.5;
-            float r = length(p);
-            float rs = 0.085;                 // event-horizon radius
-            float pulse = 0.85 + 0.45 * uPulse;
-
-            // ── Accretion disk: near edge-on ellipse (squash Y), swirling ──
-            float tilt = 2.5;
-            vec2 dp = vec2(p.x, p.y * tilt);
-            float dr = length(dp);
-            float ang = atan(dp.y, dp.x);
-            float inner = rs * 1.5;
-            float outer = rs * 6.0;
-            float band = smoothstep(inner, inner * 1.22, dr) *
-                         (1.0 - smoothstep(outer * 0.6, outer, dr));
-            float streak = fbm(vec2(ang * 2.2 + uTime * 0.5, dr * 20.0 - uTime * 1.3));
-            band *= 0.35 + 0.9 * streak;
-            band *= 1.0 - smoothstep(rs * 1.02, rs * 0.9, r); // never inside horizon
-            // Doppler beaming: the side rotating toward us (left) is hotter.
-            band *= mix(1.9, 0.45, smoothstep(-0.22, 0.22, p.x));
-
-            float ct = smoothstep(inner, outer, dr);
-            vec3 diskCol = mix(uHot, uMid, ct);
-            diskCol = mix(diskCol, uEdge, smoothstep(0.5, 1.0, ct));
-
-            // ── Einstein photon ring hugging the horizon ──
-            float ph = exp(-pow((r - rs * 1.05) / (rs * 0.14), 2.0));
-
-            // ── Event-horizon shadow + soft gravitational darkening ──
-            float core = smoothstep(rs * 1.02, rs * 0.9, r);
-            float dark = smoothstep(rs * 2.0, rs * 1.05, r) * 0.55;
-
-            vec3 col = diskCol * band * 1.3 * pulse + uHot * ph * 1.25 * pulse;
-            col *= 1.0 - core;                 // pure black inside the horizon
-
-            float a = clamp(band * 1.5 + ph * 1.35, 0.0, 1.0);
-            a = max(a, core);                  // opaque void
-            a = max(a, dark);                  // lensing shadow halo
-
-            gl_FragColor = vec4(col, a);
-          }
-        `,
-      }),
-    );
-    const hole = new THREE.Mesh(
-      track(new THREE.PlaneGeometry(95, 95)),
-      holeMat,
-    );
-    hole.position.set(shear * 60, HOLE_Y, HOLE_Z);
-    scene.add(hole);
-
-    // Soft amber bloom bleeding off the disk, breathing with the beat. Sits
-    // just behind the hole so the black core eats its centre into a glow ring.
-    const haloMat = trackM(
-      new THREE.SpriteMaterial({
-        map: glowTex,
-        color: 0xff8a2a,
-        transparent: true,
-        opacity: 0.2,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        fog: false,
-      }),
-    );
-    const halo = new THREE.Sprite(haloMat);
-    halo.scale.set(85, 85, 1);
-    halo.position.set(shear * 60, HOLE_Y, HOLE_Z - 3);
-    scene.add(halo);
-
-    return {
-      update(dt, _scrollZ, panX, pulse) {
-        uniforms.uTime.value += dt;
-        uniforms.uPulse.value = pulse;
-        hole.position.x = panX + shear * 60;
-        halo.position.x = panX + shear * 60;
-        haloMat.opacity = 0.16 + 0.2 * pulse;
-      },
-    };
-  }
-
   // Midnight (and any unknown key): the original nebula + starfield carry it.
   return { update: () => undefined };
 }
@@ -1168,6 +908,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
   tuningLabel,
   bpm,
   countInRemaining = 0,
+  onSeek,
 }: NoteHighway3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // HUD overlays updated imperatively from the rAF loop (no per-frame React
@@ -1176,12 +917,13 @@ export const NoteHighway3D = memo(function NoteHighway3D({
   const progressFillRef = useRef<HTMLDivElement>(null);
   const measureLabelRef = useRef<HTMLSpanElement>(null);
   const countdownRef = useRef<HTMLDivElement>(null);
+  // Full-screen waveform nav: the played part is revealed via clip-path and the
+  // playhead line moved, both written every frame from the rAF loop.
+  const navFillRef = useRef<HTMLDivElement>(null);
+  const navPlayheadRef = useRef<HTMLDivElement>(null);
   const [isFull, setIsFull] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   // Shared with the settings page, so dragging a slider there moves this scene too.
   const settings = useHighway3DSettings((s) => s.settings);
-  const resetSettings = useHighway3DSettings((s) => s.reset);
-  const [copied, setCopied] = useState(false);
   const {
     currentBeatsElapsedRef,
     hitNotes,
@@ -1191,6 +933,31 @@ export const NoteHighway3D = memo(function NoteHighway3D({
   } = useNoteMatchingContext();
 
   const renderData = useTablatureRenderData(measures);
+
+  // Full-screen song navigator: note density bucketed into waveform-style bars,
+  // plus measure starts (click → seek target) and a sparse measure-number ruler.
+  const nav = useMemo(() => {
+    const total = renderData.totalBeats;
+    const ends = renderData.measureEndXs;
+    if (hideNotes || total <= 0 || ends.length === 0) return null;
+    const starts = [0, ...ends.slice(0, -1)];
+    const barCount = Math.max(48, Math.min(160, ends.length * 8));
+    const counts = new Array<number>(barCount).fill(0);
+    for (const b of renderData.renderBeats) {
+      if (b.isRest || b.notes.length === 0) continue;
+      const i = Math.min(barCount - 1, Math.floor((b.offsetX / total) * barCount));
+      counts[i] += b.notes.length;
+    }
+    let max = 1;
+    for (const c of counts) if (c > max) max = c;
+    // Silent buckets keep a stub bar so the strip reads as one continuous timeline.
+    const bars = counts.map((c) => (c === 0 ? 0.08 : 0.3 + 0.7 * (c / max)));
+    const step = [1, 2, 4, 8, 16, 32, 64].find((s) => ends.length / s <= 9) ?? 128;
+    const ticks = starts
+      .map((beat, i) => ({ n: i + 1, frac: beat / total }))
+      .filter((t) => (t.n - 1) % step === 0);
+    return { bars, ticks, starts, ends, total };
+  }, [renderData, hideNotes]);
 
   // Keep the latest scoring maps + settings readable from inside the rAF closure.
   const hitRef = useRef(hitNotes);
@@ -1225,28 +992,6 @@ export const NoteHighway3D = memo(function NoteHighway3D({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isFull]);
-
-  // Copies the current view settings as JSON — paste-able straight into a
-  // chat message so someone else can dial them in for you.
-  const copySettings = async () => {
-    const json = JSON.stringify(settings);
-    try {
-      await navigator.clipboard.writeText(json);
-    } catch {
-      // Clipboard API blocked (insecure context / permissions) — fall back
-      // to a hidden textarea + the legacy copy command.
-      const ta = document.createElement("textarea");
-      ta.value = json;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -4107,6 +3852,14 @@ export const NoteHighway3D = memo(function NoteHighway3D({
         hudProgress = prog;
         progressFillRef.current.style.width = `${prog * 100}%`;
       }
+      // Full-screen waveform nav — written unconditionally so it's correct the
+      // moment the overlay mounts (entering full screen mid-exercise, seeks
+      // while paused); two style writes per frame are noise next to the scene.
+      if (navFillRef.current && navPlayheadRef.current) {
+        const pct = (prog * 100).toFixed(2);
+        navFillRef.current.style.clipPath = `inset(0 ${(100 - prog * 100).toFixed(2)}% 0 0)`;
+        navPlayheadRef.current.style.left = `${pct}%`;
+      }
       // Measure counter: how many measure-ends the cursor has passed, + 1.
       let measure = 1;
       for (let m = 0; m < renderData.measureEndXs.length; m++) {
@@ -4220,10 +3973,28 @@ export const NoteHighway3D = memo(function NoteHighway3D({
         }}
       />
 
+      {/* The 3D view is still experimental — keep that visible on the board itself. */}
+      <div className='pointer-events-none absolute bottom-2 left-2 z-10 flex items-center gap-2'>
+        <div className='rounded-md bg-zinc-900/70 px-2 py-1 text-[10px] font-semibold text-amber-400 backdrop-blur-sm'>
+          Beta — may be buggy
+        </div>
+        {isFull && (
+          <div className='font-mono rounded-md bg-zinc-900/70 px-2 py-1 text-[10px] text-zinc-500 backdrop-blur-sm'>
+            Esc — exit full screen
+          </div>
+        )}
+      </div>
+
       {!hideNotes && (
         <>
-          {/* Song progress bar + measure counter (updated imperatively in rAF). */}
-          <div className='pointer-events-none absolute inset-x-0 top-0 z-10'>
+          {/* Song progress bar + measure counter (updated imperatively in rAF).
+              Kept mounted in full screen (the rAF loop keeps writing to the refs)
+              but hidden — the waveform nav takes over there. */}
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-x-0 top-0 z-10",
+              isFull && "opacity-0",
+            )}>
             <div className='h-[3px] w-full bg-white/5'>
               <div
                 ref={progressFillRef}
@@ -4235,6 +4006,69 @@ export const NoteHighway3D = memo(function NoteHighway3D({
               className='font-mono absolute left-2 top-2 text-[11px] font-medium tabular-nums text-zinc-400'
             />
           </div>
+
+          {/* Full-screen waveform nav — density bars, played part in cyan,
+              playhead line; click jumps to the measure under the cursor. */}
+          {isFull && nav && (
+            <div className='absolute left-1/2 top-4 z-10 w-[clamp(320px,44vw,760px)] -translate-x-1/2'>
+              <div
+                className={cn("relative h-14", onSeek && "cursor-pointer")}
+                title={onSeek ? "Click to jump to a measure" : undefined}
+                onClick={(e) => {
+                  if (!onSeek) return;
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const frac = Math.max(
+                    0,
+                    Math.min(1, (e.clientX - rect.left) / rect.width),
+                  );
+                  const beat = frac * nav.total;
+                  let idx = nav.ends.findIndex((end) => beat < end);
+                  if (idx === -1) idx = nav.ends.length - 1;
+                  onSeek(nav.starts[idx]);
+                }}>
+                <div className='absolute inset-0 flex items-end gap-px'>
+                  {nav.bars.map((h, i) => (
+                    <div
+                      key={i}
+                      className='min-w-0 flex-1 rounded-[1px] bg-zinc-600/40'
+                      style={{ height: `${h * 100}%` }}
+                    />
+                  ))}
+                </div>
+                <div
+                  ref={navFillRef}
+                  className='pointer-events-none absolute inset-0 flex items-end gap-px'
+                  style={{ clipPath: "inset(0 100% 0 0)" }}>
+                  {nav.bars.map((h, i) => (
+                    <div
+                      key={i}
+                      className='min-w-0 flex-1 rounded-[1px] bg-cyan-400/80'
+                      style={{ height: `${h * 100}%` }}
+                    />
+                  ))}
+                </div>
+                <div
+                  ref={navPlayheadRef}
+                  className='pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]'
+                  style={{ left: "0%" }}
+                />
+              </div>
+              {/* Measure ruler under the strip. */}
+              <div className='relative mt-1.5 h-4'>
+                {nav.ticks.map((t) => (
+                  <span
+                    key={t.n}
+                    className={cn(
+                      "font-mono absolute text-[10px] tabular-nums text-zinc-500",
+                      t.frac > 0 && "-translate-x-1/2",
+                    )}
+                    style={{ left: `${t.frac * 100}%` }}>
+                    {t.n}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Get-ready count-in — big number that ticks down to the first note. */}
           <div
@@ -4250,81 +4084,47 @@ export const NoteHighway3D = memo(function NoteHighway3D({
         onClick={() => setIsFull((f) => !f)}
         title={isFull ? "Exit full screen (Esc)" : "Full screen"}
         aria-label={isFull ? "Exit full screen" : "Full screen"}
-        className='absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-zinc-900/85 text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white'>
+        className='absolute right-3 top-3 z-10 flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900/85 px-2.5 text-zinc-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white'>
         {isFull ? (
           <Minimize2 className='h-4 w-4' />
         ) : (
           <Maximize2 className='h-4 w-4' />
         )}
+        <span className='text-[11px] font-semibold'>
+          {isFull ? "Exit full screen" : "Full screen"}
+        </span>
       </button>
 
-      <button
-        type='button'
-        onClick={() => setShowSettings((v) => !v)}
-        title='View settings'
-        aria-label='View settings'
-        className={cn(
-          "absolute right-[52px] top-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-zinc-900/85 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white",
-          showSettings ? "text-cyan-300" : "text-zinc-300",
-        )}>
-        <SlidersHorizontal className='h-4 w-4' />
-      </button>
-
-      {showSettings && (
-        <div className='absolute right-3 top-14 z-20 w-72 space-y-3 rounded-xl bg-zinc-900/95 p-4 backdrop-blur-sm'>
-          <p className='text-[11px] text-zinc-500'>
-            Fine-tuning sliders live under Settings → Tablature now.
-          </p>
-          <div className='flex gap-2'>
-            <button
-              type='button'
-              onClick={copySettings}
-              className={cn(
-                "flex-1 rounded-lg py-1.5 text-[10px] font-semibold tracking-wide transition-colors",
-                copied
-                  ? "bg-emerald-950 text-emerald-300"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
-              )}>
-              {copied ? "Copied!" : "Copy settings"}
-            </button>
-            <button
-              type='button'
-              onClick={resetSettings}
-              className='flex-1 rounded-lg bg-zinc-800 py-1.5 text-[10px] font-semibold tracking-wide text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white'>
-              Reset view
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Exercise/song title (+ cover/artist/tuning/bpm, when available) —
-          the header above the board is hidden behind full screen, so it's
-          re-shown here top-left, mirroring the score HUD on the right. */}
+      {/* Exercise/song header — the bar above the board is hidden behind full
+          screen, so it's re-shown here top-left: cover art beside a stacked
+          title / artist / tuning / BPM block. */}
       {isFull && title && (
-        <div className='absolute left-3 top-3 z-10 flex max-w-[60%] items-center gap-3 rounded-xl bg-zinc-900/70 px-3 py-2.5 backdrop-blur-sm'>
+        <div className='absolute left-5 top-4 z-10 flex max-w-[32vw] items-center gap-4 rounded-xl bg-zinc-900/60 p-3 backdrop-blur-sm'>
           {coverUrl && (
             <img
               src={coverUrl}
               alt=''
-              className='h-14 w-14 shrink-0 rounded-lg object-cover'
+              className='h-24 w-24 shrink-0 rounded-lg object-cover'
             />
           )}
           <div className='min-w-0'>
-            <div className='truncate text-base font-bold leading-tight text-zinc-100'>
+            <h2 className='truncate text-2xl font-bold leading-tight tracking-tight text-zinc-100'>
               {title}
-            </div>
+            </h2>
             {subtitle && (
-              <div className='truncate text-xs text-zinc-400'>{subtitle}</div>
+              <div className='truncate text-sm font-semibold text-zinc-400'>
+                {subtitle}
+              </div>
             )}
             {(tuningLabel || bpm) && (
-              <div className='mt-1 flex items-center gap-3'>
+              <div className='mt-2 flex items-center gap-3'>
                 {tuningLabel && (
                   <span className='text-[11px] font-semibold text-cyan-400'>
                     Tuning: {tuningLabel}
                   </span>
                 )}
                 {bpm && (
-                  <span className='flex items-center gap-1 text-[11px] font-semibold text-zinc-400'>
+                  <span className='flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400'>
                     <Music2 className='h-3 w-3' />
                     {bpm} BPM
                   </span>
@@ -4335,16 +4135,10 @@ export const NoteHighway3D = memo(function NoteHighway3D({
         </div>
       )}
 
-      {isFull && (
-        <div className='font-mono absolute left-3 top-28 z-10 rounded-md bg-zinc-900/70 px-2 py-1 text-[10px] text-zinc-500'>
-          Esc — exit full screen
-        </div>
-      )}
-
       {/* Full screen covers the HUD that's normally docked above the board, so
           re-show it here — windowed mode already has it via TablatureSection. */}
       {isFull && isMicEnabled && (
-        <MicHud className='absolute right-3 top-14 z-10' />
+        <MicHud variant='full' className='absolute right-4 top-16 z-10' />
       )}
     </div>
   );
