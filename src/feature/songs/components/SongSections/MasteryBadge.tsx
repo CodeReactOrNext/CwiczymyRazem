@@ -25,14 +25,19 @@ interface MasteryBadgeProps {
   readonly?: boolean;
 }
 
-export const MasteryBadge = ({ mastery, onChange, readonly }: MasteryBadgeProps) => {
+export const MasteryBadge = ({
+  mastery,
+  onChange,
+  readonly,
+}: MasteryBadgeProps) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -40,42 +45,44 @@ export const MasteryBadge = ({ mastery, onChange, readonly }: MasteryBadgeProps)
 
   if (readonly) {
     return (
-      <span className={cn("px-2 py-0.5 rounded-lg text-xs font-medium", MASTERY_STYLES[mastery])}>
+      <span
+        className={cn(
+          "inline-block w-24 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium",
+          MASTERY_STYLES[mastery],
+        )}>
         {MASTERY_LABELS[mastery]}
       </span>
     );
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className='relative'>
       <button
-        type="button"
+        type='button'
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "px-2 py-0.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap",
-          MASTERY_STYLES[mastery]
-        )}
-      >
+          "w-24 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium transition-colors",
+          MASTERY_STYLES[mastery],
+        )}>
         {MASTERY_LABELS[mastery]}
       </button>
 
       {open && (
-        <div className="absolute bottom-full mb-1 right-0 z-50 bg-zinc-950 rounded-lg p-1 shadow-2xl min-w-[130px]">
+        <div className='absolute bottom-full right-0 z-50 mb-1 min-w-[130px] rounded-lg bg-zinc-950 p-1 shadow-2xl'>
           {([0, 1, 2, 3, 4] as MasteryLevel[]).map((level) => (
             <button
               key={level}
-              type="button"
+              type='button'
               onClick={() => {
                 onChange(level);
                 setOpen(false);
               }}
               className={cn(
-                "w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                "w-full rounded-lg px-3 py-1.5 text-left text-xs font-medium transition-colors",
                 mastery === level ? "font-semibold" : "opacity-80",
                 OPTION_STYLES[level],
-                level === 4 && "line-through"
-              )}
-            >
+                level === 4 && "line-through",
+              )}>
               {MASTERY_LABELS[level]}
             </button>
           ))}
