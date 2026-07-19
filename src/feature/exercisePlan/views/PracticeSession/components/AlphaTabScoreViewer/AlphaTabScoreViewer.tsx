@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { useCallback,useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { CountInOverlay } from "../CountInOverlay";
 import { ScoreControls } from "./ScoreControls";
@@ -44,8 +44,6 @@ export const AlphaTabScoreViewer = ({
 
   useEffect(() => { bpmRef.current = bpm; },             [bpm]);
   useEffect(() => { volumeRef.current = volume; },       [volume]);
-
-  const [isLooping,  setIsLooping]  = useState(false);
 
   const {
     apiRef,
@@ -123,13 +121,6 @@ export const AlphaTabScoreViewer = ({
     if (apiRef.current && uiReady) apiRef.current.metronomeVolume = isMetronomeMuted ? 0 : 1;
   }, [isMetronomeMuted, uiReady]);
 
-  // ── Extra controls ────────────────────────────────────────────────────────
-  const handleLoopToggle = useCallback(() => {
-    const next = !isLooping;
-    if (apiRef.current) apiRef.current.isLooping = next;
-    setIsLooping(next);
-  }, [isLooping]);
-
   return (
     <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
 
@@ -164,8 +155,6 @@ export const AlphaTabScoreViewer = ({
           totalMs={totalMs}
           uiReady={uiReady}
           uiPlaying={uiPlaying}
-          isLooping={isLooping}
-          onLoopToggle={handleLoopToggle}
         />
       </div>
     </div>
