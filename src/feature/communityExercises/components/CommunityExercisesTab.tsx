@@ -976,35 +976,35 @@ export const CommunityExercisesTab = ({
         ) : (
           <>
             {/* Desktop table */}
-            <div className='hidden overflow-x-auto lg:block'>
+            <div className='hidden overflow-x-auto xl:block'>
               <table className='w-full table-fixed border-separate border-spacing-y-3 text-sm'>
                 <thead>
                   <tr>
-                    <th className='px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-[220px] px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Exercise
                     </th>
-                    <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Category
                     </th>
-                    <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Difficulty
                     </th>
-                    <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-20 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       BPM
                     </th>
-                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-14 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Min
                     </th>
-                    <th className='w-20 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Plays
                     </th>
-                    <th className='w-20 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Thanks
                     </th>
-                    <th className='w-44 px-3 pb-2 text-right text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-40 px-3 pb-2 text-right text-[11px] font-bold tracking-wider text-zinc-500'>
                       Rating
                     </th>
-                    <th className='w-28 px-3 pb-2'></th>
+                    <th className='w-24 px-3 pb-2'></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1016,7 +1016,7 @@ export const CommunityExercisesTab = ({
             </div>
 
             {/* Mobile cards */}
-            <div className='flex flex-col gap-3 lg:hidden'>
+            <div className='flex flex-col gap-3 xl:hidden'>
               {pageExercises.map((ex, idx) => (
                 <ExerciseCard key={ex.id} {...rowProps(ex, idx)} />
               ))}
