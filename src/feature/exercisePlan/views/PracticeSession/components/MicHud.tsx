@@ -29,12 +29,21 @@ const getMultiplierTier = (multiplier: number) => {
 
 /**
  * The game HUD shown when mic mode is active: score and accuracy alongside a
- * combo ring that fills toward the next multiplier.
+ * combo ring that fills toward the next multiplier. `variant="full"` is the
+ * enlarged full-screen layout (big score with accuracy stacked underneath).
  */
-export const MicHud = ({ className }: { className?: string }) => {
+export const MicHud = ({
+  className,
+  variant = "docked",
+}: {
+  className?: string;
+  variant?: "docked" | "full";
+}) => {
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { score, combo, multiplier, lastFeedback, feedbackId } = gameState;
 
+  const full = variant === "full";
+  const ringPx = full ? 104 : RING_PX;
   const grade = getPerformanceGrade(sessionAccuracy);
   const tier = getMultiplierTier(multiplier);
 
@@ -61,37 +70,66 @@ export const MicHud = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "flex w-[340px] shrink-0 items-center justify-between gap-6 rounded-lg bg-zinc-900/50 px-7 py-3 duration-700 animate-in fade-in slide-in-from-right-4",
+        "flex shrink-0 items-center duration-700 animate-in fade-in slide-in-from-right-4",
+        full
+          ? "gap-7 rounded-xl bg-zinc-900/50 px-6 py-4 backdrop-blur-sm"
+          : "w-[340px] justify-between gap-6 rounded-lg bg-zinc-900/50 px-7 py-3",
         className,
       )}>
-      <div className='flex flex-col items-start'>
-        <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
-          Score
-        </span>
+      {full ? (
+        // Full screen: score stacked over accuracy, right-aligned next to the ring.
+        <div className='flex flex-col items-end'>
+          <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+            Score
+          </span>
+          <motion.span
+            key={score}
+            initial={{ scale: 1.08 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            className='text-5xl font-bold tabular-nums leading-none tracking-tighter text-zinc-100'>
+            {score.toLocaleString()}
+          </motion.span>
+          <span
+            className={cn(
+              "mt-1.5 text-2xl font-bold tabular-nums leading-none",
+              grade.color,
+            )}>
+            {sessionAccuracy}%
+          </span>
+        </div>
+      ) : (
+        <>
+          <div className='flex flex-col items-start'>
+            <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+              Score
+            </span>
 
-        <motion.span
-          key={score}
-          initial={{ scale: 1.08 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 15 }}
-          className='text-4xl font-bold tabular-nums leading-none tracking-tighter text-zinc-100'>
-          {score.toLocaleString()}
-        </motion.span>
-      </div>
+            <motion.span
+              key={score}
+              initial={{ scale: 1.08 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className='text-4xl font-bold tabular-nums leading-none tracking-tighter text-zinc-100'>
+              {score.toLocaleString()}
+            </motion.span>
+          </div>
 
-      <div className='flex flex-col items-start'>
-        <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
-          Accuracy
-        </span>
-        <span className={cn("text-xl font-bold tabular-nums", grade.color)}>
-          {sessionAccuracy}%
-        </span>
-      </div>
+          <div className='flex flex-col items-start'>
+            <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+              Accuracy
+            </span>
+            <span className={cn("text-xl font-bold tabular-nums", grade.color)}>
+              {sessionAccuracy}%
+            </span>
+          </div>
+        </>
+      )}
 
       <div className='relative'>
         <svg
-          width={RING_PX}
-          height={RING_PX}
+          width={ringPx}
+          height={ringPx}
           viewBox='0 0 100 100'
           className='shrink-0'>
           <defs>
@@ -149,7 +187,8 @@ export const MicHud = ({ className }: { className?: string }) => {
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
             className={cn(
-              "text-2xl font-bold tabular-nums tracking-tighter transition-colors duration-300",
+              "font-bold tabular-nums tracking-tighter transition-colors duration-300",
+              full ? "text-3xl" : "text-2xl",
               multiplier > 1 ? tier.text : "text-zinc-300",
             )}>
             x{multiplier}

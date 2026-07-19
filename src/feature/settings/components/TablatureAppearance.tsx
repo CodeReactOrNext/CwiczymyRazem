@@ -35,11 +35,13 @@ function ModeButton({
   onClick,
   icon: Icon,
   label,
+  beta,
 }: {
   active: boolean;
   onClick: () => void;
   icon: typeof AlignJustify;
   label: string;
+  beta?: boolean;
 }) {
   return (
     <button
@@ -54,6 +56,11 @@ function ModeButton({
       )}>
       <Icon className='h-4 w-4' />
       {label}
+      {beta && (
+        <span className='rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400'>
+          Beta
+        </span>
+      )}
     </button>
   );
 }
@@ -107,6 +114,7 @@ export const TablatureAppearance = () => {
               onClick={() => setMode("highway")}
               icon={Box}
               label='3D Highway'
+              beta
             />
           </div>
         </div>
@@ -135,7 +143,7 @@ export const TablatureAppearance = () => {
         <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-600'>
           {mode === "tab"
             ? "Hit colour and hit animations only show while you are actually playing."
-            : "Drag any slider below and the board updates as you go."}
+            : "Drag any slider below and the board updates as you go. 3D Highway is in beta — it may be buggy."}
         </p>
       </div>
 

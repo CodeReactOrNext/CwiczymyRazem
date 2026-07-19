@@ -29,10 +29,7 @@ export type Highway3DThemeKey =
   | "midnight"
   | "sunset"
   | "aurora"
-  | "ember"
-  | "void"
-  | "ice"
-  | "blackhole";
+  | "ember";
 
 export interface Highway3DTheme {
   label: string;
@@ -106,39 +103,6 @@ export const HIGHWAY3D_THEMES: Record<Highway3DThemeKey, Highway3DTheme> = {
     ],
     hitLight: "#f97316",
   },
-  void: {
-    label: "Void",
-    desc: "Fly through a tunnel of neon rings",
-    bg: "#000000",
-    nebula: [
-      "rgba(30,41,59,0.35)",
-      "rgba(51,65,85,0.25)",
-      "rgba(15,23,42,0.30)",
-    ],
-    hitLight: "#818cf8",
-  },
-  ice: {
-    label: "Ice",
-    desc: "Slow crystal shards drifting past",
-    bg: "#04101a",
-    nebula: [
-      "rgba(56,189,248,0.45)",
-      "rgba(165,243,252,0.30)",
-      "rgba(37,99,235,0.35)",
-    ],
-    hitLight: "#7dd3fc",
-  },
-  blackhole: {
-    label: "Black Hole",
-    desc: "A lensed accretion disk around a dark event horizon",
-    bg: "#03020a",
-    nebula: [
-      "rgba(66,42,120,0.30)",
-      "rgba(24,60,90,0.22)",
-      "rgba(120,60,30,0.24)",
-    ],
-    hitLight: "#ffab5e",
-  },
 };
 
 export const HIGHWAY3D_THEME_ORDER: Highway3DThemeKey[] = [
@@ -147,9 +111,6 @@ export const HIGHWAY3D_THEME_ORDER: Highway3DThemeKey[] = [
   "sunset",
   "aurora",
   "ember",
-  "void",
-  "ice",
-  "blackhole",
 ];
 
 /**
@@ -212,13 +173,6 @@ export interface Highway3DViewSettings {
   theme: Highway3DThemeKey;
 }
 
-/** Slider-driven keys only — the shape/palette pickers have their own setters. */
-export type Highway3DNumericKey = {
-  [K in keyof Highway3DViewSettings]: Highway3DViewSettings[K] extends number
-    ? K
-    : never;
-}[keyof Highway3DViewSettings];
-
 export const HW_DEFAULTS: Highway3DViewSettings = {
   angleDeg: 11,
   camHeight: 1.7,
@@ -265,81 +219,15 @@ export const HW_DEFAULTS: Highway3DViewSettings = {
   theme: "midnight",
 };
 
-export type Highway3DSettingKey = Highway3DNumericKey;
-
-const pct = (v: number) => `${Math.round(v * 100)}%`;
-const deg = (v: number) => `${v}°`;
-
-export interface Highway3DSettingDef {
-  key: Highway3DSettingKey;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  fmt: (v: number) => string;
-}
-
-/**
- * Sliders shown to the player. The full settings object still carries every
- * other knob — they keep their defaults and stay available for tuning in code;
- * only these two proved worth exposing.
- */
-export const HIGHWAY3D_SETTING_SECTIONS: {
-  title: string;
-  items: Highway3DSettingDef[];
-}[] = [
-  {
-    title: "Camera",
-    items: [
-      {
-        key: "angleDeg",
-        label: "Highway angle",
-        min: 0,
-        max: 32,
-        step: 1,
-        fmt: deg,
-      },
-      {
-        key: "windowWidth",
-        label: "Window width",
-        min: 0.7,
-        max: 1.6,
-        step: 0.05,
-        fmt: pct,
-      },
-    ],
-  },
-  {
-    title: "Board",
-    items: [
-      {
-        key: "boardOpacity",
-        label: "Board opacity",
-        min: 0,
-        max: 1,
-        step: 0.05,
-        fmt: pct,
-      },
-    ],
-  },
-];
-
 const HW_SETTINGS_KEY = "riffquest.highway3d.view";
 
 /**
- * The only keys the UI still exposes. Everything else always loads at its
- * default: values set through the old full slider panel would otherwise stick
- * in storage forever with no control left to change them (e.g. a stray lane
- * shading painting every other fret dark).
+ * The only keys the UI still exposes (theme/shape/palette pickers). Everything
+ * else always loads at its default: values set through the old slider panels
+ * would otherwise stick in storage forever with no control left to change them
+ * (e.g. a stray lane shading painting every other fret dark).
  */
-const EXPOSED_KEYS = [
-  "angleDeg",
-  "windowWidth",
-  "boardOpacity",
-  "gemShape",
-  "palette",
-  "theme",
-] as const;
+const EXPOSED_KEYS = ["gemShape", "palette", "theme"] as const;
 
 function loadViewSettings(): Highway3DViewSettings {
   if (typeof window === "undefined") return HW_DEFAULTS;
@@ -370,7 +258,6 @@ function saveViewSettings(s: Highway3DViewSettings) {
 
 interface Highway3DSettingsStore {
   settings: Highway3DViewSettings;
-  setSetting: (key: Highway3DSettingKey, value: number) => void;
   setGemShape: (shape: GemShapeKey) => void;
   setPalette: (palette: PaletteKey) => void;
   setTheme: (theme: Highway3DThemeKey) => void;
@@ -385,12 +272,6 @@ interface Highway3DSettingsStore {
  */
 export const useHighway3DSettings = create<Highway3DSettingsStore>((set) => ({
   settings: loadViewSettings(),
-  setSetting: (key, value) =>
-    set((s) => {
-      const next = { ...s.settings, [key]: value };
-      saveViewSettings(next);
-      return { settings: next };
-    }),
   setGemShape: (gemShape) =>
     set((s) => {
       const next = { ...s.settings, gemShape };
