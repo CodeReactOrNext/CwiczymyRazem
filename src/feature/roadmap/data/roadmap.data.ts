@@ -74,9 +74,10 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     kind: "feature",
     description:
       "A much better tab editor, Fame Points every time someone practices a plan you made, plus a bunch of smaller tweaks and quality of life improvements across the whole exercise builder.",
+    done: true,
   },
   { id: "t90", goal: 90, icon: Guitar, label: "+10 New Guitars & Pedals", kind: "content" },
-  { id: "t105", goal: 105, icon: Palette, label: "Fully Customizable Tablature", kind: "feature" },
+  { id: "t105", goal: 105, icon: Palette, label: "Fully Customizable Tablature", kind: "feature", done: true },
   {
     id: "t115",
     goal: 115,
