@@ -53,7 +53,10 @@
       "Bash(sed -n '37,52p' guitar-learning-without-a-teacher.mdx)",
       "Bash(npx next *)",
       "Bash(git stash *)",
-      "Bash(npx prettier *)"
+      "Bash(npx prettier *)",
+      "Bash(ls \"/c/Users/Krokon/Downloads/TheStringTheory-main/TheStringTheory-main/docs/images/\" 2>/dev/null)",
+      "Read(//c/Users/Krokon/Downloads/TheStringTheory-main/TheStringTheory-main/docs/**)",
+      "Read(//c/Users/Krokon/Downloads/**)"
     ],
     "additionalDirectories": [
       "\\tmp",

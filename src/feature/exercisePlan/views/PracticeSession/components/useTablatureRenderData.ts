@@ -68,7 +68,17 @@ const EMPTY: TablatureRenderData = {
   hasAccentedNotes: false, hasDynamics: false,
 };
 
-export function useTablatureRenderData(measures: TablatureMeasure[] | undefined): TablatureRenderData {
+/**
+ * @param palette Per-string fret-pill colours (string 1 → 6). Omit to keep the
+ *                default rainbow set; the practice session passes the palette
+ *                chosen in the tablature settings.
+ */
+export function useTablatureRenderData(
+  measures: TablatureMeasure[] | undefined,
+  palette: readonly string[] = STRING_COLORS,
+  /** Must match the worker's STRING_SPACING — it maps noteY back to a string index. */
+  stringSpacing: number = STRING_SPACING,
+): TablatureRenderData {
   return useMemo(() => {
     if (!measures) return EMPTY;
 
@@ -98,9 +108,9 @@ export function useTablatureRenderData(measures: TablatureMeasure[] | undefined)
           return {
             noteKey:       `${mIdx}-${bIdx}-${nIdx}`,
             string:        note.string,
-            noteY:         STAFF_TOP + (note.string - 1) * STRING_SPACING,
+            noteY:         STAFF_TOP + (note.string - 1) * stringSpacing,
             fret:          note.fret,
-            color:         STRING_COLORS[note.string - 1] ?? "#ffffff",
+            color:         palette[note.string - 1] ?? "#ffffff",
             isAccented:    note.isAccented,
             isHammerOn:    note.isHammerOn,
             isPullOff:     note.isPullOff,
@@ -126,7 +136,7 @@ export function useTablatureRenderData(measures: TablatureMeasure[] | undefined)
         renderBeats.push({
           offsetX:        currentX,
           duration:       beat.duration,
-          topNoteY:       STAFF_TOP + (topString - 1) * STRING_SPACING,
+          topNoteY:       STAFF_TOP + (topString - 1) * stringSpacing,
           chordName:      beat.chordName,
           beamRight:      beat.duration <= 0.5  && !!next && next.duration <= 0.5,
           beamRight2:     beat.duration <= 0.25 && !!next && next.duration <= 0.25,
@@ -169,5 +179,5 @@ export function useTablatureRenderData(measures: TablatureMeasure[] | undefined)
     });
 
     return { totalBeats: currentX, renderBeats, measureEndXs, timeSigMarkers, tupletGroups, tempoMap, hasAccentedNotes: hasAccents, hasDynamics: hasDyn };
-  }, [measures]);
+  }, [measures, palette, stringSpacing]);
 }

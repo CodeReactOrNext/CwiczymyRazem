@@ -1,6 +1,6 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useEffect, useMemo, useRef } from "react";
-import { computeChromagram, freqToPitchClass, getCentsDistance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
+import { computeChromagram, freqToPitchClass, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { getFeedbackForCombo } from "./noteMatchingFeedback";
@@ -9,6 +9,7 @@ import { useGameState } from "./useGameState";
 
 const CENTS_TOLERANCE      = 45;
 const CHORD_CHROMA_THRESHOLD = 0.55;
+const VOLUME_GATE          = 0.005;
 
 interface UseNoteMatchingOptions {
   isPlaying: boolean;
@@ -197,50 +198,78 @@ export function useNoteMatching({
         const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
         notes.forEach(({ note, noteKey }) => {
-          if (processedNotesRef.current.has(noteKey) && !hitNotesRef.current[noteKey]) return;
-
-          // Already hit — nothing left to decide for this note until the loop wraps.
-          // Bailing out here skips the per-frame pitch/chroma re-checks (the chord
-          // path costs a full analyser FFT via computeChromagram) and stops
-          // re-flagging a React flush every frame while a hit note rings in window.
-          if (hitNotesRef.current[noteKey]) return;
+          const existingHit = hitNotesRef.current[noteKey];
+          if (processedNotesRef.current.has(noteKey) && !existingHit) return;
 
           const requiresOnset = !note.isHammerOn && !note.isPullOff;
 
-          if (isWithinWindow) {
-            if (currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset)) {
-              let isHit = false;
-              if (note.isDead) {
-                isHit = hasRecentTick || hasRecentOnset;
-              } else {
-                const bendOffset     = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
-                // Prefer the note's real MIDI pitch (carries the track's actual tuning:
-                // Drop C/D, 7-string, capo). Falls back to standard-tuning fret math for
-                // regular exercises, where midiNote is undefined.
-                const baseTargetFreq = typeof note.midiNote === "number"
-                  ? midiToFrequency(note.midiNote + bendOffset)
-                  : getFrequencyFromTab(note.string, note.fret + bendOffset, tuningOffsets);
-                const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
-                if (beat.notes.length > 1) {
-                  const chroma = requiresOnset ? audioRefs.onsetChromaRef.current : getChromagram();
-                  if (chroma) isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
-                } else {
-                  // Thicker strings (like E6) often drift sharp on attack and are harder to tune perfectly.
-                  const tolerance = targetFreq < 100 ? CENTS_TOLERANCE + 25 : (targetFreq < 165 ? CENTS_TOLERANCE + 15 : CENTS_TOLERANCE);
-                  
-                  const direct = currentFreq > 20 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= tolerance;
-                  const octave = targetFreq < 165 && (currentFreq / 2) > 20 && Math.abs(getCentsDistance(currentFreq / 2, targetFreq)) <= tolerance;
-                  const thirdHarmonic = targetFreq < 130 && (currentFreq / 3) > 20 && Math.abs(getCentsDistance(currentFreq / 3, targetFreq)) <= tolerance;
-                  const fourthHarmonic = targetFreq < 100 && (currentFreq / 4) > 20 && Math.abs(getCentsDistance(currentFreq / 4, targetFreq)) <= tolerance;
-                  const subOctave = targetFreq > 70 && (currentFreq * 2) > 20 && Math.abs(getCentsDistance(currentFreq * 2, targetFreq)) <= tolerance;
-                  
-                  isHit = direct || octave || thirdHarmonic || fourthHarmonic || subOctave;
-                }
-              }
+          // Expected pitch of this note (0 for dead/muted notes — no pitch).
+          // Prefer the note's real MIDI pitch (carries the track's actual tuning:
+          // Drop C/D, 7-string, capo). Falls back to standard-tuning fret math for
+          // regular exercises, where midiNote is undefined.
+          let targetFreq = 0;
+          if (!note.isDead) {
+            const bendOffset     = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
+            const baseTargetFreq = typeof note.midiNote === "number"
+              ? midiToFrequency(note.midiNote + bendOffset)
+              : getFrequencyFromTab(note.string, note.fret + bendOffset, tuningOffsets);
+            targetFreq = getAdjustedTargetFreq(note.string, baseTargetFreq);
+          }
 
-              if (isHit) {
-                // First (and only) grade of this note — the early return above
-                // guarantees it was neither processed nor hit before.
+          // High strings (≥ E4) ring quieter and carry weaker chroma energy, so
+          // relax the volume/chroma gates there to cut false negatives.
+          const gates = getDetectionGates(targetFreq, VOLUME_GATE, CHORD_CHROMA_THRESHOLD);
+
+          // Is this note's correct pitch sounding *right now*? Shared by the initial
+          // grade and the sustain tracking below. `liveChroma` forces the live FFT
+          // (used while holding) over the onset snapshot (used at the attack).
+          const pitchIsSounding = (liveChroma: boolean): boolean => {
+            if (note.isDead) return hasRecentTick || hasRecentOnset;
+            if (beat.notes.length > 1) {
+              const chroma = (liveChroma || !requiresOnset) ? getChromagram() : audioRefs.onsetChromaRef.current;
+              return !!chroma && chroma[freqToPitchClass(targetFreq)] >= gates.chordChromaThreshold;
+            }
+            // Thicker strings (like E6) often drift sharp on attack and are harder to tune…
+            const baseTolerance = targetFreq < 100 ? CENTS_TOLERANCE + 25 : (targetFreq < 165 ? CENTS_TOLERANCE + 15 : CENTS_TOLERANCE);
+            // …and a confidently-detected expected note earns a little extra, so tuning
+            // drift on the intended note is forgiven (never a full semitone).
+            const tolerance = getExpectationBiasedTolerance(baseTolerance, audioRefs.confidenceRef.current);
+
+            // Only the actually-played fundamental counts. Octave/harmonic-ratio
+            // aliases (½, ⅓, ¼, 2×) used to also score a hit, meant to forgive the
+            // pitch detector misreading which harmonic it caught on the SAME string —
+            // but on a guitar those exact ratios (octave, octave+fifth, two octaves…)
+            // occur constantly between genuinely different notes on different
+            // strings/frets, so any confidently-detected note within roughly a
+            // harmonic ratio of the target scored a false hit. Confidence doesn't
+            // distinguish "detector misread this string" from "a real different
+            // note that happens to share a ratio" — so require the direct match.
+            return currentFreq > 20 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= tolerance;
+          };
+
+          // ── Already scored: grow the green fill for as long as the note is
+          // actually held. Advance the stored beat only while the cursor is still
+          // inside THIS note's own span and the correct pitch keeps ringing (no
+          // re-attack needed). Stop playing → the beat freezes → the fill stops
+          // exactly there. Never rewind. Score/combo were counted once, at the
+          // attack below — this pass only moves the visual fill. ──
+          if (existingHit) {
+            if (typeof existingHit === "number"
+                && loopedBeatsElapsed > existingHit
+                && loopedBeatsElapsed <= beatEnd
+                && currentVolume > gates.volumeGate
+                && pitchIsSounding(true)) {
+              hitNotesRef.current[noteKey] = Math.min(loopedBeatsElapsed, beatEnd);
+              needsFlushRef.current = true;
+            }
+            return;
+          }
+
+          if (isWithinWindow) {
+            if (currentVolume > gates.volumeGate && (hasRecentOnset || hasRecentTick || !requiresOnset)) {
+              if (pitchIsSounding(false)) {
+                // First (and only) grade of this note — the guards above guarantee
+                // it was neither processed nor hit before.
                 processedNotesRef.current.add(noteKey);
 
                 s.hits++;

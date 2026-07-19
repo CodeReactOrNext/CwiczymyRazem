@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { useCallback,useEffect, useRef, useState } from "react";
 
+import { CountInOverlay } from "../CountInOverlay";
 import { ScoreControls } from "./ScoreControls";
 import { TrackSelector } from "./TrackSelector";
 import type { AlphaTabScoreViewerProps } from "./types";
@@ -20,13 +21,18 @@ export const AlphaTabScoreViewer = ({
   baseTempo,
   mode = "score",
   isPlaying,
+  countInRemaining,
   startTime,
   bpm,
   volume = 1,
   isMetronomeMuted = false,
+  trackConfigs,
+  backingTrackIds,
   className,
   hitNotes,
   missedNotes,
+  heightPx,
+  resizeHandle,
 }: AlphaTabScoreViewerProps) => {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
@@ -60,6 +66,8 @@ export const AlphaTabScoreViewer = ({
     volumeRef,
     bpmRef,
     origBpmRef,
+    trackConfigs,
+    backingTrackIds,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.
@@ -125,18 +133,23 @@ export const AlphaTabScoreViewer = ({
   return (
     <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
 
-      {/* Score viewport — must be the scrollable parent so AT cursor follows */}
-      <div
-        ref={scrollRef}
-        className="w-full overflow-auto bg-white"
-        style={{ minHeight: 300, maxHeight: 500 }}
-      >
-        {/* position:relative wrapper so the overlay shares AlphaTab's coordinate
-            space and scrolls together with the rendered score. */}
-        <div className="relative">
-          <div ref={containerRef} />
-          <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20" />
+      {/* Score viewport — must be the scrollable parent so AT cursor follows.
+          Wrapped in a relative box so the resize handle can sit over its bottom edge. */}
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          className="w-full overflow-auto bg-white"
+          style={heightPx ? { height: heightPx } : { minHeight: 300, maxHeight: 500 }}
+        >
+          {/* position:relative wrapper so the overlay shares AlphaTab's coordinate
+              space and scrolls together with the rendered score. */}
+          <div className="relative">
+            <div ref={containerRef} />
+            <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20" />
+          </div>
         </div>
+        <CountInOverlay count={countInRemaining} bpm={bpm} />
+        {resizeHandle}
       </div>
 
       {/* Controls bar */}

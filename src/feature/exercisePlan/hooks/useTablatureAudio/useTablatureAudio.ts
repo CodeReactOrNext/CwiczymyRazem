@@ -127,6 +127,12 @@ export const useTablatureAudio = ({
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       ownAudioContextRef.current?.close();
+      // Soundfont players created below are bound to *this* context instance —
+      // once it's closed they'd silently fail (AudioBufferSourceNode errors, no
+      // sound) if left dangling in the refs. Clear them here so playNote falls
+      // back to the plain-oscillator synth until the loader effect (which shares
+      // this same dependency) supplies fresh players for the new context.
+      guitarPlayerRef.current = mutedGuitarPlayerRef.current = bassPlayerRef.current = vocalsPlayerRef.current = null;
     };
   }, [externalAudioContext]);
 
@@ -150,8 +156,11 @@ export const useTablatureAudio = ({
       setSoundfontsReady(true);
     }).catch(() => { /* synthesis fallback will be used */ });
     return () => { cancelled = true; };
+  // disabled is intentionally included: re-enabling (e.g. leaving the Notation view)
+  // must re-arm loading, since the context-close cleanup above may have cleared the
+  // players while this effect was disabled and skipping.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalAudioContext, audioContextRef.current]);
+  }, [externalAudioContext, audioContextRef.current, disabled]);
 
   // ── Per-track gain + panner ───────────────────────────────────────────────
   useEffect(() => {
@@ -198,7 +207,10 @@ export const useTablatureAudio = ({
   ) => {
     const ctx       = audioContextRef.current;
     const trackGain = trackGainsRef.current[trackId];
-    if (!ctx || !trackGain || !isFinite(time)) return;
+    // ctx.state === "closed" can happen for one scheduler tick right after the
+    // context-owning effect tears down (e.g. switching audio sources) — skip
+    // silently rather than throwing into a dead AudioContext.
+    if (!ctx || ctx.state === "closed" || !trackGain || !isFinite(time)) return;
 
     if (trackType === "drums") {
       playDrumNote(ctx, note, time, trackGain);

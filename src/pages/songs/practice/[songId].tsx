@@ -78,6 +78,7 @@ export default function SongPracticePage() {
           tips: [],
           metronomeSpeed: { min: 40, max: 240, recommended: 120 },
           relatedSkills: [],
+          imageUrl: song.coverUrl || null,
         };
 
         const plan: ExercisePlan = {

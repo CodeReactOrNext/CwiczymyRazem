@@ -18,7 +18,7 @@ import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, ChevronRight, Ear, Lock,Mic, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect,useMemo, useState } from "react";
+import { useCallback, useEffect,useMemo, useRef,useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
@@ -63,6 +63,10 @@ export const SkillDashboard = ({
   const [selectedChallenge, setSelectedChallenge] = useState<DashboardExercise | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const [leaderboardExercise, setLeaderboardExercise] = useState<{ id: string; title: string } | null>(null);
+  // Tracks whether *this page* pushed the `exerciseId` history entry (dashboard ->
+  // session), so handleClose knows to pop it (browser-back-like) instead of
+  // stripping the query on deep-linked sessions (?exerciseId= opened from elsewhere).
+  const pushedExerciseIdRef = useRef(false);
 
   const { t } = useTranslation("skills");
   const userAuth = useAppSelector(selectUserAuth);
@@ -81,32 +85,37 @@ export const SkillDashboard = ({
     if (!router.isReady) return;
     
     const { exerciseId } = router.query;
-    if (exerciseId && typeof exerciseId === "string") {
-      const exercise = exercisesAgregat.find(e => e.id === exerciseId);
-      if (exercise) {
-        const skillId = exercise.relatedSkills[0] || 'general';
-        const skillData = guitarSkills.find(s => s.id === skillId);
-        const category = skillData?.category || (exercise.category !== 'mixed' ? exercise.category : 'technique');
-        
-        const challengeLike: DashboardExercise = {
-            id: exercise.id,
-            title: exercise.title as any,
-            description: exercise.description as any,
-            category: category as any,
-            requiredSkillId: skillId,
-            requiredLevel: exercise.difficulty === 'hard' ? 2 : exercise.difficulty === 'medium' ? 1 : 0,
-            rewardDescription: 'Practice complete',
-            exercises: [exercise],
-            unlockDescription: "",
-            streakDays: 0,
-            intensity: "medium",
-            shortGoal: "",
-            accentColor: "#ffffff",
-            difficulty: exercise.difficulty,
-            tablature: exercise.tablature,
-        };
-        setSelectedChallenge(challengeLike);
-      }
+    if (!exerciseId || typeof exerciseId !== "string") {
+      // Query lost its exerciseId (browser back/forward, or handleClose's
+      // replace) - close the session so the dashboard re-appears without a
+      // full navigation.
+      setSelectedChallenge((prev) => (prev ? null : prev));
+      return;
+    }
+    const exercise = exercisesAgregat.find(e => e.id === exerciseId);
+    if (exercise) {
+      const skillId = exercise.relatedSkills[0] || 'general';
+      const skillData = guitarSkills.find(s => s.id === skillId);
+      const category = skillData?.category || (exercise.category !== 'mixed' ? exercise.category : 'technique');
+
+      const challengeLike: DashboardExercise = {
+          id: exercise.id,
+          title: exercise.title as any,
+          description: exercise.description as any,
+          category: category as any,
+          requiredSkillId: skillId,
+          requiredLevel: exercise.difficulty === 'hard' ? 2 : exercise.difficulty === 'medium' ? 1 : 0,
+          rewardDescription: 'Practice complete',
+          exercises: [exercise],
+          unlockDescription: "",
+          streakDays: 0,
+          intensity: "medium",
+          shortGoal: "",
+          accentColor: "#ffffff",
+          difficulty: exercise.difficulty,
+          tablature: exercise.tablature,
+      };
+      setSelectedChallenge(challengeLike);
     }
   }, [router.isReady, router.query]);
 
@@ -202,7 +211,15 @@ export const SkillDashboard = ({
   const handleStartChallenge = useCallback((challenge: DashboardExercise) => {
     setSelectedSkillId(null);
     setSelectedChallenge(challenge);
-  }, []);
+    // Push (not replace) so the browser's Back button returns here, to the
+    // dashboard, instead of leaving /profile/skills entirely.
+    pushedExerciseIdRef.current = true;
+    router.push(
+      { pathname: router.pathname, query: { ...router.query, exerciseId: challenge.id } },
+      undefined,
+      { shallow: true }
+    );
+  }, [router]);
 
   const returnTo = router.query.returnTo as string | undefined;
 
@@ -219,13 +236,23 @@ export const SkillDashboard = ({
   const handleClose = () => {
     if (returnTo) {
       router.push(returnTo);
-    } else {
-      setSelectedChallenge(null);
-      if (router.query.exerciseId) {
-        const restQuery = { ...router.query };
-        delete restQuery.exerciseId;
-        router.replace({ query: restQuery }, undefined, { shallow: true });
-      }
+      return;
+    }
+    if (pushedExerciseIdRef.current) {
+      // We pushed a history entry when opening this session from the
+      // dashboard - popping it lands back there, same as the browser Back button.
+      pushedExerciseIdRef.current = false;
+      router.back();
+      return;
+    }
+    setSelectedChallenge(null);
+    // The session may have been auto-opened from ?exerciseId= (favorites,
+    // daily quest, roadmap) without us pushing that entry. Drop the param on
+    // exit instead, otherwise a refresh or the next router event reopens it.
+    if (router.query.exerciseId) {
+      const restQuery = { ...router.query };
+      delete restQuery.exerciseId;
+      router.replace({ query: restQuery }, undefined, { shallow: true });
     }
   };
 

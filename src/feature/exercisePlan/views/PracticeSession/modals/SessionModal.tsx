@@ -1,9 +1,11 @@
 import { cn } from "assets/lib/utils";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useIsLandscape } from "hooks/useIsLandscape";
+import type { Dispatch, SetStateAction } from "react";
 import React, { useState } from "react";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
+import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
@@ -46,6 +48,10 @@ interface SessionModalProps {
   setIsAudioMuted: (bool: boolean) => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (bool: boolean) => void;
+  audioTracks?: AudioTrackConfig[];
+  setTrackConfigs?: Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  masterVolume?: number;
+  setMasterVolume?: (v: number) => void;
   speedMultiplier?: number;
   onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
@@ -74,6 +80,7 @@ const SessionModal = ({
   isListening,
   isAudioMuted, setIsAudioMuted,
   isMetronomeMuted, setIsMetronomeMuted,
+  audioTracks, setTrackConfigs, masterVolume, setMasterVolume,
   speedMultiplier, onSpeedMultiplierChange,
   activeTablature,
   isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
@@ -130,6 +137,8 @@ const SessionModal = ({
         isMicEnabled={isMicEnabled} toggleMic={toggleMic}
         isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
         isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+        audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
+        masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         speedMultiplier={speedMultiplier} onSpeedMultiplierChange={onSpeedMultiplierChange}
         activeTablature={activeTablature}
         isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
@@ -219,14 +228,16 @@ const SessionModal = ({
             frequencyRef={frequencyRef}
             volumeRef={volumeRef}
             disableTuner={currentExercise.disableTuner}
+            metronome={metronome} isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+            audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
+            masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
+            onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
             mobile
           />
 
           <ExerciseQuickActionsBar
             exercise={currentExercise}
             metronome={metronome}
-            isMetronomeMuted={isMetronomeMuted}
-            setIsMetronomeMuted={setIsMetronomeMuted}
             examMode={examMode}
           />
 

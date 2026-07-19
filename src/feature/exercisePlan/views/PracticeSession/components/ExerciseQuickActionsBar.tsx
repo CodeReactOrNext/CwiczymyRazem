@@ -1,8 +1,7 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
-import { Minus, Plus, Volume1, Volume2, VolumeX } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { GiMetronome } from "react-icons/gi";
 
@@ -11,8 +10,6 @@ import type { Exercise } from "../../../types/exercise.types";
 interface ExerciseQuickActionsBarProps {
   exercise: Exercise;
   metronome: any;
-  isMetronomeMuted: boolean;
-  setIsMetronomeMuted: (v: boolean) => void;
   examMode?: boolean;
   compact?: boolean;
 }
@@ -30,8 +27,6 @@ const sliderRange = (bpm: number) =>
 export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   exercise,
   metronome,
-  isMetronomeMuted,
-  setIsMetronomeMuted,
   examMode = false,
   compact = false,
 }: ExerciseQuickActionsBarProps) {
@@ -46,10 +41,6 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   const setBpm = metronome.setBpm;
   const minBpm = metronome.minBpm;
   const maxBpm = metronome.maxBpm;
-  const volume: number = metronome.volume ?? 0.5;
-  const setVolume = metronome.setVolume as ((v: number) => void) | undefined;
-
-  const VolumeIcon = isMetronomeMuted || volume <= 0.0001 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   const startEdit = () => {
     setInput(String(bpm));
@@ -136,71 +127,6 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
         >
           <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
         </RippleButton>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <RippleButton
-              title="Metronome volume"
-              className={cn(
-                "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/40",
-                compact ? "h-7 w-7" : "h-8 w-8",
-                isMetronomeMuted
-                  ? "text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
-                  : "text-white hover:bg-white/10"
-              )}
-            >
-              <VolumeIcon className={compact ? "h-4 w-4" : "h-5 w-5"} strokeWidth={2.5} />
-            </RippleButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            sideOffset={8}
-            className="w-60 rounded-xl border border-white/10 bg-zinc-900/95 p-3.5 text-white shadow-xl shadow-black/40 backdrop-blur-md"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-[10px] font-semibold capitalize tracking-[0.12em] text-zinc-400">
-                Metronome volume
-              </span>
-              <span
-                className={cn(
-                  "min-w-[2.75rem] rounded-md px-1.5 py-0.5 text-center font-mono text-[11px] font-bold tabular-nums",
-                  isMetronomeMuted ? "bg-zinc-800 text-zinc-500" : "bg-white/10 text-white"
-                )}
-              >
-                {isMetronomeMuted ? "Muted" : `${Math.round(volume * 100)}%`}
-              </span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}
-                title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
-                className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors active:scale-95",
-                  isMetronomeMuted
-                    ? "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
-                    : "bg-white/10 text-white hover:bg-white/20"
-                )}
-              >
-                <VolumeIcon className="h-4 w-4" strokeWidth={2.5} />
-              </button>
-              <Slider
-                value={[isMetronomeMuted ? 0 : volume]}
-                min={0}
-                max={1}
-                step={0.05}
-                onValueChange={(v) => {
-                  if (isMetronomeMuted && v[0] > 0) setIsMetronomeMuted(false);
-                  setVolume?.(v[0]);
-                }}
-                className={cn(
-                  "flex-1 cursor-pointer",
-                  "[&>span:first-child]:bg-white/15 [&>span:first-child>span]:bg-white",
-                  "[&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-[0_0_8px_rgba(255,255,255,0.4)]"
-                )}
-              />
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </div>
   );

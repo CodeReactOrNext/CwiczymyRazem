@@ -4,9 +4,11 @@ import { cn } from "assets/lib/utils";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 import React, { useEffect, useState } from "react";
 import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward, FaUndo } from "react-icons/fa";
 
+import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { FavoriteExerciseButton } from "../components/FavoriteExerciseButton";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
@@ -35,6 +37,10 @@ interface LandscapeSessionModalProps {
   setIsAudioMuted: (v: boolean) => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (v: boolean) => void;
+  audioTracks?: AudioTrackConfig[];
+  setTrackConfigs?: Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  masterVolume?: number;
+  setMasterVolume?: (v: number) => void;
   speedMultiplier?: number;
   onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
@@ -83,6 +89,10 @@ export function LandscapeSessionModal({
   setIsAudioMuted,
   isMetronomeMuted,
   setIsMetronomeMuted,
+  audioTracks,
+  setTrackConfigs,
+  masterVolume,
+  setMasterVolume,
   speedMultiplier,
   onSpeedMultiplierChange,
   activeTablature,
@@ -234,13 +244,15 @@ export function LandscapeSessionModal({
                         frequencyRef={frequencyRef}
                         volumeRef={volumeRef}
                         disableTuner={currentExercise.disableTuner}
+                        metronome={metronome} isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+                        audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
+                        masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
+                        onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
                         mobile
                       />
                       <ExerciseQuickActionsBar
                         exercise={currentExercise}
                         metronome={metronome}
-                        isMetronomeMuted={isMetronomeMuted}
-                        setIsMetronomeMuted={setIsMetronomeMuted}
                         examMode={examMode}
                         compact
                       />
