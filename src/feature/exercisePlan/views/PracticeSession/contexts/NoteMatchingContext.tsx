@@ -37,6 +37,10 @@ interface NoteMatchingContextValue {
   huntTarget: string | null;
   /** Live mic volume (0..1) for the detection waveform. */
   volumeRef: MutableRefObject<number>;
+  /** Live detected pitch in Hz (0 = silence) — drives the 3D neck's pitch glow. */
+  frequencyRef: MutableRefObject<number>;
+  /** Per-string semitone offset from standard tuning (index 0 = string 1 … 5 = string 6). */
+  tuningOffsets?: readonly number[];
   /** Manually advance the hunt to the next target (for no-mic practice). */
   advanceHunt: () => void;
   /** Enable the microphone / pitch detection from inside the hunt UI. */
@@ -83,6 +87,8 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   customGoalPrompt: null,
   huntTarget: null,
   volumeRef: _fallbackRef,
+  frequencyRef: _fallbackRef,
+  tuningOffsets: undefined,
   advanceHunt: () => { /* no-op default */ },
   onEnableMic: () => { /* no-op default */ },
   markNoteHuntOctave: () => { /* no-op default */ },
@@ -309,13 +315,15 @@ export function NoteMatchingProvider({
       customGoalPrompt: isHunt ? (customGoalPrompt ?? null) : null,
       huntTarget: isHunt ? (customGoal ?? null) : null,
       volumeRef: audioRefs.volumeRef,
+      frequencyRef: audioRefs.frequencyRef,
+      tuningOffsets,
       advanceHunt: onAdvanceHunt,
       onEnableMic,
       markNoteHuntOctave,
       markChordTone,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isHunt, noteHuntSecondsLeft, fretRange, customGoalPrompt, customGoal, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isHunt, noteHuntSecondsLeft, fretRange, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone],
   );
 
   return (

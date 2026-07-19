@@ -80,11 +80,42 @@ function bendEffect(note: TablatureNote): string | null {
   return null;
 }
 
-function noteEffects(note: TablatureNote): string {
+// Our model flags the *destination* of a hammer-on / pull-off — the note you arrive at
+// (higher fret for a hammer, lower for a pull) — matching how gp5Parser reads GP files
+// (isHammerOn/isPullOff derived from the arrival note's `hammerPullOrigin`) and how the
+// tab / highway / 3D views badge the technique on that same note.
+//
+// alphaTex is the mirror image: its `h` effect marks the *origin*, and AlphaTab resolves
+// the destination itself as the next note on the same string (Note.finish →
+// findHammerPullDestination; an origin with no following same-string note is silently
+// dropped). So the `h` has to move one note *back* onto the origin. Emitting it on the
+// flagged destination instead makes AlphaTab treat that note as an origin and slur it to
+// the *next* picked note — usually on another string or in the next bar — drawing the
+// stray legato arc that spans a whole measure.
+function collectHammerPullOrigins(measures: TablatureMeasure[]): WeakSet<TablatureNote> {
+  const origins = new WeakSet<TablatureNote>();
+  const lastNoteOnString = new Map<number, TablatureNote>();
+  for (const measure of measures) {
+    for (const beat of measure.beats) {
+      for (const note of beat.notes) {
+        // A chord never has two notes on one string, so `get` here always returns a note
+        // from an earlier beat — the true origin of this arrival note's slur.
+        if (note.isHammerOn || note.isPullOff) {
+          const origin = lastNoteOnString.get(note.string);
+          if (origin) origins.add(origin);
+        }
+        lastNoteOnString.set(note.string, note);
+      }
+    }
+  }
+  return origins;
+}
+
+function noteEffects(note: TablatureNote, isHammerPullOrigin: boolean): string {
   const effects: string[] = [];
   const bend = bendEffect(note);
   if (bend) effects.push(bend);
-  if (note.isHammerOn || note.isPullOff) effects.push("h");
+  if (isHammerPullOrigin) effects.push("h");
   if (note.isTap) effects.push("lht");
   if (note.isGhost) effects.push("g");
   if (note.isAccented) effects.push("ac");
@@ -106,18 +137,18 @@ function noteEffects(note: TablatureNote): string {
 // (This is the opposite of the *parsed model's* `Note.string`, where 1 = lowest string —
 // that's what useNoteHeadFeedback flips against, for notes read back out of an already
 // loaded score. Don't reuse that flip for text generation, the conventions differ.)
-function noteTex(note: TablatureNote): string {
-  return `${note.fret}.${note.string}${noteEffects(note)}`;
+function noteTex(note: TablatureNote, origins: WeakSet<TablatureNote>): string {
+  return `${note.fret}.${note.string}${noteEffects(note, origins.has(note))}`;
 }
 
-function beatTex(beat: TablatureBeat): string {
+function beatTex(beat: TablatureBeat, origins: WeakSet<TablatureNote>): string {
   const { code: duration, dots } = resolveDuration(beat.duration, beat.tuplet);
   const content =
     beat.notes.length === 0
       ? "r"
       : beat.notes.length === 1
-        ? noteTex(beat.notes[0])
-        : `(${beat.notes.map(noteTex).join(" ")})`;
+        ? noteTex(beat.notes[0], origins)
+        : `(${beat.notes.map((note) => noteTex(note, origins)).join(" ")})`;
   const beatEffectTokens: string[] = [];
   if (beat.tuplet) beatEffectTokens.push(`tu ${beat.tuplet}`);
   if (dots === 1) beatEffectTokens.push("d");
@@ -134,6 +165,7 @@ function beatTex(beat: TablatureBeat): string {
  */
 export function tablatureToAlphaTex(measures: TablatureMeasure[], baseTempo = 120): string {
   let prevTimeSignature: [number, number] | null = null;
+  const hammerPullOrigins = collectHammerPullOrigins(measures);
 
   const bars = measures.map((measure, index) => {
     const meta: string[] = [];
@@ -144,7 +176,7 @@ export function tablatureToAlphaTex(measures: TablatureMeasure[], baseTempo = 12
       meta.push(`\\ts ${numerator} ${denominator}`);
       prevTimeSignature = measure.timeSignature;
     }
-    const beats = measure.beats.map(beatTex).join(" ");
+    const beats = measure.beats.map((beat) => beatTex(beat, hammerPullOrigins)).join(" ");
     return `${meta.length > 0 ? `${meta.join(" ")} ` : ""}${beats} |`;
   });
 

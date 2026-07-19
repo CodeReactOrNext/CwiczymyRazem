@@ -3,8 +3,9 @@ import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
 import { memo } from "react";
 
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
-import { ACCENT_DOT, ARROW_AREA_H, DOTS_H, DOWN_COLOR, HEADER_H, LABEL_H, MUTED_COLOR, PAD, UP_COLOR } from "./strumming.constants";
+import { CountInOverlay } from "../CountInOverlay";
 import { useStrummingAnimation } from "./hooks/useStrummingAnimation";
+import { ACCENT_DOT, ARROW_AREA_H, DOTS_H, DOWN_COLOR, HEADER_H, LABEL_H, MUTED_COLOR, PAD, UP_COLOR } from "./strumming.constants";
 
 interface StrummingPatternViewerProps {
   patterns:             StrumPattern[];
@@ -46,18 +47,7 @@ function StrummingPatternViewerInner({
         <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
       </div>
 
-      {countInRemaining > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20 animate-in fade-in zoom-in duration-200">
-          <div className="flex flex-col items-center">
-            <span className="text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">
-              {countInRemaining}
-            </span>
-            <span className="text-xs font-bold tracking-[0.3em] text-white/50 mt-4">
-              Get Ready
-            </span>
-          </div>
-        </div>
-      )}
+      <CountInOverlay count={countInRemaining} bpm={bpm} />
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-zinc-400">
         <span className="flex items-center gap-1">

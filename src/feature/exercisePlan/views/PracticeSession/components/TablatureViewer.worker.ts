@@ -1,23 +1,77 @@
 /// <reference lib="webworker" />
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const STRING_SPACING = 32;
-const BLOCK_H = 22;   // pill height (same as old NOTE_RADIUS*2)
-const BLOCK_CORNER = 5;    // rounded corner radius
+// World-space design height of the score. The whole drawing is scaled by
+// H / BASE_H so stretching the viewer window enlarges the notation
+// proportionally. Keep in sync with TAB_BASE_HEIGHT in useTablatureWorkerBridge.
+const BASE_H = 300;
+// Vertical gap between strings. Driven by STYLE — the main thread bakes the same
+// value into every note's noteY, so the two must never drift apart.
+let STRING_SPACING = 32;
+// Width (world px) of the pinned left "tuning gutter" that shows each string's
+// tuned note. Content is inset by this much when tuning data is present so the
+// first notes don't hide behind the labels. Keep in sync with TAB_GUTTER_W in
+// useTablatureWorkerBridge.ts.
+const GUTTER_W = 36;
+// Pill geometry. Height and corner radius are overwritten by the PILL_STYLE
+// message so the player can pick a note-pill shape; the defaults below mirror
+// the "rounded" preset in tablaturePillPresets.ts.
+let BLOCK_H = 22;   // pill height
+let BLOCK_CORNER = 5;    // rounded corner radius
 const BLOCK_GAP = 4;    // gap between consecutive block right edges and next beat
 const BLOCK_PAD = 4;    // left padding from beat start
-const NOTE_RADIUS = BLOCK_H / 2; // kept for badge connector math
 const STAFF_TOP = 62;
 const STEM_TOP_Y = 12;
 const RHY_HEAD_Y = STAFF_TOP - 36;
 const RHY_HEAD_R = 3.5;
 const BEAM_H = 3;
 const BEAM_GAP = 4.5;
-const RHYTHM_COLOR = "rgba(255,255,255,0.4)";
+// Recomputed from `inkColor` whenever a STYLE message lands (see below), so the
+// rhythm lane stays legible on light boards too.
+let RHYTHM_COLOR = "rgba(255,255,255,0.4)";
 
-const STRING_COLORS = [
-  "#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc",
-] as const;
+// ── User style (driven by the STYLE message; see tablatureSettings.ts) ────────
+// Per-string palette, used here for slide lines. The pill fill colour itself
+// arrives baked into each note by the main thread's render data.
+let stringColors: string[] = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc"];
+// Scoring feedback colours: solid fill over a sustained note + brighter glow.
+let hitFill = "#10b981";
+let hitGlow = "#34d399";
+/** Board colour. The gutter strip and the played-notes fade paint with it so
+ *  scrolled-past notes dissolve into the same background the container shows. */
+let bgColor = "#09090b";
+/** Colour of everything drawn ON the board (staff, bar lines, rhythm, chord
+ *  pills). Inverts to near-black for light boards. White highlights painted on
+ *  top of the coloured note pills stay white — they are pill sheen, not ink. */
+let inkColor = "#ffffff";
+/** Fret-number colour, or "auto" to derive it per pill from that pill's brightness. */
+let fretTextColor = "#000000";
+
+/** Black or white, whichever stays readable on `hex`. Rec. 709 luma. */
+function readableInk(hex: string): string {
+  if (hex.length !== 7 || hex[0] !== "#") return "#000000";
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 140 ? "#000000" : "#ffffff";
+}
+/** Multiplier on the 13px fret-number base size. */
+let fretFontScale = 1;
+// Toggles for optional layers of the score.
+let showRhythmLane = true;
+let showChordNames = true;
+let showMeasureLines = true;
+let showTechniqueLabels = true;
+let hitAnimations = true;
+
+/** "#rrggbb" → "rgba(r,g,b,a)". Used where a hit colour needs a live alpha. */
+function withAlpha(hex: string, a: number): string {
+  if (hex.length !== 7 || hex[0] !== "#") return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 
 // Staff lines batched into 3 alpha groups (pairs: 0+5, 1+4, 2+3)
 const STAFF_LINE_GROUPS: { alpha: number; indices: number[] }[] = [
@@ -91,6 +145,10 @@ let cachedLoopSeconds = 0; // recomputed when bpm or tempoMap changes
 // Viewport
 let W = 0;
 let H = 256;
+// Uniform display scale derived from the viewer height (H / BASE_H). World
+// coordinates stay height-independent; only the transform and the viewport
+// extent (viewW/viewH) change with it.
+let vscale = 1;
 
 // Horizontal zoom multiplier applied to the base beat-width (1 = default).
 // <1 compresses the score so more of it fits on screen; >1 enlarges it.
@@ -110,6 +168,15 @@ let audioCurrentSec: number | null = null;
 let hitNotes: Record<string, boolean | number> = {};
 let missedNotes: Record<string, boolean> = {};
 let hideNotes = false;
+
+// Per-string tuning legend drawn pinned to the left edge (string 1 = high e …
+// string 6 = low E). Empty → no gutter, no content inset (editor/preview views).
+// Which strings light up is decided per-frame from the cursor (see the gutter draw).
+interface TuningStringInfo { string: number; label: string; color: string; }
+let tuningStrings: TuningStringInfo[] = [];
+// Beats of anticipation: a string lights up once a note it carries is within this
+// many beats ahead of the cursor (or is still ringing under it).
+const TUNING_LOOKAHEAD_BEATS = 2;
 
 // Frozen snapshot of the finishing repetition's hit/miss state. When the full
 // exercise loops, useNoteMatching clears hitNotes/missedNotes at the wrap; we keep
@@ -159,6 +226,41 @@ let lastRestActive = false;
 
 // Whether user is playing sound during a rest (set by main thread)
 let showRestWarning = false;
+
+// ── SMuFL music font (Bravura) ────────────────────────────────────────────────
+// Reuse the Bravura webfont already served for AlphaTab (public/alphatab/font) so
+// the rhythm symbols render as real engraved glyphs instead of hand-drawn shapes.
+// It is loaded into the worker's OWN FontFaceSet; until that resolves — or if the
+// runtime can't load fonts inside a worker — `bravuraReady` stays false and every
+// symbol falls back to the drawn shapes below, so the tab never renders blank.
+let bravuraReady = false;
+const RHY_GLYPH_PX = 25; // Bravura rhythm-symbol size, tuned to the ruler height
+// SMuFL codepoints (Bravura is SMuFL-compliant).
+const GLYPH_NOTEHEAD = { whole: "", half: "", black: "" };
+const GLYPH_FLAG_UP: Record<number, string> = { 1: "", 2: "", 3: "" }; // 8th / 16th / 32nd
+const GLYPH_REST = {
+  whole: "", half: "", quarter: "",
+  eighth: "", sixteenth: "", thirtysecond: "",
+};
+
+(function loadBravura() {
+  try {
+    const g = self as unknown as { fonts?: { add: (f: FontFace) => void } };
+    if (!g.fonts || typeof FontFace === "undefined") return;
+    const face = new FontFace("Bravura", "url(/alphatab/font/Bravura.woff2)");
+    face.load().then(f => { g.fonts!.add(f); bravuraReady = true; needsRedraw = true; })
+      .catch(() => { /* keep the hand-drawn fallback */ });
+  } catch { /* FontFace / worker fonts unsupported — keep the fallback */ }
+})();
+
+/** Draw a SMuFL glyph from Bravura at (x, y). Colour is inherited from ctx.fillStyle. */
+function drawGlyph(g: string, x: number, y: number, align: CanvasTextAlign = "center", baseline: CanvasTextBaseline = "middle") {
+  if (!ctx) return;
+  ctx.font = `${RHY_GLYPH_PX}px Bravura`;
+  ctx.textAlign = align;
+  ctx.textBaseline = baseline;
+  ctx.fillText(g, x, y);
+}
 
 // Lighten a "#rrggbb" colour toward white by `amt` (0..1). Non-hex passes through.
 function lightenHex(hex: string, amt: number): string {
@@ -233,6 +335,79 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   ctx.closePath();
 }
 
+// Strings whose notes sit under the cursor or within the look-ahead window —
+// i.e. the ones "about to be played". `curBeat` is the cursor position in beats
+// (tile-0 space). renderBeats are sorted by offsetX, so we binary-search the
+// first beat still ringing at the cursor and scan forward until past look-ahead.
+function activeTuningStrings(curBeat: number): Set<number> {
+  const active = new Set<number>();
+  if (tuningStrings.length === 0 || renderBeats.length === 0) return active;
+  let lo = 0, hi = renderBeats.length - 1, start = renderBeats.length;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (renderBeats[mid].offsetX + renderBeats[mid].duration >= curBeat) { start = mid; hi = mid - 1; }
+    else lo = mid + 1;
+  }
+  for (let i = start; i < renderBeats.length; i++) {
+    const b = renderBeats[i];
+    if (b.offsetX > curBeat + TUNING_LOOKAHEAD_BEATS) break;
+    for (const n of b.notes) active.add(Math.round((n.noteY - STAFF_TOP) / STRING_SPACING) + 1);
+  }
+  return active;
+}
+
+// ── Tuning gutter ─────────────────────────────────────────────────────────────
+// A pinned column at the left edge naming each string's tuned note (reflecting
+// the player's active tuning, e.g. Drop D → D A D G B E). A string lights up in
+// its own colour only while it's about to be played (see activeTuningStrings);
+// the rest stay dimmed. Drawn in screen space (after the scrolling content is
+// restored) so it stays put while the tab scrolls underneath and notes vanish
+// behind the opaque strip.
+function drawTuningGutter(active: Set<number>) {
+  if (!ctx || tuningStrings.length === 0) return;
+  const viewH = H / vscale;
+
+  // Opaque strip so scrolling notes disappear cleanly behind the labels …
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, GUTTER_W, viewH);
+  // … feathered into the staff on its right edge (styleguide: separate with
+  // background + space, never a hard border line).
+  const edge = ctx.createLinearGradient(GUTTER_W - 10, 0, GUTTER_W, 0);
+  edge.addColorStop(0, withAlpha(bgColor, 0.9));
+  edge.addColorStop(1, withAlpha(bgColor, 0));
+  ctx.fillStyle = edge;
+  ctx.fillRect(GUTTER_W - 10, 0, 10, viewH);
+
+  const pillX = 4, pillW = 26, pillH = BLOCK_H, r = BLOCK_CORNER;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const st of tuningStrings) {
+    const y = STAFF_TOP + (st.string - 1) * STRING_SPACING;
+    const top = y - pillH / 2;
+    // Notes are hidden (ear training) → light every string so we don't leak
+    // which one is coming next; otherwise only the strings about to be played.
+    const lit = hideNotes || active.has(st.string);
+
+    ctx.globalAlpha = lit ? 1 : 0.3;
+    ctx.fillStyle = lit ? st.color : "#3f3f46";
+    drawPill(pillX, top, pillW, pillH, r);
+    ctx.fill();
+    // Top-half sheen — same treatment as the fret pills.
+    ctx.fillStyle = "rgba(255,255,255,0.14)";
+    drawPill(pillX + 1, top + 1, pillW - 2, pillH / 2 - 1, r);
+    ctx.fill();
+
+    ctx.globalAlpha = lit ? 1 : 0.6;
+    // Lit pills carry the string colour, so they follow the fret-number setting;
+    // dimmed ones sit on a neutral grey and keep their own readable tone.
+    const litInk = fretTextColor === "auto" ? readableInk(st.color) : fretTextColor;
+    ctx.fillStyle = lit ? litInk : "#d4d4d8";
+    ctx.font = "bold 13px Inter, sans-serif";
+    ctx.fillText(st.label, pillX + pillW / 2, y + 0.5);
+  }
+  ctx.globalAlpha = 1;
+}
+
 // ── Tempo-aware cursor helpers ────────────────────────────────────────────────
 
 /** Recompute total loop duration in wall-clock seconds using the tempo map + current bpm.
@@ -283,6 +458,19 @@ function drawRestSymbol(x: number, dur: number) {
   if (!ctx) return;
   ctx.strokeStyle = RHYTHM_COLOR;
   ctx.fillStyle = RHYTHM_COLOR;
+
+  if (bravuraReady) {
+    // Real engraved rest glyph. Whole/half rests hang from / sit on a ledger
+    // line; the shorter rests centre in the stem band.
+    const g = dur >= 4 ? GLYPH_REST.whole : dur >= 2 ? GLYPH_REST.half : dur >= 1 ? GLYPH_REST.quarter
+      : dur >= 0.5 ? GLYPH_REST.eighth : dur >= 0.25 ? GLYPH_REST.sixteenth : GLYPH_REST.thirtysecond;
+    const ry = dur >= 4 ? RHY_HEAD_Y - RHY_GLYPH_PX * 0.3
+      : dur >= 2 ? RHY_HEAD_Y - RHY_GLYPH_PX * 0.15
+      : (STEM_TOP_Y + RHY_HEAD_Y) / 2 + 2;
+    drawGlyph(g, x, ry, "center", "middle");
+    return;
+  }
+
   ctx.lineWidth = 1.5;
 
   if (dur >= 4.0) {
@@ -346,6 +534,13 @@ function render() {
 
   const dynBW = Math.max(120, Math.min(200, W / 4)) * zoom;
   const totalW = totalBeats * dynBW;
+  // Viewport extent in world units — the context is scaled by dpr * vscale,
+  // so a stretched (or shrunk) window shows the same world height (BASE_H).
+  const viewW = W / vscale;
+  const viewH = H / vscale;
+  // Left inset for the pinned tuning gutter — all scrolling content shifts right
+  // by this much so the first notes clear the string-name labels. 0 when no gutter.
+  const contentLeft = tuningStrings.length > 0 ? GUTTER_W : 0;
   let dispCursor = pausedCursorPos;     // display cursor world-x (monotonic while seamless looping)
   let scrollX = pausedScrollX;
   let beatsElapsed = 0;
@@ -377,14 +572,14 @@ function render() {
       dispCursor = beatsElapsed * dynBW;
       wrappedCursor = (totalBeats > 0 ? beatsElapsed % totalBeats : 0) * dynBW;
     }
-    scrollX = Math.max(0, dispCursor - W / 4);
+    scrollX = Math.max(0, dispCursor - viewW / 4);
     // Pause/seek anchor stays within a single repetition (tile-0 space)
     pausedCursorPos = wrappedCursor;
-    pausedScrollX = Math.max(0, wrappedCursor - W / 4);
+    pausedScrollX = Math.max(0, wrappedCursor - viewW / 4);
   }
 
   const viewL = scrollX - 50;
-  const viewR = scrollX + W + 50;
+  const viewR = scrollX + viewW + 50;
   const tileStart = seamless && totalW > 0 ? Math.max(0, Math.floor(viewL / totalW)) : 0;
   const tileEnd   = seamless && totalW > 0 ? Math.floor(viewR / totalW) : 0;
   // Repetition the cursor is currently in — the one just before it is the
@@ -393,17 +588,17 @@ function render() {
   lastActiveTile = activeTile;
 
   // ── Clear & translate ────────────────────────────────────────────────────
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0, 0, viewW, viewH);
   ctx.save();
-  ctx.translate(-scrollX, 0);
+  ctx.translate(contentLeft - scrollX, 0);
 
   // ── Staff lines — 3 batched groups (drawn once across the viewport) ──────
   if (!hideNotes) {
     const lineL = Math.max(0, scrollX);
-    const lineR = seamless ? scrollX + W + 10 : Math.min(totalW, scrollX + W + 10);
+    const lineR = seamless ? scrollX + viewW + 10 : Math.min(totalW, scrollX + viewW + 10);
     ctx.lineWidth = 1;
     for (const grp of STAFF_LINE_GROUPS) {
-      ctx.strokeStyle = `rgba(255,255,255,${grp.alpha})`;
+      ctx.strokeStyle = withAlpha(inkColor, grp.alpha);
       ctx.beginPath();
       for (const i of grp.indices) {
         const y = STAFF_TOP + i * STRING_SPACING;
@@ -431,24 +626,26 @@ function render() {
     ctx.translate(tileOff, 0);
 
   // ── Measure lines — single batched path ─────────────────────────────────
-  ctx.strokeStyle = "rgba(255,255,255,0.25)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
-  // Binary search for first visible measure bar, then scan forward
-  if (measureEndXs.length > 0) {
-    let lo = 0, hi = measureEndXs.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (measureEndXs[mid] * dynBW < visL) lo = mid + 1; else hi = mid;
+  if (showMeasureLines) {
+    ctx.strokeStyle = withAlpha(inkColor, 0.25);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
+    // Binary search for first visible measure bar, then scan forward
+    if (measureEndXs.length > 0) {
+      let lo = 0, hi = measureEndXs.length - 1;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (measureEndXs[mid] * dynBW < visL) lo = mid + 1; else hi = mid;
+      }
+      for (let mi = lo; mi < measureEndXs.length; mi++) {
+        const x = measureEndXs[mi] * dynBW;
+        if (x > visR) break;
+        ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
+      }
     }
-    for (let mi = lo; mi < measureEndXs.length; mi++) {
-      const x = measureEndXs[mi] * dynBW;
-      if (x > visR) break;
-      ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
-    }
+    ctx.stroke();
   }
-  ctx.stroke();
 
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
   stringLastPos.clear();
@@ -484,7 +681,7 @@ function render() {
     const reached = cursorPos >= beatPx;
 
     // Rhythm notation
-    if (inView) {
+    if (inView && showRhythmLane) {
       const dur = beat.duration;
       ctx.strokeStyle = RHYTHM_COLOR;
       ctx.fillStyle = RHYTHM_COLOR;
@@ -494,7 +691,7 @@ function render() {
         if (warnThisBeat) {
           // Subtle amber column tint
           ctx.fillStyle = "rgba(251,191,36,0.07)";
-          ctx.fillRect(beatPx, 0, beat.duration * dynBW, H);
+          ctx.fillRect(beatPx, 0, beat.duration * dynBW, viewH);
           // Override rest symbol color to amber
           ctx.strokeStyle = "rgba(251,191,36,0.9)";
           ctx.fillStyle = "rgba(251,191,36,0.9)";
@@ -512,11 +709,17 @@ function render() {
           ctx.fillStyle = RHYTHM_COLOR;
         }
       } else if (dur >= 4.0) {
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.ellipse(beatL, RHY_HEAD_Y, RHY_HEAD_R * 1.5, RHY_HEAD_R, 0, 0, Math.PI * 2);
-        ctx.stroke();
+        // Whole note — open notehead, no stem.
+        if (bravuraReady) {
+          drawGlyph(GLYPH_NOTEHEAD.whole, beatL, RHY_HEAD_Y);
+        } else {
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(beatL, RHY_HEAD_Y, RHY_HEAD_R * 1.5, RHY_HEAD_R, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
       } else {
+        // Stem — shared by half, quarter and shorter notes.
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(beatL, RHY_HEAD_Y - RHY_HEAD_R);
@@ -524,30 +727,37 @@ function render() {
         ctx.stroke();
 
         if (dur >= 2.0) {
-          ctx.beginPath();
-          ctx.arc(beatL, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2);
-          ctx.stroke();
+          // Half note — open notehead.
+          if (bravuraReady) drawGlyph(GLYPH_NOTEHEAD.half, beatL, RHY_HEAD_Y);
+          else { ctx.beginPath(); ctx.arc(beatL, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2); ctx.stroke(); }
         } else {
-          ctx.beginPath();
-          ctx.arc(beatL, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2);
-          ctx.fill();
+          // Quarter or shorter — filled notehead …
+          if (bravuraReady) drawGlyph(GLYPH_NOTEHEAD.black, beatL, RHY_HEAD_Y);
+          else { ctx.beginPath(); ctx.arc(beatL, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2); ctx.fill(); }
 
+          // … and either a beam to the neighbour, or a flag for an isolated note.
           const flags = dur < 0.25 ? 3 : dur < 0.5 ? 2 : dur < 1.0 ? 1 : 0;
-          for (let f = 0; f < flags; f++) {
-            const beamY = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
-            const drawRight = f === 0 ? beat.beamRight : beat.beamRight2;
-            const leftBeam = f === 0 ? beat.prevBeamRight : beat.prevBeamRight2;
+          const isBeamed = beat.beamRight || beat.beamRight2 || beat.prevBeamRight || beat.prevBeamRight2;
+          if (flags > 0 && !isBeamed && bravuraReady) {
+            // Isolated note → one real flag glyph (8th / 16th / 32nd).
+            drawGlyph(GLYPH_FLAG_UP[flags] ?? GLYPH_FLAG_UP[3], beatL, STEM_TOP_Y, "left", "alphabetic");
+          } else {
+            for (let f = 0; f < flags; f++) {
+              const beamY = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
+              const drawRight = f === 0 ? beat.beamRight : beat.beamRight2;
+              const leftBeam = f === 0 ? beat.prevBeamRight : beat.prevBeamRight2;
 
-            if (drawRight) {
-              ctx.fillStyle = RHYTHM_COLOR;
-              ctx.fillRect(beatL, beamY, beat.duration * dynBW, BEAM_H);
-            } else if (!leftBeam) {
-              ctx.strokeStyle = RHYTHM_COLOR;
-              ctx.lineWidth = 1.5;
-              ctx.beginPath();
-              ctx.moveTo(beatL, beamY);
-              ctx.bezierCurveTo(beatL + 10, beamY + 3, beatL + 8, beamY + 8, beatL + 2, beamY + 12);
-              ctx.stroke();
+              if (drawRight) {
+                ctx.fillStyle = RHYTHM_COLOR;
+                ctx.fillRect(beatL, beamY, beat.duration * dynBW, BEAM_H);
+              } else if (!leftBeam) {
+                ctx.strokeStyle = RHYTHM_COLOR;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(beatL, beamY);
+                ctx.bezierCurveTo(beatL + 10, beamY + 3, beatL + 8, beamY + 8, beatL + 2, beamY + 12);
+                ctx.stroke();
+              }
             }
           }
         }
@@ -597,7 +807,7 @@ function render() {
         // ── Slide line from previous block on same string ─────────────────
         const prev = stringLastPos.get(note.noteY);
         if (prev && prev.slideOut > 0) {
-          ctx.strokeStyle = STRING_COLORS[Math.round((note.noteY - STAFF_TOP) / STRING_SPACING)] ?? "#fff";
+          ctx.strokeStyle = stringColors[Math.round((note.noteY - STAFF_TOP) / STRING_SPACING)] ?? "#fff";
           ctx.globalAlpha = 0.7;
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -609,7 +819,7 @@ function render() {
 
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
-        const finalHitColor = "#10b981";
+        const finalHitColor = hitFill;
         const isAnimatingHit = isHit && hitTimestamps[note.noteKey] !== undefined;
 
         if (!isHit && note.isPalmMute) fillColor = "#78716c";
@@ -631,7 +841,7 @@ function render() {
 
         // ── Draw pill block ──────────────────────────────────────────────
         let hitAge = 0;
-        if (isAnimatingHit) {
+        if (isAnimatingHit && hitAnimations) {
           hitAge = Math.min(1, (Date.now() - hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
         }
 
@@ -639,25 +849,18 @@ function render() {
         if (isHit && isOutgoing && tile < activeTile) {
           // Frozen tail strictly behind the cursor: keep notes fully filled and
           // never touch the live cache (its note key is shared with other tiles).
-          // The gap frame where the frozen tile is still the active tile falls
-          // through to the progressive path so the active note keeps filling.
           fillW = blockW;
         } else if (isHit) {
-          const currentVisualFill = noteVisualFill.get(note.noteKey) || 0;
-          // ~250ms slack covers typical latency + 50ms React state interval
-          const slackX = (250 / 60000) * (bpm || 120) * dynBW;
-          const limitX = typeof hitVal === 'number' ? hitVal * dynBW : cursorPos;
-          
-          let optimisticTarget = 0;
-          if (cursorPos - limitX <= slackX) {
-            // Optimistic tracking: as long as limitX is close enough to cursor, assume it's still held
-            optimisticTarget = cursorPos - blockX;
-          } else {
-            // Note dropped: cap at actual drop point + slack (preventing backward visual snap)
-            optimisticTarget = limitX - blockX + slackX;
-          }
-          
-          fillW = Math.max(0, Math.min(blockW, Math.max(currentVisualFill, optimisticTarget)));
+          // Green fills up to how far the note was actually SUSTAINED. `hitVal` is
+          // the beat matching last confirmed the correct pitch still ringing — it
+          // advances only while you hold the note and freezes the instant you stop,
+          // so the fill stops exactly where you stopped instead of racing the cursor
+          // to the end. Ease the drawn width toward that target (matching flushes at
+          // ~20Hz) for a smooth grow, and never rewind — a hit only ever grows.
+          const heldX = typeof hitVal === 'number' ? hitVal * dynBW : cursorPos;
+          const targetFill = Math.max(0, Math.min(blockW, heldX - blockX));
+          const prevFill = noteVisualFill.get(note.noteKey) || 0;
+          fillW = Math.max(prevFill, prevFill + (targetFill - prevFill) * 0.4);
           noteVisualFill.set(note.noteKey, fillW);
         } else if (reached && !isOutgoing) {
           // Only the real (reached) live pass clears the cache; the frozen tail and
@@ -669,9 +872,9 @@ function render() {
           // Harmonic: outlined pill
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
           ctx.globalAlpha = ghostAlpha * accentDim;
-          ctx.strokeStyle = isHit ? "#10b981" : col;
+          ctx.strokeStyle = isHit ? hitFill : col;
           ctx.lineWidth = 2;
-          ctx.fillStyle = (isHit ? "#10b981" : col) + "22";
+          ctx.fillStyle = (isHit ? hitFill : col) + "22";
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
           ctx.stroke();
@@ -682,7 +885,7 @@ function render() {
             ctx.save();
             drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
             ctx.clip();
-            ctx.fillStyle = "rgba(16, 185, 129, 0.4)";
+            ctx.fillStyle = withAlpha(hitFill, 0.4);
             ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
             ctx.restore();
           }
@@ -692,9 +895,9 @@ function render() {
           ctx.fillStyle = fillColor;
 
           // Glow behind the pill for fresh hits
-          if (isAnimatingHit && hitAge < 0.55) {
+          if (isAnimatingHit && hitAnimations && hitAge < 0.55) {
             const glowStr = 1 - hitAge / 0.55;
-            ctx.shadowColor = '#34d399';
+            ctx.shadowColor = hitGlow;
             ctx.shadowBlur = glowStr * 20;
           }
 
@@ -755,7 +958,7 @@ function render() {
         }
 
         // ── Hit animation (Block Shockwave + Sweet Flash) ───────────────────────
-        if (isAnimatingHit) {
+        if (isAnimatingHit && hitAnimations) {
           const eased = 1 - (1 - hitAge) * (1 - hitAge); // Quad ease-out
 
           // White flash over whole pill at start
@@ -771,7 +974,7 @@ function render() {
           // Shockwave 1 — pill outline expanding outwards
           const exp1 = eased * 8; // expands by 8px
           const a1 = (1 - hitAge) * 0.8;
-          ctx.strokeStyle = `rgba(52,211,153,${a1})`;
+          ctx.strokeStyle = withAlpha(hitGlow, a1);
           ctx.lineWidth = Math.max(0.5, 3 * (1 - hitAge));
           drawPill(blockX - exp1, blockY - exp1, blockW + exp1 * 2, BLOCK_H + exp1 * 2, BLOCK_CORNER + exp1);
           ctx.stroke();
@@ -782,7 +985,7 @@ function render() {
             const eased2 = 1 - (1 - age2) * (1 - age2);
             const exp2 = eased2 * 5;
             const a2 = (1 - age2) * 0.4;
-            ctx.strokeStyle = `rgba(16,185,129,${a2})`;
+            ctx.strokeStyle = withAlpha(hitFill, a2);
             ctx.lineWidth = Math.max(0.5, 2 * (1 - age2));
             drawPill(blockX - exp2, blockY - exp2, blockW + exp2 * 2, BLOCK_H + exp2 * 2, BLOCK_CORNER + exp2);
             ctx.stroke();
@@ -793,8 +996,10 @@ function render() {
 
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
-          const fs = hasDynamics ? Math.max(9, Math.round(13 * (0.75 + 0.25 * dyn))) : 13;
-          ctx.fillStyle = "#000000";
+          const baseFs = 13 * fretFontScale;
+          const fs = hasDynamics ? Math.max(9, Math.round(baseFs * (0.75 + 0.25 * dyn))) : Math.round(baseFs);
+          // "auto" reads the pill's own colour, so a dark palette gets light digits.
+          ctx.fillStyle = fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
           ctx.font = `bold ${fs}px Inter, sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -805,11 +1010,17 @@ function render() {
         }
 
         // ── Technique labels ──────────────────────────────────────────────
+        // Turned off as a group: skip every marker but still record this block
+        // for the next note's slide line, which is note geometry, not a label.
+        if (!showTechniqueLabels) {
+          stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + blockW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+          continue;
+        }
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = "bold 9px Inter";
         if (note.isAccented) {
-          ctx.fillStyle = "rgba(255,255,255,0.75)";
+          ctx.fillStyle = withAlpha(inkColor, 0.75);
           ctx.fillText(">", labelX, blockY - 6);
         }
         if (note.isHammerOn || note.isPullOff) {
@@ -957,7 +1168,7 @@ function render() {
       }
     }
 
-    if (beat.chordName && inView) {
+    if (beat.chordName && inView && showChordNames) {
       const label = beat.chordName;
       const fSize = 13;
       const padX  = 9;
@@ -974,12 +1185,14 @@ function render() {
       const connX  = pillX + pillW / 2;
 
       // Glow pass (drawn before the pill so glow stays behind)
-      ctx.shadowColor = "rgba(255,255,255,0.45)";
+      ctx.shadowColor = withAlpha(inkColor, 0.45);
       ctx.shadowBlur  = 8;
 
       // Pill + downward arrow as one path
       const r = 6;
-      ctx.fillStyle = "#ffffff";
+      // Chord pill is drawn in ink with the board colour as its text, so it
+      // stays a high-contrast plate on dark and light boards alike.
+      ctx.fillStyle = inkColor;
       ctx.beginPath();
       ctx.moveTo(pillX + r, pillY);
       ctx.lineTo(pillX + pillW - r, pillY);
@@ -999,8 +1212,8 @@ function render() {
 
       ctx.shadowBlur = 0;
 
-      // Chord label — dark text on white background for maximum contrast
-      ctx.fillStyle    = "#0f172a";
+      // Chord label — board-coloured text on the ink plate for maximum contrast
+      ctx.fillStyle    = bgColor;
       ctx.textAlign    = "left";
       ctx.textBaseline = "top";
       ctx.fillText(label, pillX + padX, pillY + padY);
@@ -1013,7 +1226,7 @@ function render() {
   // ── Time signature markers ───────────────────────────────────────────────
   if (timeSigMarkers.length > 0) {
     const sigMidY = STAFF_TOP + STRING_SPACING * 2.5;
-    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.fillStyle = withAlpha(inkColor, 0.45);
     ctx.font = "bold 14px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -1065,7 +1278,7 @@ function render() {
     const DYN_MAX_H = 24;
     const BAR_W = 6;
 
-    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    ctx.strokeStyle = withAlpha(inkColor, 0.06);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(Math.max(0, visL), DYN_BASE);
@@ -1090,12 +1303,21 @@ function render() {
     ctx.restore();
   } // end per-tile loop
 
-  // ── Progress overlay — dim everything left of the cursor ─────────────────
-  // Fill only the visible span (viewL..dispCursor) so the rect can't grow
-  // unbounded as the monotonic cursor advances across repetitions.
+  // ── Progress overlay — played notes fade out into the backdrop to the left ──
+  // A left→right gradient over the already-played span: near-opaque at the left
+  // edge (notes dissolve into the #09090b viewer background as they scroll off)
+  // easing to fully transparent at the cursor, so the note just played stays
+  // perfectly readable and only the older notes disappear. Fill only the visible
+  // span (viewL..dispCursor) so the rect can't grow unbounded as the monotonic
+  // cursor advances across repetitions.
   if (dispCursor > 0) {
-    ctx.fillStyle = "rgba(0,0,0,0.35)";
-    ctx.fillRect(viewL, 0, dispCursor - viewL, H);
+    const fade = ctx.createLinearGradient(viewL, 0, dispCursor, 0);
+    fade.addColorStop(0,    withAlpha(bgColor, 0.98));
+    fade.addColorStop(0.3,  withAlpha(bgColor, 0.82));
+    fade.addColorStop(0.7,  withAlpha(bgColor, 0.4));
+    fade.addColorStop(1,    withAlpha(bgColor, 0));
+    ctx.fillStyle = fade;
+    ctx.fillRect(viewL, 0, dispCursor - viewL, viewH);
   }
 
   // ── Loop range overlay ────────────────────────────────────────────────────
@@ -1105,15 +1327,15 @@ function render() {
 
     // Dim the areas outside the loop range
     ctx.fillStyle = "rgba(0,0,0,0.28)";
-    ctx.fillRect(0, 0, lsx, H);
-    ctx.fillRect(lex, 0, totalBeats * dynBW - lex, H);
+    ctx.fillRect(0, 0, lsx, viewH);
+    ctx.fillRect(lex, 0, totalBeats * dynBW - lex, viewH);
 
     // Loop boundary lines
     ctx.strokeStyle = "rgba(6,182,212,0.65)";
     ctx.lineWidth = 2;
     ctx.setLineDash([]);
-    ctx.beginPath(); ctx.moveTo(lsx, 0); ctx.lineTo(lsx, H); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(lex, 0); ctx.lineTo(lex, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(lsx, 0); ctx.lineTo(lsx, viewH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(lex, 0); ctx.lineTo(lex, viewH); ctx.stroke();
 
     // Small label at the start boundary
     ctx.fillStyle = "rgba(6,182,212,0.55)";
@@ -1131,7 +1353,7 @@ function render() {
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
     ctx.moveTo(hoverStartX, 0);
-    ctx.lineTo(hoverStartX, H);
+    ctx.lineTo(hoverStartX, viewH);
     ctx.stroke();
     ctx.setLineDash([]);
 
@@ -1164,7 +1386,7 @@ function render() {
     ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, H);
+    ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, viewH);
     ctx.stroke();
 
     if (isPlaying && beatsElapsed > 0) {
@@ -1175,13 +1397,18 @@ function render() {
         ctx.strokeStyle = `rgba(6,182,212,${opacity})`;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(dispCursor, H / 2, ripple, 0, Math.PI * 2);
+        ctx.arc(dispCursor, viewH / 2, ripple, 0, Math.PI * 2);
         ctx.stroke();
       }
     }
   }
 
   ctx.restore();
+
+  // ── Pinned tuning gutter (drawn on top of the scrolled content) ──────────
+  // Light the strings at / just ahead of the cursor. wrappedCursor is tile-0
+  // pixel space, so divide by the beat width to get the cursor beat.
+  drawTuningGutter(activeTuningStrings(dynBW > 0 ? wrappedCursor / dynBW : 0));
 
   // ── Notify main thread when cursor enters/leaves a rest beat ────────────
   if (isPlaying && countInRemaining === 0) {
@@ -1211,8 +1438,9 @@ self.onmessage = (e: MessageEvent) => {
       H = msg.height ?? 256;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
+      vscale = H > 0 ? H / BASE_H : 1;
       ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
       if (rafId !== null) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(render);
       break;
@@ -1221,11 +1449,12 @@ self.onmessage = (e: MessageEvent) => {
       dpr = msg.dpr ?? dpr;
       W = msg.width;
       H = msg.height;
+      vscale = H > 0 ? H / BASE_H : 1;
       if (canvas) {
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
       }
       break;
     }
@@ -1313,6 +1542,10 @@ self.onmessage = (e: MessageEvent) => {
       hideNotes = msg.hideNotes;
       break;
     }
+    case 'TUNING': {
+      tuningStrings = (msg.strings as TuningStringInfo[]) ?? [];
+      break;
+    }
     case 'SCROLL': {
       pausedScrollX = msg.scrollX;
       pausedCursorPos = msg.cursorPos;
@@ -1328,6 +1561,33 @@ self.onmessage = (e: MessageEvent) => {
         pausedScrollX *= ratio;
       }
       zoom = next;
+      break;
+    }
+    case 'STYLE': {
+      // Every user-facing tablature look setting arrives here as one patch.
+      // Paused frames are skipped unless something changed, so flag a redraw —
+      // otherwise a new setting wouldn't appear until playback resumed.
+      if (msg.pillHeight !== undefined) BLOCK_H = msg.pillHeight;
+      if (msg.pillCorner !== undefined) BLOCK_CORNER = msg.pillCorner;
+      if (msg.fretFontScale !== undefined) fretFontScale = msg.fretFontScale;
+      if (msg.stringColors !== undefined) stringColors = msg.stringColors;
+      if (msg.hitFill !== undefined) hitFill = msg.hitFill;
+      if (msg.hitGlow !== undefined) hitGlow = msg.hitGlow;
+      if (msg.background !== undefined) bgColor = msg.background;
+      if (msg.stringSpacing !== undefined) STRING_SPACING = msg.stringSpacing;
+      if (msg.fretText !== undefined) fretTextColor = msg.fretText;
+      if (msg.ink !== undefined) {
+        inkColor = msg.ink;
+        // Cached string rather than a per-draw call — the rhythm lane paints it
+        // dozens of times per frame.
+        RHYTHM_COLOR = withAlpha(inkColor, 0.4);
+      }
+      if (msg.showRhythmLane !== undefined) showRhythmLane = msg.showRhythmLane;
+      if (msg.showChordNames !== undefined) showChordNames = msg.showChordNames;
+      if (msg.showMeasureLines !== undefined) showMeasureLines = msg.showMeasureLines;
+      if (msg.showTechniqueLabels !== undefined) showTechniqueLabels = msg.showTechniqueLabels;
+      if (msg.hitAnimations !== undefined) hitAnimations = msg.hitAnimations;
+      needsRedraw = true;
       break;
     }
     case 'SHOW_REST_WARNING': {

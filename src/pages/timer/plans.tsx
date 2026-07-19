@@ -11,7 +11,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useEffect,useState } from "react";
+import { useEffect,useRef,useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
@@ -24,6 +24,10 @@ const TimerPlans: NextPageWithLayout = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const [isFinishing, setIsFinishing] = useState(false);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+  // Tracks whether *this page* pushed the `planId` history entry (list -> session),
+  // so handleBack knows to pop it (browser-back-like) instead of stripping the
+  // query on deep-linked sessions (?planId= opened directly from another page).
+  const pushedPlanIdRef = useRef(false);
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -52,10 +56,18 @@ const TimerPlans: NextPageWithLayout = () => {
 
   const handleBack = () => {
     if (selectedPlan) {
+      if (pushedPlanIdRef.current) {
+        // We pushed a history entry when opening this session from the list -
+        // popping it lands back on the list, same as the browser Back button.
+        pushedPlanIdRef.current = false;
+        router.back();
+        return;
+      }
       setSelectedPlan(null);
       // The session may have been auto-opened from ?planId= (Last Session
-      // shortcut, favorites, daily quest). Drop the param on exit, otherwise
-      // a refresh or the next router event reopens the session immediately.
+      // shortcut, favorites, daily quest) without us pushing that entry.
+      // Drop the param on exit instead, otherwise a refresh or the next
+      // router event reopens the session immediately.
       if (router.query.planId) {
         const restQuery = { ...router.query };
         delete restQuery.planId;
@@ -78,12 +90,26 @@ const TimerPlans: NextPageWithLayout = () => {
     }
   };
 
+  const handleSelectPlanFromList = (planId: string) => {
+    // Push (not replace) so the browser's Back button returns here, to the
+    // list, instead of leaving /timer/plans entirely.
+    pushedPlanIdRef.current = true;
+    router.push(
+      { pathname: router.pathname, query: { ...router.query, planId } },
+      undefined,
+      { shallow: true }
+    );
+  };
+
   const handlePlanFinish = () => {
     setIsFinishing(true);
     router.push("/report");
   };
 
-  return selectedPlan ? (
+  // Require both the query param and the loaded plan so that losing
+  // ?planId= (browser back/forward, or handleBack stripping it) hides the
+  // session immediately, without needing an effect to reset `selectedPlan`.
+  return router.query.planId && selectedPlan ? (
     <MainContainer>
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
@@ -99,7 +125,7 @@ const TimerPlans: NextPageWithLayout = () => {
         }
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
-      <PlanSelector onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
+      <PlanSelector onSelectPlan={handleSelectPlanFromList} loadingPlanId={loadingPlanId} />
     </div>
   );
 };

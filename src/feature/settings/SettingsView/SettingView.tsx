@@ -10,11 +10,12 @@ import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
+import { TablatureAppearance } from "feature/settings/components/TablatureAppearance";
 import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { Bell, Lock, Share2, User } from "lucide-react";
+import { Bell, Guitar, Lock, Share2, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -61,6 +62,15 @@ const SettingsView = () => {
                   <span className="font-bold">Social Media</span>
                 </TabsTrigger>
                 <TabsTrigger
+                  value="tablature"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-amber-500/10 group-data-[state=active]:text-amber-500 transition-colors">
+                    <Guitar className="h-4 w-4" />
+                  </div>
+                  <span className="font-bold">Tablature</span>
+                </TabsTrigger>
+                <TabsTrigger
                   value="notifications"
                   className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
@@ -90,6 +100,10 @@ const SettingsView = () => {
 
             <TabsContent value="socials" className="mt-0">
               <MediaLinks />
+            </TabsContent>
+
+            <TabsContent value="tablature" className="mt-0">
+              <TablatureAppearance />
             </TabsContent>
 
             <TabsContent value="notifications" className="mt-0">

@@ -64,8 +64,56 @@ describe("tablatureToAlphaTex", () => {
       },
     ];
 
+    // The isHammerOn note has no preceding same-string note to slur *from*, so no `h` is
+    // emitted (AlphaTab would drop a dangling origin anyway). The origin-placement case is
+    // covered on its own below.
     expect(tablatureToAlphaTex(measures, 120)).toBe(
-      "\\tempo 120 \\ts 4 4 r.8 (5.3{h} 5.2).16 0.6{x}.4 12.1{b (0 2)}.2 7.1{pm v}.4 |",
+      "\\tempo 120 \\ts 4 4 r.8 (5.3 5.2).16 0.6{x}.4 12.1{b (0 2)}.2 7.1{pm v}.4 |",
+    );
+  });
+
+  it("puts the hammer/pull slur on the origin note, not the flagged destination", () => {
+    // Our model flags the *destination* of a hammer/pull (the note reached by the
+    // technique); alphaTex's `h` marks the *origin* and AlphaTab slurs it forward to the
+    // next same-string note. So each flagged arrival note must move its `h` back onto the
+    // previous note on the same string. Emitting `h` on the destination instead made
+    // AlphaTab slur it to the next picked note, drawing a stray arc across the whole bar
+    // (the "Dark Pull-off Pentatonic Run" legato bug).
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 0.5, notes: [{ string: 3, fret: 7 }] },
+          { duration: 0.5, notes: [{ string: 3, fret: 5, isPullOff: true }] },
+          { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+          { duration: 0.5, notes: [{ string: 4, fret: 5, isPullOff: true }] },
+        ],
+      },
+    ];
+
+    // `h` lands on each fret-7 origin; the fret-5 destinations stay bare, so no slur
+    // leaks across the string change or into the next bar.
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 4 4 7.3{h}.8 5.3.8 7.4{h}.8 5.4.8 |",
+    );
+  });
+
+  it("chains `h` across a same-string legato run (pick, hammer, hammer)", () => {
+    // 5→7→8 all on one string: the slur origins are the 5 and the 7 (each is the note the
+    // next arrival hammers off), while the final 8 carries nothing.
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 0.25, notes: [{ string: 6, fret: 5 }] },
+          { duration: 0.25, notes: [{ string: 6, fret: 7, isHammerOn: true }] },
+          { duration: 0.25, notes: [{ string: 6, fret: 8, isHammerOn: true }] },
+        ],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 4 4 5.6{h}.16 7.6{h}.16 8.6.16 |",
     );
   });
 

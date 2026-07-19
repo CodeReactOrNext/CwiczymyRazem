@@ -276,7 +276,7 @@ export const PracticeSession = ({
 
   const [tabRestartKey, setTabRestartKey] = useState(0);
 
-  const { audioTracks, trackConfigs, setTrackConfigs, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
+  const { audioTracks, trackConfigs, setTrackConfigs, backingTrackIds, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
@@ -513,6 +513,8 @@ export const PracticeSession = ({
           onRecalibrate={handleRecalibrate}
           isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
           isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+          audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
+          masterVolume={masterVolume} setMasterVolume={setMasterVolume}
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
           isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
@@ -562,6 +564,7 @@ export const PracticeSession = ({
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
+        backingTrackIds={backingTrackIds}
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart}

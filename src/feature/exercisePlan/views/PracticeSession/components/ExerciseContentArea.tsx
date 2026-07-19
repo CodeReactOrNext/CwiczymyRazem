@@ -12,6 +12,7 @@ import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { MetronomeGapTest } from "./MetronomeGapTest";
+import { MicHud } from "./MicHud";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
@@ -33,6 +34,10 @@ interface ExerciseContentAreaProps {
   isMetronomeMuted: boolean;
   /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
   masterVolume?: number;
+  /** Per-track mute/volume for the notation viewer's underlying synth — MUST be memoized by the caller. */
+  trackConfigs?: Record<string, { volume: number; isMuted: boolean }>;
+  /** Dynamic backing-track ids, used to map `trackConfigs` onto the score's tracks — MUST be memoized by the caller. */
+  backingTrackIds?: string[];
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -91,6 +96,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   isAudioMuted,
   isMetronomeMuted,
   masterVolume,
+  trackConfigs,
+  backingTrackIds,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -139,6 +146,13 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
     <div className={cn(
       "relative w-full overflow-hidden rounded-xl bg-[#1a1a1d] shadow-xl shadow-black/40"
     )}>
+
+      {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here. */}
+      {isMicEnabled && !hasTablature && (
+        <div className="flex justify-end px-4 pt-4">
+          <MicHud />
+        </div>
+      )}
 
       {/* Ear Training */}
       {currentExercise.riddleConfig?.mode === "sequenceRepeat" && (
@@ -206,6 +220,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isAudioMuted={isAudioMuted}
           isMetronomeMuted={isMetronomeMuted}
           masterVolume={masterVolume}
+          trackConfigs={trackConfigs}
+          backingTrackIds={backingTrackIds}
           isMetronomePlaying={isMetronomePlaying}
           countInRemaining={countInRemaining}
           frequencyRef={frequencyRef}
@@ -217,7 +233,11 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           hideDynamicsLane={!!rawGpFile}
           volumeRef={volumeRef}
           isExamMode={isExamMode}
+          isMicEnabled={isMicEnabled}
           onLoopRestart={onLoopRestart}
+          title={activeExercise.title}
+          coverUrl={activeExercise.imageUrl ?? undefined}
+          subtitle={activeExercise.imageUrl ? activeExercise.description : undefined}
         />
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         <VideoSection
@@ -261,7 +281,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       {controlsSlot && (
         <div
           style={{ zoom: 0.9 }}
-          className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-white/5 px-4 py-3.5 [&>*]:!mb-0"
+          className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-4 [&>*]:!mb-0"
         >
           {controlsSlot}
         </div>

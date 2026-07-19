@@ -13,17 +13,13 @@ import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
 import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
-import { ExerciseInfoGrid } from "./ExerciseInfoGrid";
 import { ExerciseProgress } from "./ExerciseProgress";
 import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
-import { Highway3DToggleButton } from "./Highway3DToggleButton";
-import { MediaControlsToolbar } from "./MediaControlsToolbar";
-import { MicHud } from "./MicHud";
-import { NotationToggleButton } from "./NotationToggleButton";
+import { MediaControlsToolbar, SpeedDropdown } from "./MediaControlsToolbar";
 import { SessionBottomBar } from "./SessionBottomBar";
-import { SessionSidebar } from "./SessionSidebar";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
+import { TablatureViewMenu } from "./TablatureViewMenu";
 
 interface DesktopSessionViewProps {
   reportResult:             any;
@@ -87,6 +83,9 @@ interface DesktopSessionViewProps {
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  /** Dynamic backing-track ids (e.g. other Guitar Pro tracks), used to map `trackConfigs`
+   *  onto the notation viewer's underlying score tracks. */
+  backingTrackIds:          string[];
   masterVolume:             number;
   setMasterVolume:          (v: number) => void;
   examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
@@ -160,6 +159,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         // Master volume only boosts the AlphaTab (Guitar Pro) synth — no GP file, no control.
         masterVolume={p.effectiveRawGpFile ? p.masterVolume : undefined}
         onMasterVolumeChange={p.effectiveRawGpFile ? p.setMasterVolume : undefined}
+        metronome={p.metronome} isMetronomeMuted={p.isMetronomeMuted} setIsMetronomeMuted={p.setIsMetronomeMuted}
+        audioTracks={p.audioTracks} setTrackConfigs={p.setTrackConfigs}
         frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
         disableTuner={p.currentExercise.disableTuner}
         baseBpm={p.metronome?.bpm}
@@ -167,34 +168,41 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
-            {/* Exams are graded against the tab/backing-track flow only — notation is a
-                practice-only convenience, so hide the toggle entirely during an exam. */}
-            {!p.isExamMode && (p.effectiveRawGpFile || (p.activeTablature && p.activeTablature.length > 0)) && (
-              <NotationToggleButton
+            {/* One menu for every tab view: flat tablature, 3D highway, notation.
+                Notation is a practice-only convenience, so it's dropped in exams. */}
+            {(!!p.activeTablature?.length || (!p.isExamMode && !!p.effectiveRawGpFile)) && (
+              <TablatureViewMenu
                 showAlphaTabScore={p.showAlphaTabScore}
-                onToggle={p.handleToggleAlphaTabScore}
-              />
-            )}
-            {/* WIP — hidden from users for now. Flip to `!!p.activeTablature?.length` to re-enable. */}
-            {false && (
-              <Highway3DToggleButton
                 show3dHighway={p.show3dHighway}
-                onToggle={p.handleToggle3dHighway}
+                hasTablature={!!p.activeTablature?.length}
+                canNotation={!p.isExamMode && (!!p.effectiveRawGpFile || !!p.activeTablature?.length)}
+                onToggleNotation={p.handleToggleAlphaTabScore}
+                onToggle3d={p.handleToggle3dHighway}
               />
             )}
             <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
           </>
         }
       />
-      <div className="w-[360px] max-w-full [&>*]:!mb-0">
-        <ExerciseQuickActionsBar
-          exercise={p.currentExercise}
-          metronome={p.metronome}
-          isMetronomeMuted={p.isMetronomeMuted}
-          setIsMetronomeMuted={p.setIsMetronomeMuted}
-          examMode={p.isExamMode}
-        />
-      </div>
+      {/* TEMPO island: playback speed lives next to the BPM slider — one axis, one place. */}
+      {hasMetronome && !p.isExamMode && (
+        <div className="flex items-center gap-1.5 rounded-lg bg-zinc-900/40 p-1.5">
+          <SpeedDropdown
+            speedMultiplier={p.speedMultiplier}
+            onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
+            baseBpm={p.metronome?.bpm}
+            isSlowed={p.speedMultiplier < 1}
+            h="h-12"
+          />
+          <div className="w-[360px] max-w-full [&>*]:!mb-0">
+            <ExerciseQuickActionsBar
+              exercise={p.currentExercise}
+              metronome={p.metronome}
+              examMode={p.isExamMode}
+            />
+          </div>
+        </div>
+      )}
     </>
   ) : undefined;
 
@@ -239,11 +247,6 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     activeExercise={p.activeExercise}
                     plan={p.plan}
                   />
-                  {hasMicControls && (
-                    <div className="mt-4 mb-10 w-full max-w-2xl min-h-[64px]">
-                      {p.isMicEnabled && <MicHud />}
-                    </div>
-                  )}
                   {p.allGpTracks && !p.showAlphaTabScore && (
                     <GpTrackSelector tracks={p.allGpTracks} selectedIdx={p.selectedGpTrackIdx} onChange={p.setSelectedGpTrackIdx} />
                   )}
@@ -256,6 +259,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
                     isMetronomeMuted={p.isMetronomeMuted}
                     masterVolume={p.masterVolume}
+                    trackConfigs={p.trackConfigs}
+                    backingTrackIds={p.backingTrackIds}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
@@ -279,17 +284,6 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     controlsSlot={playbackControls}
                   />
                 </div>
-
-                <ExerciseInfoGrid exercise={p.activeExercise} isPlayalong={p.currentExercise.isPlayalong} hasMetronome={!!p.currentExercise.metronomeSpeed}>
-                  <SessionSidebar
-                    currentExercise={p.currentExercise} activeExercise={p.activeExercise}
-                    metronome={p.metronome} isMetronomeMuted={p.isMetronomeMuted}
-                    setIsMetronomeMuted={p.setIsMetronomeMuted}
-                    audioTracks={p.audioTracks}
-                    trackConfigs={p.trackConfigs} setTrackConfigs={p.setTrackConfigs}
-                    examMode={!!p.examMode}
-                  />
-                </ExerciseInfoGrid>
 
                 {!p.reportResult && (
                   <SessionBottomBar

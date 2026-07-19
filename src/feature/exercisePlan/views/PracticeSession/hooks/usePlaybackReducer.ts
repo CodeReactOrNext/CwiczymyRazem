@@ -1,3 +1,4 @@
+import { useTablatureSettings } from 'feature/exercisePlan/views/PracticeSession/components/tablatureSettings';
 import { useCallback,useReducer } from 'react';
 
 export type PlaybackState = {
@@ -21,14 +22,20 @@ type PlaybackAction =
   | { type: 'SET_SELECTED_GP_TRACK_IDX'; payload: number }
   | { type: 'RESET_FOR_EXERCISE'; payload: Partial<PlaybackState> };
 
-const initialState: PlaybackState = {
-  isAudioMuted: true,
-  isMetronomeMuted: false,
-  speedMultiplier: 1,
-  showAlphaTabScore: false,
-  show3dHighway: false,
-  selectedGpTrackIdx: 0,
-};
+// Seeds the view flags from the "Default view" setting (Settings → Tablature). Read via
+// getState() rather than the hook: only the value at mount time is needed, and calling a
+// hook here would subscribe the whole reducer to every unrelated tablature-setting change.
+function createInitialState(): PlaybackState {
+  const { defaultViewMode } = useTablatureSettings.getState();
+  return {
+    isAudioMuted: true,
+    isMetronomeMuted: false,
+    speedMultiplier: 1,
+    showAlphaTabScore: defaultViewMode === 'notation',
+    show3dHighway: defaultViewMode === 'highway',
+    selectedGpTrackIdx: 0,
+  };
+}
 
 function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
   switch (action.type) {
@@ -75,7 +82,7 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
 }
 
 export function usePlaybackReducer() {
-  const [state, dispatch] = useReducer(playbackReducer, initialState);
+  const [state, dispatch] = useReducer(playbackReducer, undefined, createInitialState);
 
   const setIsAudioMuted = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_AUDIO_MUTED', payload }), []);
   const setIsMetronomeMuted = useCallback((payload: boolean | ((prev: boolean) => boolean)) => dispatch({ type: 'SET_METRONOME_MUTED', payload }), []);

@@ -6,6 +6,31 @@ import type { TablatureRenderData } from "./useTablatureRenderData";
 
 const REST_VOLUME_THRESHOLD = 0.05;
 
+/**
+ * World-space design height of the tablature drawing. The worker scales its
+ * whole render by containerHeight / TAB_BASE_HEIGHT, so stretching the viewer
+ * enlarges the notation. Keep in sync with BASE_H in TablatureViewer.worker.ts.
+ */
+export const TAB_BASE_HEIGHT = 300;
+
+/**
+ * Width (world px) of the pinned left tuning gutter. Content is inset by this
+ * much whenever tuning labels are shown, so screen→beat mapping (seek/hover)
+ * must subtract it. Keep in sync with GUTTER_W in TablatureViewer.worker.ts.
+ */
+export const TAB_GUTTER_W = 36;
+
+/** One string's entry in the left tuning gutter (string 1 = high e … 6 = low E).
+ *  Which strings light up is decided live by the worker from the playback cursor
+ *  (the strings about to be played), so no static "used" flag is carried here. */
+export interface TuningGutterString {
+  string: number;
+  /** Tuned note name for this string, e.g. "E", "D", "Eb". */
+  label: string;
+  /** String colour (matches the fret-pill palette). */
+  color: string;
+}
+
 interface WorkerBridgeOptions {
   canvasRef:       { current: HTMLCanvasElement | null };
   containerRef?:   { current: HTMLElement | null };
@@ -28,6 +53,32 @@ interface WorkerBridgeOptions {
   loopStartBeat?:  number | null;
   loopEndBeat?:    number | null;
   zoom?:           number;
+  /** Left-gutter tuning legend; when non-empty the worker insets the content by TAB_GUTTER_W. */
+  tuningStrings?:  TuningGutterString[];
+  /** Visual settings patch forwarded to the worker's STYLE message. Omit to keep its defaults. */
+  style?:          TablatureStylePatch;
+}
+
+/** The look settings the worker accepts. Mirrors the STYLE message payload. */
+export interface TablatureStylePatch {
+  pillHeight?: number;
+  pillCorner?: number;
+  fretFontScale?: number;
+  stringColors?: readonly string[];
+  hitFill?: string;
+  hitGlow?: string;
+  background?: string;
+  /** Colour for everything drawn on the board; inverts on light backgrounds. */
+  ink?: string;
+  /** Vertical gap between strings, in world px. */
+  stringSpacing?: number;
+  /** Fret-number colour, or "auto" to pick per pill from its brightness. */
+  fretText?: string;
+  showRhythmLane?: boolean;
+  showChordNames?: boolean;
+  showMeasureLines?: boolean;
+  showTechniqueLabels?: boolean;
+  hitAnimations?: boolean;
 }
 
 export function useTablatureWorkerBridge({
@@ -35,7 +86,7 @@ export function useTablatureWorkerBridge({
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
   hitNotes, missedNotes, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
-  loopStartBeat, loopEndBeat, zoom = 1,
+  loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -51,6 +102,12 @@ export function useTablatureWorkerBridge({
 
   const [isRestActive,    setIsRestActive]    = useState(false);
   const [showRestWarning, setShowRestWarning] = useState(false);
+
+  // Display scale mirroring the worker's vscale — converts CSS px ↔ world px.
+  const vscale = containerSize.height > 0 ? containerSize.height / TAB_BASE_HEIGHT : 1;
+  // World-px the content is inset by when the tuning gutter is shown — the
+  // screen→beat mapping below must subtract it to match the worker.
+  const gutterW = tuningStrings && tuningStrings.length > 0 ? TAB_GUTTER_W : 0;
 
   // Worker lifecycle
   useEffect(() => {
@@ -140,6 +197,11 @@ export function useTablatureWorkerBridge({
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIT_NOTES',    hitNotes });   }, [hitNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes }); }, [missedNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'TUNING', strings: tuningStrings ?? [] }); }, [tuningStrings]);
+  useEffect(() => {
+    if (!style) return;
+    workerRef.current?.postMessage({ type: 'STYLE', ...style });
+  }, [style]);
   useEffect(() => {
     workerRef.current?.postMessage({
       type: 'LOOP_RANGE',
@@ -193,7 +255,7 @@ export function useTablatureWorkerBridge({
   };
   const handleDragMove = (clientX: number) => {
     if (!isDraggingRef.current) return;
-    const newScrollX = Math.max(0, initScrollXRef.current - (clientX - dragStartXRef.current));
+    const newScrollX = Math.max(0, initScrollXRef.current - (clientX - dragStartXRef.current) / vscale);
     pausedScrollRef.current = { ...pausedScrollRef.current, scrollX: newScrollX };
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: pausedScrollRef.current.cursorPos });
   };
@@ -210,7 +272,7 @@ export function useTablatureWorkerBridge({
     ) {
       const containerLeft = containerRef.current.getBoundingClientRect().left;
       const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-      const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
+      const worldX = (clientX - containerLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
       let beatPos = Math.max(0, worldX / dynBW);
 
       // Snap to start of the measure that was clicked
@@ -225,7 +287,7 @@ export function useTablatureWorkerBridge({
       }
 
       const newCursorPos = beatPos * dynBW;
-      const newScrollX   = Math.max(0, newCursorPos - containerSize.width / 4);
+      const newScrollX   = Math.max(0, newCursorPos - containerSize.width / vscale / 4);
       pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
       workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
       // Clear hover preview after seek click
@@ -240,7 +302,7 @@ export function useTablatureWorkerBridge({
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
     const containerLeft = containerRef.current.getBoundingClientRect().left;
     const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-    const worldX = (clientX - containerLeft) + pausedScrollRef.current.scrollX;
+    const worldX = (clientX - containerLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
     const beatPos = Math.max(0, worldX / dynBW);
 
     // Find which measure start this position snaps to
@@ -276,7 +338,7 @@ export function useTablatureWorkerBridge({
   const seekWorker = (beat: number) => {
     const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const newCursorPos = beat * dynBW;
-    const newScrollX   = Math.max(0, newCursorPos - containerSize.width / 4);
+    const newScrollX   = Math.max(0, newCursorPos - containerSize.width / vscale / 4);
     pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
     lastHoverMeasureRef.current = -1;

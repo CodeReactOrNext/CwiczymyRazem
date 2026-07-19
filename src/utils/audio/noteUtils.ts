@@ -130,3 +130,70 @@ export const getFrequencyFromTab = (string: number, fret: number, tuningOffsets?
   // Frequency = A4 * 2^((midi - 69) / 12)
   return A4 * Math.pow(2, (targetMidi - 69) / 12);
 }
+
+// ── Detection gating (register-adaptive + expectation-biased) ───────────────────
+//
+// Two refinements adapted from the native (Unity) detector to the browser pitch
+// path. Both only ever *relax* a gate, so they cut false negatives without ever
+// grading a wrong fret as correct:
+//   • High-string split — the thin high strings (≥ E4) are quieter, decay faster
+//     and carry weaker chroma energy, so the fixed volume/chroma gates reject
+//     legitimately-played high notes. Relax those gates above the split.
+//   • Expectation bias — for a note the player is already aiming at, widen the
+//     cents tolerance slightly, but only when the detector is highly confident.
+//     Anchored on the expected note, so tuning drift is forgiven while the widen
+//     never reaches a full semitone (a genuinely wrong fret still misses).
+
+/** MIDI note at/above which relaxed "high-string" detection gates apply (E4). */
+export const HIGH_STRING_MIN_MIDI = 64;
+/** Frequency (Hz) of the high-string split — notes at/above are "high strings". */
+export const HIGH_STRING_MIN_FREQ = midiToFrequency(HIGH_STRING_MIN_MIDI);
+/** Volume-gate multiplier applied to high strings (they ring quieter). */
+export const HIGH_STRING_VOLUME_MULTIPLIER = 0.5;
+/** Chroma-threshold multiplier applied to high chord tones (weaker chroma energy). */
+export const HIGH_STRING_CHROMA_MULTIPLIER = 0.8;
+/** Pitch confidence (0–1) at/above which the expectation tolerance bonus applies. */
+export const EXPECT_NEAR_CONFIDENCE = 0.9;
+/** Extra cents of tolerance granted to a confidently-detected expected note. */
+export const EXPECT_NEAR_CENTS_BONUS = 15;
+
+export interface DetectionGates {
+  /** True when relaxed high-string behaviour applies to this target. */
+  isHighString: boolean;
+  /** Minimum raw volume for the note to be considered "played". */
+  volumeGate: number;
+  /** Chroma-bin energy threshold for a chord tone to count as rung. */
+  chordChromaThreshold: number;
+}
+
+/**
+ * Register-adaptive detection gates for an expected note. Notes at/above the
+ * high-string split get relaxed volume and chroma gates; everything below keeps
+ * the base gates unchanged. A `targetFreq` of 0 (dead/muted notes with no pitch)
+ * is treated as a low string, so those keep the base gates.
+ */
+export function getDetectionGates(
+  targetFreq: number,
+  baseVolumeGate: number,
+  baseChordChromaThreshold: number,
+): DetectionGates {
+  const isHighString = targetFreq >= HIGH_STRING_MIN_FREQ - 1;
+  return {
+    isHighString,
+    volumeGate: isHighString ? baseVolumeGate * HIGH_STRING_VOLUME_MULTIPLIER : baseVolumeGate,
+    chordChromaThreshold: isHighString
+      ? baseChordChromaThreshold * HIGH_STRING_CHROMA_MULTIPLIER
+      : baseChordChromaThreshold,
+  };
+}
+
+/**
+ * Widens the cents tolerance for a note the player is already aiming at, but only
+ * when the pitch detector is highly confident. Anchored on the expected note, so
+ * it forgives tuning drift without ever reaching a full semitone.
+ */
+export function getExpectationBiasedTolerance(baseToleranceCents: number, confidence: number): number {
+  return confidence >= EXPECT_NEAR_CONFIDENCE
+    ? baseToleranceCents + EXPECT_NEAR_CENTS_BONUS
+    : baseToleranceCents;
+}

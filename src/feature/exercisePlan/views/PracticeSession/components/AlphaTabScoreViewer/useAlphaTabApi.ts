@@ -17,6 +17,10 @@ interface UseAlphaTabApiOptions {
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
   origBpmRef: React.MutableRefObject<number>;
+  /** Per-track mute/volume for the underlying synth — MUST be memoized by the caller. */
+  trackConfigs?: Record<string, { isMuted: boolean; volume: number }>;
+  /** Dynamic backing-track ids, used to map `trackConfigs` onto the score's tracks — MUST be memoized by the caller. */
+  backingTrackIds?: string[];
 }
 
 interface UseAlphaTabApiReturn {
@@ -44,6 +48,8 @@ export function useAlphaTabApi({
   volumeRef,
   bpmRef,
   origBpmRef,
+  trackConfigs = {},
+  backingTrackIds = [],
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -162,6 +168,35 @@ export function useAlphaTabApi({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawGpFile, measures, mode]);
+
+  // Per-track mute / volume — independent of which track is rendered visually.
+  // trackConfigs and backingTrackIds MUST be memoized by the caller.
+  // uiReady in deps: re-applies once the score/tracks are actually available.
+  useEffect(() => {
+    const api   = apiRef.current;
+    const score = scoreRef.current;
+    if (!api || !score?.tracks) return;
+
+    const backingIndices = new Set(
+      backingTrackIds
+        .map(id => parseInt(id.replace('track-', ''), 10))
+        .filter(n => !isNaN(n))
+    );
+    let mainTrackIdx = -1;
+    for (let i = 0; i < score.tracks.length; i++) {
+      if (!backingIndices.has(i)) { mainTrackIdx = i; break; }
+    }
+
+    score.tracks.forEach((track: any, idx: number) => {
+      const config = idx === mainTrackIdx
+        ? trackConfigs['main']
+        : trackConfigs[`track-${idx}`];
+      if (config) {
+        api.changeTrackMute([track], config.isMuted);
+        api.changeTrackVolume([track], Math.max(0, config.volume));
+      }
+    });
+  }, [trackConfigs, backingTrackIds, uiReady]);
 
   const handleTrackSelect = (idx: number) => {
     const score = scoreRef.current;

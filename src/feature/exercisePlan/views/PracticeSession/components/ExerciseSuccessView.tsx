@@ -2,10 +2,11 @@ import { Button } from "assets/components/ui/button";
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
-import { animate,motion } from "framer-motion";
+import { animate, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { useEffect, useMemo,useState } from "react";
-import { FaBullseye, FaCheck, FaFire, FaStar, FaTrophy, FaUnlock } from "react-icons/fa";
+import { Check, Flame, Star, Target, Trophy } from "lucide-react";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
 interface ExerciseStats {
@@ -13,11 +14,6 @@ interface ExerciseStats {
   maxStreak?: number;
   perfectHits?: number;
   timingMsg?: string;
-}
-
-interface UnlockedContent {
-  type: string;
-  title: string;
 }
 
 interface ExerciseSuccessViewProps {
@@ -30,17 +26,19 @@ interface ExerciseSuccessViewProps {
   maxScore?: number;
   stats?: ExerciseStats;
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
-  unlockedContent?: UnlockedContent[];
 }
 
 type TierKey = 'S' | 'A' | 'B' | 'C' | 'D';
 
+// Tier colours follow the app's rarity language: S = epic (purple), down to
+// D = neutral. Keeps the grade badge inside the accepted semantic palette
+// instead of an arbitrary red-to-cyan scale.
 const TIERS: Record<TierKey, { color: string; bg: string }> = {
-  S: { color: 'text-red-300',    bg: 'bg-red-500/10'    },
-  A: { color: 'text-orange-300', bg: 'bg-orange-500/10' },
-  B: { color: 'text-yellow-300', bg: 'bg-yellow-500/10' },
-  C: { color: 'text-green-300',  bg: 'bg-green-500/10'  },
-  D: { color: 'text-cyan-300',   bg: 'bg-cyan-500/10'   },
+  S: { color: 'text-purple-300',  bg: 'bg-purple-500/10'  },
+  A: { color: 'text-amber-300',   bg: 'bg-amber-500/10'   },
+  B: { color: 'text-cyan-300',    bg: 'bg-cyan-500/10'    },
+  C: { color: 'text-emerald-300', bg: 'bg-emerald-500/10' },
+  D: { color: 'text-zinc-300',    bg: 'bg-zinc-800'       },
 };
 
 const getTierFromAccuracy = (accuracy: number): TierKey => {
@@ -63,6 +61,16 @@ function buildChartData(timeline: ('hit' | 'miss' | 'perfect' | 'early' | 'late'
   }).filter(d => d.accuracy !== null);
 }
 
+function StatItem({ icon, value, label, accent }: { icon: ReactNode; value: string | number; label: string; accent?: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <span className={cn('text-zinc-400', accent)}>{icon}</span>
+      <div className="text-lg font-bold leading-none text-zinc-100 tabular-nums">{value}</div>
+      <div className="text-[11px] text-zinc-500">{label}</div>
+    </div>
+  );
+}
+
 export const ExerciseSuccessView = ({
   planTitle,
   onFinish,
@@ -73,7 +81,6 @@ export const ExerciseSuccessView = ({
   maxScore,
   stats,
   timeline,
-  unlockedContent,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation("common");
   const [isVisible, setIsVisible] = useState(false);
@@ -132,7 +139,7 @@ export const ExerciseSuccessView = ({
         const end = Date.now() + 3000;
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
         const rnd = (a: number, b: number) => Math.random() * (b - a) + a;
-        const colors = ["#26ccff", "#a25afd", "#ff5e7e", "#88ff5a", "#fcff42", "#ffa62d"];
+        const colors = ["#22d3ee", "#a78bfa", "#f59e0b", "#34d399"];
         const iv = setInterval(() => {
           const left = end - Date.now();
           if (left <= 0) return clearInterval(iv);
@@ -159,10 +166,14 @@ export const ExerciseSuccessView = ({
         className="relative w-full max-w-lg my-auto">
 
         {/* Main card */}
-        <div className="bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="relative overflow-hidden rounded-lg bg-zinc-900">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-16 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
+          />
 
           {/* Header */}
-          <div className="px-7 pt-7 pb-5">
+          <div className="relative px-7 pt-7 pb-5">
             {isExam ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 {/* Stars */}
@@ -175,18 +186,16 @@ export const ExerciseSuccessView = ({
                       transition={{ delay: 0.3 + i * 0.12, type: 'spring', stiffness: 200, damping: 14 }}
                       className={cn(
                         'h-12 w-12 flex items-center justify-center rounded-full',
-                        i <= stars
-                          ? 'bg-amber-500/15 text-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.35)]'
-                          : 'bg-zinc-800 text-zinc-600'
+                        i <= stars ? 'bg-amber-500/15 text-amber-400' : 'bg-zinc-800 text-zinc-600'
                       )}>
-                      <FaStar className="h-5 w-5" />
+                      <Star className="h-5 w-5" fill={i <= stars ? 'currentColor' : 'none'} />
                     </motion.div>
                   ))}
                 </div>
 
                 {/* Progress to next star */}
                 {stars < 3 && (
-                  <div className="w-36 h-0.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="w-36 h-1 bg-zinc-800 rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-amber-500 rounded-full"
                       initial={{ width: 0 }}
@@ -198,7 +207,7 @@ export const ExerciseSuccessView = ({
 
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
                   <h2 className={cn('text-2xl font-bold tracking-tight',
-                    stars === 3 ? 'text-amber-400' : isPassed ? 'text-white' : 'text-red-400'
+                    stars === 3 ? 'text-amber-400' : isPassed ? 'text-zinc-100' : 'text-red-400'
                   )}>
                     {stars === 3 ? 'Mastered!' : isPassed ? 'Exam Passed!' : 'Exam Failed'}
                   </h2>
@@ -206,8 +215,8 @@ export const ExerciseSuccessView = ({
                     {stars === 3
                       ? 'Flawless performance.'
                       : isPassed
-                      ? 'Great job — still room for perfection.'
-                      : <>Missed by <span className="text-white font-semibold">{Math.ceil(nextStarDist)}</span> pts. Give it another shot!</>
+                      ? 'Nice work — a couple more runs and you\'ll nail every note.'
+                      : <>Missed by <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span> pts. Give it another shot!</>
                     }
                   </p>
                 </motion.div>
@@ -216,12 +225,12 @@ export const ExerciseSuccessView = ({
               <motion.div
                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-4">
-                <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-cyan-500/10 shrink-0">
-                  <FaTrophy className="h-5 w-5 text-cyan-400" />
+                <div className="h-12 w-12 flex items-center justify-center rounded-lg bg-cyan-500/10 shrink-0">
+                  <Trophy className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest">{t("practice.congratulations")}</p>
-                  <h2 className="text-lg font-bold text-white leading-tight">{planTitle}</h2>
+                  <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">{t("practice.congratulations")}</p>
+                  <h2 className="text-lg font-bold text-zinc-100 leading-tight">{planTitle}</h2>
                 </div>
               </motion.div>
             )}
@@ -231,52 +240,30 @@ export const ExerciseSuccessView = ({
           {(isExam || stats) && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              className="px-7 py-5">
+              className="relative px-7 py-5">
 
               {/* Score — exam only */}
               {isExam && (
-                <div className="flex items-end justify-between mb-5">
+                <div className="flex items-end justify-between mb-6">
                   <div>
-                    <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest mb-1">Total Score</p>
-                    <div className="text-5xl font-bold text-white tabular-nums tracking-tight">{displayScore.toLocaleString()}</div>
+                    <p className="text-[11px] font-semibold text-zinc-500 tracking-wide mb-1">Total score</p>
+                    <div className="font-teko text-5xl font-bold text-zinc-100 tabular-nums leading-none">{displayScore.toLocaleString()}</div>
                   </div>
                   {/* Tier badge */}
-                  <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl', tier.bg)}>
-                    <span className={cn('text-3xl font-black leading-none', tier.color)}>{tierKey}</span>
-                    <span className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Grade</span>
+                  <div className={cn('flex flex-col items-center justify-center h-14 w-14 rounded-lg', tier.bg)}>
+                    <span className={cn('text-2xl font-black leading-none', tier.color)}>{tierKey}</span>
+                    <span className="text-zinc-500 text-[9px] tracking-wide mt-0.5">Grade</span>
                   </div>
                 </div>
               )}
 
-              {/* Accuracy + Combo + Score */}
-              <div className="grid grid-cols-3 gap-2.5">
-                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
-                    <FaStar className="text-yellow-400 h-3.5 w-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-base leading-none">{(score ?? 0).toLocaleString()}</div>
-                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Score</div>
-                  </div>
-                </div>
-                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0">
-                    <FaBullseye className="text-cyan-400 h-3.5 w-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-base leading-none">{accuracy}%</div>
-                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Accuracy</div>
-                  </div>
-                </div>
-                <div className="bg-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                    <FaFire className="text-orange-400 h-3.5 w-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold text-base leading-none">{displayStats.maxStreak ?? 0}</div>
-                    <div className="text-zinc-500 text-[9px] capitalize tracking-wider mt-0.5">Max Combo</div>
-                  </div>
-                </div>
+              {/* Accuracy / Combo / Score — grouped in one panel, not repeated cards */}
+              <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-800/40 px-4 py-4">
+                <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
+                <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
+                {!isExam && (
+                  <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
+                )}
               </div>
             </motion.div>
           )}
@@ -285,10 +272,10 @@ export const ExerciseSuccessView = ({
           {hasTimeline && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-              className="px-7 py-5">
+              className="relative px-7 py-5">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[10px] font-semibold text-zinc-500 capitalize tracking-widest">Performance</p>
-                <span className="text-[10px] text-zinc-600">{timeline!.length} notes</span>
+                <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">Performance over time</p>
+                <span className="text-[11px] text-zinc-600">{timeline!.length} notes</span>
               </div>
 
               <ChartContainer
@@ -320,7 +307,7 @@ export const ExerciseSuccessView = ({
                         return (
                           <div className="rounded-lg bg-zinc-950/90 px-3 py-2 text-xs">
                             <span className="text-zinc-400">Accuracy </span>
-                            <span className="text-white font-bold">{payload[0].value}%</span>
+                            <span className="text-zinc-100 font-bold">{payload[0].value}%</span>
                           </div>
                         );
                       }
@@ -341,32 +328,15 @@ export const ExerciseSuccessView = ({
             </motion.div>
           )}
 
-          {/* Milestone */}
-          {(unlockedContent?.length || (isExam && isPassed)) && (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
-              className="px-7 py-4">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-                  <FaUnlock className="text-purple-400 h-3.5 w-3.5" />
-                </div>
-                <div>
-                  <div className="text-white text-sm font-semibold">New Milestone Unlocked!</div>
-                  <div className="text-zinc-500 text-xs">Journey progression saved.</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
           {/* Actions */}
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
-            className="px-7 py-5 flex gap-2.5">
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
+            className="relative px-7 py-5 flex gap-2.5">
             {isExam && !isPassed && onRestart && (
               <Button
                 onClick={onRestart}
                 disabled={isLoading}
-                className="flex-1 h-10 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium transition-all">
+                className="flex-1 h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-sm font-medium">
                 Try Again
               </Button>
             )}
@@ -374,9 +344,9 @@ export const ExerciseSuccessView = ({
               onClick={onFinish}
               disabled={isLoading}
               className={cn(
-                'flex-1 h-10 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2',
+                'flex-1 h-10 rounded-lg text-sm font-medium flex items-center justify-center gap-2',
                 isExam && !isPassed
-                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                  ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'
                   : 'bg-white hover:bg-zinc-200 text-zinc-950 font-semibold'
               )}>
               {isLoading ? (
@@ -387,7 +357,7 @@ export const ExerciseSuccessView = ({
               ) : (
                 <>
                   <span>{isExam && !isPassed ? 'Back to Menu' : t("practice.finish")}</span>
-                  {(!isExam || isPassed) && <FaCheck className="h-3 w-3" />}
+                  {(!isExam || isPassed) && <Check className="h-3.5 w-3.5" />}
                 </>
               )}
             </Button>

@@ -184,9 +184,9 @@ export function useSessionAudio({
   return useMemo(() => ({
     audioTracks, trackConfigs, setTrackConfigs,
     soundfontsReady, gpAudioActive, effectiveAudioStartTime,
-    alphaTabTrackConfigs, tabSchedulerTickRef,
+    alphaTabTrackConfigs, backingTrackIds: alphaTabBackingTrackIds, tabSchedulerTickRef,
   }), [
-    audioTracks, trackConfigs, soundfontsReady, gpAudioActive, 
-    effectiveAudioStartTime, alphaTabTrackConfigs
+    audioTracks, trackConfigs, soundfontsReady, gpAudioActive,
+    effectiveAudioStartTime, alphaTabTrackConfigs, alphaTabBackingTrackIds
   ]);
 }
