@@ -7,6 +7,7 @@ export default function PremiumCancelPage() {
     <>
       <Head>
         <title>Payment cancelled | Riff Quest</title>
+        <meta name='robots' content='noindex' />
       </Head>
 
       <div className="min-h-screen bg-[#020202] flex items-center justify-center px-4">

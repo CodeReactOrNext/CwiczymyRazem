@@ -2,6 +2,7 @@
 const ratingCooldowns = new Map<string, number>();
 
 import { useQueryClient } from "@tanstack/react-query";
+import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
@@ -100,7 +101,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
 
 
       if (rateSong.fulfilled.match(resultAction)) {
-        toast.success(isNewRating ? "+3 Points! Rating updated." : "Rating updated.");
+        toast.success(isNewRating ? `+${RATE_SONG_FAME_REWARD} Fame! Rating updated.` : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
 
         if (isNewRating) {
