@@ -7,6 +7,9 @@ interface TablatureMinimapBarProps {
   loopStart: number | null;
   loopEnd: number | null;
   isPlaying: boolean;
+  /** Pitch-detect accuracy per measure (0..1), same index as measureEndXs.
+   *  null/undefined = not attempted yet this pass — cell stays unfilled. */
+  measureAccuracy?: (number | null)[];
   onSeek: (beat: number) => void;
   onLoopRangeChange: (start: number | null, end: number | null) => void;
 }
@@ -26,6 +29,16 @@ const DRAG_START_PX = 6;
 
 const ACCENT = "#22d3ee";
 
+// Same breakpoints as the S/A/B/C/D performance grade elsewhere in the session,
+// so a filled cell reads the same "how good was that" colour everywhere.
+const accuracyFillColor = (acc: number): string => {
+  if (acc >= 0.95) return "rgba(251,191,36,0.55)"; // amber-400 — S
+  if (acc >= 0.85) return "rgba(52,211,153,0.5)"; // emerald-400 — A
+  if (acc >= 0.7) return "rgba(34,211,238,0.5)"; // cyan-400 — B
+  if (acc >= 0.5) return "rgba(251,146,60,0.5)"; // orange-400 — C
+  return "rgba(248,113,113,0.55)"; // red-400 — D
+};
+
 type DragMode = "none" | "pending" | "creating";
 
 interface Measure { startBeat: number; endBeat: number; }
@@ -44,6 +57,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   loopStart,
   loopEnd,
   isPlaying,
+  measureAccuracy,
   onSeek,
   onLoopRangeChange,
 }: TablatureMinimapBarProps) {
@@ -168,19 +182,31 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     }
   }, [activeIdx, count]);
 
-  // Static cells never depend on the playhead, so they don't re-render every frame.
+  // Cells re-render when accuracy changes (mic mode), not just when the
+  // measure layout does.
   const cells = useMemo(
     () =>
-      measures.map((_, i) => (
-        <div
-          key={i}
-          className="absolute flex items-center justify-center rounded bg-zinc-800/70 text-sm font-semibold tabular-nums text-zinc-300 transition-colors hover:bg-zinc-700/80"
-          style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
-        >
-          {i + 1}
-        </div>
-      )),
-    [measures],
+      measures.map((_, i) => {
+        const acc = measureAccuracy?.[i];
+        return (
+          <div
+            key={i}
+            className="absolute overflow-hidden rounded bg-zinc-800/70 transition-colors hover:bg-zinc-700/80"
+            style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
+          >
+            {acc != null && (
+              <div
+                className="absolute inset-x-0 bottom-0 transition-[height] duration-300 ease-out"
+                style={{ height: `${Math.round(acc * 100)}%`, background: accuracyFillColor(acc) }}
+              />
+            )}
+            <div className="relative flex h-full items-center justify-center text-sm font-semibold tabular-nums text-zinc-300">
+              {i + 1}
+            </div>
+          </div>
+        );
+      }),
+    [measures, measureAccuracy],
   );
 
   if (count === 0) return null;
