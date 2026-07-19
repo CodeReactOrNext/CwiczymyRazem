@@ -337,6 +337,31 @@ export const TablatureSection = memo(function TablatureSection({
     setScoreEverShown(true);
   }
 
+  // Per-measure pitch-detect accuracy (mic mode only): share of that measure's
+  // notes played correctly so far, keyed the same way as hitNotes/missedNotes
+  // (`${measureIdx}-${beatIdx}-${noteIdx}`) so no extra bookkeeping is needed.
+  // null = the loop hasn't reached that measure yet this pass, so the nav cell
+  // stays unfilled instead of reading as a 0%.
+  const measureAccuracy = useMemo<(number | null)[] | undefined>(() => {
+    if (!isMicEnabled) return undefined;
+    return activeTablature.map((measure, mIdx) => {
+      let hit = 0;
+      let total = 0;
+      measure.beats.forEach((beat, bIdx) => {
+        beat.notes.forEach((_, nIdx) => {
+          const key = `${mIdx}-${bIdx}-${nIdx}`;
+          if (hitNotes[key]) {
+            hit++;
+            total++;
+          } else if (missedNotes[key]) {
+            total++;
+          }
+        });
+      });
+      return total > 0 ? hit / total : null;
+    });
+  }, [activeTablature, hitNotes, missedNotes, isMicEnabled]);
+
   // Song navigator strip — shared between the score (notation) view and the
   // canvas tab view, since both drive the same seek/loop wiring off `activeTablature`.
   const minimapRow = (showMinimap || isMicEnabled) && (
@@ -350,6 +375,7 @@ export const TablatureSection = memo(function TablatureSection({
             loopStart={loopStart}
             loopEnd={loopEnd}
             isPlaying={isMetronomePlaying && countInRemaining === 0}
+            measureAccuracy={measureAccuracy}
             onSeek={handleSeek}
             onLoopRangeChange={(s, e) => {
               setLoopStart(s);
