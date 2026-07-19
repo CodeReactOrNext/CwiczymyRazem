@@ -6,7 +6,7 @@ export type PlaybackState = {
   isMetronomeMuted: boolean;
   speedMultiplier: number;
   showAlphaTabScore: boolean;
-  /** Rocksmith-style 3D note highway. Mutually exclusive with showAlphaTabScore. */
+  /** Scrolling 3D note highway. Mutually exclusive with showAlphaTabScore. */
   show3dHighway: boolean;
   selectedGpTrackIdx: number;
 };

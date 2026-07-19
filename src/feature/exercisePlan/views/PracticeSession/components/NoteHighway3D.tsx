@@ -19,7 +19,7 @@ import { STRING_PALETTES } from "./tablatureSettings";
 import type { NoteRD } from "./useTablatureRenderData";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 
-interface RocksmithHighway3DProps {
+interface NoteHighway3DProps {
   measures: TablatureMeasure[];
   /** Force a rebuild of the note geometry (exercise change / restart). */
   resetKey?: number;
@@ -44,12 +44,12 @@ interface RocksmithHighway3DProps {
   countInRemaining?: number;
 }
 
-// ── Rocksmith projection ─────────────────────────────────────────────────────
+// ── Highway projection ────────────────────────────────────────────────────────
 // Highway X axis = fret lanes across the FULL 24-fret neck, note color = string,
 // note height above the board = string (low E hugs the board, high e floats).
 // A guitar neck (fret wires, inlay dots, numbers, the 6 colored strings) sits
 // horizontal at the hit line; the highway ribbon is SHEARED so its far end
-// drifts right (RS-style), and the camera pans along the neck to follow
+// drifts right, and the camera pans along the neck to follow
 // wherever the notes are played.
 const SPACING = 2.4; // z world-units per beat (base — scaled by settings)
 const NECK_LEN = 400; // highway length into the fog
@@ -76,7 +76,7 @@ const MARKER_FRETS = new Set([3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"] as const; // strings 1..6, standard tuning
 // ── Sustain ──────────────────────────────────────────────────────────────────
 // A note this long stops at the neck instead of riding past, and throws sparks
-// for exactly as long as its tail is still being drawn (RS-style).
+// for exactly as long as its tail is still being drawn.
 const SUSTAIN_MIN_BEATS = 1;
 const SUSTAIN_FADE = 0.18; // beats the parked gem takes to dissolve at the end
 // Pitch detection drops out constantly mid-ring (picking noise, harmonics
@@ -306,7 +306,7 @@ function glowTexture(): THREE.Texture {
   return new THREE.CanvasTexture(cv);
 }
 
-/** Faint nebula backdrop, Rocksmith-style. Colours come from the active theme. */
+/** Faint nebula backdrop. Colours come from the active theme. */
 function nebulaTexture(
   colors: readonly [string, string, string],
 ): THREE.Texture {
@@ -1150,12 +1150,12 @@ interface NoteEntry {
 }
 
 /**
- * Rocksmith-style 3D note highway. A pure consumer of the session's shared
+ * Scrolling 3D note highway. A pure consumer of the session's shared
  * playback cursor (`currentBeatsElapsedRef`) and scoring (`hitNotes`/`missedNotes`)
  * from NoteMatchingContext — it renders, it does not track time or match notes.
  * Desktop only; mounted lazily (client-side) from TablatureSection.
  */
-export const RocksmithHighway3D = memo(function RocksmithHighway3D({
+export const NoteHighway3D = memo(function NoteHighway3D({
   measures,
   resetKey,
   hideNotes = false,
@@ -1168,7 +1168,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
   tuningLabel,
   bpm,
   countInRemaining = 0,
-}: RocksmithHighway3DProps) {
+}: NoteHighway3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // HUD overlays updated imperatively from the rAF loop (no per-frame React
   // re-render): progress bar + measure counter, the get-ready count-in, and the
@@ -1331,7 +1331,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     scene.fog = sceneFog;
 
     // Camera: straight-on, so the guitar neck always sits horizontal at the
-    // bottom of the frame (RS-style). The "rotated" look comes from shearing
+    // bottom of the frame. The "rotated" look comes from shearing
     // the highway ribbon itself, NOT from yawing the camera. Per frame the
     // rig slides along X (panX) to follow the upcoming notes' fret region.
     // Tight framing on the active position — the smart zoom pulls back on its
@@ -1504,7 +1504,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     board.position.set(0, -0.02, -(NECK_LEN - STRIP_LEN) / 2);
     highway.add(board);
 
-    // Alternate lane shading (subtle columns like the RS highway)
+    // Alternate lane shading (subtle columns across the highway)
     const laneShadeMat = trackM(
       new THREE.MeshBasicMaterial({
         color: 0x15151d,
@@ -1561,7 +1561,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     }
     for (const t of boardNumCache.values()) textures.push(t);
 
-    // ── Anchor zone: RS-style lighter panel over the lanes the hand covers ─
+    // ── Anchor zone: lighter panel over the lanes the hand covers ──────────
     const anchorMat = trackM(
       new THREE.MeshBasicMaterial({
         color: 0x42556e,
@@ -1850,7 +1850,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     }
 
     // Fret numbers under the neck — every single fret is labelled and kept
-    // readable; the classic marker frets are amber (RS-style), bigger, brighter.
+    // readable; the classic marker frets are amber, bigger, brighter.
     // They sit on the SAME z as the strings/wires/inlay dots (STRIP_LEN * 0.5):
     // the camera is tilted, so a same-X sprite at a different depth than the
     // fret it labels drifts sideways under perspective, worse the further the
@@ -2327,7 +2327,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
       let prevSigBeat = -Infinity;
       const gemHalfW = (GEM_W * s0.gemSize) / 2;
       const gemHalfH = (GEM_H * s0.gemSize) / 2;
-      // Rocksmith-style: every chord gets the SAME box size regardless of its
+      // Every chord gets the SAME box size regardless of its
       // shape — a constant-width, full-neck-height zone. Only its CENTRE
       // follows the chord. Width is a fixed slice of the visible window (so it's
       // constant per exercise); height spans all six strings, so open, muted or
@@ -2524,7 +2524,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     // Bends rise off the string, slides glide across the lanes to their target
     // fret, vibrato wiggles — one merged, vertex-colored ribbon mesh replaces
     // the straight box tail on those notes, so the shape of the technique is
-    // read off the highway itself (RS-style) instead of a badge alone.
+    // read off the highway itself instead of a badge alone.
     const ribbonRanges = new Map<number, { start: number; count: number }>();
     const hasRibbon: boolean[] = new Array(flat.length).fill(false);
     let ribbonColorAttr: THREE.BufferAttribute | null = null;
@@ -2706,7 +2706,7 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
     const tmpDeep = new THREE.Color(); // scratch for the deepened "played" hue
 
     if (flat.length > 0) {
-      // RS-reference note: a DARK-fill pill with a mega-saturated coloured
+      // Reference note: a DARK-fill pill with a mega-saturated coloured
       // border — not a glow, just the geometry itself carrying the colour. The
       // shading is baked into vertex colours (× per-instance string hue) on an
       // UNLIT material: the flat front/back faces stay dark (the fill), while
@@ -4350,4 +4350,4 @@ export const RocksmithHighway3D = memo(function RocksmithHighway3D({
   );
 });
 
-export default RocksmithHighway3D;
+export default NoteHighway3D;
