@@ -1,20 +1,37 @@
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "assets/components/ui/chart";
-import { Pie, PieChart, Cell } from "recharts";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { SectionList, nextSectionColor } from "feature/songs/components/SongSections/SectionList";
+import {
+  nextSectionColor,
+  SectionList,
+} from "feature/songs/components/SongSections/SectionList";
 import { SectionTimeline } from "feature/songs/components/SongSections/SectionTimeline";
-import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
 import type { YouTubeSongPlayerRef } from "feature/songs/components/YouTubeSongPlayer";
-import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
-import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
+import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
+import {
+  getUserSongMeta,
+  saveUserSongMeta,
+} from "feature/songs/services/songSections.service";
 import type { Song } from "feature/songs/types/songs.type";
+import type {
+  MasteryLevel,
+  SongSection,
+} from "feature/songs/types/songSection.type";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, CheckCircle2, FileText, Keyboard, Music, Pause, Play, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  FileText,
+  Keyboard,
+  Music,
+  Pause,
+  Play,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
+import FreeTimerMetronome from "./components/FreeTimerMetronome";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
@@ -24,22 +41,6 @@ interface SongTimerLayoutProps {
   userId: string;
   songId: string;
 }
-
-const MASTERY_COLORS: Record<MasteryLevel, string> = {
-  0: "text-zinc-500",
-  1: "text-red-400",
-  2: "text-amber-400",
-  3: "text-green-400",
-  4: "text-zinc-500",
-};
-
-const MASTERY_LABELS_SHORT: Record<MasteryLevel, string> = {
-  0: "Not learned",
-  1: "Bad",
-  2: "Medium",
-  3: "Mastered",
-  4: "Skip",
-};
 
 export const SongTimerLayout = ({
   timer,
@@ -120,49 +121,9 @@ export const SongTimerLayout = ({
     };
   }, [userId, songId]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      switch (e.code) {
-        case "Space":
-          e.preventDefault();
-          playerRef.current?.togglePlay();
-          break;
-        case "KeyM":
-          if (!isLocked) {
-             e.preventDefault();
-             handleAddSection(undefined);
-          }
-          break;
-        case "KeyL":
-          e.preventDefault();
-          // Toggle loop for current section if any
-          const currentSection = sections.find(s => 
-            currentTime >= s.startTime && 
-            currentTime < (sections.find(next => next.startTime > s.startTime)?.startTime ?? Infinity)
-          );
-          if (currentSection) handleSectionLoop(currentSection);
-          break;
-        case "ArrowLeft":
-          e.preventDefault();
-          playerRef.current?.seekTo(Math.max(0, currentTime - 5));
-          break;
-        case "ArrowRight":
-          e.preventDefault();
-          playerRef.current?.seekTo(Math.min(duration, currentTime + 5));
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentTime, duration, isLocked, sections]);
-
   const persistSections = useCallback(
     (next: SongSection[]) => setSections(next),
-    []
+    [],
   );
 
   const handleUrlSave = (url: string) => setYoutubeUrl(url);
@@ -182,7 +143,7 @@ export const SongTimerLayout = ({
         playerRef.current?.seekTo(loopSec.startTime);
       }
     },
-    [duration, loopSectionId, sections]
+    [duration, loopSectionId, sections],
   );
 
   const handleSeek = (time: number) => playerRef.current?.seekTo(time);
@@ -214,11 +175,61 @@ export const SongTimerLayout = ({
     persistSections([...sections, newSection]);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if typing in an input
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
+        return;
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          playerRef.current?.togglePlay();
+          break;
+        case "KeyM":
+          if (!isLocked) {
+            e.preventDefault();
+            handleAddSection(undefined);
+          }
+          break;
+        case "KeyL": {
+          e.preventDefault();
+          // Toggle loop for current section if any
+          const currentSection = sections.find(
+            (s) =>
+              currentTime >= s.startTime &&
+              currentTime <
+                (sections.find((next) => next.startTime > s.startTime)
+                  ?.startTime ?? Infinity),
+          );
+          if (currentSection) handleSectionLoop(currentSection);
+          break;
+        }
+        case "ArrowLeft":
+          e.preventDefault();
+          playerRef.current?.seekTo(Math.max(0, currentTime - 5));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          playerRef.current?.seekTo(Math.min(duration, currentTime + 5));
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
   const handleRename = (id: string, name: string) =>
     persistSections(sections.map((s) => (s.id === id ? { ...s, name } : s)));
 
   const handleTimeChange = (id: string, startTime: number) =>
-    persistSections(sections.map((s) => (s.id === id ? { ...s, startTime } : s)));
+    persistSections(
+      sections.map((s) => (s.id === id ? { ...s, startTime } : s)),
+    );
 
   const handleMasteryChange = (id: string, mastery: MasteryLevel) =>
     persistSections(sections.map((s) => (s.id === id ? { ...s, mastery } : s)));
@@ -241,74 +252,70 @@ export const SongTimerLayout = ({
 
   const toggleTimer = () => (timerEnabled ? stopTimer() : startTimer());
 
-  // Mastery summary counts
-  const masteryCounts = ([0, 1, 2, 3, 4] as MasteryLevel[]).map((level) => ({
-    level,
-    count: sections.filter((s) => s.mastery === level).length,
-  })).filter((m) => m.count > 0);
-
   return (
     <MainContainer noBorder>
-      <div className="font-openSans h-full space-y-5 pb-8 md:p-8">
-        <div className="pl-14 sm:pl-0">
-          <div className="flex items-center gap-2">
+      <div className='h-full space-y-5 pb-8 md:p-8'>
+        <div className='pl-14 sm:pl-0'>
+          <div className='flex items-center gap-2'>
             <Button
-              variant="ghost"
-              size="icon"
+              variant='ghost'
+              size='icon'
               onClick={onBack}
-              className="rounded-full hover:bg-white/10"
-            >
-              <ArrowLeft className="h-5 w-5" />
+              className='rounded-full hover:bg-white/10'>
+              <ArrowLeft className='h-5 w-5' />
             </Button>
-            <h1 className="text-xl font-bold">{t("practice_session")}</h1>
+            <h1 className='text-xl font-bold'>{t("practice_session")}</h1>
           </div>
         </div>
 
-        <div className="w-full max-w-4xl mx-auto space-y-8 px-4">
-
-          {/* Compact timer bar */}
-          <div className="flex items-center gap-2 sm:gap-4 bg-white/[0.02] rounded-lg p-2.5 sm:px-5 sm:py-3.5">
-            <div className="h-11 w-11 rounded-lg overflow-hidden shrink-0">
+        <div className='mx-auto w-full space-y-8 px-2'>
+          {/* Compact timer bar — sticky so the timer and Finish stay reachable while scrolling */}
+          <div className='sticky top-2 z-20 flex items-center gap-2 rounded-lg bg-zinc-900/80 p-2.5 backdrop-blur sm:gap-4 sm:px-5 sm:py-3.5'>
+            <div className='h-11 w-11 shrink-0 overflow-hidden rounded-lg'>
               {song.coverUrl ? (
-                <img src={song.coverUrl} className="h-full w-full object-cover" alt={song.title} />
+                <img
+                  src={song.coverUrl}
+                  className='h-full w-full object-cover'
+                  alt={song.title}
+                />
               ) : (
-                <div className="h-full w-full bg-zinc-800 flex items-center justify-center">
-                  <Music className="h-5 w-5 text-zinc-600" />
+                <div className='flex h-full w-full items-center justify-center bg-zinc-800'>
+                  <Music className='h-5 w-5 text-zinc-600' />
                 </div>
               )}
             </div>
 
-            <div className="flex-1 min-w-0 hidden xs:block">
-              <p className="text-sm font-semibold text-white truncate">{song.title}</p>
-              <p className="text-xs text-zinc-500 truncate hidden md:block">{song.artist}</p>
+            <div className='hidden min-w-0 flex-1 xs:block'>
+              <p className='truncate text-sm font-semibold text-white'>
+                {song.title}
+              </p>
+              <p className='hidden truncate text-xs text-zinc-500 md:block'>
+                {song.artist}
+              </p>
             </div>
 
             <div
               className={cn(
                 "text-2xl font-black tabular-nums tracking-tight transition-colors",
-                timerEnabled ? "text-white" : "text-zinc-600"
-              )}
-            >
+                timerEnabled ? "text-white" : "text-zinc-500",
+              )}>
               {formatTime(time)}
             </div>
 
             <button
               onClick={toggleTimer}
               className={cn(
-                "h-10 w-10 rounded-full flex items-center justify-center transition-all shrink-0",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all",
                 timerEnabled
                   ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                  : "bg-white text-black hover:bg-zinc-100"
-              )}
-            >
+                  : "bg-white text-black hover:bg-zinc-100",
+              )}>
               {timerEnabled ? (
-                <Pause className="h-4 w-4 fill-current" />
+                <Pause className='h-4 w-4 fill-current' />
               ) : (
-                <Play className="h-4 w-4 fill-current ml-0.5" />
+                <Play className='ml-0.5 h-4 w-4 fill-current' />
               )}
             </button>
-
-            <div className="h-6 w-px bg-white/10 shrink-0" />
 
             <Button
               onClick={async () => {
@@ -324,19 +331,14 @@ export const SongTimerLayout = ({
                   timerSubmitHandler();
                 }
               }}
-              className="sm:ml-2 gap-2 px-3 sm:px-4 rounded-lg"
-            >
-              <span className="hidden sm:inline">{t("finish")}</span>
-              <CheckCircle2 className="h-4 w-4" />
+              className='ml-1 gap-2 rounded-lg px-3 sm:ml-3 sm:px-4'>
+              <span className='hidden sm:inline'>{t("finish")}</span>
+              <CheckCircle2 className='h-4 w-4' />
             </Button>
           </div>
 
-
-        </div>
-
-        {/* YouTube player + sections - WIDER CONTAINER */}
-        <div className="w-full max-w-6xl mx-auto space-y-10 px-4">
-          <div className="space-y-6">
+          {/* Player + metronome side by side on desktop, stacked on mobile */}
+          <div className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'>
             <YouTubeSongPlayer
               ref={playerRef}
               youtubeUrl={youtubeUrl}
@@ -350,81 +352,99 @@ export const SongTimerLayout = ({
               songArtist={song.artist}
             />
 
-            {youtubeUrl && (
-              <div className="space-y-8 pt-4">
-                <SectionTimeline
-                  sections={sections}
-                  currentTime={currentTime}
-                  duration={duration}
-                  loopSectionId={loopSectionId}
-                  onSeek={handleSeek}
-                  onSectionTimeChange={handleTimeChange}
-                  isLocked={isLocked}
-                />
-
-                <SectionList
-                  sections={sections}
-                  loopSectionId={loopSectionId}
-                  currentTime={currentTime}
-                  duration={duration}
-                  onPlay={handleSectionPlay}
-                  onLoop={handleSectionLoop}
-                  onMasteryChange={handleMasteryChange}
-                  onRename={handleRename}
-                  onTimeChange={handleTimeChange}
-                  onDelete={handleDelete}
-                  onAdd={handleAddSection}
-                  onAddNamed={(name) => handleAddSection(name)}
-                  isLocked={isLocked}
-                />
-              </div>
-            )}
+            <FreeTimerMetronome />
           </div>
+
+          {youtubeUrl && (
+            <div className='space-y-8'>
+              <SectionTimeline
+                sections={sections}
+                currentTime={currentTime}
+                duration={duration}
+                loopSectionId={loopSectionId}
+                onSeek={handleSeek}
+                onSectionTimeChange={handleTimeChange}
+                isLocked={isLocked}
+              />
+
+              <SectionList
+                sections={sections}
+                loopSectionId={loopSectionId}
+                currentTime={currentTime}
+                duration={duration}
+                onPlay={handleSectionPlay}
+                onLoop={handleSectionLoop}
+                onMasteryChange={handleMasteryChange}
+                onRename={handleRename}
+                onTimeChange={handleTimeChange}
+                onDelete={handleDelete}
+                onAdd={handleAddSection}
+                onAddNamed={(name) => handleAddSection(name)}
+                isLocked={isLocked}
+              />
+            </div>
+          )}
 
           {/* Shortcuts Legend - only show when YouTube URL exists */}
           {youtubeUrl && (
-            <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] rounded-lg">
-              <div className="flex items-center gap-2 text-zinc-500">
-                <Keyboard className="h-4 w-4" />
-                <span className="text-xs font-bold text-zinc-500">Shortcuts</span>
+            <div className='hidden items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-4 md:flex'>
+              <div className='flex items-center gap-2 text-zinc-500'>
+                <Keyboard className='h-4 w-4' />
+                <span className='text-xs font-bold text-zinc-500'>
+                  Shortcuts
+                </span>
               </div>
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">Space</kbd>
-                  <span className="text-xs text-zinc-500">Play/Pause</span>
+              <div className='flex flex-wrap gap-x-6 gap-y-2'>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                    Space
+                  </kbd>
+                  <span className='text-xs text-zinc-500'>Play/Pause</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">M</kbd>
-                  <span className="text-xs text-zinc-500">Mark section</span>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                    M
+                  </kbd>
+                  <span className='text-xs text-zinc-500'>Mark section</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">L</kbd>
-                  <span className="text-xs text-zinc-500">Toggle loop</span>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                    L
+                  </kbd>
+                  <span className='text-xs text-zinc-500'>Toggle loop</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-white/5 text-[10px] font-mono text-white">← →</kbd>
-                  <span className="text-xs text-zinc-500">Seek 5s</span>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                    ← →
+                  </kbd>
+                  <span className='text-xs text-zinc-500'>Seek 5s</span>
                 </div>
               </div>
             </div>
           )}
 
-
           {/* Notes Section */}
-          <div className="bg-white/[0.02] rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 bg-white/[0.01]">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <FileText className="h-4 w-4" />
-                <span className="text-xs font-bold text-zinc-500">Practice notes</span>
+          <div className='rounded-lg bg-zinc-900/40'>
+            <div className='flex items-center justify-between px-5 pt-4'>
+              <div className='flex items-center gap-2 text-zinc-400'>
+                <FileText className='h-4 w-4' />
+                <span className='text-xs font-bold text-zinc-500'>
+                  Practice notes
+                </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 {isSaving && (
-                  <span className="text-[10px] text-zinc-500 animate-pulse">Saving...</span>
+                  <span className='animate-pulse text-[10px] text-zinc-500'>
+                    Saving...
+                  </span>
                 )}
-                <span className={cn(
-                  "text-[10px] font-medium",
-                  notes.split("\n").length > 250 ? "text-amber-500" : "text-zinc-600"
-                )}>
+                <span
+                  className={cn(
+                    "text-[10px] font-medium",
+                    notes.split(" ").length > 250
+                      ? "text-amber-400"
+                      : "text-zinc-500",
+                  )}>
                   {notes.split("\n").length} / 300 lines
                 </span>
               </div>
@@ -437,8 +457,8 @@ export const SongTimerLayout = ({
                   setNotes(e.target.value);
                 }
               }}
-              placeholder="Add your practice notes here... (e.g. settings, tips for difficult parts, gear used)"
-              className="w-full min-h-[160px] bg-transparent p-5 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none resize-none leading-relaxed"
+              placeholder='Add your practice notes here... (e.g. settings, tips for difficult parts, gear used)'
+              className='min-h-[160px] w-full resize-none bg-transparent px-5 pb-5 pt-3 text-sm leading-relaxed text-zinc-300 placeholder:text-zinc-600 focus:outline-none'
             />
           </div>
         </div>

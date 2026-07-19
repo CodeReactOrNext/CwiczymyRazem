@@ -1,8 +1,19 @@
 import { Button } from "assets/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { Link, Lock, LockKeyholeOpen, Pencil, Search } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import type { YouTubeProps } from "react-youtube";
 import YouTube from "react-youtube";
 
@@ -45,8 +56,24 @@ const extractVideoId = (url: string): string | null => {
   return null;
 };
 
-export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPlayerProps>(
-  ({ youtubeUrl, onUrlSave, onTimeUpdate, onDurationReady, onPlay, isLocked, onLockToggle, songTitle, songArtist }, ref) => {
+export const YouTubeSongPlayer = forwardRef<
+  YouTubeSongPlayerRef,
+  YouTubeSongPlayerProps
+>(
+  (
+    {
+      youtubeUrl,
+      onUrlSave,
+      onTimeUpdate,
+      onDurationReady,
+      onPlay,
+      isLocked,
+      onLockToggle,
+      songTitle,
+      songArtist,
+    },
+    ref,
+  ) => {
     const playerRef = useRef<any>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const [urlInput, setUrlInput] = useState("");
@@ -59,7 +86,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
       if (youtubeUrl || isEditing || !songTitle) return;
       const query = [songArtist, songTitle].filter(Boolean).join(" ");
       fetch(`/api/songs/search-youtube?q=${encodeURIComponent(query)}`)
-        .then((r) => r.ok ? r.json() : Promise.reject())
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((data) => setSuggestions(data.videos ?? []))
         .catch(() => setSuggestions([]));
     }, [youtubeUrl, isEditing, songTitle, songArtist]);
@@ -150,26 +177,29 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
 
     if (!videoId || isEditing) {
       return (
-        <div className="rounded-lg bg-white/[0.02] p-5 flex flex-col gap-4">
-
+        <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>
           {/* Step 1 — paste link */}
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-2">
-              <span className="h-5 w-5 rounded-full bg-white/5 text-[10px] font-bold text-zinc-400 flex items-center justify-center shrink-0">1</span>
-              <div className="flex items-center gap-1.5">
-                <Link className="h-3.5 w-3.5 text-zinc-500" />
-                <span className="text-xs font-semibold text-zinc-400">
-                  {isEditing ? "Paste a new YouTube link" : "Paste a YouTube link"}
+          <div className='flex flex-col gap-2.5'>
+            <div className='flex items-center gap-2'>
+              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-bold text-zinc-400'>
+                1
+              </span>
+              <div className='flex items-center gap-1.5'>
+                <Link className='h-3.5 w-3.5 text-zinc-500' />
+                <span className='text-xs font-semibold text-zinc-400'>
+                  {isEditing
+                    ? "Paste a new YouTube link"
+                    : "Paste a YouTube link"}
                 </span>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className='flex gap-2'>
               <input
                 className={cn(
-                  "flex-1 h-10 bg-white/5 rounded-lg px-4 text-sm text-white placeholder-zinc-600 outline-none transition-colors",
-                  inputError ? "bg-red-500/10" : ""
+                  "h-10 flex-1 rounded-lg bg-zinc-800/40 px-4 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:bg-zinc-800/60",
+                  inputError && "bg-red-500/10",
                 )}
-                placeholder="e.g. youtube.com/watch?v=…"
+                placeholder='e.g. youtube.com/watch?v=…'
                 value={urlInput}
                 onChange={(e) => {
                   setUrlInput(e.target.value);
@@ -179,26 +209,24 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
               />
               <Button
                 onClick={handleSaveUrl}
-                className="h-10 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 rounded-lg px-5 font-bold text-sm transition-colors border-none"
-              >
+                className='h-10 rounded-lg border-none bg-cyan-500/10 px-5 text-sm font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20'>
                 Save
               </Button>
               {isEditing && (
                 <Button
-                  variant="ghost"
+                  variant='ghost'
                   onClick={() => {
                     setIsEditing(false);
                     setUrlInput("");
                     setInputError(false);
                   }}
-                  className="h-10 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5"
-                >
+                  className='h-10 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white'>
                   Cancel
                 </Button>
               )}
             </div>
             {inputError && (
-              <p className="text-xs text-red-400">
+              <p className='text-xs text-red-400'>
                 Invalid YouTube URL — try youtube.com/watch?v=… or youtu.be/…
               </p>
             )}
@@ -206,49 +234,57 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
 
           {suggestions.length > 0 && (
             <>
-              {/* divider */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">or</span>
-                <div className="flex-1 h-px bg-white/5" />
-              </div>
+              <span className='text-center text-xs font-medium text-zinc-500'>
+                or
+              </span>
 
               {/* Step 2 — pick suggestion */}
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="h-5 w-5 rounded-full bg-white/5 text-[10px] font-bold text-zinc-400 flex items-center justify-center shrink-0">2</span>
-                  <div className="flex items-center gap-1.5">
-                    <Search className="h-3.5 w-3.5 text-zinc-500" />
-                    <span className="text-xs font-semibold text-zinc-400">Pick from suggestions</span>
+              <div className='flex flex-col gap-2.5'>
+                <div className='flex items-center gap-2'>
+                  <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-bold text-zinc-400'>
+                    2
+                  </span>
+                  <div className='flex items-center gap-1.5'>
+                    <Search className='h-3.5 w-3.5 text-zinc-500' />
+                    <span className='text-xs font-semibold text-zinc-400'>
+                      Pick from suggestions
+                    </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className='grid grid-cols-1 gap-2 sm:grid-cols-3'>
                   {suggestions.map((video) => (
                     <button
                       key={video.id}
-                      type="button"
+                      type='button'
                       onClick={() => {
-                        onUrlSave(`https://www.youtube.com/watch?v=${video.id}`);
+                        onUrlSave(
+                          `https://www.youtube.com/watch?v=${video.id}`,
+                        );
                         setSuggestions([]);
                       }}
-                      className="group flex flex-col gap-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] p-2 text-left transition-colors"
-                    >
-                      <div className="relative w-full aspect-video rounded overflow-hidden bg-black">
+                      className='group flex flex-col gap-1.5 rounded-lg bg-zinc-800/40 p-2 text-left transition-colors hover:bg-zinc-800/70'>
+                      <div className='relative aspect-video w-full overflow-hidden rounded bg-black'>
                         <img
                           src={video.thumbnail}
                           alt={video.title}
-                          className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+                          className='h-full w-full object-cover transition-opacity group-hover:opacity-80'
                         />
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="h-8 w-8 rounded-full bg-black/60 flex items-center justify-center">
-                            <svg className="h-3.5 w-3.5 text-white fill-current ml-0.5" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
+                        <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100'>
+                          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-black/60'>
+                            <svg
+                              className='ml-0.5 h-3.5 w-3.5 fill-current text-white'
+                              viewBox='0 0 24 24'>
+                              <path d='M8 5v14l11-7z' />
                             </svg>
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-zinc-300 font-medium line-clamp-2 leading-tight">{video.title}</p>
-                      <p className="text-[10px] text-zinc-600 truncate">{video.channel}</p>
+                      <p className='line-clamp-2 text-xs font-medium leading-tight text-zinc-300'>
+                        {video.title}
+                      </p>
+                      <p className='truncate text-[10px] text-zinc-500'>
+                        {video.channel}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -260,76 +296,71 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
     }
 
     return (
-      <div className="space-y-2">
-        <div className="flex justify-end">
+      <div className='space-y-2'>
+        <div className='flex justify-end'>
           <button
             onClick={() => {
               setUrlInput(youtubeUrl ?? "");
               setIsEditing(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] text-xs font-medium text-zinc-500 hover:text-white hover:bg-white/10 transition-all"
-          >
-            <Pencil className="h-3.5 w-3.5" />
+            className='flex items-center gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+            <Pencil className='h-3.5 w-3.5' />
             Change video
           </button>
         </div>
 
-        <div className="aspect-video w-full rounded-lg overflow-hidden bg-white/5">
+        <div className='aspect-video w-full overflow-hidden rounded-lg bg-zinc-900/40'>
           <YouTube
             videoId={videoId}
             opts={opts}
             onReady={handleReady}
             onStateChange={handleStateChange}
-            className="h-full w-full"
-            iframeClassName="h-full w-full"
+            className='h-full w-full'
+            iframeClassName='h-full w-full'
           />
         </div>
 
-        <div className="flex items-center gap-1.5 pt-0.5">
-          <span className="text-xs text-zinc-600 mr-1 font-medium">
-            Speed
-          </span>
+        <div className='flex items-center gap-1.5 pt-0.5'>
+          <span className='mr-1 text-xs font-medium text-zinc-500'>Speed</span>
           {[0.5, 0.75, 1, 1.25, 1.5].map((rate) => (
             <button
               key={rate}
-              type="button"
+              type='button'
               onClick={() => handleSpeedChange(rate)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-bold transition-colors",
+                "rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
                 speed === rate
                   ? "bg-cyan-500/10 text-cyan-400"
-                  : "bg-white/[0.03] text-zinc-500 hover:bg-white/5 hover:text-white"
-              )}
-            >
+                  : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+              )}>
               {rate === 1 ? "1×" : `${rate}×`}
             </button>
           ))}
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className='ml-auto flex items-center gap-2'>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    type="button"
+                    type='button'
                     onClick={onLockToggle}
                     className={cn(
-                      "h-8 px-3 rounded-lg flex items-center gap-2 transition-all",
+                      "flex h-8 items-center gap-2 rounded-lg px-3 transition-all",
                       isLocked
                         ? "bg-amber-500/10 text-amber-400"
-                        : "bg-white/[0.03] text-zinc-500 hover:text-white hover:bg-white/5"
-                    )}
-                  >
+                        : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                    )}>
                     {isLocked ? (
-                      <Lock className="h-3.5 w-3.5" />
+                      <Lock className='h-3.5 w-3.5' />
                     ) : (
-                      <LockKeyholeOpen className="h-3.5 w-3.5" />
+                      <LockKeyholeOpen className='h-3.5 w-3.5' />
                     )}
-                    <span className="text-[10px] font-bold">
+                    <span className='text-[10px] font-bold'>
                       {isLocked ? "Locked" : "Lock"}
                     </span>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top">
+                <TooltipContent side='top'>
                   <p>{isLocked ? "Unlock editing" : "Lock editing"}</p>
                 </TooltipContent>
               </Tooltip>
@@ -338,7 +369,7 @@ export const YouTubeSongPlayer = forwardRef<YouTubeSongPlayerRef, YouTubeSongPla
         </div>
       </div>
     );
-  }
+  },
 );
 
 YouTubeSongPlayer.displayName = "YouTubeSongPlayer";
