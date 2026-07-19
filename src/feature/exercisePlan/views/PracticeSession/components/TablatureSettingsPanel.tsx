@@ -224,7 +224,7 @@ const DEFAULT_VIEW_OPTIONS: {
   {
     key: "highway",
     label: "3D Highway",
-    desc: "Rocksmith-style note lane",
+    desc: "Scrolling 3D note lane",
     Icon: Box,
   },
   {

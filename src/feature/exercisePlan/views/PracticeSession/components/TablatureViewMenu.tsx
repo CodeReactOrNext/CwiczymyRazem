@@ -31,7 +31,7 @@ const VIEWS: Record<ViewMode, ViewConfig> = {
   },
   highway: {
     label: "3D Highway",
-    desc: "Rocksmith-style note lane",
+    desc: "Scrolling 3D note lane",
     Icon: Box,
     trigger: "bg-emerald-950 text-emerald-300 hover:bg-emerald-900",
     accent: "text-emerald-400",

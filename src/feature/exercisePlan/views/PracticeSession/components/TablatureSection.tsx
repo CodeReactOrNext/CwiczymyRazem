@@ -33,8 +33,8 @@ import type { TuningGutterString } from "./useTablatureWorkerBridge";
 
 // three.js is only pulled in when the user actually switches to the 3D highway,
 // keeping it out of the main bundle. ssr:false — the scene touches `window`.
-const RocksmithHighway3D = dynamic(
-  () => import("./RocksmithHighway3D").then((m) => m.RocksmithHighway3D),
+const NoteHighway3D = dynamic(
+  () => import("./NoteHighway3D").then((m) => m.NoteHighway3D),
   { ssr: false },
 );
 
@@ -410,7 +410,7 @@ export const TablatureSection = memo(function TablatureSection({
           {minimapRow}
           {show3dHighway ? (
             <div className='relative'>
-              <RocksmithHighway3D
+              <NoteHighway3D
                 measures={activeTablature}
                 resetKey={tabResetKey}
                 hideNotes={hideNotes}

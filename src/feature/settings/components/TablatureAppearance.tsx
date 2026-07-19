@@ -15,10 +15,10 @@ import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
 // three.js only loads if the player actually opens the 3D tab here.
-const RocksmithHighway3D = dynamic(
+const NoteHighway3D = dynamic(
   () =>
-    import("feature/exercisePlan/views/PracticeSession/components/RocksmithHighway3D").then(
-      (m) => m.RocksmithHighway3D,
+    import("feature/exercisePlan/views/PracticeSession/components/NoteHighway3D").then(
+      (m) => m.NoteHighway3D,
     ),
   { ssr: false },
 );
@@ -126,7 +126,7 @@ export const TablatureAppearance = () => {
             isLightBoard={isLightBoard}
           />
         ) : (
-          <RocksmithHighway3D
+          <NoteHighway3D
             measures={SAMPLE_TABLATURE}
             heightPx={PREVIEW_HEIGHT}
           />
