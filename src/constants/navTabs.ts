@@ -12,8 +12,8 @@ export const PROGRESS_TABS: PageTab[] = [
 ];
 
 export const LEADERBOARD_TABS: PageTab[] = [
-  { label: "Ranking", href: "/leaderboard" },
   { label: "Seasons", href: "/seasons" },
+  { label: "Leaderboard", href: "/leaderboard" },
   {
     label: "Gear",
     href: "/leaderboard/gear",

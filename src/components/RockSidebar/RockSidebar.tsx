@@ -28,6 +28,7 @@ import {
   ChevronDown,
   ClipboardList,
   Clock,
+  FilePlus2,
   Home,
   LayoutDashboard,
   Library,
@@ -37,10 +38,13 @@ import {
   Map,
   MessageSquarePlus,
   Milestone,
+  Music2,
   NotebookPen,
+  PlusCircle,
   Route,
   Search,
   Settings,
+  Star,
   Swords,
   Timer,
   Trophy,
@@ -164,6 +168,14 @@ const SONGS_SUB_NAV: SidebarSubLink[] = [
   { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
   { id: "songs-explore", name: "Explore", href: "/songs?view=explore", icon: <Search size={16} /> },
   { id: "songs-playlists", name: "Playlists", href: "/songs?view=playlists", icon: <ListMusic size={16} /> },
+];
+
+const LIBRARY_SUB_NAV: SidebarSubLink[] = [
+  { id: "library-favorites", name: "Favorites", href: "/favorites", icon: <Star size={16} /> },
+  { id: "library-plans", name: "My Plans", href: "/plans", icon: <ClipboardList size={16} /> },
+  { id: "library-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
+  { id: "library-create-plan", name: "Create Plan", href: "/plans/create", icon: <PlusCircle size={16} /> },
+  { id: "library-create-exercise", name: "Create Exercise", href: "/tab-editor", icon: <FilePlus2 size={16} /> },
 ];
 
 /** Views a page falls back to when its query param is absent (bare /songs renders Explore). */
@@ -426,12 +438,18 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <Milestone size={18} />,
       tooltip: "Weekly rewards for hitting practice goals",
     },
-    { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={18} /> },
+    { id: "leaderboard", name: "Rankings", href: "/seasons", icon: <Trophy size={18} /> },
     { id: "arsenal", name: "Arsenal", href: "/arsenal", icon: <Swords size={18} /> },
   ];
 
   const libraryNavigation = [
-    { id: "library", name: "Library", href: "/favorites", icon: <Library size={18} /> },
+    {
+      id: "library",
+      name: "My Stuff",
+      href: "/favorites",
+      icon: <Library size={18} />,
+      children: LIBRARY_SUB_NAV,
+    },
   ];
 
   const otherNavigation = [
