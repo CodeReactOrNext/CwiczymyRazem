@@ -1,4 +1,4 @@
-import { useCallback, useMemo,useState } from "react";
+import { useCallback,useState } from "react";
 
 export interface CalibrationOffsets {
   [stringNumber: number]: number; // cents: + = sharp, − = flat

@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
-import { Lock, Guitar, Music2, Music } from "lucide-react";
-import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
-import type { ScaleTreeNodeData, NodeStatus } from "../types/scaleTree.types";
+import { Handle, Position } from "@xyflow/react";
+import { Guitar, Lock, Music,Music2 } from "lucide-react";
+import { useRef, useState } from "react";
+
+import type { NodeStatus,ScaleTreeNodeData } from "../types/scaleTree.types";
 
 export type ScaleTreeRFNode = Node<ScaleTreeNodeData, "scaleTreeNode">;
 

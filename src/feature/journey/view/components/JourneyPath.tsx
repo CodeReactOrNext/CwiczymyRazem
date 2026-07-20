@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import type { Song } from "feature/songs/types/songs.type";
 import {
   ArrowDown, ArrowUpDown, AudioWaveform, Bug,   Check, ChevronDown, ChevronLeft,
@@ -10,8 +11,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
-
-import { cn } from "assets/lib/utils";
 
 import { getSongsByIds } from "../../services/journey.service";
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";

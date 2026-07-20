@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
+import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock, Play, X } from "lucide-react";
-import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
-import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
+import { useMemo } from "react";
+
 import type { NodeStatus, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
 const PATTERN_LABELS: Record<string, string> = {

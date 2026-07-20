@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { FaYoutube, FaPlay, FaSearch, FaMusic } from "react-icons/fa";
+import { FaMusic,FaPlay, FaSearch, FaYoutube } from "react-icons/fa";
+
 import { useSessionUI } from "../contexts/SessionUIContext";
 
 // Slight phrasing variety so each search surfaces different tracks instead of

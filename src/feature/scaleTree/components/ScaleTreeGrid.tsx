@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useEffect, useMemo,useRef, useState } from 'react';
+
 import { ScaleTreeGridNode } from './ScaleTreeGridNode';
 
 interface ScaleTreeGridProps {

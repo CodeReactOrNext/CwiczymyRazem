@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Lock, Trophy, Music4 } from 'lucide-react';
+import { Lock, Music4,Trophy } from 'lucide-react';
+
 import type { NodeStatus } from '../types/scaleTree.types';
 
 interface ScaleTreeGridNodeProps {

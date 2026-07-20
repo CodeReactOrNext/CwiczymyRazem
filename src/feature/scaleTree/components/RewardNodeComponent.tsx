@@ -1,9 +1,9 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Zap } from "lucide-react";
-import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
-import type { RewardNodeDef } from "../types/scaleTree.types";
+import { Handle, Position } from "@xyflow/react";
+import { useCallback, useEffect,useRef, useState } from "react";
+
 import { claimReward } from "../services/rewardService";
+import type { RewardNodeDef } from "../types/scaleTree.types";
 
 export type RewardNodeRFNode = Node<RewardNodeDef & { claimed?: boolean; userId?: string }, "rewardNode">;
 

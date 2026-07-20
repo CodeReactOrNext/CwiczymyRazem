@@ -21,6 +21,14 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   { id: 17, name: "Professional Overdrive OD-5", brand: "Ronin", type: "Overdrive", imageId: 18, rarity: "Uncommon" },
   { id: 18, name: "Chromatic Tuner AT-10", brand: "Ronin",   type: "Tuner",     imageId: 19, rarity: "Common"   },
   { id: 19, name: "Graphic EQ GE-10",   brand: "Ronin",      type: "EQ",        imageId: 20, rarity: "Uncommon" },
+  // New batch (21-27)
+  { id: 20, name: "Aethernaut",             brand: "Aethernaut", type: "Boost",     imageId: 21, rarity: "Uncommon"  },
+  { id: 21, name: "The Sunken Bell",        brand: "Aqua-Fab",   type: "Delay",     imageId: 22, rarity: "Epic"      },
+  { id: 22, name: "The Astral Forge",       brand: "Friedman",   type: "Fuzz",      imageId: 23, rarity: "Legendary" },
+  { id: 23, name: "The Cobalt Cavern",      brand: "Friedman",   type: "Delay",     imageId: 24, rarity: "Epic"      },
+  { id: 24, name: "Astral Reverberator Verdant", brand: "Gravinix", type: "Reverb", imageId: 25, rarity: "Legendary" },
+  { id: 25, name: "Astral Reverberator Ember",   brand: "Gravinix", type: "Reverb", imageId: 26, rarity: "Legendary" },
+  { id: 26, name: "Nova Drive",             brand: "Astra-Path", type: "Overdrive", imageId: 27, rarity: "Rare"      },
 ];
 
 export const EFFECTS_BY_ID = new Map<number | string, EffectDefinition>(

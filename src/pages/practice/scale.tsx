@@ -1,6 +1,7 @@
-import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
-import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
+import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
+import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
+import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -9,7 +10,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
-import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
 
 export default function PracticeScalePage() {
   const router = useRouter();

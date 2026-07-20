@@ -1,4 +1,6 @@
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 import { isIOSDevice } from "../utils/deviceDetection";
 
@@ -84,6 +86,12 @@ export const useMobileMetronome = ({
     setBpm(initialBpm);
   }, [initialBpm]);
 
+  // Move an already-open, app-owned context to a newly picked output device live.
+  // Never touches an adopted/external context — its owner (AlphaTab) applies its own.
+  useEffect(() => onOutputDeviceChange((id) => {
+    if (ownsAudioContextRef.current && audioContextRef.current) applySinkId(audioContextRef.current, id);
+  }), []);
+
   // When the external context changes, adopt it (replacing the internal one if any).
   useEffect(() => {
     if (!externalAudioContext || !enabled) return;
@@ -114,6 +122,7 @@ export const useMobileMetronome = ({
       ownsAudioContextRef.current = true;
       audioContextRef.current = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
+      applySinkId(audioContextRef.current, readPersistedOutputDeviceId());
 
       // Create persistent nodes for better performance on mobile
       gainNodeRef.current = audioContextRef.current.createGain();

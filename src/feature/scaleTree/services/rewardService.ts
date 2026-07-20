@@ -1,10 +1,10 @@
-import { db } from "utils/firebase/client/firebase.utils";
 import {
+  arrayUnion,
   doc,
   getDoc,
   updateDoc,
-  arrayUnion,
 } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
 
 interface ClaimRewardResult {
   success: boolean;

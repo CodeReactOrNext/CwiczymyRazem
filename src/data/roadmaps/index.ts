@@ -1,9 +1,9 @@
 import type { StaticRoadmap } from "feature/aiCoach/types/roadmap.types";
 
 import guitarImprov from "./guitar-improvisation-fundamentals.json";
-import adamJones from "./i-want-to-play-like-adam-jones.json";
 import johnMayer from "./i-want-to-play-in-the-style-of-john-maye.json";
 import martyFriedman from "./i-want-to-play-in-the-style-of-marty-fri.json";
+import adamJones from "./i-want-to-play-like-adam-jones.json";
 import hendrix from "./play-in-the-style-of-jimi-hendrix.json";
 import petrucci from "./play-in-the-style-of-john-petrucci.json";
 import rhythmBasics from "./rhythm-guitar-basics.json";

@@ -11,11 +11,11 @@ import { YouTube } from 'components/Blog/YouTube';
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
-import { idToSlug } from 'feature/exercises/lib/slugUtils';
 import { Footer } from 'feature/landing/components/Footer';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs, getBlogBySlug } from 'lib/blog';
+import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import type { PracticeLink } from 'lib/internalLinks';
 import { CLUSTER_PRACTICE_LINK } from 'lib/internalLinks';
 import { ChevronRight, List } from 'lucide-react';
@@ -303,7 +303,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
                     <ExerciseCard
                       key={exercise.id}
                       exercise={exercise}
-                      href={`/exercises/${idToSlug(exercise.id)}`}
+                      href={getExerciseLandingHref(exercise.id, exercise)}
                     />
                   ))}
                 </div>

@@ -15,16 +15,13 @@ import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants"
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
-import {motion } from "framer-motion";
 import {
   BookOpen,
   CheckCircle,
   HelpCircle,
   Loader2,
   Music,
-  Play,
-  Star,
-  Users} from "lucide-react";
+  Play} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import posthog from "posthog-js";
+import { useEffect } from "react";
 
 export function PostHogProvider() {
   const router = useRouter();

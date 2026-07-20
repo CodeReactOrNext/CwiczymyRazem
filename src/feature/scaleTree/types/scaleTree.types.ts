@@ -1,5 +1,5 @@
-import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
+import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 
 export type NodeStatus = "locked" | "available" | "in_progress" | "completed";
 

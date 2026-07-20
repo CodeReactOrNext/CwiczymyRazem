@@ -4,8 +4,8 @@ import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exeris
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
-import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
+import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises/legatoContinuousFlow/legatoContinuousFlow";
@@ -179,9 +179,11 @@ const FREE_EXERCISE_IDS = new Set([
 
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
 import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
+import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
 import { chickenPickinExercise } from "feature/exercisePlan/data/exerises/chickenPickin/chickenPickin";
 import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
 import { chordSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/chordSpotlightDrill/chordSpotlightDrill";
+import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
 import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
 import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
@@ -189,14 +191,17 @@ import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dyn
 import { earTrainingEasy, earTrainingHard,earTrainingMedium } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
 import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
+import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
 import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
 import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
 import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
+import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
 import { hybridPickingIndependenceExercise } from "feature/exercisePlan/data/exerises/hybridPickingIndependence/hybridPickingIndependence";
 import { improvPromptEasy, improvPromptHard,improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
 import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
 import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
@@ -209,11 +214,6 @@ import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pink
 import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
 import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
 import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
-import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
-import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
-import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
-import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
-import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
 import { rhythmTrainingEasy, rhythmTrainingHard,rhythmTrainingMedium } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
@@ -247,11 +247,11 @@ import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneStr
 import { spiderPermutation1243Exercise } from "./exerises/spiderPermutation1243/spiderPermutation1243";
 import { spiderPermutation1324Exercise } from "./exerises/spiderPermutation1324/spiderPermutation1324";
 import { spiderPermutation1342Exercise } from "./exerises/spiderPermutation1342/spiderPermutation1342";
+import { spiderQuarterNotesExercise } from "./exerises/spiderQuarterNotes/spiderQuarterNotes";
 import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStairsHard";
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
-import { spiderQuarterNotesExercise } from "./exerises/spiderQuarterNotes/spiderQuarterNotes";
 
 
 const rawExercises: Exercise[] = [

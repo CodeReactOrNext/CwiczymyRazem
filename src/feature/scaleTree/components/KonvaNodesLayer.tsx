@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { Group, RegularPolygon, Shape, Text, Circle } from 'react-konva';
 import type Konva from 'konva';
+import { useCallback } from 'react';
+import { Circle,Group, Shape, Text } from 'react-konva';
 
 interface NodeData {
   status: 'locked' | 'available' | 'in_progress' | 'completed';

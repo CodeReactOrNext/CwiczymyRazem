@@ -1,8 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
 
 const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
   "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]",  scale: 1.15 },

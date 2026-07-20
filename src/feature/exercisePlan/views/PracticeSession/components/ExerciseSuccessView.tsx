@@ -151,7 +151,7 @@ export const ExerciseSuccessView = ({
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [isExam, isPassed, score]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isExam, isPassed, score]);  
 
   return (
     <motion.div

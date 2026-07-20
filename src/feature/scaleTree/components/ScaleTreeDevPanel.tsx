@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDown, ArrowUp, ArrowRight, ArrowLeft, Circle, Copy, Clipboard, Trash2 } from "lucide-react";
+import type { Edge,Node } from "@xyflow/react";
 import { cn } from "assets/lib/utils";
-import type { Node, Edge } from "@xyflow/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Circle, Clipboard, Copy } from "lucide-react";
 
 interface ScaleTreeDevPanelProps {
   selectedNodes: Node[];

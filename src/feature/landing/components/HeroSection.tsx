@@ -1,9 +1,9 @@
 import { Button } from "assets/components/ui/button";
 import { Logo } from "components/Logo/Logo";
 import { ArrowRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 
 const StaticCTA = () => (
   <div className="flex flex-col items-center gap-6">
