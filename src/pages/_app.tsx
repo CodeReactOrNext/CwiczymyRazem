@@ -1,11 +1,11 @@
 import "utils/wdyr";
 import "styles/globals.css";
 
-import { LazyMotion, domAnimation } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
+import { domAnimation,LazyMotion } from "framer-motion";
 import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
@@ -31,9 +31,8 @@ const teko = Teko({
 import Analytics from "components/Analytics/Analytics";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import useAuthSync from "hooks/useAuthSync";
-import type { AppPropsWithLayout } from "types/page";
-
 import dynamic from "next/dynamic";
+import type { AppPropsWithLayout } from "types/page";
 
 const PostHogProvider = dynamic(
   () => import("../providers/PostHogProvider").then((m) => m.PostHogProvider),

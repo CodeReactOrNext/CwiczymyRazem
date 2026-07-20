@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import type { NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
+
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 import type { AudioRefs } from "./useAudioAnalyzer";
 

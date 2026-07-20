@@ -1,5 +1,5 @@
-import * as admin from "firebase-admin";
 import { logger } from "feature/logger/Logger";
+import * as admin from "firebase-admin";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 

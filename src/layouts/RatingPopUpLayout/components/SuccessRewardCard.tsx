@@ -1,8 +1,8 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import React, { useEffect } from "react";
 import { FaSync } from "react-icons/fa";
-import { useTranslation } from "hooks/useTranslation";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;

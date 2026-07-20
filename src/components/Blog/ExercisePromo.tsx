@@ -1,6 +1,6 @@
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
-import { idToSlug } from 'feature/exercises/lib/slugUtils';
+import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 
 // next-mdx-remote v6 strips JSX expression attributes from MDX content, so every
 // prop must survive as a plain string (see AppCard for the same constraint).
@@ -35,7 +35,7 @@ export const ExercisePromo = ({ exerciseId, label = 'Try it yourself' }: Exercis
           timeInMinutes: exercise.timeInMinutes,
           premium: exercise.premium,
         }}
-        href={`/exercises/${idToSlug(exercise.id)}`}
+        href={getExerciseLandingHref(exercise.id, exercise)}
       />
     </div>
   );

@@ -7,7 +7,6 @@ import {
   FaGuitar,
   FaHeart,
   FaMedal,
-  FaStar,
   FaStarHalf,
 } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";

@@ -4,7 +4,6 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { Music2, Star, Trophy } from "lucide-react";
 
-import { TierBadge } from "../SongsGrid/TierBadge";
 
 interface SongLearningStatsProps {
   userSongs: {

@@ -1,8 +1,9 @@
 import { cn } from "assets/lib/utils";
-import { FaCheck, FaInfoCircle, FaLightbulb, FaSignal, FaGraduationCap, FaHeart, FaExternalLinkAlt, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
+import { FaCheck, FaExternalLinkAlt, FaFacebook, FaGraduationCap, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaSignal, FaTwitter } from "react-icons/fa";
+
 import type { Exercise } from "../../../types/exercise.types";
 
 interface ExerciseInstructionsInlineProps {

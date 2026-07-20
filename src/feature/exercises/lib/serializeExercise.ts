@@ -1,4 +1,4 @@
-import type { Exercise, DifficultyLevel, ExerciseCategory, TablatureMeasure, StrumPattern, BackingTrack } from 'feature/exercisePlan/types/exercise.types';
+import type { BackingTrack,DifficultyLevel, Exercise, ExerciseCategory, StrumPattern, TablatureMeasure } from 'feature/exercisePlan/types/exercise.types';
 import type { GuitarSkillId } from 'feature/skills/skills.types';
 
 /**

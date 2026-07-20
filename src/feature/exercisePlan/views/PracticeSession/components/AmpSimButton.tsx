@@ -64,7 +64,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
       </button>
 
       {open && (
-        <div className='absolute right-0 z-[9999] mt-2 w-72 rounded-xl border border-zinc-700 bg-zinc-900/95 p-4 text-left text-white shadow-2xl backdrop-blur'>
+        <div className='absolute right-0 z-[9999] mt-2 w-72 rounded-lg bg-zinc-900/95 p-4 text-left text-white shadow-2xl backdrop-blur'>
           <div className='mb-3 flex items-center justify-between'>
             <span className='text-sm font-semibold'>Wzmacniacz</span>
             <button
@@ -72,8 +72,8 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
               onClick={() => amp.toggle()}
               disabled={amp.isBusy}
               className={cn(
-                "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium disabled:opacity-50",
-                amp.isOn ? "bg-red-600 text-white" : "bg-zinc-700 text-white"
+                "flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50",
+                amp.isOn ? "bg-red-600 text-white hover:bg-red-500" : "bg-zinc-700 text-white hover:bg-zinc-600"
               )}>
               <Power size={12} />
               {amp.isOn ? "Wyłącz" : "Włącz"}
@@ -91,7 +91,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
             <select
               value={selectedId ?? ""}
               onChange={(e) => handleSelectDevice(Number(e.target.value))}
-              className='w-full rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-xs text-white'>
+              className='w-full rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
               {devices.length === 0 && <option value=''>Brak urządzeń wejściowych</option>}
               {devices.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -112,8 +112,8 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
               type='button'
               onClick={() => amp.setParams({ cab: !amp.params.cab })}
               className={cn(
-                "flex items-center justify-center gap-2 rounded-md border px-2 py-1.5 text-xs transition-colors",
-                amp.params.cab ? "border-red-500 bg-red-500/10 text-red-400" : "border-zinc-700 text-zinc-400"
+                "flex items-center justify-center gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
+                amp.params.cab ? "bg-red-500/10 text-red-400" : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700/50"
               )}>
               <Speaker size={12} />
               Kolumna (cab) {amp.params.cab ? "ON" : "OFF"}

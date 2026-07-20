@@ -1,5 +1,5 @@
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type {
   Exercise,

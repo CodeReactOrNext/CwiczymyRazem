@@ -1,6 +1,8 @@
 import * as alphaTabLib from '@coderline/alphatab';
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from 'hooks/useNativeOutputDevice';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
+import { applyAlphaTabOutputDevice } from 'utils/applyAudioSinkId';
 
 // AlphaTab measures playback position in MIDI ticks; 960 ticks = one quarter note.
 // Our tablature beat grid is also in quarter notes (parser uses displayDuration / 960),
@@ -154,6 +156,13 @@ export const useAlphaTabPlayer = ({
 
     apiRef.current = api;
 
+    // AlphaTab owns its audio graph internally with no setSinkId access — it has
+    // its own public device-selection API instead. Keep it on the same output as
+    // ASIO capture (Electron) so the driver doesn't get contested.
+    const unsubOutputDevice = onOutputDeviceChange((id) => {
+      if (isReadyRef.current) applyAlphaTabOutputDevice(api, id);
+    });
+
     api.scoreLoaded.on((score: any) => {
       scoreRef.current = score;
       if (score?.tempo > 0) originalBpmRef.current = score.tempo;
@@ -164,6 +173,7 @@ export const useAlphaTabPlayer = ({
       // Expose AlphaTab's AudioContext — accessed via the (non-hard-private) output.context field.
       const atCtx = (api.player as any)?.output?.context as AudioContext | undefined;
       if (atCtx) onAudioContextReadyRef.current?.(atCtx);
+      applyAlphaTabOutputDevice(api, readPersistedOutputDeviceId());
       // Expose imperative play handle — usable without React render cycle
       playRef.current = () => {
         api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
@@ -192,6 +202,7 @@ export const useAlphaTabPlayer = ({
     });
 
     return () => {
+      unsubOutputDevice();
       if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
       try { api.destroy(); } catch { /* ignore */ }
       isReadyRef.current     = false;

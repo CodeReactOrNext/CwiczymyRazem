@@ -6,6 +6,7 @@ import {
 import { cn } from "assets/lib/utils";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { motion } from "framer-motion";
 import { 
   BarChart3, 
   Clock, 
@@ -17,7 +18,6 @@ import {
   TrendingUp, 
   X 
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 import { TierBadge } from "../SongsGrid/TierBadge";
 

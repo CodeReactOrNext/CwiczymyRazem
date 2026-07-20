@@ -6,7 +6,6 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseCheckmark } from "feature/skills/components/ExerciseCheckmark";
-import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronRight, X } from "lucide-react";

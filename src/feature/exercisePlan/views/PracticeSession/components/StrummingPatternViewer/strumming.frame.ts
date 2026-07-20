@@ -1,12 +1,12 @@
 import type { StrumBeat, StrumPattern } from "feature/exercisePlan/types/exercise.types";
 
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
+import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels } from "./strumming.canvas";
 import {
   ACCENT_DOT, ARROW_AREA_H, BAR_LINE, BEAT_LINE, BG_COLOR,
   DOWN_COLOR, HEADER_H, LABEL_BEAT, LABEL_H, LABEL_SUB,
   MISS_COLOR, MUTED_COLOR, PAD, UP_COLOR,
 } from "./strumming.constants";
-import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels } from "./strumming.canvas";
 
 function drawSlots(
   ctx: CanvasRenderingContext2D, pattern: StrumPattern,

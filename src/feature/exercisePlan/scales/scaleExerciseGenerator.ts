@@ -1,5 +1,5 @@
 import type { Exercise } from '../types/exercise.types';
-import { getScalePatternForPosition, getScaleOnString } from './fretboardMapper';
+import { getScaleOnString,getScalePatternForPosition } from './fretboardMapper';
 import { generatePattern, getPatternName,type PatternType } from './patternGenerators';
 import { rootNotes,scaleDefinitions, type ScaleType } from './scaleDefinitions';
 

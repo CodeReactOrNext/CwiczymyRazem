@@ -1,5 +1,4 @@
 import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
-import { Gem } from "lucide-react";
 
 const RANKS = [
   {

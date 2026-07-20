@@ -1,12 +1,12 @@
+import type { Edge } from "@xyflow/react";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import { SCALE_TREE_NODES, SCALE_TREE_REWARD_NODES } from "../data/scaleTreeNodes";
-import { computeNodeStatuses, fetchAllBpmProgress } from "../services/scaleTree.service";
 import { getClaimedRewards } from "../services/rewardService";
-import type { BpmProgressMap, ScaleTreeNodeData, RewardNodeDef } from "../types/scaleTree.types";
-import type { Edge } from "@xyflow/react";
+import { computeNodeStatuses, fetchAllBpmProgress } from "../services/scaleTree.service";
+import type { BpmProgressMap,ScaleTreeNodeData } from "../types/scaleTree.types";
 
 const progressCache: Record<string, BpmProgressMap> = {};
 const rewardsCache: Record<string, string[]> = {};

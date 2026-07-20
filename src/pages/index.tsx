@@ -1,6 +1,6 @@
-import LandingPage from "feature/landing/LandingPage";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { serializeExercises } from "feature/exercises/lib/serializeExercise";
+import LandingPage from "feature/landing/LandingPage";
 import type { BlogFrontmatter} from "lib/blog";
 import {getAllBlogs } from "lib/blog";
 import type { GetStaticProps } from "next";

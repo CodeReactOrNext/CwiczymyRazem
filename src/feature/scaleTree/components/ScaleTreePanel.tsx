@@ -1,12 +1,13 @@
 import { cn } from "assets/lib/utils";
 import { BpmProgressGrid } from "feature/exercisePlan/components/BpmProgressGrid";
-import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
+import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, ExternalLink, Lock, Music, Timer, X } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "store/hooks";
+
 import type { BpmProgressMap, NodeStatus, RequiredExercise, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
 interface ScaleTreePanelProps {

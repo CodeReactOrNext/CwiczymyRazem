@@ -1,7 +1,7 @@
 "use client";
 
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
-import { idToSlug } from 'feature/exercises/lib/slugUtils';
+import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -45,8 +45,8 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
             Browse our complete library of professional guitar exercises, organized by skill category and difficulty. Each one comes with interactive tablature and audio playback.
           </p>
 
-          <Link href="/exercises" className="text-cyan-400 hover:text-cyan-300 font-semibold text-sm inline-flex items-center gap-1 transition-colors">
-            Explore all exercises
+          <Link href="/beginner-guitar-exercises" className="text-cyan-400 hover:text-cyan-300 font-semibold text-sm inline-flex items-center gap-1 transition-colors">
+            Explore the free practice guides
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -57,7 +57,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
               <ExerciseCard
                 key={ex.id}
                 exercise={ex}
-                href={`/exercises/${idToSlug(ex.id)}`}
+                href={getExerciseLandingHref(ex.id, ex)}
               />
             ))}
           </div>

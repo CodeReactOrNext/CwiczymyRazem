@@ -7,7 +7,6 @@ import {
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
-
 import { useAppSelector } from "store/hooks";
 
 export const FameBox = () => {

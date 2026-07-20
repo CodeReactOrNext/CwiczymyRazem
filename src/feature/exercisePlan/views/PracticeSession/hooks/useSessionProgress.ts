@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import type { useTimerInterface } from 'hooks/useTimer';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseSessionProgressProps {
   timer: useTimerInterface;

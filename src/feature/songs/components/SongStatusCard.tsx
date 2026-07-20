@@ -1,15 +1,13 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 
 import { SortableSongItem } from "./SortableSongItem";
 

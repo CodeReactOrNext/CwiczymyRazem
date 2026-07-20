@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { FaInfoCircle, FaLightbulb } from "react-icons/fa";
+
 import type { Exercise } from "../../../types/exercise.types";
 
 interface ExerciseInstructionsTriggerProps {

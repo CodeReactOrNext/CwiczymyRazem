@@ -1,6 +1,7 @@
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
 import { Plus } from "lucide-react";
+
 import { SectionRow } from "./SectionRow";
 
 const SUGGESTED_SECTIONS = ["Intro", "Verse", "Pre-Chorus", "Chorus", "Bridge", "Solo", "Riff", "Outro"];

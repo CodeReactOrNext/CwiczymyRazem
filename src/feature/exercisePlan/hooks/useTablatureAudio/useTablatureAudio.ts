@@ -1,5 +1,7 @@
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Soundfont from "soundfont-player";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 import type { TablatureBeat, TablatureNote } from "../../types/exercise.types";
 import { playDrumNote } from "./synth.drums";
@@ -117,6 +119,7 @@ export const useTablatureAudio = ({
     } else {
       ownAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = ownAudioContextRef.current;
+      applySinkId(ownAudioContextRef.current, readPersistedOutputDeviceId());
     }
     if (audioContextRef.current) {
       masterGainRef.current = audioContextRef.current.createGain();
@@ -135,6 +138,13 @@ export const useTablatureAudio = ({
       guitarPlayerRef.current = mutedGuitarPlayerRef.current = bassPlayerRef.current = vocalsPlayerRef.current = null;
     };
   }, [externalAudioContext]);
+
+  // Move an already-open, app-owned context to a newly picked output device live.
+  // Never touches an adopted/external context (e.g. the metronome's) — that
+  // context's own owner is responsible for its sink.
+  useEffect(() => onOutputDeviceChange((id) => {
+    if (audioContextRef.current === ownAudioContextRef.current) applySinkId(ownAudioContextRef.current, id);
+  }), []);
 
   // ── Load soundfont instruments ────────────────────────────────────────────
   useEffect(() => {

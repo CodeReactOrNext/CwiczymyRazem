@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-
 import type { NativeAudioDevice } from "types/nativeAudio";
 
 // Shared input-device discovery + selection for the native (Electron) paths.

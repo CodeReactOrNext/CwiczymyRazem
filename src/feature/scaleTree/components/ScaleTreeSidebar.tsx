@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Lock, CheckCircle, Flame } from 'lucide-react';
+import { CheckCircle, Flame,Lock } from 'lucide-react';
 
 interface ScaleSidebarItem {
   id: string;

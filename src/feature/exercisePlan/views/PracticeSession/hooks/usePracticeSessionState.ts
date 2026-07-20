@@ -1,6 +1,6 @@
 import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData } from 'feature/user/store/userSlice';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';

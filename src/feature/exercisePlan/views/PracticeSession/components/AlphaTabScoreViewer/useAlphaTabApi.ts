@@ -1,6 +1,8 @@
 import * as alphaTabLib from "@coderline/alphatab";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useEffect, useRef, useState } from "react";
+import { applyAlphaTabOutputDevice } from "utils/applyAudioSinkId";
 
 import { tablatureToAlphaTex } from "./tablatureToAlphaTex";
 import type { Track } from "./types";
@@ -105,6 +107,11 @@ export function useAlphaTabApi({
 
     apiRef.current = api;
 
+    // AlphaTab owns its audio graph internally with no setSinkId access — it has
+    // its own public device-selection API instead. Keep it on the same output as
+    // ASIO capture (Electron) so the driver doesn't get contested.
+    const unsubOutputDevice = onOutputDeviceChange((id) => applyAlphaTabOutputDevice(api, id));
+
     api.scoreLoaded.on((score: any) => {
       if (score?.tempo > 0) origBpmRef.current = score.tempo;
       scoreRef.current = score;
@@ -127,6 +134,7 @@ export function useAlphaTabApi({
       api.masterVolume    = volumeRef.current;
       api.isLooping       = true;
       api.playbackSpeed   = bpmRef.current / (origBpmRef.current || 120);
+      applyAlphaTabOutputDevice(api, readPersistedOutputDeviceId());
 
       // Single play path: the caller's isPlaying effect starts playback (with a
       // seek to the current session position). Auto-playing here too caused a
@@ -161,6 +169,7 @@ export function useAlphaTabApi({
     }
 
     return () => {
+      unsubOutputDevice();
       try { api.stop();    } catch { /* ignore */ }
       try { api.destroy(); } catch { /* ignore */ }
       apiRef.current   = null;

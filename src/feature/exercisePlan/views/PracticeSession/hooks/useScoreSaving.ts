@@ -1,11 +1,11 @@
+import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import type { RefObject } from "react";
 import { useRef } from "react";
+import { useAppSelector } from "store/hooks";
 
 import { saveLeaderboardEntry, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
-import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
 
 interface UseScoreSavingOptions {
   activeExercise:       Exercise;

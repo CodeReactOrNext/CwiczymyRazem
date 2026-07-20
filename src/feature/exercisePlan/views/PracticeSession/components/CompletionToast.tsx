@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { useTimerContext } from '../contexts/TimerContext';
 
 interface CompletionToastProps {
