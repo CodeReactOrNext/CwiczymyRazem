@@ -1,6 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import { ChevronLeft, ShieldCheck } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { FaMicrophone, FaTimes } from "react-icons/fa";
 
 interface PermissionStepProps {

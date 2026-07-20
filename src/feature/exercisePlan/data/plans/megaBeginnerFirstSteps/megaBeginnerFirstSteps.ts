@@ -1,10 +1,10 @@
+import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
+import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { spiderQuarterNotesExercise } from "feature/exercisePlan/data/exerises/spiderQuarterNotes/spiderQuarterNotes";
 import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
-import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
 import { strummingBasicExercise } from "feature/exercisePlan/data/exerises/strummingBasic/strummingBasic";
-import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 

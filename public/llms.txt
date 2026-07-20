@@ -16,7 +16,11 @@
 
 - [Home](https://riff.quest/) - The landing page and entry point to the platform.
 - [How It Works](https://riff.quest/how-it-works) - A step-by-step overview of how to get started with Riff Quest.
-- [Exercises](https://riff.quest/exercises) - Browse the catalog of guitar exercises across technique, theory, ear training, and creativity.
+- [Beginner Guitar Exercises](https://riff.quest/beginner-guitar-exercises) - Free beginner drills with interactive tabs and a 15-minute starter routine.
+- [Guitar Speed & Hand Synchronization Exercises](https://riff.quest/guitar-speed-hand-synchronization-exercises) - 15 spider, chromatic, legato and string-skipping drills with tabs.
+- [Guitar Scale Practice Routine](https://riff.quest/guitar-scale-practice-routine) - How to practice scales, pentatonic drills, and a 15-minute CAGED fretboard plan.
+- [Intermediate Guitar Practice Routine](https://riff.quest/intermediate-guitar-practice-routine) - A structured 45-minute plan with advanced technique rotation.
+- [Daily Guitar Practice Plan](https://riff.quest/daily-guitar-practice-plan) - Ready-made 15/30/60-minute daily routines and consistency systems.
 - [Song Library](https://riff.quest/song-library) - Community song library with difficulty ratings rated by real guitarists.
 - [Blog](https://riff.quest/blog) - Knowledge hub for guitarists, featuring technique tips and practice psychology.
 - [Practice Habits](https://riff.quest/blog/practice-habits) - Comprehensive guide on building effective guitar practice habits.

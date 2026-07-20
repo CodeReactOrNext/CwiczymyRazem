@@ -9,7 +9,7 @@
     "electron": "electron .",
     "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,green \"npm:dev\" \"wait-on tcp:127.0.0.1:3000 && electron .\"",
     "build": "next build",
-    "prebuild": "npm run export-exercises && node scripts/generateExerciseSitemap.mjs && node scripts/generateBlogSitemap.mjs",
+    "prebuild": "node scripts/generateBlogSitemap.mjs && node scripts/generateSongGuidesSitemap.mjs",
     "start": "next start",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -17,7 +17,6 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "postinstall": "node patch-aubio.js",
-    "export-exercises": "vitest run scripts/exportExercises.test.ts",
     "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
     "knip": "knip",
     "email": "email dev --dir src/lib/email/templates --port 3001"

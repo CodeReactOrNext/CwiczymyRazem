@@ -1,5 +1,4 @@
 import type { TablatureNote } from "../../types/exercise.types";
-
 import { getCachedNoiseBuffer } from "./audio.constants";
 
 export function playDrumNote(

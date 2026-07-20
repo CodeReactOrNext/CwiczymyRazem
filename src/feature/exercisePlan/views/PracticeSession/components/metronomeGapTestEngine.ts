@@ -12,6 +12,8 @@
  * engine drives the audio and the `keydown` listener (ref-counted via
  * retain/release), and every mounted panel just subscribes to the same state.
  */
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 export type GapVerdict = "super" | "good" | "bad" | "miss";
 type Phase = "idle" | "lead" | "gap" | "result";
@@ -76,6 +78,9 @@ class GapTestEngine {
   private refCount = 0;
 
   private ctx: AudioContext | null = null;
+  // Subscribed once (singleton, module lifetime) so an already-open context moves
+  // to a newly picked output device live.
+  private unsubOutputDevice = onOutputDeviceChange((id) => applySinkId(this.ctx, id));
   private scheduled: OscillatorNode[] = [];
   private raf = 0;
   private missTimer: ReturnType<typeof setTimeout> | null = null;
@@ -262,6 +267,7 @@ class GapTestEngine {
     if (!this.ctx) {
       const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AC();
+      applySinkId(this.ctx, readPersistedOutputDeviceId());
     }
     return this.ctx;
   }

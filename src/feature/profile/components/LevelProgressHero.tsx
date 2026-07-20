@@ -1,4 +1,3 @@
-import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelProgressHeroProps {
   lvl: number;

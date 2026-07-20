@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { Play, Repeat2, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
 import { MasteryBadge } from "./MasteryBadge";
 
 const PREDEFINED_NAMES = [

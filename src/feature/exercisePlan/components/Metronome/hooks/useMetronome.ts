@@ -1,4 +1,6 @@
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
 // Using an inline Blob URL avoids the need to serve a separate .js file.
@@ -95,6 +97,7 @@ export const useMetronome = ({
   // by the AlphaTab player before it calls play(). Without this the GP audio
   // ignores bar-click seeks (visual cursor jumps, audio does not).
   const pendingSeekBeatRef   = useRef<number | null>(null);
+  const ownsContextRef       = useRef(true);
 
   useEffect(() => {
     volumeRef.current = volume;
@@ -131,6 +134,8 @@ export const useMetronome = ({
       ?? new (window.AudioContext || (window as any).webkitAudioContext)();
 
     audioContextRef.current = ctx;
+    ownsContextRef.current  = ownsContext;
+    if (ownsContext) applySinkId(ctx, readPersistedOutputDeviceId());
     workletNodeRef.current?.disconnect();
     workletNodeRef.current  = null;
     workletReadyRef.current = false;
@@ -156,8 +161,15 @@ export const useMetronome = ({
     };
   // externalAudioContext intentionally included: when AlphaTab's context becomes
   // available we reinitialise the worklet on that context (happens before first play).
-   
+
   }, [enabled, externalAudioContext]);
+
+  // Move an already-open, app-owned context to a newly picked output device live
+  // (e.g. user changes the interface mid-session in the Setup step). Never touches
+  // an adopted/external context — its owner (AlphaTab) applies its own device.
+  useEffect(() => onOutputDeviceChange((id) => {
+    if (ownsContextRef.current && audioContextRef.current) applySinkId(audioContextRef.current, id);
+  }), []);
 
   const playSound = useCallback((time: number, isAccent: boolean = false, muted: boolean = false) => {
     if (!audioContextRef.current || muted) return;

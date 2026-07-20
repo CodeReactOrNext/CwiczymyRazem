@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import type { AmpParams, AmpStreamInfo } from "types/nativeAudio";
+
 import { readPersistedDeviceId } from "./useNativeAudioDevices";
 
 // Electron-only amp simulator control. Talks to window.nativeAmp (preload bridge)

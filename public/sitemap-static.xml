@@ -51,41 +51,40 @@
     <priority>0.3</priority>
   </url>
 
-  <!-- Exercise Pages -->
+  <!-- Practice Guide Pages (replaced the auto-generated /exercises/* pages) -->
   <url>
-    <loc>https://riff.quest/exercises</loc>
-    <lastmod>2026-07-03</lastmod>
+    <loc>https://riff.quest/beginner-guitar-exercises</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Exercise Categories -->
-  <url>
-    <loc>https://riff.quest/exercises/category/technique</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://riff.quest/exercises/category/theory</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://riff.quest/guitar-speed-hand-synchronization-exercises</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://riff.quest/exercises/category/hearing</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://riff.quest/guitar-scale-practice-routine</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://riff.quest/exercises/category/creativity</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://riff.quest/intermediate-guitar-practice-routine</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/daily-guitar-practice-plan</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
 </urlset>

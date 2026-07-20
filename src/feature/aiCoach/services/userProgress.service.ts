@@ -4,7 +4,6 @@ import {
   getDocs,
   query,
   setDoc,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";

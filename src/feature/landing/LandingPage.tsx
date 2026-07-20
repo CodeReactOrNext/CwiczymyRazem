@@ -1,11 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
 import type { BlogFrontmatter } from "lib/blog";
+import dynamic from "next/dynamic";
 
 const WhySection = dynamic(() => import("feature/landing/components/WhySection").then(m => m.WhySection));
 const InteractiveExercisesSection = dynamic(() => import("feature/landing/components/InteractiveExercisesSection").then(m => m.InteractiveExercisesSection));
@@ -15,6 +15,7 @@ const SongsLibrarySection = dynamic(() => import("feature/landing/components/Son
 const PracticePlansSection = dynamic(() => import("feature/landing/components/PracticePlansSection").then(m => m.PracticePlansSection));
 const RoadmapSection = dynamic(() => import("feature/landing/components/RoadmapSection").then(m => m.RoadmapSection));
 const SessionSummarySection = dynamic(() => import("feature/landing/components/SessionSummarySection").then(m => m.SessionSummarySection));
+const TestimonialsSection = dynamic(() => import("feature/landing/components/TestimonialsSection").then(m => m.TestimonialsSection));
 const FaqSection = dynamic(() => import("feature/landing/components/FaqSection").then(m => m.FaqSection));
 const BlogSection = dynamic(() => import("feature/landing/components/BlogSection").then(m => m.BlogSection));
 const FinalCTASection = dynamic(() => import("feature/landing/components/FinalCTASection").then(m => m.FinalCTASection));
@@ -88,6 +89,7 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
         <PracticePlansSection />
         <RoadmapSection />
         <SessionSummarySection />
+        <TestimonialsSection />
         <FaqSection questions={faqQuestions} />
         <BlogSection blogs={blogs} />
         <FinalCTASection />

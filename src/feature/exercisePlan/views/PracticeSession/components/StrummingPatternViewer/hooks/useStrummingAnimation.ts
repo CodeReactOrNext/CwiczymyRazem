@@ -1,5 +1,7 @@
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useRef } from "react";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 import type { SlotResult } from "../../../hooks/useStrummingMatcher";
 import { playStrumSound } from "../strumming.audio";
@@ -125,7 +127,10 @@ export function useStrummingAnimation({
           function getAudioCtx() {
             const ext = externalAudioContextRef.current;
             if (ext) { if (ext.state === "suspended") ext.resume(); return ext; }
-            if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+            if (!audioCtxRef.current) {
+              audioCtxRef.current = new AudioContext();
+              applySinkId(audioCtxRef.current, readPersistedOutputDeviceId());
+            }
             if (audioCtxRef.current.state === "suspended") audioCtxRef.current.resume();
             return audioCtxRef.current;
           }
@@ -161,6 +166,12 @@ export function useStrummingAnimation({
   }, [tick]);
 
   useEffect(() => () => { audioCtxRef.current?.close(); }, []);
+
+  // Move an already-open, self-created context to a newly picked output device
+  // live. Never touches an external context — its owner applies its own sink.
+  useEffect(() => onOutputDeviceChange((id) => {
+    if (!externalAudioContextRef.current) applySinkId(audioCtxRef.current, id);
+  }), []);
 
   return { canvasRef, containerRef };
 }

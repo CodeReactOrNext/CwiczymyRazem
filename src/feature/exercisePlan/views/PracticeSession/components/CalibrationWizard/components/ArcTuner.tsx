@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CX, CY, MAX_ANGLE_DEG, NEEDLE_LEN, R, arcPt } from "../calibration.constants";
+import { arcPt,CX, CY, MAX_ANGLE_DEG, NEEDLE_LEN, R } from "../calibration.constants";
 
 export const ArcTuner = React.memo(function ArcTuner({
   cents,

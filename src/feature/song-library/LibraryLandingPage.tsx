@@ -4,6 +4,7 @@ import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { Footer } from "feature/landing/components/Footer";
 import { LibraryCTASection } from "feature/song-library/components/LibraryCTASection";
 import { LibraryFaqSection } from "feature/song-library/components/LibraryFaqSection";
+import { LibraryGuidesSection } from "feature/song-library/components/LibraryGuidesSection";
 import { LibraryHeroSection } from "feature/song-library/components/LibraryHeroSection";
 import { LibraryNav } from "feature/song-library/components/LibraryNav";
 import { LibrarySEO } from "feature/song-library/components/LibrarySEO";
@@ -55,6 +56,7 @@ const LibraryLandingPage = ({ songs, totalSongs }: LibraryLandingPageProps) => {
         <LibraryHeroSection totalSongs={totalSongs} />
         <LibraryStatsBar totalSongs={totalSongs} />
         <LibrarySongGrid songs={songs} totalSongs={totalSongs} />
+        <LibraryGuidesSection />
         <LibraryTierGuide />
         <LibraryCTASection />
         <LibraryFaqSection questions={faqQuestions} />

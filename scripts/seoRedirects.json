@@ -1,0 +1,917 @@
+[
+  {
+    "source": "/exercises/spider-quarter-notes",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-one-string",
+    "destination": "/beginner-guitar-exercises#spider-one-string",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-stairs-hard",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-string-skipping",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-string-skipping",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-x",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-x",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-x-extended",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-basic",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-basic",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/play-by-ear",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/one-string-backing",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/one-chord-improv",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/triad-improvisation",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chromatic-accents",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-legato-basic",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-legato-basic",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/economy-picking-angular",
+    "destination": "/intermediate-guitar-practice-routine#economy-picking-angular",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/hammer-on-sequence-5-7-9",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/hammer-on-pentatonic-run",
+    "destination": "/guitar-scale-practice-routine#hammer-on-pentatonic-run",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pull-off-pentatonic-run",
+    "destination": "/guitar-scale-practice-routine#pull-off-pentatonic-run",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/legato-sextuplets-4-5-7",
+    "destination": "/intermediate-guitar-practice-routine#legato-sextuplets-4-5-7",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/guide-tone-voice-leading",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/two-notes-per-bar-phrasing",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-tone-improvisation",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/call-and-response-phrasing",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/minimal-motion-voice-leading",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fretboard-mastery",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/smooth-chord-transitions",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/metronome-gap-test",
+    "destination": "/guitar-speed-hand-synchronization-exercises#metronome-gap-test",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sing-what-you-play",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/open-g-repetition",
+    "destination": "/beginner-guitar-exercises#open-g-repetition",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/all-strings-open-repetition",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/random-note-hunt",
+    "destination": "/guitar-scale-practice-routine#random-note-hunt",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chromatic-note-hunt",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fretboard-region-hunt",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-hunt",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/build-the-chord",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fingerstyle-descending-arpeggios",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1234",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-permutation-1234",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1243",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1324",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1342",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1423",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-1432",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2134",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2143",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2314",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2341",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2413",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-2431",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3124",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3142",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3214",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3241",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3412",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-3421",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4123",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4132",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4213",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4231",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4312",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-permutation-4321",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/spider-chromatics",
+    "destination": "/guitar-speed-hand-synchronization-exercises#spider-chromatics",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/metal-playalong-basic",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s1",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s2",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s3",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s4",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s5",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s6",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s7",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/musician-fitness-lvl1-s8",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pentatonic-playalong-best-of",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-pentatonic-10min-workout",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-sweep-picking-15min",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-speed-builder-part1",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-stamina-picking-workout",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-gallop-picking-10-levels",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-alternate-picking-speed-builder",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-rock-metal-riffs",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-music-theory-essential",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-drop2-chords-arpeggios",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/gp-pentatonic-tutorial",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/jp-stretching",
+    "destination": "/daily-guitar-practice-plan#jp-stretching",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/alternate-picking-cross-string",
+    "destination": "/guitar-speed-hand-synchronization-exercises#alternate-picking-cross-string",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/alternate-picking-pentatonic-a-positions",
+    "destination": "/guitar-scale-practice-routine#alternate-picking-pentatonic-a-positions",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/finger-independence-1a",
+    "destination": "/beginner-guitar-exercises#finger-independence-1a",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/muting-discipline-drill",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/speed-burst-chromatic-blitz",
+    "destination": "/guitar-speed-hand-synchronization-exercises#speed-burst-chromatic-blitz",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/legato-hammer-pull-run",
+    "destination": "/guitar-speed-hand-synchronization-exercises#legato-hammer-pull-run",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/legato-trill-sprint",
+    "destination": "/guitar-speed-hand-synchronization-exercises#legato-trill-sprint",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/legato-continuous-flow",
+    "destination": "/guitar-speed-hand-synchronization-exercises#legato-continuous-flow",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/earTrainingEasy",
+    "destination": "/daily-guitar-practice-plan#earTrainingEasy",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/earTrainingMedium",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/earTrainingHard",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/first-bend",
+    "destination": "/beginner-guitar-exercises#first-bend",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/first-bend-half-step",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bend-and-release",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/high-register-bends",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/precision-bending-drill",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-control-drill",
+    "destination": "/intermediate-guitar-practice-routine#vibrato-control-drill",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/expressive-bend-phrasing",
+    "destination": "/intermediate-guitar-practice-routine#expressive-bend-phrasing",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/unison-bend-drill",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-single-string",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-pull-hammer",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-descending-target",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-triadic-cascade",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-melodic-lines",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sweep-picking-3-string",
+    "destination": "/intermediate-guitar-practice-routine#sweep-picking-3-string",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sweep-picking-motion-drill",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sweep-picking-motion-drill-6-string",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/mini-arpeggio",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sweep-5-string-cascade",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sweep-neoclassical",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythmic-pocket-mastery",
+    "destination": "/intermediate-guitar-practice-routine#rhythmic-pocket-mastery",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/hybrid-picking-independence",
+    "destination": "/intermediate-guitar-practice-routine#hybrid-picking-independence",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chicken-pickin",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/jazz-chord-melody",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-basic",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-arpeggios",
+    "destination": "/intermediate-guitar-practice-routine#string-skipping-arpeggios",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-melodic",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chromatic-spider-walk",
+    "destination": "/guitar-speed-hand-synchronization-exercises#chromatic-spider-walk",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pinky-power-drill",
+    "destination": "/guitar-speed-hand-synchronization-exercises#pinky-power-drill",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-stretch-drill",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/dynamic-crescendo",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tone-color-exploration",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tone-matching-challenge",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/scale-practice-configurable",
+    "destination": "/guitar-scale-practice-routine#scale-practice-configurable",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/improv-prompt-easy",
+    "destination": "/daily-guitar-practice-plan#improv-prompt-easy",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/improv-prompt-medium",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/improv-prompt-hard",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythm-training-easy",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythm-training-medium",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythm-training-hard",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-practice-configurable",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/composition-challenge",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/metal-gallop",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/metal-tremolo-picking",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/down-picking-doom-pulse",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/naked-tone-melody",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/muting-spotlight-drill",
+    "destination": "/daily-guitar-practice-plan#muting-spotlight-drill",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-spotlight-drill",
+    "destination": "/beginner-guitar-exercises#chord-spotlight-drill",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-sustain-drill",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-low-position",
+    "destination": "/daily-guitar-practice-plan#vibrato-low-position",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-high-position",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-finger-isolation",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-two-notes",
+    "destination": "/guitar-speed-hand-synchronization-exercises#string-skipping-two-notes",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/first-melody",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/quarter-notes-drill",
+    "destination": "/beginner-guitar-exercises#quarter-notes-drill",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pentatonic-string-crossing-3",
+    "destination": "/guitar-scale-practice-routine#pentatonic-string-crossing-3",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythm-triole",
+    "destination": "/daily-guitar-practice-plan#rhythm-triole",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pentatonic-box1-up-down",
+    "destination": "/guitar-scale-practice-routine#pentatonic-box1-up-down",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-basic",
+    "destination": "/beginner-guitar-exercises#strumming-basic",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-down-up",
+    "destination": "/beginner-guitar-exercises#strumming-down-up",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-rock",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-funk",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-2",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-3",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-4",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-5",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-6",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-7",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-8",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-9",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-10",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-11",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-12",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-13",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-14",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-15",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-16",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-18",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-19",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-20",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-21",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-22",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-23",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-24",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-25",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-26",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-27",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-28",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-29",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-30",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-31",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/strumming-pattern-32",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  }
+]

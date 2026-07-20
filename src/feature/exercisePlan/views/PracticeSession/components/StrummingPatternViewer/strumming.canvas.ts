@@ -1,6 +1,6 @@
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
 
-import { ARROW_AREA_H, CURSOR_COLOR, HEADER_H, LABEL_H, PAD, SLOT_W } from "./strumming.constants";
+import { ARROW_AREA_H, CURSOR_COLOR, LABEL_H, PAD, SLOT_W } from "./strumming.constants";
 
 export function makeLabels(beats: number, subdivisions: number): string[] {
   const subs4 = ["1","e","&","a","2","e","&","a","3","e","&","a","4","e","&","a","5","e","&","a","6","e","&","a"];

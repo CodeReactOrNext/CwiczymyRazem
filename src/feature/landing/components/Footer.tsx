@@ -85,7 +85,7 @@ export const Footer = () => {
                   </div>
 
                   {/* Navigation Links */}
-                  <div className="md:col-span-7 grid grid-cols-2 gap-12">
+                  <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
                       <div className="space-y-6">
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Community</h4>
                         <ul className="space-y-4">
@@ -94,7 +94,16 @@ export const Footer = () => {
                             <li><Link href="/song-library" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Song Library <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/about" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">About <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/how-it-works" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">How it works <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                            <li><Link href="/exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Exercises <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                        </ul>
+                      </div>
+                      <div className="space-y-6">
+                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Practice Guides</h4>
+                        <ul className="space-y-4">
+                            <li><Link href="/beginner-guitar-exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Beginner Exercises <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/guitar-speed-hand-synchronization-exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Speed & Hand Sync <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/guitar-scale-practice-routine" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Scale Practice Routine <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/intermediate-guitar-practice-routine" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Intermediate Routine <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/daily-guitar-practice-plan" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Daily Practice Plan <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                         </ul>
                       </div>
                       <div className="space-y-6">

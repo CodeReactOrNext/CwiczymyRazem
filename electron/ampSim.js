@@ -1,11 +1,12 @@
 // Amp simulator: real-time guitar monitoring with a tube-style effect chain.
-// Opens a DUPLEX RtAudio stream (input + output on the same ASIO/WASAPI device),
-// runs the DSP per audio block in JS, and writes the processed signal back out.
+// The DSP below (Biquad/AmpChain) runs inside the shared duplex stream owned by
+// ./nativeAudioEngine, alongside note-detection capture — see that file for how the
+// single ASIO/WASAPI stream is multiplexed between the two features. This module is
+// now just the DSP + a thin adapter presenting the same start/stop/setParams/getStatus
+// API it always has, so callers (electron/main.js) don't need to change.
 //
 // Signal chain (mono): high-pass → drive+waveshaper(tanh) → tone LPF →
 // cabinet (LPF + presence peak) → level + soft limiter.
-const { RtAudioFormat } = require("audify");
-const shared = require("./rtaudio");
 
 // ── RBJ biquad ───────────────────────────────────────────────────────────────
 class Biquad {
@@ -77,115 +78,22 @@ class AmpChain {
 }
 
 // ── Stream management ────────────────────────────────────────────────────────
-let isOpen = false;
-let chain = null;
-let info = null;
-
+// Lazily required (not at module load) to avoid a circular-require: the engine
+// needs AmpChain from this file, so this file cannot require the engine at the top.
 function start(opts = {}) {
-  const r = shared.getRt();
-  shared.closeStream(); // take over the device from any capture/amp stream
-  isOpen = false;
-
-  const api = (() => { try { return r.getApi(); } catch { return ""; } })();
-  const isAsio = /asio/i.test(api);
-
-  const devices = r.getDevices();
-  const inDev =
-    devices.find((d) => d.id === opts.deviceId && d.inputChannels > 0) ||
-    devices.find((d) => d.isDefaultInput && d.inputChannels > 0) ||
-    devices.find((d) => d.inputChannels > 0);
-  if (!inDev) throw new Error("No suitable input device for amp sim");
-  const inDevId = inDev.id;
-
-  // ASIO is one driver for both directions → output = input device.
-  // WASAPI/CoreAudio/DS: input (mic/interface) has no output, so route to the
-  // default render device (or the explicitly chosen output) instead.
-  let outDev;
-  if (isAsio) {
-    outDev = inDev;
-  } else if (opts.outputDeviceId != null) {
-    outDev = devices.find((d) => d.id === opts.outputDeviceId && d.outputChannels > 0);
-  }
-  if (!outDev) {
-    const defOutId = (() => { try { return r.getDefaultOutputDevice(); } catch { return undefined; } })();
-    outDev =
-      devices.find((d) => d.id === defOutId && d.outputChannels > 0) ||
-      devices.find((d) => d.outputChannels > 0);
-  }
-  if (!outDev) throw new Error("No output device available for amp monitoring");
-  const outDevId = outDev.id;
-
-  const sampleRate = opts.sampleRate || inDev.preferredSampleRate || 48000;
-  const reqFrame = opts.frameSize || 256;
-  const inChannel = Math.max(0, Math.min(opts.channel || 0, Math.max(0, inDev.inputChannels - 1)));
-  const outChannels = Math.min(2, outDev.outputChannels || 2) || 1;
-
-  chain = new AmpChain(sampleRate);
-  if (opts.params) chain.setParams(opts.params);
-
-  const actualFrame = r.openStream(
-    { deviceId: outDevId, nChannels: outChannels, firstChannel: 0 },
-    { deviceId: inDevId, nChannels: 1, firstChannel: inChannel },
-    RtAudioFormat.RTAUDIO_FLOAT32,
-    sampleRate,
-    reqFrame,
-    "CwiczymyRazem-amp",
-    (inputBuffer) => {
-      // The driver can deliver a few more blocks after stop()/restart has already
-      // nulled the chain. Bail out instead of dereferencing null.
-      const activeChain = chain;
-      if (!activeChain) return;
-      // Read mono input safely (4-byte alignment guard), process, write out.
-      const n = Math.floor(inputBuffer.byteLength / 4);
-      let inF;
-      if (inputBuffer.byteOffset % 4 === 0) {
-        inF = new Float32Array(inputBuffer.buffer, inputBuffer.byteOffset, n);
-      } else {
-        const c = Buffer.from(inputBuffer); inF = new Float32Array(c.buffer, c.byteOffset, n);
-      }
-      const out = new Float32Array(n * outChannels);
-      for (let i = 0; i < n; i++) {
-        const y = activeChain.process(inF[i]);
-        for (let ch = 0; ch < outChannels; ch++) out[i * outChannels + ch] = y;
-      }
-      try { r.write(Buffer.from(out.buffer, out.byteOffset, out.byteLength)); }
-      catch { /* stream closing — drop this block */ }
-    },
-    null
-  );
-  r.start();
-  isOpen = true;
-
-  let latFrames = 0;
-  try { latFrames = r.getStreamLatency ? r.getStreamLatency() : 0; } catch { /* ignore */ }
-
-  info = {
-    deviceName: inDev.name,
-    sampleRate,
-    frameSize: actualFrame || reqFrame,
-    outChannels,
-    inChannel,
-    roundTripMs: ((latFrames + (actualFrame || reqFrame) * 2) / sampleRate) * 1000,
-    params: chain.params,
-  };
-  return info;
+  return require("./nativeAudioEngine").attachAmp(opts);
 }
 
 function setParams(p) {
-  if (chain) chain.setParams(p || {});
-  if (info && chain) info.params = chain.params;
-  return info;
+  return require("./nativeAudioEngine").updateAmpParams(p);
 }
 
 function stop() {
-  shared.closeStream();
-  isOpen = false;
-  chain = null;
-  info = null;
+  require("./nativeAudioEngine").detachAmp();
 }
 
 function getStatus() {
-  return { isOpen, info };
+  return require("./nativeAudioEngine").getAmpStatus();
 }
 
-module.exports = { start, stop, setParams, getStatus };
+module.exports = { AmpChain, start, stop, setParams, getStatus };

@@ -1,6 +1,6 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
-import type { MutableRefObject, RefObject } from "react";
 
 import type { TablatureRenderData } from "./useTablatureRenderData";
 

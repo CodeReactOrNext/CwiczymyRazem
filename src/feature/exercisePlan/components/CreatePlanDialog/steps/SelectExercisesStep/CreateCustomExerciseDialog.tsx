@@ -1,6 +1,14 @@
 
 import { Button } from "assets/components/ui/button";
 import { Checkbox } from "assets/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import {
@@ -10,14 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "assets/components/ui/dialog";
 import { Textarea } from "assets/components/ui/textarea";
 import type {
     BackingTrack,
