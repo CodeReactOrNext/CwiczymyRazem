@@ -1,6 +1,6 @@
+import AppLayout from "layouts/AppLayout/AppLayout";
 import dynamic from "next/dynamic";
 import type { ReactElement } from "react";
-import AppLayout from "layouts/AppLayout/AppLayout";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 

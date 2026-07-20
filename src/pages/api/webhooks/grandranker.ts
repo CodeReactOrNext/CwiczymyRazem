@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { Octokit } from '@octokit/rest';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 interface Article {
   id: string;

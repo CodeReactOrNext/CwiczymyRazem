@@ -1,10 +1,10 @@
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 import { getExerciseBpmProgress } from "../../../services/bpmProgressService";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
 
 interface UseEarTrainingOptions {
   currentExercise: Exercise;

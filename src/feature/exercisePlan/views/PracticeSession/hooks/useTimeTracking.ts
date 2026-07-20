@@ -1,6 +1,6 @@
 import { increaseTimerTime } from 'feature/user/store/userSlice';
 import type { useTimerInterface } from 'hooks/useTimer';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import type { SkillsType } from 'types/skillsTypes';
 

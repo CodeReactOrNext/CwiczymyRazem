@@ -1,5 +1,5 @@
 import { useBpmProgress } from "feature/exercisePlan/hooks/useBpmProgress";
-import { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import React, { createContext, useContext, useMemo } from "react";
 
 interface BpmProgressContextType {

@@ -1,9 +1,9 @@
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "assets/components/ui/button";
 import { AlertTriangle, Home,RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
-import * as Sentry from "@sentry/nextjs";
 
 interface Props {
   children: ReactNode;

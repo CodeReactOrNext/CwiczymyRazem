@@ -297,7 +297,7 @@ export const PracticeSession = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain } = useGuitarAudioInput();
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice } = useGuitarAudioInput();
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
@@ -588,6 +588,7 @@ export const PracticeSession = ({
         handleCalibrationCancel={handleCalibrationCancel} handleCalibrationComplete={handleCalibrationComplete}
         audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
+        isNative={isNative} onSelectDevice={selectDevice}
         exerciseId={activeExercise.id} isMounted={isMounted}
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}

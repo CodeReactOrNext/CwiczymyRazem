@@ -1,17 +1,16 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { selectTimerData } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
-import type { TimerInterface } from "types/api.types";
+import { useAppSelector } from "store/hooks";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
+import { useTimerContext } from "../contexts/TimerContext";
 import ExerciseControls from "./ExerciseControls";
 import { TimerDisplay } from "./TimerDisplay";
-import { useTimerContext } from "../contexts/TimerContext";
-import { useAppSelector } from "store/hooks";
-import { selectTimerData } from "feature/user/store/userSlice";
 
 interface MainTimerSectionProps {
   exerciseKey: number;

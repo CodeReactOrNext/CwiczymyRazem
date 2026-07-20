@@ -1,8 +1,8 @@
 import { firestore } from "utils/firebase/api/firebase.config";
 
 import {
-  type EmailCooldownData,
   EMAIL_COOLDOWNS_COLLECTION,
+  type EmailCooldownData,
   type EmailCooldownType,
 } from "./cooldown";
 

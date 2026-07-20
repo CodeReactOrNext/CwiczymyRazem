@@ -1,4 +1,4 @@
-import type { MutableRefObject, RefObject } from "react";
+import type { MutableRefObject } from "react";
 import { useEffect } from "react";
 import { getNoteFromFrequency, NOTES } from "utils/audio/noteUtils";
 

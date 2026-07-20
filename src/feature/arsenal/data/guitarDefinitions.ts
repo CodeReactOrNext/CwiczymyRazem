@@ -91,8 +91,16 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   { id: 48, imageId: "special/49", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
   { id: 49, imageId: "special/50", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
   { id: 50, imageId: "special/51", name: "Stratocaster Heavy Relic", brand: "Fairmont", rarity: "Legendary", yearFrom: 1960, yearTo: 1970, countries: ["USA"] },
-
-
+  // New batch (51-59) — marki/modele dobrane po kształcie, do poprawki
+  { id: 51, imageId: "special/52", name: "Omega VII", brand: "Izanor", rarity: "Epic", yearFrom: 2012, yearTo: 2023, countries: ["USA", "Japan"] },
+  { id: 52, imageId: "special/53", name: "RX-1000 VII", brand: "Izanor", rarity: "Epic", yearFrom: 2010, yearTo: 2023, countries: ["USA", "Japan"] },
+  { id: 53, imageId: "special/54", name: "Nyx VII", brand: "Izanor", rarity: "Rare", yearFrom: 2010, yearTo: 2023, countries: ["Indonesia", "China", "Korea"] },
+  { id: 54, imageId: "special/55", name: "Monarch V Amethyst", brand: "Grayson", rarity: "Epic", yearFrom: 1960, yearTo: 1990, countries: ["USA"] },
+  { id: 55, imageId: "special/56", name: "Monarch SE Onyx", brand: "RPS", rarity: "Epic", yearFrom: 2010, yearTo: 2026, countries: ["Korea", "Indonesia"] },
+  { id: 56, imageId: "special/57", name: "Stratocaster Racing Green", brand: "Fairmont", rarity: "Rare", yearFrom: 1990, yearTo: 2012, countries: ["USA", "Japan"] },
+  { id: 57, imageId: "special/58", name: "Luther Sovereign Custom", brand: "Louis Carver", rarity: "Common", yearFrom: 1950, yearTo: 1960, countries: ["UK", "USA"] },
+  { id: 58, imageId: "special/59", name: "Solidbody Special", brand: "Corvin", rarity: "Rare", yearFrom: 1950, yearTo: 2020, countries: ["Czech Republic", "UK"] },
+  { id: 59, imageId: "special/60", name: "Stratocaster Shoreline Gold", brand: "Fairmont", rarity: "Epic", yearFrom: 1970, yearTo: 2020, countries: ["USA", "Japan"] },
 ];
 
 export const GUITARS_BY_ID = new Map<number | string, GuitarDefinition>(

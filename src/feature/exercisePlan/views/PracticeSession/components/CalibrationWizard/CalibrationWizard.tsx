@@ -24,11 +24,13 @@ interface CalibrationWizardProps {
   isListening:       boolean;
   inputGain:         number;
   onInputGainChange: (gain: number) => void;
+  isNative:          boolean;
+  onSelectDevice?:   (deviceId: number) => Promise<void>;
 }
 
 export const CalibrationWizard = ({
   isOpen, onComplete, onCancel, audioInit, audioRefs,
-  isListening, inputGain, onInputGainChange,
+  isListening, inputGain, onInputGainChange, isNative, onSelectDevice,
 }: CalibrationWizardProps) => {
   const [step,        setStep]        = useState<"source" | "permission" | "setup" | "tuning" | "summary">("source");
   const [inputSource, setInputSource] = useState<InputSource>("interface");
@@ -107,6 +109,7 @@ export const CalibrationWizard = ({
                   inputSource={inputSource}
                   audioRefs={audioRefs} inputGain={inputGain}
                   onInputGainChange={onInputGainChange}
+                  isNative={isNative} onSelectDevice={onSelectDevice}
                   onGrant={handleGrant}
                   onNext={() => setStep("tuning")}
                   onBack={() => setStep(isListening ? "source" : "permission")}

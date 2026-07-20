@@ -1,4 +1,6 @@
+import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useEffect, useRef } from "react";
+import { applySinkId } from "utils/applyAudioSinkId";
 
 interface UseExamBackingAudioProps {
   url: string;
@@ -12,8 +14,8 @@ interface UseExamBackingAudioProps {
 
 function getOrCreateCtx(ref: React.MutableRefObject<AudioContext | null>): AudioContext {
   if (!ref.current || ref.current.state === "closed") {
-     
     ref.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    applySinkId(ref.current, readPersistedOutputDeviceId());
   }
   return ref.current;
 }
@@ -95,4 +97,7 @@ export function useExamBackingAudio(props: UseExamBackingAudioProps) {
       ctxRef.current?.close().catch(() => {});
     };
   }, []);
+
+  // Move an already-open context to a newly picked output device live.
+  useEffect(() => onOutputDeviceChange((id) => applySinkId(ctxRef.current, id)), []);
 }

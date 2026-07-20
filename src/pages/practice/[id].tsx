@@ -28,7 +28,7 @@ export default function PracticePage() {
       } catch (error) {
         console.error("Error loading plan:", error);
         toast.error(t("errors.load_plan_failed"));
-        router.push("/exercises");
+        router.push("/timer/plans");
       }
     };
 
@@ -43,7 +43,7 @@ export default function PracticePage() {
     <PremiumGate feature="practice" requiredPlan="master">
       <PracticeSession
         plan={plan}
-        onClose={() => router.push("/exercises")}
+        onClose={() => router.push("/timer/plans")}
         onFinish={() => {
           setIsFinishing(true);
           router.push("/report");

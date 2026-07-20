@@ -1,6 +1,7 @@
-import type { ScaleTreeNodeDef, RewardNodeDef } from "../types/scaleTree.types";
-import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
+import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
+
+import type { RewardNodeDef,ScaleTreeNodeDef } from "../types/scaleTree.types";
 
 const X_STEP = 100;    // horizontal gap between fret positions (spine columns)
 const Y_STEP = 62;     // vertical gap between pattern variants (branch rows)

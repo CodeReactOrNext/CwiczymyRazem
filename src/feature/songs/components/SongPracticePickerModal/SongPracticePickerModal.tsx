@@ -17,14 +17,13 @@ import {
   FolderOpen,
   Link2Off,
   Loader2,
-  Lock,
   Upload,
 } from "lucide-react";
-import { PiCassetteTapeLight } from "react-icons/pi";
-import { SiGuitarpro } from "react-icons/si";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { PiCassetteTapeLight } from "react-icons/pi";
+import { SiGuitarpro } from "react-icons/si";
 import { toast } from "sonner";
 
 type Phase = "pick" | "attach";

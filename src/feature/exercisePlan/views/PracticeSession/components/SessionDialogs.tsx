@@ -5,11 +5,11 @@ import { playCompletionSound } from "utils/audioUtils";
 
 import { EarTrainingLeaderboardDialog } from "../../../components/EarTrainingLeaderboardDialog";
 import { ExerciseCompleteDialog } from "../../../components/ExerciseCompleteDialog";
+import { useSessionUI } from "../contexts/SessionUIContext";
+import { useTimerContext } from "../contexts/TimerContext";
 import { CalibrationChoiceDialog } from "./CalibrationChoiceDialog";
 import { CalibrationWizard } from "./CalibrationWizard";
 import { MicModeDialog } from "./MicModeDialog";
-import { useTimerContext } from "../contexts/TimerContext";
-import { useSessionUI } from "../contexts/SessionUIContext";
 
 interface SessionDialogsProps {
   // ExerciseCompleteDialog
@@ -37,6 +37,8 @@ interface SessionDialogsProps {
   isListening: boolean;
   inputGain: number;
   setInputGain: (v: number) => void;
+  isNative: boolean;
+  onSelectDevice?: (deviceId: number) => Promise<void>;
 
   // Leaderboard
   exerciseId: string;
@@ -70,6 +72,8 @@ export const SessionDialogs = ({
   isListening,
   inputGain,
   setInputGain,
+  isNative,
+  onSelectDevice,
   exerciseId,
   isMounted,
   hasReportResult,
@@ -139,6 +143,8 @@ export const SessionDialogs = ({
         isListening={isListening}
         inputGain={inputGain}
         onInputGainChange={setInputGain}
+        isNative={isNative}
+        onSelectDevice={onSelectDevice}
       />
 
       <EarTrainingLeaderboardDialog

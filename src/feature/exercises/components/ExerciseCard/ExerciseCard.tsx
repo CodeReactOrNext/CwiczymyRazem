@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { ArrowRight, Lock } from 'lucide-react';
+import Link from 'next/link';
 
 interface ExerciseCardProps {
   exercise: {

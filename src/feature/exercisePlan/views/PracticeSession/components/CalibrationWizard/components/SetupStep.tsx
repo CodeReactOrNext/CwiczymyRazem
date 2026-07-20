@@ -2,7 +2,9 @@ import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
-import { ChevronLeft } from "lucide-react";
+import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
+import { useNativeOutputDevice } from "hooks/useNativeOutputDevice";
+import { ChevronLeft, RefreshCw, Speaker } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronRight, FaHeadphones, FaMicrophone, FaPlug, FaTimes, FaVolumeOff } from "react-icons/fa";
 
@@ -15,6 +17,8 @@ interface SetupStepProps {
   audioRefs:         AudioRefs;
   inputGain:         number;
   onInputGainChange: (v: number) => void;
+  isNative:          boolean;
+  onSelectDevice?:   (deviceId: number) => Promise<void>;
   onGrant:           () => void;
   onNext:            () => void;
   onBack:            () => void;
@@ -23,7 +27,7 @@ interface SetupStepProps {
 
 export const SetupStep = React.memo(function SetupStep({
   isListening, isLoading, inputSource, audioRefs, inputGain, onInputGainChange,
-  onGrant, onNext, onBack, onCancel,
+  isNative, onSelectDevice, onGrant, onNext, onBack, onCancel,
 }: SetupStepProps) {
   const [volume, setVolume] = useState(0);
   const rafRef = useRef(0);
@@ -75,17 +79,32 @@ export const SetupStep = React.memo(function SetupStep({
 
 
         {/* Source-specific tips — always visible */}
-        {inputSource === "microphone" ? <MicrophoneTips /> : <InterfaceTips />}
+        {inputSource === "microphone" ? (
+          <MicrophoneTips />
+        ) : isNative ? (
+          <NativeInterfaceSelector isListening={isListening} onSelectDevice={onSelectDevice} />
+        ) : (
+          <InterfaceTips />
+        )}
 
-        {/* Grant access — only when mic not yet active */}
+        {/* Grant access — only when mic not yet active. Native interface capture
+            needs no OS permission, so the copy differs from the browser mic path. */}
         {!isListening && (
           <Button
             onClick={onGrant}
             disabled={isLoading}
             className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold h-11"
           >
-            <FaMicrophone className="mr-2 h-4 w-4" />
-            {isLoading ? "Requesting access…" : "Grant Microphone Access"}
+            {isNative && inputSource === "interface" ? (
+              <FaPlug className="mr-2 h-4 w-4" />
+            ) : (
+              <FaMicrophone className="mr-2 h-4 w-4" />
+            )}
+            {isLoading
+              ? "Connecting…"
+              : isNative && inputSource === "interface"
+                ? "Start Listening"
+                : "Grant Microphone Access"}
           </Button>
         )}
 
@@ -178,6 +197,110 @@ function MicrophoneTips() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Electron-only: pick which ASIO/WASAPI interface feeds pitch detection.
+ * Shares its persisted device id with the amp simulator (useNativeAudioDevices),
+ * so a choice made here or in the amp panel applies everywhere.
+ */
+function NativeInterfaceSelector({
+  isListening, onSelectDevice,
+}: {
+  isListening: boolean;
+  onSelectDevice?: (deviceId: number) => Promise<void>;
+}) {
+  const { devices, api, selectedId, loading, refresh, select } = useNativeAudioDevices();
+  const output = useNativeOutputDevice(devices.find((d) => d.id === selectedId)?.name);
+  const [outputExpanded, setOutputExpanded] = useState(false);
+
+  const handleSelect = async (id: number) => {
+    select(id);
+    if (isListening) await onSelectDevice?.(id); // live stream → restart on the new device
+  };
+
+  const selectedOutput = output.devices.find((d) => d.deviceId === output.selectedId);
+  const showOutputPicker = outputExpanded || !output.selectedId;
+
+  return (
+    <div className="rounded-lg bg-zinc-900/70 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FaPlug className="h-3 w-3 text-cyan-400" />
+          <span className="text-[10px] font-bold tracking-widest text-zinc-500">
+            Interface{api ? ` · ${api}` : ""}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => refresh()}
+          title="Refresh device list"
+          className="text-zinc-500 hover:text-white transition-colors"
+        >
+          <RefreshCw className={cn("h-3 w-3", loading && "animate-spin")} />
+        </button>
+      </div>
+
+      <select
+        value={selectedId ?? ""}
+        onChange={(e) => handleSelect(Number(e.target.value))}
+        className="w-full rounded-lg bg-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+      >
+        {devices.length === 0 && <option value="">No input devices found</option>}
+        {devices.map((d) => (
+          <option key={d.id} value={d.id}>
+            {d.name} ({d.inputChannels} in)
+          </option>
+        ))}
+      </select>
+
+      <p className="text-[11px] text-zinc-500 leading-relaxed">
+        Native low-latency capture — bypasses the browser entirely. Plug your guitar straight into the interface above.
+      </p>
+
+      {/* ── Output routing — ASIO is exclusive, so app audio (metronome, backing
+          tracks) must share this same device or capture gets glitchy/cut off. ── */}
+      {!showOutputPicker ? (
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <Speaker className="h-3 w-3 shrink-0 text-zinc-500" />
+            <span className="text-[11px] text-zinc-500 truncate">
+              Output: {selectedOutput?.label || "matched"} (auto)
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOutputExpanded(true)}
+            className="shrink-0 text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors"
+          >
+            Change
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center gap-2">
+            <Speaker className="h-3 w-3 text-zinc-500" />
+            <span className="text-[10px] font-bold tracking-widest text-zinc-500">Output</span>
+          </div>
+          <select
+            value={output.selectedId ?? ""}
+            onChange={(e) => output.select(e.target.value)}
+            className="w-full rounded-lg bg-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+          >
+            {output.devices.length === 0 && <option value="">No output devices found</option>}
+            {output.devices.map((d) => (
+              <option key={d.deviceId} value={d.deviceId}>
+                {d.label || d.deviceId}
+              </option>
+            ))}
+          </select>
+          <p className="text-[11px] text-zinc-500 leading-relaxed">
+            Should match the interface above so audio and capture use the same device.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

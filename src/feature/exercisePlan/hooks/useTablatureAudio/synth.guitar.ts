@@ -1,4 +1,3 @@
-import type { BendPoint } from "../../types/exercise.types";
 
 import { getCachedNoiseBuffer, SOFT_CLIP_CURVE_LIGHT } from "./audio.constants";
 import type { StringSynthOptions } from "./types";
