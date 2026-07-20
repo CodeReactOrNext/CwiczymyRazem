@@ -21,6 +21,7 @@ export function readPersistedOutputDeviceId(): string | null {
  *  already-open AudioContext / AlphaTab instance can move live. localStorage's own
  *  `storage` event doesn't fire in the tab that wrote it, hence a custom event. */
 export function onOutputDeviceChange(cb: (deviceId: string | null) => void): () => void {
+  if (typeof window === "undefined") return () => {};
   const listener = (e: Event) => cb((e as CustomEvent<string | null>).detail);
   window.addEventListener(OUTPUT_DEVICE_CHANGE_EVENT, listener);
   return () => window.removeEventListener(OUTPUT_DEVICE_CHANGE_EVENT, listener);
