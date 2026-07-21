@@ -1,4 +1,5 @@
 import { getLocalDateKey } from "utils/converter";
+import { buildCsv, downloadCsv } from "utils/csvExport";
 
 import type { FormattedActivityReport } from "./activityLog.types";
 
@@ -11,21 +12,9 @@ const CSV_HEADERS = [
   "Theory (min)",
   "Hearing (min)",
   "Creativity (min)",
-  "Plan ID",
 ];
 
 const msToMinutes = (ms: number) => Math.round(ms / 60000);
-
-const escapeCsvField = (value: string | number) => {
-  const stringValue = String(value);
-  if (/[",\n]/.test(stringValue)) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
-};
-
-const toCsvRow = (fields: Array<string | number>) =>
-  fields.map(escapeCsvField).join(",");
 
 export const buildActivityLogCsv = (
   reports: FormattedActivityReport[]
@@ -34,23 +23,20 @@ export const buildActivityLogCsv = (
     const dateKey = getLocalDateKey(new Date(report.date));
 
     if (report.activities && report.activities.length > 0) {
-      return report.activities.map((activity) =>
-        toCsvRow([
-          dateKey,
-          activity.title,
-          activity.points,
-          msToMinutes(activity.time),
-          msToMinutes(activity.timeSumary?.techniqueTime ?? 0),
-          msToMinutes(activity.timeSumary?.theoryTime ?? 0),
-          msToMinutes(activity.timeSumary?.hearingTime ?? 0),
-          msToMinutes(activity.timeSumary?.creativityTime ?? 0),
-          activity.planId ?? "",
-        ])
-      );
+      return report.activities.map((activity) => [
+        dateKey,
+        activity.title,
+        activity.points,
+        msToMinutes(activity.time),
+        msToMinutes(activity.timeSumary?.techniqueTime ?? 0),
+        msToMinutes(activity.timeSumary?.theoryTime ?? 0),
+        msToMinutes(activity.timeSumary?.hearingTime ?? 0),
+        msToMinutes(activity.timeSumary?.creativityTime ?? 0),
+      ]);
     }
 
     return [
-      toCsvRow([
+      [
         dateKey,
         report.exceriseTitle ?? "",
         0,
@@ -59,24 +45,14 @@ export const buildActivityLogCsv = (
         msToMinutes(report.theoryTime),
         msToMinutes(report.hearingTime),
         msToMinutes(report.creativityTime),
-        "",
-      ]),
+      ],
     ];
   });
 
-  return [toCsvRow(CSV_HEADERS), ...rows].join("\n");
+  return buildCsv(CSV_HEADERS, rows);
 };
 
 export const downloadActivityLogCsv = (
   reports: FormattedActivityReport[],
   filename = `riffquest-sessions-${getLocalDateKey(new Date())}.csv`
-) => {
-  const csv = buildActivityLogCsv(reports);
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-};
+) => downloadCsv(buildActivityLogCsv(reports), filename);
