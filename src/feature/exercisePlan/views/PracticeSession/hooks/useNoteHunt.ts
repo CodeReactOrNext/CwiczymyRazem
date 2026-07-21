@@ -2,7 +2,7 @@ import { getNotePositionsInRange } from "feature/exercisePlan/scales/fretboardMa
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoteFromFrequency, NOTES } from "utils/audio/noteUtils";
 
-import { type GameState,getFeedbackForCombo } from "./noteMatchingFeedback";
+import type { GameState } from "./noteMatchingFeedback";
 
 export interface NoteHuntState {
   /** Live detected note name (e.g. "C#"), or null when silent. */
@@ -73,7 +73,6 @@ function sameState(a: NoteHuntState, b: NoteHuntState): boolean {
     a.isMatch === b.isMatch &&
     a.hitId === b.hitId &&
     a.gameState.score === b.gameState.score &&
-    a.gameState.feedbackId === b.gameState.feedbackId &&
     a.foundOctaves.length === b.foundOctaves.length &&
     a.octaves.length === b.octaves.length &&
     Math.abs(a.cents - b.cents) < 3
@@ -88,7 +87,6 @@ function buildState(
   cents: number,
   isMatch: boolean,
   hitId: number,
-  feedback: { text: string; id: number },
   scoreOffset = 0,
 ): NoteHuntState {
   const foundInRange = octaves.filter(o => found.has(o)).length;
@@ -101,8 +99,6 @@ function buildState(
       score: scoreOffset + scoreForCount(foundInRange),
       combo: foundInRange,
       multiplier,
-      lastFeedback: feedback.text,
-      feedbackId: feedback.id,
     },
     accuracy: octaves.length > 0 ? Math.round((foundInRange / octaves.length) * 100) : 0,
     maxPossibleScore: scoreForCount(octaves.length),
@@ -133,7 +129,7 @@ export function useNoteHunt(
   fretRange?: [number, number],
 ): NoteHuntControls {
   const [state, setState] = useState<NoteHuntState>(() =>
-    buildState(targetOctaves(targetNote, fretRange), new Set(), null, null, 0, false, 0, { text: "", id: 0 }),
+    buildState(targetOctaves(targetNote, fretRange), new Set(), null, null, 0, false, 0),
   );
 
   // Re-roll progress when EITHER the note or the region window changes. Derived as
@@ -147,7 +143,6 @@ export function useNoteHunt(
   const foundRef       = useRef<Set<number>>(new Set());
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
-  const feedbackRef    = useRef<{ text: string; id: number }>({ text: "", id: 0 });
   const targetRef      = useRef(targetNote);
   const octavesRef     = useRef<number[]>(targetOctaves(targetNote, fretRange));
   // Score banked from previous targets — keeps the total accumulating across rotations.
@@ -167,10 +162,9 @@ export function useNoteHunt(
     wasMatchingRef.current = false;
     prevFoundRef.current  = 0;
     hitIdRef.current      = 0;
-    feedbackRef.current   = { text: "", id: 0 };
     // Push the cleared state now — the RAF loop is idle when the mic is off, so
     // without this the previous note's found octaves would linger after a rotate.
-    setState(buildState(octavesRef.current, foundRef.current, null, null, 0, false, 0, feedbackRef.current, sessionScoreRef.current));
+    setState(buildState(octavesRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
 
@@ -213,22 +207,12 @@ export function useNoteHunt(
               wasMatchingRef.current = false;
             }
 
-            // Feedback fires when a new in-range octave is located.
             const foundInRange = octaves.filter(o => foundRef.current.has(o)).length;
-            if (foundInRange > prevFoundRef.current) {
-              const prevMult = Math.min(8, Math.floor(prevFoundRef.current / 5) + 1);
-              const mult     = Math.min(8, Math.floor(foundInRange / 5) + 1);
-              if (mult > prevMult) feedbackRef.current = { text: "MULTIPLIER UP!", id: feedbackRef.current.id + 1 };
-              else {
-                const tier = getFeedbackForCombo(foundInRange);
-                if (tier) feedbackRef.current = { text: tier.text, id: feedbackRef.current.id + 1 };
-              }
-              prevFoundRef.current = foundInRange;
-            }
+            if (foundInRange > prevFoundRef.current) prevFoundRef.current = foundInRange;
 
             const next = buildState(
               octaves, foundRef.current, data.note, data.octave, data.cents,
-              isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
+              isMatch, hitIdRef.current, sessionScoreRef.current,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -261,14 +245,10 @@ export function useNoteHunt(
       hitIdRef.current++;
     }
     const foundInRange = octavesRef.current.filter(o => found.has(o)).length;
-    if (foundInRange > prevFoundRef.current) {
-      const tier = getFeedbackForCombo(foundInRange);
-      if (tier) feedbackRef.current = { text: tier.text, id: feedbackRef.current.id + 1 };
-    }
     prevFoundRef.current = foundInRange;
     setState(prev => buildState(
       octavesRef.current, found, prev.detectedNote, prev.detectedOctave, prev.cents,
-      prev.isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
+      prev.isMatch, hitIdRef.current, sessionScoreRef.current,
     ));
   }, []);
 

@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
 
+import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
+
 // ── Layout constants ──────────────────────────────────────────────────────────
 // World-space design height of the score. The whole drawing is scaled by
 // H / BASE_H so stretching the viewer window enlarges the notation
@@ -164,9 +166,10 @@ let countInRemaining = 0;
 let audioStartSec: number | null = null;
 let audioCurrentSec: number | null = null;
 
-// Visual state
-let hitNotes: Record<string, boolean | number> = {};
-let missedNotes: Record<string, boolean> = {};
+// Visual state — hit/miss overlay bookkeeping lives in noteHitVisualState.ts
+// (see there for how HIT_NOTES/MISSED_NOTES/RESET/DATA update it) so it can be
+// unit tested without a real Worker/OffscreenCanvas.
+const visual = createNoteHitVisualState();
 let hideNotes = false;
 
 // Per-string tuning legend drawn pinned to the left edge (string 1 = high e …
@@ -178,22 +181,13 @@ let tuningStrings: TuningStringInfo[] = [];
 // many beats ahead of the cursor (or is still ringing under it).
 const TUNING_LOOKAHEAD_BEATS = 2;
 
-// Frozen snapshot of the finishing repetition's hit/miss state. When the full
-// exercise loops, useNoteMatching clears hitNotes/missedNotes at the wrap; we keep
-// the previous pass's state so the outgoing tail (the repetition scrolling off to
-// the left) stays painted as played instead of "restarting" to raw.
-let frozenHitNotes: Record<string, boolean | number> = {};
-let frozenMissedNotes: Record<string, boolean> = {};
-let hasFrozen = false;
 // Tile index the frozen snapshot belongs to, captured from the visual cursor at
 // freeze time. Matching resets ~one input-latency before the visual wrap, so we
 // pin the tile at reset time to keep the tail painted through that gap.
-let frozenTile = -1;
 let lastActiveTile = 0;
 
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
 const HIT_ANIM_MS = 320;
-let hitTimestamps: Record<string, number> = {};
 
 // Visual cache for progressive fills to prevent backward snapping during latency variance
 const noteVisualFill = new Map<string, number>();
@@ -203,8 +197,6 @@ const noteVisualFill = new Map<string, number>();
 const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
 // Dirty flag — skip rAF paint when nothing changed (paused, no animations)
 let needsRedraw = true;
-// Counter for active hit animations — avoids Object.keys() in the hot render path
-let hitTimestampsCount = 0;
 // Cache for bend badge text widths — ctx.measureText is expensive, text never changes
 const bendTextWidthCache = new Map<string, number>();
 // Wall-clock time (ms) at which the last TICK was received — used for interpolation
@@ -523,7 +515,7 @@ function render() {
   if (!ctx || W === 0) return;
 
   // Skip paint when paused and nothing animating
-  if (!isPlaying && !needsRedraw && hitTimestampsCount === 0) {
+  if (!isPlaying && !needsRedraw && visual.hitTimestampsCount === 0) {
     if (lastRestActive) {
       lastRestActive = false;
       self.postMessage({ type: 'REST_ACTIVE', isRest: false });
@@ -619,9 +611,9 @@ function render() {
     const cursorPos = dispCursor - tileOff;
     // Outgoing tail (the repetition just behind the cursor) renders the frozen
     // previous-pass state so it stays painted instead of resetting to raw.
-    const isOutgoing = seamless && hasFrozen && tile === frozenTile;
-    const tileHit = isOutgoing ? frozenHitNotes : hitNotes;
-    const tileMissed = isOutgoing ? frozenMissedNotes : missedNotes;
+    const isOutgoing = seamless && visual.hasFrozen && tile === visual.frozenTile;
+    const tileHit = isOutgoing ? visual.frozenHitNotes : visual.hitNotes;
+    const tileMissed = isOutgoing ? visual.frozenMissedNotes : visual.missedNotes;
     ctx.save();
     ctx.translate(tileOff, 0);
 
@@ -820,7 +812,7 @@ function render() {
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
         const finalHitColor = hitFill;
-        const isAnimatingHit = isHit && hitTimestamps[note.noteKey] !== undefined;
+        const isAnimatingHit = isHit && visual.hitTimestamps[note.noteKey] !== undefined;
 
         if (!isHit && note.isPalmMute) fillColor = "#78716c";
         else if (!isHit && isDead) fillColor = "#374151";
@@ -842,7 +834,7 @@ function render() {
         // ── Draw pill block ──────────────────────────────────────────────
         let hitAge = 0;
         if (isAnimatingHit && hitAnimations) {
-          hitAge = Math.min(1, (Date.now() - hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
+          hitAge = Math.min(1, (Date.now() - visual.hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
         }
 
         let fillW = 0;
@@ -991,7 +983,7 @@ function render() {
             ctx.stroke();
           }
 
-          if (hitAge >= 1) { delete hitTimestamps[note.noteKey]; hitTimestampsCount--; }
+          if (hitAge >= 1) { delete visual.hitTimestamps[note.noteKey]; visual.hitTimestampsCount--; }
         }
 
         // ── Fret label ────────────────────────────────────────────────────
@@ -1471,9 +1463,7 @@ self.onmessage = (e: MessageEvent) => {
       pausedScrollX = 0;
       loopStartBeat = null;
       loopEndBeat   = null;
-      frozenHitNotes = {};
-      frozenMissedNotes = {};
-      hasFrozen = false;
+      resetFrozenNoteState(visual);
       recomputeLoopSeconds();
       break;
     }
@@ -1503,38 +1493,11 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'HIT_NOTES': {
-      const newHits = msg.hitNotes as Record<string, boolean>;
-      const now = Date.now();
-      // Hits only ever grow within a pass; a shrink means the loop wrapped and
-      // matching reset. Freeze the finishing pass so the outgoing tail stays painted.
-      if (Object.keys(newHits).length < Object.keys(hitNotes).length) {
-        frozenHitNotes = hitNotes;
-        frozenTile = lastActiveTile;
-        hasFrozen = true;
-      }
-      // Record timestamp for notes that are newly hit this frame
-      for (const key of Object.keys(newHits)) {
-        if (newHits[key] && !hitNotes[key]) {
-          if (!hitTimestamps[key]) hitTimestampsCount++;
-          hitTimestamps[key] = now;
-        }
-      }
-      // Clear timestamps for notes that got reset (loop restart)
-      for (const key of Object.keys(hitTimestamps)) {
-        if (!newHits[key]) { delete hitTimestamps[key]; hitTimestampsCount--; }
-      }
-      hitNotes = newHits;
+      applyHitNotes(visual, msg.hitNotes as Record<string, boolean>, Date.now(), lastActiveTile);
       break;
     }
     case 'MISSED_NOTES': {
-      const newMissed = msg.missedNotes as Record<string, boolean>;
-      // Same shrink-detect as hits — freeze the finishing pass's misses for the tail.
-      if (Object.keys(newMissed).length < Object.keys(missedNotes).length) {
-        frozenMissedNotes = missedNotes;
-        frozenTile = lastActiveTile;
-        hasFrozen = true;
-      }
-      missedNotes = newMissed;
+      applyMissedNotes(visual, msg.missedNotes as Record<string, boolean>, lastActiveTile);
       needsRedraw = true;
       break;
     }
@@ -1597,11 +1560,11 @@ self.onmessage = (e: MessageEvent) => {
     case 'RESET': {
       pausedScrollX = 0;
       pausedCursorPos = 0;
-      missedNotes = {};
       showRestWarning = false;
-      frozenHitNotes = {};
-      frozenMissedNotes = {};
-      hasFrozen = false;
+      // Clears hitNotes too (not just missedNotes) — leaving old hits behind
+      // made previously-played notes stay lit green after a restart, even
+      // though the score/game state had already been reset back to zero.
+      resetNoteHitVisualState(visual);
       // loop range is intentionally NOT cleared here so it survives loop restarts
       break;
     }
