@@ -2,7 +2,7 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 
 import type { GameState } from "./noteMatchingFeedback";
 
-const INITIAL_GS: GameState = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
+const INITIAL_GS: GameState = { score: 0, combo: 0, multiplier: 1 };
 
 export function useGameState(currentExerciseIndex: number, onReset?: () => void) {
   const [hitNotes,        setHitNotes]        = useState<Record<string, boolean | number>>({});
@@ -21,12 +21,6 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const consecutiveMissesRef = useRef(0);
   const lastFlushRef         = useRef(0);
   const needsFlushRef        = useRef(false);
-
-  useEffect(() => {
-    if (!gameState.lastFeedback) return;
-    const t = setTimeout(() => setGameState(prev => ({ ...prev, lastFeedback: "" })), 1500);
-    return () => clearTimeout(t);
-  }, [gameState.feedbackId]);
 
   const reset = useCallback(() => {
     setHitNotes({});    hitNotesRef.current          = {};

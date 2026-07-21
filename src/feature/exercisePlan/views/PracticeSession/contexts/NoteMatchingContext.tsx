@@ -68,7 +68,7 @@ export interface NoteMatchingHandle {
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
-const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
+const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1 };
 
 const _fallbackRef = { current: 0 } as MutableRefObject<number>;
 

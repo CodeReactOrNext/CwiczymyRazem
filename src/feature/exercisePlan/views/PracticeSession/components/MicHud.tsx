@@ -1,12 +1,8 @@
 import { cn } from "assets/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
-import {
-  feedbackStyles,
-  getPerformanceGrade,
-} from "../hooks/noteMatchingFeedback";
+import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
 
 /** Mirrors the multiplier curve in useNoteMatching: min(8, floor(combo / 5) + 1). */
 const MAX_MULTIPLIER = 8;
@@ -15,8 +11,6 @@ const COMBO_PER_MULTIPLIER = 5;
 const RING_RADIUS = 42;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 const RING_PX = 76;
-
-const FEEDBACK_VISIBLE_MS = 1200;
 
 /** Ring warms up as the multiplier climbs: cyan -> amber -> orange. */
 const getMultiplierTier = (multiplier: number) => {
@@ -40,26 +34,12 @@ export const MicHud = ({
   variant?: "docked" | "full";
 }) => {
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
-  const { score, combo, multiplier, lastFeedback, feedbackId } = gameState;
+  const { score, combo, multiplier } = gameState;
 
   const full = variant === "full";
   const ringPx = full ? 104 : RING_PX;
   const grade = getPerformanceGrade(sessionAccuracy);
   const tier = getMultiplierTier(multiplier);
-
-  // lastFeedback is sticky in game state, so each burst is retired by its id.
-  const [retiredFeedbackId, setRetiredFeedbackId] = useState(-1);
-  useEffect(() => {
-    if (!lastFeedback) return undefined;
-    const timeout = setTimeout(
-      () => setRetiredFeedbackId(feedbackId),
-      FEEDBACK_VISIBLE_MS,
-    );
-    return () => clearTimeout(timeout);
-  }, [feedbackId, lastFeedback]);
-
-  const visibleFeedback = feedbackId === retiredFeedbackId ? "" : lastFeedback;
-  const feedbackStyle = feedbackStyles[visibleFeedback];
 
   const comboProgress =
     multiplier >= MAX_MULTIPLIER
@@ -194,28 +174,6 @@ export const MicHud = ({
             x{multiplier}
           </motion.span>
         </div>
-
-        <AnimatePresence>
-          {visibleFeedback && (
-            <motion.span
-              key={feedbackId}
-              initial={{
-                opacity: 0,
-                y: -4,
-                scale: feedbackStyle?.scale ?? 1.3,
-              }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ type: "spring", stiffness: 400, damping: 18 }}
-              className={cn(
-                "absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap text-sm font-bold tracking-wide",
-                feedbackStyle?.color ?? "text-zinc-300",
-                feedbackStyle?.dropShadow,
-              )}>
-              {visibleFeedback}
-            </motion.span>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

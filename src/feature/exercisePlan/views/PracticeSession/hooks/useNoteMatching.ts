@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { computeChromagram, freqToPitchClass, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
-import { getFeedbackForCombo } from "./noteMatchingFeedback";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
@@ -277,8 +276,6 @@ export function useNoteMatching({
                 const newCombo      = gs.combo + 1;
                 if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
                 const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                if (newMultiplier > gs.multiplier) { gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++; }
-                else { const tier = getFeedbackForCombo(newCombo); if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; } }
                 gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
                 gs.combo  = newCombo;
                 gs.multiplier = newMultiplier;
