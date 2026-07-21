@@ -1,3 +1,4 @@
+import { Accordion } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
@@ -352,7 +353,9 @@ export const SongTimerLayout = ({
               songArtist={song.artist}
             />
 
-            <FreeTimerMetronome />
+            <Accordion type='multiple'>
+              <FreeTimerMetronome />
+            </Accordion>
           </div>
 
           {youtubeUrl && (
