@@ -25,7 +25,7 @@ export const legatoTrillSprintExercise: Exercise = {
   tablature: [
     // M1: Single-string sextuplet trills (5-7) â€” strings 6-5-4-3
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 7, isHammerOn: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 7, isHammerOn: true }] },
@@ -35,7 +35,7 @@ export const legatoTrillSprintExercise: Exercise = {
     },
     // M2: Trills (5-7) â€” strings 2-1, then descend 1-2
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 7, isHammerOn: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 7, isHammerOn: true }] },
@@ -45,7 +45,7 @@ export const legatoTrillSprintExercise: Exercise = {
     },
     // M3: Wider interval trills (5-8) â€” strings 6-5-4-3
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 8, isHammerOn: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 8, isHammerOn: true }] },
@@ -55,7 +55,7 @@ export const legatoTrillSprintExercise: Exercise = {
     },
     // M4: Wider interval trills (5-8) â€” strings 2-1, then back
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 2, fret: 8, isHammerOn: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 1, fret: 8, isHammerOn: true }] },
@@ -65,7 +65,7 @@ export const legatoTrillSprintExercise: Exercise = {
     },
     // M5: Cross-string sextuplets â€” 3nps legato, 2 strings per beat (ascending)
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 8, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 8, isHammerOn: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 4, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 4, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 4, fret: 9, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 3, fret: 5 }] }, { duration: 0.33333333333333333, notes: [{ string: 3, fret: 7, isHammerOn: true }] }, { duration: 0.33333333333333333, notes: [{ string: 3, fret: 9, isHammerOn: true }] },
@@ -75,7 +75,7 @@ export const legatoTrillSprintExercise: Exercise = {
     },
     // M6: Cross-string sextuplets descending
     {
-      timeSignature: [4, 4],
+      timeSignature: [8, 4],
       beats: [
         { duration: 0.33333333333333333, notes: [{ string: 3, fret: 9 }] }, { duration: 0.33333333333333333, notes: [{ string: 3, fret: 7, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 3, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 4, fret: 9 }] }, { duration: 0.33333333333333333, notes: [{ string: 4, fret: 7, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 4, fret: 5, isPullOff: true }] },
         { duration: 0.33333333333333333, notes: [{ string: 5, fret: 8 }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 7, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 5, fret: 5, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 8 }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 7, isPullOff: true }] }, { duration: 0.33333333333333333, notes: [{ string: 6, fret: 5, isPullOff: true }] },

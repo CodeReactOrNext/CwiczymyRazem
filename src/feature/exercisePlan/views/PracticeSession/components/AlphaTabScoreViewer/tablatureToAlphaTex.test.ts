@@ -59,7 +59,7 @@ describe("tablatureToAlphaTex", () => {
           },
           { duration: 1, notes: [{ string: 6, fret: 0, isDead: true }] },
           { duration: 2, notes: [{ string: 1, fret: 12, isBend: true, bendSemitones: 1 }] },
-          { duration: 1, notes: [{ string: 1, fret: 7, isVibrato: true, isPalmMute: true }] },
+          { duration: 0.25, notes: [{ string: 1, fret: 7, isVibrato: true, isPalmMute: true }] },
         ],
       },
     ];
@@ -68,7 +68,7 @@ describe("tablatureToAlphaTex", () => {
     // emitted (AlphaTab would drop a dangling origin anyway). The origin-placement case is
     // covered on its own below.
     expect(tablatureToAlphaTex(measures, 120)).toBe(
-      "\\tempo 120 \\ts 4 4 r.8 (5.3 5.2).16 0.6{x}.4 12.1{b (0 2)}.2 7.1{pm v}.4 |",
+      "\\tempo 120 \\ts 4 4 r.8 (5.3 5.2).16 0.6{x}.4 12.1{b (0 2)}.2 7.1{pm v}.16 |",
     );
   });
 
@@ -169,6 +169,47 @@ describe("tablatureToAlphaTex", () => {
     expect(tablatureToAlphaTex(measures, 120)).toBe(
       "\\tempo 120 \\ts 4 4 5.6.8 {tu 3} 7.6.8 {tu 3} 5.6.8 {tu 3} |",
     );
+  });
+
+  it("widens a measure's emitted time signature when its beats exceed the declared capacity (#741)", () => {
+    // Some shipped exercise data crammed a whole phrase (e.g. 16 eighth notes = 8 quarter
+    // notes) into a single TablatureMeasure still declared as 4/4 (capacity 4). Emitting
+    // that as one \ts 4 4 bar would silently print more notated length than the bar can
+    // hold — instead of splitting it into extra bars or padding it, widen the *emitted*
+    // \ts to match the real total (mirrors how the broken exercise data itself was fixed:
+    // by correcting timeSignature, not by restructuring beats).
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [1, 2, 3, 4, 5, 6].map((fret) => ({ duration: 1, notes: [{ string: 6, fret }] })),
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 6 4 1.6.4 2.6.4 3.6.4 4.6.4 5.6.4 6.6.4 |",
+    );
+  });
+
+  it("re-emits \\ts once a widened bar is followed by a measure back at its declared meter", () => {
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [1, 2, 3, 4, 5, 6].map((fret) => ({ duration: 1, notes: [{ string: 6, fret }] })),
+      },
+      { timeSignature: [4, 4], beats: [{ duration: 4, notes: [{ string: 6, fret: 0 }] }] },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 6 4 1.6.4 2.6.4 3.6.4 4.6.4 5.6.4 6.6.4 |\n\\ts 4 4 0.6.1 |",
+    );
+  });
+
+  it("leaves an under-filled measure alone — a short bar isn't padded or widened", () => {
+    const measures: TablatureMeasure[] = [
+      { timeSignature: [4, 4], beats: [{ duration: 1, notes: [{ string: 1, fret: 0 }] }] },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 0.1.4 |");
   });
 
   it("renders a full bend curve as exact bend points", () => {
