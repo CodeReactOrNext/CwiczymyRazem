@@ -1,5 +1,6 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import { Accordion } from "assets/components/ui/accordion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
+import FreeTimerIntervalAlert from "./components/FreeTimerIntervalAlert";
 import FreeTimerMetronome from "./components/FreeTimerMetronome";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
@@ -382,9 +384,12 @@ const TimerLayout = ({
               </div>
             </div>
 
-            <div className='lg:w-[320px] lg:shrink-0 lg:self-stretch'>
+            <Accordion
+              type='multiple'
+              className='flex flex-col gap-3 lg:w-[320px] lg:shrink-0 lg:self-stretch'>
               <FreeTimerMetronome />
-            </div>
+              <FreeTimerIntervalAlert elapsedMs={sumTime} isRunning={timerEnabled} />
+            </Accordion>
           </div>
         </Card>
 
