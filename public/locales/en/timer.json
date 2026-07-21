@@ -75,6 +75,8 @@
     "next_in": "Next alert in {{time}}",
     "enable": "Enable alert",
     "disable": "Disable alert",
-    "toast": "Time to switch it up! {{minutes}} minutes passed"
+    "toast": "Time to switch it up! {{minutes}} minutes passed",
+    "custom_placeholder": "Custom",
+    "custom_aria": "Custom interval in minutes"
   }
 }
