@@ -1,22 +1,58 @@
 // Electron main process: thin shell around the existing Next.js app + native
 // audio IPC. In dev it loads the local Next dev server; in production it loads
 // the URL from ELECTRON_START_URL (your hosted deployment) or localhost.
-const { app, BrowserWindow, ipcMain, session } = require("electron");
+const { app, BrowserWindow, ipcMain, session, Menu, shell, dialog } = require("electron");
 const path = require("path");
 const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
+const buildMenu = require("./menu");
 
 const isDev = !app.isPackaged;
 const START_URL =
   process.env.ELECTRON_START_URL || (isDev ? "http://localhost:3000" : "http://localhost:3000");
+const APP_ICON = path.join(__dirname, "..", "public", "favicon", "android-chrome-512x512.png");
+const RELOAD_RETRY_MS = 800; // dev server / remote host may still be starting up
+
+app.setName("riff.quest");
 
 let mainWindow = null;
+let splashWindow = null;
+let retryTimer = null;
+
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 360,
+    height: 220,
+    frame: false,
+    resizable: false,
+    movable: true,
+    show: true,
+    backgroundColor: "#0a0a0a",
+    icon: APP_ICON,
+    webPreferences: {
+      preload: path.join(__dirname, "splashPreload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  splashWindow.loadFile(path.join(__dirname, "splash.html"));
+  splashWindow.on("closed", () => { splashWindow = null; });
+}
+
+function setSplashStatus(text) {
+  if (splashWindow && !splashWindow.isDestroyed()) {
+    splashWindow.webContents.send("splash:status", text);
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
+    show: false, // revealed on ready-to-show, once the splash hands off
     backgroundColor: "#0a0a0a",
+    icon: APP_ICON,
+    title: "riff.quest",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -28,7 +64,25 @@ function createWindow() {
   mainWindow.loadURL(START_URL);
   if (isDev) mainWindow.webContents.openDevTools({ mode: "detach" });
 
+  mainWindow.once("ready-to-show", () => {
+    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+    mainWindow.show();
+    if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
+  });
+
+  // The dev server (or a remote deployment) may not be reachable yet — retry
+  // instead of leaving the user on Electron's default "can't reach this page".
+  mainWindow.webContents.on("did-fail-load", (_event, errorCode) => {
+    if (errorCode === -3) return; // ERR_ABORTED — usually just a redirect/navigation
+    setSplashStatus("Nie można połączyć się z aplikacją — ponawiam próbę…");
+    if (retryTimer) clearTimeout(retryTimer);
+    retryTimer = setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadURL(START_URL);
+    }, RELOAD_RETRY_MS);
+  });
+
   mainWindow.on("closed", () => {
+    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
     audioBridge.stop();
     ampSim.stop();
     mainWindow = null;
@@ -62,6 +116,8 @@ ipcMain.handle("amp:status", () => ampSim.getStatus());
 app.whenReady().then(() => {
   // Auto-grant mic permission so the web fallback path also works if ever used.
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(true));
+  Menu.setApplicationMenu(buildMenu({ isDev, shell, dialog, getMainWindow: () => mainWindow }));
+  createSplashWindow();
   createWindow();
 
   app.on("activate", () => {
