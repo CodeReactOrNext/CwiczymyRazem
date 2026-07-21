@@ -214,6 +214,14 @@ export const STRING_SPACING_MIN = 22;
 export const STRING_SPACING_MAX = 46;
 export const STRING_SPACING_DEFAULT = 32;
 
+/** AlphaTab's own `display.scale` — overall size of the rendered sheet music. */
+export const NOTATION_ZOOM_MIN = 0.6;
+export const NOTATION_ZOOM_MAX = 1.6;
+
+/** AlphaTab's own `display.stretchForce` — horizontal spacing between notes. */
+export const NOTATION_SPACING_MIN = 0.6;
+export const NOTATION_SPACING_MAX = 1.8;
+
 export interface TablatureSettings {
   // ── Session ──
   /** View shown when a practice session opens an exercise with tablature. */
@@ -243,6 +251,10 @@ export interface TablatureSettings {
   // ── Notation ──
   /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
   notationDarkMode: boolean;
+  /** Overall size of the rendered sheet music (AlphaTab `display.scale`, 1 = 100%). */
+  notationZoom: number;
+  /** Horizontal spacing between notes (AlphaTab `display.stretchForce`, 1 = default). */
+  notationSpacing: number;
 }
 
 export const DEFAULT_SETTINGS: TablatureSettings = {
@@ -263,6 +275,8 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   hitAnimations: true,
   ambientGlow: true,
   notationDarkMode: false,
+  notationZoom: 1,
+  notationSpacing: 1,
 };
 
 interface TablatureSettingsStore extends TablatureSettings {

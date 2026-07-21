@@ -251,6 +251,25 @@ a {
   fill: #3b82f6;
   stroke: #3b82f6;
 }
+
+/* Dark board (.notation-dark, see AlphaTabScoreViewer): the light-board yellow
+   bar / blue selection are complementary hues, which is fine as a light wash
+   on paper but reads as a harsh clash once both sit on near-black. Re-key to
+   analogous accents from the app's own palette (amber "now playing", purple
+   "selection") instead of swapping hue for opacity. */
+.notation-dark .at-cursor-bar {
+  background: rgba(245, 158, 11, 0.22);
+}
+.notation-dark .at-cursor-beat {
+  background: rgba(251, 191, 36, 0.9);
+}
+.notation-dark .at-selection div {
+  background: rgba(168, 85, 247, 0.16);
+}
+.notation-dark .at-highlight * {
+  fill: #22d3ee;
+  stroke: #22d3ee;
+}
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 @keyframes music-pulse {

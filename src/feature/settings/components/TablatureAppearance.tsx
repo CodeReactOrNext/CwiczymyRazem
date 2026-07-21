@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { AlphaTabScoreViewer } from "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer";
 import {
   SAMPLE_TABLATURE,
   SAMPLE_TEMPO,
@@ -6,11 +7,12 @@ import {
 import { useTablatureStyle } from "feature/exercisePlan/views/PracticeSession/components/tablatureSettings";
 import {
   Highway3DSettingsPanel,
+  NotationSettingsPanel,
   TablatureSettingsPanel,
 } from "feature/exercisePlan/views/PracticeSession/components/TablatureSettingsPanel";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { TuningGutterString } from "feature/exercisePlan/views/PracticeSession/components/useTablatureWorkerBridge";
-import { AlignJustify, Box } from "lucide-react";
+import { AlignJustify, Box, Music } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
@@ -28,7 +30,7 @@ const STANDARD_TUNING = ["E", "A", "D", "G", "B", "E"];
 
 const PREVIEW_HEIGHT = 300;
 
-type PreviewMode = "tab" | "highway";
+type PreviewMode = "tab" | "highway" | "notation";
 
 function ModeButton({
   active,
@@ -48,14 +50,17 @@ function ModeButton({
       type='button'
       onClick={onClick}
       aria-pressed={active}
+      title={label}
       className={cn(
-        "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50",
+        "flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 sm:gap-2 sm:px-4",
         active
           ? "bg-cyan-500/10 text-cyan-300"
           : "text-zinc-400 hover:bg-white/5 hover:text-white",
       )}>
-      <Icon className='h-4 w-4' />
-      {label}
+      <Icon className='h-4 w-4 shrink-0' />
+      {/* Label text only from sm: up — three full labels don't fit next to each
+          other on a phone-width screen, so mobile falls back to icon + title. */}
+      <span className='hidden sm:inline'>{label}</span>
       {beta && (
         <span className='rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400'>
           Beta
@@ -94,15 +99,20 @@ export const TablatureAppearance = () => {
       </div>
 
       {/* ── Live preview ──
-          Pinned to the top of the scroll area: the controls below are taller
-          than a screen, so without this you would be changing settings with the
-          thing they affect scrolled out of sight. */}
-      <div className='sticky top-0 z-20 overflow-hidden rounded-lg bg-[#0f0f12] shadow-lg shadow-black/40 ring-1 ring-white/5'>
-        <div className='flex items-center justify-between gap-4 px-4 py-3'>
+          Pinned to the top of the scroll area on desktop: the controls below are
+          taller than a screen, so without this you would be changing settings
+          with the thing they affect scrolled out of sight. Left un-pinned below
+          md — on a phone this panel alone is most of the viewport, so sticking it
+          would permanently bury every settings section under it. md:top-16
+          clears UserHeader (also md:+ only, see DesktopHeaderWrapper), which
+          otherwise sits at the same top-0 and would fight this for the same
+          spot. */}
+      <div className='overflow-hidden rounded-lg bg-[#0f0f12] shadow-lg shadow-black/40 ring-1 ring-white/5 md:sticky md:top-16 md:z-20'>
+        <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3'>
           <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>
             Live preview
           </span>
-          <div className='flex items-center gap-1'>
+          <div className='flex flex-wrap items-center gap-1'>
             <ModeButton
               active={mode === "tab"}
               onClick={() => setMode("tab")}
@@ -115,6 +125,12 @@ export const TablatureAppearance = () => {
               icon={Box}
               label='3D Highway'
               beta
+            />
+            <ModeButton
+              active={mode === "notation"}
+              onClick={() => setMode("notation")}
+              icon={Music}
+              label='Notation'
             />
           </div>
         </div>
@@ -133,9 +149,20 @@ export const TablatureAppearance = () => {
             ambientGlow={false}
             isLightBoard={isLightBoard}
           />
-        ) : (
+        ) : mode === "highway" ? (
           <NoteHighway3D
             measures={SAMPLE_TABLATURE}
+            heightPx={PREVIEW_HEIGHT}
+          />
+        ) : (
+          <AlphaTabScoreViewer
+            measures={SAMPLE_TABLATURE}
+            baseTempo={SAMPLE_TEMPO}
+            mode='score'
+            isPlaying={false}
+            countInRemaining={0}
+            startTime={null}
+            bpm={SAMPLE_TEMPO}
             heightPx={PREVIEW_HEIGHT}
           />
         )}
@@ -143,12 +170,20 @@ export const TablatureAppearance = () => {
         <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-600'>
           {mode === "tab"
             ? "Hit colour and hit animations only show while you are actually playing."
-            : "Drag any slider below and the board updates as you go. 3D Highway is in beta — it may be buggy."}
+            : mode === "highway"
+              ? "Drag any slider below and the board updates as you go. 3D Highway is in beta — it may be buggy."
+              : "The same viewer used mid-session — toggle the board below to see it on paper or on black."}
         </p>
       </div>
 
       {/* ── Controls for whichever view is being previewed ── */}
-      {mode === "tab" ? <TablatureSettingsPanel /> : <Highway3DSettingsPanel />}
+      {mode === "tab" ? (
+        <TablatureSettingsPanel />
+      ) : mode === "highway" ? (
+        <Highway3DSettingsPanel />
+      ) : (
+        <NotationSettingsPanel />
+      )}
     </div>
   );
 };

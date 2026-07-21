@@ -27,6 +27,10 @@ import {
   FRET_FONT_MIN,
   FRET_TEXT_COLORS,
   HIT_COLORS,
+  NOTATION_SPACING_MAX,
+  NOTATION_SPACING_MIN,
+  NOTATION_ZOOM_MAX,
+  NOTATION_ZOOM_MIN,
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
   STRING_PALETTES,
@@ -521,17 +525,6 @@ export function TablatureSettingsPanel() {
         </div>
       </Section>
 
-      <Section
-        title='Notation'
-        hint='The standard sheet-music viewer, separate from the fretboard tab above.'>
-        <ToggleRow
-          label='Dark score'
-          desc='Black board with white staff and notes, instead of white paper'
-          checked={settings.notationDarkMode}
-          onChange={(next) => set("notationDarkMode", next)}
-        />
-      </Section>
-
       <ResetButton onClick={reset} label='Reset tablature settings' />
     </div>
   );
@@ -621,6 +614,54 @@ export function Highway3DSettingsPanel() {
       </Section>
 
       <ResetButton onClick={reset} label='Reset 3D view' />
+    </div>
+  );
+}
+
+/**
+ * The standard-notation viewer's own settings — split out as its own live-preview
+ * view (see TablatureAppearance) rather than a toggle bolted onto the flat-tab
+ * panel above, even though it persists to the same tablature settings store.
+ */
+export function NotationSettingsPanel() {
+  const settings = useTablatureSettings();
+  const { set } = settings;
+
+  return (
+    <div className='space-y-4'>
+      <Section
+        title='Sizing'
+        hint='AlphaTab’s own zoom and note spacing — independent of the flat-tab sliders above.'>
+        <div className='grid gap-x-8 gap-y-4 sm:grid-cols-2'>
+          <SliderRow
+            label='Zoom'
+            value={settings.notationZoom}
+            min={NOTATION_ZOOM_MIN}
+            max={NOTATION_ZOOM_MAX}
+            step={0.05}
+            display={`${Math.round(settings.notationZoom * 100)}%`}
+            onChange={(v) => set("notationZoom", Math.round(v * 100) / 100)}
+          />
+          <SliderRow
+            label='Note spacing'
+            value={settings.notationSpacing}
+            min={NOTATION_SPACING_MIN}
+            max={NOTATION_SPACING_MAX}
+            step={0.05}
+            display={`${Math.round(settings.notationSpacing * 100)}%`}
+            onChange={(v) => set("notationSpacing", Math.round(v * 100) / 100)}
+          />
+        </div>
+      </Section>
+
+      <Section title='Board' hint='Colour of the sheet-music board.'>
+        <ToggleRow
+          label='Dark score'
+          desc='Black board with white staff and notes, instead of white paper'
+          checked={settings.notationDarkMode}
+          onChange={(next) => set("notationDarkMode", next)}
+        />
+      </Section>
     </div>
   );
 }
