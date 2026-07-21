@@ -2,6 +2,18 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 
 /**
+ * `AutoPlanGenerator` (see `feature/practice/views/AutoPlanGenerator`) is the
+ * only place that mints auto-plan ids, always as `"auto-" + Date.now()`. Match
+ * that exact shape instead of a loose `startsWith("auto")` prefix, otherwise
+ * any id/query param merely starting with "auto" (typed manually, or crafted
+ * via the `?planId=` query the report page trusts) would be misrecognized.
+ */
+const AUTO_PLAN_ID_PATTERN = /^auto-\d+$/;
+
+/** Whether `planId` matches the exact id shape `AutoPlanGenerator` mints — see #735. */
+export const isAutoPlanId = (planId: string): boolean => AUTO_PLAN_ID_PATTERN.test(planId);
+
+/**
  * Whether `planId` belongs to an actual, deliberately-selected Practice Plan
  * (a default plan or an auto-generated one) rather than an ad-hoc single-exercise
  * session (Skill Dashboard, Exercise Library, scale drills, quick GP-tab
@@ -9,7 +21,7 @@ import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
  * from "My Plans" / "Browse Plans".
  */
 export const isRecognizedPracticePlanId = (planId: string): boolean =>
-  planId.startsWith("auto") || defaultPlans.some((p) => p.id === planId);
+  isAutoPlanId(planId) || defaultPlans.some((p) => p.id === planId);
 
 /**
  * Whether a finished session represents a real Practice Plan and should count
