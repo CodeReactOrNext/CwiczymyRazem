@@ -10,7 +10,7 @@ export type ReportListInterfaceWithTimeSumary = PartiallyRequired<
   activities?: ActivityDetail[];
 };
 
-interface ActivityDetail {
+export interface ActivityDetail {
   title: string;
   planId?: string;
   points: number;
@@ -24,12 +24,15 @@ interface ActivityDetail {
   };
 }
 
-interface ActivityReport {
+export interface FormattedActivityReport {
   date: Date;
   techniqueTime: number;
   theoryTime: number;
   hearingTime: number;
   creativityTime: number;
+  exceriseTitle?: string;
+  totalTime: number;
+  activities?: ActivityDetail[];
 }
 
 export interface DateWithReport {
