@@ -36,6 +36,8 @@ export const AlphaTabScoreViewer = ({
   resizeHandle,
 }: AlphaTabScoreViewerProps) => {
   const notationDarkMode = useTablatureSettings((s) => s.notationDarkMode);
+  const notationZoom = useTablatureSettings((s) => s.notationZoom);
+  const notationSpacing = useTablatureSettings((s) => s.notationSpacing);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
   const origBpmRef         = useRef(120);
@@ -67,6 +69,8 @@ export const AlphaTabScoreViewer = ({
     bpmRef,
     origBpmRef,
     notationDarkMode,
+    notationZoom,
+    notationSpacing,
     trackConfigs,
     backingTrackIds,
   });
@@ -132,7 +136,10 @@ export const AlphaTabScoreViewer = ({
       <div className="relative">
         <div
           ref={scrollRef}
-          className={cn("w-full overflow-auto", notationDarkMode ? "bg-zinc-950" : "bg-white")}
+          className={cn(
+            "w-full overflow-auto",
+            notationDarkMode ? "bg-zinc-950 notation-dark" : "bg-white",
+          )}
           style={heightPx ? { height: heightPx } : { minHeight: 300, maxHeight: 500 }}
         >
           {/* position:relative wrapper so the overlay shares AlphaTab's coordinate
