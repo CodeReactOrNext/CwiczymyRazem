@@ -27,6 +27,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
+import FreeTimerIntervalAlert from "./components/FreeTimerIntervalAlert";
 import FreeTimerMetronome from "./components/FreeTimerMetronome";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
@@ -382,8 +383,9 @@ const TimerLayout = ({
               </div>
             </div>
 
-            <div className='lg:w-[320px] lg:shrink-0 lg:self-stretch'>
+            <div className='flex flex-col gap-4 lg:w-[320px] lg:shrink-0 lg:self-stretch'>
               <FreeTimerMetronome />
+              <FreeTimerIntervalAlert elapsedMs={sumTime} isRunning={timerEnabled} />
             </div>
           </div>
         </Card>
