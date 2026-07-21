@@ -15,6 +15,8 @@ interface UseAlphaTabApiOptions {
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
   baseTempo?: number;
   mode: "score" | "tab";
+  /** Black board with white ink instead of the default white paper. */
+  notationDarkMode?: boolean;
   /** Ref — always current value of volume, safe to read inside async callbacks */
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
@@ -47,6 +49,7 @@ export function useAlphaTabApi({
   measures,
   baseTempo = 120,
   mode,
+  notationDarkMode = false,
   volumeRef,
   bpmRef,
   origBpmRef,
@@ -95,6 +98,18 @@ export function useAlphaTabApi({
         // mode="tab" we render tablature ONLY, so note-head bounds land on the
         // fret numbers (see useNoteHeadFeedback) instead of the notation heads.
         staveProfile: mode === "tab" ? "Tab" : "ScoreTab",
+        // Only the ink needs flipping — the black board itself comes from the
+        // container's own background (see AlphaTabScoreViewer), same as the tab.
+        resources: notationDarkMode
+          ? {
+              staffLineColor: "#e4e4e7",
+              barSeparatorColor: "#e4e4e7",
+              barNumberColor: "#e4e4e7",
+              mainGlyphColor: "#f4f4f5",
+              secondaryGlyphColor: "#a1a1aa",
+              scoreInfoColor: "#e4e4e7",
+            }
+          : undefined,
       },
       player: {
         enablePlayer:  true,
@@ -176,7 +191,7 @@ export function useAlphaTabApi({
       scoreRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawGpFile, measures, mode]);
+  }, [rawGpFile, measures, mode, notationDarkMode]);
 
   // Per-track mute / volume — independent of which track is rendered visually.
   // trackConfigs and backingTrackIds MUST be memoized by the caller.

@@ -240,6 +240,9 @@ export interface TablatureSettings {
   // ── Feedback ──
   hitAnimations: boolean;
   ambientGlow: boolean;
+  // ── Notation ──
+  /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
+  notationDarkMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: TablatureSettings = {
@@ -259,6 +262,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   showTechniqueLabels: true,
   hitAnimations: true,
   ambientGlow: true,
+  notationDarkMode: false,
 };
 
 interface TablatureSettingsStore extends TablatureSettings {

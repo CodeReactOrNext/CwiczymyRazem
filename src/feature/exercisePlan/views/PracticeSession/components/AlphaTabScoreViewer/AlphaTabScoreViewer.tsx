@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { useEffect, useRef } from "react";
 
 import { CountInOverlay } from "../CountInOverlay";
+import { useTablatureSettings } from "../tablatureSettings";
 import { ScoreControls } from "./ScoreControls";
 import { TrackSelector } from "./TrackSelector";
 import type { AlphaTabScoreViewerProps } from "./types";
@@ -34,6 +35,7 @@ export const AlphaTabScoreViewer = ({
   heightPx,
   resizeHandle,
 }: AlphaTabScoreViewerProps) => {
+  const notationDarkMode = useTablatureSettings((s) => s.notationDarkMode);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
   const origBpmRef         = useRef(120);
@@ -64,6 +66,7 @@ export const AlphaTabScoreViewer = ({
     volumeRef,
     bpmRef,
     origBpmRef,
+    notationDarkMode,
     trackConfigs,
     backingTrackIds,
   });
@@ -129,7 +132,7 @@ export const AlphaTabScoreViewer = ({
       <div className="relative">
         <div
           ref={scrollRef}
-          className="w-full overflow-auto bg-white"
+          className={cn("w-full overflow-auto", notationDarkMode ? "bg-zinc-950" : "bg-white")}
           style={heightPx ? { height: heightPx } : { minHeight: 300, maxHeight: 500 }}
         >
           {/* position:relative wrapper so the overlay shares AlphaTab's coordinate

@@ -521,6 +521,17 @@ export function TablatureSettingsPanel() {
         </div>
       </Section>
 
+      <Section
+        title='Notation'
+        hint='The standard sheet-music viewer, separate from the fretboard tab above.'>
+        <ToggleRow
+          label='Dark score'
+          desc='Black board with white staff and notes, instead of white paper'
+          checked={settings.notationDarkMode}
+          onChange={(next) => set("notationDarkMode", next)}
+        />
+      </Section>
+
       <ResetButton onClick={reset} label='Reset tablature settings' />
     </div>
   );
