@@ -35,14 +35,6 @@ export interface FormattedActivityReport {
   activities?: ActivityDetail[];
 }
 
-interface ActivityReport {
-  date: Date;
-  techniqueTime: number;
-  theoryTime: number;
-  hearingTime: number;
-  creativityTime: number;
-}
-
 export interface DateWithReport {
   date: Date;
   report: ReportListInterfaceWithTimeSumary | undefined;
