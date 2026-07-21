@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<title>riff.quest</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #0a0a0a;
+    color: #e4e4e7;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+  }
+  .wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .logo span { color: #22d3ee; }
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid rgba(228, 228, 231, 0.15);
+    border-top-color: #22d3ee;
+    animation: spin 0.8s linear infinite;
+  }
+  .status {
+    font-size: 12px;
+    color: #71717a;
+    letter-spacing: 0.02em;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo">riff<span>.</span>quest</div>
+    <div class="spinner"></div>
+    <div class="status" id="status">Uruchamianie aplikacji…</div>
+  </div>
+  <script>
+    window.splash.onStatus((text) => {
+      const el = document.getElementById("status");
+      if (el) el.textContent = text;
+    });
+  </script>
+</body>
+</html>
