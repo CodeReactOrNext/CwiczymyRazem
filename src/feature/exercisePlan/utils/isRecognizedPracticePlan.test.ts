@@ -1,8 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { isRecognizedPracticePlan, isRecognizedPracticePlanId } from "./isRecognizedPracticePlan";
+import {
+  isAutoPlanId,
+  isRecognizedPracticePlan,
+  isRecognizedPracticePlanId,
+} from "./isRecognizedPracticePlan";
 
 const exercise = { id: "some_exercise" } as any;
+
+describe("isAutoPlanId", () => {
+  it("recognizes the exact id shape AutoPlanGenerator mints (`auto-` + Date.now())", () => {
+    expect(isAutoPlanId("auto-1234567890")).toBe(true);
+  });
+
+  it("does not recognize a manually typed/crafted id that merely starts with 'auto' — see #735", () => {
+    expect(isAutoPlanId("auto")).toBe(false);
+    expect(isAutoPlanId("automatic-warmup")).toBe(false);
+    expect(isAutoPlanId("auto_1234567890")).toBe(false);
+    expect(isAutoPlanId("auto-plan")).toBe(false);
+    expect(isAutoPlanId("auto-123abc")).toBe(false);
+  });
+});
 
 describe("isRecognizedPracticePlanId", () => {
   it("recognizes a default plan id", () => {
@@ -10,13 +28,18 @@ describe("isRecognizedPracticePlanId", () => {
   });
 
   it("recognizes an auto-generated plan id", () => {
-    expect(isRecognizedPracticePlanId("auto_1234567890")).toBe(true);
+    expect(isRecognizedPracticePlanId("auto-1234567890")).toBe(true);
   });
 
   it("does not recognize an ad-hoc single-exercise id", () => {
     expect(isRecognizedPracticePlanId("some_exercise")).toBe(false);
     expect(isRecognizedPracticePlanId("temp-some_exercise")).toBe(false);
     expect(isRecognizedPracticePlanId("exercise-some_exercise")).toBe(false);
+  });
+
+  it("does not recognize a manually typed/crafted id that merely starts with 'auto'", () => {
+    expect(isRecognizedPracticePlanId("automatic-warmup")).toBe(false);
+    expect(isRecognizedPracticePlanId("auto")).toBe(false);
   });
 });
 

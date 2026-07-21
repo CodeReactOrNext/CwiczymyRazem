@@ -1,5 +1,5 @@
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
-import { isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
+import { isAutoPlanId, isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
 import { selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
@@ -120,7 +120,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
         }
 
-        if (plan.id.startsWith('auto')) {
+        if (isAutoPlanId(plan.id)) {
           dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
 

@@ -3,7 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import Backdrop from "components/UI/Backdrop";
-import { isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
+import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -270,7 +270,7 @@ const ReportView = () => {
         // Structured practice (a plan or a specific exercise) awards skill points
         // server-side even though the manual form does not populate skillPointsGained.
         dispatch(updateQuestProgress({ type: 'improve_skill' }));
-        if (inputData.planId.startsWith('auto')) {
+        if (isAutoPlanId(inputData.planId)) {
             dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
 
