@@ -3,6 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import Backdrop from "components/UI/Backdrop";
+import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -260,12 +261,16 @@ const ReportView = () => {
     }
 
     if (inputData.planId) {
-        dispatch(updateQuestProgress({ type: 'practice_plan' }));
-        dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
+        // "Complete a Practice Plan" must only fire for an actual Practice Plan
+        // (default/custom/auto), not for ad-hoc single-exercise sessions — see #731.
+        if (isRecognizedPracticePlanId(inputData.planId)) {
+          dispatch(updateQuestProgress({ type: 'practice_plan' }));
+          dispatch(updateQuestProgress({ type: 'complete_two_plans' }));
+        }
         // Structured practice (a plan or a specific exercise) awards skill points
         // server-side even though the manual form does not populate skillPointsGained.
         dispatch(updateQuestProgress({ type: 'improve_skill' }));
-        if (inputData.planId.startsWith('auto')) {
+        if (isAutoPlanId(inputData.planId)) {
             dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
 
