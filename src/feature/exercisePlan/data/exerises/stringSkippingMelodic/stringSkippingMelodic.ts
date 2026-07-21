@@ -79,7 +79,7 @@ export const stringSkippingMelodicExercise: Exercise = {
       ],
     },
     {
-      timeSignature: [4, 4],
+      timeSignature: [7, 8],
       beats: [
         { duration: 0.5, notes: [{ string: 6, fret: 3 }] },
         { duration: 0.25, notes: [{ string: 3, fret: 4 }] },
