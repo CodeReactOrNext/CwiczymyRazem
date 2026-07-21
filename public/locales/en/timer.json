@@ -67,5 +67,14 @@
     "title": "Metronome",
     "start": "Start metronome",
     "stop": "Stop metronome"
+  },
+  "interval_alert": {
+    "title": "Interval Alert",
+    "description": "Get an alert every few minutes to switch skills",
+    "minutes_short": "{{minutes}}m",
+    "next_in": "Next alert in {{time}}",
+    "enable": "Enable alert",
+    "disable": "Disable alert",
+    "toast": "Time to switch it up! {{minutes}} minutes passed"
   }
 }
