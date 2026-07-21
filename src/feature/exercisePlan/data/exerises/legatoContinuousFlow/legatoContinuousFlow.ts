@@ -25,7 +25,7 @@ export const legatoContinuousFlowExercise: Exercise = {
   tablature: [
     // M1: Full ascending 3nps A natural minor at 5th pos — pick only first note per string
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 6, fret: 5 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 8, isHammerOn: true }] },
         { duration: 0.25, notes: [{ string: 5, fret: 5 }] }, { duration: 0.25, notes: [{ string: 5, fret: 7, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 5, fret: 8, isHammerOn: true }] },
@@ -35,7 +35,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     },
     // M2: Continue ascending strings 2-1, then descend all 6 strings
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 2, fret: 5 }] }, { duration: 0.25, notes: [{ string: 2, fret: 6, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 8, isHammerOn: true }] },
         { duration: 0.25, notes: [{ string: 1, fret: 5 }] }, { duration: 0.25, notes: [{ string: 1, fret: 7, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 1, fret: 8, isHammerOn: true }] },
@@ -45,7 +45,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     },
     // M3: Descend strings 3-6, then shift to 7th pos ascending
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 3, fret: 9 }] }, { duration: 0.25, notes: [{ string: 3, fret: 7, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 5, isPullOff: true }] },
         { duration: 0.25, notes: [{ string: 4, fret: 9 }] }, { duration: 0.25, notes: [{ string: 4, fret: 7, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 4, fret: 5, isPullOff: true }] },
@@ -55,7 +55,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     },
     // M4: Ascending at 7th position
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 6, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 8, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 6, fret: 10, isHammerOn: true }] },
         { duration: 0.25, notes: [{ string: 5, fret: 7 }] }, { duration: 0.25, notes: [{ string: 5, fret: 8, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 5, fret: 10, isHammerOn: true }] },
@@ -65,7 +65,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     },
     // M5: Continue ascending 7th pos, turn, and begin descending back to 5th pos
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 2, fret: 8 }] }, { duration: 0.25, notes: [{ string: 2, fret: 10, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 2, fret: 12, isHammerOn: true }] },
         { duration: 0.25, notes: [{ string: 1, fret: 7 }] }, { duration: 0.25, notes: [{ string: 1, fret: 8, isHammerOn: true }] }, { duration: 0.25, notes: [{ string: 1, fret: 10, isHammerOn: true }] },
@@ -75,7 +75,7 @@ export const legatoContinuousFlowExercise: Exercise = {
     },
     // M6: Descend 7th position back through all strings
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 3, fret: 10 }] }, { duration: 0.25, notes: [{ string: 3, fret: 9, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 3, fret: 7, isPullOff: true }] },
         { duration: 0.25, notes: [{ string: 4, fret: 10 }] }, { duration: 0.25, notes: [{ string: 4, fret: 9, isPullOff: true }] }, { duration: 0.25, notes: [{ string: 4, fret: 7, isPullOff: true }] },

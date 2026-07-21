@@ -135,7 +135,7 @@ export const sweepNeoclassicalExercise: Exercise = {
     },
     // M6: C sweep, final Am resolution
     {
-      timeSignature: [4, 4],
+      timeSignature: [5, 4],
       beats: [
         // C down (str5 f12, str4 f14, str3 f12, str2 f13, str1 f12→15)
         { duration: 0.25, notes: [{ string: 5, fret: 12 }] },

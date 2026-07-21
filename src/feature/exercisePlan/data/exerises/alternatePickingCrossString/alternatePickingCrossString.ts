@@ -57,7 +57,7 @@ export const alternatePickingCrossStringExercise: Exercise = {
     },
     // M3: 3nps ascending A natural minor — strings 6-5-4 (A B C, D E F, G A B)
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 6, fret: 5 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 8 }] },
         { duration: 0.25, notes: [{ string: 5, fret: 5 }] }, { duration: 0.25, notes: [{ string: 5, fret: 7 }] }, { duration: 0.25, notes: [{ string: 5, fret: 8 }] },
@@ -67,7 +67,7 @@ export const alternatePickingCrossStringExercise: Exercise = {
     },
     // M4: 3nps ascending — strings 2-1, then start descending
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 2, fret: 5 }] }, { duration: 0.25, notes: [{ string: 2, fret: 7 }] }, { duration: 0.25, notes: [{ string: 2, fret: 8 }] },
         { duration: 0.25, notes: [{ string: 1, fret: 5 }] }, { duration: 0.25, notes: [{ string: 1, fret: 7 }] }, { duration: 0.25, notes: [{ string: 1, fret: 8 }] },
@@ -77,7 +77,7 @@ export const alternatePickingCrossStringExercise: Exercise = {
     },
     // M5: 3nps descending — strings 3-4-5-6
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 3, fret: 9 }] }, { duration: 0.25, notes: [{ string: 3, fret: 7 }] }, { duration: 0.25, notes: [{ string: 3, fret: 5 }] },
         { duration: 0.25, notes: [{ string: 4, fret: 9 }] }, { duration: 0.25, notes: [{ string: 4, fret: 7 }] }, { duration: 0.25, notes: [{ string: 4, fret: 5 }] },

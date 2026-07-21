@@ -157,6 +157,32 @@ function beatTex(beat: TablatureBeat, origins: WeakSet<TablatureNote>): string {
   return `${content}.${duration}${beatEffects}`;
 }
 
+// Defensive guard against malformed exercise data: a measure's notated beats should never
+// exceed the capacity its own time signature implies (numerator * 4/denominator, in
+// quarter-note units) — some shipped exercises had 2x the beats their declared `\ts` could
+// hold (see #741). That was fixed at the data level by correcting each broken measure's own
+// timeSignature to match its actual content (e.g. 16 eighth notes became one 8/4 bar,
+// instead of being split into two 4/4 bars or padded with rests) — this mirrors the same
+// fix at render time, so a bar's printed length can never silently exceed what its own
+// `\ts` declares, even if bad data slips past the tablatureMeasureIntegrity test later.
+// Underflowing measures are left alone — a short bar just renders short, it doesn't
+// desync anything downstream — so a legitimately shorter bar isn't widened or padded here.
+function effectiveTimeSignature(beats: TablatureBeat[], timeSignature: [number, number]): [number, number] {
+  const [numerator, denominator] = timeSignature;
+  const capacity = numerator * (4 / denominator);
+  const EPS = 1e-2;
+  const total = beats.reduce((sum, beat) => sum + beat.duration, 0);
+  if (total <= capacity + EPS) return timeSignature;
+
+  // Express `total` as the simplest [numerator, denominator] pair (smallest power-of-two
+  // denominator) that reproduces it exactly.
+  for (const den of [4, 8, 16, 32] as const) {
+    const num = total * (den / 4);
+    if (Math.abs(num - Math.round(num)) < 1e-6) return [Math.round(num), den];
+  }
+  return [Math.round(total * 64), 256];
+}
+
 /**
  * Converts our own `TablatureMeasure[]` format into alphaTex — the text markup
  * AlphaTab can render directly via `api.tex(...)`, without needing a real Guitar
@@ -171,10 +197,10 @@ export function tablatureToAlphaTex(measures: TablatureMeasure[], baseTempo = 12
     const meta: string[] = [];
     if (index === 0) meta.push(`\\tempo ${Math.round(baseTempo)}`);
     if (measure.tempoChange) meta.push(`\\tempo ${Math.round(baseTempo * measure.tempoChange)}`);
-    const [numerator, denominator] = measure.timeSignature;
+    const [numerator, denominator] = effectiveTimeSignature(measure.beats, measure.timeSignature);
     if (!prevTimeSignature || prevTimeSignature[0] !== numerator || prevTimeSignature[1] !== denominator) {
       meta.push(`\\ts ${numerator} ${denominator}`);
-      prevTimeSignature = measure.timeSignature;
+      prevTimeSignature = [numerator, denominator];
     }
     const beats = measure.beats.map((beat) => beatTex(beat, hammerPullOrigins)).join(" ");
     return `${meta.length > 0 ? `${meta.join(" ")} ` : ""}${beats} |`;

@@ -20,7 +20,7 @@ export const chickenPickinExercise: Exercise = {
   relatedSkills: ["hybrid_picking"],
   tablature: [
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.5, notes: [{ string: 5, fret: 3 }] },
         { duration: 0.25, notes: [{ string: 2, fret: 0, isAccented: true }] },
@@ -32,7 +32,7 @@ export const chickenPickinExercise: Exercise = {
       ],
     },
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.5, notes: [{ string: 6, fret: 3 }] },
         { duration: 0.25, notes: [{ string: 3, fret: 0, isAccented: true }] },
@@ -45,7 +45,7 @@ export const chickenPickinExercise: Exercise = {
       ],
     },
     {
-      timeSignature: [4, 4],
+      timeSignature: [3, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 5, fret: 3 }] },
         { duration: 0.25, notes: [{ string: 2, fret: 0, isAccented: true }] },

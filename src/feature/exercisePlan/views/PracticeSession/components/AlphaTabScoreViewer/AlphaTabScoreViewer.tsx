@@ -45,6 +45,9 @@ export const AlphaTabScoreViewer = ({
   const volumeRef          = useRef(volume);
   // Guards api.stop() — AlphaSynth throws if stopped before it has ever played.
   const hasStartedRef      = useRef(false);
+  // Distinguishes an actual isPlaying transition from a startTime-only change (e.g. count-in
+  // ending) while already playing — see the playback effect below.
+  const prevIsPlayingRef   = useRef(false);
 
   useEffect(() => { bpmRef.current = bpm; },             [bpm]);
   useEffect(() => { volumeRef.current = volume; },       [volume]);
@@ -78,16 +81,31 @@ export const AlphaTabScoreViewer = ({
   // Colour the actual fret numbers green on a hit / red on a miss.
   useNoteHeadFeedback({ apiRef, overlayRef, uiReady, measures, hitNotes, missedNotes, selectedTrackIdx });
 
+  // A fresh AlphaTab instance (new rawGpFile/measures/mode, see useAlphaTabApi) has never
+  // played yet — reset the "has it played before" bookkeeping so a leftover `true` from a
+  // previous exercise/instance doesn't make us call stop() on a synth that never started.
+  useEffect(() => { if (!uiReady) hasStartedRef.current = false; }, [uiReady]);
+
   // ── Playback: driven by session controls ─────────────────────────────────
   // startTime changing = new session → always restart from the beginning.
   // isPlaying toggling = play / stop at current position.
+  //
+  // prevIsPlayingRef distinguishes "isPlaying actually changed" from "startTime changed
+  // while isPlaying was already true" (e.g. count-in ending) — the latter must be a no-op.
+  // The pause transition (isPlaying → false, below) already calls api.stop() once; calling
+  // it again here right before play() raced AlphaSynth's internal stop teardown and could
+  // silently kill audio + cursor movement on resume, while the (independent, React-driven)
+  // minimap kept ticking as if nothing had gone wrong.
   useEffect(() => {
     const api = apiRef.current;
     if (!api || !uiReady) return;
 
+    const wasPlaying = prevIsPlayingRef.current;
+    prevIsPlayingRef.current = isPlaying;
+
     if (isPlaying) {
-      // Only stop once it has actually played — stopping a fresh AlphaSynth throws.
-      if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
+      if (wasPlaying) return; // startTime-only change while already playing — no-op.
+
       // Toggling the view mid-playback remounts this AlphaTab instance; without a
       // seek it would restart the audio at the top. startTime is the metronome's
       // back-dated master clock, so this continues from the session's position.
@@ -99,7 +117,7 @@ export const AlphaTabScoreViewer = ({
       }
       try { api.play(); } catch { /* ignore */ }
       hasStartedRef.current = true;
-    } else if (hasStartedRef.current) {
+    } else if (wasPlaying && hasStartedRef.current) {
       try { api.stop(); } catch { /* ignore */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
