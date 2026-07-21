@@ -15,6 +15,12 @@ interface UseAlphaTabApiOptions {
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
   baseTempo?: number;
   mode: "score" | "tab";
+  /** Black board with white ink instead of the default white paper. */
+  notationDarkMode?: boolean;
+  /** Overall size of the rendered sheet music (AlphaTab `display.scale`, 1 = 100%). */
+  notationZoom?: number;
+  /** Horizontal spacing between notes (AlphaTab `display.stretchForce`, 1 = default). */
+  notationSpacing?: number;
   /** Ref — always current value of volume, safe to read inside async callbacks */
   volumeRef: React.MutableRefObject<number>;
   bpmRef: React.MutableRefObject<number>;
@@ -47,6 +53,9 @@ export function useAlphaTabApi({
   measures,
   baseTempo = 120,
   mode,
+  notationDarkMode = false,
+  notationZoom = 1,
+  notationSpacing = 1,
   volumeRef,
   bpmRef,
   origBpmRef,
@@ -95,6 +104,23 @@ export function useAlphaTabApi({
         // mode="tab" we render tablature ONLY, so note-head bounds land on the
         // fret numbers (see useNoteHeadFeedback) instead of the notation heads.
         staveProfile: mode === "tab" ? "Tab" : "ScoreTab",
+        scale: notationZoom,
+        stretchForce: notationSpacing,
+        // Only the ink needs flipping — the black board itself comes from the
+        // container's own background (see AlphaTabScoreViewer), same as the tab.
+        resources: notationDarkMode
+          ? {
+              // Muted relative to the glyphs below — otherwise the staff/TAB
+              // grid lines sit at nearly the same brightness as the notes and
+              // fret numbers, and the two blend into a single grey mass.
+              staffLineColor: "#52525b",
+              barSeparatorColor: "#52525b",
+              barNumberColor: "#a1a1aa",
+              mainGlyphColor: "#f4f4f5",
+              secondaryGlyphColor: "#a1a1aa",
+              scoreInfoColor: "#e4e4e7",
+            }
+          : undefined,
       },
       player: {
         enablePlayer:  true,
@@ -176,7 +202,7 @@ export function useAlphaTabApi({
       scoreRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawGpFile, measures, mode]);
+  }, [rawGpFile, measures, mode, notationDarkMode, notationZoom, notationSpacing]);
 
   // Per-track mute / volume — independent of which track is rendered visually.
   // trackConfigs and backingTrackIds MUST be memoized by the caller.
