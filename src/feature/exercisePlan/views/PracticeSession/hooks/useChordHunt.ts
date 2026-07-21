@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoteFromFrequency, NOTES } from "utils/audio/noteUtils";
 
-import { type GameState, getFeedbackForCombo } from "./noteMatchingFeedback";
+import type { GameState } from "./noteMatchingFeedback";
 
 export interface ChordHuntState {
   /** Live detected note name (e.g. "C#"), or null when silent. */
@@ -46,7 +46,6 @@ function sameState(a: ChordHuntState, b: ChordHuntState): boolean {
     a.isMatch === b.isMatch &&
     a.hitId === b.hitId &&
     a.gameState.score === b.gameState.score &&
-    a.gameState.feedbackId === b.gameState.feedbackId &&
     a.foundTones.length === b.foundTones.length &&
     a.tones.length === b.tones.length &&
     Math.abs(a.cents - b.cents) < 3
@@ -62,7 +61,6 @@ function buildState(
   cents: number,
   isMatch: boolean,
   hitId: number,
-  feedback: { text: string; id: number },
   scoreOffset = 0,
 ): ChordHuntState {
   const foundCount = tones.filter(t => found.has(t)).length;
@@ -76,8 +74,6 @@ function buildState(
       score: scoreOffset + scoreForCount(foundCount),
       combo: foundCount,
       multiplier,
-      lastFeedback: feedback.text,
-      feedbackId: feedback.id,
     },
     accuracy: tones.length > 0 ? Math.round((foundCount / tones.length) * 100) : 0,
     maxPossibleScore: scoreForCount(tones.length),
@@ -107,7 +103,7 @@ export function useChordHunt(
   active: boolean,
 ): ChordHuntControls {
   const [state, setState] = useState<ChordHuntState>(() =>
-    buildState(tones, labels, new Set(), null, null, 0, false, 0, { text: "", id: 0 }),
+    buildState(tones, labels, new Set(), null, null, 0, false, 0),
   );
 
   // Primitive key so a fresh tones array each render doesn't reset progress.
@@ -120,7 +116,6 @@ export function useChordHunt(
   const foundRef       = useRef<Set<number>>(new Set());
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
-  const feedbackRef    = useRef<{ text: string; id: number }>({ text: "", id: 0 });
   const tonesRef       = useRef<number[]>(tones);
   const labelsRef      = useRef<string[]>(labels);
   // Score banked from previous chords — keeps the total accumulating across rotations.
@@ -137,10 +132,9 @@ export function useChordHunt(
     wasMatchingRef.current = false;
     prevFoundRef.current  = 0;
     hitIdRef.current      = 0;
-    feedbackRef.current   = { text: "", id: 0 };
     // Push the cleared state now — the RAF loop is idle when the mic is off, so
     // without this the previous chord's found tones would linger after a rotate.
-    setState(buildState(tonesRef.current, labelsRef.current, foundRef.current, null, null, 0, false, 0, feedbackRef.current, sessionScoreRef.current));
+    setState(buildState(tonesRef.current, labelsRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
 
@@ -183,20 +177,11 @@ export function useChordHunt(
             }
 
             const foundCount = tonesNow.filter(t => foundRef.current.has(t)).length;
-            if (foundCount > prevFoundRef.current) {
-              const prevMult = Math.min(8, Math.floor(prevFoundRef.current / 5) + 1);
-              const mult     = Math.min(8, Math.floor(foundCount / 5) + 1);
-              if (mult > prevMult) feedbackRef.current = { text: "MULTIPLIER UP!", id: feedbackRef.current.id + 1 };
-              else {
-                const tier = getFeedbackForCombo(foundCount);
-                if (tier) feedbackRef.current = { text: tier.text, id: feedbackRef.current.id + 1 };
-              }
-              prevFoundRef.current = foundCount;
-            }
+            if (foundCount > prevFoundRef.current) prevFoundRef.current = foundCount;
 
             const next = buildState(
               tonesNow, labelsRef.current, foundRef.current, data.note, pc, data.cents,
-              isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
+              isMatch, hitIdRef.current, sessionScoreRef.current,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -227,14 +212,10 @@ export function useChordHunt(
       hitIdRef.current++;
     }
     const foundCount = tonesRef.current.filter(t => found.has(t)).length;
-    if (foundCount > prevFoundRef.current) {
-      const tier = getFeedbackForCombo(foundCount);
-      if (tier) feedbackRef.current = { text: tier.text, id: feedbackRef.current.id + 1 };
-    }
     prevFoundRef.current = foundCount;
     setState(prev => buildState(
       tonesRef.current, labelsRef.current, found, prev.detectedNote, prev.detectedPitchClass, prev.cents,
-      prev.isMatch, hitIdRef.current, feedbackRef.current, sessionScoreRef.current,
+      prev.isMatch, hitIdRef.current, sessionScoreRef.current,
     ));
   }, []);
 

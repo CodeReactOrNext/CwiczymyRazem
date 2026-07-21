@@ -3,7 +3,6 @@ import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { startTransition,useEffect, useRef, useState } from "react";
 
 import type { GameState } from "./noteMatchingFeedback";
-import { getFeedbackForCombo } from "./noteMatchingFeedback";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -45,7 +44,7 @@ export function useStrummingMatcher({
   const processedSlotsRef       = useRef<Set<number>>(new Set());
   const lastProcessedOnsetRef   = useRef<number>(0);
   const rhythmStatsRef          = useRef({ hits: 0, misses: 0, wrongHits: 0 });
-  const gameStateRef            = useRef<GameState>({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+  const gameStateRef            = useRef<GameState>({ score: 0, combo: 0, multiplier: 1 });
   const lastHudFlushRef         = useRef<number>(0);
   const needsFlushRef           = useRef<boolean>(false);
   const prevLoopIdxRef          = useRef<number>(0);
@@ -53,7 +52,7 @@ export function useStrummingMatcher({
 
   // ── React state (flushed ~10Hz) ─────────────────────────────────────────────
   const [slotFeedback, setSlotFeedback] = useState<Map<number, SlotResult>>(new Map());
-  const [gameState,    setGameState]    = useState<GameState>({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+  const [gameState,    setGameState]    = useState<GameState>({ score: 0, combo: 0, multiplier: 1 });
   const [sessionAccuracy, setSessionAccuracy] = useState(100);
   const [sessionStats,    setSessionStats]    = useState({ hits: 0, misses: 0 });
 
@@ -63,26 +62,18 @@ export function useStrummingMatcher({
     processedSlotsRef.current.clear();
     lastProcessedOnsetRef.current = 0;
     rhythmStatsRef.current  = { hits: 0, misses: 0, wrongHits: 0 };
-    gameStateRef.current    = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
+    gameStateRef.current    = { score: 0, combo: 0, multiplier: 1 };
     prevLoopIdxRef.current  = 0;
     needsFlushRef.current   = true;
     startTransition(() => {
       setSlotFeedback(new Map());
-      setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+      setGameState({ score: 0, combo: 0, multiplier: 1 });
       setSessionAccuracy(100);
       setSessionStats({ hits: 0, misses: 0 });
     });
   };
 
-  useEffect(() => { resetGame(); }, [currentExerciseIndex]);  
-
-  // Clear feedback message after it shows
-  useEffect(() => {
-    if (gameState.lastFeedback) {
-      const t = setTimeout(() => setGameState(prev => ({ ...prev, lastFeedback: "" })), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [gameState.feedbackId]);
+  useEffect(() => { resetGame(); }, [currentExerciseIndex]);
 
   // ── Detection RAF loop ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -165,12 +156,6 @@ export function useStrummingMatcher({
               rhythmStatsRef.current.hits++;
               const newCombo = gs.combo + 1;
               const newMult  = Math.min(8, Math.floor(newCombo / 5) + 1);
-              if (newMult > gs.multiplier) {
-                gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++;
-              } else {
-                const tier = getFeedbackForCombo(newCombo);
-                if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
-              }
               gs.score     += Math.round(100 * newMult);
               gs.combo      = newCombo;
               gs.multiplier = newMult;

@@ -4,15 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
 
-const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
-  "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]",  scale: 1.15 },
-  "GREAT!":         { color: "text-cyan-400",    dropShadow: "drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]",  scale: 1.2  },
-  "AMAZING!":       { color: "text-purple-400",  dropShadow: "drop-shadow-[0_0_12px_rgba(192,132,252,0.6)]", scale: 1.25 },
-  "ON FIRE!":       { color: "text-orange-400",  dropShadow: "drop-shadow-[0_0_12px_rgba(251,146,60,0.6)]",  scale: 1.3  },
-  "UNSTOPPABLE!":   { color: "text-amber-400",   dropShadow: "drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]",  scale: 1.35 },
-  "MULTIPLIER UP!": { color: "text-main",        dropShadow: "drop-shadow-[0_0_12px_rgba(239,68,68,0.6)]",   scale: 1.3  },
-};
-
 export function MobileMicGameHud() {
   const { gameState, maxPossibleScore, sessionAccuracy } = useNoteMatchingContext();
 
@@ -78,30 +69,6 @@ export function MobileMicGameHud() {
           </div>
         </div>
 
-      </div>
-
-      {/* Feedback text */}
-      <div className="relative h-10 flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          {gameState.lastFeedback && (() => {
-            const style = mobileFeedbackStyles[gameState.lastFeedback] || {
-              color: "text-cyan-400",
-              dropShadow: "drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]",
-              scale: 1.2,
-            };
-            return (
-              <motion.div
-                key={gameState.feedbackId}
-                initial={{ y: 20, opacity: 0, scale: 0.5 }}
-                animate={{ y: 0, opacity: 1, scale: style.scale }}
-                exit={{ y: -20, opacity: 0, scale: style.scale + 0.3 }}
-                className={cn("text-xl font-black capitalize italic tracking-tighter", style.color, style.dropShadow)}
-              >
-                {gameState.lastFeedback}
-              </motion.div>
-            );
-          })()}
-        </AnimatePresence>
       </div>
     </div>
   );
