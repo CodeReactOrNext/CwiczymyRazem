@@ -3675,10 +3675,7 @@ export const spiderPermutation4123Exercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [3, 4],
       "beats": [
         {
           "duration": 0.25,

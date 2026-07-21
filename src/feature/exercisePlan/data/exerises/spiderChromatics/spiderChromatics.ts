@@ -26,7 +26,7 @@ export const spiderChromaticsExercise: Exercise = {
   relatedSkills: ["finger_independence", "alternate_picking"],
   tablature: [
     {
-      "timeSignature": [4, 4],
+      "timeSignature": [8, 4],
       "beats": [
         { "duration": 0.5, "notes": [{ "string": 6, "fret": 1 }] },
         { "duration": 0.5, "notes": [{ "string": 6, "fret": 2 }] },
@@ -47,7 +47,7 @@ export const spiderChromaticsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [4, 4],
+      "timeSignature": [8, 4],
       "beats": [
         { "duration": 0.5, "notes": [{ "string": 2, "fret": 1 }] },
         { "duration": 0.5, "notes": [{ "string": 2, "fret": 2 }] },
@@ -68,7 +68,7 @@ export const spiderChromaticsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [4, 4],
+      "timeSignature": [6, 4],
       "beats": [
         { "duration": 0.5, "notes": [{ "string": 4, "fret": 1 }] },
         { "duration": 0.5, "notes": [{ "string": 4, "fret": 2 }] },

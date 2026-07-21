@@ -27,10 +27,7 @@ export const chromaticAccentsExercise: Exercise = {
   },
   tablature: [
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [8, 4],
       "beats": [
         {
           "duration": 0.5,
@@ -183,10 +180,7 @@ export const chromaticAccentsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [8, 4],
       "beats": [
         {
           "duration": 0.5,
@@ -341,10 +335,7 @@ export const chromaticAccentsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [8, 4],
       "beats": [
         {
           "duration": 0.5,
@@ -497,10 +488,7 @@ export const chromaticAccentsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [8, 4],
       "beats": [
         {
           "duration": 0.5,
@@ -654,10 +642,7 @@ export const chromaticAccentsExercise: Exercise = {
       ]
     },
     {
-      "timeSignature": [
-        4,
-        4
-      ],
+      "timeSignature": [8, 4],
       "beats": [
         {
           "duration": 0.5,

@@ -99,7 +99,7 @@ export const tappingMelodicLinesExercise: Exercise = {
     },
     // M6: Resolving phrase
     {
-      timeSignature: [4, 4],
+      timeSignature: [5, 4],
       beats: [
         { duration: 0.25, notes: [{ string: 3, fret: 5 }] },
         { duration: 0.25, notes: [{ string: 2, fret: 5 }] },

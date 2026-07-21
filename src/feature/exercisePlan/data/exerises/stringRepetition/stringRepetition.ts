@@ -26,7 +26,7 @@ export const stringRepetitionExercise: Exercise = {
   relatedSkills: ["rhythm"],
   tablature: [
     {
-      timeSignature: [4, 4],
+      timeSignature: [6, 4],
       beats: [
         { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
         { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
