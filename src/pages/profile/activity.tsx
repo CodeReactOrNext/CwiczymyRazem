@@ -15,7 +15,9 @@ import { LevelProgressHero } from "feature/profile/components/LevelProgressHero"
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsSection } from "feature/profile/components/StatsSection";
+import { downloadProfileSummaryCsv } from "feature/profile/services/profileSummary.export";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
+import { downloadSongProgressCsv } from "feature/songs/services/songs.export";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -28,6 +30,16 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
+
+const ExportButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  <button
+    type='button'
+    onClick={onClick}
+    className='flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+    <Download size={14} />
+    {label}
+  </button>
+);
 
 const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -51,6 +63,29 @@ const ProfileActivityPage = () => {
 
     downloadActivityLogCsv(reportList);
     toast.success("Sessions exported to CSV");
+  };
+
+  const handleExportSongs = () => {
+    const songCount = songs
+      ? songs.wantToLearn.length + songs.learning.length + songs.learned.length
+      : 0;
+    if (!songs || songCount === 0) {
+      toast.error("No songs to export yet");
+      return;
+    }
+
+    downloadSongProgressCsv(songs);
+    toast.success("Song progress exported to CSV");
+  };
+
+  const handleExportSummary = () => {
+    if (!userStats) {
+      toast.error("No profile stats to export yet");
+      return;
+    }
+
+    downloadProfileSummaryCsv(userStats);
+    toast.success("Profile summary exported to CSV");
   };
 
   return (
@@ -80,13 +115,11 @@ const ProfileActivityPage = () => {
             activeHref='/profile/activity'
             ariaLabel='Progress sections'
           />
-          <button
-            type='button'
-            onClick={handleExportSessions}
-            className='ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-            <Download size={14} />
-            Export sessions
-          </button>
+          <div className='ml-auto flex items-center gap-1'>
+            <ExportButton label='Export sessions' onClick={handleExportSessions} />
+            <ExportButton label='Export songs' onClick={handleExportSongs} />
+            <ExportButton label='Export summary' onClick={handleExportSummary} />
+          </div>
           <Link
             href='/scoring'
             className='rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
