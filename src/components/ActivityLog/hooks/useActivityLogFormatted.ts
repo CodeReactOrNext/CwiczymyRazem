@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 
-import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
+import type { FormattedActivityReport, ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 
 export const useActivityLogFormatted = (reportList: ReportListInterfaceWithTimeSumary[] | null) => {
-  const formattedReports = useMemo(() => {
+  const formattedReports = useMemo<FormattedActivityReport[]>(() => {
     return (
       reportList?.map((report) => ({
         date: report.date,
