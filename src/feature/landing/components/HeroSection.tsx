@@ -74,6 +74,84 @@ const headlineLine: Variants = {
   },
 };
 
+// A handful of notes across 6 strings, hand-placed to read like a real riff
+// rather than a random scatter. Positions are percentages along the strip.
+const TAB_NOTES = [
+  { string: 5, x: 6, fret: 0 },
+  { string: 4, x: 16, fret: 2 },
+  { string: 4, x: 27, fret: 4 },
+  { string: 3, x: 38, fret: 2 },
+  { string: 3, x: 49, fret: 4 },
+  { string: 2, x: 60, fret: 0 },
+  { string: 3, x: 71, fret: 2 },
+  { string: 4, x: 82, fret: 0 },
+  { string: 5, x: 92, fret: 3 },
+];
+
+/**
+ * Small, custom-built "live tab playback" visual: 6 tab strings with fret
+ * markers and a looping playhead, built entirely from CSS/SVG. Replaces the
+ * `tabs.webp` screenshot that used to sit here (also reused lower down in
+ * InteractiveExercisesSection) with something that can't look like a
+ * duplicated, cropped photo, while still communicating the real product
+ * feature: animated Guitar Pro tablature synced to audio.
+ */
+const LiveTabStripCard = ({
+  shouldReduceMotion,
+}: {
+  shouldReduceMotion: boolean;
+}) => (
+  <>
+    <div className='relative overflow-hidden rounded-lg p-1.5 glass-card'>
+      <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
+        <div className='absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(34,211,238,0.08),transparent_70%)]' />
+        <div className='relative flex h-full flex-col justify-center gap-4 px-8 py-10 sm:gap-5 sm:px-12'>
+          {Array.from({ length: 6 }).map((_, stringIndex) => (
+            <div
+              key={stringIndex}
+              className='relative h-px w-full bg-zinc-700/50'>
+              {TAB_NOTES.filter((note) => note.string === stringIndex).map(
+                (note, i) => (
+                  <span
+                    key={i}
+                    style={{ left: `${note.x}%` }}
+                    className='absolute -top-[9px] flex h-[18px] w-[18px] -translate-x-1/2 items-center justify-center rounded-full bg-cyan-500/20 text-[9px] font-bold text-cyan-300 ring-1 ring-cyan-400/30'>
+                    {note.fret}
+                  </span>
+                ),
+              )}
+            </div>
+          ))}
+          {!shouldReduceMotion && (
+            <motion.div
+              aria-hidden
+              className='absolute inset-y-6 w-px bg-gradient-to-b from-transparent via-cyan-300 to-transparent'
+              animate={{ left: ["4%", "96%"] }}
+              transition={{
+                duration: 3.4,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: "linear",
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+    <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
+      <span className='relative flex h-2 w-2'>
+        {!shouldReduceMotion && (
+          <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
+        )}
+        <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
+      </span>
+      <span className='text-[11px] font-bold text-cyan-400'>
+        Live tab playback
+      </span>
+    </div>
+  </>
+);
+
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
 
@@ -159,15 +237,20 @@ export const HeroSection = () => {
           </motion.div>
 
           {/*
-            Rebuilt from scratch: instead of a single flat screenshot sitting
-            in a frame, this is a small assembled "dashboard" collage, two
-            real product signals (streak/XP, an AI session grade) peeking
-            out from behind the main tab view. It reads as an actual product
-            in use rather than a static marketing photo, and it's built
-            entirely from the app's own data model, not a generic effect.
+            Rebuilt again: the previous version leaned on the same
+            `tabs.webp` screenshot already used lower down in
+            InteractiveExercisesSection, and its rotated frame read as a
+            generic "app screenshot in a tilted card" template. This version
+            drops the raster screenshot entirely - a large, tinted guitar
+            illustration (built from an unused in-repo asset, recolored to
+            the single landing accent) anchors the composition the way
+            Discord's hero uses an oversized character illustration, and the
+            product signal is a small, custom-built live tab strip instead
+            of a photo, so nothing here is cropped/skewed or duplicated
+            elsewhere on the page.
           */}
           <motion.div
-            className='relative mx-auto w-full max-w-md pb-4 pt-6 lg:max-w-none lg:pl-6'
+            className='relative mx-auto w-full max-w-md pb-10 pt-6 lg:max-w-none lg:pl-6'
             initial={
               shouldReduceMotion ? false : { opacity: 0, scale: 0.94, x: 24 }
             }
@@ -179,7 +262,28 @@ export const HeroSection = () => {
             }}>
             <motion.div
               aria-hidden
-              className='absolute -left-4 -top-10 z-0 hidden w-40 -rotate-6 rounded-lg p-4 glass-card sm:block lg:-left-14 lg:-top-12'
+              className='absolute -right-6 -top-16 z-0 hidden w-48 select-none opacity-90 sm:block lg:-right-10 lg:-top-20 lg:w-64'
+              initial={
+                shouldReduceMotion ? false : { opacity: 0, y: 20, rotate: 4 }
+              }
+              animate={{ opacity: 0.9, y: 0, rotate: 8 }}
+              transition={{
+                duration: 0.9,
+                delay: shouldReduceMotion ? 0 : 0.2,
+                ease: easeOutExpo,
+              }}>
+              <Image
+                src='/static/images/guitar-accent-cyan.png'
+                alt=''
+                width={254}
+                height={705}
+                className='h-auto w-full drop-shadow-[0_0_60px_rgba(34,211,238,0.25)]'
+              />
+            </motion.div>
+
+            <motion.div
+              aria-hidden
+              className='absolute -left-4 -top-8 z-20 hidden w-40 rounded-lg p-4 glass-card sm:block lg:-left-14 lg:-top-10'
               initial={
                 shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
               }
@@ -205,7 +309,7 @@ export const HeroSection = () => {
 
             <motion.div
               aria-hidden
-              className='absolute -right-3 -top-8 z-0 hidden items-center gap-2 rounded-lg px-4 py-3 glass-card sm:flex lg:-right-8'
+              className='absolute -bottom-6 -left-2 z-20 hidden items-center gap-2 rounded-lg px-4 py-3 glass-card sm:flex lg:-bottom-8 lg:-left-6'
               initial={
                 shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
               }
@@ -230,29 +334,7 @@ export const HeroSection = () => {
 
             <div className='relative z-10'>
               <AuroraGlowFrame>
-                <div className='relative -rotate-2 overflow-hidden rounded-lg p-1.5 glass-card'>
-                  <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
-                    <Image
-                      src='/images/feature/tabs.webp'
-                      alt='Animated Guitar Pro tablature synced with real-time audio playback'
-                      fill
-                      priority
-                      sizes='(min-width: 1024px) 45vw, 90vw'
-                      className='object-cover object-center'
-                    />
-                  </div>
-                </div>
-                <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
-                  <span className='relative flex h-2 w-2'>
-                    {!shouldReduceMotion && (
-                      <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
-                    )}
-                    <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
-                  </span>
-                  <span className='text-[11px] font-bold text-cyan-400'>
-                    Live tab playback
-                  </span>
-                </div>
+                <LiveTabStripCard shouldReduceMotion={!!shouldReduceMotion} />
               </AuroraGlowFrame>
             </div>
           </motion.div>
