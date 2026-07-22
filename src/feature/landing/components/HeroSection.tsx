@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
 import type { Transition, Variants } from "framer-motion";
 import {
@@ -9,16 +10,16 @@ import {
   useReducedMotion,
   useTransform,
 } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import type { PointerEvent } from "react";
 
 const StaticCTA = () => (
-  <div className='flex flex-col items-center gap-5'>
-    <div className='flex flex-col items-center gap-2'>
-      <div className='flex flex-col items-center justify-center gap-4 sm:flex-row'>
+  <div className='flex flex-col items-center gap-5 lg:items-start'>
+    <div className='flex flex-col items-center gap-2 lg:items-start'>
+      <div className='flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start'>
         <Link href='/signup'>
           <div className='group relative overflow-hidden rounded-lg p-[1px] transition-transform duration-300 active:scale-[0.98]'>
             <div className='absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100 will-change-transform' />
@@ -31,7 +32,7 @@ const StaticCTA = () => (
           </div>
         </Link>
       </div>
-      <span className='mt-1 whitespace-nowrap text-center text-xs font-medium text-zinc-400'>
+      <span className='mt-1 whitespace-nowrap text-center text-xs font-medium text-zinc-400 lg:text-left'>
         Free forever for tracking progress
       </span>
     </div>
@@ -99,18 +100,13 @@ export const HeroSection = () => {
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(34,211,238,0.12),transparent_60%)]' />
         {/*
-          Diagonal accent stripes instead of the tiled guitar-icon texture.
-          The tiled pattern used to cover the entire hero as a full-bleed
-          "wallpaper", which read as noise rather than atmosphere. This is
-          confined to the right two-thirds behind the tab screenshot, fades
-          out toward the headline via the mask, and echoes the diagonal
-          stripe motif from the Rocksmith reference the client pointed to.
+          The tiled guitar/music-icon texture is back in the hero, but this
+          time applied to the *entire* section as real ambience rather than
+          cropped inside a small floating box (that hard-clipping was the
+          bug from the previous round). Kept very faint so it reads as
+          texture, not wallpaper.
         */}
-        <div
-          aria-hidden
-          className='absolute inset-y-0 right-0 w-2/3 opacity-[0.06] [mask-image:linear-gradient(to_left,black,transparent_85%)]'>
-          <div className='absolute inset-0 -rotate-6 bg-[repeating-linear-gradient(115deg,rgba(34,211,238,0.9)_0px,rgba(34,211,238,0.9)_1.5px,transparent_1.5px,transparent_46px)]' />
-        </div>
+        <GuitarPatternBackground opacity={0.025} scale={1.3} />
         {!shouldReduceMotion && (
           <motion.div
             className='absolute inset-0'
@@ -124,7 +120,7 @@ export const HeroSection = () => {
       </nav>
 
       <div className='relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 py-8 lg:px-12'>
-        <div className='grid w-full items-center gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12'>
+        <div className='grid w-full items-center gap-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12'>
           <motion.div
             className='mx-auto flex max-w-xl flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left'
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -162,8 +158,16 @@ export const HeroSection = () => {
             <HeroAuthButtons />
           </motion.div>
 
+          {/*
+            Rebuilt from scratch: instead of a single flat screenshot sitting
+            in a frame, this is a small assembled "dashboard" collage, two
+            real product signals (streak/XP, an AI session grade) peeking
+            out from behind the main tab view. It reads as an actual product
+            in use rather than a static marketing photo, and it's built
+            entirely from the app's own data model, not a generic effect.
+          */}
           <motion.div
-            className='relative mx-auto w-full max-w-md lg:max-w-none'
+            className='relative mx-auto w-full max-w-md pb-4 pt-6 lg:max-w-none lg:pl-6'
             initial={
               shouldReduceMotion ? false : { opacity: 0, scale: 0.94, x: 24 }
             }
@@ -173,31 +177,84 @@ export const HeroSection = () => {
               delay: shouldReduceMotion ? 0 : 0.35,
               ease: easeOutExpo,
             }}>
-            <AuroraGlowFrame>
-              <div className='relative -rotate-2 overflow-hidden rounded-lg p-1.5 glass-card'>
-                <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
-                  <Image
-                    src='/images/feature/tabs.webp'
-                    alt='Animated Guitar Pro tablature synced with real-time audio playback'
-                    fill
-                    priority
-                    sizes='(min-width: 1024px) 45vw, 90vw'
-                    className='object-cover object-center'
-                  />
+            <motion.div
+              aria-hidden
+              className='absolute -left-4 -top-10 z-0 hidden w-40 -rotate-6 rounded-lg p-4 glass-card sm:block lg:-left-14 lg:-top-12'
+              initial={
+                shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                duration: 0.6,
+                delay: shouldReduceMotion ? 0 : 0.75,
+                ease: easeOutExpo,
+              }}>
+              <div className='mb-2 flex items-center justify-between'>
+                <span className='text-[10px] font-bold text-zinc-400'>
+                  Level 12
+                </span>
+                <Flame className='h-3.5 w-3.5 text-cyan-400' />
+              </div>
+              <div className='h-1.5 w-full overflow-hidden rounded-full bg-zinc-700/50'>
+                <div className='h-full w-2/3 rounded-full bg-cyan-400' />
+              </div>
+              <div className='mt-2 text-[10px] font-bold text-zinc-400'>
+                1,240 XP this month
+              </div>
+            </motion.div>
+
+            <motion.div
+              aria-hidden
+              className='absolute -right-3 -top-8 z-0 hidden items-center gap-2 rounded-lg px-4 py-3 glass-card sm:flex lg:-right-8'
+              initial={
+                shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                duration: 0.6,
+                delay: shouldReduceMotion ? 0 : 0.9,
+                ease: easeOutExpo,
+              }}>
+              <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-sm font-bold text-cyan-400'>
+                A-
+              </div>
+              <div>
+                <div className='text-[11px] font-bold text-white'>
+                  Session graded
+                </div>
+                <div className='text-[10px] font-medium text-zinc-400'>
+                  by AI, instantly
                 </div>
               </div>
-              <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
-                <span className='relative flex h-2 w-2'>
-                  {!shouldReduceMotion && (
-                    <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
-                  )}
-                  <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
-                </span>
-                <span className='text-[11px] font-bold text-cyan-400'>
-                  Live tab playback
-                </span>
-              </div>
-            </AuroraGlowFrame>
+            </motion.div>
+
+            <div className='relative z-10'>
+              <AuroraGlowFrame>
+                <div className='relative -rotate-2 overflow-hidden rounded-lg p-1.5 glass-card'>
+                  <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
+                    <Image
+                      src='/images/feature/tabs.webp'
+                      alt='Animated Guitar Pro tablature synced with real-time audio playback'
+                      fill
+                      priority
+                      sizes='(min-width: 1024px) 45vw, 90vw'
+                      className='object-cover object-center'
+                    />
+                  </div>
+                </div>
+                <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
+                  <span className='relative flex h-2 w-2'>
+                    {!shouldReduceMotion && (
+                      <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
+                    )}
+                    <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
+                  </span>
+                  <span className='text-[11px] font-bold text-cyan-400'>
+                    Live tab playback
+                  </span>
+                </div>
+              </AuroraGlowFrame>
+            </div>
           </motion.div>
         </div>
       </div>

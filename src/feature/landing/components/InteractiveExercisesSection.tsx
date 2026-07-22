@@ -8,23 +8,23 @@ const features = [
   {
     icon: <ListMusic className='h-4 w-4' />,
     label: "144 exercises built in",
-    desc: "Ready-to-play technical drills, from finger warm-ups and legato to alternate picking and advanced shred techniques",
+    desc: "From finger warm-ups to advanced shred techniques",
   },
   {
     icon: <Guitar className='h-4 w-4' />,
     label: "Guitar Pro files",
-    desc: "Import any GP file and practice with color-coded tablature synced to audio playback",
+    desc: "Import any GP file, tablature stays synced to audio",
   },
   {
     icon: <Star className='h-4 w-4' />,
     label: "Guitar Hero on a real guitar",
-    desc: "Earn points for every exercise you complete, the same dopamine hit, but you're actually building a real skill",
+    desc: "Earn points per exercise while building a real skill",
   },
 ];
 
 export const InteractiveExercisesSection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute right-0 top-1/3 h-[700px] w-[700px] rounded-full bg-cyan-500/5 blur-[160px]' />
@@ -40,10 +40,9 @@ export const InteractiveExercisesSection = () => {
               <span className='text-zinc-400'>Hear every note.</span>
             </h2>
 
-            <p className='mb-12 max-w-md text-lg leading-relaxed text-zinc-400'>
-              144 technical exercises with animated GP tablature. See exactly
-              what to play, hear how it sounds, and slow down to any tempo you
-              need.
+            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
+              144 technical exercises with animated GP tablature, synced to
+              real audio playback at any tempo.
             </p>
 
             {/* Feature list */}

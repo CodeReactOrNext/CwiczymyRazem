@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export const PracticePlansSection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute left-0 top-1/3 h-[600px] w-[600px] rounded-full bg-cyan-500/5 blur-[150px]' />
@@ -14,15 +14,14 @@ export const PracticePlansSection = () => {
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-14 max-w-2xl'>
+        <div className='mb-10 max-w-2xl'>
           <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
             Your practice, <br />
             <span className='text-zinc-400'>your rules.</span>
           </h2>
           <p className='max-w-md text-lg leading-relaxed text-zinc-400'>
-            Stop improvising your sessions. Build structured practice plans from
-            scratch or pick a ready-made template, then execute with focus and
-            track every minute of it.
+            Stop improvising. Build a structured plan from scratch or pick a
+            template, then execute with focus.
           </p>
         </div>
 
@@ -49,8 +48,7 @@ export const PracticePlansSection = () => {
                     Build your own plan
                   </div>
                   <div className='text-sm leading-relaxed text-zinc-400'>
-                    Create a fully custom routine from scratch, pick exercises,
-                    set durations, define order
+                    Pick exercises, set durations, define the order
                   </div>
                 </div>
               </div>
@@ -66,8 +64,7 @@ export const PracticePlansSection = () => {
                 Ready-made templates
               </div>
               <div className='text-sm leading-relaxed text-zinc-400'>
-                Curated plans for technique, theory, creativity, and ear
-                training
+                Curated for technique, theory, creativity, ear training
               </div>
             </div>
           </div>
@@ -81,8 +78,7 @@ export const PracticePlansSection = () => {
                 Timed sessions
               </div>
               <div className='text-sm leading-relaxed text-zinc-400'>
-                Each block has a fixed time slot so your practice stays focused
-                and on schedule
+                Each block gets a fixed slot, so practice stays on schedule
               </div>
             </div>
           </div>
@@ -96,8 +92,7 @@ export const PracticePlansSection = () => {
                 Auto-plan
               </div>
               <div className='text-sm leading-relaxed text-zinc-400'>
-                One click generates a ready-to-go session based on your stats,
-                no planning needed, just pick up and play
+                One click generates a session from your stats, no planning
               </div>
             </div>
           </div>

@@ -1,11 +1,12 @@
 "use client";
 
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Brain, Music2, TrendingUp } from "lucide-react";
 
 const leadReason = {
   title: "Focus on what matters",
   description:
-    "Don't waste time on generic exercises. Tracker helps you focus on the techniques that actually improve your playing, based on where you actually are.",
+    "No generic exercises. Just the techniques that actually move your playing forward, based on where you are today.",
   icon: <Brain className='h-8 w-8 text-cyan-400' />,
   iconBg: "bg-cyan-500/10",
 };
@@ -14,14 +15,14 @@ const reasons = [
   {
     title: "Track your progress",
     description:
-      "See your improvement over time with detailed practice logs and frequency charts. Motivation comes from seeing results.",
+      "Detailed logs and frequency charts. Motivation comes from seeing results.",
     icon: <TrendingUp className='h-6 w-6 text-cyan-500' />,
     iconBg: "bg-cyan-500/10",
   },
   {
     title: "Build consistent habits",
     description:
-      "The secret to guitar mastery is consistency. Our tools are designed to keep you picking up your guitar every single day.",
+      "Consistency beats talent. Our tools keep you picking up the guitar every day.",
     icon: <Music2 className='h-6 w-6 text-cyan-300' />,
     iconBg: "bg-cyan-500/10",
   },
@@ -29,12 +30,13 @@ const reasons = [
 
 export const WhySection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Subtle background glow */}
       <div className='pointer-events-none absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/[0.15] blur-[140px]'></div>
+      <GuitarPatternBackground opacity={0.02} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-20 max-w-3xl'>
+        <div className='mb-14 max-w-3xl'>
           <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
             Built for those who <br />
             <span className='text-cyan-400'>refuse to plateau.</span>

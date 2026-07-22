@@ -60,7 +60,7 @@ const colorMap: Record<string, string> = {
 
 export const RoadmapSection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute right-0 top-1/4 h-[600px] w-[600px] rounded-full bg-cyan-500/5 blur-[160px]' />
@@ -81,10 +81,8 @@ export const RoadmapSection = () => {
             </h2>
 
             <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
-              Tell the app what you want to achieve. It builds a week-by-week
-              mastery roadmap with the right drills in the right order, each one
-              linked to a curated YouTube lesson so you know exactly how to
-              execute it.
+              Tell the app your goal. It builds a week-by-week roadmap, each
+              step linked to a curated lesson.
             </p>
 
             {/* Goal selector mock */}

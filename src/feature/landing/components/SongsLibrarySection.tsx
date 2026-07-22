@@ -8,28 +8,28 @@ const features = [
   {
     icon: <Disc3 className='h-4 w-4' />,
     label: "Thousands of songs",
-    desc: "A growing community-curated library spanning every genre and difficulty level",
+    desc: "A growing library spanning every genre and level",
   },
   {
     icon: <Star className='h-4 w-4' />,
     label: "Community difficulty ratings",
-    desc: "Real scores from guitarists who actually practiced the song, no guesswork",
+    desc: "Real scores from guitarists who played the song",
   },
   {
     icon: <Filter className='h-4 w-4' />,
     label: "Smart filtering",
-    desc: "Browse by genre, difficulty, technique type, or your current skill level",
+    desc: "By genre, difficulty, technique, or skill level",
   },
   {
     icon: <BookMarked className='h-4 w-4' />,
     label: "Want to learn list",
-    desc: "Save songs to your queue and turn your wishlist into a structured practice plan",
+    desc: "Turn your wishlist into a structured plan",
   },
 ];
 
 export const SongsLibrarySection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute right-0 top-1/4 h-[700px] w-[700px] rounded-full bg-cyan-500/5 blur-[160px]' />
@@ -45,10 +45,9 @@ export const SongsLibrarySection = () => {
               <span className='text-zinc-400'>to learn. Ranked.</span>
             </h2>
 
-            <p className='mb-12 max-w-md text-lg leading-relaxed text-zinc-400'>
-              Browse a massive library rated by the community, not algorithms.
-              Find songs that match exactly where you are right now, add them to
-              your queue, and start learning with context.
+            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
+              Rated by the community, not algorithms. Find songs that match
+              your level and start learning with context.
             </p>
 
             {/* Feature list */}
