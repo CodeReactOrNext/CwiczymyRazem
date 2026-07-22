@@ -1,6 +1,5 @@
 import { Button } from "assets/components/ui/button";
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
-import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
 import type { Transition, Variants } from "framer-motion";
 import {
@@ -99,7 +98,19 @@ export const HeroSection = () => {
       className='relative flex min-h-[100dvh] flex-col overflow-hidden bg-zinc-950'>
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(34,211,238,0.12),transparent_60%)]' />
-        <GuitarPatternBackground opacity={0.08} scale={1.3} />
+        {/*
+          Diagonal accent stripes instead of the tiled guitar-icon texture.
+          The tiled pattern used to cover the entire hero as a full-bleed
+          "wallpaper", which read as noise rather than atmosphere. This is
+          confined to the right two-thirds behind the tab screenshot, fades
+          out toward the headline via the mask, and echoes the diagonal
+          stripe motif from the Rocksmith reference the client pointed to.
+        */}
+        <div
+          aria-hidden
+          className='absolute inset-y-0 right-0 w-2/3 opacity-[0.06] [mask-image:linear-gradient(to_left,black,transparent_85%)]'>
+          <div className='absolute inset-0 -rotate-6 bg-[repeating-linear-gradient(115deg,rgba(34,211,238,0.9)_0px,rgba(34,211,238,0.9)_1.5px,transparent_1.5px,transparent_46px)]' />
+        </div>
         {!shouldReduceMotion && (
           <motion.div
             className='absolute inset-0'
