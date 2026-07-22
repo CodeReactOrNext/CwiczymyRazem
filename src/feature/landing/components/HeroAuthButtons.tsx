@@ -53,7 +53,7 @@ export const HeroAuthButtons = () => {
                   <Loader2 className='animate-spin' />
                 ) : (
                   <span className='relative z-10 flex items-center gap-2'>
-                    <LayoutDashboard className='w-5 h-5 transition-transform group-hover:scale-110' />
+                    <LayoutDashboard className='w-5 h-5 transition-transform' />
                     Go to Dashboard
                   </span>
                 )}
@@ -65,7 +65,7 @@ export const HeroAuthButtons = () => {
             <div className="flex flex-col items-center gap-2">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href='/signup'>
-                  <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                  <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 active:scale-[0.98]">
                     <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] will-change-transform bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                     <Button className='relative h-14 px-8 bg-white hover:bg-zinc-50 text-black border-none font-bold text-base transition-all rounded-[7px] shadow-2xl overflow-hidden group/btn'>
                       <span className="relative z-10 flex items-center gap-3 whitespace-nowrap">
@@ -78,7 +78,7 @@ export const HeroAuthButtons = () => {
                 <Button
                   onClick={handleGoogleLogin}
                   disabled={isGoogleFetching}
-                  className="h-14 px-8 bg-black text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
+                  className="h-14 px-8 bg-zinc-900 text-white hover:bg-zinc-800 font-semibold text-base transition-all rounded-lg flex items-center gap-3"
                 >
                   <FcGoogle className="h-5 w-5 mr-2" /> Continue with Google
                 </Button>
@@ -87,9 +87,9 @@ export const HeroAuthButtons = () => {
                 Free forever for tracking progress
               </span>
             </div>
-            <div className="flex items-center gap-6 text-white text-sm font-bold uppercase tracking-widest mt-2">
-              <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign In</Link>
-              <span className="w-1 h-1 rounded-full bg-white/20"></span>
+            <div className="flex items-center gap-3 text-sm font-medium text-zinc-400 mt-1">
+              <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign in</Link>
+              <span aria-hidden>·</span>
               <Link href="/how-it-works" className="hover:text-cyan-400 transition-colors">How it works</Link>
             </div>
           </div>

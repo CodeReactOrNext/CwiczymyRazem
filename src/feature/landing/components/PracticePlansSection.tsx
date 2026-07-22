@@ -1,125 +1,91 @@
 "use client";
 
-import { ClipboardList, Layers, PenLine, Shuffle, Timer } from "lucide-react";
+import { Layers, PenLine, Shuffle, Timer } from "lucide-react";
 import Image from "next/image";
-
-const features = [
-  {
-    icon: <PenLine className="w-4 h-4" />,
-    label: "Build your own plan",
-    desc: "Create a fully custom routine from scratch — pick exercises, set durations, define order",
-  },
-  {
-    icon: <Layers className="w-4 h-4" />,
-    label: "Ready-made templates",
-    desc: "Start from curated plans for technique, theory, creativity, and ear training",
-  },
-  {
-    icon: <Timer className="w-4 h-4" />,
-    label: "Timed sessions",
-    desc: "Each block has a fixed time slot so your practice stays focused and on schedule",
-  },
-  {
-    icon: <Shuffle className="w-4 h-4" />,
-    label: "Auto-plan",
-    desc: "One click generates a ready-to-go session based on your stats — no planning needed, just pick up and play",
-  },
-];
 
 export const PracticePlansSection = () => {
   return (
-    <section className="relative py-32 bg-zinc-950 overflow-hidden">
+    <section className="relative py-28 bg-zinc-950 overflow-hidden">
       {/* Background ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/3 left-0 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/4 blur-[130px] rounded-full" />
       </div>
 
-      {/* Top divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
-
       <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-12 xl:gap-16 items-center">
+        <div className="max-w-2xl mb-14">
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
+            Your practice, <br />
+            <span className="text-zinc-500">your rules.</span>
+          </h2>
+          <p className="text-zinc-400 text-lg leading-relaxed max-w-md">
+            Stop improvising your sessions. Build structured practice plans
+            from scratch or pick a ready-made template, then execute with
+            focus and track every minute of it.
+          </p>
+        </div>
 
-          {/* Left — screenshot */}
-          <div className="relative order-2 lg:order-1">
-            {/* Outer glow */}
-            <div className="absolute inset-0 -m-8 bg-gradient-radial from-amber-500/8 via-transparent to-transparent blur-2xl pointer-events-none" />
-
-            {/* App chrome frame */}
-            <div className="relative rounded-2xl border border-white/10 bg-zinc-900/60 p-1.5 shadow-2xl backdrop-blur-sm">
-              {/* Fake title bar */}
-              <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                <div className="flex-1 mx-4 h-4 rounded bg-zinc-800/60 max-w-[180px]" />
-                <div className="flex items-center gap-1.5">
-                  <ClipboardList className="w-3 h-3 text-zinc-600" />
-                  <span className="text-[9px] font-black text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded uppercase tracking-widest">My Plans</span>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
+          {/* Featured tile: real screenshot */}
+          <div className="md:col-span-3 md:row-span-2 rounded-lg glass-card p-1.5 flex flex-col">
+            <div className="relative overflow-hidden rounded-lg flex-1">
+              <Image
+                src="/images/feature/practices-plans.webp"
+                alt="Practice plans library with custom and template routines"
+                width={1200}
+                height={800}
+                className="w-full h-auto object-cover"
+                priority={false}
+              />
+            </div>
+            <div className="flex items-start gap-4 p-5">
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0">
+                <PenLine className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-white mb-0.5">Build your own plan</div>
+                <div className="text-sm text-zinc-500 leading-relaxed">
+                  Create a fully custom routine from scratch, pick exercises, set durations, define order
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Screenshot */}
-              <div className="relative overflow-hidden rounded-xl">
-                <Image
-                  src="/images/feature/practices-plans.webp"
-                  alt="Practice plans library with custom and template routines"
-                  width={1200}
-                  height={800}
-                  className="w-full h-auto object-cover"
-                  priority={false}
-                />
-                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-900/60 to-transparent pointer-events-none" />
+          <div className="md:col-span-2 rounded-lg bg-zinc-900/40 p-5 flex items-start gap-4">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white mb-0.5">Ready-made templates</div>
+              <div className="text-sm text-zinc-500 leading-relaxed">
+                Curated plans for technique, theory, creativity, and ear training
               </div>
             </div>
+          </div>
 
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -left-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 shadow-xl">
-              <PenLine className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-[11px] font-black text-white uppercase tracking-widest">
-                Your routine
-              </span>
+          <div className="md:col-span-2 rounded-lg bg-zinc-900/40 p-5 flex items-start gap-4">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0">
+              <Timer className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white mb-0.5">Timed sessions</div>
+              <div className="text-sm text-zinc-500 leading-relaxed">
+                Each block has a fixed time slot so your practice stays focused and on schedule
+              </div>
             </div>
           </div>
 
-          {/* Right — content */}
-          <div className="flex flex-col order-1 lg:order-2">
-            <span className="text-sm font-black uppercase tracking-[0.3em] text-amber-400 mb-6">
-              Practice Plans
-            </span>
-
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
-              Your practice, <br />
-              <span className="text-zinc-500">your rules.</span>
-            </h2>
-
-            <p className="text-zinc-400 text-lg leading-relaxed mb-12 max-w-md">
-              Stop improvising your sessions. Build structured practice plans
-              from scratch or pick a ready-made template — then execute with
-              focus and track every minute of it.
-            </p>
-
-            {/* Feature list */}
-            <ul className="space-y-5">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-start gap-4 group">
-                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 shadow-lg transition-all duration-300 group-hover:scale-105">
-                    {f.icon}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-white uppercase tracking-wide mb-0.5">
-                      {f.label}
-                    </div>
-                    <div className="text-sm text-zinc-500 leading-relaxed">
-                      {f.desc}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+          <div className="md:col-span-5 rounded-lg bg-amber-500/10 p-6 flex items-center gap-5">
+            <div className="w-11 h-11 rounded-lg bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
+              <Shuffle className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-base font-bold text-white mb-0.5">Auto-plan</div>
+              <div className="text-sm text-zinc-400 leading-relaxed">
+                One click generates a ready-to-go session based on your stats, no planning needed, just pick up and play
+              </div>
+            </div>
           </div>
-
         </div>
       </div>
     </section>

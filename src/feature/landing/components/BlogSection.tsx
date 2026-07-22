@@ -18,7 +18,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
   const latestBlogs = (pinned ? [pinned, ...rest] : blogs).slice(0, 4);
 
   return (
-    <section className="py-24 bg-black border-t border-white/5">
+    <section className="py-24 bg-black">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
           <div>
@@ -27,7 +27,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
               <span className="text-zinc-600">for the journey.</span>
             </h2>
           </div>
-          <Link href="/blog" className="text-sm font-bold text-zinc-500 hover:text-white transition-colors flex items-center gap-2 uppercase tracking-widest">
+          <Link href="/blog" className="text-sm font-bold text-zinc-500 hover:text-white transition-colors flex items-center gap-2">
             View all articles <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -36,18 +36,18 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
           {latestBlogs.map((article, index) => (
             <div key={index}>
               <Link href={`/blog/${article.slug}`} className="group block">
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-900 mb-4 border border-white/5 group-hover:border-white/20 transition-colors">
-                  <NextImage 
-                    src={article.image} 
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-zinc-900 mb-4">
+                  <NextImage
+                    src={article.image}
                     alt={article.title}
                     fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-100"
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 opacity-60 group-hover:opacity-100"
                   />
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                  <div className="flex items-center gap-3 text-[10px] font-bold text-zinc-600">
                     <span className="text-cyan-500/80">Article</span>
-                    <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
+                    <span aria-hidden>·</span>
                     <span>{new Date(article.date).toLocaleDateString()}</span>
                   </div>
                   <h3 className="text-lg font-bold text-white tracking-tight leading-snug group-hover:text-cyan-400 transition-colors line-clamp-2">
