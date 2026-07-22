@@ -4,30 +4,81 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
+import { fraunces } from "feature/landing/lib/fonts";
 import type { BlogFrontmatter } from "lib/blog";
 import dynamic from "next/dynamic";
 
-const WhySection = dynamic(() => import("feature/landing/components/WhySection").then(m => m.WhySection));
-const InteractiveExercisesSection = dynamic(() => import("feature/landing/components/InteractiveExercisesSection").then(m => m.InteractiveExercisesSection));
-const ExerciseCatalogPreview = dynamic(() => import("feature/landing/components/ExerciseCatalogPreview").then(m => m.ExerciseCatalogPreview));
-const StatisticsSection = dynamic(() => import("feature/landing/components/StatisticsSection").then(m => m.StatisticsSection));
-const SongsLibrarySection = dynamic(() => import("feature/landing/components/SongsLibrarySection").then(m => m.SongsLibrarySection));
-const PracticePlansSection = dynamic(() => import("feature/landing/components/PracticePlansSection").then(m => m.PracticePlansSection));
-const RoadmapSection = dynamic(() => import("feature/landing/components/RoadmapSection").then(m => m.RoadmapSection));
-const SessionSummarySection = dynamic(() => import("feature/landing/components/SessionSummarySection").then(m => m.SessionSummarySection));
-const TestimonialsSection = dynamic(() => import("feature/landing/components/TestimonialsSection").then(m => m.TestimonialsSection));
-const FaqSection = dynamic(() => import("feature/landing/components/FaqSection").then(m => m.FaqSection));
-const BlogSection = dynamic(() => import("feature/landing/components/BlogSection").then(m => m.BlogSection));
-const FinalCTASection = dynamic(() => import("feature/landing/components/FinalCTASection").then(m => m.FinalCTASection));
-const Footer = dynamic(() => import("feature/landing/components/Footer").then(m => m.Footer));
-const CookieBanner = dynamic(() => import("feature/landing/components/CookieBanner").then(m => m.CookieBanner), { ssr: false });
+const WhySection = dynamic(() =>
+  import("feature/landing/components/WhySection").then((m) => m.WhySection),
+);
+const InteractiveExercisesSection = dynamic(() =>
+  import("feature/landing/components/InteractiveExercisesSection").then(
+    (m) => m.InteractiveExercisesSection,
+  ),
+);
+const ExerciseCatalogPreview = dynamic(() =>
+  import("feature/landing/components/ExerciseCatalogPreview").then(
+    (m) => m.ExerciseCatalogPreview,
+  ),
+);
+const StatisticsSection = dynamic(() =>
+  import("feature/landing/components/StatisticsSection").then(
+    (m) => m.StatisticsSection,
+  ),
+);
+const SongsLibrarySection = dynamic(() =>
+  import("feature/landing/components/SongsLibrarySection").then(
+    (m) => m.SongsLibrarySection,
+  ),
+);
+const PracticePlansSection = dynamic(() =>
+  import("feature/landing/components/PracticePlansSection").then(
+    (m) => m.PracticePlansSection,
+  ),
+);
+const RoadmapSection = dynamic(() =>
+  import("feature/landing/components/RoadmapSection").then(
+    (m) => m.RoadmapSection,
+  ),
+);
+const SessionSummarySection = dynamic(() =>
+  import("feature/landing/components/SessionSummarySection").then(
+    (m) => m.SessionSummarySection,
+  ),
+);
+const TestimonialsSection = dynamic(() =>
+  import("feature/landing/components/TestimonialsSection").then(
+    (m) => m.TestimonialsSection,
+  ),
+);
+const FaqSection = dynamic(() =>
+  import("feature/landing/components/FaqSection").then((m) => m.FaqSection),
+);
+const BlogSection = dynamic(() =>
+  import("feature/landing/components/BlogSection").then((m) => m.BlogSection),
+);
+const FinalCTASection = dynamic(() =>
+  import("feature/landing/components/FinalCTASection").then(
+    (m) => m.FinalCTASection,
+  ),
+);
+const Footer = dynamic(() =>
+  import("feature/landing/components/Footer").then((m) => m.Footer),
+);
+const CookieBanner = dynamic(
+  () =>
+    import("feature/landing/components/CookieBanner").then(
+      (m) => m.CookieBanner,
+    ),
+  { ssr: false },
+);
 
 interface LandingPageProps {
   blogs: BlogFrontmatter[];
   spotlightExercises?: Array<{
     id: string;
     title: string;
-    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
+    difficulty: "beginner" | "easy" | "medium" | "hard";
     category: string;
     description: string;
     timeInMinutes: number;
@@ -36,7 +87,6 @@ interface LandingPageProps {
 
 const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
-  
     {
       title: "Who is this app for?",
       message:
@@ -77,13 +127,15 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
   return (
     <>
       <LandingSEO faqQuestions={faqQuestions} />
-      <main className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden'>
-        
+      <main
+        className={`${fraunces.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
         <HeroSection />
         <ProductDemo />
         <WhySection />
         <InteractiveExercisesSection />
-        {spotlightExercises.length > 0 && <ExerciseCatalogPreview exercises={spotlightExercises} />}
+        {spotlightExercises.length > 0 && (
+          <ExerciseCatalogPreview exercises={spotlightExercises} />
+        )}
         <StatisticsSection />
         <SongsLibrarySection />
         <PracticePlansSection />

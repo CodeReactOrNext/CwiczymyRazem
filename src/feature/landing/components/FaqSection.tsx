@@ -2,27 +2,28 @@
 
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 
-export const FaqSection = ({ questions }: { questions: faqQuestionInterface[] }) => {
+export const FaqSection = ({
+  questions,
+}: {
+  questions: faqQuestionInterface[];
+}) => {
   return (
-    <section className='py-24 bg-zinc-900/20'>
+    <section className='bg-zinc-900/40 py-28'>
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='max-w-xl mb-16'>
-          <h2 className='text-3xl font-bold text-white tracking-tighter leading-tight font-display'>
-            Frequently asked <br/>
-            <span className="text-zinc-600">questions.</span>
+        <div className='mb-16 max-w-xl'>
+          <h2 className='font-landingHeading text-3xl font-semibold leading-tight tracking-tight text-white'>
+            Frequently asked <br />
+            <span className='text-zinc-600'>questions.</span>
           </h2>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12'>
+        <div className='grid grid-cols-1 gap-x-12 gap-y-12 md:grid-cols-2'>
           {questions.map((faq, index) => (
-            <div 
-              key={index} 
-              className='flex flex-col'
-            >
-              <h3 className='text-base font-bold text-white tracking-tight mb-3'>
+            <div key={index} className='flex flex-col'>
+              <h3 className='mb-3 text-base font-bold tracking-tight text-white'>
                 {faq.title}
               </h3>
-              <p className='text-zinc-500 text-sm leading-relaxed max-w-md'>
+              <p className='max-w-md text-sm leading-relaxed text-zinc-500'>
                 {faq.message}
               </p>
             </div>
