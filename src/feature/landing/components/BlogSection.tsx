@@ -18,9 +18,9 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
   const latestBlogs = (pinned ? [pinned, ...rest] : blogs).slice(0, 4);
 
   return (
-    <section className='bg-zinc-950 py-28'>
+    <section className='bg-zinc-950 py-20'>
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-16 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
+        <div className='mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
           <div>
             <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white'>
               Knowledge <br />

@@ -1,16 +1,18 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export const FinalCTASection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-950 py-32'>
+    <section className='relative overflow-hidden bg-zinc-950 py-28'>
       {/* Background decoration - Floating Glow (pure CSS, no JS-driven animation) */}
       <div className='absolute inset-0 z-0 overflow-hidden'>
         <div className='pointer-events-none absolute left-1/4 top-1/4 h-[800px] w-[800px] animate-glow-float-1 rounded-full bg-cyan-500/15 blur-[140px]' />
         <div className='pointer-events-none absolute bottom-1/4 right-1/4 h-[800px] w-[800px] animate-glow-float-2 rounded-full bg-cyan-500/10 blur-[140px]' />
+        <GuitarPatternBackground opacity={0.02} />
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
@@ -21,10 +23,8 @@ export const FinalCTASection = () => {
               <span className='text-cyan-400'>future self.</span>
             </h2>
 
-            <p className='mx-auto mb-12 max-w-2xl text-lg font-medium leading-relaxed text-zinc-400 sm:text-xl'>
-              Join guitarists who already transformed their practice into
-              progress. <br className='hidden sm:block' />
-              The journey to mastery starts with a single click.
+            <p className='mx-auto mb-10 max-w-2xl text-lg font-medium leading-relaxed text-zinc-400 sm:text-xl'>
+              Join guitarists who already turned practice into progress.
             </p>
 
             <div className='flex flex-col items-center'>

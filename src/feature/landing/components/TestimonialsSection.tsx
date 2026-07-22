@@ -32,11 +32,11 @@ export const TestimonialsSection = () => {
     // for the WCAG contrast table). Hard edge on purpose: no gradient fade
     // into the dark sections above/below it, so the tone shift itself reads
     // as an intentional pause, not a glitch.
-    <section className='relative overflow-hidden bg-ivory py-32'>
+    <section className='relative overflow-hidden bg-ivory py-24'>
       <GuitarPatternBackground variant='light' opacity={0.035} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-16 max-w-3xl'>
+        <div className='mb-12 max-w-3xl'>
           <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
             Loved by guitarists <br />
             who show up.

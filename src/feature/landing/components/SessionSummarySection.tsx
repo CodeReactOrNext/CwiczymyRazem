@@ -8,23 +8,23 @@ const features = [
   {
     icon: <Brain className='h-4 w-4' />,
     label: "AI session assessment",
-    desc: "Every session gets a grade with a written breakdown of your strengths and blind spots",
+    desc: "A grade with a breakdown of strengths and blind spots",
   },
   {
     icon: <Sparkles className='h-4 w-4' />,
     label: "Personalized feedback",
-    desc: "Not generic tips, feedback based on what you actually practiced that day",
+    desc: "Based on what you actually practiced that day",
   },
   {
     icon: <TrendingUp className='h-4 w-4' />,
     label: "Points & level progression",
-    desc: "Earn XP for each session and watch your level climb in real time",
+    desc: "Earn XP and watch your level climb in real time",
   },
 ];
 
 export const SessionSummarySection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-900 py-32'>
+    <section className='relative overflow-hidden bg-zinc-900 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute left-1/2 top-1/3 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-cyan-500/5 blur-[150px]' />
@@ -36,13 +36,12 @@ export const SessionSummarySection = () => {
           <span className='text-zinc-400'>knowing what’s next.</span>
         </h2>
 
-        <p className='mx-auto mb-14 max-w-xl text-lg leading-relaxed text-zinc-400'>
-          After each practice, the AI grades your session, highlights your
-          strengths, and tells you exactly what to focus on next time. No more
-          guessing, just clear, actionable direction.
+        <p className='mx-auto mb-10 max-w-xl text-lg leading-relaxed text-zinc-400'>
+          The AI grades your session, highlights your strengths, and tells you
+          what to focus on next.
         </p>
 
-        <AuroraGlowFrame className='mx-auto mb-16 max-w-3xl'>
+        <AuroraGlowFrame className='mx-auto mb-12 max-w-3xl'>
           <div className='relative rounded-lg p-1.5 glass-card'>
             <div className='relative overflow-hidden rounded-lg'>
               <Image

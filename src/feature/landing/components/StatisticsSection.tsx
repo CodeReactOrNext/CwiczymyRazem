@@ -122,28 +122,28 @@ const features = [
   {
     icon: <Clock className='h-4 w-4' />,
     label: "Total practice time",
-    desc: "Every session logged, see exactly how many hours you've invested in your craft",
+    desc: "Every session logged, down to the hour",
   },
   {
     icon: <BarChart2 className='h-4 w-4' />,
     label: "Skill breakdown",
-    desc: "Track time spent on Technique, Theory, Creativity, and Ear Training separately",
+    desc: "Technique, Theory, Creativity, Ear Training",
   },
   {
     icon: <Star className='h-4 w-4' />,
     label: "Points & milestones",
-    desc: "Earn XP for every session and watch your rank climb the leaderboard",
+    desc: "Earn XP and climb the leaderboard",
   },
   {
     icon: <TrendingUp className='h-4 w-4' />,
     label: "Long-term trends",
-    desc: "Spot patterns, plateau moments, and breakthroughs across months and years",
+    desc: "Spot plateaus and breakthroughs over time",
   },
 ];
 
 export const StatisticsSection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-900 py-32'>
+    <section className='relative overflow-hidden bg-zinc-900 py-24'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute left-0 top-1/4 h-[600px] w-[600px] rounded-full bg-cyan-500/5 blur-[150px]' />
@@ -193,10 +193,9 @@ export const StatisticsSection = () => {
               <span className='text-zinc-400'>Your data does the talking.</span>
             </h2>
 
-            <p className='mb-12 max-w-md text-lg leading-relaxed text-zinc-400'>
-              A detailed stats dashboard that breaks down every hour of practice
-              into meaningful categories. Know exactly where your time goes and
-              where to invest it next.
+            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
+              A stats dashboard that breaks every hour into meaningful
+              categories, so you know where your time actually goes.
             </p>
 
             {/* Feature list */}
