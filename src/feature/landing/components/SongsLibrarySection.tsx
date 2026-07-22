@@ -40,7 +40,7 @@ export const SongsLibrarySection = () => {
         <div className='grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.7fr] xl:gap-16'>
           {/* Left - content */}
           <div className='flex flex-col'>
-            <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
               Every song you want <br />
               <span className='text-zinc-400'>to learn. Ranked.</span>
             </h2>

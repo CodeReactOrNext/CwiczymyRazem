@@ -16,7 +16,7 @@ export const FinalCTASection = () => {
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='flex flex-col items-center text-center'>
           <div className='max-w-4xl'>
-            <h2 className='mb-8 font-landingHeading text-5xl font-semibold leading-[0.9] tracking-tight text-white sm:text-6xl lg:text-7xl'>
+            <h2 className='mb-8 font-landingHeading text-5xl font-bold leading-[0.9] tracking-tight text-white sm:text-6xl lg:text-7xl'>
               Level up your <br />
               <span className='text-cyan-400'>future self.</span>
             </h2>
