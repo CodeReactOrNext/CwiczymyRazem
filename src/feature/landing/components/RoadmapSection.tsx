@@ -7,21 +7,21 @@ const GOAL_TAGS = ["Shred Speed", "Fingerpicking", "Music Theory", "Improvisatio
 
 const ROADMAP_STEPS = [
   {
-    level: "Week 1–2",
+    level: "Week 1-2",
     title: "Chromatic warm-up",
     type: "Technique",
     color: "cyan",
     done: true,
   },
   {
-    level: "Week 3–4",
-    title: "Spider exercise — positions",
+    level: "Week 3-4",
+    title: "Spider exercise positions",
     type: "Technique",
     color: "cyan",
     done: true,
   },
   {
-    level: "Week 5–6",
+    level: "Week 5-6",
     title: "Pentatonic patterns",
     type: "Creativity",
     color: "amber",
@@ -29,7 +29,7 @@ const ROADMAP_STEPS = [
     active: true,
   },
   {
-    level: "Week 7–8",
+    level: "Week 7-8",
     title: "String skipping drill",
     type: "Technique",
     color: "cyan",
@@ -45,29 +45,26 @@ const ROADMAP_STEPS = [
 ];
 
 const colorMap: Record<string, string> = {
-  cyan: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
-  amber: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+  cyan: "bg-cyan-500/10 text-cyan-400",
+  amber: "bg-amber-500/10 text-amber-400",
 };
 
 export const RoadmapSection = () => {
   return (
-    <section className="relative py-32 bg-zinc-950 overflow-hidden">
+    <section className="relative py-28 bg-zinc-950 overflow-hidden">
       {/* Background ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-cyan-500/5 blur-[160px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-sky-500/4 blur-[130px] rounded-full" />
       </div>
 
-      {/* Top divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
-
       <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 items-start">
 
-          {/* Left — content */}
+          {/* Left - content */}
           <div className="flex flex-col lg:sticky lg:top-24">
-            <span className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400 mb-6">
-              Mastery Roadmaps
+            <span className="text-sm font-bold tracking-wide text-cyan-400 mb-6">
+              Mastery roadmaps
             </span>
 
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
@@ -77,23 +74,23 @@ export const RoadmapSection = () => {
 
             <p className="text-zinc-400 text-lg leading-relaxed mb-8 max-w-md">
               Tell the app what you want to achieve. It builds a week-by-week
-              mastery roadmap with the right drills in the right order — each
+              mastery roadmap with the right drills in the right order, each
               one linked to a curated YouTube lesson so you know exactly how
               to execute it.
             </p>
 
             {/* Goal selector mock */}
             <div className="mb-10">
-              <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3">Your goal</div>
+              <div className="text-[10px] font-bold text-zinc-600 mb-3">Your goal</div>
               <div className="flex flex-wrap gap-2">
                 {GOAL_TAGS.map((tag, i) => (
                   <div
                     key={tag}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider border transition-colors cursor-default",
+                      "px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-default",
                       i === 0
-                        ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                        : "bg-zinc-900/60 border-white/5 text-zinc-600"
+                        ? "bg-cyan-500/15 text-cyan-300"
+                        : "bg-zinc-900/60 text-zinc-600"
                     )}
                   >
                     {tag}
@@ -104,7 +101,7 @@ export const RoadmapSection = () => {
 
           </div>
 
-          {/* Right — roadmap visual */}
+          {/* Right - roadmap visual */}
           <div className="relative flex flex-col gap-3">
             {ROADMAP_STEPS.map((step, i) => (
               <div key={i} className="relative flex gap-4">
@@ -135,16 +132,16 @@ export const RoadmapSection = () => {
 
                 {/* Card */}
                 <div className={cn(
-                  "flex-1 rounded-xl border p-4 transition-all",
+                  "flex-1 rounded-lg p-4 transition-all",
                   step.active
-                    ? "border-cyan-500/30 bg-cyan-500/5"
+                    ? "bg-cyan-500/5"
                     : step.done
-                    ? "border-white/5 bg-zinc-900/30 opacity-60"
-                    : "border-white/5 bg-zinc-900/40"
+                    ? "bg-zinc-900/30 opacity-60"
+                    : "bg-zinc-900/40"
                 )}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">{step.level}</div>
+                      <div className="text-[10px] font-bold text-zinc-600 mb-1">{step.level}</div>
                       <div className={cn(
                         "text-sm font-bold tracking-tight",
                         step.active ? "text-white" : step.done ? "text-zinc-400" : "text-zinc-300"
@@ -153,13 +150,13 @@ export const RoadmapSection = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className={cn("text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded border", colorMap[step.color])}>
+                      <span className={cn("text-[10px] font-bold px-2 py-1 rounded", colorMap[step.color])}>
                         {step.type}
                       </span>
                     </div>
                   </div>
                   {step.active && (
-                    <div className="mt-3 flex items-center gap-1.5 text-[10px] font-black text-cyan-400 uppercase tracking-widest">
+                    <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-cyan-400">
                       <span>Continue</span>
                       <ArrowRight className="w-3 h-3" />
                     </div>

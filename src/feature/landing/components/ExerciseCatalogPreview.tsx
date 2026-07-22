@@ -20,22 +20,15 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
   exercises,
 }) => {
   return (
-    <section className="relative py-32 bg-zinc-950 overflow-hidden">
+    <section className="relative py-28 bg-zinc-950 overflow-hidden">
       {/* Background ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/3 right-0 w-[700px] h-[700px] bg-cyan-500/5 blur-[160px] rounded-full" />
         <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-sky-500/5 blur-[130px] rounded-full" />
       </div>
 
-      {/* Top divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
-
       <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto">
-          <span className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400 mb-4 block">
-            Exercise Catalog
-          </span>
-
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
             Hundreds of exercises<br />
             <span className="text-zinc-500">ready to learn</span>

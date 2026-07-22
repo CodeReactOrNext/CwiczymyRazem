@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const FinalCTASection = () => {
   return (
-    <section className="relative py-32 bg-black overflow-hidden border-t border-white/5">
+    <section className="relative py-32 bg-black overflow-hidden">
       {/* Background decoration - Floating Glow (pure CSS, no JS-driven animation) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="animate-glow-float-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500/15 rounded-full blur-[140px] pointer-events-none" />
@@ -28,7 +28,7 @@ export const FinalCTASection = () => {
 
                 <div className="flex flex-col items-center">
                   <Link href="/signup">
-                      <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                      <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 active:scale-[0.98]">
                           {/* Vibrant Rotating Border Beam - Restored and Working */}
                           <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                           
