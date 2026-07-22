@@ -1,5 +1,6 @@
 "use client";
 
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Quote } from "lucide-react";
 import Image from "next/image";
 
@@ -27,25 +28,25 @@ const rest = [
 
 export const TestimonialsSection = () => {
   return (
-    <section className='relative py-28 bg-zinc-950 overflow-hidden'>
-      {/* Background ambience */}
-      <div className='pointer-events-none absolute inset-0'>
-        <div className='absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-purple-500/5 blur-[150px]' />
-        <div className='absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/4 blur-[130px]' />
-      </div>
+    // The one light section on the landing page (see PR writeup for why and
+    // for the WCAG contrast table). Hard edge on purpose: no gradient fade
+    // into the dark sections above/below it, so the tone shift itself reads
+    // as an intentional pause, not a glitch.
+    <section className='relative overflow-hidden bg-ivory py-32'>
+      <GuitarPatternBackground variant='light' opacity={0.035} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mb-16 max-w-3xl'>
-          <h2 className='font-display text-4xl font-bold leading-tight tracking-tighter text-white sm:text-5xl'>
+          <h2 className='font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
             Loved by guitarists <br />
             who show up.
           </h2>
         </div>
 
-        <div className='grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6'>
-          <div className='flex flex-col justify-between rounded-lg bg-zinc-900/40 p-10'>
-            <Quote className='mb-6 h-9 w-9 shrink-0 text-purple-400/60' />
-            <p className='flex-1 text-xl leading-relaxed text-zinc-200'>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-[1.3fr_1fr]'>
+          <div className='flex flex-col justify-between rounded-lg bg-ivory-surface p-10'>
+            <Quote className='mb-6 h-9 w-9 shrink-0 text-ivory-accent' />
+            <p className='flex-1 text-xl leading-relaxed text-ivory-fg'>
               {featured.quote}
             </p>
             <div className='mt-8 flex items-center gap-3'>
@@ -57,8 +58,12 @@ export const TestimonialsSection = () => {
                 className='h-12 w-12 rounded-full object-cover'
               />
               <div>
-                <div className='text-sm font-bold text-white'>{featured.name}</div>
-                <div className='text-xs text-zinc-500'>RiffQuest community</div>
+                <div className='text-sm font-bold text-ivory-fg'>
+                  {featured.name}
+                </div>
+                <div className='text-xs text-ivory-muted'>
+                  RiffQuest community
+                </div>
               </div>
             </div>
           </div>
@@ -67,9 +72,8 @@ export const TestimonialsSection = () => {
             {rest.map((testimonial) => (
               <div
                 key={testimonial.name}
-                className='flex flex-1 flex-col rounded-lg bg-zinc-900/40 p-6'
-              >
-                <p className='flex-1 text-sm leading-relaxed text-zinc-300'>
+                className='flex flex-1 flex-col rounded-lg bg-ivory-surface p-6'>
+                <p className='flex-1 text-sm leading-relaxed text-ivory-fg'>
                   {testimonial.quote}
                 </p>
                 <div className='mt-6 flex items-center gap-3'>
@@ -81,8 +85,12 @@ export const TestimonialsSection = () => {
                     className='h-9 w-9 rounded-full object-cover'
                   />
                   <div>
-                    <div className='text-sm font-bold text-white'>{testimonial.name}</div>
-                    <div className='text-xs text-zinc-500'>RiffQuest community</div>
+                    <div className='text-sm font-bold text-ivory-fg'>
+                      {testimonial.name}
+                    </div>
+                    <div className='text-xs text-ivory-muted'>
+                      RiffQuest community
+                    </div>
                   </div>
                 </div>
               </div>
