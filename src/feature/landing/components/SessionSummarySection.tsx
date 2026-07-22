@@ -1,5 +1,6 @@
 "use client";
 
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Brain, Sparkles, TrendingUp } from "lucide-react";
 import Image from "next/image";
 
@@ -23,7 +24,7 @@ const features = [
 
 export const SessionSummarySection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-900/40 py-32'>
+    <section className='relative overflow-hidden bg-zinc-900 py-32'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute left-1/2 top-1/3 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-cyan-500/5 blur-[150px]' />
@@ -32,7 +33,7 @@ export const SessionSummarySection = () => {
       <div className='relative z-10 mx-auto max-w-5xl px-6 text-center lg:px-8'>
         <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
           End every session <br />
-          <span className='text-zinc-500'>knowing what’s next.</span>
+          <span className='text-zinc-400'>knowing what’s next.</span>
         </h2>
 
         <p className='mx-auto mb-14 max-w-xl text-lg leading-relaxed text-zinc-400'>
@@ -41,9 +42,7 @@ export const SessionSummarySection = () => {
           guessing, just clear, actionable direction.
         </p>
 
-        <div className='relative mx-auto mb-16 max-w-3xl'>
-          <div className='pointer-events-none absolute inset-0 -m-8 bg-[radial-gradient(circle,rgba(6,182,212,0.1),transparent_70%)] blur-2xl' />
-
+        <AuroraGlowFrame className='mx-auto mb-16 max-w-3xl'>
           <div className='relative rounded-lg p-1.5 glass-card'>
             <div className='relative overflow-hidden rounded-lg'>
               <Image
@@ -58,7 +57,7 @@ export const SessionSummarySection = () => {
           </div>
 
           {/* Floating grade badge */}
-          <div className='absolute -bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
+          <div className='absolute -bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
             <div className='flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500/20'>
               <span className='text-[13px] font-bold text-cyan-400'>A-</span>
             </div>
@@ -66,14 +65,14 @@ export const SessionSummarySection = () => {
               <div className='text-[11px] font-bold text-white'>
                 Creative flow
               </div>
-              <div className='text-[10px] font-medium text-zinc-500'>
+              <div className='text-[10px] font-medium text-zinc-400'>
                 Today’s assessment
               </div>
             </div>
           </div>
-        </div>
+        </AuroraGlowFrame>
 
-        <div className='flex flex-col gap-10 rounded-lg bg-zinc-800/40 p-8 text-left sm:flex-row sm:gap-8'>
+        <div className='flex flex-col gap-10 rounded-lg bg-zinc-800/60 p-8 text-left sm:flex-row sm:gap-8'>
           {features.map((f, i) => (
             <div key={i} className='flex flex-1 items-start gap-4'>
               <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
@@ -83,7 +82,7 @@ export const SessionSummarySection = () => {
                 <div className='mb-1 text-sm font-bold text-white'>
                   {f.label}
                 </div>
-                <div className='text-sm leading-relaxed text-zinc-500'>
+                <div className='text-sm leading-relaxed text-zinc-400'>
                   {f.desc}
                 </div>
               </div>

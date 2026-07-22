@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "assets/lib/utils";
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { BarChart2, Clock, Star, TrendingUp, Users } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
@@ -50,16 +51,16 @@ const ActivityHeatmap = () => {
   );
 
   return (
-    <div className='rounded-lg bg-zinc-900/40 px-4 py-3'>
+    <div className='rounded-lg bg-zinc-800/60 px-4 py-3'>
       <div className='mb-3 flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          <div className='text-[10px] font-bold text-zinc-500'>
+          <div className='text-[10px] font-bold text-zinc-400'>
             Practice activity
           </div>
           <div className='text-[10px] font-bold text-white'>263 sessions</div>
         </div>
         <div className='flex items-center gap-2'>
-          <span className='text-[9px] font-bold text-zinc-700'>Less</span>
+          <span className='text-[9px] font-bold text-zinc-400'>Less</span>
           <div className='flex gap-[3px]'>
             {LEGEND_CLASSES.map((cls, i) => (
               <div
@@ -68,7 +69,7 @@ const ActivityHeatmap = () => {
               />
             ))}
           </div>
-          <span className='text-[9px] font-bold text-zinc-700'>More</span>
+          <span className='text-[9px] font-bold text-zinc-400'>More</span>
         </div>
       </div>
 
@@ -77,7 +78,7 @@ const ActivityHeatmap = () => {
         {MONTHS.map((m) => (
           <div
             key={m}
-            className='w-[52px] min-w-0 text-[8px] font-bold text-zinc-700'>
+            className='w-[52px] min-w-0 text-[8px] font-bold text-zinc-400'>
             {m}
           </div>
         ))}
@@ -85,7 +86,7 @@ const ActivityHeatmap = () => {
 
       <div className='flex items-start gap-1.5 overflow-x-auto'>
         {/* Day labels */}
-        <div className='flex h-[84px] shrink-0 flex-col justify-between pt-[1px] text-[8px] font-bold text-zinc-700'>
+        <div className='flex h-[84px] shrink-0 flex-col justify-between pt-[1px] text-[8px] font-bold text-zinc-400'>
           <span>M</span>
           <span>T</span>
           <span>S</span>
@@ -142,7 +143,7 @@ const features = [
 
 export const StatisticsSection = () => {
   return (
-    <section className='relative overflow-hidden bg-zinc-900/40 py-32'>
+    <section className='relative overflow-hidden bg-zinc-900 py-32'>
       {/* Background ambience */}
       <div className='pointer-events-none absolute inset-0'>
         <div className='absolute left-0 top-1/4 h-[600px] w-[600px] rounded-full bg-cyan-500/5 blur-[150px]' />
@@ -153,9 +154,7 @@ export const StatisticsSection = () => {
         <div className='grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.7fr_1fr] xl:gap-16'>
           {/* Left - screenshot + heatmap */}
           <div className='order-2 flex flex-col gap-4 lg:order-1'>
-            <div className='relative'>
-              <div className='pointer-events-none absolute inset-0 -m-8 bg-[radial-gradient(circle,rgba(6,182,212,0.1),transparent_70%)] blur-2xl' />
-
+            <AuroraGlowFrame>
               <div className='relative rounded-lg p-1.5 glass-card'>
                 <div className='relative overflow-hidden rounded-lg'>
                   <Image
@@ -171,13 +170,13 @@ export const StatisticsSection = () => {
               </div>
 
               {/* Floating badge */}
-              <div className='absolute -bottom-4 -left-4 flex items-center gap-2 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
+              <div className='absolute -bottom-4 -left-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
                 <Users className='h-3.5 w-3.5 text-cyan-400' />
                 <span className='text-[11px] font-bold text-white'>
                   Your progress
                 </span>
               </div>
-            </div>
+            </AuroraGlowFrame>
 
             {/* Heatmap below image */}
             <ActivityHeatmap />
@@ -191,7 +190,7 @@ export const StatisticsSection = () => {
 
             <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
               Numbers don’t lie. <br />
-              <span className='text-zinc-500'>Your data does the talking.</span>
+              <span className='text-zinc-400'>Your data does the talking.</span>
             </h2>
 
             <p className='mb-12 max-w-md text-lg leading-relaxed text-zinc-400'>
@@ -211,7 +210,7 @@ export const StatisticsSection = () => {
                     <div className='mb-0.5 text-sm font-bold text-white'>
                       {f.label}
                     </div>
-                    <div className='text-sm leading-relaxed text-zinc-500'>
+                    <div className='text-sm leading-relaxed text-zinc-400'>
                       {f.desc}
                     </div>
                   </div>

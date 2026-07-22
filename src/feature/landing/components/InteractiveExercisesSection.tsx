@@ -1,5 +1,6 @@
 "use client";
 
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Guitar, ListMusic, Star } from "lucide-react";
 import Image from "next/image";
 
@@ -36,7 +37,7 @@ export const InteractiveExercisesSection = () => {
           <div className='flex flex-col'>
             <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
               Practice with tabs. <br />
-              <span className='text-zinc-500'>Hear every note.</span>
+              <span className='text-zinc-400'>Hear every note.</span>
             </h2>
 
             <p className='mb-12 max-w-md text-lg leading-relaxed text-zinc-400'>
@@ -56,7 +57,7 @@ export const InteractiveExercisesSection = () => {
                     <div className='mb-0.5 text-sm font-bold text-white'>
                       {f.label}
                     </div>
-                    <div className='text-sm leading-relaxed text-zinc-500'>
+                    <div className='text-sm leading-relaxed text-zinc-400'>
                       {f.desc}
                     </div>
                   </div>
@@ -66,9 +67,7 @@ export const InteractiveExercisesSection = () => {
           </div>
 
           {/* Right - screenshot */}
-          <div className='relative'>
-            <div className='pointer-events-none absolute inset-0 -m-8 bg-[radial-gradient(circle,rgba(6,182,212,0.12),transparent_70%)] blur-2xl' />
-
+          <AuroraGlowFrame>
             <div className='relative rounded-lg p-1.5 glass-card'>
               <div className='relative overflow-hidden rounded-lg'>
                 <Image
@@ -84,13 +83,13 @@ export const InteractiveExercisesSection = () => {
             </div>
 
             {/* Floating badge */}
-            <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
+            <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
               <span className='h-2 w-2 animate-pulse rounded-full bg-cyan-400' />
               <span className='text-[11px] font-bold text-white'>
                 Live sync
               </span>
             </div>
-          </div>
+          </AuroraGlowFrame>
         </div>
       </div>
     </section>

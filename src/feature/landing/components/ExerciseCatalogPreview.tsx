@@ -32,7 +32,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
           <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
             Hundreds of exercises
             <br />
-            <span className='text-zinc-500'>ready to learn</span>
+            <span className='text-zinc-400'>ready to learn</span>
           </h2>
 
           <p className='mb-4 text-lg leading-relaxed text-zinc-400'>

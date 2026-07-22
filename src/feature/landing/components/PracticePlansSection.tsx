@@ -1,5 +1,6 @@
 "use client";
 
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Layers, PenLine, Shuffle, Timer } from "lucide-react";
 import Image from "next/image";
 
@@ -16,7 +17,7 @@ export const PracticePlansSection = () => {
         <div className='mb-14 max-w-2xl'>
           <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
             Your practice, <br />
-            <span className='text-zinc-500'>your rules.</span>
+            <span className='text-zinc-400'>your rules.</span>
           </h2>
           <p className='max-w-md text-lg leading-relaxed text-zinc-400'>
             Stop improvising your sessions. Build structured practice plans from
@@ -27,34 +28,36 @@ export const PracticePlansSection = () => {
 
         <div className='grid grid-cols-1 gap-5 md:grid-cols-5'>
           {/* Featured tile: real screenshot */}
-          <div className='flex flex-col rounded-lg p-1.5 glass-card md:col-span-3 md:row-span-2'>
-            <div className='relative flex-1 overflow-hidden rounded-lg'>
-              <Image
-                src='/images/feature/practices-plans.webp'
-                alt='Practice plans library with custom and template routines'
-                width={1200}
-                height={800}
-                className='h-auto w-full object-cover'
-                priority={false}
-              />
-            </div>
-            <div className='flex items-start gap-4 p-5'>
-              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
-                <PenLine className='h-4 w-4' />
+          <AuroraGlowFrame className='md:col-span-3 md:row-span-2'>
+            <div className='flex h-full flex-col rounded-lg p-1.5 glass-card'>
+              <div className='relative flex-1 overflow-hidden rounded-lg'>
+                <Image
+                  src='/images/feature/practices-plans.webp'
+                  alt='Practice plans library with custom and template routines'
+                  width={1200}
+                  height={800}
+                  className='h-auto w-full object-cover'
+                  priority={false}
+                />
               </div>
-              <div>
-                <div className='mb-0.5 text-sm font-bold text-white'>
-                  Build your own plan
+              <div className='flex items-start gap-4 p-5'>
+                <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
+                  <PenLine className='h-4 w-4' />
                 </div>
-                <div className='text-sm leading-relaxed text-zinc-500'>
-                  Create a fully custom routine from scratch, pick exercises,
-                  set durations, define order
+                <div>
+                  <div className='mb-0.5 text-sm font-bold text-white'>
+                    Build your own plan
+                  </div>
+                  <div className='text-sm leading-relaxed text-zinc-400'>
+                    Create a fully custom routine from scratch, pick exercises,
+                    set durations, define order
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </AuroraGlowFrame>
 
-          <div className='flex items-start gap-4 rounded-lg bg-zinc-900/40 p-5 md:col-span-2'>
+          <div className='flex items-start gap-4 rounded-lg bg-zinc-900/70 p-5 md:col-span-2'>
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
               <Layers className='h-4 w-4' />
             </div>
@@ -62,14 +65,14 @@ export const PracticePlansSection = () => {
               <div className='mb-0.5 text-sm font-bold text-white'>
                 Ready-made templates
               </div>
-              <div className='text-sm leading-relaxed text-zinc-500'>
+              <div className='text-sm leading-relaxed text-zinc-400'>
                 Curated plans for technique, theory, creativity, and ear
                 training
               </div>
             </div>
           </div>
 
-          <div className='flex items-start gap-4 rounded-lg bg-zinc-900/40 p-5 md:col-span-2'>
+          <div className='flex items-start gap-4 rounded-lg bg-zinc-900/70 p-5 md:col-span-2'>
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
               <Timer className='h-4 w-4' />
             </div>
@@ -77,7 +80,7 @@ export const PracticePlansSection = () => {
               <div className='mb-0.5 text-sm font-bold text-white'>
                 Timed sessions
               </div>
-              <div className='text-sm leading-relaxed text-zinc-500'>
+              <div className='text-sm leading-relaxed text-zinc-400'>
                 Each block has a fixed time slot so your practice stays focused
                 and on schedule
               </div>

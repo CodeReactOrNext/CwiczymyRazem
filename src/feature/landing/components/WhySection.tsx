@@ -42,7 +42,7 @@ export const WhySection = () => {
         </div>
 
         <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
-          <div className='flex flex-col justify-between rounded-lg bg-zinc-900/40 p-8 lg:p-10'>
+          <div className='flex flex-col justify-between rounded-lg bg-zinc-900/70 p-8 lg:p-10'>
             <div
               className={`h-16 w-16 rounded-lg ${leadReason.iconBg} mb-10 flex items-center justify-center`}>
               {leadReason.icon}
@@ -61,7 +61,7 @@ export const WhySection = () => {
             {reasons.map((reason, index) => (
               <div
                 key={index}
-                className='flex items-start gap-5 rounded-lg bg-zinc-900/40 p-8'>
+                className='flex items-start gap-5 rounded-lg bg-zinc-900/70 p-8'>
                 <div
                   className={`h-11 w-11 rounded-lg ${reason.iconBg} flex shrink-0 items-center justify-center`}>
                   {reason.icon}
