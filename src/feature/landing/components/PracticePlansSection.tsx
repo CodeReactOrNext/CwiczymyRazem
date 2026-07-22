@@ -15,7 +15,7 @@ export const PracticePlansSection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mb-14 max-w-2xl'>
-          <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+          <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
             Your practice, <br />
             <span className='text-zinc-400'>your rules.</span>
           </h2>

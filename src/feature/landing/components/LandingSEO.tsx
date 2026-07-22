@@ -41,7 +41,8 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
       <meta name='twitter:image' content={ogImageUrl} />
 
       <link rel='canonical' href={siteUrl} />
-      <link rel='preload' as='image' href='/images/hero-image.webp' fetchPriority='high' />
+      {/* Hero's `priority` image changed with the redesign — see HeroSection.tsx (tabs.webp preview panel). */}
+      <link rel='preload' as='image' href='/images/feature/tabs.webp' fetchPriority='high' />
 
       {/* Structured Data */}
       <script

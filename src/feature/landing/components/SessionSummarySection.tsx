@@ -31,7 +31,7 @@ export const SessionSummarySection = () => {
       </div>
 
       <div className='relative z-10 mx-auto max-w-5xl px-6 text-center lg:px-8'>
-        <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+        <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
           End every session <br />
           <span className='text-zinc-400'>knowing what’s next.</span>
         </h2>

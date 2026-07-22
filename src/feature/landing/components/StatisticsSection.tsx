@@ -188,7 +188,7 @@ export const StatisticsSection = () => {
               Progress tracking
             </span>
 
-            <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
               Numbers don’t lie. <br />
               <span className='text-zinc-400'>Your data does the talking.</span>
             </h2>

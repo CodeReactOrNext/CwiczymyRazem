@@ -37,7 +37,7 @@ export const TestimonialsSection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mb-16 max-w-3xl'>
-          <h2 className='font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
+          <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
             Loved by guitarists <br />
             who show up.
           </h2>

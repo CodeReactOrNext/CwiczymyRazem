@@ -75,7 +75,7 @@ export const RoadmapSection = () => {
               Mastery roadmaps
             </span>
 
-            <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
               Pick your goal. <br />
               <span className='text-zinc-400'>We map the path.</span>
             </h2>

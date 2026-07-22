@@ -22,7 +22,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mb-16 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
           <div>
-            <h2 className='font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white'>
+            <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white'>
               Knowledge <br />
               <span className='text-zinc-400'>for the journey.</span>
             </h2>

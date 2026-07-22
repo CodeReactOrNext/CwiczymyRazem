@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
 import type { Transition, Variants } from "framer-motion";
@@ -76,14 +77,14 @@ const headlineLine: Variants = {
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
 
-  // Cursor-reactive spotlight instead of the generic floating glow orbs this
-  // section used to have. Driven entirely through motion values (never
-  // `useState`) so pointer movement never triggers a React re-render.
+  // Cursor-reactive spotlight instead of generic floating glow orbs. Driven
+  // entirely through motion values (never `useState`) so pointer movement
+  // never triggers a React re-render.
   const pointerX = useMotionValue(0.5);
   const pointerY = useMotionValue(0.32);
   const spotlightX = useTransform(pointerX, (value) => `${value * 100}%`);
   const spotlightY = useTransform(pointerY, (value) => `${value * 100}%`);
-  const spotlightBackground = useMotionTemplate`radial-gradient(560px circle at ${spotlightX} ${spotlightY}, rgba(34,211,238,0.16), transparent 65%)`;
+  const spotlightBackground = useMotionTemplate`radial-gradient(560px circle at ${spotlightX} ${spotlightY}, rgba(34,211,238,0.14), transparent 65%)`;
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
     if (shouldReduceMotion) return;
@@ -95,18 +96,9 @@ export const HeroSection = () => {
   return (
     <section
       onPointerMove={handlePointerMove}
-      className='relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-zinc-950'>
+      className='relative flex min-h-[100dvh] flex-col overflow-hidden bg-zinc-950'>
       <div className='pointer-events-none absolute inset-0'>
-        <div className='absolute inset-0 select-none opacity-40'>
-          <div className='absolute inset-0 z-10 bg-gradient-to-b from-black/70 via-black/50 to-black'></div>
-          <Image
-            src='/images/hero-image.webp'
-            alt='Guitarist practicing'
-            fill
-            className='object-cover object-center grayscale'
-            priority
-          />
-        </div>
+        <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(34,211,238,0.12),transparent_60%)]' />
         <GuitarPatternBackground opacity={0.08} scale={1.3} />
         {!shouldReduceMotion && (
           <motion.div
@@ -116,48 +108,87 @@ export const HeroSection = () => {
         )}
       </div>
 
-      <nav className='relative z-30 flex w-full justify-center px-6 py-8 lg:px-8'>
+      <nav className='relative z-30 flex w-full justify-center px-6 py-8 lg:justify-start lg:px-12'>
         <Logo large />
       </nav>
 
-      <div className='relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-6 text-center lg:px-8'>
-        <motion.div
-          className='mx-auto flex max-w-3xl flex-col items-center py-8 sm:py-12'
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: easeOutExpo }}>
-          <motion.h1
-            variants={headlineGroup}
-            initial={shouldReduceMotion ? "visible" : "hidden"}
-            animate='visible'
-            className='mb-6 font-landingHeading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl'>
-            <motion.span variants={headlineLine} className='block'>
-              The guitar practice tracker
-            </motion.span>
-            <motion.span
-              variants={headlineLine}
-              className='relative mt-1 inline-block text-cyan-400'>
-              built for real progress.
+      <div className='relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 py-8 lg:px-12'>
+        <div className='grid w-full items-center gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12'>
+          <motion.div
+            className='mx-auto flex max-w-xl flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left'
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: easeOutExpo }}>
+            <motion.h1
+              variants={headlineGroup}
+              initial={shouldReduceMotion ? "visible" : "hidden"}
+              animate='visible'
+              className='mb-6 font-landingHeading text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl'>
+              <motion.span variants={headlineLine} className='block'>
+                The guitar practice tracker
+              </motion.span>
               <motion.span
-                aria-hidden
-                className='absolute inset-x-0 -bottom-1.5 h-[3px] origin-left rounded-full bg-gradient-to-r from-cyan-400 via-cyan-300/80 to-transparent'
-                initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{
-                  duration: 0.7,
-                  delay: shouldReduceMotion ? 0 : 0.7,
-                  ease: easeOutExpo,
-                }}
-              />
-            </motion.span>
-          </motion.h1>
-          <p className='mb-10 max-w-2xl text-lg font-medium leading-relaxed tracking-tight text-zinc-400 sm:text-xl'>
-            Log sessions, discover song difficulty ratings, and follow a{" "}
-            <br className='hidden sm:block' />
-            structured routine, from beginner to advanced.
-          </p>
-          <HeroAuthButtons />
-        </motion.div>
+                variants={headlineLine}
+                className='relative mt-1 inline-block text-cyan-400'>
+                built for real progress.
+                <motion.span
+                  aria-hidden
+                  className='absolute inset-x-0 -bottom-1.5 h-[3px] origin-left rounded-full bg-gradient-to-r from-cyan-400 via-cyan-300/80 to-transparent'
+                  initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{
+                    duration: 0.7,
+                    delay: shouldReduceMotion ? 0 : 0.7,
+                    ease: easeOutExpo,
+                  }}
+                />
+              </motion.span>
+            </motion.h1>
+            <p className='mb-10 max-w-lg text-lg font-medium leading-relaxed tracking-tight text-zinc-400 sm:text-xl'>
+              Log sessions, discover song difficulty ratings, and follow a
+              structured routine, from beginner to advanced.
+            </p>
+            <HeroAuthButtons />
+          </motion.div>
+
+          <motion.div
+            className='relative mx-auto w-full max-w-md lg:max-w-none'
+            initial={
+              shouldReduceMotion ? false : { opacity: 0, scale: 0.94, x: 24 }
+            }
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{
+              duration: 0.8,
+              delay: shouldReduceMotion ? 0 : 0.35,
+              ease: easeOutExpo,
+            }}>
+            <AuroraGlowFrame>
+              <div className='relative -rotate-2 overflow-hidden rounded-lg p-1.5 glass-card'>
+                <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
+                  <Image
+                    src='/images/feature/tabs.webp'
+                    alt='Animated Guitar Pro tablature synced with real-time audio playback'
+                    fill
+                    priority
+                    sizes='(min-width: 1024px) 45vw, 90vw'
+                    className='object-cover object-center'
+                  />
+                </div>
+              </div>
+              <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
+                <span className='relative flex h-2 w-2'>
+                  {!shouldReduceMotion && (
+                    <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
+                  )}
+                  <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
+                </span>
+                <span className='text-[11px] font-bold text-cyan-400'>
+                  Live tab playback
+                </span>
+              </div>
+            </AuroraGlowFrame>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

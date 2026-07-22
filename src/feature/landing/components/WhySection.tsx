@@ -35,7 +35,7 @@ export const WhySection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mb-20 max-w-3xl'>
-          <h2 className='font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+          <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
             Built for those who <br />
             <span className='text-cyan-400'>refuse to plateau.</span>
           </h2>
