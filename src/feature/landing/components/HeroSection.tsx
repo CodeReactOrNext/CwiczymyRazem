@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
+import type { Transition, Variants } from "framer-motion";
 import {
   motion,
   useMotionTemplate,
@@ -56,17 +57,19 @@ const HeroAuthButtons = dynamic(
   { ssr: false, loading: () => <StaticCTA /> },
 );
 
-const headlineGroup = {
+const easeOutExpo: Transition["ease"] = [0.16, 1, 0.3, 1];
+
+const headlineGroup: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
 };
 
-const headlineLine = {
+const headlineLine: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.7, ease: easeOutExpo },
   },
 };
 
@@ -122,7 +125,7 @@ export const HeroSection = () => {
           className='mx-auto flex max-w-3xl flex-col items-center py-8 sm:py-12'
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
+          transition={{ duration: 0.6, ease: easeOutExpo }}>
           <motion.h1
             variants={headlineGroup}
             initial={shouldReduceMotion ? "visible" : "hidden"}
@@ -143,7 +146,7 @@ export const HeroSection = () => {
                 transition={{
                   duration: 0.7,
                   delay: shouldReduceMotion ? 0 : 0.7,
-                  ease: [0.16, 1, 0.3, 1],
+                  ease: easeOutExpo,
                 }}
               />
             </motion.span>
