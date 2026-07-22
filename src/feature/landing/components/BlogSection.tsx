@@ -24,12 +24,12 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
           <div>
             <h2 className='font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white'>
               Knowledge <br />
-              <span className='text-zinc-600'>for the journey.</span>
+              <span className='text-zinc-400'>for the journey.</span>
             </h2>
           </div>
           <Link
             href='/blog'
-            className='flex items-center gap-2 text-sm font-bold text-zinc-500 transition-colors hover:text-white'>
+            className='flex items-center gap-2 text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
             View all articles <ArrowRight className='h-4 w-4' />
           </Link>
         </div>
@@ -47,7 +47,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <div className='flex items-center gap-3 text-[10px] font-bold text-zinc-600'>
+                  <div className='flex items-center gap-3 text-[10px] font-bold text-zinc-400'>
                     <span className='text-cyan-500/80'>Article</span>
                     <span aria-hidden>·</span>
                     <span>{new Date(article.date).toLocaleDateString()}</span>

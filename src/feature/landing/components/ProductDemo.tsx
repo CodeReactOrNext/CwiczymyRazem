@@ -1,10 +1,12 @@
 "use client";
 
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
+
 export const ProductDemo = () => {
   return (
     <section className='relative overflow-hidden bg-zinc-950 py-28'>
       <div className='relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='relative mx-auto max-w-5xl'>
+        <AuroraGlowFrame className='mx-auto max-w-5xl'>
           <div className='relative overflow-hidden rounded-lg p-1.5 glass-card'>
             <div className='relative aspect-video overflow-hidden rounded-lg bg-zinc-950'>
               <video
@@ -21,7 +23,7 @@ export const ProductDemo = () => {
               </video>
             </div>
           </div>
-        </div>
+        </AuroraGlowFrame>
       </div>
     </section>
   );

@@ -107,7 +107,7 @@ export const HeroSection = () => {
             priority
           />
         </div>
-        <GuitarPatternBackground opacity={0.05} scale={1.3} />
+        <GuitarPatternBackground opacity={0.08} scale={1.3} />
         {!shouldReduceMotion && (
           <motion.div
             className='absolute inset-0'

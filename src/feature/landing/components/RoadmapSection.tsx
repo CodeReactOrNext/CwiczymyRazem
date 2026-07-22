@@ -77,7 +77,7 @@ export const RoadmapSection = () => {
 
             <h2 className='mb-6 font-landingHeading text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
               Pick your goal. <br />
-              <span className='text-zinc-500'>We map the path.</span>
+              <span className='text-zinc-400'>We map the path.</span>
             </h2>
 
             <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
@@ -89,7 +89,7 @@ export const RoadmapSection = () => {
 
             {/* Goal selector mock */}
             <div className='mb-10'>
-              <div className='mb-3 text-[10px] font-bold text-zinc-600'>
+              <div className='mb-3 text-[10px] font-bold text-zinc-400'>
                 Your goal
               </div>
               <div className='flex flex-wrap gap-2'>
@@ -100,7 +100,7 @@ export const RoadmapSection = () => {
                       "cursor-default rounded-lg px-3 py-1.5 text-[11px] font-bold transition-colors",
                       i === 0
                         ? "bg-cyan-500/15 text-cyan-300"
-                        : "bg-zinc-900/60 text-zinc-600",
+                        : "bg-zinc-900/60 text-zinc-400",
                     )}>
                     {tag}
                   </div>
@@ -156,11 +156,11 @@ export const RoadmapSection = () => {
                       ? "bg-cyan-500/5"
                       : step.done
                         ? "bg-zinc-900/30 opacity-60"
-                        : "bg-zinc-900/40",
+                        : "bg-zinc-900/60",
                   )}>
                   <div className='flex items-start justify-between gap-3'>
                     <div className='min-w-0 flex-1'>
-                      <div className='mb-1 text-[10px] font-bold text-zinc-600'>
+                      <div className='mb-1 text-[10px] font-bold text-zinc-400'>
                         {step.level}
                       </div>
                       <div
@@ -196,7 +196,7 @@ export const RoadmapSection = () => {
             ))}
 
             {/* Bottom unlock hint */}
-            <div className='ml-12 mt-2 flex items-center gap-2 text-[10px] font-bold text-zinc-600'>
+            <div className='ml-12 mt-2 flex items-center gap-2 text-[10px] font-bold text-zinc-400'>
               <Target className='h-3.5 w-3.5' />
               <span>Complete each stage to unlock the next</span>
             </div>
