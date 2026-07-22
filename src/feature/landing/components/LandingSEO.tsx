@@ -41,8 +41,9 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
       <meta name='twitter:image' content={ogImageUrl} />
 
       <link rel='canonical' href={siteUrl} />
-      {/* Hero's `priority` image changed with the redesign — see HeroSection.tsx (tabs.webp preview panel). */}
-      <link rel='preload' as='image' href='/images/feature/tabs.webp' fetchPriority='high' />
+      {/* Hero no longer renders a raster screenshot above the fold (see
+          HeroSection.tsx - it's now a CSS/SVG-built tab strip), so there is
+          no longer a single dominant LCP image left to preload here. */}
 
       {/* Structured Data */}
       <script

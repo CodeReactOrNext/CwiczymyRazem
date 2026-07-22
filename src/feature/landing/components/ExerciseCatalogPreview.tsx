@@ -1,6 +1,6 @@
 "use client";
 
-import { ExerciseCard } from "feature/exercises/components/ExerciseCard/ExerciseCard";
+import { LandingExerciseCard } from "feature/landing/components/LandingExerciseCard";
 import { getExerciseLandingHref } from "lib/exerciseLandingLink";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
         {exercises.length > 0 && (
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
             {exercises.map((ex) => (
-              <ExerciseCard
+              <LandingExerciseCard
                 key={ex.id}
                 exercise={ex}
                 href={getExerciseLandingHref(ex.id, ex)}
