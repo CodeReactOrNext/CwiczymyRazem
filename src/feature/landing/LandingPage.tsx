@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionSeam } from "components/SectionSeam/SectionSeam";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
@@ -130,6 +131,7 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
       <main
         className={`${jakartaLanding.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
         <HeroSection />
+        <SectionSeam />
         <ProductDemo />
         <WhySection />
         <InteractiveExercisesSection />
@@ -137,9 +139,11 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
           <ExerciseCatalogPreview exercises={spotlightExercises} />
         )}
         <StatisticsSection />
+        <SectionSeam from='900' to='950' />
         <SongsLibrarySection />
         <PracticePlansSection />
         <RoadmapSection />
+        <SectionSeam from='950' to='900' />
         <SessionSummarySection />
         <TestimonialsSection />
         <FaqSection questions={faqQuestions} />
