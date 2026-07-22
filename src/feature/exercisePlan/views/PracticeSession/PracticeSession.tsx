@@ -37,6 +37,7 @@ import {
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
 import { useCalibration } from "./hooks/useCalibration";
+import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
@@ -398,6 +399,13 @@ export const PracticeSession = ({
   }, [isPlaying, startTimer, handleNextRiddle]);
 
   // ── Misc effects ──────────────────────────────────────────────────────────
+
+  // Electron shell: keep the display awake + taskbar progress (web: no-op).
+  useDesktopSessionIntegration({
+    timer,
+    durationInSeconds: videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60,
+    freeMode,
+  });
 
   useEffect(() => {
     const duration = videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60;
