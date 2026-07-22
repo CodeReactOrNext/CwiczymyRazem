@@ -4,7 +4,7 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
-import { fraunces } from "feature/landing/lib/fonts";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { BlogFrontmatter } from "lib/blog";
 import dynamic from "next/dynamic";
 
@@ -128,7 +128,7 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
     <>
       <LandingSEO faqQuestions={faqQuestions} />
       <main
-        className={`${fraunces.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
+        className={`${jakartaLanding.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
         <HeroSection />
         <ProductDemo />
         <WhySection />

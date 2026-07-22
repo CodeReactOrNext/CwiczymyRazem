@@ -1,17 +1,20 @@
-import { Fraunces } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
-// Landing-only display face. Deliberately not Inter (nor `Plus Jakarta Sans`,
-// which the app's `font-display` token points at but which is never actually
-// loaded anywhere — see docs/STYLEGUIDE.md §5 "dług/pułapka"). Fraunces is a
-// variable serif with a wide optical-size axis, so a single family carries
-// both the huge hero headline and the smaller section titles while giving
-// strong weight/style contrast against the Inter body copy.
+// Landing-only display face. `docs/STYLEGUIDE.md` §5 already documents
+// `font-display`/`font-jakarta` as "Plus Jakarta Sans", but that token is
+// never actually loaded anywhere (no `next/font` call, no `<link>`), so the
+// landing silently rendered in Inter. A previous pass swapped in Fraunces
+// (a serif) instead, but a serif display face reads as mismatched against
+// this app's dark, glassy, gamified UI language, elsewhere the product is
+// entirely geometric sans. Loading the family the docs already call for
+// fixes the "dług/pułapka" bug and gives real weight contrast against the
+// Inter body copy without introducing a new, undocumented font choice.
 //
 // Scoped to `feature/landing` on purpose: the app-wide `font-display` token
 // is used in ~30 other features and changing it would ripple far outside the
 // scope of this landing-page redesign.
-export const fraunces = Fraunces({
+export const jakartaLanding = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-jakarta-landing",
   display: "swap",
 });
