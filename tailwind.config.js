@@ -279,7 +279,12 @@ module.exports = {
         // deliberately: `font-display` above is used app-wide (~30 files) and
         // is left untouched to avoid a blast-radius change outside the landing
         // page redesign this token was introduced for.
-        landingHeading: ["var(--font-fraunces)", "Georgia", "serif"],
+        landingHeading: [
+          "var(--font-jakarta-landing)",
+          "Plus Jakarta Sans",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       keyframes: {
         "accordion-down": {
