@@ -1,11 +1,15 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
+import type { DailyPoolEntry } from "feature/arsenal/data/dailyCase";
+import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { rollEffectCountry, rollEffectFeatures, rollEffectYear } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { rollCondition, rollItemFeatures, rollVintageYear } from "feature/arsenal/data/itemStats";
 import type {
   CaseType,
+  EffectDefinition,
   EffectInventoryItem,
+  GuitarDefinition,
   GuitarRarity,
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
@@ -70,11 +74,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const existingEquipped = data.arsenal?.equippedGuitarId ?? data.selectedGuitar ?? null;
       const newFame = currentFame - caseDef.fameCost;
 
-      if (Math.random() < GUITAR_CHANCE) {
-        // Draw guitar
+      // Daily case: the drop comes from today's deterministic featured pool —
+      // the exact 10 items the shop preview shows. Rarity is still rolled from
+      // the case's probability table; the item is then picked from the pool's
+      // entries of that rarity (guitar or effect, whatever the slot holds).
+      let dailyPick: DailyPoolEntry | null = null;
+      if (caseType === "daily") {
+        const pool = getDailyPool();
         const rarity = drawRarity(caseDef.probabilities);
-        const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
-        const guitar = pool[Math.floor(Math.random() * pool.length)];
+        const candidates = pool.filter((e) => e.def.rarity === rarity);
+        // Slots guarantee every rarity is present; fall back to the whole pool just in case.
+        const pickFrom = candidates.length > 0 ? candidates : pool;
+        dailyPick = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+      }
+
+      const isGuitarDrop = dailyPick
+        ? dailyPick.kind === "guitar"
+        : Math.random() < GUITAR_CHANCE;
+
+      if (isGuitarDrop) {
+        // Draw guitar
+        let guitar: GuitarDefinition;
+        if (dailyPick?.kind === "guitar") {
+          guitar = dailyPick.def;
+        } else {
+          const rarity = drawRarity(caseDef.probabilities);
+          const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
+          guitar = pool[Math.floor(Math.random() * pool.length)];
+        }
         const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
         const condition = rollCondition();
@@ -112,9 +139,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return { type: "guitar", guitar, newItem, newInventory, newFame };
       } else {
         // Draw effect
-        const rarity = drawRarity(caseDef.probabilities);
-        const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
-        const effect = pool[Math.floor(Math.random() * pool.length)];
+        let effect: EffectDefinition;
+        if (dailyPick?.kind === "effect") {
+          effect = dailyPick.def;
+        } else {
+          const rarity = drawRarity(caseDef.probabilities);
+          const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
+          effect = pool[Math.floor(Math.random() * pool.length)];
+        }
         const effectCondition = rollCondition();
         const effectYear = rollEffectYear(effect);
         const effectCountry = rollEffectCountry(effect);
