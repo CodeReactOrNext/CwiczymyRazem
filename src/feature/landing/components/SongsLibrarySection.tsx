@@ -1,7 +1,8 @@
 "use client";
 
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
-import { BookMarked, Disc3, Filter, Sliders, Star } from "lucide-react";
+import { Reveal } from "feature/landing/components/Reveal";
+import { BookMarked, Disc3, Filter, Star } from "lucide-react";
 import Image from "next/image";
 
 const features = [
@@ -39,15 +40,15 @@ export const SongsLibrarySection = () => {
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.7fr] xl:gap-16'>
           {/* Left - content */}
-          <div className='flex flex-col'>
+          <Reveal className='flex flex-col'>
             <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
-              Every song you want <br />
+              Every song you want{" "}
               <span className='text-zinc-400'>to learn. Ranked.</span>
             </h2>
 
             <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
-              Rated by the community, not algorithms. Find songs that match
-              your level and start learning with context.
+              Rated by the community, not algorithms. Find songs that match your
+              level and start learning with context.
             </p>
 
             {/* Feature list */}
@@ -68,39 +69,27 @@ export const SongsLibrarySection = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
           {/* Right - screenshot */}
-          <AuroraGlowFrame>
-            <div className='relative rounded-lg p-1.5 glass-card'>
-              <div className='flex items-center gap-1.5 px-3 py-2'>
-                <Sliders className='h-3 w-3 text-zinc-400' />
-                <span className='rounded bg-cyan-400/10 px-2 py-0.5 text-[9px] font-bold text-cyan-400'>
-                  Difficulty under 6
-                </span>
+          <Reveal delay={0.1}>
+            <AuroraGlowFrame>
+              <div className='relative rounded-lg p-1.5 glass-card'>
+                <div className='relative overflow-hidden rounded-lg'>
+                  <Image
+                    src='/images/songs-library.webp'
+                    alt='Song library with community difficulty ratings and genre filters'
+                    width={1122}
+                    height={1125}
+                    className='h-auto w-full object-cover'
+                    priority={false}
+                  />
+                  {/* Bottom fade */}
+                  <div className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-900/70 to-transparent' />
+                </div>
               </div>
-
-              <div className='relative overflow-hidden rounded-lg'>
-                <Image
-                  src='/images/feature/songs.webp'
-                  alt='Song library with community difficulty ratings and genre filters'
-                  width={900}
-                  height={700}
-                  className='h-auto w-full object-cover'
-                  priority={false}
-                />
-                {/* Bottom fade */}
-                <div className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-900/70 to-transparent' />
-              </div>
-            </div>
-
-            {/* Floating badge */}
-            <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
-              <span className='text-[11px] font-bold text-cyan-400'>
-                Community rated
-              </span>
-            </div>
-          </AuroraGlowFrame>
+            </AuroraGlowFrame>
+          </Reveal>
         </div>
       </div>
     </section>

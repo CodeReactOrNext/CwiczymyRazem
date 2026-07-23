@@ -93,21 +93,6 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "VideoObject",
-            "name": "Riff Quest Demo",
-            "description": "See how Riff Quest turns guitar practice into visible progress.",
-            "thumbnailUrl": `${siteUrl}/images/video-poster.png`,
-            "uploadDate": "2024-01-27T12:00:00Z",
-            "contentUrl": `${siteUrl}/demo.webm`,
-            "embedUrl": `${siteUrl}/`,
-          }),
-        }}
-      />
-      <script
-        type='application/ld+json'
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Riff Quest",
             "url": siteUrl,

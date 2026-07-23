@@ -18,6 +18,7 @@
     "coverage": "vitest run --coverage",
     "postinstall": "node patch-aubio.js",
     "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
+    "update-hero-stats": "vitest run --mode hero-stats scripts/updateHeroStats.test.ts",
     "knip": "knip",
     "email": "email dev --dir src/lib/email/templates --port 3001"
   },

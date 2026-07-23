@@ -4,14 +4,11 @@ import { SectionSeam } from "components/SectionSeam/SectionSeam";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
-import { ProductDemo } from "feature/landing/components/ProductDemo";
+import { LandingStickyNav } from "feature/landing/components/LandingStickyNav";
 import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { BlogFrontmatter } from "lib/blog";
 import dynamic from "next/dynamic";
 
-const WhySection = dynamic(() =>
-  import("feature/landing/components/WhySection").then((m) => m.WhySection),
-);
 const InteractiveExercisesSection = dynamic(() =>
   import("feature/landing/components/InteractiveExercisesSection").then(
     (m) => m.InteractiveExercisesSection,
@@ -37,19 +34,14 @@ const PracticePlansSection = dynamic(() =>
     (m) => m.PracticePlansSection,
   ),
 );
-const RoadmapSection = dynamic(() =>
-  import("feature/landing/components/RoadmapSection").then(
-    (m) => m.RoadmapSection,
-  ),
-);
-const SessionSummarySection = dynamic(() =>
-  import("feature/landing/components/SessionSummarySection").then(
-    (m) => m.SessionSummarySection,
-  ),
-);
 const TestimonialsSection = dynamic(() =>
   import("feature/landing/components/TestimonialsSection").then(
     (m) => m.TestimonialsSection,
+  ),
+);
+const MidCTASection = dynamic(() =>
+  import("feature/landing/components/MidCTASection").then(
+    (m) => m.MidCTASection,
   ),
 );
 const FaqSection = dynamic(() =>
@@ -57,11 +49,6 @@ const FaqSection = dynamic(() =>
 );
 const BlogSection = dynamic(() =>
   import("feature/landing/components/BlogSection").then((m) => m.BlogSection),
-);
-const FinalCTASection = dynamic(() =>
-  import("feature/landing/components/FinalCTASection").then(
-    (m) => m.FinalCTASection,
-  ),
 );
 const Footer = dynamic(() =>
   import("feature/landing/components/Footer").then((m) => m.Footer),
@@ -111,7 +98,7 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
     {
       title: "How does progress tracking work?",
       message:
-        "The app automatically logs your sessions and skill development in areas like Technique, Theory, and Ear Training, giving you a clear birds-eye view of your improvement.",
+        "The app automatically logs your sessions and skill development in areas like Technique, Theory, and Ear Training, giving you a clear bird's-eye view of your improvement.",
     },
     {
       title: "Can I track my own custom songs and exercises?",
@@ -130,10 +117,8 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
       <LandingSEO faqQuestions={faqQuestions} />
       <main
         className={`${jakartaLanding.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
+        <LandingStickyNav />
         <HeroSection />
-        <SectionSeam />
-        <ProductDemo />
-        <WhySection />
         <InteractiveExercisesSection />
         {spotlightExercises.length > 0 && (
           <ExerciseCatalogPreview exercises={spotlightExercises} />
@@ -142,13 +127,10 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
         <SectionSeam from='900' to='950' />
         <SongsLibrarySection />
         <PracticePlansSection />
-        <RoadmapSection />
-        <SectionSeam from='950' to='900' />
-        <SessionSummarySection />
         <TestimonialsSection />
+        <MidCTASection />
         <FaqSection questions={faqQuestions} />
         <BlogSection blogs={blogs} />
-        <FinalCTASection />
         <Footer />
         <CookieBanner />
       </main>

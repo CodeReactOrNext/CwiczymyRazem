@@ -1,8 +1,19 @@
 "use client";
 
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
-import { Quote } from "lucide-react";
+import { Reveal } from "feature/landing/components/Reveal";
+import { Clock, Quote } from "lucide-react";
 import Image from "next/image";
+
+// The logged-hours count is the credibility signal of this section (real
+// usage, not a purchased review), so it renders as an accent pill instead
+// of muted micro-text.
+const HoursBadge = ({ hours }: { hours: string }) => (
+  <span className='mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-ivory-accent/10 px-2.5 py-1 text-xs font-bold text-ivory-accent'>
+    <Clock className='h-3 w-3' />
+    {hours}
+  </span>
+);
 
 const featured = {
   name: "teruimaxx",
@@ -48,14 +59,15 @@ export const TestimonialsSection = () => {
       <GuitarPatternBackground variant='light' opacity={0.09} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-12 max-w-3xl'>
+        <Reveal className='mb-12 max-w-3xl'>
           <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
-            Loved by guitarists <br />
-            who show up.
+            Loved by guitarists who show up.
           </h2>
-        </div>
+        </Reveal>
 
-        <div className='mb-6 flex flex-col gap-8 rounded-lg bg-ivory-surface p-10 lg:flex-row lg:items-center'>
+        <Reveal
+          delay={0.05}
+          className='mb-6 flex flex-col gap-8 rounded-lg bg-ivory-surface p-10 lg:flex-row lg:items-center'>
           <Quote className='h-9 w-9 shrink-0 text-ivory-accent' />
           <p className='flex-1 text-xl leading-relaxed text-ivory-fg'>
             {featured.quote}
@@ -72,16 +84,17 @@ export const TestimonialsSection = () => {
               <div className='text-sm font-bold text-ivory-fg'>
                 {featured.name}
               </div>
-              <div className='text-xs text-ivory-muted'>{featured.hours}</div>
+              <HoursBadge hours={featured.hours} />
             </div>
           </div>
-        </div>
+        </Reveal>
 
         <div className='grid grid-cols-1 gap-6 sm:grid-cols-3'>
-          {rest.map((testimonial) => (
-            <div
+          {rest.map((testimonial, i) => (
+            <Reveal
               key={testimonial.name}
-              className='flex flex-1 flex-col rounded-lg bg-ivory-surface p-6'>
+              delay={0.1 + i * 0.08}
+              className='flex h-full flex-col rounded-lg bg-ivory-surface p-6'>
               <p className='flex-1 text-sm leading-relaxed text-ivory-fg'>
                 {testimonial.quote}
               </p>
@@ -97,12 +110,10 @@ export const TestimonialsSection = () => {
                   <div className='text-sm font-bold text-ivory-fg'>
                     {testimonial.name}
                   </div>
-                  <div className='text-xs text-ivory-muted'>
-                    {testimonial.hours}
-                  </div>
+                  <HoursBadge hours={testimonial.hours} />
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
