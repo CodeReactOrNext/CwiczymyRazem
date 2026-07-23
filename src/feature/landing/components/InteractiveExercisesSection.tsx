@@ -1,115 +1,100 @@
 "use client";
 
-import { Guitar, ListMusic, Star } from "lucide-react";
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
+import { Reveal } from "feature/landing/components/Reveal";
+import { Guitar, Mic, Timer } from "lucide-react";
 import Image from "next/image";
 
+// "144 exercises" lives in ExerciseCatalogPreview (breadth); this section
+// sells the depth of a single exercise: synced playback, tempo work and
+// pitch-detection scoring, all in one place.
 const features = [
   {
-    icon: <ListMusic className="w-4 h-4" />,
-    label: "144 exercises built in",
-    desc: "Ready-to-play technical drills — from finger warm-ups and legato to alternate picking and advanced shred techniques",
-  },
-  {
-    icon: <Guitar className="w-4 h-4" />,
+    icon: <Guitar className='h-4 w-4' />,
     label: "Guitar Pro files",
-    desc: "Import any GP file and practice with color-coded tablature synced to audio playback",
+    desc: "Import any GP file, tablature stays synced to audio",
   },
   {
-    icon: <Star className="w-4 h-4" />,
-    label: "Guitar Hero on a real guitar",
-    desc: "Earn points for every exercise you complete — the same dopamine hit, but you're actually building a real skill",
+    icon: <Timer className='h-4 w-4' />,
+    label: "Tempo control",
+    desc: "Slow any exercise down until it's clean, then speed up",
+  },
+  {
+    icon: <Mic className='h-4 w-4' />,
+    label: "Live score and accuracy",
+    desc: "Each take gets a score, accuracy and a combo multiplier",
   },
 ];
 
 export const InteractiveExercisesSection = () => {
   return (
-    <section className="relative py-32 bg-zinc-950 overflow-hidden">
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/3 right-0 w-[700px] h-[700px] bg-cyan-500/5 blur-[160px] rounded-full" />
-        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-sky-500/5 blur-[130px] rounded-full" />
+      <div className='pointer-events-none absolute inset-0'>
+        <div className='absolute right-0 top-1/3 h-[700px] w-[700px] rounded-full bg-cyan-500/5 blur-[160px]' />
+        <div className='absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/[0.03] blur-[130px]' />
       </div>
 
-      {/* Top divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
+      <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
+        <Reveal className='mb-12 max-w-2xl'>
+          <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+            Practice with tabs. <br />
+            <span className='text-zinc-400'>Hear every note.</span>
+          </h2>
+          <p className='max-w-xl text-lg leading-relaxed text-zinc-400'>
+            Animated GP tablature, synced to real audio playback. Turn on pitch
+            detection and it&apos;s Guitar Hero, on a real guitar: every note
+            you hit lights up as you play.
+          </p>
+        </Reveal>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.7fr] gap-12 xl:gap-16 items-center">
-
-          {/* Left — content */}
-          <div className="flex flex-col">
-            <span className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400 mb-6">
-              Interactive Exercises
-            </span>
-
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
-              Practice with tabs. <br />
-              <span className="text-zinc-500">Hear every note.</span>
-            </h2>
-
-            <p className="text-zinc-400 text-lg leading-relaxed mb-12 max-w-md">
-              144 technical exercises with animated GP tablature — see exactly what to play, hear how it sounds, and slow down to any tempo you need.
-            </p>
-
-            {/* Feature list */}
-            <ul className="space-y-5">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-start gap-4 group">
-                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0 shadow-lg transition-all duration-300 group-hover:scale-105">
-                    {f.icon}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-white uppercase tracking-wide mb-0.5">
-                      {f.label}
-                    </div>
-                    <div className="text-sm text-zinc-500 leading-relaxed">
-                      {f.desc}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right — screenshot */}
-          <div className="relative">
-            {/* Outer glow */}
-            <div className="absolute inset-0 -m-8 bg-gradient-radial from-cyan-500/10 via-transparent to-transparent blur-2xl pointer-events-none" />
-
-            {/* App chrome frame */}
-            <div className="relative rounded-2xl border border-white/10 bg-zinc-900/60 p-1.5 shadow-2xl backdrop-blur-sm">
-              {/* Fake title bar */}
-              <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                <div className="flex-1 mx-4 h-4 rounded bg-zinc-800/60 max-w-[200px]" />
-              </div>
-
-              {/* Screenshot */}
-              <div className="relative overflow-hidden rounded-xl mt-0">
+        <Reveal delay={0.1}>
+          <AuroraGlowFrame>
+            <div className='relative rounded-lg p-1.5 glass-card'>
+              <div className='relative overflow-hidden rounded-lg'>
+                {/* The full 2336px-wide strip collapses into an unreadable
+                  sliver on phones, so mobile gets a taller crop of the same
+                  screenshot (playhead + detected notes + Pitch Detect). */}
                 <Image
-                  src="/images/feature/tabs.webp"
-                  alt="Interactive Guitar Pro tablature with animated playback"
-                  width={1400}
-                  height={350}
-                  className="w-full h-auto object-cover"
+                  src='/images/tabs-live.webp'
+                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                  width={2336}
+                  height={625}
+                  className='hidden h-auto w-full sm:block'
                   priority={false}
                 />
-                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-zinc-900/60 pointer-events-none" />
+                <Image
+                  src='/images/tabs-live-mobile.webp'
+                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                  width={972}
+                  height={625}
+                  className='h-auto w-full sm:hidden'
+                  priority={false}
+                />
               </div>
             </div>
+          </AuroraGlowFrame>
+        </Reveal>
 
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -right-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 shadow-xl">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[11px] font-black text-white uppercase tracking-widest">
-                Live Sync
-              </span>
+        <Reveal
+          delay={0.15}
+          className='mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-3'>
+          {features.map((f) => (
+            <div key={f.label} className='flex items-start gap-4'>
+              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
+                {f.icon}
+              </div>
+              <div>
+                <div className='mb-0.5 text-sm font-bold text-white'>
+                  {f.label}
+                </div>
+                <div className='text-sm leading-relaxed text-zinc-400'>
+                  {f.desc}
+                </div>
+              </div>
             </div>
-          </div>
-
-        </div>
+          ))}
+        </Reveal>
       </div>
     </section>
   );

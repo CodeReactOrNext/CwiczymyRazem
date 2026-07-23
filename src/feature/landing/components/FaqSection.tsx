@@ -1,34 +1,42 @@
 "use client";
 
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
+import { Reveal } from "feature/landing/components/Reveal";
+import { ChevronDown } from "lucide-react";
 
-export const FaqSection = ({ questions }: { questions: faqQuestionInterface[] }) => {
+/**
+ * Native <details> instead of the shared Radix accordion on purpose:
+ * Radix unmounts closed panels, while <details> keeps every answer in the
+ * server-rendered HTML (SEO, find-in-page auto-expand) with zero JS.
+ */
+export const FaqSection = ({
+  questions,
+}: {
+  questions: faqQuestionInterface[];
+}) => {
   return (
-    <section className='py-20 bg-zinc-950 border-t border-white/5'>
-      <div className='mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='max-w-xl mb-12'>
-          <h2 className='text-3xl font-bold text-white tracking-tighter leading-tight font-display'>
-            Frequently Asked <br/>
-            <span className="text-zinc-600">Questions.</span>
-          </h2>
-        </div>
+    <section className='bg-zinc-900 py-20'>
+      <Reveal className='mx-auto max-w-3xl px-6 lg:px-8'>
+        <h2 className='mb-10 font-landingHeading text-3xl font-bold leading-tight tracking-tight text-white'>
+          Frequently asked questions
+        </h2>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 border-t border-white/5 pt-12'>
-          {questions.map((faq, index) => (
-            <div 
-              key={index} 
-              className='flex flex-col'
-            >
-              <h3 className='text-base font-bold text-white tracking-tight mb-3'>
+        <div className='space-y-3'>
+          {questions.map((faq) => (
+            <details
+              key={faq.title}
+              className='group rounded-lg bg-zinc-950/50 px-6'>
+              <summary className='flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-base font-bold tracking-tight text-white [&::-webkit-details-marker]:hidden'>
                 {faq.title}
-              </h3>
-              <p className='text-zinc-500 text-sm leading-relaxed max-w-md'>
+                <ChevronDown className='h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-180' />
+              </summary>
+              <p className='pb-6 text-sm leading-relaxed text-zinc-400'>
                 {faq.message}
               </p>
-            </div>
+            </details>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 };
