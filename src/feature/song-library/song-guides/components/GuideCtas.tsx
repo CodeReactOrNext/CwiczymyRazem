@@ -4,17 +4,36 @@ import Link from "next/link";
 
 import type { SongGuide } from "../types";
 
-export const GuideInlineCta = ({ guide }: { guide: SongGuide }) => {
+interface GuideCtaProps {
+  guide: SongGuide;
+  /** Album cover reused from live data — purely decorative here. */
+  coverUrl?: string | null;
+}
+
+export const GuideInlineCta = ({ guide, coverUrl }: GuideCtaProps) => {
   return (
     <section className='mx-auto w-full max-w-5xl px-6 py-10'>
       <div className='flex flex-col items-start gap-6 rounded-lg bg-cyan-500/10 p-8 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h2 className='font-display mb-2 text-xl font-bold text-zinc-100'>
-            {guide.inlineCta.heading}
-          </h2>
-          <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            {guide.inlineCta.text}
-          </p>
+        <div className='flex items-start gap-5'>
+          {coverUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverUrl}
+              alt=''
+              aria-hidden='true'
+              width={64}
+              height={64}
+              className='hidden h-16 w-16 shrink-0 rounded-lg object-cover sm:block'
+            />
+          )}
+          <div>
+            <h2 className='font-display mb-2 text-xl font-bold text-zinc-100'>
+              {guide.inlineCta.heading}
+            </h2>
+            <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+              {guide.inlineCta.text}
+            </p>
+          </div>
         </div>
         <Link href='/signup' className='shrink-0'>
           <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
@@ -27,7 +46,7 @@ export const GuideInlineCta = ({ guide }: { guide: SongGuide }) => {
   );
 };
 
-export const GuideFinalCta = ({ guide }: { guide: SongGuide }) => {
+export const GuideFinalCta = ({ guide, coverUrl }: GuideCtaProps) => {
   return (
     <section className='relative overflow-hidden bg-black py-28'>
       <div className='absolute inset-0 z-0 overflow-hidden'>
@@ -36,6 +55,17 @@ export const GuideFinalCta = ({ guide }: { guide: SongGuide }) => {
       </div>
 
       <div className='relative z-10 mx-auto max-w-3xl px-6 text-center'>
+        {coverUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverUrl}
+            alt=''
+            aria-hidden='true'
+            width={96}
+            height={96}
+            className='mx-auto mb-8 h-24 w-24 rounded-lg object-cover'
+          />
+        )}
         <h2 className='font-display mb-6 text-4xl font-bold leading-tight tracking-tighter text-white sm:text-5xl'>
           {guide.finalCta.headingTop}
           <br />

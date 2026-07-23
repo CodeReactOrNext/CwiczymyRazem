@@ -1,8 +1,8 @@
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 import type { GuideLiveData, GuidePathSong, SongGuide } from "../types";
-import { DifficultyMeter } from "./DifficultyMeter";
 import { GuideSection } from "./GuideSection";
 
 interface GuideLearningPathProps {
@@ -11,6 +11,8 @@ interface GuideLearningPathProps {
 }
 
 const PathSongCard = ({ song }: { song: GuidePathSong }) => {
+  const tier = getSongTier(song.difficulty);
+
   const body = (
     <div className='h-full rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-900/70'>
       <div className='mb-1 flex items-start justify-between gap-3'>
@@ -26,9 +28,11 @@ const PathSongCard = ({ song }: { song: GuidePathSong }) => {
       <p translate='no' className='mb-3 text-sm text-zinc-500'>
         {song.artist}
       </p>
-      <div className='mb-3 max-w-[160px]'>
-        <DifficultyMeter value={song.difficulty} />
-      </div>
+      <span
+        className={`mb-3 inline-block rounded px-2 py-0.5 text-xs font-bold ${tier.bgColor}`}
+        style={{ color: tier.color }}>
+        {tier.label}
+      </span>
       <p className='text-sm leading-relaxed text-zinc-400'>{song.why}</p>
     </div>
   );

@@ -34,7 +34,7 @@ export const masterOfPuppets: SongGuide = {
     { label: "Length", value: "8:35" },
   ],
   editorial: {
-    difficulty: 8.6,
+    difficulty: 8.5,
     timeToLearn: "3–6 months to full tempo",
     oneLiner:
       "A stamina exam disguised as a song — the definitive test of downpicking, palm muting, and rhythm precision.",
@@ -42,7 +42,7 @@ export const masterOfPuppets: SongGuide = {
   verdict: {
     heading: "The verdict: an endurance sport with a guitar attached",
     paragraphs: [
-      "On the Riff Quest scale, Master of Puppets sits high in the A tier — around 8.6 out of 10 — and it earns every decimal. The difficulty is not in the notes. The intro chromatic descent, the E5 gallops, the verse riff: at 120 BPM these are intermediate material. The difficulty is that Hetfield downpicks nearly all of it at 212 BPM, with palm-muted precision, for the length of two normal songs.",
+      "On the Riff Quest ladder, Master of Puppets sits high in the A tier — and it earns every rung. The difficulty is not in the notes. The intro chromatic descent, the E5 gallops, the verse riff: at 120 BPM these are intermediate material. The difficulty is that Hetfield downpicks nearly all of it at 212 BPM, with palm-muted precision, for the length of two normal songs.",
       "This makes Master of Puppets a different kind of hard from, say, a shred solo. A fast solo is a coordination problem; this is a conditioning problem. Your picking forearm will fail before your brain does — and the only fix is structured tempo training over weeks, exactly like building up a running pace.",
       "There are two genuinely technical checkpoints too: Kirk Hammett's frantic wah solo, and the interlude's clean arpeggio section with its harmonized lead — beautiful, exposed, and unforgiving. But ask anyone who's performed this song what the hard part is, and they'll point at their right arm.",
     ],
@@ -278,7 +278,7 @@ export const masterOfPuppets: SongGuide = {
     {
       title: "How hard is Master of Puppets on guitar?",
       message:
-        "It rates around 8.6/10 in the Riff Quest community — high A tier. The riffs themselves are intermediate-friendly at slow speed; the difficulty is downpicking them at roughly 212 BPM with clean palm muting for eight and a half minutes. It's a stamina and precision challenge more than a finger-twister.",
+        "High A tier on the Riff Quest ladder — the live community rating sits at the top of this page. The riffs themselves are intermediate-friendly at slow speed; the difficulty is downpicking them at roughly 212 BPM with clean palm muting for eight and a half minutes. It's a stamina and precision challenge more than a finger-twister.",
     },
     {
       title: "How long does it take to learn Master of Puppets?",
@@ -298,7 +298,7 @@ export const masterOfPuppets: SongGuide = {
     {
       title: "Is Master of Puppets harder than Enter Sandman?",
       message:
-        "Substantially. Enter Sandman sits around 5.5/10 — moderate tempo, groove-based, forgiving. Master of Puppets is 8.6/10: nearly twice the effective picking speed, stricter muting, and four extra minutes of endurance. Sandman is a great stepping stone about three difficulty points below.",
+        "Substantially. Enter Sandman is solid B-tier material — moderate tempo, groove-based, forgiving. Master of Puppets is high A tier: nearly twice the effective picking speed, stricter muting, and four extra minutes of endurance. Sandman is a great stepping stone a full tier below.",
     },
     {
       title: "Can a beginner learn Master of Puppets?",
