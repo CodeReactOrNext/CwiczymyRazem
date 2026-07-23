@@ -1,3 +1,4 @@
+import { evaluate } from '@mdx-js/mdx';
 import { ActionCard } from 'components/Blog/ActionCard';
 import { AppCard } from 'components/Blog/AppCard';
 import { BlogAlert } from 'components/Blog/BlogAlert';
@@ -23,10 +24,9 @@ import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
-import { MDXRemote } from 'next-mdx-remote';
-import { serialize } from 'next-mdx-remote/serialize';
 import { useEffect, useState } from 'react';
+import * as jsxRuntime from 'react/jsx-runtime';
+import { renderToStaticMarkup } from 'react-dom/server';
 import remarkGfm from 'remark-gfm';
 
 
@@ -43,7 +43,7 @@ interface PracticeExercise {
 
 interface BlogPostProps {
   frontmatter: BlogFrontmatter;
-  mdxSource: MDXRemoteSerializeResult;
+  contentHtml: string;
   relatedBlogs: BlogFrontmatter[];
   headings: { text: string; id: string }[];
   faqs: { question: string; answer: string }[];
@@ -78,7 +78,7 @@ const components = {
     ),
 };
 
-const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], faqs = [], practiceLink = null, practiceExercises = [] }: BlogPostProps) => {
+const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], faqs = [], practiceLink = null, practiceExercises = [] }: BlogPostProps) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -277,9 +277,10 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
             </aside>
 
             <div className="flex-1 min-w-0 max-w-full lg:max-w-2xl mx-auto lg:mx-0 overflow-hidden">
-              <div className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-500/5 prose-blockquote:py-2 prose-blockquote:pr-6 prose-blockquote:font-normal prose-blockquote:italic prose-blockquote:text-zinc-200 before:prose-blockquote:content-none after:prose-blockquote:content-none prose-blockquote:before:hidden prose-blockquote:after:hidden">
-                <MDXRemote {...mdxSource} components={components} />
-              </div>
+              <div
+                className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-500/5 prose-blockquote:py-2 prose-blockquote:pr-6 prose-blockquote:font-normal prose-blockquote:italic prose-blockquote:text-zinc-200 before:prose-blockquote:content-none after:prose-blockquote:content-none prose-blockquote:before:hidden prose-blockquote:after:hidden"
+                dangerouslySetInnerHTML={{ __html: contentHtml }}
+              />
             </div>
           </div>
         </article>
@@ -349,11 +350,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
   const { frontmatter, content } = await getBlogBySlug(slug);
-  const mdxSource = await serialize(content, {
-    mdxOptions: {
-      remarkPlugins: [remarkGfm],
-    },
+
+  // Compiled and rendered to static HTML here at build time (Node has no CSP),
+  // instead of shipping compiled MDX for the client to `new Function()`-eval on
+  // hydration — the browser's script-src CSP has no 'unsafe-eval' and blocks that.
+  // None of the MDX components below are interactive, so static markup is lossless.
+  const { default: MDXContent } = await evaluate(content, {
+    ...jsxRuntime,
+    remarkPlugins: [remarkGfm],
   });
+  const contentHtml = renderToStaticMarkup(<MDXContent components={components} />);
 
   const headings = content.split('\n')
     .filter(line => line.startsWith('## '))
@@ -428,7 +434,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       frontmatter,
-      mdxSource,
+      contentHtml,
       relatedBlogs,
       headings,
       faqs,
