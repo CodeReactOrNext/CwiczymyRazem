@@ -42,7 +42,7 @@ export const nothingElseMatters: SongGuide = {
   verdict: {
     heading: "The verdict: easy to start, honest work to finish",
     paragraphs: [
-      "Riff Quest players rate Nothing Else Matters around the middle of the C tier — roughly a 4.5 out of 10. That average hides a split personality. The intro and verses sit closer to a 3: open strings, slow tempo, one repeating picking pattern, and no chord shapes that hurt. If you have six months of playing behind you, you can have the intro sounding respectable in a weekend.",
+      "Nothing Else Matters sits in the middle of the C tier on the Riff Quest ladder. That grade hides a split personality. The intro and verses are genuinely beginner-friendly: open strings, slow tempo, one repeating picking pattern, and no chord shapes that hurt. If you have six months of playing behind you, you can have the intro sounding respectable in a weekend.",
       "The number climbs because of everything after the second chorus. The interlude moves the arpeggios up the neck onto fretted shapes, the dynamics need real right-hand control, and the solo — famously played by James Hetfield instead of Kirk Hammett — is melodic but full of expressive bends and one quick pull-off run that surprises almost everyone the first time.",
       "Call it what it is: a C-tier song with a D-tier front door and a B-tier back room. That structure is exactly what makes it such a good learning song — you're never stuck, and there's always a next layer.",
     ],
@@ -289,7 +289,7 @@ export const nothingElseMatters: SongGuide = {
     {
       title: "Is the Nothing Else Matters solo hard?",
       message:
-        "It's the hardest part of the song — around a 6.5/10. Not because of speed (only the final descending run is fast), but because the slow tempo exposes every bend that doesn't hit pitch. It's an excellent first 'real' solo precisely because it forces accuracy over flash.",
+        "It's the hardest part of the song — a solid intermediate solo. Not because of speed (only the final descending run is fast), but because the slow tempo exposes every bend that doesn't hit pitch. It's an excellent first 'real' solo precisely because it forces accuracy over flash.",
     },
     {
       title: "What should I learn after Nothing Else Matters?",

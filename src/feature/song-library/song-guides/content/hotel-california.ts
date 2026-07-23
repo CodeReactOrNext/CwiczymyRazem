@@ -42,7 +42,7 @@ export const hotelCalifornia: SongGuide = {
   verdict: {
     heading: "The verdict: two songs, two grades",
     paragraphs: [
-      "The Riff Quest community lands Hotel California around 6.5 out of 10 — mid B tier. Split it in half and the picture sharpens: the rhythm part alone is a 5 (barre chords are the only gatekeeper), while the full outro solo is a 7.5, with the final harmonized arpeggios flirting with 8.",
+      "Hotel California lands mid B tier on the Riff Quest ladder. Split it in half and the picture sharpens: the rhythm part alone is comfortable intermediate territory — barre chords are the only gatekeeper — while the full outro solo is advanced work, with the final harmonized arpeggios as its steepest stretch.",
       "The rhythm exam is passed with exactly two skills: a clean B minor barre and a clean F# barre. The other six chords are old friends (A, E, G, D, Em) plus one more barre appearance. If your barres ring true, you can play a convincing Hotel California within days — the progression never changes, verse after verse, which makes it one of the highest-reward-per-effort songs in the classic rock canon.",
       "The lead exam is a different semester. The outro isn't one solo but a structured duel: Felder's melodic opening statements, Walsh's answering phrases with his signature squawking bends, trading back and forth, then locking into harmonized thirds for the descending arpeggio finale. Playing one guitar part is intermediate work. Understanding both, and hearing how they interlock, is what turns this song into an education.",
     ],
@@ -89,14 +89,14 @@ export const hotelCalifornia: SongGuide = {
       },
       {
         name: "Expressive bends & 'talking' phrasing (solo)",
-        difficulty: 6,
+        difficulty: 4,
         role: "bonus",
         description:
           "Felder's singing lines and Walsh's pushed, vocal bends are a study in making an electric guitar speak rather than shred.",
       },
       {
         name: "Harmonized arpeggio cascades (outro)",
-        difficulty: 7,
+        difficulty: 5,
         role: "bonus",
         description:
           "The famous finale: two guitars in thirds, descending broken-chord shapes in relentless triplets. Precision at moderate speed, sustained for a full minute.",
@@ -275,7 +275,7 @@ export const hotelCalifornia: SongGuide = {
     {
       title: "How hard is Hotel California on guitar?",
       message:
-        "About 6.5/10 overall in Riff Quest community ratings — but it splits cleanly: the rhythm part is around 5/10 (barre chords are the only gatekeeper), while the full outro solo with its harmonized cascades reaches 7.5–8/10. Most players learn the two halves months or years apart, and that's the right approach.",
+        "Mid B tier on the Riff Quest ladder — the live community rating sits at the top of this page. It splits cleanly: the rhythm part is comfortable intermediate territory (barre chords are the only gatekeeper), while the full outro solo with its harmonized cascades is advanced work. Most players learn the two halves months or years apart, and that's the right approach.",
     },
     {
       title: "What chords do I need for Hotel California?",
@@ -290,7 +290,7 @@ export const hotelCalifornia: SongGuide = {
     {
       title: "How hard is the Hotel California solo?",
       message:
-        "Around 7.5/10. The trading phrases between Felder and Walsh are intermediate-friendly when learned one at a time — expressive bends at a moderate tempo. The difficulty peaks in the final minute: descending harmonized arpeggio cascades in steady triplets, which demand clean position shifts and real patience to master.",
+        "It's the advanced half of the song. The trading phrases between Felder and Walsh are intermediate-friendly when learned one at a time — expressive bends at a moderate tempo. The difficulty peaks in the final minute: descending harmonized arpeggio cascades in steady triplets, which demand clean position shifts and real patience to master.",
     },
     {
       title: "Can I play Hotel California alone, or does it need two guitars?",

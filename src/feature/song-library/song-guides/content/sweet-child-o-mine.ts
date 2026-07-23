@@ -34,7 +34,7 @@ export const sweetChildOMine: SongGuide = {
     { label: "Length", value: "5:56" },
   ],
   editorial: {
-    difficulty: 7.6,
+    difficulty: 7.5,
     timeToLearn: "1–2 weeks intro; 2–4 months full song",
     oneLiner:
       "A string-skipping etude that grew into an anthem — moderate riff, serious solo, and the best picking-accuracy workout in classic rock.",
@@ -42,8 +42,8 @@ export const sweetChildOMine: SongGuide = {
   verdict: {
     heading: "The verdict: the riff lets you in, the solo makes you earn it",
     paragraphs: [
-      "Riff Quest players rate Sweet Child O' Mine around 7.6 out of 10 — the doorstep of the A tier. Like most anthems, the average splits into very different rooms. The intro riff, for all its fame, is honest intermediate work: one repeating string-skipping pattern at 125 BPM that yields to a week of focused practice. The rhythm parts underneath the verses are friendlier still — open-feel chords and light embellishment.",
-      "The number climbs because of everything Slash plays after the second chorus. The first solo is melodic and singable; the second is a genuine technical exam — fast minor runs, long bends held against vibrato, and the wah-soaked outro section where the phrases start sprinting. Getting note-perfect through the back half of this song is A-tier lead guitar, full stop.",
+      "Sweet Child O' Mine sits right at the doorstep of the A tier on the Riff Quest ladder. Like most anthems, that grade splits into very different rooms. The intro riff, for all its fame, is honest intermediate work: one repeating string-skipping pattern at 125 BPM that yields to a week of focused practice. The rhythm parts underneath the verses are friendlier still — open-feel chords and light embellishment.",
+      "The grade climbs because of everything Slash plays after the second chorus. The first solo is melodic and singable; the second is a genuine technical exam — fast minor runs, long bends held against vibrato, and the wah-soaked outro section where the phrases start sprinting. Getting note-perfect through the back half of this song is A-tier lead guitar, full stop.",
       "The strategic beauty: the layers are independent. The riff alone is a party trick worth owning. Riff plus rhythm makes you the campfire hero. The full song with solos is a certification. Few songs let you cash out at three different levels like this.",
     ],
   },
@@ -68,35 +68,35 @@ export const sweetChildOMine: SongGuide = {
     items: [
       {
         name: "String skipping (intro riff)",
-        difficulty: 4,
+        difficulty: 3,
         role: "core",
         description:
           "The signature move: the picking hand leaps between non-adjacent strings in a fixed loop. Precision, not speed, is the challenge — every miss is a clunker on a clean pattern.",
       },
       {
         name: "Alternate picking consistency",
-        difficulty: 4,
+        difficulty: 3,
         role: "core",
         description:
           "The riff runs continuous eighth notes; the solos add faster values. Even, relaxed alternation is the foundation everything sits on.",
       },
       {
         name: "Rock rhythm & embellished chords",
-        difficulty: 3,
+        difficulty: 2,
         role: "core",
         description:
           "Verses and choruses ride open-feel shapes (D, C, G world) with slides and small fills — comfortable territory for anyone past the barre-chord hump.",
       },
       {
         name: "Bends, vibrato & sustain (solos)",
-        difficulty: 6,
+        difficulty: 4,
         role: "core",
         description:
           "Slash's identity: full-tone bends that land perfectly, then breathe with wide vibrato. The slow phrases are harder to make beautiful than the fast ones are to make accurate.",
       },
       {
         name: "Fast minor runs + wah (second solo & outro)",
-        difficulty: 7,
+        difficulty: 5,
         role: "bonus",
         description:
           "The E♭-minor runs in the climax move at real speed, and the outro adds a rocking wah pedal on top. This is the layer that earns the A-tier grade.",
@@ -275,7 +275,7 @@ export const sweetChildOMine: SongGuide = {
     {
       title: "How hard is Sweet Child O' Mine on guitar?",
       message:
-        "Around 7.6/10 in Riff Quest community ratings — low A tier. The famous intro riff is intermediate work (about 5.5/10) that most players get clean within a week or two. The full song earns its rating in the second solo and outro: fast minor runs, demanding bends, and wah control that put the back half firmly in advanced territory.",
+        "Low A tier on the Riff Quest ladder — the live community rating sits at the top of this page. The famous intro riff is honest intermediate work that most players get clean within a week or two. The full song earns its grade in the second solo and outro: fast minor runs, demanding bends, and wah control that put the back half firmly in advanced territory.",
     },
     {
       title: "What tuning is Sweet Child O' Mine in?",
@@ -295,7 +295,7 @@ export const sweetChildOMine: SongGuide = {
     {
       title: "How hard are the Sweet Child O' Mine solos?",
       message:
-        "The first solo rates around 6.5/10 — melodic, mid-tempo, a realistic milestone for an intermediate player. The second solo is around 8/10: fast E♭-minor runs, big position shifts, and stacked bends at performance intensity, typically a one-to-two-month project on its own. The wah-drenched outro adds stamina on top.",
+        "The first solo is melodic and mid-tempo — a realistic milestone for an intermediate player. The second solo is a different league: fast E♭-minor runs, big position shifts, and stacked bends at performance intensity, typically a one-to-two-month project on its own. The wah-drenched outro adds stamina on top.",
     },
     {
       title: "What should I learn after Sweet Child O' Mine?",

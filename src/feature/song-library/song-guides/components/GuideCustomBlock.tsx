@@ -1,4 +1,3 @@
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { Gauge } from "lucide-react";
 
 import type { GuideCustomBlock as GuideCustomBlockType } from "../types";
@@ -87,25 +86,16 @@ export const GuideCustomBlock = ({ block }: GuideCustomBlockProps) => {
         <GuideSection heading={block.heading} intro={block.intro}>
           <div className='space-y-4'>
             {block.stages.map((stage) => {
-              const tier = getSongTier(stage.difficulty);
-
               return (
                 <div key={stage.name} className='rounded-lg bg-zinc-900/40 p-6'>
                   <div className='mb-3 flex flex-wrap items-center justify-between gap-3'>
                     <h3 className='font-semibold text-zinc-100'>{stage.name}</h3>
-                    <div className='flex items-center gap-4'>
-                      <span className='text-xs tabular-nums text-zinc-500'>
-                        {stage.timecode}
-                      </span>
-                      <span
-                        className='text-sm font-bold tabular-nums'
-                        style={{ color: tier.color }}>
-                        {stage.difficulty.toFixed(1)} / 10
-                      </span>
-                    </div>
+                    <span className='text-xs tabular-nums text-zinc-500'>
+                      {stage.timecode}
+                    </span>
                   </div>
                   <div className='mb-3 max-w-xs'>
-                    <DifficultyMeter value={stage.difficulty} />
+                    <DifficultyMeter value={stage.difficulty} showValue={false} />
                   </div>
                   <p className='mb-4 text-sm leading-relaxed text-zinc-400'>
                     {stage.description}
