@@ -362,13 +362,40 @@ const nextConfig = {
     ]
   },
   async headers() {
+    // Full CSP only in production: Turbopack's dev runtime and Sentry (which
+    // only initializes when NODE_ENV === "production", see sentry.client.config.ts)
+    // don't need it, and a strict script-src risks breaking local HMR.
+    const isProd = process.env.NODE_ENV === "production";
+    const frameAncestors = "frame-ancestors 'self' https://*.contentsquare.net https://*.contentsquare.com https://app.contentsquare.com";
+    const csp = isProd
+      ? [
+          "default-src 'self'",
+          // 'wasm-unsafe-eval' is required by aubiojs (WASM pitch-detection engine).
+          "script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com https://apis.google.com",
+          // Tailwind + inline `style` attributes (incl. framer-motion) are pervasive
+          // without a nonce system in place, so style-src stays relaxed.
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: blob: https:",
+          "font-src 'self' data:",
+          // *.googleapis.com covers Firebase Auth/Firestore/FCM; *.firebaseapp.com
+          // covers the default Firebase Auth helper domain.
+          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://o4510635176099840.ingest.de.sentry.io https://eu.posthog.com",
+          "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com https://*.firebaseapp.com",
+          frameAncestors,
+          // Sentry Replay compresses events off the main thread via a blob: worker.
+          "worker-src 'self' blob:",
+          "object-src 'none'",
+          "base-uri 'self'",
+        ].join("; ")
+      : frameAncestors;
+
     return [
       {
         source: "/(.*)",
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'self' https://*.contentsquare.net https://*.contentsquare.com https://app.contentsquare.com",
+            value: csp,
           },
           {
             key: "X-Content-Type-Options",
@@ -377,6 +404,10 @@ const nextConfig = {
           {
             key: "Referrer-Policy",
             value: "origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), midi=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)",
           },
         ],
       },
