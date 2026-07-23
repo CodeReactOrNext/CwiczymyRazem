@@ -3,16 +3,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { Guitar,PackageOpen, Store,Swords } from "lucide-react";
+import { BookMarked,Guitar,PackageOpen, Store,Swords } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-const ARSENAL_TABS = ["cases", "collection", "rig", "market"] as const;
+const ARSENAL_TABS = ["cases", "collection", "dex", "rig", "market"] as const;
 type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
+import { DexView } from "./components/Dex/DexView";
 import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
 import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
@@ -102,6 +103,13 @@ export const ArsenalView = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger
+                value="dex"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
+                <BookMarked size={16} />
+                <span className={activeTab === "dex" ? "inline" : "hidden sm:inline"}>Dex</span>
+              </TabsTrigger>
+              <TabsTrigger
                 value="rig"
                 className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
               >
@@ -138,6 +146,18 @@ export const ArsenalView = () => {
                   <GuitarInventory data={data} />
                   <EffectCollection data={data} />
                 </>
+              ) : null}
+            </TabsContent>
+
+            <TabsContent value="dex" className="mt-4">
+              {isLoading ? (
+                <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <Skeleton key={i} className="h-44 rounded-lg bg-zinc-800/50" />
+                  ))}
+                </div>
+              ) : data ? (
+                <DexView data={data} />
               ) : null}
             </TabsContent>
 

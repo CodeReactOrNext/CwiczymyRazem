@@ -11,9 +11,9 @@ import { Layers } from "lucide-react";
 import { useEffect, useMemo,useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type { ArsenalUserData, EffectInventoryItem, GuitarRarity } from "../../types/arsenal.types";
+import type { ArsenalUserData, EffectInventoryItem } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
-import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
+import { RARITY_RANK } from "../RarityProgress";
 import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
 import { EffectCard } from "./EffectCard";
@@ -113,27 +113,13 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const uniqueOwnedCount = ownedEffectIds.size;
   const totalEffectsCount = EFFECT_DEFINITIONS.length;
 
-  // Bucket every owned copy per rarity (newest first),
-  // and count how many models of each rarity exist / are owned.
-  const itemsByRarity = {} as Record<GuitarRarity, EffectInventoryItem[]>;
-  const totalByRarity = {} as Record<GuitarRarity, number>;
-  const ownedByRarity = {} as Record<GuitarRarity, number>;
-  for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity] = [];
-    totalByRarity[rarity] = 0;
-    ownedByRarity[rarity] = 0;
-  }
-  for (const effect of EFFECT_DEFINITIONS) {
-    totalByRarity[effect.rarity]++;
-    if (ownedEffectIds.has(effect.id)) ownedByRarity[effect.rarity]++;
-  }
-  for (const item of data.effectInventory) {
-    const rarity = EFFECTS_BY_ID.get(item.effectId)?.rarity ?? "Common";
-    itemsByRarity[rarity].push(item);
-  }
-  for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity].sort((a, b) => b.acquiredAt - a.acquiredAt);
-  }
+  // Single flat grid, sorted rarest-first then newest-first — no per-rarity sections.
+  const sortedItems = [...data.effectInventory].sort((a, b) => {
+    const rarityA = EFFECTS_BY_ID.get(a.effectId)?.rarity ?? "Common";
+    const rarityB = EFFECTS_BY_ID.get(b.effectId)?.rarity ?? "Common";
+    if (rarityA !== rarityB) return RARITY_RANK[rarityB] - RARITY_RANK[rarityA];
+    return b.acquiredAt - a.acquiredAt;
+  });
 
   const handleSellClick = (inventoryItemId: string, effectId: number | string) => {
     setSelectedItemId(inventoryItemId);
@@ -200,33 +186,18 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
             </button>
           )}
         </div>
-        <div className="flex flex-col gap-12">
-          {RARITY_ORDER.map((rarity) => {
-            const items = itemsByRarity[rarity];
-            if (items.length === 0) return null;
-            return (
-              <section key={rarity}>
-                <RaritySectionHeader
-                  rarity={rarity}
-                  owned={ownedByRarity[rarity]}
-                  total={totalByRarity[rarity]}
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {items.map((item) => (
-                    <EffectCard
-                      key={item.id}
-                      item={item}
-                      isOnPedalboard={pedalboardItemIds.has(item.id)}
-                      onSellClick={handleSellClick}
-                      isSelling={isSelling}
-                      onListClick={handleListClick}
-                      isListing={isListing}
-                    />
-                  ))}
-                </div>
-              </section>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {sortedItems.map((item) => (
+            <EffectCard
+              key={item.id}
+              item={item}
+              isOnPedalboard={pedalboardItemIds.has(item.id)}
+              onSellClick={handleSellClick}
+              isSelling={isSelling}
+              onListClick={handleListClick}
+              isListing={isListing}
+            />
+          ))}
         </div>
       </div>
 

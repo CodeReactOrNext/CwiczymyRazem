@@ -14,10 +14,10 @@ import { Layers,PackageOpen } from "lucide-react";
 import { useEffect,useMemo,useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type { ArsenalUserData, GuitarRarity, InventoryItem, RigSetup } from "../../types/arsenal.types";
+import type { ArsenalUserData, InventoryItem, RigSetup } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
-import { RARITY_ORDER, RaritySectionHeader } from "../RarityProgress";
+import { RARITY_RANK } from "../RarityProgress";
 import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
 import { EquipTargetDialog } from "./EquipTargetDialog";
@@ -153,37 +153,20 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const uniqueOwnedCount = uniqueOwnedIds.size;
   const totalGuitarsCount = GUITAR_DEFINITIONS.length;
 
-  // Group inventory items per rarity (by guitar type, then highest level first
-  // within a type), and count how many of each rarity exist / are owned.
-  const itemsByRarity = {} as Record<GuitarRarity, typeof data.inventory>;
-  const totalByRarity = {} as Record<GuitarRarity, number>;
-  const ownedByRarity = {} as Record<GuitarRarity, number>;
-  for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity] = [];
-    totalByRarity[rarity] = 0;
-    ownedByRarity[rarity] = 0;
-  }
-  for (const guitar of GUITAR_DEFINITIONS) {
-    totalByRarity[guitar.rarity]++;
-    if (uniqueOwnedIds.has(guitar.id)) ownedByRarity[guitar.rarity]++;
-  }
-  for (const item of data.inventory) {
-    const rarity = GUITARS_BY_ID.get(item.guitarId)?.rarity ?? "Common";
-    itemsByRarity[rarity].push(item);
-  }
-  for (const rarity of RARITY_ORDER) {
-    itemsByRarity[rarity].sort((a, b) => {
-      // Keep every copy of the same guitar model together...
-      if (a.guitarId !== b.guitarId) {
-        return String(a.guitarId).localeCompare(String(b.guitarId), undefined, { numeric: true });
-      }
-      // ...then highest level first within that model.
-      const guitar = GUITARS_BY_ID.get(a.guitarId);
-      const levelDiff = guitar ? getItemLevel(b, guitar) - getItemLevel(a, guitar) : 0;
-      if (levelDiff !== 0) return levelDiff;
-      return b.acquiredAt - a.acquiredAt;
-    });
-  }
+  // Single flat grid, sorted rarest-first; same-guitar copies stay together
+  // (highest level first) instead of being split into per-rarity sections.
+  const sortedItems = [...data.inventory].sort((a, b) => {
+    const rarityA = GUITARS_BY_ID.get(a.guitarId)?.rarity ?? "Common";
+    const rarityB = GUITARS_BY_ID.get(b.guitarId)?.rarity ?? "Common";
+    if (rarityA !== rarityB) return RARITY_RANK[rarityB] - RARITY_RANK[rarityA];
+    if (a.guitarId !== b.guitarId) {
+      return String(a.guitarId).localeCompare(String(b.guitarId), undefined, { numeric: true });
+    }
+    const guitar = GUITARS_BY_ID.get(a.guitarId);
+    const levelDiff = guitar ? getItemLevel(b, guitar) - getItemLevel(a, guitar) : 0;
+    if (levelDiff !== 0) return levelDiff;
+    return b.acquiredAt - a.acquiredAt;
+  });
 
   const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {
     setSelectedItemId(inventoryItemId);
@@ -246,36 +229,21 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
         )}
       </div>
 
-      <div className="flex flex-col gap-12">
-        {RARITY_ORDER.map((rarity) => {
-          const items = itemsByRarity[rarity];
-          if (items.length === 0) return null;
-          return (
-            <section key={rarity}>
-              <RaritySectionHeader
-                rarity={rarity}
-                owned={ownedByRarity[rarity]}
-                total={totalByRarity[rarity]}
-              />
-              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {items.map((item) => (
-                  <GuitarCard
-                    key={item.id}
-                    item={item}
-                    isEquipped={data.equippedItemId === item.id}
-                    rigSlot={(() => { const i = rig.guitarSlots.indexOf(item.id); return i >= 0 ? i : null; })()}
-                    onEquipClick={() => setEquipItem(item)}
-                    isEquipping={isEquipping}
-                    onSellClick={handleSellClick}
-                    isSelling={isSelling}
-                    onListClick={handleListClick}
-                    isListing={isListing}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {sortedItems.map((item) => (
+          <GuitarCard
+            key={item.id}
+            item={item}
+            isEquipped={data.equippedItemId === item.id}
+            rigSlot={(() => { const i = rig.guitarSlots.indexOf(item.id); return i >= 0 ? i : null; })()}
+            onEquipClick={() => setEquipItem(item)}
+            isEquipping={isEquipping}
+            onSellClick={handleSellClick}
+            isSelling={isSelling}
+            onListClick={handleListClick}
+            isListing={isListing}
+          />
+        ))}
       </div>
 
       {(() => {
