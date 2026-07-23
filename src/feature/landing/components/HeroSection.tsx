@@ -1,52 +1,34 @@
 import { Button } from "assets/components/ui/button";
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
+import { HERO_STATS } from "feature/landing/data/heroStats";
 import type { Transition, Variants } from "framer-motion";
 import {
+  animate,
   motion,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useTransform,
 } from "framer-motion";
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import type { PointerEvent } from "react";
+import { useEffect } from "react";
 
 const StaticCTA = () => (
-  <div className='flex flex-col items-center gap-5 lg:items-start'>
-    <div className='flex flex-col items-center gap-2 lg:items-start'>
-      <div className='flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start'>
-        <Link href='/signup'>
-          <div className='group relative overflow-hidden rounded-lg p-[1px] transition-transform duration-300 active:scale-[0.98]'>
-            <div className='absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100 will-change-transform' />
-            <Button className='group/btn relative h-14 overflow-hidden rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-all hover:bg-zinc-50'>
-              <span className='relative z-10 flex items-center gap-3 whitespace-nowrap'>
-                Start My Guitar Progress
-                <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
-              </span>
-            </Button>
-          </div>
-        </Link>
-      </div>
-      <span className='mt-1 whitespace-nowrap text-center text-xs font-medium text-zinc-400 lg:text-left'>
-        Free forever for tracking progress
-      </span>
-    </div>
-    <div className='mt-1 flex items-center gap-3 text-sm font-medium text-zinc-400'>
-      <Link href='/login' className='transition-colors hover:text-cyan-400'>
-        Sign in
-      </Link>
-      <span aria-hidden>·</span>
-      <Link
-        href='/how-it-works'
-        className='transition-colors hover:text-cyan-400'>
-        How it works
-      </Link>
-    </div>
+  <div className='flex flex-col items-center gap-2'>
+    <Link href='/signup'>
+      <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
+        <span className='flex items-center gap-3 whitespace-nowrap'>
+          Start tracking free
+          <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
+        </span>
+      </Button>
+    </Link>
+    <span className='mt-1 whitespace-nowrap text-xs font-medium text-zinc-400'>
+      Free forever, no paywalls
+    </span>
   </div>
 );
 
@@ -74,272 +56,223 @@ const headlineLine: Variants = {
   },
 };
 
-// A handful of notes across 6 strings, hand-placed to read like a real riff
-// rather than a random scatter. Positions are percentages along the strip.
-const TAB_NOTES = [
-  { string: 5, x: 6, fret: 0 },
-  { string: 4, x: 16, fret: 2 },
-  { string: 4, x: 27, fret: 4 },
-  { string: 3, x: 38, fret: 2 },
-  { string: 3, x: 49, fret: 4 },
-  { string: 2, x: 60, fret: 0 },
-  { string: 3, x: 71, fret: 2 },
-  { string: 4, x: 82, fret: 0 },
-  { string: 5, x: 92, fret: 3 },
-];
-
 /**
- * Small, custom-built "live tab playback" visual: 6 tab strings with fret
- * markers and a looping playhead, built entirely from CSS/SVG. Replaces the
- * `tabs.webp` screenshot that used to sit here (also reused lower down in
- * InteractiveExercisesSection) with something that can't look like a
- * duplicated, cropped photo, while still communicating the real product
- * feature: animated Guitar Pro tablature synced to audio.
+ * Perspective stage: the dashboard window tilts back in 3D while two real
+ * UI collages (borrowed from the how-it-works assets) float above it on
+ * separate depth planes. The tilt is static CSS, so reduced motion only
+ * skips the entrance animation, not the composition.
  */
-const LiveTabStripCard = ({
+/**
+ * Count-up stat driven by a motion value rendered straight into the DOM,
+ * so the rolling number never re-renders the React tree.
+ */
+const StatCounter = ({
+  value,
+  label,
+  delay,
+  shouldReduceMotion,
+}: {
+  value: number;
+  label: string;
+  delay: number;
+  shouldReduceMotion: boolean;
+}) => {
+  const count = useMotionValue(0);
+  // Stats are rounded down before being written to heroStats.ts, so the
+  // trailing "+" signals a floor, not a fake-precise exact count.
+  const display = useTransform(
+    count,
+    (v) => `${Math.round(v).toLocaleString("en-US")}+`,
+  );
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      count.set(value);
+      return undefined;
+    }
+    const controls = animate(count, value, {
+      duration: 1.8,
+      delay,
+      ease: easeOutExpo,
+    });
+    return () => controls.stop();
+  }, [count, value, delay, shouldReduceMotion]);
+
+  return (
+    <div className='flex flex-col items-center gap-1'>
+      <motion.span className='font-landingHeading text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+        {display}
+      </motion.span>
+      <span className='text-sm font-medium text-zinc-400'>{label}</span>
+    </div>
+  );
+};
+
+const HeroPerspectiveStage = ({
   shouldReduceMotion,
 }: {
   shouldReduceMotion: boolean;
 }) => (
-  <>
-    <div className='relative overflow-hidden rounded-lg p-1.5 glass-card'>
-      <div className='relative aspect-[4/3] overflow-hidden rounded-lg bg-zinc-950 sm:aspect-video'>
-        <div className='absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(34,211,238,0.08),transparent_70%)]' />
-        <div className='relative flex h-full flex-col justify-center gap-4 px-8 py-10 sm:gap-5 sm:px-12'>
-          {Array.from({ length: 6 }).map((_, stringIndex) => (
-            <div
-              key={stringIndex}
-              className='relative h-px w-full bg-zinc-700/50'>
-              {TAB_NOTES.filter((note) => note.string === stringIndex).map(
-                (note, i) => (
-                  <span
-                    key={i}
-                    style={{ left: `${note.x}%` }}
-                    className='absolute -top-[9px] flex h-[18px] w-[18px] -translate-x-1/2 items-center justify-center rounded-full bg-cyan-500/20 text-[9px] font-bold text-cyan-300 ring-1 ring-cyan-400/30'>
-                    {note.fret}
-                  </span>
-                ),
-              )}
-            </div>
-          ))}
-          {!shouldReduceMotion && (
-            <motion.div
-              aria-hidden
-              className='absolute inset-y-6 w-px bg-gradient-to-b from-transparent via-cyan-300 to-transparent'
-              animate={{ left: ["4%", "96%"] }}
-              transition={{
-                duration: 3.4,
-                repeat: Infinity,
-                repeatType: "loop",
-                ease: "linear",
-              }}
+  <div className='relative'>
+    <div className='[perspective:1800px]'>
+      <div className='[transform:rotateX(16deg)]'>
+        <Link href='/dashboard' className='block'>
+          <div className='overflow-hidden rounded-xl bg-zinc-950 shadow-[0_30px_90px_-20px_rgba(0,0,0,0.6),0_0_80px_rgba(34,211,238,0.05)] ring-1 ring-white/10'>
+            <Image
+              src='/images/hero-dashboard.webp'
+              alt='Riff Quest dashboard with daily practice, quests and activity heatmap'
+              width={1416}
+              height={917}
+              priority
+              className='h-auto w-full'
             />
-          )}
-        </div>
+          </div>
+        </Link>
       </div>
     </div>
-    <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
-      <span className='relative flex h-2 w-2'>
-        {!shouldReduceMotion && (
-          <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75' />
-        )}
-        <span className='relative inline-flex h-2 w-2 rounded-full bg-cyan-400' />
-      </span>
-      <span className='text-[11px] font-bold text-cyan-400'>
-        Live tab playback
-      </span>
-    </div>
-  </>
+
+    {/* The floating collages sit OUTSIDE the tilted plane on purpose: they
+        stay flat and screen-facing, which is what makes them read as
+        separate cards hovering above the receding dashboard. Each one bobs
+        slowly on its own phase to sell the hover. */}
+    <motion.div
+      aria-hidden
+      className='absolute -left-6 bottom-[34%] hidden w-[42%] sm:block lg:-left-16'
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.7,
+        delay: shouldReduceMotion ? 0 : 0.7,
+        ease: easeOutExpo,
+      }}>
+      <motion.div
+        animate={shouldReduceMotion ? undefined : { y: [0, -8, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
+        <Image
+          src='/images/how-it-works/step-2.webp'
+          alt=''
+          width={956}
+          height={534}
+          className='h-auto w-full drop-shadow-[0_16px_32px_rgba(0,0,0,0.45)]'
+        />
+      </motion.div>
+    </motion.div>
+    <motion.div
+      aria-hidden
+      className='absolute -right-4 -top-10 hidden w-[45%] sm:block lg:-right-16'
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.7,
+        delay: shouldReduceMotion ? 0 : 0.85,
+        ease: easeOutExpo,
+      }}>
+      <motion.div
+        animate={shouldReduceMotion ? undefined : { y: [0, -10, 0] }}
+        transition={{
+          duration: 8.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1.2,
+        }}>
+        <Image
+          src='/images/how-it-works/step-1.webp'
+          alt=''
+          width={906}
+          height={466}
+          className='h-auto w-full drop-shadow-[0_16px_32px_rgba(0,0,0,0.45)]'
+        />
+      </motion.div>
+    </motion.div>
+  </div>
 );
 
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
 
-  // Cursor-reactive spotlight instead of generic floating glow orbs. Driven
-  // entirely through motion values (never `useState`) so pointer movement
-  // never triggers a React re-render.
-  const pointerX = useMotionValue(0.5);
-  const pointerY = useMotionValue(0.32);
-  const spotlightX = useTransform(pointerX, (value) => `${value * 100}%`);
-  const spotlightY = useTransform(pointerY, (value) => `${value * 100}%`);
-  const spotlightBackground = useMotionTemplate`radial-gradient(560px circle at ${spotlightX} ${spotlightY}, rgba(34,211,238,0.14), transparent 65%)`;
-
-  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
-    if (shouldReduceMotion) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - rect.left) / rect.width);
-    pointerY.set((event.clientY - rect.top) / rect.height);
-  };
-
   return (
-    <section
-      onPointerMove={handlePointerMove}
-      className='relative flex min-h-[100dvh] flex-col overflow-hidden bg-zinc-950'>
+    <section className='relative flex min-h-[100dvh] flex-col overflow-hidden bg-zinc-950'>
+      {/* Cortex-style spotlight: one concentrated beam from the top edge,
+          one faint wide wash so the falloff stays soft. */}
       <div className='pointer-events-none absolute inset-0'>
-        <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(34,211,238,0.12),transparent_60%)]' />
-        {/*
-          The tiled guitar/music-icon texture is back in the hero, but this
-          time applied to the *entire* section as real ambience rather than
-          cropped inside a small floating box (that hard-clipping was the
-          bug from the previous round). Kept very faint so it reads as
-          texture, not wallpaper.
-        */}
-        <GuitarPatternBackground opacity={0.025} scale={1.3} />
-        {!shouldReduceMotion && (
-          <motion.div
-            className='absolute inset-0'
-            style={{ background: spotlightBackground }}
-          />
-        )}
+        <div className='absolute inset-0 bg-[radial-gradient(ellipse_45%_55%_at_50%_-15%,rgba(34,211,238,0.26),transparent_65%)]' />
+        <div className='absolute inset-0 bg-[radial-gradient(ellipse_85%_60%_at_50%_-10%,rgba(34,211,238,0.08),transparent_60%)]' />
+        <GuitarPatternBackground opacity={0.02} scale={1.3} />
       </div>
 
-      <nav className='relative z-30 flex w-full justify-center px-6 py-8 lg:justify-start lg:px-12'>
-        <Logo large />
+      <nav className='relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-12'>
+        <Logo />
+        <div className='flex items-center gap-6 text-sm font-medium text-zinc-400'>
+          <Link
+            href='/how-it-works'
+            className='transition-colors hover:text-white'>
+            How it works
+          </Link>
+          <Link href='/login' className='transition-colors hover:text-white'>
+            Sign in
+          </Link>
+        </div>
       </nav>
 
-      <div className='relative z-20 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 py-8 lg:px-12'>
-        <div className='grid w-full items-center gap-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12'>
-          <motion.div
-            className='mx-auto flex max-w-xl flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left'
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}>
-            <motion.h1
-              variants={headlineGroup}
-              initial={shouldReduceMotion ? "visible" : "hidden"}
-              animate='visible'
-              className='mb-6 font-landingHeading text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl'>
-              <motion.span variants={headlineLine} className='block'>
-                The guitar practice tracker
-              </motion.span>
-              <motion.span
-                variants={headlineLine}
-                className='relative mt-1 inline-block text-cyan-400'>
-                built for real progress.
-                <motion.span
-                  aria-hidden
-                  className='absolute inset-x-0 -bottom-1.5 h-[3px] origin-left rounded-full bg-gradient-to-r from-cyan-400 via-cyan-300/80 to-transparent'
-                  initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{
-                    duration: 0.7,
-                    delay: shouldReduceMotion ? 0 : 0.7,
-                    ease: easeOutExpo,
-                  }}
-                />
-              </motion.span>
-            </motion.h1>
-            <p className='mb-10 max-w-lg text-lg font-medium leading-relaxed tracking-tight text-zinc-400 sm:text-xl'>
-              Log sessions, discover song difficulty ratings, and follow a
-              structured routine, from beginner to advanced.
-            </p>
-            <HeroAuthButtons />
-          </motion.div>
-
-          {/*
-            Rebuilt again: the previous version leaned on the same
-            `tabs.webp` screenshot already used lower down in
-            InteractiveExercisesSection, and its rotated frame read as a
-            generic "app screenshot in a tilted card" template. This version
-            drops the raster screenshot entirely - a large, tinted guitar
-            illustration (built from an unused in-repo asset, recolored to
-            the single landing accent) anchors the composition the way
-            Discord's hero uses an oversized character illustration, and the
-            product signal is a small, custom-built live tab strip instead
-            of a photo, so nothing here is cropped/skewed or duplicated
-            elsewhere on the page.
-          */}
-          <motion.div
-            className='relative mx-auto w-full max-w-md pb-10 pt-6 lg:max-w-none lg:pl-6'
-            initial={
-              shouldReduceMotion ? false : { opacity: 0, scale: 0.94, x: 24 }
-            }
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: shouldReduceMotion ? 0 : 0.35,
-              ease: easeOutExpo,
-            }}>
-            <motion.div
-              aria-hidden
-              className='absolute -right-6 -top-16 z-0 hidden w-48 select-none opacity-90 sm:block lg:-right-10 lg:-top-20 lg:w-64'
-              initial={
-                shouldReduceMotion ? false : { opacity: 0, y: 20, rotate: 4 }
-              }
-              animate={{ opacity: 0.9, y: 0, rotate: 8 }}
-              transition={{
-                duration: 0.9,
-                delay: shouldReduceMotion ? 0 : 0.2,
-                ease: easeOutExpo,
-              }}>
-              <Image
-                src='/static/images/guitar-accent-cyan.png'
-                alt=''
-                width={254}
-                height={705}
-                className='h-auto w-full drop-shadow-[0_0_60px_rgba(34,211,238,0.25)]'
-              />
-            </motion.div>
-
-            <motion.div
-              aria-hidden
-              className='absolute -left-4 -top-8 z-20 hidden w-40 rounded-lg p-4 glass-card sm:block lg:-left-14 lg:-top-10'
-              initial={
-                shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
-              }
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                duration: 0.6,
-                delay: shouldReduceMotion ? 0 : 0.75,
-                ease: easeOutExpo,
-              }}>
-              <div className='mb-2 flex items-center justify-between'>
-                <span className='text-[10px] font-bold text-zinc-400'>
-                  Level 12
-                </span>
-                <Flame className='h-3.5 w-3.5 text-cyan-400' />
-              </div>
-              <div className='h-1.5 w-full overflow-hidden rounded-full bg-zinc-700/50'>
-                <div className='h-full w-2/3 rounded-full bg-cyan-400' />
-              </div>
-              <div className='mt-2 text-[10px] font-bold text-zinc-400'>
-                1,240 XP this month
-              </div>
-            </motion.div>
-
-            <motion.div
-              aria-hidden
-              className='absolute -bottom-6 -left-2 z-20 hidden items-center gap-2 rounded-lg px-4 py-3 glass-card sm:flex lg:-bottom-8 lg:-left-6'
-              initial={
-                shouldReduceMotion ? false : { opacity: 0, y: 14, scale: 0.9 }
-              }
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                duration: 0.6,
-                delay: shouldReduceMotion ? 0 : 0.9,
-                ease: easeOutExpo,
-              }}>
-              <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-sm font-bold text-cyan-400'>
-                A-
-              </div>
-              <div>
-                <div className='text-[11px] font-bold text-white'>
-                  Session graded
-                </div>
-                <div className='text-[10px] font-medium text-zinc-400'>
-                  by AI, instantly
-                </div>
-              </div>
-            </motion.div>
-
-            <div className='relative z-10'>
-              <AuroraGlowFrame>
-                <LiveTabStripCard shouldReduceMotion={!!shouldReduceMotion} />
-              </AuroraGlowFrame>
-            </div>
-          </motion.div>
-        </div>
+      <div className='relative z-20 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pt-8 text-center sm:pt-12 lg:px-12'>
+        <motion.div
+          className='flex flex-col items-center'
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: easeOutExpo }}>
+          <motion.h1
+            variants={headlineGroup}
+            initial={shouldReduceMotion ? "visible" : "hidden"}
+            animate='visible'
+            className='mb-6 font-landingHeading text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl'>
+            <motion.span variants={headlineLine} className='block'>
+              The guitar practice tracker
+            </motion.span>
+            <motion.span
+              variants={headlineLine}
+              className='block text-cyan-400'>
+              built for real progress
+            </motion.span>
+          </motion.h1>
+          <p className='mx-auto mb-10 max-w-xl text-lg font-medium leading-relaxed tracking-tight text-zinc-400 sm:text-xl'>
+            Log sessions, discover song difficulty ratings, and follow a
+            structured routine, from beginner to advanced.
+          </p>
+          <HeroAuthButtons />
+        </motion.div>
       </div>
+
+      <motion.div
+        className='relative z-10 mx-auto mt-14 w-full max-w-6xl flex-1 px-6 sm:mt-16 lg:px-10'
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.8,
+          delay: shouldReduceMotion ? 0 : 0.35,
+          ease: easeOutExpo,
+        }}>
+        <HeroPerspectiveStage shouldReduceMotion={!!shouldReduceMotion} />
+      </motion.div>
+
+      <motion.div
+        className='relative z-20 mx-auto flex w-full max-w-4xl flex-col items-center gap-10 px-6 pb-24 pt-16 sm:flex-row sm:justify-center sm:gap-20 sm:pt-20'
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.7,
+          delay: shouldReduceMotion ? 0 : 0.7,
+          ease: easeOutExpo,
+        }}>
+        {HERO_STATS.map((stat, i) => (
+          <StatCounter
+            key={stat.label}
+            value={stat.value}
+            label={stat.label}
+            delay={0.9 + i * 0.15}
+            shouldReduceMotion={!!shouldReduceMotion}
+          />
+        ))}
+      </motion.div>
     </section>
   );
 };

@@ -40,64 +40,41 @@ export const HeroAuthButtons = () => {
           </div>
         ) : isLoggedIn ? (
           <div className='flex flex-col items-center'>
-            <div className='group relative overflow-hidden rounded-lg p-[1px]'>
-              {!isDashboardLoading && (
-                <div className='absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] will-change-transform' />
+            <Button
+              onClick={handleGoToDashboard}
+              disabled={isDashboardLoading}
+              className='h-14 rounded-lg border-none bg-white px-10 text-lg font-bold text-black transition-colors hover:bg-zinc-50 active:scale-[0.98]'>
+              {isDashboardLoading ? (
+                <Loader2 className='animate-spin' />
+              ) : (
+                <span className='flex items-center gap-2'>
+                  <LayoutDashboard className='h-5 w-5' />
+                  Go to Dashboard
+                </span>
               )}
-              <Button
-                onClick={handleGoToDashboard}
-                disabled={isDashboardLoading}
-                className='relative h-14 overflow-hidden rounded-lg border-none bg-zinc-950 px-10 text-lg font-bold text-white transition-all hover:bg-zinc-900'>
-                {isDashboardLoading ? (
-                  <Loader2 className='animate-spin' />
-                ) : (
-                  <span className='relative z-10 flex items-center gap-2'>
-                    <LayoutDashboard className='h-5 w-5 transition-transform' />
-                    Go to Dashboard
-                  </span>
-                )}
-              </Button>
-            </div>
+            </Button>
           </div>
         ) : (
-          <div className='flex flex-col items-center gap-6'>
-            <div className='flex flex-col items-center gap-2'>
-              <div className='flex flex-col items-center justify-center gap-4 sm:flex-row'>
-                <Link href='/signup'>
-                  <div className='group relative overflow-hidden rounded-lg p-[1px] transition-transform duration-300 active:scale-[0.98]'>
-                    <div className='absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100 will-change-transform' />
-                    <Button className='group/btn relative h-14 overflow-hidden rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-all hover:bg-zinc-50'>
-                      <span className='relative z-10 flex items-center gap-3 whitespace-nowrap'>
-                        Start My Guitar Progress
-                        <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
-                      </span>
-                    </Button>
-                  </div>
-                </Link>
-                <Button
-                  onClick={handleGoogleLogin}
-                  disabled={isGoogleFetching}
-                  className='flex h-14 items-center gap-3 rounded-lg bg-zinc-900 px-8 text-base font-semibold text-white transition-all hover:bg-zinc-800'>
-                  <FcGoogle className='mr-2 h-5 w-5' /> Continue with Google
+          <div className='flex flex-col items-center gap-2'>
+            <div className='flex flex-col items-center gap-4 sm:flex-row'>
+              <Link href='/signup'>
+                <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
+                  <span className='flex items-center gap-3 whitespace-nowrap'>
+                    Start tracking free
+                    <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
+                  </span>
                 </Button>
-              </div>
-              <span className='mt-1 whitespace-nowrap text-center text-xs font-medium text-zinc-400'>
-                Free forever for tracking progress
-              </span>
-            </div>
-            <div className='mt-1 flex items-center gap-3 text-sm font-medium text-zinc-400'>
-              <Link
-                href='/login'
-                className='transition-colors hover:text-cyan-400'>
-                Sign in
               </Link>
-              <span aria-hidden>·</span>
-              <Link
-                href='/how-it-works'
-                className='transition-colors hover:text-cyan-400'>
-                How it works
-              </Link>
+              <Button
+                onClick={handleGoogleLogin}
+                disabled={isGoogleFetching}
+                className='flex h-14 items-center gap-3 rounded-lg bg-zinc-900 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-800'>
+                <FcGoogle className='mr-2 h-5 w-5' /> Continue with Google
+              </Button>
             </div>
+            <span className='mt-1 whitespace-nowrap text-xs font-medium text-zinc-400'>
+              Free forever, no paywalls
+            </span>
           </div>
         )}
       </div>

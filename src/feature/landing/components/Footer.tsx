@@ -7,14 +7,14 @@ import Link from "next/link";
 
 export const Footer = () => {
   return (
-    <footer className='relative overflow-hidden bg-zinc-950 pb-12 pt-32'>
+    <footer className='relative overflow-hidden bg-zinc-950 pb-12 pt-24'>
       {/* Background decoration */}
       <div className='absolute left-1/2 top-0 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/5 blur-[120px]'></div>
 
-      <GuitarPatternBackground opacity={0.07} />
+      <GuitarPatternBackground opacity={0.03} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mb-24 grid grid-cols-1 gap-16 md:grid-cols-12 lg:gap-24'>
+        <div className='mb-16 grid grid-cols-1 gap-16 md:grid-cols-12 lg:gap-24'>
           {/* Brand Column */}
           <div className='space-y-10 md:col-span-5'>
             <div className='space-y-6'>
@@ -26,8 +26,8 @@ export const Footer = () => {
                 className='h-10 w-auto'
               />
               <p className='max-w-sm text-lg font-medium leading-relaxed text-zinc-400'>
-                The intelligent practice assistant designed for guitarists who
-                value measurable progress over guesswork.
+                A practice tracker for guitarists who want proof they are
+                improving.
               </p>
               <p className='max-w-sm text-sm font-medium leading-relaxed text-zinc-400'>
                 Riff Quest is{" "}
@@ -174,27 +174,8 @@ export const Footer = () => {
               </ul>
             </div>
             <div className='space-y-6'>
-              <h4 className='text-xs font-bold text-white/40'>Social</h4>
+              <h4 className='text-xs font-bold text-white/40'>Support</h4>
               <ul className='space-y-4'>
-                <li>
-                  <Link
-                    href='https://discord.gg/6yJmsZW2Ne'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
-                    Discord
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href='https://buymeacoffee.com/riffquest'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='group flex items-center text-sm font-bold text-amber-600/70 transition-colors hover:text-amber-400'>
-                    Buy me a coffee{" "}
-                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
-                  </Link>
-                </li>
                 <li>
                   <Link
                     href='/contact'
@@ -225,9 +206,7 @@ export const Footer = () => {
         </div>
 
         <div className='flex flex-col items-center justify-between gap-6 pt-8 sm:flex-row'>
-          <p className='text-xs font-bold text-zinc-500'>
-            © 2026 Riff Quest · Crafted for guitarists
-          </p>
+          <p className='text-xs font-bold text-zinc-500'>© 2026 Riff Quest</p>
         </div>
       </div>
     </footer>

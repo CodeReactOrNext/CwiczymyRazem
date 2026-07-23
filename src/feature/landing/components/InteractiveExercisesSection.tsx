@@ -1,24 +1,28 @@
 "use client";
 
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
-import { Guitar, ListMusic, Star } from "lucide-react";
+import { Reveal } from "feature/landing/components/Reveal";
+import { Guitar, Mic, Timer } from "lucide-react";
 import Image from "next/image";
 
+// "144 exercises" lives in ExerciseCatalogPreview (breadth); this section
+// sells the depth of a single exercise: synced playback, tempo work and
+// pitch-detection scoring, all in one place.
 const features = [
-  {
-    icon: <ListMusic className='h-4 w-4' />,
-    label: "144 exercises built in",
-    desc: "From finger warm-ups to advanced shred techniques",
-  },
   {
     icon: <Guitar className='h-4 w-4' />,
     label: "Guitar Pro files",
     desc: "Import any GP file, tablature stays synced to audio",
   },
   {
-    icon: <Star className='h-4 w-4' />,
-    label: "Guitar Hero on a real guitar",
-    desc: "Earn points per exercise while building a real skill",
+    icon: <Timer className='h-4 w-4' />,
+    label: "Tempo control",
+    desc: "Slow any exercise down until it's clean, then speed up",
+  },
+  {
+    icon: <Mic className='h-4 w-4' />,
+    label: "Live score and accuracy",
+    desc: "Each take gets a score, accuracy and a combo multiplier",
   },
 ];
 
@@ -32,64 +36,65 @@ export const InteractiveExercisesSection = () => {
       </div>
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.7fr] xl:gap-16'>
-          {/* Left - content */}
-          <div className='flex flex-col'>
-            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
-              Practice with tabs. <br />
-              <span className='text-zinc-400'>Hear every note.</span>
-            </h2>
+        <Reveal className='mb-12 max-w-2xl'>
+          <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+            Practice with tabs. <br />
+            <span className='text-zinc-400'>Hear every note.</span>
+          </h2>
+          <p className='max-w-xl text-lg leading-relaxed text-zinc-400'>
+            Animated GP tablature, synced to real audio playback. Turn on pitch
+            detection and it&apos;s Guitar Hero, on a real guitar: every note
+            you hit lights up as you play.
+          </p>
+        </Reveal>
 
-            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
-              144 technical exercises with animated GP tablature, synced to
-              real audio playback at any tempo.
-            </p>
-
-            {/* Feature list */}
-            <ul className='space-y-5'>
-              {features.map((f, i) => (
-                <li key={i} className='flex items-start gap-4'>
-                  <div className='mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
-                    {f.icon}
-                  </div>
-                  <div>
-                    <div className='mb-0.5 text-sm font-bold text-white'>
-                      {f.label}
-                    </div>
-                    <div className='text-sm leading-relaxed text-zinc-400'>
-                      {f.desc}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right - screenshot */}
+        <Reveal delay={0.1}>
           <AuroraGlowFrame>
             <div className='relative rounded-lg p-1.5 glass-card'>
               <div className='relative overflow-hidden rounded-lg'>
+                {/* The full 2336px-wide strip collapses into an unreadable
+                  sliver on phones, so mobile gets a taller crop of the same
+                  screenshot (playhead + detected notes + Pitch Detect). */}
                 <Image
-                  src='/images/feature/tabs.webp'
-                  alt='Interactive Guitar Pro tablature with animated playback'
-                  width={1400}
-                  height={350}
-                  className='h-auto w-full object-cover'
+                  src='/images/tabs-live.webp'
+                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                  width={2336}
+                  height={625}
+                  className='hidden h-auto w-full sm:block'
                   priority={false}
                 />
-                <div className='pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-zinc-900/60' />
+                <Image
+                  src='/images/tabs-live-mobile.webp'
+                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                  width={972}
+                  height={625}
+                  className='h-auto w-full sm:hidden'
+                  priority={false}
+                />
               </div>
             </div>
-
-            {/* Floating badge */}
-            <div className='absolute -bottom-4 -right-4 flex items-center gap-2 rounded-lg bg-zinc-800/70 px-4 py-2.5'>
-              <span className='h-2 w-2 animate-pulse rounded-full bg-cyan-400' />
-              <span className='text-[11px] font-bold text-white'>
-                Live sync
-              </span>
-            </div>
           </AuroraGlowFrame>
-        </div>
+        </Reveal>
+
+        <Reveal
+          delay={0.15}
+          className='mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-3'>
+          {features.map((f) => (
+            <div key={f.label} className='flex items-start gap-4'>
+              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
+                {f.icon}
+              </div>
+              <div>
+                <div className='mb-0.5 text-sm font-bold text-white'>
+                  {f.label}
+                </div>
+                <div className='text-sm leading-relaxed text-zinc-400'>
+                  {f.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </Reveal>
       </div>
     </section>
   );
