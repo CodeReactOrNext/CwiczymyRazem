@@ -61,7 +61,7 @@ export type GuitarRarity =
   | "Legendary"
   | "Mythic";
 
-export type CaseType = "standard" | "premium" | "elite";
+export type CaseType = "standard" | "premium" | "elite" | "daily";
 
 type ProductionCountry =
   | "USA"
