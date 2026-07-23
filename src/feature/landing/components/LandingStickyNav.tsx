@@ -40,7 +40,7 @@ export const LandingStickyNav = () => {
       }
       className='fixed inset-x-0 top-0 z-50 bg-zinc-950/85 backdrop-blur-md'>
       <div className='mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 lg:px-12'>
-        <Logo />
+        <Logo compact />
         <div className='flex items-center gap-6'>
           <Link
             href='/how-it-works'
