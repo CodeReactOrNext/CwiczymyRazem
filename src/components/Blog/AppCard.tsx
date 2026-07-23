@@ -1,8 +1,9 @@
 import { Check, Star, X } from 'lucide-react';
 import React from 'react';
 
-// next-mdx-remote v6 strips JSX expression attributes from MDX content, so every
-// prop must survive as a plain string. List props take pipe-delimited values.
+// MDX content is compiled with no scope, so `{expression}` attributes referencing
+// undefined identifiers throw at render — every prop must survive as a plain
+// string. List props take pipe-delimited values.
 interface AppCardProps {
   name: string;
   icon: string;
