@@ -122,7 +122,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [], headings = [], fa
         "description": frontmatter.description,
         "image": absoluteImage,
         "author": {
-          "@type": "Person",
+          "@type": "Organization",
           "name": frontmatter.author || "Riff Quest",
           "url": "https://riff.quest"
         },

@@ -2,9 +2,11 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { FaqLayout } from "feature/faq/components/FaqLayout";
 import { useTranslation } from "hooks/useTranslation";
 
-const FaqView = () => {
+// Shared with the FAQPage JSON-LD in pages/faq/index.tsx so the structured
+// data and the rendered accordion can never drift out of sync.
+export const useFaqQuestions = (): faqQuestionInterface[] => {
   const { t } = useTranslation("faq");
-  const faqQuestions: faqQuestionInterface[] = [
+  return [
     {
       title: t("about_title"),
       message: t("about_description"),
@@ -26,6 +28,10 @@ const FaqView = () => {
       message: t("about_excerise_description"),
     },
   ];
+};
+
+const FaqView = () => {
+  const faqQuestions = useFaqQuestions();
 
   return <FaqLayout faqQuestions={faqQuestions} />;
 };
