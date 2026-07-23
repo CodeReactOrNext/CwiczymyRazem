@@ -15,12 +15,12 @@ export const GuideSection = ({
   className,
 }: GuideSectionProps) => {
   return (
-    <section className={cn("mx-auto w-full max-w-5xl px-6 py-10", className)}>
-      <h2 className='font-display mb-3 text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+    <section className={cn("mx-auto w-full max-w-5xl px-6 py-12", className)}>
+      <h2 className='font-display mb-4 text-balance text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
         {heading}
       </h2>
       {intro && (
-        <p className='mb-8 max-w-3xl leading-relaxed text-zinc-400'>{intro}</p>
+        <p className='mb-10 max-w-3xl leading-relaxed text-zinc-400'>{intro}</p>
       )}
       {children}
     </section>

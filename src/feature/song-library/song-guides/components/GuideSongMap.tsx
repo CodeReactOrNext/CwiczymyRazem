@@ -28,7 +28,7 @@ export const GuideSongMap = ({ guide }: GuideSongMapProps) => {
                 )}
               </div>
               <div className='w-40'>
-                <DifficultyMeter value={section.difficulty} />
+                <DifficultyMeter value={section.difficulty} showValue={false} />
               </div>
             </div>
             <p className='text-sm leading-relaxed text-zinc-400'>

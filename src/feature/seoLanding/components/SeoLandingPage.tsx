@@ -1,11 +1,21 @@
 import { BlogCard } from "components/Blog/BlogCard";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
+import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { FinalCTASection } from "feature/landing/components/FinalCTASection";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { motion, useScroll, useSpring } from "framer-motion";
 import type { BlogFrontmatter } from "lib/blog";
-import { ArrowRight, ChevronRight, List } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ChevronRight,
+  Lightbulb,
+  List,
+  Sparkles,
+} from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,9 +46,14 @@ const FAQ_HEADING = "FAQ";
 const Block = ({
   block,
   exercisesById,
+  exercisePosition,
+  exerciseTotal,
 }: {
   block: SeoLandingBlock;
   exercisesById: Record<string, SerializedExercise>;
+  /** 1-based position per exercise id, in page order. */
+  exercisePosition: Record<string, number>;
+  exerciseTotal: number;
 }) => {
   switch (block.kind) {
     case "paragraph":
@@ -62,35 +77,56 @@ const Block = ({
       );
     case "tip":
       return (
-        <div className='rounded-lg bg-cyan-500/5 p-5'>
-          <p className='mb-1 text-sm font-semibold text-cyan-400'>
-            {block.title ?? "Pro tip"}
-          </p>
-          <p className='text-sm leading-relaxed text-zinc-300'>
-            <InlineText text={block.text} />
-          </p>
+        <div className='flex gap-4 rounded-lg bg-amber-500/5 p-5'>
+          <Lightbulb
+            className='mt-0.5 h-5 w-5 shrink-0 text-amber-400'
+            aria-hidden='true'
+          />
+          <div>
+            <p className='mb-1 text-sm font-semibold text-amber-400'>
+              {block.title ?? "Pro tip"}
+            </p>
+            <p className='text-sm leading-relaxed text-zinc-300'>
+              <InlineText text={block.text} />
+            </p>
+          </div>
         </div>
       );
     case "cta":
       return (
-        <div className='rounded-lg bg-gradient-to-br from-cyan-500/10 via-zinc-900 to-zinc-950 p-6 sm:p-8'>
-          <p className='mb-2 text-xl font-bold text-white'>{block.title}</p>
-          <p className='mb-5 leading-relaxed text-zinc-400'>
-            <InlineText text={block.text} />
-          </p>
-          <Link
-            href='/signup'
-            className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
-            Start free
-            <ArrowRight className='h-4 w-4' aria-hidden='true' />
-          </Link>
+        <div className='relative overflow-hidden rounded-lg bg-zinc-900/60 p-6 sm:p-10'>
+          <div className='pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/15 blur-[100px]' />
+          <div className='relative'>
+            <p className='mb-3 text-2xl font-bold tracking-tight text-white sm:text-3xl'>
+              {block.title}
+            </p>
+            <p className='mb-6 max-w-xl leading-relaxed text-zinc-400'>
+              <InlineText text={block.text} />
+            </p>
+            <div className='flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
+              <Link
+                href='/signup'
+                className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                Start free
+                <ArrowRight className='h-4 w-4' aria-hidden='true' />
+              </Link>
+              <span className='text-xs font-medium text-zinc-400'>
+                Free forever — no credit card
+              </span>
+            </div>
+          </div>
         </div>
       );
     case "exercise": {
       const exercise = exercisesById[block.exerciseId];
       if (!exercise) return null;
       return (
-        <ExerciseShowcase exercise={exercise} commentary={block.commentary} />
+        <ExerciseShowcase
+          exercise={exercise}
+          commentary={block.commentary}
+          position={exercisePosition[block.exerciseId]}
+          total={exerciseTotal}
+        />
       );
     }
     case "schedule":
@@ -144,6 +180,11 @@ export const SeoLandingPage = ({
 
   const canonical = `https://riff.quest/${config.slug}`;
   const exerciseIds = collectExerciseIds(config);
+  const exercisePosition = Object.fromEntries(
+    exerciseIds.map((id, index) => [id, index + 1])
+  );
+  const firstSectionId =
+    config.sections.length > 0 ? headingId(config.sections[0].heading) : "";
   const pageTitle =
     config.metaTitle.length <= 47
       ? `${config.metaTitle} | Riff Quest`
@@ -238,14 +279,15 @@ export const SeoLandingPage = ({
         />
       </Head>
 
-      <main className='min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300'>
+      <main
+        className={`${jakartaLanding.variable} min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300`}>
         <motion.div
           className='fixed left-0 right-0 top-0 z-[60] h-1 origin-left bg-cyan-500'
           style={{ scaleX }}
         />
 
         <nav className='fixed left-0 right-0 top-0 z-50 bg-zinc-950/90 backdrop-blur-sm'>
-          <div className='mx-auto flex h-16 max-w-6xl items-center justify-between px-6'>
+          <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6'>
             <Link href='/' className='transition-opacity hover:opacity-70'>
               <Image
                 src='/images/longlightlogo.svg'
@@ -263,52 +305,95 @@ export const SeoLandingPage = ({
               </Link>
               <Link
                 href='/signup'
-                className='text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300'>
-                Start Free →
+                className='rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                Start free
               </Link>
             </div>
           </div>
         </nav>
 
-        <div className='mx-auto max-w-6xl px-6 pt-24'>
-          <div className='mb-8 flex items-center gap-2 text-xs tracking-widest text-zinc-500'>
-            <Link href='/' className='transition-colors hover:text-zinc-300'>
-              Home
-            </Link>
-            <ChevronRight className='h-3 w-3' aria-hidden='true' />
-            <span className='max-w-[280px] truncate text-zinc-400'>
-              {config.title}
-            </span>
-          </div>
+        <div className='relative overflow-hidden'>
+          <div className='pointer-events-none absolute -top-48 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]' />
+          <GuitarPatternBackground opacity={0.02} />
 
-          <header className='max-w-3xl pb-14'>
-            <h1 className='mb-6 text-4xl font-bold leading-tight tracking-tighter text-white sm:text-5xl'>
-              {config.title}
-            </h1>
-            <div className='space-y-4'>
-              {config.intro.map((paragraph, idx) => (
-                <p key={idx} className='text-lg leading-relaxed text-zinc-400'>
-                  <InlineText text={paragraph} />
-                </p>
-              ))}
+          <div className='relative mx-auto max-w-7xl px-6 pt-24'>
+            <div className='mb-8 flex items-center gap-2 text-xs tracking-widest text-zinc-500'>
+              <Link href='/' className='transition-colors hover:text-zinc-300'>
+                Home
+              </Link>
+              <ChevronRight className='h-3 w-3' aria-hidden='true' />
+              <span className='max-w-[280px] truncate text-zinc-400'>
+                {config.title}
+              </span>
             </div>
-            <div className='mt-8 flex flex-wrap items-center gap-3 text-sm'>
-              {exerciseIds.length > 0 && (
-                <span className='rounded bg-cyan-500/10 px-3 py-1.5 font-semibold text-cyan-400'>
-                  {exerciseIds.length} interactive exercises
+
+            <header className='max-w-4xl pb-16'>
+              <p className='mb-4 inline-flex items-center gap-2 rounded bg-cyan-500/10 px-3 py-1.5 text-sm font-semibold text-cyan-400'>
+                <Sparkles className='h-4 w-4' aria-hidden='true' />
+                Free practice guide
+              </p>
+              <h1 className='mb-6 text-balance font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+                {config.title}
+              </h1>
+              <div className='space-y-4'>
+                {config.intro.map((paragraph, idx) => (
+                  <p key={idx} className='text-lg leading-relaxed text-zinc-400'>
+                    <InlineText text={paragraph} />
+                  </p>
+                ))}
+              </div>
+
+              <div className='mt-8 flex flex-wrap items-center gap-3 text-sm'>
+                {exerciseIds.length > 0 && (
+                  <span className='rounded bg-cyan-500/10 px-3 py-1.5 font-semibold text-cyan-400'>
+                    {exerciseIds.length} interactive exercises
+                  </span>
+                )}
+                <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
+                  100% free — no paywalls
                 </span>
-              )}
-              <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
-                100% free — no paywalls
-              </span>
-              <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
-                Updated {config.updatedAt}
-              </span>
-            </div>
-          </header>
+                <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
+                  Updated {config.updatedAt}
+                </span>
+              </div>
+
+              <div className='mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
+                <Link
+                  href='/signup'
+                  className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                  Start practicing free
+                  <ArrowRight className='h-4 w-4' aria-hidden='true' />
+                </Link>
+                {firstSectionId && (
+                  <a
+                    href={`#${firstSectionId}`}
+                    className='inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500'>
+                    Jump to the drills
+                    <ArrowDown className='h-4 w-4' aria-hidden='true' />
+                  </a>
+                )}
+              </div>
+            </header>
+          </div>
         </div>
 
-        <article className='mx-auto max-w-6xl px-6 pb-16'>
+        <article className='mx-auto max-w-7xl px-6 pb-16'>
+          <details className='mb-12 rounded-lg bg-zinc-900/40 p-5 lg:hidden'>
+            <summary className='cursor-pointer text-sm font-bold text-white'>
+              On this page
+            </summary>
+            <nav className='mt-4 flex flex-col gap-3'>
+              {headings.map((heading) => (
+                <a
+                  key={heading.id}
+                  href={`#${heading.id}`}
+                  className='text-sm text-zinc-400 transition-colors hover:text-cyan-400'>
+                  {heading.text}
+                </a>
+              ))}
+            </nav>
+          </details>
+
           <div className='flex flex-col gap-12 lg:flex-row'>
             <aside className='sticky top-32 hidden max-h-[calc(100vh-200px)] w-64 shrink-0 overflow-y-auto lg:block'>
               <div className='mb-6 flex items-center gap-2 text-lg font-bold tracking-wide text-white'>
@@ -331,21 +416,26 @@ export const SeoLandingPage = ({
               </nav>
             </aside>
 
-            <div className='min-w-0 max-w-3xl flex-1'>
-              <div className='space-y-16'>
-                {config.sections.map((section) => (
+            <div className='min-w-0 max-w-4xl flex-1'>
+              <div className='space-y-20'>
+                {config.sections.map((section, sectionIdx) => (
                   <section key={section.heading}>
+                    <p className='mb-2 text-sm font-bold text-cyan-400'>
+                      Part {String(sectionIdx + 1).padStart(2, "0")}
+                    </p>
                     <h2
                       id={headingId(section.heading)}
-                      className='mb-6 scroll-mt-28 text-3xl font-bold tracking-tight text-white'>
+                      className='mb-8 scroll-mt-28 text-balance text-3xl font-bold tracking-tight text-white'>
                       {section.heading}
                     </h2>
-                    <div className='space-y-6'>
+                    <div className='space-y-8'>
                       {section.blocks.map((block, idx) => (
                         <Block
                           key={idx}
                           block={block}
                           exercisesById={exercisesById}
+                          exercisePosition={exercisePosition}
+                          exerciseTotal={exerciseIds.length}
                         />
                       ))}
                     </div>
@@ -356,12 +446,14 @@ export const SeoLandingPage = ({
                   <section>
                     <h2
                       id={headingId(FAQ_HEADING)}
-                      className='mb-6 scroll-mt-28 text-3xl font-bold tracking-tight text-white'>
+                      className='mb-8 scroll-mt-28 text-3xl font-bold tracking-tight text-white'>
                       {FAQ_HEADING}
                     </h2>
-                    <div className='space-y-8'>
+                    <div className='space-y-4'>
                       {config.faqs.map((faq) => (
-                        <div key={faq.question}>
+                        <div
+                          key={faq.question}
+                          className='rounded-lg bg-zinc-900/40 p-6'>
                           <h3 className='mb-2 text-lg font-semibold text-zinc-100'>
                             {faq.question}
                           </h3>
@@ -379,7 +471,7 @@ export const SeoLandingPage = ({
         </article>
 
         {relatedGuides.length > 0 && (
-          <section className='mx-auto max-w-6xl px-6 py-16'>
+          <section className='mx-auto max-w-7xl px-6 py-16'>
             <h2 className='mb-8 text-2xl font-bold text-white'>
               More practice guides
             </h2>
@@ -405,7 +497,7 @@ export const SeoLandingPage = ({
         )}
 
         {relatedSongGuides.length > 0 && (
-          <section className='mx-auto max-w-6xl px-6 py-16'>
+          <section className='mx-auto max-w-7xl px-6 py-16'>
             <h2 className='mb-8 text-2xl font-bold text-white'>
               See these exercises in a real song
             </h2>
@@ -436,7 +528,7 @@ export const SeoLandingPage = ({
         )}
 
         {relatedBlogs.length > 0 && (
-          <section className='mx-auto max-w-6xl px-6 py-16'>
+          <section className='mx-auto max-w-7xl px-6 py-16'>
             <h2 className='mb-8 text-2xl font-bold text-white'>From the blog</h2>
             <div className='grid gap-8 sm:grid-cols-2 lg:grid-cols-3'>
               {relatedBlogs.map((blog) => (
@@ -448,6 +540,7 @@ export const SeoLandingPage = ({
 
         <FinalCTASection />
         <Footer />
+        <CookieBanner />
       </main>
     </>
   );

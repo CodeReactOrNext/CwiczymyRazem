@@ -34,7 +34,7 @@ export const stairwayToHeaven: SongGuide = {
     { label: "Length", value: "8:02" },
   ],
   editorial: {
-    difficulty: 6.8,
+    difficulty: 7,
     timeToLearn: "4–8 weeks for the full song",
     oneLiner:
       "Five songs stacked into one — a complete course in acoustic and electric guitar that happens to end with a legendary solo.",
@@ -42,7 +42,7 @@ export const stairwayToHeaven: SongGuide = {
   verdict: {
     heading: "The verdict: a staircase, literally",
     paragraphs: [
-      "The Riff Quest community puts Stairway to Heaven at about 6.8 out of 10 — solid B tier. But no section of the song is actually a 6.8. The intro is a 4, the solo is an 8, and the song simply spends eight minutes climbing between them. The average is honest; it's just an average of a staircase.",
+      "Stairway to Heaven grades out as solid B tier on the Riff Quest ladder — but no single section of the song actually feels like a B. The fingerpicked intro is friendly early-intermediate territory, the solo is genuine advanced work, and the song simply spends eight minutes climbing between them. The average is honest; it's just an average of a staircase.",
       "This is why Stairway is such an unusual proposition. Beginners can genuinely play the opening — and genuinely can't play the ending. Intermediate players can play everything except the solo's fastest licks. Advanced players use the solo as a phrasing masterclass. The song meets you where you are, then shows you exactly where you're not yet.",
       "Our take: it's the single best 'growth song' in classic rock. Learn it stage by stage over a month or two, and you'll come out the other side a measurably different guitarist — not because you memorized eight minutes of music, but because each stage quietly installed a new skill.",
     ],
@@ -68,35 +68,35 @@ export const stairwayToHeaven: SongGuide = {
     items: [
       {
         name: "Fingerpicked arpeggios with a moving bassline",
-        difficulty: 3,
+        difficulty: 2,
         role: "core",
         description:
           "The intro's descending Am line is the archetype of 'melody inside an arpeggio'. Thumb independence is the skill being built.",
       },
       {
         name: "Chord-melody & partial shapes",
-        difficulty: 3,
+        difficulty: 2,
         role: "core",
         description:
           "Verses weave melody notes through Am, C, D and Fmaj7 fragments — small shapes, precise fingertips, everything ringing.",
       },
       {
         name: "Barre chords & driving strumming",
-        difficulty: 4,
+        difficulty: 3,
         role: "core",
         description:
           "The 'And as we wind on down the road' section trades delicacy for push. Clean Fmaj7-to-Am motion and confident eighth-note strumming carry it.",
       },
       {
         name: "The fanfare arpeggios",
-        difficulty: 5,
+        difficulty: 4,
         role: "core",
         description:
           "The pre-solo fanfare (the Dsus4 build) is quick, articulated, and everyone hears it in their head already — which makes every flubbed note obvious.",
       },
       {
         name: "Pentatonic lead: bends, pull-offs, phrasing",
-        difficulty: 7,
+        difficulty: 5,
         role: "bonus",
         description:
           "The solo is a compendium of A-minor pentatonic vocabulary — singing bends, cascading pull-off runs, and the famous repeating triplet climax that outruns most players' first attempts.",
@@ -235,7 +235,7 @@ export const stairwayToHeaven: SongGuide = {
     {
       title: "How hard is Stairway to Heaven on guitar?",
       message:
-        "Around 6.8/10 overall in Riff Quest community ratings — but it's really a staircase from 4/10 (the fingerpicked intro) to 8/10 (the solo's final run). Beginners can play the opening within weeks; the complete song with solo is a solid intermediate achievement.",
+        "Solid B tier on the Riff Quest ladder — the live community rating sits at the top of this page. In practice it's a staircase: the fingerpicked intro is early-intermediate, the verses add complexity one layer at a time, and the solo's final run is advanced work. Beginners can play the opening within weeks; the complete song with solo is a solid intermediate achievement.",
     },
     {
       title: "Can a beginner learn Stairway to Heaven?",
@@ -250,7 +250,7 @@ export const stairwayToHeaven: SongGuide = {
     {
       title: "Is the Stairway to Heaven solo hard?",
       message:
-        "It rates around 8/10 as a standalone piece. The opening phrases are very learnable pentatonic vocabulary — the difficulty concentrates in the cascading pull-off runs and the famous repeating triplet climax, which need weeks of metronome work. It's regarded as one of the best phrasing studies in rock for exactly this reason.",
+        "As a standalone piece it's advanced work — the hardest thing in the song by a clear margin. The opening phrases are very learnable pentatonic vocabulary — the difficulty concentrates in the cascading pull-off runs and the famous repeating triplet climax, which need weeks of metronome work. It's regarded as one of the best phrasing studies in rock for exactly this reason.",
     },
     {
       title: "Do I need a 12-string or two guitars to play it?",

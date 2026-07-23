@@ -3,19 +3,11 @@ import { StaticTablature } from "feature/exercises/components/StaticTablature/St
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { ArrowRight, Clock, Music } from "lucide-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { InlineText } from "./InlineText";
 import { MountOnVisible } from "./MountOnVisible";
-
-const TablatureViewer = dynamic(
-  () =>
-    import(
-      "feature/exercisePlan/views/PracticeSession/components/TablatureViewer"
-    ).then((m) => m.TablatureViewer),
-  { ssr: false }
-);
+import { NotationPreview } from "./NotationPreview";
 
 const difficultyBadges: Record<string, { label: string; className: string }> = {
   beginner: { label: "Beginner", className: "bg-sky-500/10 text-sky-300" },
@@ -28,16 +20,23 @@ interface ExerciseShowcaseProps {
   exercise: SerializedExercise;
   /** Expert commentary paragraphs written for the landing page context. */
   commentary: string[];
+  /** 1-based position of this drill among all embeds on the page. */
+  position?: number;
+  /** Total number of embedded drills on the page. */
+  total?: number;
 }
 
 /**
  * One embedded exercise on an SEO landing page: badges + expert commentary +
- * interactive tab preview (lazy) + plain-text tab for crawlers + practice CTA.
- * Anchored by the exercise slug so old /exercises/{slug} redirects can deep-link.
+ * real notation rendered by AlphaTab (lazy) + plain-text tab for crawlers +
+ * practice CTA. Anchored by the exercise slug so old /exercises/{slug}
+ * redirects can deep-link.
  */
 export const ExerciseShowcase = ({
   exercise,
   commentary,
+  position,
+  total,
 }: ExerciseShowcaseProps) => {
   const slug = idToSlug(exercise.id);
   const difficulty = difficultyBadges[exercise.difficulty];
@@ -48,7 +47,12 @@ export const ExerciseShowcase = ({
 
   return (
     <div id={slug} className='scroll-mt-28 rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
-      <div className='mb-4 flex flex-wrap items-center gap-2'>
+      <div className='mb-5 flex flex-wrap items-center gap-2'>
+        {position !== undefined && total !== undefined && (
+          <span className='rounded bg-cyan-500/10 px-2.5 py-1 text-xs font-bold text-cyan-400'>
+            Drill {position} of {total}
+          </span>
+        )}
         <span
           className={`inline-block rounded px-2.5 py-1 text-xs font-semibold ${difficulty.className}`}>
           {difficulty.label}
@@ -79,20 +83,14 @@ export const ExerciseShowcase = ({
       </div>
 
       {exercise.tablature && (
-        <div className='mt-6 space-y-3'>
+        <div className='mt-8 space-y-3'>
           <MountOnVisible
             placeholder={
-              <div className='h-40 animate-pulse rounded-lg bg-zinc-900/60' />
+              <div className='min-h-[180px] animate-pulse rounded-lg bg-zinc-950/70' />
             }>
-            <TablatureViewer
+            <NotationPreview
               measures={exercise.tablature}
               bpm={exercise.metronomeSpeed?.recommended || 120}
-              isPlaying={false}
-              startTime={null}
-              countInRemaining={0}
-              hideNotes={exercise.hideTablatureNotes}
-              hideDynamicsLane={true}
-              className='w-full'
             />
           </MountOnVisible>
           <details className='group'>
@@ -109,13 +107,13 @@ export const ExerciseShowcase = ({
       )}
 
       {!exercise.tablature && exercise.strummingPatterns && (
-        <div className='mt-6'>
+        <div className='mt-8'>
           <StaticStrumPattern patterns={exercise.strummingPatterns} />
         </div>
       )}
 
       {exercise.instructions.length > 0 && (
-        <div className='mt-6'>
+        <div className='mt-8'>
           <p className='mb-3 text-sm font-semibold text-zinc-200'>
             How to practice it
           </p>
@@ -134,13 +132,16 @@ export const ExerciseShowcase = ({
         </div>
       )}
 
-      <div className='mt-6'>
+      <div className='mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
         <Link
           href={`/practice/exercise/${slug}`}
-          className='inline-flex items-center gap-2 rounded-lg bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-400 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500'>
+          className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
           Practice this with real-time feedback
           <ArrowRight className='h-4 w-4' aria-hidden='true' />
         </Link>
+        <span className='text-xs font-medium text-zinc-400'>
+          Free, right in your browser
+        </span>
       </div>
     </div>
   );
