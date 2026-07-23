@@ -37,7 +37,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   },
   daily: {
     id: "daily",
-    name: "Daily Case",
+    name: "Featured Case",
     description: "A rotating pool of 10 items.",
     fameCost: 200,
     yearFrom: 2018,

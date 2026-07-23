@@ -73,7 +73,13 @@ const SongGuidePage = ({
       case "progression":
         return <GuideProgression key={sectionId} guide={guide} />;
       case "inlineCta":
-        return <GuideInlineCta key={sectionId} guide={guide} />;
+        return (
+          <GuideInlineCta
+            key={sectionId}
+            guide={guide}
+            coverUrl={liveData.song?.coverUrl}
+          />
+        );
       case "relatedExercises":
         return (
           <GuideRelatedExercises key={sectionId} links={relatedLandingLinks} />
@@ -92,7 +98,7 @@ const SongGuidePage = ({
         <GuideStatsBar guide={guide} liveData={liveData} />
         {guide.sectionOrder.map(renderSection)}
         <FaqSection questions={guide.faq} />
-        <GuideFinalCta guide={guide} />
+        <GuideFinalCta guide={guide} coverUrl={liveData.song?.coverUrl} />
         <Footer />
         <CookieBanner />
       </main>
