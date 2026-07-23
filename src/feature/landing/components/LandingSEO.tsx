@@ -41,7 +41,9 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
       <meta name='twitter:image' content={ogImageUrl} />
 
       <link rel='canonical' href={siteUrl} />
-      <link rel='preload' as='image' href='/images/hero-image.webp' fetchPriority='high' />
+      {/* Hero no longer renders a raster screenshot above the fold (see
+          HeroSection.tsx - it's now a CSS/SVG-built tab strip), so there is
+          no longer a single dominant LCP image left to preload here. */}
 
       {/* Structured Data */}
       <script
@@ -83,21 +85,6 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
                 "text": q.message,
               },
             })),
-          }),
-        }}
-      />
-      <script
-        type='application/ld+json'
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "VideoObject",
-            "name": "Riff Quest Demo",
-            "description": "See how Riff Quest turns guitar practice into visible progress.",
-            "thumbnailUrl": `${siteUrl}/images/video-poster.png`,
-            "uploadDate": "2024-01-27T12:00:00Z",
-            "contentUrl": `${siteUrl}/demo.webm`,
-            "embedUrl": `${siteUrl}/`,
           }),
         }}
       />

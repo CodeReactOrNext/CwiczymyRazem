@@ -1,125 +1,92 @@
 "use client";
 
-import { ClipboardList, Layers, PenLine, Shuffle, Timer } from "lucide-react";
+import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
+import { Reveal } from "feature/landing/components/Reveal";
+import { Layers, PenLine, Shuffle, Timer } from "lucide-react";
 import Image from "next/image";
 
 const features = [
   {
-    icon: <PenLine className="w-4 h-4" />,
+    icon: <PenLine className='h-4 w-4' />,
     label: "Build your own plan",
-    desc: "Create a fully custom routine from scratch — pick exercises, set durations, define order",
+    desc: "Pick exercises, set durations, define the order",
   },
   {
-    icon: <Layers className="w-4 h-4" />,
+    icon: <Layers className='h-4 w-4' />,
     label: "Ready-made templates",
-    desc: "Start from curated plans for technique, theory, creativity, and ear training",
+    desc: "Curated for technique, theory, creativity, ear training",
   },
   {
-    icon: <Timer className="w-4 h-4" />,
+    icon: <Timer className='h-4 w-4' />,
     label: "Timed sessions",
-    desc: "Each block has a fixed time slot so your practice stays focused and on schedule",
+    desc: "Each block gets a fixed slot, so practice stays on schedule",
   },
   {
-    icon: <Shuffle className="w-4 h-4" />,
+    icon: <Shuffle className='h-4 w-4' />,
     label: "Auto-plan",
-    desc: "One click generates a ready-to-go session based on your stats — no planning needed, just pick up and play",
+    desc: "One click generates a session from your stats, no planning",
   },
 ];
 
 export const PracticePlansSection = () => {
   return (
-    <section className="relative py-32 bg-zinc-950 overflow-hidden">
+    <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-0 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-500/4 blur-[130px] rounded-full" />
+      <div className='pointer-events-none absolute inset-0'>
+        <div className='absolute left-0 top-1/3 h-[600px] w-[600px] rounded-full bg-cyan-500/5 blur-[150px]' />
+        <div className='absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/[0.04] blur-[130px]' />
       </div>
 
-      {/* Top divider */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
-
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-12 xl:gap-16 items-center">
-
-          {/* Left — screenshot */}
-          <div className="relative order-2 lg:order-1">
-            {/* Outer glow */}
-            <div className="absolute inset-0 -m-8 bg-gradient-radial from-amber-500/8 via-transparent to-transparent blur-2xl pointer-events-none" />
-
-            {/* App chrome frame */}
-            <div className="relative rounded-2xl border border-white/10 bg-zinc-900/60 p-1.5 shadow-2xl backdrop-blur-sm">
-              {/* Fake title bar */}
-              <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                <div className="flex-1 mx-4 h-4 rounded bg-zinc-800/60 max-w-[180px]" />
-                <div className="flex items-center gap-1.5">
-                  <ClipboardList className="w-3 h-3 text-zinc-600" />
-                  <span className="text-[9px] font-black text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded uppercase tracking-widest">My Plans</span>
+      <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
+        <div className='grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.7fr_1fr] xl:gap-16'>
+          {/* Left - screenshot */}
+          <div className='order-2 lg:order-1'>
+            <Reveal>
+              <AuroraGlowFrame>
+                <div className='relative rounded-lg p-1.5 glass-card'>
+                  <div className='relative overflow-hidden rounded-lg'>
+                    <Image
+                      src='/images/plans-library.webp'
+                      alt='Practice plans library with ready-made training programs'
+                      width={1401}
+                      height={704}
+                      className='h-auto w-full'
+                      priority={false}
+                    />
+                  </div>
                 </div>
-              </div>
-
-              {/* Screenshot */}
-              <div className="relative overflow-hidden rounded-xl">
-                <Image
-                  src="/images/feature/practices-plans.webp"
-                  alt="Practice plans library with custom and template routines"
-                  width={1200}
-                  height={800}
-                  className="w-full h-auto object-cover"
-                  priority={false}
-                />
-                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-900/60 to-transparent pointer-events-none" />
-              </div>
-            </div>
-
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -left-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 shadow-xl">
-              <PenLine className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-[11px] font-black text-white uppercase tracking-widest">
-                Your routine
-              </span>
-            </div>
+              </AuroraGlowFrame>
+            </Reveal>
           </div>
 
-          {/* Right — content */}
-          <div className="flex flex-col order-1 lg:order-2">
-            <span className="text-sm font-black uppercase tracking-[0.3em] text-amber-400 mb-6">
-              Practice Plans
-            </span>
-
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6">
-              Your practice, <br />
-              <span className="text-zinc-500">your rules.</span>
+          {/* Right - content */}
+          <Reveal delay={0.1} className='order-1 flex flex-col lg:order-2'>
+            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+              Your practice, your rules.
             </h2>
-
-            <p className="text-zinc-400 text-lg leading-relaxed mb-12 max-w-md">
-              Stop improvising your sessions. Build structured practice plans
-              from scratch or pick a ready-made template — then execute with
-              focus and track every minute of it.
+            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
+              Stop improvising. Build a structured plan from scratch or pick a
+              template, then execute with focus.
             </p>
 
-            {/* Feature list */}
-            <ul className="space-y-5">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-start gap-4 group">
-                  <div className="mt-0.5 w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 shadow-lg transition-all duration-300 group-hover:scale-105">
+            <ul className='space-y-5'>
+              {features.map((f) => (
+                <li key={f.label} className='flex items-start gap-4'>
+                  <div className='mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
                     {f.icon}
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-white uppercase tracking-wide mb-0.5">
+                    <div className='mb-0.5 text-sm font-bold text-white'>
                       {f.label}
                     </div>
-                    <div className="text-sm text-zinc-500 leading-relaxed">
+                    <div className='text-sm leading-relaxed text-zinc-400'>
                       {f.desc}
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
-          </div>
-
+          </Reveal>
         </div>
       </div>
     </section>
