@@ -2,6 +2,8 @@
 
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
@@ -37,6 +39,10 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
   const rarities = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
   const strip: StripItem[] = [];
 
+  // Daily case can only drop today's featured pool, so the roulette fillers
+  // come from that pool too — the animation never teases an impossible item.
+  const dailyPool = caseDef.id === "daily" ? getDailyPool() : null;
+
   for (let i = 0; i < VISIBLE_ITEMS; i++) {
     if (i === WIN_INDEX) {
       strip.push(winItem);
@@ -48,6 +54,13 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
     for (const [rarity, prob] of rarities) {
       roll -= prob;
       if (roll <= 0) { chosen = rarity; break; }
+    }
+
+    if (dailyPool) {
+      const candidates = dailyPool.filter((e) => e.def.rarity === chosen);
+      const pickFrom = candidates.length > 0 ? candidates : dailyPool;
+      strip.push(pickFrom[Math.floor(Math.random() * pickFrom.length)]);
+      continue;
     }
 
     if (Math.random() < 0.6) {
@@ -163,6 +176,19 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             />
           )}
 
+          {/* One-shot screen flash the instant the roulette lands */}
+          {phase === "reveal" && rarityStyles && (
+            <motion.div
+              className="fixed inset-0 z-20 pointer-events-none"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: 0 }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
+              style={{
+                background: `radial-gradient(circle at center, ${rarityStyles.baseColor}66 0%, transparent 60%)`,
+              }}
+            />
+          )}
+
           <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-6 w-full max-w-4xl px-4 my-auto">
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
@@ -178,7 +204,13 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
               className="relative w-full overflow-hidden rounded-lg bg-zinc-950/90"
               style={{ height: 220 }}
             >
-              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[4px] bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)]" />
+              <GuitarPatternBackground opacity={0.03} />
+
+              {/* Center pointer: glowing line + carets top and bottom */}
+              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[2px] bg-gradient-to-b from-transparent via-amber-400 to-transparent shadow-[0_0_16px_rgba(251,191,36,0.8)]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-amber-400" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 h-0 w-0 border-x-8 border-b-8 border-x-transparent border-b-amber-400" />
+
               <div className="absolute inset-y-0 left-0 w-40 z-20 bg-gradient-to-r from-zinc-950 to-transparent pointer-events-none" />
               <div className="absolute inset-y-0 right-0 w-40 z-20 bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none" />
 
@@ -199,10 +231,13 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       style={{ width: ITEM_WIDTH }}
                     >
                       <div
-                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60"
+                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60 transition-all duration-500"
                         style={{
                           border: `1px solid ${rs.baseColor}55`,
                           background: `radial-gradient(circle at center, ${rs.baseColor}26 0%, ${rs.baseColor}0d 45%, rgba(24,24,27,0.85) 85%)`,
+                          boxShadow: isWinner
+                            ? `0 0 34px ${rs.baseColor}99, inset 0 0 24px ${rs.baseColor}2e`
+                            : undefined,
                         }}
                       >
                         {item.kind === "guitar" ? (
@@ -218,6 +253,11 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                             className="relative z-10 h-32 w-32 object-contain"
                           />
                         )}
+                        {/* Rarity bar at the tile bottom, CS-case style */}
+                        <div
+                          className="absolute bottom-0 left-0 right-0 z-20 h-1"
+                          style={{ background: rs.baseColor, opacity: isWinner ? 1 : 0.75 }}
+                        />
                       </div>
                       <div className={cn("flex flex-col items-center transition-opacity duration-500", isWinner ? "opacity-100" : "opacity-70")}>
                         <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-500 mb-0.5">
@@ -240,9 +280,63 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                   initial={{ opacity: 0, y: 30, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                  className="flex flex-col items-center gap-4 w-full"
+                  className="flex flex-col items-center gap-3 w-full"
                 >
+                  {/* Rarity splash headline */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 14, scale: 0.85 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 16, delay: 0.15 }}
+                    className="font-display text-3xl sm:text-4xl font-black capitalize tracking-wide"
+                    style={{
+                      color: rarityStyles.baseColor,
+                      textShadow: `0 0 32px ${rarityStyles.baseColor}88`,
+                    }}
+                  >
+                    {revealRarity}
+                  </motion.p>
+
                   <div className="relative flex items-center justify-center">
+                    {/* Slow-rotating light rays behind the card */}
+                    <motion.div
+                      className="pointer-events-none absolute h-[520px] w-[520px] rounded-full"
+                      style={{
+                        background: `repeating-conic-gradient(from 0deg, ${rarityStyles.baseColor}1f 0deg 10deg, transparent 10deg 22deg)`,
+                        WebkitMaskImage: "radial-gradient(circle, black 30%, transparent 68%)",
+                        maskImage: "radial-gradient(circle, black 30%, transparent 68%)",
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1, rotate: 360 }}
+                      transition={{
+                        opacity: { duration: 0.6 },
+                        rotate: { duration: 46, repeat: Infinity, ease: "linear" },
+                      }}
+                    />
+
+                    {/* One-shot particle burst */}
+                    {Array.from({ length: 14 }).map((_, i) => {
+                      const angle = (i / 14) * Math.PI * 2;
+                      const dist = 150 + (i % 3) * 45;
+                      return (
+                        <motion.span
+                          key={i}
+                          className="pointer-events-none absolute z-20 h-1.5 w-1.5 rounded-full"
+                          style={{
+                            background: rarityStyles.baseColor,
+                            boxShadow: `0 0 10px ${rarityStyles.baseColor}`,
+                          }}
+                          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                          animate={{
+                            x: Math.cos(angle) * dist,
+                            y: Math.sin(angle) * dist,
+                            opacity: 0,
+                            scale: 0.3,
+                          }}
+                          transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 + (i % 5) * 0.04 }}
+                        />
+                      );
+                    })}
+
                     <motion.div
                       className="absolute w-44 h-44 sm:w-56 sm:h-56 rounded-full blur-[40px] will-change-[opacity,transform]"
                       style={{ backgroundColor: `${rarityStyles.baseColor}33` }}
