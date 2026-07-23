@@ -1,4 +1,4 @@
-import FaqView from "feature/faq/FaqView";
+import FaqView, { useFaqQuestions } from "feature/faq/FaqView";
 import { Footer } from "feature/landing/components/Footer";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
@@ -19,6 +19,7 @@ const FaqPage: NextPageWithLayout = () => {
   const isLogged = status === "authenticated";
 
   const siteUrl = "https://riff.quest/faq";
+  const faqQuestions = useFaqQuestions();
 
   return (
     <>
@@ -35,6 +36,23 @@ const FaqPage: NextPageWithLayout = () => {
         <meta name="twitter:title" content="Guitar Practice FAQ | Riff Quest" />
         <meta name="twitter:description" content="Answers to the most common questions about Riff Quest guitar practice app." />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": faqQuestions.map((q) => ({
+                "@type": "Question",
+                "name": q.title,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": q.message,
+                },
+              })),
+            }),
+          }}
+        />
       </Head>
       <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
         {!isLogged && (
