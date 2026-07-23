@@ -1,7 +1,7 @@
 import React from 'react';
 
-// next-mdx-remote v6 strips JSX expression attributes from MDX content, so props
-// must survive as plain strings — same pipe-delimited convention as AppCard.
+// MDX content is compiled with no scope, so props must survive as plain strings
+// — same pipe-delimited convention as AppCard.
 interface StepListProps {
   /** Pipe-delimited items, each formatted as "Title::Description". */
   steps: string;

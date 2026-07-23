@@ -2,8 +2,8 @@ import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 
-// next-mdx-remote v6 strips JSX expression attributes from MDX content, so every
-// prop must survive as a plain string (see AppCard for the same constraint).
+// MDX content is compiled with no scope, so every prop must survive as a plain
+// string (see AppCard for the same constraint).
 interface ExercisePromoProps {
   /** Exercise id, e.g. "spider_basic" — see feature/exercisePlan/data/exerises/**\/*.ts. */
   exerciseId: string;
