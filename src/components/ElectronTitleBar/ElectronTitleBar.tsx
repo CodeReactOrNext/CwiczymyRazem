@@ -1,147 +1,86 @@
 import { cn } from "assets/lib/utils";
-import { Minus, X } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { ChevronLeft, ChevronRight, House } from "lucide-react";
+import { useRouter } from "next/router";
+import { createPortal } from "react-dom";
 
-// Empty square outline — window is not maximized yet.
-const MaximizeIcon = () => (
-  <svg
-    width='10'
-    height='10'
-    viewBox='0 0 10 10'
-    fill='none'
-    aria-hidden='true'>
-    <rect x='0.5' y='0.5' width='9' height='9' stroke='currentColor' />
-  </svg>
-);
+import { WindowControls } from "./WindowControls";
 
-// Two overlapping squares — the classic "restore down" glyph, no lucide equivalent.
-const RestoreIcon = () => (
-  <svg
-    width='10'
-    height='10'
-    viewBox='0 0 10 10'
-    fill='none'
-    aria-hidden='true'>
-    <path d='M2.5 1H9.5V8' stroke='currentColor' />
-    <rect x='0.5' y='2.5' width='7' height='7' stroke='currentColor' />
-  </svg>
-);
-
-const WindowButton = ({
+const NavButton = ({
   onClick,
   label,
-  variant = "default",
   children,
 }: {
   onClick: () => void;
   label: string;
-  variant?: "default" | "close";
   children: React.ReactNode;
 }) => (
   <button
     type='button'
     onClick={onClick}
     aria-label={label}
-    className={cn(
-      "flex h-9 w-11 items-center justify-center text-zinc-400 transition-colors [-webkit-app-region:no-drag]",
-      variant === "close"
-        ? "hover:bg-red-500 hover:text-white"
-        : "hover:bg-zinc-800 hover:text-zinc-100",
-    )}>
+    className='flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900 text-zinc-300 transition-colors [-webkit-app-region:no-drag] hover:bg-zinc-800 hover:text-zinc-100'>
     {children}
   </button>
 );
 
-interface DesktopState {
-  isElectron: boolean;
-  isMac: boolean;
-  isMaximized: boolean;
-}
-
-const initialDesktopState: DesktopState = {
-  isElectron: false,
-  isMac: false,
-  isMaximized: false,
-};
-
 /**
- * Custom title bar for the Electron desktop shell. The main process creates a
- * frameless BrowserWindow (see electron/main.js); this replaces the OS chrome
- * so the window looks native to *our* design instead of the system default.
- * Renders nothing on the web build — `window.electronWindow` is only present
- * inside Electron (injected by electron/preload.js).
+ * Persistent, app-wide title bar for the Electron desktop shell — back /
+ * forward / home navigation on the left, minimize/maximize/close on the
+ * right (Spotify-desktop-style single strip). Mounted once, globally, in
+ * _app.tsx; the app's own content reserves `pt-10` for it there so nothing
+ * renders underneath.
+ *
+ * Portalled straight into `document.body` rather than rendered in place:
+ * `position: fixed` only anchors to the viewport as long as no ancestor sets
+ * a `transform`/`filter`/`perspective`/`will-change` — any one of those
+ * (present somewhere in a React tree this size, e.g. framer-motion wrappers
+ * or backdrop-blur containers) would silently turn it into a scroll-along
+ * `absolute` instead. Rendering as a direct child of `<body>` sidesteps that
+ * whole class of bug. The bar's z-index is likewise set to the CSS max so it
+ * stays above even the most aggressive in-app overlays (practice session
+ * views go up to `z-[999999999]`).
+ *
+ * On mac the OS draws real traffic lights (`titleBarStyle: "hidden"` +
+ * `trafficLightPosition` in electron/main.js) independent of any web
+ * content, so the bar still renders (for the nav buttons) but leaves room on
+ * the left instead of drawing its own window controls. Renders nothing on
+ * the web build — `window.electronWindow` is only present inside Electron
+ * (injected by electron/preload.js).
  */
 export const ElectronTitleBar = () => {
-  const [{ isElectron, isMac, isMaximized }, setDesktopState] =
-    useState(initialDesktopState);
+  const router = useRouter();
+  const { isElectron, isMac, isMaximized, minimize, toggleMaximize, close } =
+    useElectronWindowControls();
 
-  useEffect(() => {
-    const api = window.electronWindow;
-    if (!api) return undefined;
+  if (!isElectron || typeof document === "undefined") return null;
 
-    // Both the initial reveal and later updates flow through async callbacks
-    // (IPC round-trips), never a direct synchronous setState in the effect body.
-    let cancelled = false;
-    api.isMaximized().then((maximized) => {
-      if (cancelled) return;
-      setDesktopState({
-        isElectron: true,
-        isMac: api.platform === "darwin",
-        isMaximized: maximized,
-      });
-    });
-
-    const unsubscribe = api.onMaximizedChange((maximized) =>
-      setDesktopState((s) => ({ ...s, isMaximized: maximized })),
-    );
-
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
-  }, []);
-
-  if (!isElectron) return null;
-
-  const api = window.electronWindow;
-  if (!api) return null;
-
-  return (
+  return createPortal(
     <div
-      className='sticky top-0 z-50 flex h-9 w-full shrink-0 select-none items-center justify-between bg-zinc-950 [-webkit-app-region:drag]'
-      onDoubleClick={() => api.toggleMaximize()}>
-      <div className={cn("flex items-center gap-2 px-3", isMac && "pl-20")}>
-        <Image
-          src='/images/logolight.svg'
-          alt=''
-          width={14}
-          height={14}
-          className='h-3.5 w-3.5 opacity-80'
-        />
-        <span className='text-[11px] font-bold tracking-wide text-zinc-400'>
-          riff<span className='text-cyan-500'>.</span>quest
-        </span>
+      className='fixed left-0 right-0 top-0 z-[2147483647] flex h-10 select-none items-center justify-between bg-zinc-950 [-webkit-app-region:drag]'
+      onDoubleClick={toggleMaximize}>
+      <div className={cn("flex items-center gap-1.5 px-3", isMac && "pl-20")}>
+        <NavButton label='Wstecz' onClick={() => router.back()}>
+          <ChevronLeft size={16} strokeWidth={2} />
+        </NavButton>
+        <NavButton label='Dalej' onClick={() => window.history.forward()}>
+          <ChevronRight size={16} strokeWidth={2} />
+        </NavButton>
+        <NavButton label='Panel główny' onClick={() => router.push("/dashboard")}>
+          <House size={14} strokeWidth={2} />
+        </NavButton>
       </div>
 
       {!isMac && (
-        <div className='flex h-full items-stretch'>
-          <WindowButton label='Minimalizuj' onClick={() => api.minimize()}>
-            <Minus size={13} strokeWidth={1.5} />
-          </WindowButton>
-          <WindowButton
-            label={isMaximized ? "Przywróć" : "Maksymalizuj"}
-            onClick={() => api.toggleMaximize()}>
-            {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
-          </WindowButton>
-          <WindowButton
-            label='Zamknij'
-            variant='close'
-            onClick={() => api.close()}>
-            <X size={14} strokeWidth={1.5} />
-          </WindowButton>
-        </div>
+        <WindowControls
+          isMaximized={isMaximized}
+          onMinimize={minimize}
+          onToggleMaximize={toggleMaximize}
+          onClose={close}
+          className='h-10'
+        />
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
