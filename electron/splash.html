@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<title>riff.quest</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: transparent;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+  }
+  /* Transparent window: body padding leaves room for the card's drop shadow. */
+  body { padding: 24px; }
+
+  .card {
+    position: relative;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #09090b;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 24px 48px rgba(0, 0, 0, 0.55);
+    -webkit-app-region: drag;
+    animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Cyan halo — same vibe as the auth pages' top glow. */
+  .glow {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 130%;
+    height: 65%;
+    transform: translate(-50%, -55%);
+    background: radial-gradient(50% 50% at 50% 50%, rgba(34, 211, 238, 0.12), transparent 70%);
+    filter: blur(36px);
+    pointer-events: none;
+  }
+
+  .pattern {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .logo {
+    height: 62px;
+    filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.18));
+    animation:
+      rise-in 0.6s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both,
+      breathe 3.2s 0.8s ease-in-out infinite;
+  }
+
+  .wordmark {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #e4e4e7;
+    animation: rise-in 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .wordmark span { color: #22d3ee; }
+
+  .eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 18px;
+    margin-top: 2px;
+    animation: rise-in 0.6s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .eq i {
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    background: #22d3ee;
+    transform-origin: bottom;
+    animation: eq ease-in-out infinite;
+  }
+  .eq i:nth-child(1) { animation-duration: 1.05s; animation-delay: -0.30s; opacity: 0.45; }
+  .eq i:nth-child(2) { animation-duration: 0.85s; animation-delay: -0.65s; opacity: 0.75; }
+  .eq i:nth-child(3) { animation-duration: 1.20s; animation-delay: -0.10s; opacity: 1;    }
+  .eq i:nth-child(4) { animation-duration: 0.95s; animation-delay: -0.50s; opacity: 0.75; }
+  .eq i:nth-child(5) { animation-duration: 1.10s; animation-delay: -0.85s; opacity: 0.45; }
+
+  .status {
+    font-size: 11px;
+    color: #71717a;
+    letter-spacing: 0.02em;
+    text-align: center;
+    max-width: 280px;
+    animation: rise-in 0.6s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes breathe {
+    50% { filter: drop-shadow(0 0 34px rgba(34, 211, 238, 0.32)); }
+  }
+  @keyframes eq {
+    0%, 100% { transform: scaleY(0.25); }
+    50%      { transform: scaleY(1); }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+
+    <!-- Same tiled icon pattern as the auth pages (LoginView). -->
+    <svg class="pattern" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="splash-bg-pattern" x="0" y="0" width="160" height="160"
+                 patternUnits="userSpaceOnUse" patternTransform="rotate(-15)">
+          <!-- guitar -->
+          <g transform="translate(20, 20) scale(1.333)"
+             fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m11.9 12.1 4.514-4.514"/>
+            <path d="M20.1 2.3a1 1 0 0 0-1.4 0l-1.114 1.114A2 2 0 0 0 17 4.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 17.828 7h1.344a2 2 0 0 0 1.414-.586L21.7 5.3a1 1 0 0 0 0-1.4z"/>
+            <path d="m6 16 2 2"/>
+            <path d="M8.2 9.9C8.7 8.8 9.8 8 11 8c2.8 0 5 2.2 5 5 0 1.2-.8 2.3-1.9 2.8l-.9.4A2 2 0 0 0 12 18a4 4 0 0 1-4 4c-3.3 0-6-2.7-6-6a4 4 0 0 1 4-4 2 2 0 0 0 1.8-1.2z"/>
+            <circle cx="11.5" cy="12.5" r=".5" fill="#fff"/>
+          </g>
+          <!-- music note -->
+          <g transform="translate(100, 40) scale(1.167)"
+             fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
+          </g>
+          <!-- guitar pick -->
+          <g transform="translate(40, 100) scale(1.25)"
+             fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 18.5c2 -2.5 4 -6.5 4 -10.5c0 -2.946 -2.084 -4.157 -4.204 -4.654c-.864 -.23 -2.13 -.346 -3.796 -.346c-1.667 0 -2.932 .115 -3.796 .346c-2.12 .497 -4.204 1.708 -4.204 4.654c0 3.312 2 8 4 10.5c.297 .37 .618 .731 .963 1.081l.354 .347a3.9 3.9 0 0 0 5.364 0a14.05 14.05 0 0 0 1.319 -1.428z"/>
+          </g>
+          <!-- headphones -->
+          <g transform="translate(110, 110) scale(1.333)"
+             fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>
+          </g>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="100%" height="100%" fill="url(#splash-bg-pattern)" />
+    </svg>
+
+    <div class="content">
+      <!-- public/images/logolight.svg, inlined -->
+      <svg class="logo" viewBox="0 0 1067.86 1261.04" xmlns="http://www.w3.org/2000/svg" fill="#fbfbfa">
+        <path d="M432.39,617.95c0,.55.29,1.07.79,1.31,3.11,1.44,14.14.95,16.7.78,22.93-1.59,55.09-12.07,75.73-22.27,83.42-41.25,126.25-132.81,96.14-222.9-.12-.35-.1-.72.05-1.06l.27-.61c.19-.42.57-.73,1.02-.83,34.96-7.83,69.93-16.67,105.82-19.31,40.03-2.95,83.2,1.81,120.17,17.81,5.22,2.26,15.36,5.6,16.89,11.11,2.11,7.59,3.04,24.23,3.42,32.58,9.19,201.67-138.28,305.11-321.38,328.6-.01,0-.02,0-.03,0-1.62.2-1.77,2.5-.18,2.88,37.17,8.87,72.38,24.71,105.27,43.82,85.25,49.54,148.44,127.05,208.74,203.26l205.75,265.55c.75.97.06,2.37-1.16,2.37h-250.06c-.58,0-1.1-.34-1.34-.86-20.57-45.44-41.52-91.02-65.44-134.81-60.57-110.9-138.89-200.31-261.65-242.35-17.11-5.86-35.9-11.16-53.92-12.84-.86-.08-1.6.61-1.6,1.47v117.84c0,1.43-1.83,2.02-2.66.86l-175.74-244.03c-.37-.51-.37-1.2,0-1.72l175.74-243.86c.83-1.16,2.66-.57,2.66.86v116.35Z"/>
+        <path d="M696.97,54.64c-3.67,5.91-10.69,10.58-18.03,10.43-2.76-.06-8.03-2.41-10.73-1.89-.48.09-.88.43-1.07.88l-10.2,24.64c-.31.74.03,1.58.76,1.91l70.77,31.28c.31.14.65.16.97.08l1.47-.39c.4-.11.73-.37.92-.74,1.93-3.71,9.65-22.11,9.64-23.32-.01-3.9-3.42-4.11-5.61-6.45-7.14-7.64-7.76-12.81-4.66-22.71,4.42-14.1,11.38-26.36,28.24-22.87,3.54.73,33.62,15.19,36.46,17.54,15.29,12.67-1.08,48.82-19.9,46.98-2.06-.2-7.06-2.63-9.55-2.73-.59-.02-1.13.33-1.37.87l-11.09,24.56c-.33.74,0,1.61.73,1.94l71.88,32.76c.73.33,1.6.02,1.94-.71l11.62-24.68c.15-.33.18-.7.08-1.05l-.1-.32c-.12-.39-.4-.71-.76-.89-16.97-8.48-12.95-25.31-5.16-39.38,4.93-8.92,12.03-13.06,22.44-11.09,4.34.82,26.92,11.53,31.78,14.22,15.02,8.34,13.84,19.46,7.42,33.51-6.75,14.77-15.52,20.22-31.09,14.55-.75-.27-1.58.08-1.88.82l-10.07,24.8c-.29.71.01,1.52.69,1.87,17.36,8.83,35.7,16.7,49.89,30.49,29.66,28.81,46.33,91.13,29.46,129.48-14.36,32.63-39.95,8.73-61.79-1.14-66.97-30.25-125.91-27.06-196.88-15.54-16.95,2.75-51.84,12.6-67.07,9.48-14.95-3.06-29.31-33.35-38.76-45.24-38.05-47.89-107.5-82.19-168.48-85.52-112.65-6.15-212.39,54.8-263.01,153.97l-16.66,36.65c-.7,1.53-3,.88-2.79-.79,8.52-69.58,36.64-140.05,78.57-195.75,91.22-121.19,233.34-151.41,378.79-138.96,19.72,1.69,38.05,15.34,56.76,21.41.7.23,1.45-.11,1.77-.77l11.56-23.85c.35-.72.05-1.57-.65-1.94-16.25-8.77-14.12-21.52-6.99-36.65,3.44-7.3,7-13.03,15.76-14.24,9.49-1.31,25.78,7.59,34.77,12.05,9.45,4.68,17.93,8.84,17.55,21.27-.14,4.46-5.79,17.09-8.33,21.19Z"/>
+        <path d="M71.76,910.68c25.68,44.8,62.62,84.76,105.31,114.17,125.32,86.34,302.03,86.24,422.36-9.3,1.03-.69,2.09-.69,3.24-.37,1.77.5,23.27,22.59,26.23,25.85,28.49,31.29,52.78,68.42,72.76,105.28,5.98,11.04,13.9,24.99,18.57,36.38.57,1.38,1.95,3.77,1.91,5.46-.01.49-.29.94-.71,1.2-42.3,25.91-89.54,44.37-138.04,55.21-237.58,53.1-471.38-60.86-554.03-291.99-39.77-111.22-41.86-261.79,10.52-369.52,1.64-3.37,7.3-9.77,6.07-2.96-1.43,7.93-5.34,17.49-7.28,25.75-24.06,102.44-20.12,212.05,33.08,304.86Z"/>
+      </svg>
+
+      <div class="wordmark">riff<span>.</span>quest</div>
+
+      <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+      <div class="status" id="status">Uruchamianie aplikacji…</div>
+    </div>
+  </div>
+  <script>
+    window.splash.onStatus((text) => {
+      const el = document.getElementById("status");
+      if (el) el.textContent = text;
+    });
+  </script>
+</body>
+</html>

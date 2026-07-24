@@ -66,7 +66,7 @@ export const SetupStep = React.memo(function SetupStep({
             <ChevronLeft size={16} />
           </button>
           <h2 className="text-lg font-bold tracking-tight">
-            {inputSource === "interface" ? "Audio Interface Setup" : "Microphone Setup"}
+            {isNative ? "Audio Setup" : inputSource === "interface" ? "Audio Interface Setup" : "Microphone Setup"}
           </h2>
         </div>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
@@ -79,10 +79,10 @@ export const SetupStep = React.memo(function SetupStep({
 
 
         {/* Source-specific tips — always visible */}
-        {inputSource === "microphone" ? (
-          <MicrophoneTips />
-        ) : isNative ? (
+        {isNative ? (
           <NativeInterfaceSelector isListening={isListening} onSelectDevice={onSelectDevice} />
+        ) : inputSource === "microphone" ? (
+          <MicrophoneTips />
         ) : (
           <InterfaceTips />
         )}
@@ -95,14 +95,14 @@ export const SetupStep = React.memo(function SetupStep({
             disabled={isLoading}
             className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold h-11"
           >
-            {isNative && inputSource === "interface" ? (
+            {isNative ? (
               <FaPlug className="mr-2 h-4 w-4" />
             ) : (
               <FaMicrophone className="mr-2 h-4 w-4" />
             )}
             {isLoading
               ? "Connecting…"
-              : isNative && inputSource === "interface"
+              : isNative
                 ? "Start Listening"
                 : "Grant Microphone Access"}
           </Button>

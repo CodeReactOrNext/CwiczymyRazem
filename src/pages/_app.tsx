@@ -29,8 +29,11 @@ const teko = Teko({
 });
 
 import Analytics from "components/Analytics/Analytics";
+import { ElectronIntegrations } from "components/ElectronIntegrations";
+import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import useAuthSync from "hooks/useAuthSync";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import dynamic from "next/dynamic";
 import type { AppPropsWithLayout } from "types/page";
 
@@ -77,6 +80,10 @@ const sharedHead = (
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
   const page = getLayout(<Component {...pageProps} />);
+  // ElectronTitleBar (below) is a fixed, portalled overlay and takes no
+  // layout space on its own — reserve room for it here so page content
+  // never renders underneath it.
+  const { isElectron } = useElectronWindowControls();
 
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
@@ -101,7 +108,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                 <Analytics />
                 <ResponsiveInitializer />
                 <TooltipProvider>
-                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
+                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
+                    <ElectronTitleBar />
+                    <ElectronIntegrations />
                     <NextTopLoader color='#06b6d4' />
                     <div id='overlays'></div>
                     {page}
@@ -127,7 +136,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                 <Analytics />
                 <ResponsiveInitializer />
                 <TooltipProvider>
-                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
+                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
+                    <ElectronTitleBar />
+                    <ElectronIntegrations />
                     <Toaster position='top-right' toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />
