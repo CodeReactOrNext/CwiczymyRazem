@@ -1,3 +1,4 @@
+import type { SongPart } from "feature/songs/types/songs.type";
 import {
   collection,
   doc,
@@ -20,6 +21,8 @@ export interface UserSongProgress {
   bestAccuracy: number | null;
   lastAccuracy: number | null;
   sessionCount: number;
+  /** Parts of the song the user marked as playable (riff / solo / whole song). */
+  parts: SongPart[];
   updatedAt: Date;
 }
 
@@ -36,6 +39,7 @@ const toProgress = (songId: string, data: Record<string, any>): UserSongProgress
   bestAccuracy: data.bestAccuracy ?? null,
   lastAccuracy: data.lastAccuracy ?? null,
   sessionCount: data.sessionCount ?? 0,
+  parts: data.parts ?? [],
   updatedAt: data.updatedAt?.toDate?.() ?? new Date(),
 });
 
@@ -79,6 +83,18 @@ export const detachGpFileFromSong = async (
     selectedTrackIndex: 0,
     updatedAt: serverTimestamp(),
   });
+};
+
+export const updateSongParts = async (
+  userId: string,
+  songId: string,
+  parts: SongPart[]
+): Promise<void> => {
+  await setDoc(
+    progressRef(userId, songId),
+    { songId, parts, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
 };
 
 export const recordPracticeSession = async (

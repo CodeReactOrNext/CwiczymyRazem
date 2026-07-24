@@ -6,8 +6,9 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
+import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import {
@@ -40,6 +41,9 @@ interface SongCardProps {
   /** Board view: show practice time / "Not practiced" instead of genre & popularity. */
   showPracticeStatus?: boolean;
   practiceMs?: number;
+  /** Parts of the song the user marked as playable (riff / solo / whole song). */
+  parts?: SongPart[];
+  onPartsChange?: (parts: SongPart[]) => void;
 }
 
 export const SongCard = ({
@@ -50,6 +54,8 @@ export const SongCard = ({
   onPlay,
   showPracticeStatus,
   practiceMs,
+  parts,
+  onPartsChange,
 }: SongCardProps) => {
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
@@ -248,6 +254,13 @@ export const SongCard = ({
             </span>
           </div>
         </div>
+
+        {/* Part marks: what of this song the user can already play */}
+        {userStatus && onPartsChange && (
+          <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+            <SongPartMarks parts={parts ?? []} onChange={onPartsChange} />
+          </div>
+        )}
       </div>
     </div>
   );

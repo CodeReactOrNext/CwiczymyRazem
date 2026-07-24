@@ -90,7 +90,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const isGuitarDrop = dailyPick
         ? dailyPick.kind === "guitar"
-        : Math.random() < GUITAR_CHANCE;
+        : caseDef.dropKind
+          ? caseDef.dropKind === "guitar"
+          : Math.random() < GUITAR_CHANCE;
 
       if (isGuitarDrop) {
         // Draw guitar

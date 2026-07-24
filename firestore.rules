@@ -29,6 +29,17 @@ service cloud.firestore {
       match /gpFolders/{folderId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Per-song practice progress (play time, sessions, accuracy, attached GP
+      // file, marked parts: riff / solo / whole song) — owner only
+      match /songProgress/{songId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Per-song user metadata (sections, practice notes, YouTube link) — owner only
+      match /userSongs/{songId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // ─── Exercise plans ───────────────────────────────────────────────────────
