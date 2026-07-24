@@ -1,6 +1,7 @@
 const STORAGE_KEY = "practice_session_settings";
 const GLOBAL_METRONOME_VOLUME_KEY = "practice_metronome_volume";
 const GLOBAL_MASTER_VOLUME_KEY = "practice_master_volume";
+const GLOBAL_TRACK_VOLUME_KEY = "practice_track_volume";
 
 export interface PracticeSessionSettings {
   isAudioMuted?: boolean;
@@ -66,5 +67,33 @@ export function loadGlobalMasterVolume(): number | null {
 export function saveGlobalMasterVolume(volume: number): void {
   try {
     localStorage.setItem(GLOBAL_MASTER_VOLUME_KEY, JSON.stringify(volume));
+  } catch { /* localStorage unavailable (e.g. private mode) — settings just won't persist */ }
+}
+
+type TrackVolumeRole = "main" | "backing";
+type StoredTrackVolumes = Partial<Record<TrackVolumeRole, number>>;
+
+// The main instrument track and any extra backing tracks (drums/bass/etc. from a
+// Guitar Pro file, or a plan's own backingTracks) each keep their own remembered
+// level — also a device-wide preference, restored as the starting point for every
+// new exercise instead of the hardcoded 100%/80% defaults.
+function readTrackVolumes(): StoredTrackVolumes {
+  try {
+    const raw = localStorage.getItem(GLOBAL_TRACK_VOLUME_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function loadGlobalTrackVolume(role: TrackVolumeRole): number | null {
+  return readTrackVolumes()[role] ?? null;
+}
+
+export function saveGlobalTrackVolume(role: TrackVolumeRole, volume: number): void {
+  try {
+    const all = readTrackVolumes();
+    all[role] = volume;
+    localStorage.setItem(GLOBAL_TRACK_VOLUME_KEY, JSON.stringify(all));
   } catch { /* localStorage unavailable (e.g. private mode) — settings just won't persist */ }
 }

@@ -1,8 +1,9 @@
 import { cn } from "assets/lib/utils";
 import { formatDistanceToNowStrict } from "date-fns";
+import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongPart } from "feature/songs/types/songs.type";
 import { Heart, Music, Play } from "lucide-react";
 
 const formatPracticeTime = (ms: number) => {
@@ -44,6 +45,7 @@ interface SongBoardRowProps {
   /** Favorites page: shows a heart toggle instead of relying on the card menu. */
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  onPartsChange?: (parts: SongPart[]) => void;
 }
 
 /**
@@ -57,6 +59,7 @@ export const SongBoardRow = ({
   onPractice,
   isFavorite,
   onToggleFavorite,
+  onPartsChange,
 }: SongBoardRowProps) => {
   const sessionCount = progress?.sessionCount ?? 0;
   const totalPracticeMs = progress?.totalPracticeMs ?? 0;
@@ -116,7 +119,23 @@ export const SongBoardRow = ({
             "Not practiced yet"
           )}
         </p>
+        {/* Part marks below lg — the row is too tight for a separate column */}
+        {onPartsChange && (
+          <div className="mt-1.5 lg:hidden" onClick={(e) => e.stopPropagation()}>
+            <SongPartMarks parts={progress?.parts ?? []} onChange={onPartsChange} />
+          </div>
+        )}
       </div>
+
+      {/* Part marks column (lg+) */}
+      {onPartsChange && (
+        <div
+          className="hidden shrink-0 lg:block"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SongPartMarks parts={progress?.parts ?? []} onChange={onPartsChange} />
+        </div>
+      )}
 
       {/* Stats columns (lg+) */}
       <div className="hidden w-[300px] shrink-0 grid-cols-3 gap-4 lg:grid xl:w-[340px]">

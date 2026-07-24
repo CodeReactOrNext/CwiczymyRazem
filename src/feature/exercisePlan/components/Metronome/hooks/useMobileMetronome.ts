@@ -2,6 +2,7 @@ import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNati
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
 import { isIOSDevice } from "../utils/deviceDetection";
 
 interface UseMobileMetronomeProps {
@@ -41,6 +42,9 @@ export const useMobileMetronome = ({
   const [audioInitialized, setAudioInitialized] = useState(false);
   // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
   const [volume, setVolume] = useState(0.5);
+  // Clicks per beat: 1 = plain quarter notes (no subdivision), 2 = eighth notes,
+  // 3 = eighth-note triplets, 4 = sixteenth notes.
+  const [subdivision, setSubdivision] = useState(1);
   // Playback anchor mirrored into React state. The refs are set by the scheduler
   // on the first scheduled beat, which on a skipCountIn start (loop restart,
   // live seek) changes no state at all — without this mirror the memoized
@@ -57,6 +61,9 @@ export const useMobileMetronome = ({
   const audioStartTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
   const beatCounterRef = useRef<number>(0);
+  // Position within the current beat's subdivision grid — 0 is always the beat
+  // itself, anything else is a subdivision tick between beats.
+  const subdivisionIndexRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
   const volumeRef = useRef(volume);
@@ -150,17 +157,18 @@ export const useMobileMetronome = ({
   }, [audioInitialized, isIOS]);
 
   // Schedule next note with precise timing
-  const scheduleNote = useCallback((time: number, isAccent: boolean = false) => {
+  const scheduleNote = useCallback((time: number, kind: ClickKind = 'beat') => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
-    const peak = 0.85 * volumeRef.current;
+    const { frequency, gainScale } = CLICK_TONES[kind];
+    const peak = 0.85 * volumeRef.current * gainScale;
     if (peak <= 0.0001) return;
 
     const oscillator = audioContextRef.current.createOscillator();
     const noteGain = audioContextRef.current.createGain();
 
     oscillator.type = 'sine';
-    oscillator.frequency.value = isAccent ? 1200 : 800;
+    oscillator.frequency.value = frequency;
 
     // Use a per-note gain node to avoid interfering with global gain or concurrent notes
     noteGain.gain.setValueAtTime(0, time);
@@ -182,16 +190,25 @@ export const useMobileMetronome = ({
 
     const context = audioContextRef.current;
     const currentTime = context.currentTime;
-    const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
+    const secondsPerBeat   = 60.0 / (bpm * speedMultiplier);
+    const subdivisionCount = Math.max(1, subdivision);
+    const tickInterval     = secondsPerBeat / subdivisionCount;
 
     // Schedule notes ahead of time for precise timing
     while (nextNoteTimeRef.current < currentTime + 0.1) {
       if (countInTargetRef.current > 0) {
-        scheduleNote(nextNoteTimeRef.current, countInTargetRef.current === 4);
+        // The count-in is always plain quarter notes — subdivision only kicks in
+        // once real playback starts below.
+        scheduleNote(nextNoteTimeRef.current, countInTargetRef.current === 4 ? 'accent' : 'beat');
         setCountInRemaining(countInTargetRef.current);
         countInTargetRef.current -= 1;
+        nextNoteTimeRef.current  += secondsPerBeat;
       } else {
-        if (startTimeRef.current === null) {
+        // Only a true beat (subdivision index 0) drives the playback anchor and the
+        // 4-beat accent grid — subdivision ticks in between are just extra clicks.
+        const isBeat = subdivisionIndexRef.current === 0;
+
+        if (isBeat && startTimeRef.current === null) {
           // Account for lookahead: startTime should reflect when the beat will actually play,
           // not when it is scheduled. This prevents the cursor from being ~100ms ahead.
           const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - context.currentTime) * 1000);
@@ -204,16 +221,22 @@ export const useMobileMetronome = ({
           setCountInRemaining(0);
           setPlaybackAnchor({ wall: startTimeRef.current, audio: audioStartTimeRef.current });
         }
-        scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
-        beatCounterRef.current += 1;
-      }
 
-      nextNoteTimeRef.current += secondsPerBeat;
+        if (isBeat) {
+          scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0 ? 'accent' : 'beat');
+          beatCounterRef.current += 1;
+        } else {
+          scheduleNote(nextNoteTimeRef.current, 'sub');
+        }
+
+        subdivisionIndexRef.current = (subdivisionIndexRef.current + 1) % subdivisionCount;
+        nextNoteTimeRef.current    += tickInterval;
+      }
     }
 
     // Use lookahead scheduling for better timing accuracy on mobile
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, speedMultiplier, scheduleNote]);
+  }, [bpm, speedMultiplier, subdivision, scheduleNote]);
 
   // Resume audio context if suspended (common on mobile)
   const resumeAudioContext = useCallback(async () => {
@@ -243,6 +266,7 @@ export const useMobileMetronome = ({
       startTimeRef.current      = null;
       audioStartTimeRef.current = null;
       beatCounterRef.current    = 0;
+      subdivisionIndexRef.current = 0;
       setPlaybackAnchor({ wall: null, audio: null });
       scheduler();
     }
@@ -277,6 +301,7 @@ export const useMobileMetronome = ({
     pausedElapsedTimeRef.current = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current = 0;
+    subdivisionIndexRef.current = 0;
     pendingSeekBeatRef.current = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
@@ -357,6 +382,8 @@ export const useMobileMetronome = ({
     setBpm,
     volume,
     setVolume,
+    subdivision,
+    setSubdivision,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -372,6 +399,7 @@ export const useMobileMetronome = ({
     audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
+    subdivision, setSubdivision,
     toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
     handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
     playbackAnchor,

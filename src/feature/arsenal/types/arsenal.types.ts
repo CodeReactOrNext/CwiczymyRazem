@@ -61,7 +61,13 @@ export type GuitarRarity =
   | "Legendary"
   | "Mythic";
 
-export type CaseType = "standard" | "premium" | "elite" | "daily";
+export type CaseType =
+  | "standard"
+  | "premium-guitar"
+  | "premium-effect"
+  | "elite-guitar"
+  | "elite-effect"
+  | "daily";
 
 type ProductionCountry =
   | "USA"
@@ -110,6 +116,8 @@ export interface CaseDefinition {
   yearFrom: number;
   yearTo: number;
   country: ProductionCountry;
+  /** Locks the drop to one pool. Undefined (standard/daily) rolls from both. */
+  dropKind?: "guitar" | "effect";
 }
 
 /** Per-category stat sums (each a "+N" that adds into the item level). */

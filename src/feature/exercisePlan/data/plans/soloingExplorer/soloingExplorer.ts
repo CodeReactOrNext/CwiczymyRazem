@@ -1,6 +1,5 @@
 import { improvPromptEasy } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
-import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
@@ -16,7 +15,6 @@ export const soloingExplorerPlan: ExercisePlan = {
   exercises: [
     oneStringBackingExercise,
     improvPromptEasy,
-    playByEarExercise,
     twoNotesPerBarPhrasingExercise
   ],
   userId: "system",

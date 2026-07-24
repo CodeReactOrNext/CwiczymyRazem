@@ -32,7 +32,7 @@ const faqQuestions = [
   {
     title: "Is the guitar song library free to use?",
     message:
-      "Browsing the library and tracking your songs is free forever. A Pro plan unlocks additional features like Guitar Pro tab integration and AI practice recommendations.",
+      "Yes — the song library, progress tracking, and every feature in Riff Quest are free forever. There are no Pro plans, paywalls, or locked features.",
   },
   {
     title: "How do I add a song to my practice list?",

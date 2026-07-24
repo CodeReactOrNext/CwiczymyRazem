@@ -15,6 +15,9 @@ interface SongDifficulty {
 
 export type SongStatus = "wantToLearn" | "learning" | "learned";
 
+/** Parts of a song a user can mark as playable: the riff/fragment, the solo, or the whole song. */
+export type SongPart = "riff" | "solo" | "wholeSong";
+
 export interface Song {
   id: string;
   title: string;

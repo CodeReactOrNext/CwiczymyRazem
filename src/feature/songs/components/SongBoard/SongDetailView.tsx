@@ -18,9 +18,10 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar/Avatar";
+import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongPart } from "feature/songs/types/songs.type";
 import type { MasteryLevel,SongSection } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
@@ -58,6 +59,7 @@ interface SongDetailViewProps {
   onPractice: (song: Song) => void;
   onRemove: (songId: string) => void;
   onStatusChange: (songId: string, status: any, title: string, artist: string) => void;
+  onPartsChange?: (songId: string, parts: SongPart[]) => void;
   onBack?: () => void;
   /** Text on the back button. Defaults to the library context. */
   backLabel?: string;
@@ -125,7 +127,7 @@ const LegendItem = ({ color, label, glow }: { color: string; label: string; glow
   </div>
 );
 
-export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onBack, backLabel = "Back to library", showBackOnDesktop = false }: SongDetailViewProps) => {
+export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onPartsChange, onBack, backLabel = "Back to library", showBackOnDesktop = false }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -313,10 +315,10 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                <p className="text-sm sm:text-lg md:text-xl font-bold text-zinc-400 drop-shadow-sm">{song.artist}</p>
             </div>
 
-            <div className="shrink-0 hidden sm:flex flex-col items-center gap-2">
-               <div 
+            <div className="shrink-0 hidden sm:flex flex-col items-end gap-3">
+               <div
                  className="h-16 w-16 md:h-20 md:w-20 rounded-lg flex flex-col items-center justify-center relative overflow-hidden transition-all shadow-lg"
-                 style={{ 
+                 style={{
                    backgroundColor: `${tier.color}10`,
                    boxShadow: `0 0 20px ${tier.color}15`
                  }}
@@ -325,6 +327,15 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                    <span className="text-3xl md:text-4xl font-black relative z-10" style={{ color: tier.color }}>{tier.tier}</span>
                    <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>Tier</span>
                </div>
+
+               {status && (
+                 <SongPartMarks
+                    parts={progress?.parts ?? []}
+                    onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
+                    size="lg"
+                    className="justify-center"
+                 />
+               )}
             </div>
          </div>
          
@@ -369,6 +380,18 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      </div>
                      <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes}m</span>
                   </div>
+
+                  {/* sm+ shows the button-style marks next to the tier badge instead */}
+                  {status && (
+                    <div className="flex flex-col items-center sm:hidden">
+                       <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Can play</span>
+                       <SongPartMarks
+                          parts={progress?.parts ?? []}
+                          onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
+                          size="sm"
+                       />
+                    </div>
+                  )}
                </div>
             </div>
 

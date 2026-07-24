@@ -68,7 +68,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
   const [addSongInitialQuery, setAddSongInitialQuery] = useState({ title: "", artist: "" });
 
-  const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
+  const { progressMap, attachGpFile, detachGpFile, setSongParts } = useUserSongProgress(
     userAuth ?? null
   );
   const {
@@ -444,6 +444,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                       setDetailsTarget(null);
                   }}
                   onStatusChange={handleStatusChange}
+                  onPartsChange={setSongParts}
                   onBack={() => setDetailsTarget(null)}
                   backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to Explore'}
                   showBackOnDesktop={view === 'playlists'}
@@ -500,6 +501,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                                 progress={progressMap[song.id] ?? null}
                                 onOpenDetails={() => setDetailsTarget(song)}
                                 onPractice={() => setPracticeTarget(song)}
+                                onPartsChange={(parts) => setSongParts(song.id, parts)}
                               />
                             ))}
                           </div>
@@ -666,6 +668,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onPractice={(song) => setPracticeTarget(song)}
                   userSongs={userSongs}
                   updateUserSongsCache={updateUserSongsCache}
+                  progressMap={progressMap}
+                  onPartsChange={setSongParts}
                 />
               </div>
             )}

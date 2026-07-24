@@ -15,7 +15,9 @@ export const DropRates = ({
 }: {
   probabilities: CaseDefinition["probabilities"];
 }) => {
-  const probs = Object.entries(probabilities) as [GuitarRarity, number][];
+  const probs = (Object.entries(probabilities) as [GuitarRarity, number][]).filter(
+    ([, prob]) => prob > 0
+  );
   return (
     <TooltipProvider>
       <Tooltip delayDuration={150}>

@@ -114,7 +114,7 @@ const FavoritesPage: NextPageWithLayout = () => {
 
   // Practice/GP picker — same chooser you get when clicking a song on /songs.
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
-  const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
+  const { progressMap, attachGpFile, detachGpFile, setSongParts } = useUserSongProgress(
     userAuth ?? null
   );
 
@@ -336,6 +336,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                       progress={progressMap[song.id] ?? null}
                       onOpenDetails={() => setPracticeTarget(song)}
                       onPractice={() => setPracticeTarget(song)}
+                      onPartsChange={(parts) => setSongParts(song.id, parts)}
                       isFavorite
                       onToggleFavorite={() =>
                         dispatch(
