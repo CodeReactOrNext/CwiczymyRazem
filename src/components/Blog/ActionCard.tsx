@@ -15,7 +15,7 @@ export const ActionCard = ({
   href = '/signup' 
 }: ActionCardProps) => {
   return (
-    <div className="my-12 overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 shadow-2xl">
+    <div className="my-12 overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 shadow-2xl">
       <div className="relative z-10">
         <h3 className="mb-3 text-2xl font-bold tracking-tight text-white">
           {title}

@@ -48,9 +48,9 @@ export const AppCard = ({
   const shots = splitList(screenshots);
 
   return (
-    <div className="not-prose my-10 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/40">
+    <div className="not-prose my-10 overflow-hidden rounded-xl bg-zinc-900/40">
       {/* Header: icon, name, badge, rating */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-white/5 p-5">
+      <div className="flex flex-wrap items-center gap-4 p-5">
         <img
           src={icon}
           alt={`${name} logo`}
@@ -58,7 +58,7 @@ export const AppCard = ({
           height={56}
           loading="lazy"
           decoding="async"
-          className="h-14 w-14 shrink-0 rounded-xl border border-white/10"
+          className="h-14 w-14 shrink-0 rounded-xl"
         />
         <div className="min-w-0 flex-1">
           <div className="text-lg font-bold tracking-tight text-white">{name}</div>
@@ -82,7 +82,7 @@ export const AppCard = ({
       </div>
 
       {/* Spec row */}
-      <div className="grid grid-cols-1 divide-y divide-white/5 border-b border-white/5 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+      <div className="grid grid-cols-1 sm:grid-cols-3">
         {[
           ['Price', price],
           ['Free tier', freeTier],
@@ -97,7 +97,7 @@ export const AppCard = ({
 
       {/* Screenshots */}
       {shots.length > 0 && (
-        <div className="flex gap-3 overflow-x-auto border-b border-white/5 bg-zinc-950/40 p-5">
+        <div className="flex gap-3 overflow-x-auto bg-zinc-950/40 p-5">
           {shots.map((src, i) => (
             <img
               key={src}
@@ -105,7 +105,7 @@ export const AppCard = ({
               alt={screenshotAlt ? `${screenshotAlt} (${i + 1})` : `${name} app screenshot ${i + 1}`}
               loading="lazy"
               decoding="async"
-              className="h-64 w-auto shrink-0 rounded-lg border border-white/10 object-contain"
+              className="h-64 w-auto shrink-0 rounded-lg object-contain"
             />
           ))}
         </div>

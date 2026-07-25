@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Calendar, ChevronRight,Clock, User } from 'lucide-react';
-import Link from 'next/link';
+import { Calendar, Clock, User } from 'lucide-react';
+import Image from 'next/image';
 import React, { useRef } from 'react';
 
 interface BlogHeaderProps {
@@ -10,10 +10,11 @@ interface BlogHeaderProps {
   date: string;
   image: string;
   author?: string;
+  authorImage?: string;
   readTime?: string;
 }
 
-export const BlogHeader = ({ title, description, date, image, author, readTime = "5 min" }: BlogHeaderProps) => {
+export const BlogHeader = ({ title, description, date, image, author, authorImage, readTime = "5 min" }: BlogHeaderProps) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -55,15 +56,6 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
             transition={{ delay: 0.2, duration: 0.8 }}
             className="max-w-4xl"
           >
-            {/* Breadcrumb-ish / Top Meta */}
-            <div className="mb-6 flex items-center gap-2 text-sm font-medium text-cyan-400">
-              <Link href="/blog" className="hover:text-cyan-300 transition-colors tracking-widest text-xs">
-                Blog
-              </Link>
-              <ChevronRight className="h-3 w-3 text-zinc-600" />
-              <span className="text-zinc-400 tracking-widest text-xs">Article</span>
-            </div>
-
             {/* Title */}
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-[1.1]">
               {title}
@@ -75,11 +67,21 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
             </p>
 
             {/* Metadata Footer */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 border-t border-white/10 pt-6">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 pt-6">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 border border-white/10">
-                  <User className="h-4 w-4 text-cyan-400" />
-                </div>
+                {authorImage ? (
+                  <Image
+                    src={authorImage}
+                    alt={author || "Riff Quest"}
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900">
+                    <User className="h-4 w-4 text-cyan-400" />
+                  </div>
+                )}
                 <span className="font-medium text-zinc-200">{author || "Riff Quest"}</span>
               </div>
 
