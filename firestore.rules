@@ -44,10 +44,7 @@ service cloud.firestore {
       // Daily submission counters (e.g. community section-map sharing) — the
       // owner may read their own counter, but only the backend (Admin SDK)
       // may write it, otherwise a client could reset its own rate limit.
-      match /rateLimits/{limitId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow write: if false; // Admin SDK only
-      }
+    
     }
 
     // ─── Exercise plans ───────────────────────────────────────────────────────
