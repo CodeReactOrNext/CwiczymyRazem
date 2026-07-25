@@ -4,7 +4,7 @@ import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMa
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongPart } from "feature/songs/types/songs.type";
-import { Heart, Music, Play } from "lucide-react";
+import { Heart, ListMusic, Music, Play } from "lucide-react";
 
 const formatPracticeTime = (ms: number) => {
   const totalMinutes = Math.floor(ms / 60000);
@@ -46,6 +46,8 @@ interface SongBoardRowProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onPartsChange?: (parts: SongPart[]) => void;
+  /** A community-verified YouTube section map exists for this song. */
+  hasSectionMap?: boolean;
 }
 
 /**
@@ -60,6 +62,7 @@ export const SongBoardRow = ({
   isFavorite,
   onToggleFavorite,
   onPartsChange,
+  hasSectionMap,
 }: SongBoardRowProps) => {
   const sessionCount = progress?.sessionCount ?? 0;
   const totalPracticeMs = progress?.totalPracticeMs ?? 0;
@@ -93,9 +96,20 @@ export const SongBoardRow = ({
 
       {/* Title / artist (+ compact stats below lg) */}
       <div className="min-w-0 flex-1">
-        <p translate="no" className="truncate text-[15px] font-bold text-white">
-          {song.title}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p translate="no" className="truncate text-[15px] font-bold text-white">
+            {song.title}
+          </p>
+          {hasSectionMap && (
+            <span
+              title="Community section map available"
+              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400"
+            >
+              <ListMusic className="h-2.5 w-2.5" />
+              Map
+            </span>
+          )}
+        </div>
         <p translate="no" className="truncate text-sm text-zinc-400">
           {song.artist}
         </p>

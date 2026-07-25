@@ -2,6 +2,7 @@ import { Accordion } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { CommunityMapImportModal } from "feature/songs/components/SongSections/CommunityMapImportModal";
 import {
   nextSectionColor,
   SectionList,
@@ -9,6 +10,8 @@ import {
 import { SectionTimeline } from "feature/songs/components/SongSections/SectionTimeline";
 import type { YouTubeSongPlayerRef } from "feature/songs/components/YouTubeSongPlayer";
 import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
+import { useVerifiedSongSectionMaps } from "feature/songs/hooks/useVerifiedSongSectionMaps";
+import { submitSongSectionMap } from "feature/songs/services/songSectionMap.service";
 import {
   getUserSongMeta,
   saveUserSongMeta,
@@ -18,6 +21,9 @@ import type {
   MasteryLevel,
   SongSection,
 } from "feature/songs/types/songSection.type";
+import { SECTION_COLORS } from "feature/songs/types/songSection.type";
+import { MIN_SECTIONS } from "feature/songs/utils/sectionMapValidation.utils";
+import { extractVideoId } from "feature/songs/utils/youtube.utils";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import {
@@ -69,9 +75,36 @@ export const SongTimerLayout = ({
   const [isLocked, setIsLocked] = useState(false);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isMetaLoaded, setIsMetaLoaded] = useState(false);
   const isInitialMount = useRef(true);
   const metaLoadedRef = useRef(false);
   const latestMetaRef = useRef({ youtubeUrl, sections, notes });
+
+  const videoId = youtubeUrl ? extractVideoId(youtubeUrl) : null;
+  // Shows even before a video is pasted — importing sets both the video and
+  // the sections together. Only relevant when there's nothing local to
+  // import over yet.
+  const { bySongId: verifiedSectionMaps } = useVerifiedSongSectionMaps();
+  // Gated on isMetaLoaded too — `sections` starts as [] before the user's
+  // own (possibly non-empty) meta has loaded, so without this a returning
+  // user with existing sections could see the prompt flash open for a beat.
+  const sectionMap =
+    isMetaLoaded && sections.length === 0
+      ? verifiedSectionMaps.get(songId)
+      : undefined;
+  const lastSharedSignatureRef = useRef<string | null>(null);
+
+  // Prompt once, the moment a community map shows up — not a passive banner
+  // the user has to notice on their own.
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const importPromptShownRef = useRef(false);
+
+  useEffect(() => {
+    if (sectionMap && !importPromptShownRef.current) {
+      importPromptShownRef.current = true;
+      setIsImportModalOpen(true);
+    }
+  }, [sectionMap]);
 
   useEffect(() => {
     getUserSongMeta(userId, songId).then((meta) => {
@@ -79,6 +112,7 @@ export const SongTimerLayout = ({
       setSections(meta.sections ?? []);
       setNotes(meta.notes ?? "");
       metaLoadedRef.current = true;
+      setIsMetaLoaded(true);
     });
   }, [userId, songId]);
 
@@ -107,6 +141,31 @@ export const SongTimerLayout = ({
     return () => clearTimeout(timeout);
   }, [youtubeUrl, sections, notes, userId, songId]);
 
+  // Best-effort background share: once there are enough sections and a
+  // pinned video, silently publish them so other users on the same song+video
+  // get a community-verified starting point. Server-side gates (practice
+  // history, structural validation, daily rate limit) decide acceptance —
+  // rejections are expected/non-actionable here, so they're never surfaced.
+  useEffect(() => {
+    if (!videoId || sections.length < MIN_SECTIONS) return;
+
+    const entries = sections
+      .map((s) => ({ name: s.name, startTime: s.startTime }))
+      .sort((a, b) => a.startTime - b.startTime);
+    const signature = JSON.stringify(entries);
+    if (signature === lastSharedSignatureRef.current) return;
+
+    const timeout = setTimeout(async () => {
+      try {
+        await submitSongSectionMap(songId, videoId, entries);
+        lastSharedSignatureRef.current = signature;
+      } catch (error) {
+        console.error("Error auto-sharing section map:", error);
+      }
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [sections, videoId, songId]);
+
   // Leaving the page (back button, navigating to another song, …) unmounts
   // this component, which cancels the debounce timeout above — without this,
   // any edit made in the last second before navigating away is silently lost.
@@ -126,6 +185,24 @@ export const SongTimerLayout = ({
     (next: SongSection[]) => setSections(next),
     [],
   );
+
+  const handleImportCommunityMap = () => {
+    if (!sectionMap) return;
+    const imported: SongSection[] = sectionMap.consensusSections.map(
+      (cs, i) => ({
+        id: uuidv4(),
+        name: cs.name,
+        startTime: cs.startTime,
+        color: SECTION_COLORS[i % SECTION_COLORS.length],
+        mastery: 0,
+      }),
+    );
+    // Sections only make sense paired with the exact video they were mapped
+    // against — safe to set even if a different link was already pasted,
+    // since we only ever offer this import while sections is still empty.
+    setYoutubeUrl(`https://www.youtube.com/watch?v=${sectionMap.videoId}`);
+    persistSections(imported);
+  };
 
   const handleUrlSave = (url: string) => setYoutubeUrl(url);
 
@@ -466,6 +543,13 @@ export const SongTimerLayout = ({
           </div>
         </div>
       </div>
+
+      <CommunityMapImportModal
+        map={sectionMap}
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        onImport={handleImportCommunityMap}
+      />
     </MainContainer>
   );
 };
