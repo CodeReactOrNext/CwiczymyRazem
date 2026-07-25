@@ -210,7 +210,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
   relatedBlogSlugs: [
     "advanced-guitar-practice-techniques",
     "guitar-practice-stagnation-solutions",
-    "easy-guitar-solos-to-learn-for-intermediate-players",
+    "best-guitar-techniques-for-speed",
   ],
   relatedSongGuideSlugs: ["sweet-child-o-mine", "hotel-california"],
 };
