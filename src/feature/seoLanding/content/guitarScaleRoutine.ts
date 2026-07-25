@@ -218,7 +218,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
   ],
   relatedBlogSlugs: [
     "how-to-practice-guitar-scales-effectively",
-    "learn-guitar-more-efficiently-deliberate-practice",
+    "is-deliberate-practice-necessary-for-guitar",
     "guitar-practice-goal-setting",
   ],
   relatedSongGuideSlugs: ["stairway-to-heaven"],

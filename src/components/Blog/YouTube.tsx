@@ -5,7 +5,7 @@ interface YouTubeProps {
 
 export const YouTube = ({ id }: YouTubeProps) => {
   return (
-    <div className="my-8 overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-xl">
+    <div className="my-8 overflow-hidden rounded-xl bg-zinc-900 shadow-xl">
       <div className="relative aspect-video">
         <iframe
           src={`https://www.youtube.com/embed/${id}`}

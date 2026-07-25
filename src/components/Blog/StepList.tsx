@@ -25,7 +25,7 @@ export const StepList = ({ steps }: StepListProps) => {
       {items.map((step, index) => (
         <div
           key={step.title}
-          className="flex gap-4 rounded-xl border border-white/10 bg-zinc-900/40 p-5"
+          className="flex gap-4 rounded-xl bg-zinc-900/40 p-5"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">
             {index + 1}
