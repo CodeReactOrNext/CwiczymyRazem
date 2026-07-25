@@ -42,10 +42,13 @@ export const CalibrationWizard = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    setStep("source");
+    // Native (Electron) capture has no "interface vs. microphone" distinction
+    // (it's one device list) and no browser permission prompt — skip straight
+    // to device selection instead of the web-only source/permission steps.
+    setStep(isNative ? "setup" : "source");
     setIsGranting(false);
     setMicError(false);
-  }, [isOpen]);
+  }, [isOpen, isNative]);
 
   const { currentStringIndex, stringState, offsets, currentOffset, sampleCount, handleRetry, advanceString } =
     useCalibrationCapture({ step: step === "permission" || step === "source" ? "setup" : step, isOpen, isListening, audioRefs, strings, onAllStringsDone: () => setStep("summary") });
@@ -112,7 +115,7 @@ export const CalibrationWizard = ({
                   isNative={isNative} onSelectDevice={onSelectDevice}
                   onGrant={handleGrant}
                   onNext={() => setStep("tuning")}
-                  onBack={() => setStep(isListening ? "source" : "permission")}
+                  onBack={() => (isNative ? handleCancel() : setStep(isListening ? "source" : "permission"))}
                   onCancel={handleCancel}
                 />
               </motion.div>
