@@ -23,9 +23,9 @@ export const ActionCard = ({
         <p className="mb-6 text-zinc-400">
           {description}
         </p>
-        <Link 
+        <Link
           href={href}
-          className="inline-flex items-center gap-2 rounded-full bg-cyan-500 px-6 py-2.5 text-sm font-bold text-zinc-950 transition-all hover:bg-cyan-400 hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]"
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           {ctaText}
           <ArrowRight className="h-4 w-4" />

@@ -28,6 +28,7 @@ import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
+import { useVerifiedSongSectionMaps } from "feature/songs/hooks/useVerifiedSongSectionMaps";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { Song } from "feature/songs/types/songs.type";
@@ -68,9 +69,10 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
   const [addSongInitialQuery, setAddSongInitialQuery] = useState({ title: "", artist: "" });
 
-  const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
+  const { progressMap, attachGpFile, detachGpFile, setSongParts } = useUserSongProgress(
     userAuth ?? null
   );
+  const { bySongId: verifiedSectionMaps } = useVerifiedSongSectionMaps();
   const {
     page,
     isLoading,
@@ -444,6 +446,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                       setDetailsTarget(null);
                   }}
                   onStatusChange={handleStatusChange}
+                  onPartsChange={setSongParts}
                   onBack={() => setDetailsTarget(null)}
                   backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to Explore'}
                   showBackOnDesktop={view === 'playlists'}
@@ -498,8 +501,10 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                                 key={song.id}
                                 song={song}
                                 progress={progressMap[song.id] ?? null}
+                                hasSectionMap={verifiedSectionMaps.has(song.id)}
                                 onOpenDetails={() => setDetailsTarget(song)}
                                 onPractice={() => setPracticeTarget(song)}
+                                onPartsChange={(parts) => setSongParts(song.id, parts)}
                               />
                             ))}
                           </div>
@@ -666,6 +671,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onPractice={(song) => setPracticeTarget(song)}
                   userSongs={userSongs}
                   updateUserSongsCache={updateUserSongsCache}
+                  progressMap={progressMap}
+                  onPartsChange={setSongParts}
                 />
               </div>
             )}

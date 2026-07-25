@@ -621,8 +621,7 @@
           "description": "[What it is]\nTranscribing Petrucci solos means listening closely to a recorded solo and capturing every pitch, rhythm, articulation, and micro-timing detail into notation or onto the fretboard by ear. It’s a forensic process: not just which notes are played, but how they’re attacked, connected, bent, and released, plus the dynamic and tonal choices that shape the phrase. The goal is a faithful, repeatable representation you can study and perform.\n\n[Why it matters]\nTranscription exposes the building blocks of Petrucci's musical language—scale choices, intervallic shapes, rhythmic placement, and expressive nuances—so you internalize vocabulary instead of copying surface tricks. It trains your ear to hear subtle timing shifts and pitch inflections that define his style, and it sharpens judgment about which notes serve the harmony versus which are ornamental. That understanding directly improves your ability to write and improvise in a similar voice.\n\n[How to practice]\nWork in very short chunks: isolate a small phrase, loop it, and identify the pitch and exact rhythmic placement before moving on; write it down as tab or standard notation and mark articulations and inflections. Use slow-down tools and repeated listening to confirm micro-timing and subtle pitch bends, then play back your transcription against the recording to spot differences and refine phrasing, dynamics, and tone. Gradually assemble the chunks into longer passages, and annotate your transcription with harmonic function and expressive notes so it becomes a living reference for composition and performance.",
           "successCriteria": "You can play a full Petrucci solo top-to-bottom matching the recording’s pitches, rhythms, articulations, and expressive inflections; your written transcription accurately reflects those details and notes the harmonic role of key phrases. You can explain and reproduce the solo’s distinctive choices (timing, phrasing, ornamentation) and use them as raw material in your own improvisation and composition.",
           "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "play_by_ear"
+          "order": 1
         },
         {
           "id": "1de534a7-bbfb-4bf1-9c3d-73c3fc84eab8",
@@ -653,7 +652,6 @@
           "successCriteria": "You can play complete Dream Theater parts through from start to finish with consistent tone and articulation, staying locked with the rhythm section and fitting sonically into the mix. Transitions between contrasting sections are seamless, dynamics and effects choices support the arrangement, and recorded or live performances sound intentional and song-focused rather than merely technical. You can reproduce the parts reliably under rehearsal and performance conditions and adjust on the fly if the band changes arrangements.",
           "sessionsRequired": 8,
           "order": 4,
-          "suggestedExerciseId": "play_by_ear",
           "suggestedLessonIds": [
             "S5c3cF4EbG4"
           ]

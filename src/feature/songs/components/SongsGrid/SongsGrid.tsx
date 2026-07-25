@@ -6,7 +6,8 @@ import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { ITEMS_PER_PAGE } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
+import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import posthog from "posthog-js";
 import { useState } from "react";
 
@@ -30,6 +31,8 @@ interface SongsGridProps {
     learning: Song[];
     learned: Song[];
   }) => void;
+  progressMap?: Record<string, UserSongProgress>;
+  onPartsChange?: (songId: string, parts: SongPart[]) => void;
 }
 
 export const SongsGrid = ({
@@ -44,6 +47,8 @@ export const SongsGrid = ({
   onPractice,
   userSongs,
   updateUserSongsCache,
+  progressMap,
+  onPartsChange,
 }: SongsGridProps) => {
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
@@ -134,6 +139,10 @@ export const SongsGrid = ({
                   onOpenDetails={() => openDetails(song)}
                   onStatusChange={(status) => changeStatus(song, status)}
                   onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
+                  parts={progressMap?.[song.id]?.parts ?? []}
+                  onPartsChange={
+                    onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined
+                  }
                 />
               );
             })}
@@ -151,6 +160,10 @@ export const SongsGrid = ({
                   onOpenDetails={() => openDetails(song)}
                   onStatusChange={(status) => changeStatus(song, status)}
                   onPlay={userStatus && onPractice ? () => onPractice(song) : undefined}
+                  parts={progressMap?.[song.id]?.parts ?? []}
+                  onPartsChange={
+                    onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined
+                  }
                 />
               );
             })}

@@ -3,8 +3,10 @@ import {
   detachGpFileFromSong,
   getAllUserSongProgress,
   recordPracticeSession,
+  updateSongParts,
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
+import type { SongPart } from "feature/songs/types/songs.type";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseUserSongProgressReturn {
@@ -13,6 +15,7 @@ interface UseUserSongProgressReturn {
   attachGpFile: (songId: string, gpFileId: string, gpFileName: string, trackIndex?: number) => Promise<void>;
   detachGpFile: (songId: string) => Promise<void>;
   recordSession: (songId: string, sessionMs: number, accuracy: number | null) => Promise<void>;
+  setSongParts: (songId: string, parts: SongPart[]) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -22,6 +25,7 @@ const EMPTY: UseUserSongProgressReturn = {
   attachGpFile: async () => {},
   detachGpFile: async () => {},
   recordSession: async () => {},
+  setSongParts: async () => {},
   refresh: async () => {},
 };
 
@@ -65,6 +69,7 @@ export const useUserSongProgress = (
             bestAccuracy: null,
             lastAccuracy: null,
             sessionCount: 0,
+            parts: [],
             updatedAt: new Date(),
           }),
           gpFileId,
@@ -109,6 +114,7 @@ export const useUserSongProgress = (
               gpFileId: null,
               gpFileName: null,
               selectedTrackIndex: 0,
+              parts: [],
             }),
             totalPracticeMs: (existing?.totalPracticeMs ?? 0) + sessionMs,
             sessionCount: (existing?.sessionCount ?? 0) + 1,
@@ -123,7 +129,39 @@ export const useUserSongProgress = (
     [userId, progressMap]
   );
 
+  const setSongParts = useCallback(
+    async (songId: string, parts: SongPart[]) => {
+      if (!userId) return;
+      // Optimistic: the mark animates the moment it's tapped; resync on failure.
+      setProgressMap((prev) => ({
+        ...prev,
+        [songId]: {
+          ...(prev[songId] ?? {
+            songId,
+            gpFileId: null,
+            gpFileName: null,
+            selectedTrackIndex: 0,
+            totalPracticeMs: 0,
+            lastPracticedAt: null,
+            bestAccuracy: null,
+            lastAccuracy: null,
+            sessionCount: 0,
+            updatedAt: new Date(),
+          }),
+          parts,
+        } as UserSongProgress,
+      }));
+      try {
+        await updateSongParts(userId, songId, parts);
+      } catch (error) {
+        console.error("Error saving song part marks:", error);
+        await load();
+      }
+    },
+    [userId, load]
+  );
+
   if (!userId) return EMPTY;
 
-  return { progressMap, isLoading, attachGpFile, detachGpFile, recordSession, refresh: load };
+  return { progressMap, isLoading, attachGpFile, detachGpFile, recordSession, setSongParts, refresh: load };
 };

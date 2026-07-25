@@ -30,7 +30,6 @@ import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneCh
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
-import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
@@ -262,7 +261,6 @@ const rawExercises: Exercise[] = [
   spiderXExercise,
   spiderXExtendedExercise,
   spiderBasicExercise,
-  playByEarExercise,
   oneStringBackingExercise,
   oneChordImprovExercise,
   triadImprovisationExercise,

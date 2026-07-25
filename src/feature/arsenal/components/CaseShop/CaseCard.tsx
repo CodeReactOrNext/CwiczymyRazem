@@ -7,7 +7,8 @@ import { DropRates } from "./DropRates";
 import { OpenCaseButton } from "./OpenCaseButton";
 
 /** Per-tier identity lives in the background + glow only — structure,
-    typography and the button are identical across every case. */
+    typography and the button are identical across every case. Tier is
+    derived from the id prefix (e.g. "elite-effect" -> "elite"). */
 const CASE_ACCENT: Record<string, { color: string; gradient: string; image: string }> = {
   standard: {
     color: "#a1a1aa",
@@ -26,21 +27,40 @@ const CASE_ACCENT: Record<string, { color: string; gradient: string; image: stri
   },
 };
 
+/** Effect-pool cases get dedicated pedal-case art instead of the shared guitar case. */
+const EFFECT_CASE_IMAGE: Record<string, string> = {
+  premium: "/images/case-effects-premium.png",
+  elite: "/images/case-effects-elite.png",
+};
+
 interface CaseCardProps {
   caseDef: CaseDefinition;
   currentFame: number;
   onOpen: (caseType: string) => void;
   isOpening: boolean;
+  /** "compact" halves the card's visual footprint for the Premium/Elite pool grid. */
+  size?: "full" | "compact";
+  className?: string;
 }
 
-export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardProps) => {
-  const accent = CASE_ACCENT[caseDef.id] || CASE_ACCENT.standard;
+export const CaseCard = ({
+  caseDef,
+  currentFame,
+  onOpen,
+  isOpening,
+  size = "full",
+  className,
+}: CaseCardProps) => {
+  const tier = caseDef.id.split("-")[0];
+  const accent = CASE_ACCENT[tier] || CASE_ACCENT.standard;
+  const image = caseDef.dropKind === "effect" ? EFFECT_CASE_IMAGE[tier] || accent.image : accent.image;
   const canAfford = currentFame >= caseDef.fameCost;
+  const isCompact = size === "compact";
 
   return (
     // 1px shell showing the animated border underneath the card face.
     <div
-      className='relative overflow-hidden rounded-lg p-px'
+      className={cn("relative overflow-hidden rounded-lg p-px", className)}
       style={{ background: `${accent.color}24` }}>
       {/* Light beam travelling around the border — oversized rotating conic
           gradient; only the 1px ring around the opaque card face is visible. */}
@@ -54,37 +74,51 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
       />
 
       <div
-        className='relative flex h-full flex-col gap-4 overflow-hidden rounded-[7px] p-6'
+        className={cn(
+          "relative flex h-full flex-col overflow-hidden rounded-[7px]",
+          isCompact ? "gap-2 p-4" : "gap-4 p-6"
+        )}
         style={{ background: accent.gradient }}>
         {/* Guitar icon watermark — same texture as /login */}
         <GuitarPatternBackground opacity={0.05} />
 
         {/* Soft tier-colored glows drifting in the background */}
         <div
-          className='pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full blur-[50px] animate-glow-float-1'
+          className={cn(
+            "pointer-events-none absolute -left-12 -top-12 rounded-full animate-glow-float-1",
+            isCompact ? "h-32 w-32 blur-[36px]" : "h-48 w-48 blur-[50px]"
+          )}
           style={{
             background: `radial-gradient(circle at center, ${accent.color}50 0%, transparent 70%)`,
           }}
         />
         <div
-          className='pointer-events-none absolute -bottom-12 -right-12 h-48 w-48 rounded-full blur-[50px] animate-glow-float-2'
+          className={cn(
+            "pointer-events-none absolute -bottom-12 -right-12 rounded-full animate-glow-float-2",
+            isCompact ? "h-32 w-32 blur-[36px]" : "h-48 w-48 blur-[50px]"
+          )}
           style={{
             background: `radial-gradient(circle at center, ${accent.color}45 0%, transparent 70%)`,
           }}
         />
 
-        {/* Case image with tier-colored glow backdrop */}
-        <div className='relative flex items-center justify-center py-2'>
+        {/* Case image with tier-colored glow backdrop — grows to fill the card
+            (e.g. Standard stretched to match the Premium/Elite grid's height)
+            so the image sits centered instead of leaving a dead gap above the footer. */}
+        <div className={cn("relative flex items-center justify-center", !isCompact && "flex-1 py-2")}>
           <div
-            className='pointer-events-none absolute h-28 w-48 rounded-full blur-[44px]'
+            className={cn(
+              "pointer-events-none absolute rounded-full",
+              isCompact ? "h-20 w-36 blur-[34px]" : "h-32 w-56 blur-[48px]"
+            )}
             style={{
               background: `radial-gradient(ellipse at center, ${accent.color}40 0%, ${accent.color}12 55%, transparent 80%)`,
             }}
           />
           <img
-            src={accent.image}
+            src={image}
             alt={caseDef.name}
-            className='relative z-10 h-44 object-contain'
+            className={cn("relative z-10 object-contain", isCompact ? "h-28" : "h-52")}
             style={{ filter: "drop-shadow(0 10px 24px rgba(0,0,0,0.55))" }}
             draggable={false}
           />
@@ -93,17 +127,20 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
         {/* Name + description */}
         <div className='relative text-center'>
           <h3
-            className='bg-clip-text font-display text-2xl font-black tracking-wide text-transparent'
+            className={cn(
+              "bg-clip-text font-display font-black tracking-wide text-transparent",
+              isCompact ? "text-lg" : "text-2xl"
+            )}
             style={{
               backgroundImage: `linear-gradient(180deg, #ffffff 20%, ${accent.color} 135%)`,
             }}>
             {caseDef.name}
           </h3>
-          <p className='mt-1.5 text-sm text-zinc-400'>{caseDef.description}</p>
+          {!isCompact && <p className='mt-1.5 text-sm text-zinc-400'>{caseDef.description}</p>}
         </div>
 
         {/* Footer — drop rates, cost, uniform button */}
-        <div className='relative mt-auto flex flex-col gap-4 pt-2'>
+        <div className={cn("relative mt-auto flex flex-col", isCompact ? "gap-2" : "gap-4 pt-2")}>
           <div className='flex items-center justify-between'>
             <DropRates probabilities={caseDef.probabilities} />
             <div className='flex items-center gap-1.5 text-sm font-bold'>
@@ -121,7 +158,7 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
             canAfford={canAfford}
             isOpening={isOpening}
             onClick={() => onOpen(caseDef.id)}
-            className='w-full'
+            className={cn("w-full", isCompact && "py-2")}
           />
         </div>
       </div>

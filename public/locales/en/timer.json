@@ -78,5 +78,13 @@
     "toast": "Time to switch it up! {{minutes}} minutes passed",
     "custom_placeholder": "Custom",
     "custom_aria": "Custom interval in minutes"
+  },
+  "community_map": {
+    "banner_title": "Community map available",
+    "banner_description": "{{count}} musicians confirmed these section timings.",
+    "explainer": "Other players marked where each part of this song starts — intro, verse, chorus, solo — using this exact YouTube video.",
+    "disclaimer": "We don't verify these are accurate — think of it as a starting point. You can rename, move, or delete any section afterward, and this can change at any time.",
+    "import": "Import sections",
+    "not_now": "Not now"
   }
 }
