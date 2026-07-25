@@ -87,4 +87,12 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Song Library -->
+  <url>
+    <loc>https://riff.quest/song-library</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>

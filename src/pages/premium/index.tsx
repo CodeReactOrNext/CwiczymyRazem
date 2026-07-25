@@ -12,6 +12,17 @@ export default function PremiumPage() {
     <>
       <Head>
         <title>Choose your plan | Riff Quest</title>
+        <meta name="description" content="Compare Riff Quest plans and upgrade to Practice Master for AI-powered practice insights, custom plans, and premium guitar tracking features." />
+        <link rel='canonical' href='https://riff.quest/premium' />
+        <meta property="og:title" content="Choose your plan | Riff Quest" />
+        <meta property="og:description" content="Compare Riff Quest plans and upgrade to Practice Master for AI-powered practice insights, custom plans, and premium guitar tracking features." />
+        <meta property="og:url" content="https://riff.quest/premium" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Choose your plan | Riff Quest" />
+        <meta name="twitter:description" content="Compare Riff Quest plans and upgrade to Practice Master for AI-powered practice insights, custom plans, and premium guitar tracking features." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
         {isMaster ? (
