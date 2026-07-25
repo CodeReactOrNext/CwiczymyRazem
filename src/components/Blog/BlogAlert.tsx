@@ -1,5 +1,4 @@
-import { AlertTriangle, Info, Lightbulb, Star,Zap } from 'lucide-react';
-import React from 'react';
+import { useId } from 'react';
 
 type AlertType = 'info' | 'warning' | 'tip' | 'important' | 'takeaway';
 
@@ -10,52 +9,134 @@ interface BlogAlertProps {
 
 const config = {
   info: {
-    icon: Info,
-    baseClass: 'border-blue-500/30 bg-blue-500/5 text-blue-200',
-    iconClass: 'text-blue-400',
+    baseClass: 'bg-blue-500/5 text-blue-200',
+    textClass: 'text-blue-200',
+    strokeClass: 'stroke-blue-400',
     title: 'Note'
   },
   warning: {
-    icon: AlertTriangle,
-    baseClass: 'border-amber-500/30 bg-amber-500/5 text-amber-200',
-    iconClass: 'text-amber-400',
+    baseClass: 'bg-amber-500/5 text-amber-200',
+    textClass: 'text-amber-200',
+    strokeClass: 'stroke-amber-400',
     title: 'Warning'
   },
   tip: {
-    icon: Lightbulb,
-    baseClass: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-200',
-    iconClass: 'text-emerald-400',
+    baseClass: 'bg-emerald-500/5 text-emerald-200',
+    textClass: 'text-emerald-200',
+    strokeClass: 'stroke-emerald-400',
     title: 'Tip'
   },
   important: {
-    icon: Zap,
-    baseClass: 'border-purple-500/30 bg-purple-500/5 text-purple-200',
-    iconClass: 'text-purple-400',
+    baseClass: 'bg-purple-500/5 text-purple-200',
+    textClass: 'text-purple-200',
+    strokeClass: 'stroke-violet-400',
     title: 'Important'
   },
   takeaway: {
-    icon: Star,
-    baseClass: 'border-rose-500/30 bg-rose-500/5 text-rose-200',
-    iconClass: 'text-rose-400',
+    baseClass: 'bg-rose-500/5 text-rose-200',
+    textClass: 'text-rose-200',
+    strokeClass: 'stroke-rose-400',
     title: 'Takeaway'
   }
 };
 
-export const BlogAlert = ({ type = 'info', children }: BlogAlertProps) => {
-  const { icon: Icon, baseClass, iconClass, title } = config[type];
+const getPatternIconSVG = (type: AlertType, strokeClass: string) => {
+  const commonProps = { className: strokeClass, strokeWidth: '1.5', fill: 'none' };
+
+  if (type === 'info') {
+    return (
+      <g {...commonProps} viewBox='0 0 24 24'>
+        <circle cx='12' cy='12' r='10' />
+        <path d='M12 16v-4M12 8h.01' />
+      </g>
+    );
+  }
+  if (type === 'warning') {
+    return (
+      <g {...commonProps} viewBox='0 0 24 24'>
+        <path d='M12 2L2 20h20L12 2M12 9v4M12 17h.01' />
+      </g>
+    );
+  }
+  if (type === 'tip') {
+    return (
+      <g {...commonProps} viewBox='0 0 24 24'>
+        <path d='M15 14c1.66-1.66 2.5-2.5 2.5-4C17.5 9.1 15.9 7.5 14 7.5S10.5 9.1 10.5 10c0 1.5.84 2.34 2.5 4m-5 4h8m-4 6a6 6 0 1 1 0-12 6 6 0 0 1 0 12' />
+      </g>
+    );
+  }
+  if (type === 'important') {
+    return (
+      <g {...commonProps} viewBox='0 0 24 24'>
+        <path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z' />
+      </g>
+    );
+  }
+  return (
+    <g {...commonProps} viewBox='0 0 24 24'>
+      <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
+    </g>
+  );
+};
+
+const PatternBackground = ({ type, patternId }: { type: AlertType; patternId: string }) => {
+  const { strokeClass } = config[type];
 
   return (
-    <div className={`my-8 flex gap-4 rounded-lg border p-4 ${baseClass}`}>
-      <div className="mt-0.5 shrink-0">
-        <Icon className={`h-5 w-5 ${iconClass}`} />
-      </div>
-      <div>
-        <div className={`mb-1 text-sm font-bold tracking-wider ${iconClass}`}>
+    <svg
+      className='pointer-events-none absolute inset-0 h-full w-full rounded-lg'
+      style={{ opacity: 0.08 }}
+      aria-hidden='true'
+    >
+      <defs>
+        <pattern
+          id={patternId}
+          x='0'
+          y='0'
+          width='120'
+          height='120'
+          patternUnits='userSpaceOnUse'
+          patternTransform='rotate(-15)'
+        >
+          <g transform='translate(20, 20)'>
+            <svg width='20' height='20' viewBox='0 0 24 24'>
+              {getPatternIconSVG(type, strokeClass)}
+            </svg>
+          </g>
+          <g transform='translate(80, 40)'>
+            <svg width='16' height='16' viewBox='0 0 24 24'>
+              {getPatternIconSVG(type, strokeClass)}
+            </svg>
+          </g>
+          <g transform='translate(40, 80)'>
+            <svg width='18' height='18' viewBox='0 0 24 24'>
+              {getPatternIconSVG(type, strokeClass)}
+            </svg>
+          </g>
+          <g transform='translate(90, 90)'>
+            <svg width='20' height='20' viewBox='0 0 24 24'>
+              {getPatternIconSVG(type, strokeClass)}
+            </svg>
+          </g>
+        </pattern>
+      </defs>
+      <rect x='0' y='0' width='100%' height='100%' fill={`url(#${patternId})`} />
+    </svg>
+  );
+};
+
+export const BlogAlert = ({ type = 'info', children }: BlogAlertProps) => {
+  const patternId = useId();
+  const { baseClass, textClass, title } = config[type];
+
+  return (
+    <div className={`relative my-8 overflow-hidden rounded-lg p-8 ${baseClass}`}>
+      <PatternBackground type={type} patternId={patternId} />
+      <div className='relative'>
+        <div className={`mb-2 text-sm font-bold tracking-wider ${textClass}`}>
           {title}
         </div>
-        <div className="text-sm leading-relaxed">
-          {children}
-        </div>
+        <div className='text-sm leading-relaxed'>{children}</div>
       </div>
     </div>
   );

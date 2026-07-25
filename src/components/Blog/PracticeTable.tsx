@@ -31,17 +31,17 @@ const defaultSteps: PracticeStep[] = [
 
 export const PracticeTable = () => {
   return (
-    <div className="my-10 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/30">
+    <div className="my-10 overflow-hidden rounded-xl bg-zinc-900/30">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse table-auto sm:table-fixed">
           <thead>
-            <tr className="border-b border-white/10 bg-white/5">
+            <tr className="bg-white/5">
               <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Segment</th>
               <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Duration</th>
               <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Focus</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody>
             {defaultSteps.map((step, index) => (
               <tr key={index} className="transition-colors hover:bg-white/[0.02]">
                 <td className="px-4 py-4 font-bold text-white align-top">

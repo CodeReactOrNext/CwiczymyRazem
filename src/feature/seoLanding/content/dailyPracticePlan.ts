@@ -215,7 +215,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "If motivation itself is the bottleneck, our guides on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps) and [what to practice on guitar daily](/blog/what-to-practice-on-guitar-daily) go deeper. And when the 30-minute plan starts feeling small, graduate to the full [intermediate practice routine](/intermediate-guitar-practice-routine).",
+          text: "If motivation itself is the bottleneck, our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps) goes deeper. And when the 30-minute plan starts feeling small, graduate to the full [intermediate practice routine](/intermediate-guitar-practice-routine).",
         },
       ],
     },
@@ -254,7 +254,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
   ],
   relatedBlogSlugs: [
     "how-long-practice-guitar-daily",
-    "what-to-practice-on-guitar-daily",
+    "guitar-practice-mental-preparation",
     "practice-guitar-every-day-simple-steps",
   ],
   relatedSongGuideSlugs: ["nothing-else-matters"],

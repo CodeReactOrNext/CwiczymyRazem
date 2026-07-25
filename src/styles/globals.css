@@ -319,3 +319,27 @@ a {
     animation: shimmer-slide 2s infinite linear;
   }
 }
+
+/* Blog blockquote styling with quote icon */
+.prose blockquote {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.prose blockquote::before {
+  content: '\201C';
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4.5rem;
+  font-weight: 600;
+  color: rgb(34 211 238 / 0.25);
+  line-height: 1;
+  margin: 0;
+  z-index: 0;
+  font-family: Georgia, serif;
+}

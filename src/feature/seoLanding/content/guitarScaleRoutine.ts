@@ -175,7 +175,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "The routine above makes scales automatic; the last step is making them optional. Set aside one session a week where you ignore positions entirely: pick three notes, improvise with only those; sing a phrase, then find it on the neck; learn a solo you love and notice which scale it *breaks*. Ear-first practice is the difference between playing scales and playing music — our guide to [ear training for guitarists](/blog/best-ear-training-exercises-for-guitarists) is the natural companion here.",
+          text: "The routine above makes scales automatic; the last step is making them optional. Set aside one session a week where you ignore positions entirely: pick three notes, improvise with only those; sing a phrase, then find it on the neck; learn a solo you love and notice which scale it *breaks*. Ear-first practice is the difference between playing scales and playing music — train your ear alongside the fretboard, not after it.",
         },
         {
           kind: "paragraph",
@@ -218,8 +218,8 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
   ],
   relatedBlogSlugs: [
     "how-to-practice-guitar-scales-effectively",
-    "best-ear-training-exercises-for-guitarists",
-    "benefits-of-learning-guitar-music-theory",
+    "is-deliberate-practice-necessary-for-guitar",
+    "guitar-practice-goal-setting",
   ],
   relatedSongGuideSlugs: ["stairway-to-heaven"],
 };

@@ -266,8 +266,8 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
   ],
   relatedBlogSlugs: [
     "best-guitar-techniques-for-speed",
-    "guitar-technique-training",
-    "metronome-vs-backing-tracks-for-improving-timing-accuracy",
+    "advanced-guitar-practice-techniques",
+    "how-to-practice-guitar-scales-effectively",
   ],
   relatedSongGuideSlugs: ["master-of-puppets", "sweet-child-o-mine"],
 };

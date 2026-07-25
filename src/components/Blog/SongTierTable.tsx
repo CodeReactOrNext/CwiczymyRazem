@@ -12,8 +12,8 @@ export const SongTierTable = () => {
   const tiers = getAllTiers().filter((tier) => tier.tier !== '?');
 
   return (
-    <div className="not-prose my-10 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/40">
-      <div className="divide-y divide-white/5">
+    <div className="not-prose my-10 overflow-hidden rounded-xl bg-zinc-900/40">
+      <div>
         {tiers.map((tier) => {
           const detail = tierDetails[tier.tier] ?? { range: '', desc: '' };
           return (
