@@ -40,6 +40,14 @@ service cloud.firestore {
       match /userSongs/{songId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Daily submission counters (e.g. community section-map sharing) — the
+      // owner may read their own counter, but only the backend (Admin SDK)
+      // may write it, otherwise a client could reset its own rate limit.
+      match /rateLimits/{limitId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false; // Admin SDK only
+      }
     }
 
     // ─── Exercise plans ───────────────────────────────────────────────────────
@@ -196,6 +204,17 @@ service cloud.firestore {
     // Admin SDK, which bypasses these rules. Clients are read-only so a buyer
     // can browse, but can never forge a listing, change a price or mark one sold.
     match /marketplace/{listingId} {
+      allow read:  if request.auth != null;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ─── Community song section maps ──────────────────────────────────────────
+    // Shared YouTube section timings other users can import for the same
+    // song+video. Every submission is structurally validated, rate-limited and
+    // consensus-recomputed server-side via /api/songs/section-map/submit
+    // (Admin SDK) — clients may only read, never write, so the automatic
+    // quality gate can't be bypassed.
+    match /songSectionMaps/{mapId} {
       allow read:  if request.auth != null;
       allow write: if false; // Admin SDK only
     }

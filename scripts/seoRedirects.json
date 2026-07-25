@@ -35,11 +35,6 @@
     "permanent": true
   },
   {
-    "source": "/exercises/play-by-ear",
-    "destination": "/daily-guitar-practice-plan",
-    "permanent": true
-  },
-  {
     "source": "/exercises/one-string-backing",
     "destination": "/daily-guitar-practice-plan",
     "permanent": true

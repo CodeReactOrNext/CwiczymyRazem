@@ -28,6 +28,7 @@ import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
+import { useVerifiedSongSectionMaps } from "feature/songs/hooks/useVerifiedSongSectionMaps";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { Song } from "feature/songs/types/songs.type";
@@ -71,6 +72,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   const { progressMap, attachGpFile, detachGpFile, setSongParts } = useUserSongProgress(
     userAuth ?? null
   );
+  const { bySongId: verifiedSectionMaps } = useVerifiedSongSectionMaps();
   const {
     page,
     isLoading,
@@ -499,6 +501,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                                 key={song.id}
                                 song={song}
                                 progress={progressMap[song.id] ?? null}
+                                hasSectionMap={verifiedSectionMaps.has(song.id)}
                                 onOpenDetails={() => setDetailsTarget(song)}
                                 onPractice={() => setPracticeTarget(song)}
                                 onPartsChange={(parts) => setSongParts(song.id, parts)}

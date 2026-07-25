@@ -17,9 +17,12 @@ import {
   TooltipTrigger 
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import Avatar from "components/UI/Avatar/Avatar";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
+import { MasteryBadge } from "feature/songs/components/SongSections/MasteryBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import { useVerifiedSongSectionMaps } from "feature/songs/hooks/useVerifiedSongSectionMaps";
 import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
 import type { Song, SongPart } from "feature/songs/types/songs.type";
 import type { MasteryLevel,SongSection } from "feature/songs/types/songSection.type";
@@ -31,20 +34,24 @@ import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { 
+import {
   ArrowLeft,
   Check,
   Clock,
   FileText,
+  ListMusic,
   MessageSquare,
   Music,
   Play,
+  Plus,
   Save,
-  Star, 
-  Target, 
+  Sparkles,
+  Star,
+  Target,
   Trash2,
   TrendingUp,
   Users} from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect, useMemo,useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -66,14 +73,6 @@ interface SongDetailViewProps {
   /** Show the back button on desktop too (used when the detail is nested, e.g. inside a playlist). */
   showBackOnDesktop?: boolean;
 }
-
-const MASTERY_COLORS: Record<MasteryLevel, string> = {
-  0: "#3f3f46", 
-  1: "#ef4444", 
-  2: "#f59e0b", 
-  3: "#22c55e", 
-  4: "#52525b", 
-};
 
 const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: number; color: string; size?: number; onRate?: (rating: number) => void }) => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -114,24 +113,14 @@ const InfoRow = ({ label, value, icon: Icon }: any) => (
   </div>
 );
 
-const LegendItem = ({ color, label, glow }: { color: string; label: string; glow?: boolean }) => (
-  <div className="flex items-center gap-2">
-     <div 
-        className="w-2 h-2 rounded-full" 
-        style={{ 
-           backgroundColor: color,
-           boxShadow: glow ? `0 0 10px ${color}80` : 'none'
-        }} 
-     />
-     <span className="text-xs font-bold text-zinc-400 tracking-tight">{label}</span>
-  </div>
-);
-
 export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onPartsChange, onBack, backLabel = "Back to library", showBackOnDesktop = false }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const userAuth = useAppSelector(selectUserAuth);
+  const { bySongId: verifiedSectionMaps } = useVerifiedSongSectionMaps();
+  const communityMap = verifiedSectionMaps.get(song.id);
   const [isRating, setIsRating] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const [sections, setSections] = useState<SongSection[]>([]);
@@ -261,6 +250,29 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
     return { counts, progressPct, totalSections, masteredCount };
   }, [sections]);
 
+  const handleSectionMasteryChange = (id: string, mastery: MasteryLevel) => {
+    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, mastery } : s)));
+  };
+
+  // Auto-mark the coarse "can play" flags once section mastery implies them:
+  // any mastered section counts as a riff/fragment, a mastered section named
+  // "solo" covers the solo mark, and mastering every section covers the whole song.
+  useEffect(() => {
+    if (!onPartsChange || !status || sections.length === 0) return;
+    const currentParts: SongPart[] = progress?.parts ?? [];
+    const impliedParts = new Set<SongPart>(currentParts);
+
+    if (sections.some((s) => s.mastery === 3)) impliedParts.add("riff");
+    if (sections.some((s) => s.mastery === 3 && s.name.toLowerCase().includes("solo"))) {
+      impliedParts.add("solo");
+    }
+    if (sections.every((s) => s.mastery === 3)) impliedParts.add("wholeSong");
+
+    if (impliedParts.size > currentParts.length) {
+      onPartsChange(song.id, Array.from(impliedParts));
+    }
+  }, [sections, progress?.parts, onPartsChange, status, song.id]);
+
   const totalHours = progress ? Math.floor(progress.totalPracticeMs / 3600000) : 0;
   const totalMinutes = progress ? Math.floor((progress.totalPracticeMs % 3600000) / 60000) : 0;
 
@@ -327,18 +339,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                    <span className="text-3xl md:text-4xl font-black relative z-10" style={{ color: tier.color }}>{tier.tier}</span>
                    <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>Tier</span>
                </div>
-
-               {status && (
-                 <SongPartMarks
-                    parts={progress?.parts ?? []}
-                    onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
-                    size="lg"
-                    className="justify-center"
-                 />
-               )}
             </div>
          </div>
-         
+
          <div className="relative px-6 md:px-8 pb-8 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
             <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-10 w-full lg:w-auto">
                {/* Primary Action Button */}
@@ -380,18 +383,6 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      </div>
                      <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes}m</span>
                   </div>
-
-                  {/* sm+ shows the button-style marks next to the tier badge instead */}
-                  {status && (
-                    <div className="flex flex-col items-center sm:hidden">
-                       <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Can play</span>
-                       <SongPartMarks
-                          parts={progress?.parts ?? []}
-                          onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
-                          size="sm"
-                       />
-                    </div>
-                  )}
                </div>
             </div>
 
@@ -592,23 +583,23 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                          const t = getSongTier(diff.rating);
                          
                          return (
-                           <div key={diff.userId || i} className="relative group/avatar">
+                           <div key={diff.userId || i} className="relative group/avatar hover:z-20">
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <div className="relative">
-                                       <Avatar 
+                                       <Avatar
                                          name={profile?.displayName || "Musician"}
                                          avatarURL={profile?.avatar}
                                          lvl={profile?.lvl || 0}
                                          size="sm"
                                          className="transition-transform group-hover/avatar:scale-110 shadow-lg"
                                        />
-                                       <div 
-                                         className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-zinc-950 flex items-center justify-center text-[8px] font-black shadow-lg" 
-                                         style={{ color: t.color }}
+                                       <div
+                                         className="absolute -bottom-1.5 -right-1.5 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-black shadow-lg ring-2 ring-zinc-900"
+                                         style={{ backgroundColor: t.color, color: "#09090b" }}
                                        >
-                                         {t.tier}
+                                         {diff.rating}
                                        </div>
                                     </div>
                                   </TooltipTrigger>
@@ -616,6 +607,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                     <div className="space-y-1">
                                        <p className="text-xs font-black text-white">{profile?.displayName || "Unknown Musician"}</p>
                                        <p className="text-[10px] text-zinc-400">Rating: <span className="font-bold" style={{ color: t.color }}>{diff.rating}/10</span></p>
+                                       <p className="text-[10px] text-zinc-400">Tier: <span className="font-bold" style={{ color: t.color }}>{t.label}</span></p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
@@ -639,108 +631,142 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          </div>
 
          {/* Full Width Bottom: Integrated Mastery Timeline Box */}
-         {masteryData && (
-           <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
-             <div className="flex flex-col items-center gap-8">
-               {/* Mastery Summary (Timeline) */}
-               <div className="w-full space-y-4">
-                  <div className="flex items-center justify-between">
-                     <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-zinc-300">
-                           Song mastery
-                        </span>
-                        <p className="text-xs font-medium text-zinc-500 mt-1">Practice progression</p>
-                     </div>
-                     <span className="text-xs font-semibold text-zinc-400 tabular-nums">
-                        {masteryData.masteredCount} / {masteryData.totalSections} Sections ({masteryData.progressPct}%)
-                     </span>
-                  </div>
-                  
-                  <div className="h-4 w-full rounded-full overflow-hidden bg-black/40 relative">
-                     <TooltipProvider>
-                        {sections
-                          .sort((a, b) => a.startTime - b.startTime)
-                          .map((s, idx, arr) => {
-                             const nextStart = arr[idx + 1]?.startTime || (s.startTime + 10);
-                             const lastSection = arr[arr.length - 1];
-                             const totalDuration = lastSection.startTime + 10;
-                             const widthPct = ( (nextStart - s.startTime) / totalDuration ) * 100;
-                             const leftPct = ( s.startTime / totalDuration ) * 100;
-                             
-                             return (
-                               <Tooltip key={s.id}>
-                                 <TooltipTrigger asChild>
-                                   <div
-                                     className="absolute top-0 h-full transition-all hover:brightness-125 cursor-help"
-                                     style={{ 
-                                         left: `${leftPct}%`, 
-                                         width: `${widthPct}%`,
-                                         backgroundColor: MASTERY_COLORS[s.mastery]
-                                     }}
-                                   />
-                                 </TooltipTrigger>
-                                 <TooltipContent className="bg-zinc-950 shadow-2xl">
-                                    <div className="space-y-1">
-                                       <p className="text-xs font-black text-white">{s.name}</p>
-                                       <p className="text-[10px] font-bold" style={{ color: MASTERY_COLORS[s.mastery] }}>
-                                          {MASTERY_LABELS[s.mastery]}
-                                       </p>
-                                    </div>
-                                 </TooltipContent>
-                               </Tooltip>
-                             );
-                          })}
-                     </TooltipProvider>
-                  </div>
-               </div>
-
-               {/* Legend Area */}
-               <div className="w-full pt-4 space-y-4">
-                  <div className="flex flex-wrap justify-center gap-6">
-                    <LegendItem color="#3f3f46" label="Not learned" />
-                    <LegendItem color="#ef4444" label="Bad" />
-                    <LegendItem color="#f59e0b" label="Medium" />
-                    <LegendItem color="#22c55e" label="Mastered" glow />
-                  </div>
-               </div>
-             </div>
-
-             {/* Column 4: Practice Notes */}
-             <div className="lg:col-span-3 bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm relative group/notes mt-8">
-                <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-2">
-                      <MessageSquare size={18} className="transition-all duration-500 text-zinc-700" />
-                      <span className="text-sm font-semibold text-zinc-300">Practice notes</span>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      {isSaving && (
-                         <div className="flex items-center gap-1.5 animate-pulse">
-                            <Save size={10} className="text-zinc-500" />
-                            <span className="text-[9px] text-zinc-500 font-bold">Saving</span>
-                         </div>
-                      )}
-                      <span className={cn(
-                        "text-[9px] font-bold",
-                        notes.length > 450 ? "text-amber-500" : "text-zinc-600"
-                      )}>
-                        {notes.length} / 500 CHARACTERS
+         <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
+           <div className="flex flex-col items-center gap-8">
+             {/* Mastery Summary (Timeline) */}
+             <div className="w-full space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                   <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-zinc-300">
+                         Song mastery
                       </span>
+                      <p className="text-xs font-medium text-zinc-500 mt-1">
+                         {masteryData ? "Practice progression" : "Map sections to track your progression"}
+                      </p>
+                   </div>
+                   <div className="flex items-center gap-4">
+                      {masteryData && (
+                        <span className="text-xs font-semibold text-zinc-400 tabular-nums">
+                           {masteryData.masteredCount} / {masteryData.totalSections} Sections ({masteryData.progressPct}%)
+                        </span>
+                      )}
+                      {status && (
+                        <SongPartMarks
+                           parts={progress?.parts ?? []}
+                           onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
+                           size="lg"
+                        />
+                      )}
                    </div>
                 </div>
 
-                <textarea
-                   value={notes}
-                   onChange={(e) => {
-                     if (e.target.value.length <= 500) {
-                        setNotes(e.target.value);
-                     }
-                   }}
-                   placeholder="Add your practice notes here... (e.g. guitar settings, tips for difficult parts, gear used)"
-                   className="w-full min-h-[250px] bg-black/20 rounded-lg p-4 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all resize-none leading-relaxed shadow-inner"
-                />
+                {!masteryData && (
+                  <div className="relative overflow-hidden rounded-lg bg-gradient-to-b from-cyan-500/[0.07] to-transparent">
+                     <div className="pointer-events-none absolute inset-0">
+                        <div className="absolute left-1/2 top-0 h-28 w-[32rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-cyan-500/10 blur-3xl" />
+                        <GuitarPatternBackground opacity={0.025} scale={0.75} />
+                     </div>
+
+                     <div className="relative z-10 flex flex-col items-center gap-3 px-6 py-6 text-center sm:py-7">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-cyan-500/10">
+                           <ListMusic className="h-5 w-5 text-cyan-400" />
+                        </div>
+
+                        <div className="space-y-1">
+                           <p className="text-base font-bold text-white">Unlock section-by-section mastery</p>
+                           <p className="max-w-sm text-sm text-zinc-400">
+                              Mark where the intro, verse, chorus and solo start — every section then tracks its own progress as you practice.
+                           </p>
+                        </div>
+
+                        <Button
+                           onClick={() => router.push(`/timer/song/${song.id}`)}
+                           className="mt-1 rounded-lg bg-white px-6 text-sm font-bold text-zinc-950 hover:bg-zinc-200"
+                        >
+                           <ListMusic className="mr-2 h-4 w-4" />
+                           Map this song
+                        </Button>
+
+                        {communityMap && (
+                          <div className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300">
+                             <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                             {communityMap.contributorCount} musician{communityMap.contributorCount === 1 ? "" : "s"} already mapped this — you&apos;ll be offered to import it when you start.
+                          </div>
+                        )}
+                     </div>
+                  </div>
+                )}
+
+                {masteryData && (
+                  <div className="w-full space-y-1.5">
+                     {sections
+                       .slice()
+                       .sort((a, b) => a.startTime - b.startTime)
+                       .map((s) => (
+                         <div
+                           key={s.id}
+                           className={cn(
+                             "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
+                             s.mastery === 3 ? "bg-green-500/5" : "bg-black/20"
+                           )}
+                         >
+                            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                            <span className="flex-1 truncate text-sm font-semibold text-zinc-200">{s.name}</span>
+                            <MasteryBadge
+                               mastery={s.mastery}
+                               onChange={(m) => handleSectionMasteryChange(s.id, m)}
+                            />
+                         </div>
+                       ))}
+
+                     <button
+                        type="button"
+                        onClick={() => router.push(`/timer/song/${song.id}`)}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 py-3 text-xs font-semibold text-zinc-300 transition-colors hover:bg-white/10"
+                     >
+                        <Plus className="h-4 w-4" />
+                        Add new section
+                     </button>
+                  </div>
+                )}
              </div>
            </div>
-         )}
+
+           {/* Column 4: Practice Notes */}
+           <div className="lg:col-span-3 bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm relative group/notes mt-8">
+              <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                    <MessageSquare size={18} className="transition-all duration-500 text-zinc-700" />
+                    <span className="text-sm font-semibold text-zinc-300">Practice notes</span>
+                 </div>
+                 <div className="flex items-center gap-3">
+                    {isSaving && (
+                       <div className="flex items-center gap-1.5 animate-pulse">
+                          <Save size={10} className="text-zinc-500" />
+                          <span className="text-[9px] text-zinc-500 font-bold">Saving</span>
+                       </div>
+                    )}
+                    <span className={cn(
+                      "text-[9px] font-bold",
+                      notes.length > 450 ? "text-amber-500" : "text-zinc-600"
+                    )}>
+                      {notes.length} / 500 CHARACTERS
+                    </span>
+                 </div>
+              </div>
+
+              <textarea
+                 value={notes}
+                 onChange={(e) => {
+                   if (e.target.value.length <= 500) {
+                      setNotes(e.target.value);
+                   }
+                 }}
+                 placeholder="Add your practice notes here... (e.g. guitar settings, tips for difficult parts, gear used)"
+                 className="w-full min-h-[250px] bg-black/20 rounded-lg p-4 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all resize-none leading-relaxed shadow-inner"
+              />
+           </div>
+         </div>
       </div>
     </div>
   );

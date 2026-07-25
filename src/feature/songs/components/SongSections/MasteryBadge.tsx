@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const MASTERY_STYLES: Record<MasteryLevel, string> = {
@@ -61,10 +62,13 @@ export const MasteryBadge = ({
         type='button'
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "w-24 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium transition-colors",
+          "flex w-28 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium transition-colors",
           MASTERY_STYLES[mastery],
         )}>
         {MASTERY_LABELS[mastery]}
+        <ChevronDown
+          className={cn("h-3 w-3 shrink-0 opacity-60 transition-transform", open && "rotate-180")}
+        />
       </button>
 
       {open && (
