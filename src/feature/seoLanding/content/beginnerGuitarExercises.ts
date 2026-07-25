@@ -10,7 +10,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
   updatedAt: "2026-07-20",
   intro: [
     "As a beginner, you should practice four things on guitar: fretting-hand accuracy, picking consistency, chord changes, and timing. Every exercise on this page trains one of those, takes under ten minutes, and comes with an interactive tab you can play along with for free.",
-    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below or see the full [daily guitar practice plan](/daily-guitar-practice-plan).",
+    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below, see the full [daily guitar practice plan](/daily-guitar-practice-plan), or read our breakdown of [how long to practice guitar daily](/blog/how-long-practice-guitar-daily) by skill level.",
   ],
   sections: [
     {
@@ -95,7 +95,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, pair this section with our [beginner chord guide](/blog/learn-guitar-chords-beginners-guide).",
+          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, drill chord changes in isolation before adding the strumming hand.",
         },
         {
           kind: "exercise",
@@ -234,9 +234,9 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
     "guitar-scale-practice-routine",
   ],
   relatedBlogSlugs: [
-    "how-to-learn-guitar-online-effectively-for-beginners",
+    "guitar-learning-without-a-teacher",
     "beginner-guitar-practice-checklist-daily-essentials",
-    "learn-guitar-chords-beginners-guide",
+    "how-long-practice-guitar-daily",
   ],
   relatedSongGuideSlugs: ["nothing-else-matters", "hotel-california"],
 };

@@ -46,6 +46,9 @@ export interface BlogFrontmatter {
    *  Keep it <= ~57 chars so the rendered SERP title (incl. optional brand) stays under 60. */
   metaTitle?: string;
   description: string;
+  /** Optional shorter, conversational hero subtitle. Falls back to `description`
+   *  (which is tuned for the SEO meta tag, not for reading under a big H1). */
+  heroSubtitle?: string;
   date: string;
   updatedAt?: string;
   image: string;

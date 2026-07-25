@@ -1,25 +1,32 @@
 import { evaluate } from '@mdx-js/mdx';
 import { ActionCard } from 'components/Blog/ActionCard';
 import { AppCard } from 'components/Blog/AppCard';
+import { AuthorBio } from 'components/Blog/AuthorBio';
 import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
+import { PhotoBlock } from 'components/Blog/PhotoBlock';
 import { PracticeTable } from 'components/Blog/PracticeTable';
+import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
+import { SessionTimeline } from 'components/Blog/SessionTimeline';
 import { SongTierTable } from 'components/Blog/SongTierTable';
+import { StatRow } from 'components/Blog/StatRow';
 import { StepList } from 'components/Blog/StepList';
+import { TierCards } from 'components/Blog/TierCards';
 import { YouTube } from 'components/Blog/YouTube';
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
 import { Footer } from 'feature/landing/components/Footer';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { getAuthorProfile } from 'lib/authors';
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs, getBlogBySlug } from 'lib/blog';
 import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import type { PracticeLink } from 'lib/internalLinks';
 import { CLUSTER_PRACTICE_LINK } from 'lib/internalLinks';
-import { ChevronRight, List } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Clock, Flame, HelpCircle, List, Sprout, Target, Trophy } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -51,21 +58,60 @@ interface BlogPostProps {
   practiceExercises: PracticeExercise[];
 }
 
+// Keyword -> icon for H2 section markers. Falls back to a plain dot when no
+// keyword matches, so existing posts without these headings render unchanged.
+const H2_ICONS: [RegExp, React.ElementType][] = [
+  [/beginner/i, Sprout],
+  [/intermediate/i, Flame],
+  [/advanced/i, Trophy],
+  [/efficien/i, Target],
+  [/faq/i, HelpCircle],
+  [/conclusion/i, CheckCircle2],
+  [/^how long/i, Clock],
+];
+
+const getH2Icon = (text: string): React.ElementType | null => {
+  const match = H2_ICONS.find(([pattern]) => pattern.test(text));
+  return match ? match[1] : null;
+};
+
 const components = {
   YouTube,
   BlogAlert,
   ActionCard,
   AppCard,
   ExercisePromo,
+  PhotoBlock,
   PracticeTable,
+  SessionLengthChart,
+  SessionTimeline,
+  StatRow,
   StepList,
   SongTierTable,
-  // Mapping h2 to include IDs for ToC
-  h2: (props: any) => (
-    <h2
-      id={props.children?.toString().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}
-      {...props}
-    />
+  TierCards,
+  // Mapping h2 to include IDs for ToC, plus an accent marker for section scanning
+  h2: ({ children, ...rest }: any) => {
+    const text = children?.toString() ?? '';
+    const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+    const Icon = getH2Icon(text);
+    return (
+      <h2 {...rest} id={id} className="flex items-center gap-3.5">
+        {Icon ? (
+          <Icon className="h-6 w-6 shrink-0 text-cyan-400" aria-hidden="true" />
+        ) : (
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true" />
+        )}
+        <span>{children}</span>
+      </h2>
+    );
+  },
+  // h3 gets a small marker to echo h2's language at a subtler scale, so
+  // sub-sections read as part of the same heading system, not plain bold text.
+  h3: ({ children, ...rest }: any) => (
+    <h3 {...rest} className="flex items-center gap-3">
+      <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-500/60" aria-hidden="true" />
+      <span>{children}</span>
+    </h3>
   ),
   // Content images live below the fold; lazy-load them to cut initial page weight
   img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
@@ -113,6 +159,8 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
     ? frontmatter.image
     : `https://riff.quest${frontmatter.image}`;
 
+  const authorProfile = getAuthorProfile(frontmatter.author);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -121,7 +169,12 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         "headline": frontmatter.title,
         "description": frontmatter.description,
         "image": absoluteImage,
-        "author": {
+        "author": authorProfile ? {
+          "@type": "Person",
+          "name": authorProfile.name,
+          "description": authorProfile.bio,
+          "image": `https://riff.quest${authorProfile.image}`
+        } : {
           "@type": "Organization",
           "name": frontmatter.author || "Riff Quest",
           "url": "https://riff.quest"
@@ -215,13 +268,13 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         />
       </Head>
 
-      <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
+      <main className="min-h-screen bg-zinc-950 text-zinc-300">
         <motion.div
           className="fixed top-0 left-0 right-0 z-[60] h-1 bg-cyan-500 origin-left"
           style={{ scaleX }}
         />
 
-        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-zinc-950/90 backdrop-blur-sm">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-sm">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
             <Link href="/" className="transition-opacity hover:opacity-70">
               <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' />
@@ -245,13 +298,14 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
 
         <BlogHeader
           title={frontmatter.title}
-          description={frontmatter.description}
+          description={frontmatter.heroSubtitle || frontmatter.description}
           date={frontmatter.date}
           image={frontmatter.image}
           author={frontmatter.author}
+          authorImage={authorProfile?.image}
         />
 
-        <article className="container mx-auto px-4 py-12 overflow-x-hidden min-w-0">
+        <article className="container mx-auto px-4 py-12 min-w-0">
           <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-12">
             {/* Sidebar ToC */}
             <aside className="hidden lg:block w-64 shrink-0 overflow-y-auto max-h-[calc(100vh-200px)] sticky top-32">
@@ -264,10 +318,10 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                   <a
                     key={heading.id}
                     href={`#${heading.id}`}
-                    className={`text-sm transition-all duration-200 border-l-2 pl-4 py-1 hover:text-cyan-400 ${
-                      activeId === heading.id 
-                        ? 'border-cyan-500 text-cyan-400 font-medium' 
-                        : 'border-white/5 text-zinc-500'
+                    className={`rounded px-4 py-1.5 text-sm transition-background hover:text-cyan-400 ${
+                      activeId === heading.id
+                        ? 'bg-cyan-500/10 text-cyan-400 font-medium'
+                        : 'text-zinc-500'
                     }`}
                   >
                     {heading.text}
@@ -276,17 +330,28 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
               </nav>
             </aside>
 
-            <div className="flex-1 min-w-0 max-w-full lg:max-w-2xl mx-auto lg:mx-0 overflow-hidden">
+            <div className="flex-1 min-w-0 max-w-full lg:max-w-3xl mx-auto lg:mx-0 overflow-hidden">
               <div
-                className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-500/5 prose-blockquote:py-2 prose-blockquote:pr-6 prose-blockquote:font-normal prose-blockquote:italic prose-blockquote:text-zinc-200 before:prose-blockquote:content-none after:prose-blockquote:content-none prose-blockquote:before:hidden prose-blockquote:after:hidden"
+                className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-blockquote:text-xl prose-blockquote:leading-relaxed prose-blockquote:text-center prose-blockquote:pb-10 prose-blockquote:pt-14 prose-blockquote:px-6 sm:prose-blockquote:px-14 prose-blockquote:my-12 prose-blockquote:font-normal prose-blockquote:italic prose-blockquote:text-zinc-200 prose-blockquote:bg-zinc-800/40 prose-blockquote:border-0 prose-blockquote:rounded-lg prose-blockquote:relative prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
                 dangerouslySetInnerHTML={{ __html: contentHtml }}
               />
+
+              {authorProfile && (
+                <div className="mt-12">
+                  <AuthorBio
+                    name={authorProfile.name}
+                    image={authorProfile.image}
+                    role={authorProfile.role}
+                    bio={authorProfile.bio}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </article>
 
         {practiceLink && (
-          <section className="container mx-auto px-4 py-16 border-t border-white/5">
+          <section className="container mx-auto px-4 py-16">
             <div className="mx-auto max-w-6xl">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <h2 className="text-2xl font-bold text-white">Put It Into Practice</h2>
@@ -314,7 +379,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         )}
 
         {relatedBlogs.length > 0 && (
-          <section className="container mx-auto px-4 py-16 border-t border-white/5">
+          <section className="container mx-auto px-4 py-16">
             <div className="mx-auto max-w-6xl">
               <h2 className="text-2xl font-bold text-white mb-8">
                 Read Also
