@@ -95,7 +95,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, pair this section with our [beginner chord guide](/blog/learn-guitar-chords-beginners-guide).",
+          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, drill chord changes in isolation before adding the strumming hand.",
         },
         {
           kind: "exercise",
@@ -234,9 +234,9 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
     "guitar-scale-practice-routine",
   ],
   relatedBlogSlugs: [
-    "how-to-learn-guitar-online-effectively-for-beginners",
+    "guitar-learning-without-a-teacher",
     "beginner-guitar-practice-checklist-daily-essentials",
-    "learn-guitar-chords-beginners-guide",
+    "practice-guitar-every-day-simple-steps",
   ],
   relatedSongGuideSlugs: ["nothing-else-matters", "hotel-california"],
 };
