@@ -1,0 +1,69 @@
+# Desktop packaging (electron-builder). The desktop app is a thin shell: it
+# loads https://riff.quest remotely (see electron/main.js START_URL), so the
+# package ships only the Electron main-process files, the favicons referenced
+# by main.js, and the native audio module — NOT the Next.js app or its deps.
+appId: quest.riff.desktop
+productName: riff.quest
+copyright: © riff.quest
+
+directories:
+  buildResources: build-resources
+  output: dist-electron
+
+files:
+  - electron/**/*
+  - public/favicon/**/*
+  - package.json
+  # Exclude the whole Next.js dependency tree, then whitelist the native audio
+  # module (audify is N-API, the locally built binary works in Electron as-is)
+  # and its tiny runtime deps.
+  - "!node_modules/**/*"
+  - node_modules/audify/index.js
+  - node_modules/audify/package.json
+  - node_modules/audify/build/Release/**
+  - node_modules/bindings/**
+  - node_modules/file-uri-to-path/**
+  # electron-updater + its runtime deps (nested fs-extra/semver live inside
+  # node_modules/electron-updater/node_modules and are covered by the first line).
+  - node_modules/electron-updater/**
+  - node_modules/builder-util-runtime/**
+  - node_modules/js-yaml/**
+  - node_modules/argparse/**
+  - node_modules/lazy-val/**
+  - node_modules/lodash.escaperegexp/**
+  - node_modules/lodash.isequal/**
+  - node_modules/tiny-typed-emitter/**
+  - node_modules/debug/**
+  - node_modules/ms/**
+  - node_modules/sax/**
+  - node_modules/graceful-fs/**
+  - node_modules/jsonfile/**
+  - node_modules/universalify/**
+
+asar: true
+asarUnpack:
+  - "**/*.node"
+
+# audify needs no rebuild (N-API); skip rebuilding the unrelated web deps.
+npmRebuild: false
+nodeGypRebuild: false
+
+win:
+  icon: build-resources/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: true
+  perMachine: false
+  artifactName: riff.quest-Setup-${version}.${ext}
+  shortcutName: riff.quest
+
+# Auto-update feed (electron-updater checks GitHub Releases of this repo).
+# Publishing needs GH_TOKEN: `npx electron-builder --win -p always`.
+publish:
+  provider: github
+  owner: CodeReactOrNext
+  repo: CwiczymyRazem

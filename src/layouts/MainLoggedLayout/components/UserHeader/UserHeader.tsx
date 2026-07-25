@@ -44,7 +44,7 @@ const UserHeader = ({
                 className="h-7 w-7"
               />
             </Link>
-   
+
           </div>
 
           <div className='hidden flex-1 justify-center px-6 md:flex'>
@@ -63,7 +63,7 @@ const UserHeader = ({
                 <Separator orientation='vertical' className='mx-2 h-6 bg-white/10' />
                 <UserNav />
               </div>
-              
+
               {/* Mobile Actions */}
               <div className='flex items-center gap-1 sm:hidden'>
                  <UserNav showOnlyLogout />
