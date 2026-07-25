@@ -2,6 +2,8 @@ import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNati
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
+
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
 // Using an inline Blob URL avoids the need to serve a separate .js file.
 const WORKLET_CODE = `
@@ -73,6 +75,9 @@ export const useMetronome = ({
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
   // 0..1 click volume. ~0.35 maps to the historical 0.3 peak gain; 1 peaks at 0.85.
   const [volume, setVolume] = useState(0.5);
+  // Clicks per beat: 1 = plain quarter notes (no subdivision), 2 = eighth notes,
+  // 3 = eighth-note triplets, 4 = sixteenth notes.
+  const [subdivision, setSubdivision] = useState(1);
   // Playback anchor mirrored into React state. The refs are set on the audio
   // thread's first scheduled beat, which on a skipCountIn start (loop restart,
   // live seek) changes no state at all — without this mirror the memoized
@@ -87,6 +92,9 @@ export const useMetronome = ({
   const startTimeRef         = useRef<number | null>(null);
   const audioStartTimeRef    = useRef<number | null>(null);
   const beatCounterRef       = useRef<number>(0);
+  // Position within the current beat's subdivision grid — 0 is always the beat
+  // itself, anything else is a subdivision tick between beats.
+  const subdivisionIndexRef  = useRef<number>(0);
   const isMutedRef           = useRef(isMuted);
   const mutePlaybackClickRef = useRef(mutePlaybackClick);
   const volumeRef            = useRef(volume);
@@ -171,10 +179,11 @@ export const useMetronome = ({
     if (ownsContextRef.current && audioContextRef.current) applySinkId(audioContextRef.current, id);
   }), []);
 
-  const playSound = useCallback((time: number, isAccent: boolean = false, muted: boolean = false) => {
+  const playSound = useCallback((time: number, kind: ClickKind = 'beat', muted: boolean = false) => {
     if (!audioContextRef.current || muted) return;
 
-    const peak = 0.85 * volumeRef.current;
+    const { frequency, gainScale } = CLICK_TONES[kind];
+    const peak = 0.85 * volumeRef.current * gainScale;
     if (peak <= 0.0001) return;
 
     const context    = audioContextRef.current;
@@ -182,7 +191,7 @@ export const useMetronome = ({
     const gainNode   = context.createGain();
 
     oscillator.type            = 'sine';
-    oscillator.frequency.value = isAccent ? 1200 : 800;
+    oscillator.frequency.value = frequency;
 
     gainNode.gain.setValueAtTime(0, time);
     gainNode.gain.linearRampToValueAtTime(peak, time + 0.001);
@@ -199,23 +208,32 @@ export const useMetronome = ({
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
 
-    const lookahead      = 0.1; // 100ms
-    const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
-    const ctx            = audioContextRef.current;
+    const lookahead        = 0.1; // 100ms
+    const secondsPerBeat   = 60.0 / (bpm * speedMultiplier);
+    const subdivisionCount = Math.max(1, subdivision);
+    const tickInterval     = secondsPerBeat / subdivisionCount;
+    const ctx              = audioContextRef.current;
 
     while (nextNoteTimeRef.current < ctx.currentTime + lookahead) {
       if (countInTargetRef.current > 0) {
         // Count-in beeps stay audible even when `mutePlaybackClick` is set (e.g. AlphaTab
         // notation is shown): AlphaTab itself hasn't started playing yet at this point
         // (see PracticeSession's isAudioPlaying gate), so nothing else would click here.
-        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4, isMutedRef.current);
+        // The count-in is always plain quarter notes — subdivision only kicks in once
+        // real playback starts below.
+        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4 ? 'accent' : 'beat', isMutedRef.current);
 
         const currentCount = countInTargetRef.current;
         setTimeout(() => setCountInRemaining(currentCount), 0);
 
         countInTargetRef.current -= 1;
+        nextNoteTimeRef.current  += secondsPerBeat;
       } else {
-        if (startTimeRef.current === null) {
+        // Only a true beat (subdivision index 0) drives the playback anchor and the
+        // 4-beat accent grid — subdivision ticks in between are just extra clicks.
+        const isBeat = subdivisionIndexRef.current === 0;
+
+        if (isBeat && startTimeRef.current === null) {
           const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - ctx.currentTime) * 1000);
           // When resuming from a pause, snap the resume offset to a WHOLE number of
           // beats. Otherwise resuming mid-beat (e.g. at beat 5.3) makes the click grid
@@ -237,19 +255,22 @@ export const useMetronome = ({
             setPlaybackAnchor({ wall, audio });
           }, 0);
         }
+
         // Once real playback has started, `mutePlaybackClick` hands the click over to
         // another clock (e.g. AlphaTab's own built-in metronome) so the two can't drift.
-        playSound(
-          nextNoteTimeRef.current,
-          beatCounterRef.current % 4 === 0,
-          isMutedRef.current || mutePlaybackClickRef.current,
-        );
-        beatCounterRef.current += 1;
-      }
+        const muted = isMutedRef.current || mutePlaybackClickRef.current;
+        if (isBeat) {
+          playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0 ? 'accent' : 'beat', muted);
+          beatCounterRef.current += 1;
+        } else {
+          playSound(nextNoteTimeRef.current, 'sub', muted);
+        }
 
-      nextNoteTimeRef.current += secondsPerBeat;
+        subdivisionIndexRef.current = (subdivisionIndexRef.current + 1) % subdivisionCount;
+        nextNoteTimeRef.current    += tickInterval;
+      }
     }
-  }, [bpm, speedMultiplier, playSound]);
+  }, [bpm, speedMultiplier, subdivision, playSound]);
 
   // Keep schedulerRef in sync with the latest scheduler closure.
   useEffect(() => {
@@ -289,6 +310,7 @@ export const useMetronome = ({
     startTimeRef.current      = null;
     audioStartTimeRef.current = null;
     beatCounterRef.current    = 0;
+    subdivisionIndexRef.current = 0;
     setCountInRemaining(useCountIn ? 4 : 0);
     setPlaybackAnchor({ wall: null, audio: null });
 
@@ -325,6 +347,7 @@ export const useMetronome = ({
     pausedElapsedTimeRef.current  = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current        = 0;
+    subdivisionIndexRef.current   = 0;
     pendingSeekBeatRef.current    = null; // back to the top → GP audio starts at 0
   }, [stopMetronome]);
 
@@ -366,6 +389,8 @@ export const useMetronome = ({
     setBpm,
     volume,
     setVolume,
+    subdivision,
+    setSubdivision,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -379,7 +404,8 @@ export const useMetronome = ({
     audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm,
-    setBpm, volume, setVolume, toggleMetronome, startMetronome, stopMetronome,
+    setBpm, volume, setVolume, subdivision, setSubdivision,
+    toggleMetronome, startMetronome, stopMetronome,
     restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm,
     playbackAnchor,
   ]);

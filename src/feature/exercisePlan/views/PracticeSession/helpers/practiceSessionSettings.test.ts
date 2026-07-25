@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   loadGlobalMetronomeVolume,
+  loadGlobalTrackVolume,
   loadPracticeSessionSettings,
   saveGlobalMetronomeVolume,
+  saveGlobalTrackVolume,
   savePracticeSessionSettings,
 } from "./practiceSessionSettings";
 
@@ -74,5 +76,30 @@ describe("global metronome volume", () => {
     savePracticeSessionSettings("exercise-2", { metronomeBpm: 140 });
 
     expect(loadGlobalMetronomeVolume()).toBe(0.4);
+  });
+});
+
+describe("global track volume", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("returns null when nothing was persisted for a role", () => {
+    expect(loadGlobalTrackVolume("main")).toBeNull();
+    expect(loadGlobalTrackVolume("backing")).toBeNull();
+  });
+
+  it("persists and restores the volume regardless of exercise", () => {
+    saveGlobalTrackVolume("backing", 0.5);
+
+    expect(loadGlobalTrackVolume("backing")).toBe(0.5);
+  });
+
+  it("keeps the main track and backing track volumes independent", () => {
+    saveGlobalTrackVolume("main", 0.9);
+    saveGlobalTrackVolume("backing", 0.3);
+
+    expect(loadGlobalTrackVolume("main")).toBe(0.9);
+    expect(loadGlobalTrackVolume("backing")).toBe(0.3);
   });
 });

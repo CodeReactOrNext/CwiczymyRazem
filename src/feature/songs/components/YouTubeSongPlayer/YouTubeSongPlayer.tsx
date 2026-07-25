@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { extractVideoId } from "feature/songs/utils/youtube.utils";
 import { Link, Lock, LockKeyholeOpen, Pencil, Search } from "lucide-react";
 import {
   forwardRef,
@@ -43,18 +44,6 @@ interface YouTubeSongPlayerProps {
   songTitle?: string;
   songArtist?: string;
 }
-
-const extractVideoId = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/)([^&\n?#]+)/,
-    /youtube\.com\/embed\/([^&\n?#]+)/,
-  ];
-  for (const p of patterns) {
-    const m = url.match(p);
-    if (m) return m[1];
-  }
-  return null;
-};
 
 export const YouTubeSongPlayer = forwardRef<
   YouTubeSongPlayerRef,

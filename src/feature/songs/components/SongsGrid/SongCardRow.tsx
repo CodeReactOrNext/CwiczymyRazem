@@ -1,7 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
+import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { Music, Star } from "lucide-react";
@@ -14,6 +15,9 @@ interface SongCardRowProps {
   userStatus?: SongStatus;
   onStatusChange?: (status: SongStatus | undefined) => void;
   onPlay?: () => void;
+  /** Parts of the song the user marked as playable (riff / solo / whole song). */
+  parts?: SongPart[];
+  onPartsChange?: (parts: SongPart[]) => void;
 }
 
 /**
@@ -27,6 +31,8 @@ export const SongCardRow = ({
   userStatus,
   onStatusChange,
   onPlay,
+  parts,
+  onPartsChange,
 }: SongCardRowProps) => {
   const userId = useAppSelector(selectUserAuth);
   const isRated = song.difficulties?.some((d) => d.userId === userId);
@@ -86,6 +92,12 @@ export const SongCardRow = ({
           </p>
           {isRated && <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />}
         </div>
+        {/* Part marks: what of this song the user can already play */}
+        {userStatus && onPartsChange && (
+          <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
+            <SongPartMarks parts={parts ?? []} onChange={onPartsChange} />
+          </div>
+        )}
       </div>
 
       {/* Actions */}

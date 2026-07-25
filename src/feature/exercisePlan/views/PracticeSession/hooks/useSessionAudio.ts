@@ -7,6 +7,7 @@ import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { useTablatureAudio } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack } from "../../../types/exercise.types";
 import type { TablatureMeasure } from "../../../types/exercise.types";
+import { loadGlobalTrackVolume, saveGlobalTrackVolume } from "../helpers/practiceSessionSettings";
 
 interface UseSessionAudioOptions {
   activeTablature:         TablatureMeasure[] | undefined;
@@ -57,11 +58,12 @@ export function useSessionAudio({
 
   useEffect(() => {
     const configs: Record<string, { volume: number; isMuted: boolean }> = {
-      main: { volume: 1.0, isMuted: isAudioMuted },
+      main: { volume: loadGlobalTrackVolume("main") ?? 1.0, isMuted: isAudioMuted },
     };
     if (dynamicBackingTracks) {
+      const backingVolume = loadGlobalTrackVolume("backing") ?? 0.8;
       dynamicBackingTracks.forEach(track => {
-        configs[track.id] = { volume: 0.8, isMuted: false };
+        configs[track.id] = { volume: backingVolume, isMuted: false };
       });
     }
     setTrackConfigs(configs);
@@ -72,6 +74,14 @@ export function useSessionAudio({
   useEffect(() => {
     setTrackConfigs(prev => ({ ...prev, main: { ...prev.main, isMuted: isAudioMuted } }));
   }, [isAudioMuted]);
+
+  // Track volume is a device-wide preference — persist it so the next exercise (or
+  // session) starts at the same level instead of resetting to the hardcoded default.
+  useEffect(() => {
+    if (trackConfigs.main) saveGlobalTrackVolume("main", trackConfigs.main.volume);
+    const backingTrack = Object.entries(trackConfigs).find(([id]) => id !== "main");
+    if (backingTrack) saveGlobalTrackVolume("backing", backingTrack[1].volume);
+  }, [trackConfigs]);
 
   const audioTracks = useMemo((): AudioTrackConfig[] => {
     const tracks: AudioTrackConfig[] = [{
