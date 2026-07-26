@@ -73,10 +73,12 @@ export const OnlineUsers = () => {
                                             )}
                                         </div>
 
-                                        {/* Desktop app badge */}
+                                        {/* Desktop app badge — top-right: the left edge of every
+                                        avatar but the first sits under its higher z-indexed
+                                        neighbor in the stack, so bottom-left gets hidden there. */}
                                         {user.platform === "desktop" && (
                                             <div
-                                                className="absolute -bottom-0.5 -left-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
+                                                className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
                                                 title="Using the desktop app">
                                                 <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
                                             </div>
