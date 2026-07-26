@@ -37,6 +37,7 @@ import {
   LogOut,
   Map,
   MessageSquarePlus,
+  Mic2,
   Milestone,
   Music2,
   NotebookPen,
@@ -176,6 +177,8 @@ const LIBRARY_SUB_NAV: SidebarSubLink[] = [
   { id: "library-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
   { id: "library-create-plan", name: "Create Plan", href: "/plans/create", icon: <PlusCircle size={16} /> },
   { id: "library-create-exercise", name: "Create Exercise", href: "/tab-editor", icon: <FilePlus2 size={16} /> },
+  { id: "library-recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={16} /> },
+  { id: "library-settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
 ];
 
 /** Views a page falls back to when its query param is absent (bare /songs renders Explore). */
@@ -334,7 +337,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/my-exercises")) return "library";
     if (pathname.startsWith("/tab-editor")) return "library";
     if (pathname.startsWith("/favorites")) return "library";
-    if (pathname.startsWith("/settings")) return "settings";
+    if (pathname.startsWith("/recordings")) return "library";
+    if (pathname.startsWith("/settings")) return "library";
     if (pathname.startsWith("/roadmap")) return "roadmap";
     return null;
   };
@@ -424,10 +428,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <Library size={18} />,
       children: LIBRARY_SUB_NAV,
     },
-  ];
-
-  const otherNavigation = [
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} />, muted: true },
   ];
 
   const renderNavLinks = (
@@ -534,10 +534,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       <div className="space-y-8">
         <div>
           <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
-        </div>
-
-        <div>
-          <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
         </div>
 
         <div>
