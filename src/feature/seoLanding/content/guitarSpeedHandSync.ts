@@ -264,10 +264,6 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
     "guitar-scale-practice-routine",
     "beginner-guitar-exercises",
   ],
-  relatedBlogSlugs: [
-    "best-guitar-techniques-for-speed",
-    "advanced-guitar-practice-techniques",
-    "how-to-practice-guitar-scales-effectively",
-  ],
+  relatedBlogSlugs: ["how-to-practice-guitar-scales-effectively"],
   relatedSongGuideSlugs: ["master-of-puppets", "sweet-child-o-mine"],
 };

@@ -45,6 +45,7 @@ import {
   Route,
   Search,
   Settings,
+  SlidersHorizontal,
   Star,
   Swords,
   Timer,
@@ -164,6 +165,15 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
   { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
 ];
+
+// Electron-only (window.nativeAmp) — spliced into PRACTICE_SUB_NAV below only when
+// isElectron, since this feature does nothing on the web build.
+const TONE_STUDIO_SUBLINK: SidebarSubLink = {
+  id: "practice-tone-studio",
+  name: "Tone Studio",
+  href: "/tone-studio",
+  icon: <SlidersHorizontal size={16} />,
+};
 
 const SONGS_SUB_NAV: SidebarSubLink[] = [
   { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
@@ -355,6 +365,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/profile/skills")) return "practice";
     if (pathname === "/ai-coach") return "practice";
     if (pathname === "/journey") return "practice";
+    if (pathname.startsWith("/tone-studio")) return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
@@ -423,7 +434,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: "Practice",
       href: "/timer",
       icon: <Timer size={18} />,
-      children: PRACTICE_SUB_NAV,
+      children: isElectron ? [...PRACTICE_SUB_NAV, TONE_STUDIO_SUBLINK] : PRACTICE_SUB_NAV,
     },
     {
       id: "songs",

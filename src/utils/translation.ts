@@ -2,7 +2,6 @@
 // Import all translation files for usage outside of React hooks
 import not_found from '../../public/locales/en/404.json';
 import achievements from '../../public/locales/en/achievements.json';
-import chat from '../../public/locales/en/chat.json';
 import common from '../../public/locales/en/common.json';
 import exercises from '../../public/locales/en/exercises.json';
 import faq from '../../public/locales/en/faq.json';
@@ -23,7 +22,6 @@ import yup_errors from '../../public/locales/en/yup_errors.json';
 type TranslationNamespace =
   | '404'
   | 'achievements'
-  | 'chat'
   | 'common'
   | 'exercises'
   | 'faq'
@@ -44,7 +42,6 @@ type TranslationNamespace =
 const translations: Record<TranslationNamespace, any> = {
   '404': not_found,
   achievements,
-  chat,
   common,
   exercises,
   faq,

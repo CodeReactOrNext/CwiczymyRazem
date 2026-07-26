@@ -2,7 +2,9 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
-import { Power, RefreshCw, Speaker, Zap } from "lucide-react";
+import { useTonePresets } from "hooks/useTonePresets";
+import { Power, RefreshCw, SlidersHorizontal, Zap } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 interface AmpSimButtonProps {
@@ -14,14 +16,16 @@ interface AmpSimButtonProps {
 
 /**
  * Electron-only amp simulator control. Renders nothing on the web build
- * (window.nativeAmp is absent). Toggles real-time monitoring with a tube-style
- * effect chain running natively over ASIO/WASAPI, and lets the user pick which
- * audio interface to use. Styled to sit inline next to the Recalibrate button.
+ * (window.nativeAmp is absent). Toggles real-time monitoring, lets the user pick
+ * which audio interface + saved tone preset to use, plus a basic level control.
+ * Deep tone-shaping (drive/EQ/delay/reverb/IR) lives on the /tone-studio page.
  */
 export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps) => {
   const amp = useAmpSim();
   const { devices, api, selectedId, loading, refresh, select } = useNativeAudioDevices();
+  const { presets } = useTonePresets();
   const [open, setOpen] = useState(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
   if (!amp.available) return null;
 
@@ -30,21 +34,12 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
     await amp.restart(); // re-open on the new interface if currently running
   };
 
-  const knob = (label: string, key: "drive" | "tone" | "level") => (
-    <div className='flex flex-col gap-1'>
-      <div className='flex justify-between text-xs text-zinc-400'>
-        <span>{label}</span>
-        <span>{Math.round(amp.params[key] * 100)}</span>
-      </div>
-      <Slider
-        value={[amp.params[key]]}
-        min={0}
-        max={1}
-        step={0.01}
-        onValueChange={([v]) => amp.setParams({ [key]: v })}
-      />
-    </div>
-  );
+  const handleSelectPreset = (id: string) => {
+    const preset = presets.find((p) => p.id === id);
+    if (!preset) return;
+    setActivePresetId(id);
+    amp.setParams(preset.params);
+  };
 
   const onColor = amp.isOn ? "bg-red-950 text-red-400 hover:bg-red-900" : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700";
 
@@ -101,23 +96,38 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
             </select>
           </div>
 
+          {/* ── Preset selection ──────────────────────────────────── */}
+          <div className='mb-3'>
+            <span className='mb-1 block text-xs text-zinc-400'>Brzmienie</span>
+            <select
+              value={activePresetId ?? ""}
+              onChange={(e) => handleSelectPreset(e.target.value)}
+              className='w-full rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
+              <option value='' disabled>
+                Wybierz preset…
+              </option>
+              {presets.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {amp.error && <p className='mb-2 text-xs text-red-400'>{amp.error}</p>}
 
-          <div className='flex flex-col gap-3'>
-            {knob("Drive", "drive")}
-            {knob("Tone", "tone")}
-            {knob("Level", "level")}
-
-            <button
-              type='button'
-              onClick={() => amp.setParams({ cab: !amp.params.cab })}
-              className={cn(
-                "flex items-center justify-center gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
-                amp.params.cab ? "bg-red-500/10 text-red-400" : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700/50"
-              )}>
-              <Speaker size={12} />
-              Kolumna (cab) {amp.params.cab ? "ON" : "OFF"}
-            </button>
+          <div className='flex flex-col gap-1'>
+            <div className='flex justify-between text-xs text-zinc-400'>
+              <span>Level</span>
+              <span>{Math.round(amp.params.level * 100)}</span>
+            </div>
+            <Slider
+              value={[amp.params.level]}
+              min={0}
+              max={1}
+              step={0.01}
+              onValueChange={([v]) => amp.setParams({ level: v })}
+            />
           </div>
 
           {amp.isOn && amp.info && (
@@ -125,6 +135,13 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
               {amp.info.deviceName} · {amp.info.sampleRate / 1000}kHz · ~{amp.info.roundTripMs.toFixed(0)}ms latency
             </p>
           )}
+
+          <Link
+            href='/tone-studio'
+            className='mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-800/50 px-2 py-1.5 text-xs text-zinc-300 transition-colors hover:bg-zinc-800'>
+            <SlidersHorizontal size={12} />
+            Otwórz Tone Studio
+          </Link>
         </div>
       )}
     </div>

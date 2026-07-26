@@ -170,7 +170,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "When a plateau hits anyway — it will — the answer is usually upstream: hand synchronization ([speed & sync exercises](/guitar-speed-hand-synchronization-exercises)), fretboard blind spots ([scale routine](/guitar-scale-practice-routine)), or simple under-recovery, covered in our guide to [breaking through practice stagnation](/blog/guitar-practice-stagnation-solutions).",
+          text: "When a plateau hits anyway — it will — the answer is usually upstream: hand synchronization ([speed & sync exercises](/guitar-speed-hand-synchronization-exercises)), fretboard blind spots ([scale routine](/guitar-scale-practice-routine)), or simple under-recovery.",
         },
       ],
     },
@@ -207,10 +207,6 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
     "guitar-scale-practice-routine",
     "daily-guitar-practice-plan",
   ],
-  relatedBlogSlugs: [
-    "advanced-guitar-practice-techniques",
-    "guitar-practice-stagnation-solutions",
-    "how-long-practice-guitar-daily",
-  ],
+  relatedBlogSlugs: ["how-long-practice-guitar-daily"],
   relatedSongGuideSlugs: ["sweet-child-o-mine", "hotel-california"],
 };

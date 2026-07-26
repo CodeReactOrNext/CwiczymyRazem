@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { PatternBackground } from './PatternBackground';
 
 type AlertType = 'info' | 'warning' | 'tip' | 'important' | 'takeaway';
 
@@ -40,98 +40,41 @@ const config = {
   }
 };
 
-const getPatternIconSVG = (type: AlertType, strokeClass: string) => {
-  const commonProps = { className: strokeClass, strokeWidth: '1.5', fill: 'none' };
-
-  if (type === 'info') {
-    return (
-      <g {...commonProps} viewBox='0 0 24 24'>
-        <circle cx='12' cy='12' r='10' />
-        <path d='M12 16v-4M12 8h.01' />
-      </g>
-    );
-  }
-  if (type === 'warning') {
-    return (
-      <g {...commonProps} viewBox='0 0 24 24'>
-        <path d='M12 2L2 20h20L12 2M12 9v4M12 17h.01' />
-      </g>
-    );
-  }
-  if (type === 'tip') {
-    return (
-      <g {...commonProps} viewBox='0 0 24 24'>
-        <path d='M15 14c1.66-1.66 2.5-2.5 2.5-4C17.5 9.1 15.9 7.5 14 7.5S10.5 9.1 10.5 10c0 1.5.84 2.34 2.5 4m-5 4h8m-4 6a6 6 0 1 1 0-12 6 6 0 0 1 0 12' />
-      </g>
-    );
-  }
-  if (type === 'important') {
-    return (
-      <g {...commonProps} viewBox='0 0 24 24'>
-        <path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z' />
-      </g>
-    );
-  }
-  return (
-    <g {...commonProps} viewBox='0 0 24 24'>
+const ICONS: Record<AlertType, React.ReactNode> = {
+  info: (
+    <g>
+      <circle cx='12' cy='12' r='10' />
+      <path d='M12 16v-4M12 8h.01' />
+    </g>
+  ),
+  warning: (
+    <g>
+      <path d='M12 2L2 20h20L12 2M12 9v4M12 17h.01' />
+    </g>
+  ),
+  tip: (
+    <g>
+      <path d='M15 14c1.66-1.66 2.5-2.5 2.5-4C17.5 9.1 15.9 7.5 14 7.5S10.5 9.1 10.5 10c0 1.5.84 2.34 2.5 4m-5 4h8m-4 6a6 6 0 1 1 0-12 6 6 0 0 1 0 12' />
+    </g>
+  ),
+  important: (
+    <g>
+      <path d='M13 2L3 14h9l-1 8 10-12h-9l1-8z' />
+    </g>
+  ),
+  takeaway: (
+    <g>
       <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
     </g>
-  );
-};
-
-const PatternBackground = ({ type, patternId }: { type: AlertType; patternId: string }) => {
-  const { strokeClass } = config[type];
-
-  return (
-    <svg
-      className='pointer-events-none absolute inset-0 h-full w-full rounded-lg'
-      style={{ opacity: 0.08 }}
-      aria-hidden='true'
-    >
-      <defs>
-        <pattern
-          id={patternId}
-          x='0'
-          y='0'
-          width='120'
-          height='120'
-          patternUnits='userSpaceOnUse'
-          patternTransform='rotate(-15)'
-        >
-          <g transform='translate(20, 20)'>
-            <svg width='20' height='20' viewBox='0 0 24 24'>
-              {getPatternIconSVG(type, strokeClass)}
-            </svg>
-          </g>
-          <g transform='translate(80, 40)'>
-            <svg width='16' height='16' viewBox='0 0 24 24'>
-              {getPatternIconSVG(type, strokeClass)}
-            </svg>
-          </g>
-          <g transform='translate(40, 80)'>
-            <svg width='18' height='18' viewBox='0 0 24 24'>
-              {getPatternIconSVG(type, strokeClass)}
-            </svg>
-          </g>
-          <g transform='translate(90, 90)'>
-            <svg width='20' height='20' viewBox='0 0 24 24'>
-              {getPatternIconSVG(type, strokeClass)}
-            </svg>
-          </g>
-        </pattern>
-      </defs>
-      <rect x='0' y='0' width='100%' height='100%' fill={`url(#${patternId})`} />
-    </svg>
-  );
+  )
 };
 
 export const BlogAlert = ({ type = 'info', children }: BlogAlertProps) => {
-  const patternId = useId();
-  const { baseClass, textClass, title } = config[type];
+  const { baseClass, textClass, strokeClass, title } = config[type];
 
   return (
     <div className={`relative my-8 overflow-hidden rounded-lg p-8 ${baseClass}`}>
-      <PatternBackground type={type} patternId={patternId} />
+      <PatternBackground icon={ICONS[type]} strokeClass={strokeClass} />
       <div className='relative'>
         <div className={`mb-2 text-sm font-bold tracking-wider ${textClass}`}>
           {title}

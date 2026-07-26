@@ -6,8 +6,46 @@ import { readPersistedDeviceId } from "./useNativeAudioDevices";
 // Electron-only amp simulator control. Talks to window.nativeAmp (preload bridge)
 // which runs a duplex ASIO/WASAPI stream + DSP chain in the main process.
 
+const BUFFER_SIZE_STORAGE_KEY = "amp_sim_buffer_size";
+const DEFAULT_BUFFER_SIZE = 256;
+
+function readPersistedBufferSize(): number {
+  try {
+    const raw = localStorage.getItem(BUFFER_SIZE_STORAGE_KEY);
+    if (raw !== null) {
+      const v = parseInt(raw, 10);
+      if (!isNaN(v) && v > 0) return v;
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_BUFFER_SIZE;
+}
+
 const PARAMS_STORAGE_KEY = "amp_sim_params";
-const DEFAULT_PARAMS: AmpParams = { drive: 0.5, tone: 0.5, level: 0.6, cab: true };
+const DEFAULT_PARAMS: AmpParams = {
+  preampGain: 0.3,
+  drive: 0.5,
+  bass: 0.5,
+  mid: 0.5,
+  treble: 0.5,
+  level: 0.6,
+  cab: true,
+  gate: true,
+  overdriveEnabled: false,
+  overdriveDrive: 0.35,
+  overdriveTone: 0.5,
+  overdriveLevel: 0.5,
+  delayEnabled: false,
+  delayMs: 300,
+  delayFeedback: 0.35,
+  delayMix: 0.25,
+  reverbEnabled: false,
+  reverbSize: 0.5,
+  reverbDamping: 0.5,
+  reverbMix: 0.25,
+  irId: null,
+  namEnabled: false,
+  namModelId: null,
+};
 
 function loadParams(): AmpParams {
   try {
@@ -29,6 +67,8 @@ export const useAmpSim = () => {
   const [info, setInfo] = useState<AmpStreamInfo | null>(null);
   const [params, setParamsState] = useState<AmpParams>(DEFAULT_PARAMS);
   useEffect(() => { setParamsState(loadParams()); }, []);
+  const [bufferSize, setBufferSizeState] = useState<number>(DEFAULT_BUFFER_SIZE);
+  useEffect(() => { setBufferSizeState(readPersistedBufferSize()); }, []);
 
   const paramsRef = useRef(params);
   paramsRef.current = params;
@@ -41,7 +81,8 @@ export const useAmpSim = () => {
     setError(null);
     try {
       const deviceId = readPersistedDeviceId() ?? undefined;
-      const streamInfo = await window.nativeAmp.start({ deviceId, params: paramsRef.current });
+      const frameSize = readPersistedBufferSize();
+      const streamInfo = await window.nativeAmp.start({ deviceId, frameSize, params: paramsRef.current });
       setInfo(streamInfo);
       setIsOn(true);
     } catch (e: any) {
@@ -69,6 +110,18 @@ export const useAmpSim = () => {
     await start();
   }, [stop, start]);
 
+  /** Change the requested ASIO/WASAPI buffer size (in frames). Persists and, if
+   *  currently running, reopens the stream so it takes effect immediately — the
+   *  driver may still hand back something else (see nativeAudioEngine's retry),
+   *  and if note-detection capture is attached at the same time it wins the
+   *  shared stream's frame size regardless (it's the timing-critical side), so
+   *  this only reliably applies when the amp runs standalone. */
+  const setBufferSize = useCallback(async (size: number) => {
+    setBufferSizeState(size);
+    try { localStorage.setItem(BUFFER_SIZE_STORAGE_KEY, String(size)); } catch { /* ignore */ }
+    await restart();
+  }, [restart]);
+
   const setParams = useCallback((patch: Partial<AmpParams>) => {
     setParamsState((prev) => {
       const next = { ...prev, ...patch };
@@ -83,5 +136,8 @@ export const useAmpSim = () => {
     return () => { window.nativeAmp?.stop().catch(() => { /* ignore */ }); };
   }, []);
 
-  return { available, isOn, isBusy, error, info, params, toggle, start, stop, restart, setParams };
+  return {
+    available, isOn, isBusy, error, info, params, bufferSize,
+    toggle, start, stop, restart, setParams, setBufferSize,
+  };
 };

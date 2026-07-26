@@ -80,7 +80,6 @@ export const getServerSideProps = withAuth({
     "toast",
     "skills",
     "songs",
-    "chat",
     "my_plans",
     "exercises",
   ],

@@ -34,10 +34,29 @@ contextBridge.exposeInMainWorld("nativeAmp", {
   listDevices: () => ipcRenderer.invoke("amp:list-devices"),
   /** Start monitoring. opts: { deviceId?, channel?, sampleRate?, frameSize?, params? } */
   start: (opts) => ipcRenderer.invoke("amp:start", opts),
-  /** Live-update tone params: { drive?, tone?, level?, cab? } (0..1 / bool). */
+  /** Live-update tone params: { drive?, bass?, mid?, treble?, level?, cab?, gate?,
+   *  delayEnabled?, delayMs?, delayFeedback?, delayMix?, reverbEnabled?, reverbSize?,
+   *  reverbDamping?, reverbMix?, irId? } (0..1 / bool, irId: string | null). */
   setParams: (params) => ipcRenderer.invoke("amp:set-params", params),
   stop: () => ipcRenderer.invoke("amp:stop"),
   getStatus: () => ipcRenderer.invoke("amp:status"),
+});
+
+// Tone Studio: local preset + cabinet-IR CRUD (config, not the live audio stream —
+// that stays on nativeAmp above).
+contextBridge.exposeInMainWorld("toneStudio", {
+  isAvailable: true,
+  listPresets: () => ipcRenderer.invoke("tone:list-presets"),
+  savePreset: (preset) => ipcRenderer.invoke("tone:save-preset", preset),
+  deletePreset: (id) => ipcRenderer.invoke("tone:delete-preset", id),
+  listIRs: () => ipcRenderer.invoke("tone:list-irs"),
+  deleteIR: (id) => ipcRenderer.invoke("tone:delete-ir", id),
+  /** Opens a native file picker for a .wav IR; resolves null if the user cancels. */
+  importIR: () => ipcRenderer.invoke("tone:import-ir"),
+  listNamModels: () => ipcRenderer.invoke("tone:list-nam-models"),
+  deleteNamModel: (id) => ipcRenderer.invoke("tone:delete-nam-model", id),
+  /** Opens a native file picker for a .nam model; resolves null if the user cancels. */
+  importNamModel: () => ipcRenderer.invoke("tone:import-nam-model"),
 });
 
 // App-shell integration: design-matched context menu + tray/dock quick actions

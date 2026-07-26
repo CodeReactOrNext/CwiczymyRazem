@@ -19,6 +19,7 @@ const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
+const toneStore = require("./toneStore");
 
 const isDev = !app.isPackaged;
 const isMac = process.platform === "darwin";
@@ -33,6 +34,16 @@ const APP_ICON = path.join(
   "android-chrome-512x512.png",
 );
 const RELOAD_RETRY_MS = 2500; // auto-reconnect interval while offline / server starting
+
+// nativeAudioEngine.js dispatches its real-time ASIO/WASAPI callback into THIS
+// (main) process. Chromium normally throttles timers/backgrounding for windows
+// that lose focus or are occluded to save power — with the amp on, that shows
+// up as monitoring latency ballooning by hundreds of ms the moment the user
+// alt-tabs away (e.g. to compare against another app). Must be set before the
+// app is ready.
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
 
 // Frameless on Windows/Linux (renderer draws its own title bar + controls);
 // on macOS keep the native traffic lights but hide the default title bar,
@@ -167,6 +178,7 @@ function createWindow() {
   });
 
   windowState.trackWindow(mainWindow);
+  mainWindow.webContents.setBackgroundThrottling(false);
   mainWindow.loadURL(START_URL);
   if (isDev) mainWindow.webContents.openDevTools({ mode: "detach" });
 
@@ -291,8 +303,8 @@ ipcMain.handle("native-audio:start", (_e, opts) => {
   });
 });
 
-ipcMain.handle("native-audio:stop", () => {
-  audioBridge.stop();
+ipcMain.handle("native-audio:stop", async () => {
+  await audioBridge.stop();
   return true;
 });
 ipcMain.handle("native-audio:status", () => audioBridge.getStatus());
@@ -374,11 +386,38 @@ ipcMain.handle("amp:start", (_e, opts) => ampSim.start(opts || {}));
 ipcMain.handle("amp:set-params", (_e, params) =>
   ampSim.setParams(params || {}),
 );
-ipcMain.handle("amp:stop", () => {
-  ampSim.stop();
+ipcMain.handle("amp:stop", async () => {
+  await ampSim.stop();
   return true;
 });
 ipcMain.handle("amp:status", () => ampSim.getStatus());
+
+// ── Tone Studio IPC (local preset + cabinet-IR persistence) ──────────────────
+ipcMain.handle("tone:list-presets", () => toneStore.listPresets());
+ipcMain.handle("tone:save-preset", (_e, preset) => toneStore.savePreset(preset));
+ipcMain.handle("tone:delete-preset", (_e, id) => toneStore.deletePreset(id));
+ipcMain.handle("tone:list-irs", () => toneStore.listIRs());
+ipcMain.handle("tone:delete-ir", (_e, id) => toneStore.deleteIR(id));
+ipcMain.handle("tone:import-ir", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Wybierz plik IR (WAV)",
+    filters: [{ name: "WAV", extensions: ["wav"] }],
+    properties: ["openFile"],
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  return toneStore.importIR(result.filePaths[0]);
+});
+ipcMain.handle("tone:list-nam-models", () => toneStore.listNamModels());
+ipcMain.handle("tone:delete-nam-model", (_e, id) => toneStore.deleteNamModel(id));
+ipcMain.handle("tone:import-nam-model", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Wybierz plik modelu NAM (.nam)",
+    filters: [{ name: "NAM", extensions: ["nam"] }],
+    properties: ["openFile"],
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  return toneStore.importNamModel(result.filePaths[0]);
+});
 
 // ── Tray / dock integration ──────────────────────────────────────────────────
 function createTray() {

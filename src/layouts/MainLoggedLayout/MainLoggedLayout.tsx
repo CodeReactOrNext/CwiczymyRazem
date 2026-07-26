@@ -1,4 +1,5 @@
 import { RockSidebar } from "components/RockSidebar";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -25,8 +26,13 @@ const MainLoggedLayout = ({
   variant,
   wide = false,
 }: LandingLayoutProps) => {
+  const { isElectron } = useElectronWindowControls();
+
   return (
-    <main className='h-[100dvh] bg-zinc-950 font-sans overflow-hidden'>
+    <main
+      className={`bg-zinc-950 font-sans overflow-hidden ${
+        isElectron ? "h-[calc(100dvh-2.5rem)]" : "h-[100dvh]"
+      }`}>
       {/* Subtle background texture */}
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02)_0%,transparent_80%)] opacity-20'></div>
 

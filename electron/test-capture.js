@@ -3,7 +3,7 @@
 const { app } = require("electron");
 const audioBridge = require("./audioBridge");
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   let frames = 0;
   let samples = 0;
   let peak = 0;
@@ -12,7 +12,7 @@ app.whenReady().then(() => {
     const dev = devices.find((d) => d.inputChannels > 0);
     if (!dev) { console.log("NO_INPUT_DEVICE"); return app.quit(); }
 
-    const info = audioBridge.start(
+    const info = await audioBridge.start(
       { deviceId: dev.id, channel: 0, frameSize: 256 },
       (buf) => {
         frames++;

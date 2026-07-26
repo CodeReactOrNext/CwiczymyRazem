@@ -70,5 +70,5 @@ export default SummaryPage;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "profile", "footer", "achievements", "toast", "skills", "songs", "chat", "my_plans", "exercises"],
+  translations: ["common", "profile", "footer", "achievements", "toast", "skills", "songs", "my_plans", "exercises"],
 });

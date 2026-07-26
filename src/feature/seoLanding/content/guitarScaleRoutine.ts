@@ -216,10 +216,6 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
     "daily-guitar-practice-plan",
     "intermediate-guitar-practice-routine",
   ],
-  relatedBlogSlugs: [
-    "how-to-practice-guitar-scales-effectively",
-    "is-deliberate-practice-necessary-for-guitar",
-    "guitar-practice-goal-setting",
-  ],
+  relatedBlogSlugs: ["how-to-practice-guitar-scales-effectively"],
   relatedSongGuideSlugs: ["stairway-to-heaven"],
 };

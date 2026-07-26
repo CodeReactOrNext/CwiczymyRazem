@@ -32,6 +32,7 @@ import Analytics from "components/Analytics/Analytics";
 import { ElectronIntegrations } from "components/ElectronIntegrations";
 import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
+import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
 import useAuthSync from "hooks/useAuthSync";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import dynamic from "next/dynamic";
@@ -111,6 +112,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                   <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
                     <ElectronTitleBar />
                     <ElectronIntegrations />
+                    <DesktopNotifications />
                     <NextTopLoader color='#06b6d4' />
                     <div id='overlays'></div>
                     {page}
@@ -139,6 +141,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                   <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
                     <ElectronTitleBar />
                     <ElectronIntegrations />
+                    <DesktopNotifications />
                     <Toaster position='top-right' toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />

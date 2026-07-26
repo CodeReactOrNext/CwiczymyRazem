@@ -28,4 +28,5 @@ export type NavPagesTypes =
   | "favorites"
   | "roadmap"
   | "practice-log"
+  | "tone-studio"
   | null;

@@ -3,7 +3,6 @@
  */
 import type not_found from "../../public/locales/en/404.json";
 import type achievements from "../../public/locales/en/achievements.json";
-import type chat from "../../public/locales/en/chat.json";
 import type common from "../../public/locales/en/common.json";
 import type exercises from "../../public/locales/en/exercises.json";
 import type faq from "../../public/locales/en/faq.json";
@@ -37,6 +36,5 @@ export interface I18nNamespaces {
   timer: typeof timer;
   toast: typeof toast;
   skills: typeof skills;
-  chat: typeof chat;
   exercises: typeof exercises;
 }

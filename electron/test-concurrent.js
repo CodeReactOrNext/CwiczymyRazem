@@ -25,13 +25,13 @@ async function main() {
   const onFrame = () => { frames++; };
 
   // 1. Capture alone.
-  engine.attachCapture({ deviceId: dev.id, channel: 0, frameSize: 256 }, onFrame);
+  await engine.attachCapture({ deviceId: dev.id, channel: 0, frameSize: 256 }, onFrame);
   await wait(500);
   console.log(frames > 0 ? "CAPTURE_ALONE_OK frames=" + frames : "CAPTURE_ALONE_FAIL frames=" + frames);
 
   // 2. Amp alone (capture detached first).
-  engine.detachCapture();
-  engine.attachAmp({ deviceId: dev.id, channel: 0, frameSize: 256, params: { drive: 0.7, tone: 0.5, level: 0.6, cab: true } });
+  await engine.detachCapture();
+  await engine.attachAmp({ deviceId: dev.id, channel: 0, frameSize: 256, params: { drive: 0.7, bass: 0.5, mid: 0.5, treble: 0.5, level: 0.6, cab: true, gate: true } });
   await wait(500);
   console.log(engine.getAmpStatus().isOpen ? "AMP_ALONE_OK" : "AMP_ALONE_FAIL");
 
@@ -39,7 +39,7 @@ async function main() {
   // Before this fix, this combination was impossible — attaching either one always
   // killed the other's stream.
   frames = 0;
-  engine.attachCapture({ deviceId: dev.id, channel: 0, frameSize: 256 }, onFrame);
+  await engine.attachCapture({ deviceId: dev.id, channel: 0, frameSize: 256 }, onFrame);
   await wait(500);
   const bothStatus = { capture: engine.getCaptureStatus().isOpen, amp: engine.getAmpStatus().isOpen };
   const bothOk = frames > 0 && bothStatus.capture && bothStatus.amp;
@@ -48,7 +48,7 @@ async function main() {
 
   // 4. Detach amp — capture must keep flowing uninterrupted.
   frames = 0;
-  engine.detachAmp();
+  await engine.detachAmp();
   await wait(500);
   console.log(!engine.getAmpStatus().isOpen && frames > 0 ? "AMP_DETACH_OK frames=" + frames : "AMP_DETACH_FAIL frames=" + frames);
 

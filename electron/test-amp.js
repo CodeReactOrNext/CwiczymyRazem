@@ -4,7 +4,7 @@ const { app } = require("electron");
 const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   const { devices } = audioBridge.listDevices();
   // Prefer a real interface that has both inputs and outputs.
   const candidates = devices.filter((d) => d.inputChannels > 0 && d.outputChannels > 0);
@@ -14,12 +14,12 @@ app.whenReady().then(() => {
   let started = null;
   for (const dev of candidates) {
     try {
-      started = ampSim.start({ deviceId: dev.id, channel: 0, frameSize: 256, params: { drive: 0.7, tone: 0.5, level: 0.6, cab: true } });
+      started = await ampSim.start({ deviceId: dev.id, channel: 0, frameSize: 256, params: { drive: 0.7, bass: 0.5, mid: 0.5, treble: 0.5, level: 0.6, cab: true, gate: true } });
       console.log("AMP_OPEN device=" + JSON.stringify(started.deviceName) +
         " sr=" + started.sampleRate + " frame=" + started.frameSize +
         " outCh=" + started.outChannels + " roundTripMs=" + started.roundTripMs.toFixed(2));
       break;
-    } catch (e) { lastErr = (e && e.message) || String(e); ampSim.stop(); }
+    } catch (e) { lastErr = (e && e.message) || String(e); await ampSim.stop(); }
   }
   if (!started) { console.log("AMP_OPEN_FAIL " + lastErr); return app.quit(); }
 

@@ -140,11 +140,6 @@ const nextConfig = {
         destination: '/blog/how-to-track-guitar-practice-progress-effectively',
         permanent: true,
       },
-      {
-        source: '/blog/how-to-set-guitar-practice-goals',
-        destination: '/blog/guitar-practice-goal-setting',
-        permanent: true,
-      },
       // SEO consolidation (2026-07): resolved a second round of keyword cannibalization
       // across six topic clusters, each collapsed onto its best-performing post per
       // Search Console data. See issue #644.
@@ -295,27 +290,6 @@ const nextConfig = {
       {
         source: '/blog/practice-habits',
         destination: '/blog/how-to-track-guitar-practice-progress-effectively',
-        permanent: true,
-      },
-      // Cluster: "guitar practice stagnation"
-      {
-        source: '/blog/why-youre-not-improving-at-guitar-8-common-reasons',
-        destination: '/blog/guitar-practice-stagnation-solutions',
-        permanent: true,
-      },
-      {
-        source: '/blog/why-am-i-not-improving-at-guitar',
-        destination: '/blog/guitar-practice-stagnation-solutions',
-        permanent: true,
-      },
-      {
-        source: '/blog/why-is-my-guitar-playing-not-improving-after-months',
-        destination: '/blog/guitar-practice-stagnation-solutions',
-        permanent: true,
-      },
-      {
-        source: '/blog/why-is-my-guitar-practice-inconsistent',
-        destination: '/blog/guitar-practice-stagnation-solutions',
         permanent: true,
       },
       // Cluster: "how long to practice guitar daily"

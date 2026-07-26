@@ -12,6 +12,9 @@ directories:
 
 files:
   - electron/**/*
+  # Rebuild reference for electron/nam/nam.wasm — not needed at runtime.
+  - "!electron/nam/wrapper.cpp"
+  - "!electron/nam/README.md"
   - public/favicon/**/*
   - package.json
   # Exclude the whole Next.js dependency tree, then whitelist the native audio

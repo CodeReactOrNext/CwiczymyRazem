@@ -1,0 +1,83 @@
+# NAM WASM core
+
+`nam.wasm` + `nam.js` are a compiled build of the real
+[NeuralAmpModelerCore](https://github.com/sdatkinson/NeuralAmpModelerCore) (MIT) —
+the same C++/Eigen DSP library real NAM plugins use to run `.nam` captured-amp
+models — plus `wrapper.cpp`, a thin C API exposing model load/process/reset to
+JS. This is a vendored prebuilt artifact (like `audify`'s native binary); there
+is no build step for it in this repo's normal `npm run` scripts.
+
+## Why WASM instead of a native Node addon
+
+A pure-JS reimplementation of WaveNet inference was benchmarked at ~0.5x
+real-time for the "standard" NAM architecture (16/8 channels, 10 dilations) —
+not fast enough. A native Node addon around the real C++ core would need its
+own prebuilt-binary CI pipeline (this project's only other native dep, `audify`,
+ships prebuilt N-API binaries so no compiler is needed to build the app — NAM's
+core has no such npm package). Compiling the real core to WASM gets native-like
+speed (~2.2x real-time for the standard architecture, measured on this repo's
+dev machine) as a single portable file, with no compiler needed to build/run
+the app afterward — only to rebuild `nam.wasm` itself, which is rare.
+
+## Rebuilding
+
+Requires the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html)
+activated (`emsdk install latest && emsdk activate latest`), then from a checkout
+of `NeuralAmpModelerCore` with submodules fetched (`git submodule update --init --depth 1`):
+
+```sh
+emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions \
+  -I<NeuralAmpModelerCore>/NAM \
+  -I<NeuralAmpModelerCore>/Dependencies/eigen \
+  -I<NeuralAmpModelerCore>/Dependencies/nlohmann \
+  wrapper.cpp \
+  <NeuralAmpModelerCore>/NAM/activations.cpp \
+  <NeuralAmpModelerCore>/NAM/container.cpp \
+  <NeuralAmpModelerCore>/NAM/conv1d.cpp \
+  <NeuralAmpModelerCore>/NAM/convnet.cpp \
+  <NeuralAmpModelerCore>/NAM/dsp.cpp \
+  <NeuralAmpModelerCore>/NAM/get_dsp.cpp \
+  <NeuralAmpModelerCore>/NAM/linear.cpp \
+  <NeuralAmpModelerCore>/NAM/lstm.cpp \
+  <NeuralAmpModelerCore>/NAM/ring_buffer.cpp \
+  <NeuralAmpModelerCore>/NAM/util.cpp \
+  <NeuralAmpModelerCore>/NAM/wavenet/model.cpp \
+  <NeuralAmpModelerCore>/NAM/wavenet/slimmable.cpp \
+  -sMODULARIZE=1 -sEXPORT_NAME=createNamModule -sENVIRONMENT=node \
+  -sALLOW_MEMORY_GROWTH=1 -sDISABLE_EXCEPTION_CATCHING=0 \
+  -sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","HEAPF32","HEAPU8","stringToUTF8","lengthBytesUTF8"]' \
+  -sEXPORTED_FUNCTIONS='["_malloc","_free","_nam_load","_nam_unload","_nam_is_loaded","_nam_set_sample_rate","_nam_reset","_nam_process","_nam_get_buffer","_nam_buffer_capacity"]' \
+  -o nam.js
+```
+
+(`NAM/wavenet/slimmable.cpp` must be included — `model.cpp` references
+`nam::slimmable_wavenet::create_config` even for non-slimmable models.
+`NAM_ENABLE_A2_FAST` / `NAM/wavenet/a2_fast.cpp` are deliberately NOT compiled
+in — that fast path wasn't needed to clear real-time, and skipping it keeps
+the build surface smaller.)
+
+## Loading a model — the stack-overflow trap
+
+`nam_load` takes a `const char*` (the `.nam` file's raw JSON text). **Never**
+pass it via `ccall(..., ["string"])` — that marshalling stack-allocates the
+string, and a real model's JSON (weights array included) can be several MB
+while the default WASM stack is 64KB. Always write it to the heap yourself:
+
+```js
+const len = Module.lengthBytesUTF8(jsonStr) + 1;
+const ptr = Module._malloc(len);
+Module.stringToUTF8(jsonStr, ptr, len);
+Module.ccall("nam_load", "number", ["number"], [ptr]);
+Module._free(ptr);
+```
+
+See `electron/dsp/nam.js` for the wrapper that does this.
+
+## Per-sample call overhead — why processing is batched
+
+Calling `nam_process(1)` once per audio sample (matching `ampSim.js`'s
+sample-at-a-time `process(x)` convention) measured at ~0.7x real-time — the
+JS↔WASM boundary crossing cost dominates at 48000+ calls/sec. Batching into
+64-sample blocks recovers ~2.2x real-time at the cost of ~1.3ms of added
+latency. `electron/dsp/nam.js` does this batching internally so callers still
+see a plain `process(x)` per-sample interface.

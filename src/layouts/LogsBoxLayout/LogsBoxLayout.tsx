@@ -4,7 +4,8 @@ import Changelog, {
   useChangelogData,
 } from "components/Changelog/Changelog";
 import type { AchievementList } from "feature/achievements/types";
-import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
+import DiscordChatEmbed from "feature/discordBot/components/DiscordChatEmbed";
+import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
@@ -16,11 +17,9 @@ import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
-import { FaGuitar, FaMedal } from "react-icons/fa";
+import { FaDiscord, FaGuitar, FaMedal } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
-import { IoChatboxEllipses } from "react-icons/io5";
 
-import Chat from "../../feature/chat/Chat";
 import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
@@ -42,21 +41,15 @@ const LogsBoxLayout = ({
   className = "",
 }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "discord" | "excerise" | "chat" | "changelog"
+    "logs" | "achievements" | "discord" | "excerise" | "changelog"
   >("logs");
   const [changelogDotHidden, setChangelogDotHidden] = useState(false);
-
-  const {
-    unreadCount: unreadChats,
-    hasNewMessages: hasNewChats,
-    markAsRead: markChatsAsRead,
-  } = useUnreadMessages("chats");
 
   const {
     unreadCount: unreadLogs,
     hasNewMessages: hasNewLogs,
     markAsRead: markLogsAsRead,
-  } = useUnreadMessages("logs");
+  } = useUnreadMessages();
 
   const { changelog } = useChangelogData("2026-05");
 
@@ -71,9 +64,7 @@ const LogsBoxLayout = ({
   const { t } = useTranslation("common");
 
   const handleCategoryChange = (category: typeof showedCategory) => {
-    if (category === "chat" || showedCategory === "chat") {
-      markChatsAsRead();
-    } else if (category === "logs") {
+    if (category === "logs") {
       markLogsAsRead();
     } else if (category === "changelog") {
       // Zapis "przeczytane" robi sam <Changelog/> po zamontowaniu — dzięki temu
@@ -87,7 +78,7 @@ const LogsBoxLayout = ({
     <Card
       className={`relative m-auto flex ${
         showedCategory !== "achievements" && !className.includes("h-")
-          ? "h-[800px]"
+          ? "h-[520px] sm:h-[650px] lg:h-[800px]"
           : ""
       } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
       <div className='left-0 top-0 mb-2 flex flex-row justify-around gap-4 font-bold'>
@@ -96,16 +87,14 @@ const LogsBoxLayout = ({
           active={showedCategory === "logs"}
           onClick={() => handleCategoryChange("logs")}
           Icon={FaGuitar}
-          notificationCount={showedCategory === "chat" ? 0 : unreadLogs}
-          hasNewMessages={showedCategory === "chat" ? false : hasNewLogs}
+          notificationCount={unreadLogs}
+          hasNewMessages={hasNewLogs}
         />
         <LogsBoxButton
-          title='Chat'
-          active={showedCategory === "chat"}
-          onClick={() => handleCategoryChange("chat")}
-          Icon={IoChatboxEllipses}
-          notificationCount={unreadChats}
-          hasNewMessages={hasNewChats}
+          title='Discord'
+          active={showedCategory === "discord"}
+          onClick={() => handleCategoryChange("discord")}
+          Icon={FaDiscord}
         />
         {!className.includes("border-none") && (
           <>
@@ -147,7 +136,7 @@ const LogsBoxLayout = ({
             <Changelog month='2026-05' />
           </m.div>
         )}
-        {(showedCategory === "logs" || showedCategory === "chat") && (
+        {(showedCategory === "logs" || showedCategory === "discord") && (
           <m.div
             key={showedCategory}
             initial={{ opacity: 0, y: 6 }}
@@ -165,7 +154,7 @@ const LogsBoxLayout = ({
               </div>
             )}
 
-            {showedCategory === "chat" && <Chat />}
+            {showedCategory === "discord" && <DiscordChatEmbed />}
           </m.div>
         )}
       </AnimatePresence>

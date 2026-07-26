@@ -7,6 +7,10 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
+import {
+  notificationHref,
+  placeSuffix,
+} from "feature/notifications/services/notification.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -26,13 +30,6 @@ import {
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
-
-const placeSuffix = (place: number) => {
-  if (place === 1) return "st";
-  if (place === 2) return "nd";
-  if (place === 3) return "rd";
-  return "th";
-};
 
 const typeConfig = {
   like: {
@@ -184,19 +181,6 @@ export const NotificationsBell = () => {
     useAppNotifications(userId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-
-  // Where (if anywhere) a notification deep-links when clicked.
-  const notificationHref = (n: any): string | null => {
-    if (n.type === "marketplace_sold") return "/arsenal?tab=market";
-    if (
-      (n.type === "playlist_saved" || n.type === "playlist_liked") &&
-      n.playlistId
-    )
-      return `/songs?view=playlists&playlistId=${n.playlistId}`;
-    if (n.type === "exercise_thanked" || n.type === "exercise_completed")
-      return "/profile/skills?tab=community";
-    return null;
-  };
 
   const handleNotificationClick = (n: any) => {
     markAsRead(n.id);

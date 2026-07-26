@@ -7,6 +7,7 @@ import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { Checklist } from 'components/Blog/Checklist';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
+import { PatternBackground } from 'components/Blog/PatternBackground';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
 import { PracticeTable } from 'components/Blog/PracticeTable';
 import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
@@ -117,6 +118,41 @@ const components = {
   ),
   // Content images live below the fold; lazy-load them to cut initial page weight
   img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
+  // Expert-quote blockquotes get the same repeating-icon treatment as BlogAlert,
+  // just smaller/tighter so the box doesn't dominate the page
+  blockquote: ({ children, ...rest }: any) => (
+    <div className='relative my-10 overflow-hidden rounded-lg bg-zinc-800/40 px-6 py-8 sm:px-10'>
+      <PatternBackground
+        icon={
+          <g>
+            <path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
+            <path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
+          </g>
+        }
+        strokeClass='stroke-cyan-400'
+      />
+      <blockquote
+        {...rest}
+        className='relative m-0 border-0 text-center text-base italic leading-relaxed text-zinc-200 [&>p]:m-0 [&>p]:before:content-none [&>p]:after:content-none'
+      >
+        {children}
+      </blockquote>
+    </div>
+  ),
+  // Source citations are written as `[\[5\]](url)`; render them as small,
+  // superscript-style markers so they read as footnotes, not body links
+  a: ({ children, ...rest }: any) => {
+    const text = Array.isArray(children) ? children.join('') : (children?.toString() ?? '');
+    const isCitation = /^\[\d+\]$/.test(text.trim());
+    return (
+      <a
+        {...rest}
+        className={isCitation ? 'align-super text-[0.65em] text-zinc-500 no-underline hover:text-zinc-300' : undefined}
+      >
+        {children}
+      </a>
+    );
+  },
   // GFM task-list checkboxes render as bare inputs; give them an accessible name
   input: (props: any) =>
     props.type === 'checkbox' ? (
@@ -334,7 +370,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
 
             <div className="flex-1 min-w-0 max-w-full lg:max-w-3xl mx-auto lg:mx-0 overflow-hidden">
               <div
-                className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-blockquote:text-xl prose-blockquote:leading-relaxed prose-blockquote:text-center prose-blockquote:pb-10 prose-blockquote:pt-14 prose-blockquote:px-6 sm:prose-blockquote:px-14 prose-blockquote:my-12 prose-blockquote:font-normal prose-blockquote:italic prose-blockquote:text-zinc-200 prose-blockquote:bg-zinc-800/40 prose-blockquote:border-0 prose-blockquote:rounded-lg prose-blockquote:relative prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
+                className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
                 dangerouslySetInnerHTML={{ __html: contentHtml }}
               />
 

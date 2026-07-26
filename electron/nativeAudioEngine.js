@@ -12,6 +12,27 @@
 const { RtAudioFormat, RtAudioApi } = require("audify");
 const { AmpChain } = require("./ampSim");
 const shared = require("./rtaudio");
+const toneStore = require("./toneStore");
+
+/** Resolves a cabinet `irId` and/or a NAM `namModelId` in an amp params patch to
+ *  actual file contents (Float32 samples / raw .nam JSON) before handing the patch
+ *  to AmpChain (which stays fs/Electron-free on purpose — see ampSim.js). Skips the
+ *  disk read entirely when an id hasn't actually changed, so live slider tweaks
+ *  (which never include these ids) never trigger it, and re-selecting the same
+ *  IR/model twice doesn't re-read it either. */
+function resolveAmpPatch(patch, chain) {
+  if (!patch || !chain) return patch;
+  let resolved = patch;
+  if ("irId" in patch && patch.irId !== chain.params.irId) {
+    const irSamples = patch.irId ? toneStore.getIRSamples(patch.irId, chain.sr) : null;
+    resolved = { ...resolved, irSamples };
+  }
+  if ("namModelId" in patch && patch.namModelId !== chain.params.namModelId) {
+    const namModelJson = patch.namModelId ? toneStore.getNamModelJson(patch.namModelId) : null;
+    resolved = { ...resolved, namModelJson };
+  }
+  return resolved;
+}
 
 let captureConsumer = null; // { requested: {deviceId, channel, sampleRate, frameSize}, onFrame }
 let ampConsumer = null;     // { requested: {deviceId, channel, sampleRate, frameSize, outputDeviceId}, params }
@@ -22,6 +43,93 @@ let ampChain = null;
 let openShape = null;
 let captureInfo = null;
 let ampInfo = null;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// ── Diagnostic-only latency instrumentation (AUDIO_LATENCY_DEBUG=1) ──────────
+// electron/test-output-queue-latency.js measures audify's input/output hand-off
+// in isolation (a bare RtAudio instance, trivial passthrough, no window). This
+// hooks the same measurement into the REAL running app + REAL AmpChain DSP,
+// because the isolated test can't see load from an actual open BrowserWindow/
+// renderer, which the isolated test showed is NOT where audify's own overhead
+// lives (~4ms there) — so if the real app measures much higher, the difference
+// is coming from something specific to running inside the full app, not audify
+// itself. Zero-cost when the env var isn't set: no timers, no arrays, no extra
+// work on the audio callback.
+const DEBUG_TIMING = !!process.env.AUDIO_LATENCY_DEBUG;
+let debugPendingWrites = [];
+let debugProcessMs = [];
+let debugQueueDelaysMs = [];
+
+function debugOnFrameOutput() {
+  const tConsumed = process.hrtime.bigint();
+  const tWrite = debugPendingWrites.shift();
+  if (tWrite !== undefined) debugQueueDelaysMs.push(Number(tConsumed - tWrite) / 1e6);
+}
+
+function debugStats(arr) {
+  if (arr.length < 10) return null;
+  const n = arr.length;
+  const mean = arr.reduce((a, b) => a + b, 0) / n;
+  const max = Math.max(...arr);
+  return `mean=${mean.toFixed(3)}ms max=${max.toFixed(3)}ms n=${n}`;
+}
+
+if (DEBUG_TIMING) {
+  const timer = setInterval(() => {
+    const processStats = debugStats(debugProcessMs);
+    const queueStats = debugStats(debugQueueDelaysMs);
+    if (processStats || queueStats) {
+      console.log(
+        `[audio-latency-debug] callback->write (DSP): ${processStats || "n/a"}  |  write->consumed (audify queue): ${queueStats || "n/a"}`
+      );
+    }
+    debugProcessMs = [];
+    debugQueueDelaysMs = [];
+  }, 3000);
+  if (timer.unref) timer.unref();
+}
+
+// Some ASIO drivers hand back an oversized "safe" buffer on the first open right
+// after a stream teardown — before settling into their real low-latency path —
+// instead of the small size we asked for. That's what makes latency read as fine
+// one time the amp is turned on and audibly high (a few hundred ms) the next,
+// with nothing else about the request having changed. Closing and reopening
+// again (with a short pause so the driver fully releases the previous buffer)
+// consistently gets the small buffer instead of carrying the inflated one for
+// the rest of the session.
+const MAX_OPEN_ATTEMPTS = 3;
+const REOPEN_DELAY_MS = 150;
+function isOversized(actualFrame, requestedFrameSize) {
+  return actualFrame > requestedFrameSize * 2;
+}
+
+/** Opens the stream, retrying (close + short pause + reopen) while the driver
+ *  keeps handing back a way-oversized buffer. Only starts the stream once it
+ *  settles on an acceptable size or attempts run out, so a discarded oversized
+ *  attempt never audibly starts. */
+async function openStreamWithRetry(rt, outParams, inParams, sampleRate, requestedFrameSize) {
+  let actualFrame;
+  for (let attempt = 1; attempt <= MAX_OPEN_ATTEMPTS; attempt++) {
+    actualFrame = rt.openStream(
+      outParams,
+      inParams,
+      RtAudioFormat.RTAUDIO_FLOAT32,
+      sampleRate,
+      requestedFrameSize,
+      "CwiczymyRazem-native",
+      onInputBlock,
+      DEBUG_TIMING ? debugOnFrameOutput : null
+    );
+    if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
+    shared.closeStream();
+    await sleep(REOPEN_DELAY_MS);
+  }
+  rt.start();
+  return actualFrame;
+}
 
 function listDevices() {
   const rt = shared.getRt();
@@ -155,6 +263,8 @@ function recomputeInfos() {
  *  duplex anyway) when duplex. Reads live module state on every call so attach/detach
  *  that doesn't change the stream's shape needs no new callback. */
 function onInputBlock(inputBuffer) {
+  const tStart = DEBUG_TIMING ? process.hrtime.bigint() : null;
+
   if (captureConsumer) {
     try { captureConsumer.onFrame(inputBuffer); } catch { /* isolate: a bad consumer must not break amp output */ }
   }
@@ -183,16 +293,36 @@ function onInputBlock(inputBuffer) {
 
   try { rt.write(Buffer.from(out.buffer, out.byteOffset, out.byteLength)); }
   catch { /* stream closing — drop this block */ }
+
+  if (DEBUG_TIMING) {
+    const tWrite = process.hrtime.bigint();
+    debugProcessMs.push(Number(tWrite - tStart) / 1e6);
+    debugPendingWrites.push(tWrite);
+  }
+}
+
+// ensureOpen() now awaits across retried opens (see openStreamWithRetry above),
+// where previously it ran start-to-finish synchronously. Two overlapping callers
+// (e.g. capture attaching while the amp's reopen is mid-retry-sleep) would
+// otherwise both touch the single shared `rt` stream at once. Queue keeps calls
+// serialized — each caller still gets its own resolution/rejection, only the
+// underlying work is ordered.
+let ensureOpenQueue = Promise.resolve();
+function ensureOpen() {
+  const result = ensureOpenQueue.then(ensureOpenInner);
+  ensureOpenQueue = result.catch(() => {});
+  return result;
 }
 
 /** Reconciles the live stream with whatever consumers are currently attached.
  *  Validates/resolves devices before touching anything, so a bad request throws
  *  without disturbing an already-running session. */
-function ensureOpen() {
+async function ensureOpenInner() {
   const desired = computeDesiredShape(); // may throw — nothing mutated yet if it does
 
   if (!desired) {
     shared.closeStream();
+    if (DEBUG_TIMING) debugPendingWrites = []; // a closed stream will never consume these — don't let a future reopen dequeue stale timestamps
     openShape = null;
     ampChain = null;
     recomputeInfos();
@@ -204,7 +334,7 @@ function ensureOpen() {
   if (shapesEqual(openShape, desired) && shared.isStreamOpen()) {
     if (ampConsumer) {
       if (!ampChain) ampChain = new AmpChain(openShape.sampleRate);
-      ampChain.setParams(ampConsumer.params || {});
+      ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
     } else {
       ampChain = null;
     }
@@ -213,24 +343,15 @@ function ensureOpen() {
   }
 
   shared.closeStream();
+  if (DEBUG_TIMING) debugPendingWrites = []; // same — the old queue is gone, don't dequeue stale entries against the new stream
 
   const outParams = desired.duplex ? { deviceId: desired.outDeviceId, nChannels: desired.outChannels, firstChannel: 0 } : null;
   const inParams = { deviceId: desired.deviceId, nChannels: 1, firstChannel: desired.channel };
 
   ampChain = desired.duplex ? new AmpChain(desired.sampleRate) : null;
-  if (ampChain && ampConsumer) ampChain.setParams(ampConsumer.params || {});
+  if (ampChain && ampConsumer) ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
 
-  const actualFrame = rt.openStream(
-    outParams,
-    inParams,
-    RtAudioFormat.RTAUDIO_FLOAT32,
-    desired.sampleRate,
-    desired.requestedFrameSize,
-    "CwiczymyRazem-native",
-    onInputBlock,
-    null
-  );
-  rt.start();
+  const actualFrame = await openStreamWithRetry(rt, outParams, inParams, desired.sampleRate, desired.requestedFrameSize);
 
   let streamLatencyFrames = 0;
   try { streamLatencyFrames = rt.getStreamLatency ? rt.getStreamLatency() : 0; } catch { /* ignore */ }
@@ -239,7 +360,7 @@ function ensureOpen() {
   recomputeInfos();
 }
 
-function attachCapture(opts, onFrame) {
+async function attachCapture(opts, onFrame) {
   captureConsumer = {
     requested: {
       deviceId: opts.deviceId,
@@ -250,7 +371,7 @@ function attachCapture(opts, onFrame) {
     onFrame,
   };
   try {
-    ensureOpen();
+    await ensureOpen();
   } catch (err) {
     captureConsumer = null;
     throw err;
@@ -258,16 +379,16 @@ function attachCapture(opts, onFrame) {
   return captureInfo;
 }
 
-function detachCapture() {
+async function detachCapture() {
   captureConsumer = null;
-  try { ensureOpen(); } catch { /* best-effort reconcile of whatever's left attached */ }
+  try { await ensureOpen(); } catch { /* best-effort reconcile of whatever's left attached */ }
 }
 
 function getCaptureStatus() {
   return { isOpen: !!captureConsumer, info: captureInfo };
 }
 
-function attachAmp(opts = {}) {
+async function attachAmp(opts = {}) {
   ampConsumer = {
     requested: {
       deviceId: opts.deviceId,
@@ -279,7 +400,7 @@ function attachAmp(opts = {}) {
     params: opts.params || {},
   };
   try {
-    ensureOpen();
+    await ensureOpen();
   } catch (err) {
     ampConsumer = null;
     throw err;
@@ -289,14 +410,14 @@ function attachAmp(opts = {}) {
 
 function updateAmpParams(params) {
   if (ampConsumer) ampConsumer.params = { ...ampConsumer.params, ...(params || {}) };
-  if (ampChain) ampChain.setParams(params || {});
+  if (ampChain) ampChain.setParams(resolveAmpPatch(params || {}, ampChain));
   if (ampInfo && ampChain) ampInfo.params = ampChain.params;
   return ampInfo;
 }
 
-function detachAmp() {
+async function detachAmp() {
   ampConsumer = null;
-  try { ensureOpen(); } catch { /* best-effort reconcile of whatever's left attached */ }
+  try { await ensureOpen(); } catch { /* best-effort reconcile of whatever's left attached */ }
 }
 
 function getAmpStatus() {

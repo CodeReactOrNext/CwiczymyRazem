@@ -16,12 +16,12 @@ import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDe
 import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
-import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { LogReaction } from "feature/logs/components/LogReaction";
+import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
@@ -992,7 +992,7 @@ const GroupedLogItem = ({
 };
 
 const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
-  const { isNewMessage } = useUnreadMessages("logs");
+  const { isNewMessage } = useUnreadMessages();
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);

@@ -252,10 +252,6 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
     "intermediate-guitar-practice-routine",
     "guitar-scale-practice-routine",
   ],
-  relatedBlogSlugs: [
-    "how-long-practice-guitar-daily",
-    "guitar-practice-mental-preparation",
-    "practice-guitar-every-day-simple-steps",
-  ],
+  relatedBlogSlugs: ["how-long-practice-guitar-daily", "practice-guitar-every-day-simple-steps"],
   relatedSongGuideSlugs: ["nothing-else-matters"],
 };

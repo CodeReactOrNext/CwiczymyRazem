@@ -36,7 +36,7 @@ const SkeletonLogRow = () => (
 const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
   <Card
     className={`relative m-auto flex ${
-      !className.includes("h-") ? "h-[800px]" : ""
+      !className.includes("h-") ? "h-[520px] sm:h-[650px] lg:h-[800px]" : ""
     } font-openSans flex-col p-1 ${
       className.includes("border-none") ? "pb-24" : "pb-3"
     } text-xs leading-5 rounded-xl xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
