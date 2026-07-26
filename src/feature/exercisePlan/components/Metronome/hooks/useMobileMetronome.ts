@@ -2,6 +2,13 @@ import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNati
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import {
+  type AccentLevel,
+  cycleAccentLevel,
+  DEFAULT_ACCENT_PATTERN,
+  getAccentLevel,
+  resizeAccentPattern,
+} from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
 import { isIOSDevice } from "../utils/deviceDetection";
 
@@ -45,6 +52,11 @@ export const useMobileMetronome = ({
   // Clicks per beat: 1 = plain quarter notes (no subdivision), 2 = eighth notes,
   // 3 = eighth-note triplets, 4 = sixteenth notes.
   const [subdivision, setSubdivision] = useState(1);
+  // One entry per beat in the bar — its length *is* the time signature's
+  // numerator (custom meters), each entry's value is that beat's accent level.
+  const [accentPattern, setAccentPattern] = useState<AccentLevel[]>(DEFAULT_ACCENT_PATTERN);
+  // Which beat in the pattern is currently sounding — drives the UI's playhead highlight.
+  const [currentBeat, setCurrentBeat] = useState(0);
   // Playback anchor mirrored into React state. The refs are set by the scheduler
   // on the first scheduled beat, which on a skipCountIn start (loop restart,
   // live seek) changes no state at all — without this mirror the memoized
@@ -60,6 +72,9 @@ export const useMobileMetronome = ({
   const startTimeRef = useRef<number | null>(null);
   const audioStartTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
+  // Count-in length in beats — mirrors accentPattern.length at start time, so
+  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4".
+  const countInStartRef  = useRef<number>(4);
   const beatCounterRef = useRef<number>(0);
   // Position within the current beat's subdivision grid — 0 is always the beat
   // itself, anything else is a subdivision tick between beats.
@@ -198,8 +213,13 @@ export const useMobileMetronome = ({
     while (nextNoteTimeRef.current < currentTime + 0.1) {
       if (countInTargetRef.current > 0) {
         // The count-in is always plain quarter notes — subdivision only kicks in
-        // once real playback starts below.
-        scheduleNote(nextNoteTimeRef.current, countInTargetRef.current === 4 ? 'accent' : 'beat');
+        // once real playback starts below. It previews the same accent pattern
+        // that will play once the bar starts, so a muted beat stays silent here too.
+        const countInBeatIndex = countInStartRef.current - countInTargetRef.current;
+        const countInLevel     = getAccentLevel(accentPattern, countInBeatIndex);
+        if (countInLevel !== 0) {
+          scheduleNote(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat');
+        }
         setCountInRemaining(countInTargetRef.current);
         countInTargetRef.current -= 1;
         nextNoteTimeRef.current  += secondsPerBeat;
@@ -223,8 +243,11 @@ export const useMobileMetronome = ({
         }
 
         if (isBeat) {
-          scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0 ? 'accent' : 'beat');
+          const beatIndex = beatCounterRef.current;
+          const level     = getAccentLevel(accentPattern, beatIndex);
+          if (level !== 0) scheduleNote(nextNoteTimeRef.current, level === 2 ? 'accent' : 'beat');
           beatCounterRef.current += 1;
+          setCurrentBeat(accentPattern.length > 0 ? beatIndex % accentPattern.length : 0);
         } else {
           scheduleNote(nextNoteTimeRef.current, 'sub');
         }
@@ -236,7 +259,7 @@ export const useMobileMetronome = ({
 
     // Use lookahead scheduling for better timing accuracy on mobile
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, speedMultiplier, subdivision, scheduleNote]);
+  }, [bpm, speedMultiplier, subdivision, accentPattern, scheduleNote]);
 
   // Resume audio context if suspended (common on mobile)
   const resumeAudioContext = useCallback(async () => {
@@ -259,20 +282,23 @@ export const useMobileMetronome = ({
     }
 
     if (audioContextRef.current) {
-      const useCountIn = !options?.skipCountIn;
+      const useCountIn   = !options?.skipCountIn;
+      const countInBeats = Math.max(1, accentPattern.length);
       nextNoteTimeRef.current   = audioContextRef.current.currentTime;
-      countInTargetRef.current  = useCountIn ? 4 : 0;
-      setCountInRemaining(useCountIn ? 4 : 0);
+      countInTargetRef.current  = useCountIn ? countInBeats : 0;
+      countInStartRef.current   = countInBeats;
+      setCountInRemaining(useCountIn ? countInBeats : 0);
       startTimeRef.current      = null;
       audioStartTimeRef.current = null;
       beatCounterRef.current    = 0;
       subdivisionIndexRef.current = 0;
       setPlaybackAnchor({ wall: null, audio: null });
+      setCurrentBeat(0);
       scheduler();
     }
 
     setIsPlaying(true);
-  }, [initializeAudio, resumeAudioContext, scheduler]);
+  }, [initializeAudio, resumeAudioContext, scheduler, accentPattern.length]);
 
   const stopMetronome = useCallback(() => {
     if (timeoutRef.current) {
@@ -361,6 +387,17 @@ export const useMobileMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  // Change the meter's beat count (its numerator, e.g. 4/4 → 5/4). New beats
+  // start as plain clicks; existing accents are kept.
+  const setBeatsPerBar = useCallback((count: number) => {
+    setAccentPattern((prev) => resizeAccentPattern(prev, count));
+  }, []);
+
+  // Click-to-cycle a single beat's accent: plain → accent → muted → plain.
+  const cycleBeatAccent = useCallback((index: number) => {
+    setAccentPattern((prev) => prev.map((level, i) => (i === index ? cycleAccentLevel(level) : level)));
+  }, []);
+
   const seekToBeats = useCallback((beats: number) => {
     // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
     // without waiting for the next React render cycle.
@@ -384,6 +421,10 @@ export const useMobileMetronome = ({
     setVolume,
     subdivision,
     setSubdivision,
+    accentPattern,
+    setBeatsPerBar,
+    cycleBeatAccent,
+    currentBeat,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -399,7 +440,7 @@ export const useMobileMetronome = ({
     audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
-    subdivision, setSubdivision,
+    subdivision, setSubdivision, accentPattern, setBeatsPerBar, cycleBeatAccent, currentBeat,
     toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
     handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
     playbackAnchor,

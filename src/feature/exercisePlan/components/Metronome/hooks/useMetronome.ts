@@ -2,6 +2,13 @@ import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNati
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import {
+  type AccentLevel,
+  cycleAccentLevel,
+  DEFAULT_ACCENT_PATTERN,
+  getAccentLevel,
+  resizeAccentPattern,
+} from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
 
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
@@ -78,6 +85,11 @@ export const useMetronome = ({
   // Clicks per beat: 1 = plain quarter notes (no subdivision), 2 = eighth notes,
   // 3 = eighth-note triplets, 4 = sixteenth notes.
   const [subdivision, setSubdivision] = useState(1);
+  // One entry per beat in the bar — its length *is* the time signature's
+  // numerator (custom meters), each entry's value is that beat's accent level.
+  const [accentPattern, setAccentPattern] = useState<AccentLevel[]>(DEFAULT_ACCENT_PATTERN);
+  // Which beat in the pattern is currently sounding — drives the UI's playhead highlight.
+  const [currentBeat, setCurrentBeat] = useState(0);
   // Playback anchor mirrored into React state. The refs are set on the audio
   // thread's first scheduled beat, which on a skipCountIn start (loop restart,
   // live seek) changes no state at all — without this mirror the memoized
@@ -89,6 +101,9 @@ export const useMetronome = ({
   const workletNodeRef       = useRef<AudioWorkletNode | null>(null);
   const workletReadyRef      = useRef(false);
   const countInTargetRef     = useRef<number>(0);
+  // Count-in length in beats — mirrors accentPattern.length at start time, so
+  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4".
+  const countInStartRef      = useRef<number>(4);
   const startTimeRef         = useRef<number | null>(null);
   const audioStartTimeRef    = useRef<number | null>(null);
   const beatCounterRef       = useRef<number>(0);
@@ -220,8 +235,13 @@ export const useMetronome = ({
         // notation is shown): AlphaTab itself hasn't started playing yet at this point
         // (see PracticeSession's isAudioPlaying gate), so nothing else would click here.
         // The count-in is always plain quarter notes — subdivision only kicks in once
-        // real playback starts below.
-        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4 ? 'accent' : 'beat', isMutedRef.current);
+        // real playback starts below. It previews the same accent pattern that will
+        // play once the bar starts, so a muted beat stays silent during count-in too.
+        const countInBeatIndex = countInStartRef.current - countInTargetRef.current;
+        const countInLevel     = getAccentLevel(accentPattern, countInBeatIndex);
+        if (countInLevel !== 0) {
+          playSound(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat', isMutedRef.current);
+        }
 
         const currentCount = countInTargetRef.current;
         setTimeout(() => setCountInRemaining(currentCount), 0);
@@ -260,8 +280,12 @@ export const useMetronome = ({
         // another clock (e.g. AlphaTab's own built-in metronome) so the two can't drift.
         const muted = isMutedRef.current || mutePlaybackClickRef.current;
         if (isBeat) {
-          playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0 ? 'accent' : 'beat', muted);
+          const beatIndex = beatCounterRef.current;
+          const level     = getAccentLevel(accentPattern, beatIndex);
+          if (level !== 0) playSound(nextNoteTimeRef.current, level === 2 ? 'accent' : 'beat', muted);
           beatCounterRef.current += 1;
+          const patternPosition = accentPattern.length > 0 ? beatIndex % accentPattern.length : 0;
+          setTimeout(() => setCurrentBeat(patternPosition), 0);
         } else {
           playSound(nextNoteTimeRef.current, 'sub', muted);
         }
@@ -270,7 +294,7 @@ export const useMetronome = ({
         nextNoteTimeRef.current    += tickInterval;
       }
     }
-  }, [bpm, speedMultiplier, subdivision, playSound]);
+  }, [bpm, speedMultiplier, subdivision, accentPattern, playSound]);
 
   // Keep schedulerRef in sync with the latest scheduler closure.
   useEffect(() => {
@@ -304,15 +328,18 @@ export const useMetronome = ({
 
     if (ctx.state === 'suspended') ctx.resume();
 
-    const useCountIn = !options?.skipCountIn;
+    const useCountIn  = !options?.skipCountIn;
+    const countInBeats = Math.max(1, accentPattern.length);
     nextNoteTimeRef.current   = ctx.currentTime;
-    countInTargetRef.current  = useCountIn ? 4 : 0;
+    countInTargetRef.current  = useCountIn ? countInBeats : 0;
+    countInStartRef.current   = countInBeats;
     startTimeRef.current      = null;
     audioStartTimeRef.current = null;
     beatCounterRef.current    = 0;
     subdivisionIndexRef.current = 0;
-    setCountInRemaining(useCountIn ? 4 : 0);
+    setCountInRemaining(useCountIn ? countInBeats : 0);
     setPlaybackAnchor({ wall: null, audio: null });
+    setCurrentBeat(0);
 
     const node = ensureWorkletNode();
     if (node) {
@@ -322,7 +349,7 @@ export const useMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [scheduler, ensureWorkletNode]);
+  }, [scheduler, ensureWorkletNode, accentPattern.length]);
 
   const stopMetronome = useCallback(() => {
     workletNodeRef.current?.port.postMessage({ type: 'stop' });
@@ -369,6 +396,17 @@ export const useMetronome = ({
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
 
+  // Change the meter's beat count (its numerator, e.g. 4/4 → 5/4). New beats
+  // start as plain clicks; existing accents are kept.
+  const setBeatsPerBar = useCallback((count: number) => {
+    setAccentPattern((prev) => resizeAccentPattern(prev, count));
+  }, []);
+
+  // Click-to-cycle a single beat's accent: plain → accent → muted → plain.
+  const cycleBeatAccent = useCallback((index: number) => {
+    setAccentPattern((prev) => prev.map((level, i) => (i === index ? cycleAccentLevel(level) : level)));
+  }, []);
+
   const seekToBeats = useCallback((beats: number) => {
     // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
     // without waiting for the next React render cycle.
@@ -391,6 +429,10 @@ export const useMetronome = ({
     setVolume,
     subdivision,
     setSubdivision,
+    accentPattern,
+    setBeatsPerBar,
+    cycleBeatAccent,
+    currentBeat,
     toggleMetronome,
     startMetronome,
     stopMetronome,
@@ -405,6 +447,7 @@ export const useMetronome = ({
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm,
     setBpm, volume, setVolume, subdivision, setSubdivision,
+    accentPattern, setBeatsPerBar, cycleBeatAccent, currentBeat,
     toggleMetronome, startMetronome, stopMetronome,
     restartMetronome, seekToBeats, handleSetRecommendedBpm, recommendedBpm,
     playbackAnchor,

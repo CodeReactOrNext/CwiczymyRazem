@@ -8,6 +8,7 @@ interface OnlineUser {
   avatar: string;
   state: "online" | "offline";
   last_changed: number;
+  platform?: "desktop" | "web";
   currentActivity?: {
     planTitle: string;
     exerciseTitle: string;

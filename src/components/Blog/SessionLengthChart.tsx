@@ -9,11 +9,11 @@ interface Bar {
 }
 
 const bars: Bar[] = [
-  { labelLine1: 'Typical session', labelLine2: '(median)', valueLabel: '20 min', minutes: 20, color: '#0891b2' },
-  { labelLine1: 'Average session', valueLabel: '60–80 min', minutes: 70, color: '#d97706' },
+  { labelLine1: 'Typical session', labelLine2: '(median)', valueLabel: '15 min', minutes: 15, color: '#0891b2' },
+  { labelLine1: 'Average session', valueLabel: '54 min', minutes: 54, color: '#d97706' },
 ];
 
-const CHART_MAX_MINUTES = 90;
+const CHART_MAX_MINUTES = 60;
 const BAR_WIDTH = 24;
 const CORNER_RADIUS = 4;
 const BASELINE_Y = 220;
@@ -36,9 +36,9 @@ export const SessionLengthChart = () => {
   return (
     <div className="my-10 rounded-lg bg-zinc-900/40 p-6">
       <p className="text-sm font-medium text-zinc-200">How long do Riff Quest sessions actually run?</p>
-      <p className="mt-1 text-xs text-zinc-500">Real usage data from Riff Quest, June 28 – July 13, 2026</p>
+      <p className="mt-1 text-xs text-zinc-500">Real usage data across 7,800+ logged Riff Quest practice sessions, July 2026</p>
 
-      <svg viewBox="0 0 360 260" className="mt-6 w-full max-w-md" role="img" aria-label="Bar chart comparing typical (median) Riff Quest session length of 20 minutes against an average session length of 60 to 80 minutes.">
+      <svg viewBox="0 0 360 260" className="mt-6 w-full max-w-md" role="img" aria-label="Bar chart comparing typical (median) Riff Quest session length of 15 minutes against an average session length of 54 minutes.">
         <line x1={40} y1={BASELINE_Y} x2={320} y2={BASELINE_Y} stroke="#3f3f46" strokeWidth={1} />
 
         {bars.map((bar, i) => {
@@ -61,7 +61,7 @@ export const SessionLengthChart = () => {
       </svg>
 
       <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-        Average session length trends upward as players build the habit — it peaked at roughly 83 minutes during the week of June 28, 2026, well above the beginner baseline in this guide.
+        The median matches this guide&apos;s 15-minute daily baseline almost exactly — a handful of long sessions from more advanced players pull the average well above it.
       </p>
     </div>
   );

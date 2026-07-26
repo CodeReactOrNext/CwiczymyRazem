@@ -19,6 +19,7 @@ import {
 } from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence, motion } from "framer-motion";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
@@ -334,6 +335,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
+  const { isElectron } = useElectronWindowControls();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -663,7 +665,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden">
+              className={`fixed left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden ${
+                isElectron ? "top-10 h-[calc(100dvh-2.5rem)]" : "top-0 h-[100dvh]"
+              }`}>
               <div className="flex items-center justify-between border-b border-white/10 p-4">
                 <Link
                   href="/dashboard"

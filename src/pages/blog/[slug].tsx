@@ -5,6 +5,7 @@ import { AuthorBio } from 'components/Blog/AuthorBio';
 import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
+import { Checklist } from 'components/Blog/Checklist';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
 import { PracticeTable } from 'components/Blog/PracticeTable';
@@ -80,6 +81,7 @@ const components = {
   BlogAlert,
   ActionCard,
   AppCard,
+  Checklist,
   ExercisePromo,
   PhotoBlock,
   PracticeTable,
