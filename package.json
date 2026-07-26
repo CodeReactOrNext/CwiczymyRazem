@@ -1,6 +1,6 @@
 {
   "name": "cwiczymy_razem",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "description": "riff.quest — guitar practice desktop app (native ASIO/WASAPI audio)",
