@@ -41,7 +41,10 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        # --legacy-peer-deps: the repo has a latent peer-dep conflict
+        # (@testing-library/react@13 wants React 18, project is on React 19)
+        # that only npm ci on a clean install actually enforces.
+        run: npm ci --legacy-peer-deps
 
       - name: Build and publish
         run: npm run ${{ matrix.script }}
