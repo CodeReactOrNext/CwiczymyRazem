@@ -78,3 +78,6 @@ publish:
   provider: github
   owner: Michaljapko
   repo: riff-quest-releases
+  # electron-builder defaults to publishing as a draft (hidden until manually
+  # published) — auto-update needs the release to be live immediately.
+  releaseType: release
