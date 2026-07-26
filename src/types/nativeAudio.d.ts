@@ -81,21 +81,13 @@ export interface AmpParams {
   delayFeedback: number;
   /** 0..1 dry/wet mix. */
   delayMix: number;
-  /** Reverb effect (post-delay) on/off. */
-  reverbEnabled: boolean;
-  /** 0..1 room size / decay length. */
-  reverbSize: number;
-  /** 0..1 high-frequency damping in the reverb tail. */
-  reverbDamping: number;
-  /** 0..1 dry/wet mix. */
-  reverbMix: number;
   /** Loaded cabinet IR id (see toneStudio.d.ts), or null for the built-in biquad
    *  cabinet model. Only used when `cab` is true. */
   irId: string | null;
   /** NAM (Neural Amp Modeler) captured-amp model on/off. When true and a model is
    *  loaded, it REPLACES the preamp/tone-stack/power/cabinet block (drive, bass,
    *  mid, treble, cab, irId are all ignored) — gate/overdrive stay before it and
-   *  delay/reverb stay after, same as pedals-into-amp-into-rack in a real rig.
+   *  delay stays after, same as pedals-into-amp-into-rack in a real rig.
    *  Falls back to the traditional chain if no model is loaded yet. */
   namEnabled: boolean;
   /** Imported NAM model id (see toneStudio.d.ts), or null. */

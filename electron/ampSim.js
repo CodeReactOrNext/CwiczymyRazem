@@ -10,7 +10,7 @@
 // → DC blocker → 3-band tone stack (bass/mid/treble shelving+peaking) →
 // POWER AMP stage (oversampled asymmetric-tanh gain #2, the `drive` knob) →
 // DC blocker → cabinet (resonance peak + LPF + presence peak, OR a loaded IR
-// convolution) → delay → reverb → level + soft limiter.
+// convolution) → delay → level + soft limiter.
 //
 // Two cascaded gain stages (not one) because that's what actually separates a
 // "real amp" sound from a single distortion box: a real tube amp's preamp
@@ -24,15 +24,18 @@
 // harmonics it generates above Nyquist back down as inharmonic aliasing.
 //
 // When a NAM (Neural Amp Modeler) model is loaded and enabled, it REPLACES the
-// preamp/tone-stack/power/cabinet block above (hpf through cab) — a captured
-// .nam model already models all of that end-to-end. Gate/overdrive stay before
-// it and delay/reverb stay after, same as pedals-into-amp-into-rack in a real
-// rig. See dsp/nam.js and electron/nam/README.md for why this needs its own
+// preamp/tone-stack/power block above (hpf through the power amp stage) — a
+// captured .nam model already models all of that end-to-end. The cabinet stage
+// stays independent of NAM and still applies afterward when `cab` is on: many
+// .nam captures are DI'd amp-only (no mic'd cab baked in), so users pair them
+// with the built-in cab sim or a loaded IR same as with the classic amp path.
+// Gate/overdrive stay before NAM and delay stays after, same as
+// pedals-into-amp-into-rack in a real rig.
+// See dsp/nam.js and electron/nam/README.md for why this needs its own
 // internal block-buffering (the WASM call overhead per sample is too high to
 // call it the way every other stage here is called, one sample at a time).
 
 const { Delay } = require("./dsp/delay");
-const { Reverb } = require("./dsp/reverb");
 const { Convolver } = require("./dsp/convolver");
 const { Overdrive } = require("./dsp/overdrive");
 const { Oversampler2x } = require("./dsp/oversample");
@@ -164,7 +167,6 @@ class AmpChain {
     this.preampOversampler = new Oversampler2x(sr, ampClipShape);
     this.powerOversampler = new Oversampler2x(sr, ampClipShape);
     this.delay = new Delay(sr);
-    this.reverb = new Reverb(sr);
     this.convolver = new Convolver(sr);
     this.overdrive = new Overdrive(sr);
     this.nam = new NamEngine(sr);
@@ -172,7 +174,6 @@ class AmpChain {
       preampGain: 0.3, drive: 0.5, bass: 0.5, mid: 0.5, treble: 0.5, level: 0.6, cab: true, gate: true,
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: false, delayMs: 300, delayFeedback: 0.35, delayMix: 0.25,
-      reverbEnabled: false, reverbSize: 0.5, reverbDamping: 0.5, reverbMix: 0.25,
       namEnabled: false, namModelId: null,
       irId: null,
     };
@@ -194,21 +195,19 @@ class AmpChain {
   setParams(p) {
     this.params = { ...this.params, ...p };
     const { bass, mid, treble, delayEnabled, delayMs, delayFeedback, delayMix,
-      reverbEnabled, reverbSize, reverbDamping, reverbMix,
       overdriveEnabled, overdriveDrive, overdriveTone, overdriveLevel } = this.params;
     // 0..1 → ±12dB around the center detent (0.5 = flat), like a real tone stack.
     this.bassEq.lowShelf(this.sr, 120, (bass - 0.5) * 24);
     this.midEq.peaking(this.sr, 800, 0.8, (mid - 0.5) * 24);
     this.trebleEq.highShelf(this.sr, 3000, (treble - 0.5) * 24);
     // Effects always run (cheap); "enabled" just zeroes the wet mix so toggling
-    // never clicks and needs no extra branch in process(). Unlike delay/reverb
-    // (which have a user-facing Mix knob), the pedal is either fully in the
-    // signal path or fully bypassed — real stompboxes don't blend.
+    // never clicks and needs no extra branch in process(). Unlike delay (which
+    // has a user-facing Mix knob), the pedal is either fully in the signal
+    // path or fully bypassed — real stompboxes don't blend.
     this.overdrive.setParams({
       drive: overdriveDrive, tone: overdriveTone, level: overdriveLevel, mix: overdriveEnabled ? 1 : 0,
     });
     this.delay.setParams({ delayMs, feedback: delayFeedback, mix: delayEnabled ? delayMix : 0 });
-    this.reverb.setParams({ size: reverbSize, damping: reverbDamping, mix: reverbEnabled ? reverbMix : 0 });
     // irSamples/namModelJson are resolved by the caller (nativeAudioEngine, which
     // owns disk/fs access) and passed through only when irId/namModelId actually
     // changed — this module stays a pure DSP chain with no fs/Electron dependency
@@ -244,15 +243,14 @@ class AmpChain {
       // `drive` knob, now the second of two gain stages instead of the only one.
       s = this.powerOversampler.process(s, 1 + drive * 30);
       s = this.dcBlockPower.process(s);
+    }
 
-      if (cab) {
-        if (this.convolver.ir) s = this.convolver.process(s);
-        else { s = this.cabRes.process(s); s = this.cabLpf.process(s); s = this.cabPeak.process(s); }
-      }
+    if (cab) {
+      if (this.convolver.ir) s = this.convolver.process(s);
+      else { s = this.cabRes.process(s); s = this.cabLpf.process(s); s = this.cabPeak.process(s); }
     }
 
     s = this.delay.process(s);
-    s = this.reverb.process(s);
     s = s * level * 0.7;                 // makeup compensation for tanh loudness
     // soft safety limiter
     if (s > 1) s = 1; else if (s < -1) s = -1;
@@ -264,7 +262,7 @@ class AmpChain {
     this.dcBlockPreamp.reset(); this.dcBlockPower.reset();
     this.bassEq.reset(); this.midEq.reset(); this.trebleEq.reset();
     this.cabRes.reset(); this.cabLpf.reset(); this.cabPeak.reset();
-    this.delay.reset(); this.reverb.reset(); this.convolver.reset(); this.overdrive.reset();
+    this.delay.reset(); this.convolver.reset(); this.overdrive.reset();
     this.nam.reset();
   }
 }

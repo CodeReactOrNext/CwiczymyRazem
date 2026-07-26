@@ -18,7 +18,7 @@ interface AmpSimButtonProps {
  * Electron-only amp simulator control. Renders nothing on the web build
  * (window.nativeAmp is absent). Toggles real-time monitoring, lets the user pick
  * which audio interface + saved tone preset to use, plus a basic level control.
- * Deep tone-shaping (drive/EQ/delay/reverb/IR) lives on the /tone-studio page.
+ * Deep tone-shaping (drive/EQ/delay/IR) lives on the /tone-studio page.
  */
 export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps) => {
   const amp = useAmpSim();

@@ -61,17 +61,17 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
   ).toLocaleDateString();
 
   return (
-    <Card className="bg-zinc-900/50 border-white/5 overflow-hidden flex flex-col h-full hover:border-white/10 transition-colors group/card">
-      <div 
-        className="aspect-video bg-black relative group cursor-pointer" 
+    <Card className="bg-zinc-900/40 overflow-hidden flex flex-col h-full hover:bg-zinc-900/60 transition-colors group/card">
+      <div
+        className="aspect-video bg-black relative group cursor-pointer"
         onClick={() => onView(recording.id)}
       >
-            <div 
+            <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: videoId ? `url(https://img.youtube.com/vi/${videoId}/hqdefault.jpg)` : undefined }}
             >
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <div className="rounded-full bg-white/10 p-4 backdrop-blur-sm border border-white/20 group-hover:scale-110 transition-transform">
+                    <div className="rounded-full bg-white/15 p-4 backdrop-blur-sm transition-colors group-hover:bg-white/25">
                         <Play className="h-8 w-8 text-white fill-current" />
                     </div>
                 </div>
@@ -119,7 +119,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
             )}
         </div>
         {(recording.songTitle || recording.songArtist) && (
-             <div className="text-xs font-medium text-cyan-400 bg-cyan-950/30 px-2 py-1 rounded inline-block">
+             <div className="text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded inline-block">
                 {recording.songArtist} - {recording.songTitle}
              </div>
         )}
@@ -129,8 +129,8 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
         <p className="text-zinc-400 text-sm line-clamp-3 mb-4">
             {recording.description}
         </p>
-        
-        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+
+        <div className="flex items-center gap-2 pt-3">
              <div className="transform scale-[0.85] origin-left">
                 <Avatar 
                     avatarURL={recording.userAvatarUrl || undefined} 
@@ -146,23 +146,23 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
       </CardContent>
 
       <CardFooter className="p-3 bg-white/5 flex items-center justify-between">
-            <Button 
-                variant="ghost" 
-                size="sm" 
-                className={cn("gap-1.5 hover:text-red-400", hasLiked && "text-red-500 hover:text-red-600")}
+            <Button
+                variant="ghost"
+                size="sm"
+                className={cn("hover:text-red-400", hasLiked && "text-red-500 hover:text-red-600")}
                 onClick={handleLike}
             >
-                <Heart className={cn("h-4 w-4", hasLiked && "fill-current")} />
+                <Heart className={cn("mr-1.5 h-4 w-4", hasLiked && "fill-current")} />
                 <span className="text-xs font-bold">{recording.likes.length}</span>
             </Button>
 
-            <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-1.5 hover:text-cyan-400"
+            <Button
+                variant="ghost"
+                size="sm"
+                className="hover:text-cyan-400"
                 onClick={() => onView(recording.id)}
             >
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="mr-1.5 h-4 w-4" />
                 <span className="text-xs font-bold">{recording.commentCount}</span>
             </Button>
       </CardFooter>

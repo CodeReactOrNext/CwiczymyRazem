@@ -63,7 +63,12 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
       continue;
     }
 
-    if (Math.random() < 0.6) {
+    // Guitar/effect-only cases (e.g. "Elite Guitar Case") must only fill the
+    // strip with items they can actually drop — otherwise the reel teases an
+    // impossible pull. Mixed cases keep the 60/40 guitar/effect split.
+    const wantsGuitar = caseDef.dropKind ? caseDef.dropKind === "guitar" : Math.random() < 0.6;
+
+    if (wantsGuitar) {
       const pool = GUITARS_BY_RARITY[chosen];
       if (pool && pool.length > 0) {
         strip.push({ kind: "guitar", def: pool[Math.floor(Math.random() * pool.length)] });

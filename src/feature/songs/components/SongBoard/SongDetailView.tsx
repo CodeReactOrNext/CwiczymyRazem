@@ -19,6 +19,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import Avatar from "components/UI/Avatar/Avatar";
+import { SongRecordingsSection } from "feature/recordings/components/SongRecordingsSection";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { MasteryBadge } from "feature/songs/components/SongSections/MasteryBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
@@ -767,6 +768,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               />
            </div>
          </div>
+
+         {/* Recordings for this song */}
+         <SongRecordingsSection songId={song.id} songTitle={song.title} songArtist={song.artist} />
       </div>
     </div>
   );

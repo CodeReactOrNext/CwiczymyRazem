@@ -209,6 +209,12 @@ export const PracticeSession = ({
     handleNextRiddle, handleRevealRiddle,
   } = useEarTraining({ currentExercise, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
+  // Ear-training riddles have their own untimed matcher (useRiddleSequenceMatcher
+  // below) that ignores wrong notes — the generic tempo-locked note matching
+  // must stay out of it, or it silently scores the melody's own demo playback
+  // (and any free-form listening) as missed notes before the player ever guesses.
+  const isEarTrainingRiddle = currentExercise.riddleConfig?.mode === "sequenceRepeat";
+
   useEffect(() => {
     // Dynamic customGoal (e.g. Random Note Hunt): pick a fresh target on entry,
     // then keep it fixed for the session so pausing never changes it. This runs
@@ -432,7 +438,8 @@ export const PracticeSession = ({
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       audioContext={metronome.audioContext} audioStartTime={metronome.audioStartTime}
-      effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
+      effectiveBpm={effectiveBpm} rawBpm={metronome.bpm}
+      activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
@@ -482,8 +489,8 @@ export const PracticeSession = ({
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              isMicEnabled ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
-              currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
+              isMicEnabled && !isEarTrainingRiddle ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
+              isEarTrainingRiddle ? { score: earTrainingScore } : null);
             if (isExamMode) onExamComplete?.(successSnapshot.accuracy);
           }}
           onRestart={() => {
@@ -503,8 +510,8 @@ export const PracticeSession = ({
             const snap = noteMatchingHandle.current?.snapshot();
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
-              currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
+              isMicEnabled && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+              isEarTrainingRiddle ? { score: earTrainingScore } : null);
             if (isExamMode && snap) onExamComplete?.(snap.accuracy);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}

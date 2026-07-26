@@ -35,8 +35,8 @@ contextBridge.exposeInMainWorld("nativeAmp", {
   /** Start monitoring. opts: { deviceId?, channel?, sampleRate?, frameSize?, params? } */
   start: (opts) => ipcRenderer.invoke("amp:start", opts),
   /** Live-update tone params: { drive?, bass?, mid?, treble?, level?, cab?, gate?,
-   *  delayEnabled?, delayMs?, delayFeedback?, delayMix?, reverbEnabled?, reverbSize?,
-   *  reverbDamping?, reverbMix?, irId? } (0..1 / bool, irId: string | null). */
+   *  delayEnabled?, delayMs?, delayFeedback?, delayMix?, irId? } (0..1 / bool,
+   *  irId: string | null). */
   setParams: (params) => ipcRenderer.invoke("amp:set-params", params),
   stop: () => ipcRenderer.invoke("amp:stop"),
   getStatus: () => ipcRenderer.invoke("amp:status"),

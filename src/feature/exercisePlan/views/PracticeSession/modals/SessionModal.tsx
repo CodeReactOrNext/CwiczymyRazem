@@ -208,7 +208,7 @@ const SessionModal = ({
             </div>
           )}
 
-          {isMicEnabled && !currentExercise.customGoal && <MobileMicGameHud />}
+          {isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && <MobileMicGameHud />}
 
           <MobileTimerDisplay isPlaying={isPlaying} />
 

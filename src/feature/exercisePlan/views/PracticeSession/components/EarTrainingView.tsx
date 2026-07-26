@@ -58,8 +58,8 @@ export const EarTrainingView = ({
       : !canGuess
         ? { title: "Listen & repeat", caption: "Play the melody, then find it on your guitar" }
         : listening
-          ? { title: "Your turn", caption: "Play the notes you heard — dots fill on correct notes" }
-          : { title: "Your turn", caption: isMicEnabled ? "Play your answer, or replay the melody" : "Play it back, then check the answer" };
+          ? { title: "Listening for your answer", caption: "Play the notes you heard — get them all right and it advances on its own" }
+          : { title: "Your turn", caption: isMicEnabled ? "Play your answer on your guitar, or replay the melody first" : "Play it back from memory, then reveal to check yourself" };
 
   return (
     <div className={cn("mx-auto w-full max-w-xl", className)}>
@@ -174,7 +174,7 @@ export const EarTrainingView = ({
               className="h-9 px-4 text-zinc-400 hover:text-zinc-100"
               onClick={onReveal}
             >
-              <Eye className="mr-1.5 h-3.5 w-3.5" /> Show answer
+              <Eye className="mr-1.5 h-3.5 w-3.5" /> {isMicEnabled ? "Stuck? Reveal" : "Show answer"}
             </Button>
           </div>
         ) : !isGuessed ? (

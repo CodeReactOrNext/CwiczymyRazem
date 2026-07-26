@@ -209,8 +209,9 @@ export function LandscapeSessionModal({
                       <Badge variant='outline' className='shrink-0 text-[8px]'>{currentExerciseIndex + 1}/{totalExercises}</Badge>
                     </div>
 
-                    {/* Mic stats */}
-                    {isMicEnabled && (
+                    {/* Mic stats — ear training keeps its own score inside EarTrainingView,
+                        the generic tab accuracy meter doesn't apply to it. */}
+                    {isMicEnabled && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
                       <div className="px-3 py-1 space-y-1">
                         <div className="flex items-center justify-between text-[9px]">
                           <span className="text-zinc-600 tracking-widest">Score</span>

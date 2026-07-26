@@ -91,11 +91,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/recordings',
-        destination: '/dashboard',
-        permanent: true,
-      },
-      {
         source: '/profile/exercises',
         destination: '/practice-log',
         permanent: true,

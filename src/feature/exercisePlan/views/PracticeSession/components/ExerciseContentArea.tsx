@@ -147,8 +147,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       "relative w-full overflow-hidden rounded-xl bg-[#1a1a1d] shadow-xl shadow-black/40"
     )}>
 
-      {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here. */}
-      {isMicEnabled && !hasTablature && (
+      {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here.
+          Ear training keeps its own score inside EarTrainingView instead — the generic
+          tab accuracy meter doesn't apply to it (see PracticeSession's isEarTrainingRiddle). */}
+      {isMicEnabled && !hasTablature && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
         <div className="flex justify-end px-4 pt-4">
           <MicHud />
         </div>

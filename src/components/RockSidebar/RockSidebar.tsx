@@ -22,7 +22,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
-import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   Brain,
@@ -56,7 +55,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { FaDiscord } from "react-icons/fa";
 import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -165,15 +163,6 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
   { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
 ];
-
-// Electron-only (window.nativeAmp) — spliced into PRACTICE_SUB_NAV below only when
-// isElectron, since this feature does nothing on the web build.
-const TONE_STUDIO_SUBLINK: SidebarSubLink = {
-  id: "practice-tone-studio",
-  name: "Tone Studio",
-  href: "/tone-studio",
-  icon: <SlidersHorizontal size={16} />,
-};
 
 const SONGS_SUB_NAV: SidebarSubLink[] = [
   { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
@@ -309,39 +298,7 @@ const SidebarActionButton = ({
   );
 };
 
-const SidebarExternalLink = ({
-  href,
-  icon,
-  iconClass = "text-zinc-600",
-  label,
-  onClick,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  iconClass?: string;
-  label: string;
-  onClick?: () => void;
-}) => {
-  const { createRipple, ripple } = useRipple();
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => {
-        createRipple(e);
-        onClick?.();
-      }}
-      className="relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
-      {ripple}
-      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
-      <span>{label}</span>
-    </a>
-  );
-};
-
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
-  const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
@@ -365,7 +322,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/profile/skills")) return "practice";
     if (pathname === "/ai-coach") return "practice";
     if (pathname === "/journey") return "practice";
-    if (pathname.startsWith("/tone-studio")) return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
@@ -373,6 +329,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/seasons")) return "leaderboard";
     if (pathname.startsWith("/arsenal")) return "arsenal";
+    if (pathname.startsWith("/tone-studio")) return "tone-studio";
     if (pathname.startsWith("/plans")) return "library";
     if (pathname.startsWith("/my-exercises")) return "library";
     if (pathname.startsWith("/tab-editor")) return "library";
@@ -434,7 +391,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: "Practice",
       href: "/timer",
       icon: <Timer size={18} />,
-      children: isElectron ? [...PRACTICE_SUB_NAV, TONE_STUDIO_SUBLINK] : PRACTICE_SUB_NAV,
+      children: PRACTICE_SUB_NAV,
     },
     {
       id: "songs",
@@ -453,6 +410,10 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     },
     { id: "leaderboard", name: "Rankings", href: "/seasons", icon: <Trophy size={18} /> },
     { id: "arsenal", name: "Arsenal", href: "/arsenal", icon: <Swords size={18} /> },
+    // Electron-only (window.nativeAmp) — does nothing on the web build.
+    ...(isElectron
+      ? [{ id: "tone-studio", name: "Tone Studio", href: "/tone-studio", icon: <SlidersHorizontal size={18} /> }]
+      : []),
   ];
 
   const libraryNavigation = [
@@ -576,12 +537,14 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         </div>
 
         <div>
+          <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
+        </div>
+
+        <div>
           <div className="space-y-1">{renderNavLinks(libraryNavigation, mobile ? handleLinkClick : undefined)}</div>
         </div>
 
         <div className="space-y-1">
-          {renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}
-
           <SidebarActionButton
             icon={<MessageSquarePlus size={16} />}
             label="Send Feedback"
@@ -589,13 +552,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               if (mobile) handleLinkClick();
               setIsFeedbackOpen(true);
             }}
-          />
-
-          <SidebarExternalLink
-            href="https://discord.gg/6yJmsZW2Ne"
-            icon={<FaDiscord size={16} />}
-            label={t("nav.discord")}
-            onClick={mobile ? handleLinkClick : undefined}
           />
         </div>
       </div>

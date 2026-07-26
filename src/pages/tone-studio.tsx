@@ -14,9 +14,9 @@ const ToneStudioPage: NextPageWithLayout = () => {
   if (!amp.available) {
     return (
       <div className='flex min-h-[60vh] flex-col items-center justify-center gap-2 px-6 text-center'>
-        <p className='text-sm font-medium text-zinc-300'>Tone Studio jest dostępne tylko w aplikacji desktopowej</p>
+        <p className='text-sm font-medium text-zinc-300'>Tone Studio is only available in the desktop app</p>
         <p className='max-w-sm text-xs text-zinc-500'>
-          Pobierz i uruchom aplikację riff.quest na komputerze, żeby kształtować brzmienie i ładować własne IR.
+          Download and run the riff.quest desktop app to shape your tone and load custom IRs.
         </p>
       </div>
     );

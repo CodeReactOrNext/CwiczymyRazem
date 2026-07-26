@@ -27,7 +27,7 @@ describe("AmpChain drive stage", () => {
   function freshChain(overrides = {}) {
     const amp = new AmpChain(sr);
     amp.setParams({
-      preampGain: 0, drive: 0, gate: false, cab: false, delayEnabled: false, reverbEnabled: false,
+      preampGain: 0, drive: 0, gate: false, cab: false, delayEnabled: false,
       bass: 0.5, mid: 0.5, treble: 0.5, level: 1,
       ...overrides,
     });
@@ -102,7 +102,7 @@ describe("AmpChain drive stage", () => {
     expect(measurePeak(1)).toBeGreaterThan(measurePeak(0));
   });
 
-  it("routes through NAM instead of the traditional preamp/tonestack/power/cab chain when enabled and loaded", async () => {
+  it("routes through NAM instead of the traditional preamp/tonestack/power chain when enabled and loaded", async () => {
     const amp = freshChain({ drive: 0.8, preampGain: 0.8 }); // chosen so the traditional chain audibly clips
     await amp.nam.loadModel(SMALL_NAM_MODEL_JSON);
     amp.setParams({ namEnabled: true });
@@ -149,5 +149,27 @@ describe("AmpChain drive stage", () => {
       return Math.sqrt(sumSq / count);
     };
     expect(measureRms(true)).toBeGreaterThan(measureRms(false));
+  });
+
+  it("still applies the cabinet stage after NAM — many .nam captures are DI'd amp-only", async () => {
+    const measureRms = async (cab) => {
+      const amp = freshChain({ cab, namEnabled: true });
+      await amp.nam.loadModel(SMALL_NAM_MODEL_JSON);
+      const freq = 120;
+      const samplesPerCycle = sr / freq;
+      const totalCycles = 40;
+      let sumSq = 0;
+      let count = 0;
+      for (let i = 0; i < totalCycles * samplesPerCycle; i++) {
+        const x = 0.2 * Math.sin((2 * Math.PI * freq * i) / sr);
+        const y = amp.process(x);
+        if (i > (totalCycles - 10) * samplesPerCycle) {
+          sumSq += y * y;
+          count++;
+        }
+      }
+      return Math.sqrt(sumSq / count);
+    };
+    expect(await measureRms(true)).toBeGreaterThan(await measureRms(false));
   });
 });

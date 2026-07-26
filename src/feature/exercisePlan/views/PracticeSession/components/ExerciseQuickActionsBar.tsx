@@ -15,6 +15,10 @@ import {
   SubdivisionIcon,
   SUBDIVISIONS,
 } from "../../../components/Metronome/SubdivisionIcon";
+import {
+  MAX_BEATS_PER_BAR,
+  MIN_BEATS_PER_BAR,
+} from "../../../components/Metronome/utils/accentPattern";
 import type { Exercise } from "../../../types/exercise.types";
 
 interface ExerciseQuickActionsBarProps {
@@ -187,6 +191,80 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                   </DropdownMenuItem>
                 );
               })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {metronome.accentPattern && metronome.setBeatsPerBar && metronome.cycleBeatAccent && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type='button'
+                title='Beats per bar & accents'
+                className={cn(stepBtn, "font-mono text-xs font-bold")}>
+                {metronome.accentPattern.length}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align='end'
+              // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
+              // (mobile modal) — the dropdown's default z-50 would paint underneath it.
+              className='z-[99999999] w-64 border border-white/10 bg-zinc-900 p-3 text-white'>
+              <div className='flex items-center justify-between px-0.5'>
+                <span className='select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
+                  Beats per bar
+                </span>
+                <div className='flex items-center gap-1'>
+                  <button
+                    type='button'
+                    onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length - 1)}
+                    disabled={metronome.accentPattern.length <= MIN_BEATS_PER_BAR}
+                    aria-label='Remove beat'
+                    className='flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-40'>
+                    <Minus className='h-3 w-3' strokeWidth={2.5} />
+                  </button>
+                  <span translate='no' className='w-4 select-none text-center text-xs font-bold tabular-nums text-zinc-300'>
+                    {metronome.accentPattern.length}
+                  </span>
+                  <button
+                    type='button'
+                    onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length + 1)}
+                    disabled={metronome.accentPattern.length >= MAX_BEATS_PER_BAR}
+                    aria-label='Add beat'
+                    className='flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-40'>
+                    <Plus className='h-3 w-3' strokeWidth={2.5} />
+                  </button>
+                </div>
+              </div>
+
+              <div className='mt-2 flex flex-wrap gap-1.5'>
+                {metronome.accentPattern.map((level: number, i: number) => (
+                  <button
+                    key={i}
+                    type='button'
+                    onClick={() => metronome.cycleBeatAccent(i)}
+                    title={
+                      level === 2
+                        ? "Accent — click to mute"
+                        : level === 1
+                          ? "Click — click to accent"
+                          : "Muted — click to reset"
+                    }
+                    className={cn(
+                      "flex h-8 min-w-8 flex-1 select-none items-center justify-center rounded-full text-[11px] font-bold tabular-nums transition-colors",
+                      level === 2 && "bg-cyan-500/20 text-cyan-300",
+                      level === 1 && "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/70",
+                      level === 0 && "bg-zinc-900/60 text-zinc-700 hover:bg-zinc-800/60",
+                      metronome.isPlaying && metronome.currentBeat === i && "ring-2 ring-cyan-400",
+                    )}>
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <p className='mt-2 select-none text-[10px] text-zinc-600'>
+                Click a beat to accent, click again to mute
+              </p>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

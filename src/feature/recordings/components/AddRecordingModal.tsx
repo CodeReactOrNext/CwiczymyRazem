@@ -9,12 +9,13 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
+import { cn } from "assets/lib/utils";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import debounce from "lodash/debounce";
-import { Loader2, Music, Video, X } from "lucide-react";
+import { ArrowRight, Loader2, Music, Search, Video, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -23,26 +24,61 @@ import { useAppSelector } from "store/hooks";
 interface AddRecordingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Pre-selects the song this recording is for (e.g. opened from a song's detail page). */
+  initialSong?: { id: string; title: string; artist: string } | null;
 }
 
 const isValidFaYoutubeUrl = (url: string) => {
   return /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(url);
 };
 
-export const AddRecordingModal = ({ isOpen, onClose }: AddRecordingModalProps) => {
+/** One row in the song-search results box — cover art, title/artist, pick action. */
+const SongResultRow = ({ song, onSelect }: { song: Song; onSelect: () => void }) => (
+  <button
+    type="button"
+    onClick={onSelect}
+    className="w-full flex items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5 hover:bg-cyan-500/10 transition-colors text-left group"
+  >
+    {song.coverUrl ? (
+      <img src={song.coverUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+    ) : (
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
+        <Music className="h-4 w-4" />
+      </div>
+    )}
+    <div className="min-w-0 flex-1">
+      <div className="font-bold text-sm text-white truncate group-hover:text-cyan-400">{song.title}</div>
+      <div className="text-xs text-zinc-500 truncate">{song.artist}</div>
+    </div>
+    <ArrowRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-cyan-400" />
+  </button>
+);
+
+export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecordingModalProps) => {
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  
+
   // Song search state
   const [searchArtist, setSearchArtist] = useState("");
   const [searchTitle, setSearchTitle] = useState("");
   const [matches, setMatches] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-  
+  const [wasOpen, setWasOpen] = useState(isOpen);
+
   const userId = useAppSelector(selectUserAuth);
   const { addRecording, isAdding } = useRecordingMutations();
+
+  // Carries the song over when the modal is opened from that song's own page,
+  // same derived-state-during-render pattern as AddSongModal's initialTitle/Artist.
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen && initialSong) {
+      setSelectedSong(initialSong as Song);
+      setTitle(`${initialSong.artist} - ${initialSong.title} Cover`);
+    }
+  }
 
   const resetForm = () => {
     setVideoUrl("");
@@ -143,150 +179,157 @@ export const AddRecordingModal = ({ isOpen, onClose }: AddRecordingModalProps) =
     }
   };
 
+  const fieldClass =
+    "border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium";
+  const hasSongQuery = !!(searchArtist.trim() || searchTitle.trim());
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md bg-zinc-950 border-white/5 text-white overflow-hidden flex flex-col max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Video className="h-5 w-5 text-cyan-400" />
-            Add New Recording
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-none sm:max-w-xl bg-zinc-950 text-white p-0 overflow-hidden h-full sm:h-auto flex flex-col">
+        <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6 sm:max-h-[85vh]">
+          <DialogHeader className="mb-6">
+            <DialogTitle className="flex items-center gap-3 text-xl font-bold">
+              <div className="p-2 rounded-lg bg-cyan-500/10">
+                <Video className="h-5 w-5 text-cyan-400" />
+              </div>
+              Add New Recording
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto pr-1">
-          {/* YouTube Field */}
-          <div className="space-y-2">
-            <Label htmlFor="videoUrl">YouTube URL *</Label>
-            <div className="relative">
-                <FaYoutube className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                <Input
-                id="videoUrl"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://youtu.be/..."
-                className="pl-9 bg-zinc-900 border-white/10"
-                required
-                />
-            </div>
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Song Linking Section — first, so picking it can auto-fill the title below */}
+            <div className="space-y-2">
+               <Label className="text-zinc-400 font-bold ml-1">
+                  What song is this? <span className="font-normal text-zinc-600">(optional)</span>
+               </Label>
 
-          {/* Title Field */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="My awesome cover"
-              className="bg-zinc-900 border-white/10"
-              required
-            />
-          </div>
+               {selectedSong ? (
+                   <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-500/10">
+                       <div className="flex items-center gap-3">
+                           {selectedSong.coverUrl ? (
+                             <img src={selectedSong.coverUrl} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                           ) : (
+                             <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
+                                 <Music className="h-4 w-4" />
+                             </div>
+                           )}
+                           <div>
+                               <div className="font-bold text-sm text-white">{selectedSong.title}</div>
+                               <div className="text-xs text-cyan-200">{selectedSong.artist}</div>
+                           </div>
+                       </div>
+                       <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleRemoveSelectedSong}
+                          className="h-8 w-8 text-cyan-400 hover:text-cyan-200 hover:bg-cyan-500/20"
+                       >
+                           <X className="h-4 w-4" />
+                       </Button>
+                   </div>
+               ) : (
+                   <>
+                      <div className="grid grid-cols-2 gap-3">
+                         <Input
+                             value={searchArtist}
+                             onChange={(e) => setSearchArtist(e.target.value)}
+                             placeholder="Artist..."
+                             className={cn("h-11", fieldClass)}
+                         />
+                         <Input
+                             value={searchTitle}
+                             onChange={(e) => setSearchTitle(e.target.value)}
+                             placeholder="Song title..."
+                             className={cn("h-11", fieldClass)}
+                         />
+                      </div>
 
-          {/* Song Linking Section */}
-          <div className="space-y-2">
-             <Label>Song Info (Search or Enter Manually)</Label>
-             
-             {selectedSong ? (
-                 <div className="flex items-center justify-between p-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10">
-                     <div className="flex items-center gap-3">
-                         <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
-                             <Music className="h-4 w-4" />
-                         </div>
-                         <div>
-                             <div className="font-bold text-sm text-white">{selectedSong.title}</div>
-                             <div className="text-xs text-cyan-200">{selectedSong.artist}</div>
-                         </div>
-                     </div>
-                     <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={handleRemoveSelectedSong}
-                        className="h-8 w-8 text-cyan-400 hover:text-cyan-200 hover:bg-cyan-500/20"
-                     >
-                         <X className="h-4 w-4" />
-                     </Button>
-                 </div>
-             ) : (
-                 <div className="grid grid-cols-2 gap-3 relative">
-                    <div className="space-y-1">
-                        <Input 
-                            value={searchArtist}
-                            onChange={(e) => setSearchArtist(e.target.value)}
-                            placeholder="Artist..."
-                            className="bg-zinc-900 border-white/10 text-xs h-9"
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <Input 
-                            value={searchTitle}
-                            onChange={(e) => setSearchTitle(e.target.value)}
-                            placeholder="Song Title..."
-                            className="bg-zinc-900 border-white/10 text-xs h-9"
-                        />
-                    </div>
-
-                    {isSearching && (
-                        <div className="absolute right-[-20px] top-2.5">
-                            <Loader2 className="h-4 w-4 animate-spin text-zinc-500" />
-                        </div>
-                    )}
-
-                    {/* Search Results Dropdown */}
-                    {matches.length > 0 && !selectedSong && (
-                        <div className="absolute top-10 left-0 right-0 z-10 max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-zinc-900 shadow-xl custom-scrollbar">
-                            <div className="p-2 text-xs font-bold text-zinc-500 uppercase tracking-wider bg-zinc-950/50">
-                                Found in library:
+                      {/* Always-visible results box — reserves its own space so it never
+                          overlaps the fields below, and gives room for cover art + a clear
+                          empty/loading state instead of a cramped floating dropdown. */}
+                      <div className="custom-scrollbar h-48 space-y-1 overflow-y-auto rounded-lg bg-black/20 p-1.5">
+                        {!hasSongQuery ? (
+                          <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium text-zinc-500">
+                            <Search className="mr-2 h-4 w-4 shrink-0" />
+                            Type an artist or song title to search your library
+                          </div>
+                        ) : isSearching ? (
+                          Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="flex animate-pulse items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5">
+                              <div className="h-10 w-10 shrink-0 rounded-lg bg-zinc-800" />
+                              <div className="flex-1 space-y-2">
+                                <div className="h-3.5 w-2/5 rounded bg-zinc-800" />
+                                <div className="h-2.5 w-1/4 rounded bg-zinc-800" />
+                              </div>
                             </div>
-                            {matches.map(song => (
-                                <button
-                                    key={song.id}
-                                    type="button"
-                                    onClick={() => handleSelectSong(song)}
-                                    className="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 text-left group"
-                                >
-                                    <div>
-                                        <div className="font-bold text-sm text-white group-hover:text-cyan-400">{song.title}</div>
-                                        <div className="text-xs text-zinc-500">{song.artist}</div>
-                                    </div>
-                                    <div className="text-[10px] text-zinc-600 group-hover:text-cyan-500 font-medium px-2 py-1 rounded bg-zinc-950 border border-zinc-800 group-hover:border-cyan-500/20">
-                                        Select
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                 </div>
-             )}
-             {!selectedSong && (searchArtist || searchTitle) && matches.length === 0 && !isSearching && (
-                 <p className="text-[10px] text-zinc-500 italic mt-1 ml-1">
-                    * Not in library? No problem, just fill it in manually.
-                 </p>
-             )}
-          </div>
+                          ))
+                        ) : matches.length > 0 ? (
+                          matches.map((song) => (
+                            <SongResultRow key={song.id} song={song} onSelect={() => handleSelectSong(song)} />
+                          ))
+                        ) : (
+                          <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center">
+                            <p className="text-sm font-semibold text-zinc-300">Not in the library</p>
+                            <p className="text-xs text-zinc-500">No problem — we&apos;ll save it exactly as typed.</p>
+                          </div>
+                        )}
+                      </div>
+                   </>
+               )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Tell us about your recording..."
-              className="bg-zinc-900 border-white/10 min-h-[80px]"
-            />
-          </div>
+            {/* YouTube Field */}
+            <div className="space-y-2">
+              <Label htmlFor="videoUrl" className="text-zinc-400 font-bold ml-1">YouTube URL *</Label>
+              <div className="relative">
+                  <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <Input
+                  id="videoUrl"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://youtu.be/..."
+                  className={cn("pl-9 h-11", fieldClass)}
+                  required
+                  />
+              </div>
+            </div>
 
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="ghost" onClick={handleClose} disabled={isAdding}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isAdding} className="bg-cyan-600 hover:bg-cyan-500 text-white">
-              {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Share Recording
-            </Button>
-          </DialogFooter>
-        </form>
+            {/* Title Field */}
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-zinc-400 font-bold ml-1">Title *</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="My awesome cover"
+                className={cn("h-11", fieldClass)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-zinc-400 font-bold ml-1">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell us about your recording..."
+                className={cn("min-h-[90px]", fieldClass)}
+              />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="ghost" onClick={handleClose} disabled={isAdding}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isAdding} className="bg-cyan-600 hover:bg-cyan-500 text-white">
+                {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Share Recording
+              </Button>
+            </DialogFooter>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

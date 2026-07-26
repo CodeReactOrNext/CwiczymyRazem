@@ -37,4 +37,20 @@ describe("Delay", () => {
     d.reset();
     for (let i = 0; i < 10; i++) expect(d.process(0)).toBeCloseTo(0, 6);
   });
+
+  it("stays near unity under sustained input with feedback near max", () => {
+    // A feedback delay is a comb filter too: a sustained tone near a multiple
+    // of 1/delayTime gets amplified every round trip (~1/(1-feedback), ~20x at
+    // feedback=0.95). Without a loop limiter this measured 5.6x on a held note
+    // with Feedback maxed, riding into ampSim.js's hard limiter as clipping.
+    const sr = 48000;
+    const d = new Delay(sr, 2000);
+    d.setParams({ delayMs: 300, feedback: 0.95, mix: 1 });
+    let maxAbs = 0;
+    for (let i = 0; i < sr * 5; i++) {
+      const y = d.process(Math.sin((2 * Math.PI * 220 * i) / sr) * 0.5);
+      maxAbs = Math.max(maxAbs, Math.abs(y));
+    }
+    expect(maxAbs).toBeLessThan(2);
+  });
 });
