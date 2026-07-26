@@ -1,6 +1,7 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
+import { Monitor } from "lucide-react";
 import Link from "next/link";
 
 export const OnlineUsers = () => {
@@ -71,6 +72,15 @@ export const OnlineUsers = () => {
                                                 <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
                                             )}
                                         </div>
+
+                                        {/* Desktop app badge */}
+                                        {user.platform === "desktop" && (
+                                            <div
+                                                className="absolute -bottom-0.5 -left-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
+                                                title="Using the desktop app">
+                                                <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
+                                            </div>
+                                        )}
                                     </div>
                                 </Link>
                             </UserTooltip>

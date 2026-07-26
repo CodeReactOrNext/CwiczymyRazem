@@ -1,5 +1,6 @@
 import { Separator } from "assets/components/ui/separator";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { GlobalSearch } from "components/GlobalSearch/GlobalSearch";
 import UserNav from "components/UserNav";
 import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
 import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
@@ -57,6 +58,8 @@ const UserHeader = ({
 
           {/* Right Section - Actions */}
             <div className='flex items-center gap-2'>
+              <GlobalSearch />
+
               {/* Desktop Actions */}
               <div className='hidden sm:flex items-center gap-1'>
                 <CopyLinkProfile />

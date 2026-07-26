@@ -1,5 +1,6 @@
 import { selectCurrentActivity, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
 import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
@@ -8,6 +9,7 @@ export const usePresence = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
   const currentActivity = useAppSelector(selectCurrentActivity);
+  const { isElectron } = useElectronWindowControls();
 
   useEffect(() => {
     if (!userAuth || !userInfo || !isDatabaseEnabled) return;
@@ -32,6 +34,7 @@ export const usePresence = () => {
         state: "online",
         last_changed: serverTimestamp(),
         currentActivity: currentActivity || null,
+        platform: isElectron ? "desktop" : "web",
       });
       fetch("/api/presence/cleanup", { method: "POST" }).catch(() => {});
     };
@@ -62,5 +65,5 @@ export const usePresence = () => {
       setOffline();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [userAuth, userInfo, currentActivity]);
+  }, [userAuth, userInfo, currentActivity, isElectron]);
 };
