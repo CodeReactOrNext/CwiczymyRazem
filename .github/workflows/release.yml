@@ -1,0 +1,49 @@
+# Builds and publishes the desktop app installers whenever a version tag is
+# pushed. Releases are published to a separate public repo
+# (Michaljapko/riff-quest-releases, see electron-builder.yml `publish`) because
+# this source repo is private and private-repo release assets aren't publicly
+# downloadable — electron-updater on users' machines needs public access.
+#
+# Windows and Linux build in parallel, each on its native OS (electron-builder
+# native modules — audify's ASIO/WASAPI/ALSA binary — can't be cross-built).
+#
+# Release flow: bump the version and tag it locally, then push the tag —
+#   npm version patch   # or minor / major
+#   git push --follow-tags
+name: Release desktop app
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: electron:release
+          - os: ubuntu-latest
+            script: electron:release:linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and publish
+        run: npm run ${{ matrix.script }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_REPO_TOKEN }}

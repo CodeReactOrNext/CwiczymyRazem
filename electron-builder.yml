@@ -61,9 +61,20 @@ nsis:
   artifactName: riff.quest-Setup-${version}.${ext}
   shortcutName: riff.quest
 
+linux:
+  icon: build-resources/icon.png
+  category: AudioVideo
+  executableName: riff-quest
+  target:
+    - target: AppImage
+      arch:
+        - x64
+
 # Auto-update feed (electron-updater checks GitHub Releases of this repo).
-# Publishing needs GH_TOKEN: `npx electron-builder --win -p always`.
+# This is a separate, public repo — the source repo is private, and private-repo
+# release assets aren't publicly downloadable, which would break auto-update for
+# users. Publishing needs GH_TOKEN for that repo: `npx electron-builder --win -p always`.
 publish:
   provider: github
-  owner: CodeReactOrNext
-  repo: CwiczymyRazem
+  owner: Michaljapko
+  repo: riff-quest-releases
