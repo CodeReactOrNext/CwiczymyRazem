@@ -65,8 +65,8 @@ export const GettingStartedWidget = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const { quest, isLoading, markStep, claimReward, isClaiming } =
     useGettingStartedQuest(userAuth);
-  const { data: arsenalData } = useArsenalData();
-  const { data: userSongsData } = useQuery({
+  const { data: arsenalData, isLoading: isArsenalLoading } = useArsenalData();
+  const { data: userSongsData, isLoading: isUserSongsLoading } = useQuery({
     queryKey: ["user-songs", userAuth],
     queryFn: () => getUserSongs(userAuth as string),
     enabled: !!userAuth,
@@ -75,7 +75,14 @@ export const GettingStartedWidget = () => {
   const [openModal, setOpenModal] = useState<ModalId>(null);
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
-  if (isLoading || !quest || !userStats) return null;
+  if (
+    isLoading ||
+    isArsenalLoading ||
+    isUserSongsLoading ||
+    !quest ||
+    !userStats
+  )
+    return null;
 
   const songCount =
     (userSongsData?.wantToLearn.length ?? 0) +
