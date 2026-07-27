@@ -12,6 +12,8 @@ export const useTonePresets = () => {
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importingNamModel, setImportingNamModel] = useState(false);
+  const [irError, setIrError] = useState<string | null>(null);
+  const [namError, setNamError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!window.toneStudio) return;
@@ -57,10 +59,14 @@ export const useTonePresets = () => {
   const importIR = useCallback(async () => {
     if (!window.toneStudio) return null;
     setImporting(true);
+    setIrError(null);
     try {
       const meta = await window.toneStudio.importIR();
       if (meta) await refresh();
       return meta;
+    } catch (e: any) {
+      setIrError(e?.message || "Failed to import the IR file");
+      return null;
     } finally {
       setImporting(false);
     }
@@ -75,10 +81,14 @@ export const useTonePresets = () => {
   const importNamModel = useCallback(async () => {
     if (!window.toneStudio) return null;
     setImportingNamModel(true);
+    setNamError(null);
     try {
       const meta = await window.toneStudio.importNamModel();
       if (meta) await refresh();
       return meta;
+    } catch (e: any) {
+      setNamError(e?.message || "Failed to import the .nam model");
+      return null;
     } finally {
       setImportingNamModel(false);
     }
@@ -91,7 +101,7 @@ export const useTonePresets = () => {
   }, [refresh]);
 
   return {
-    presets, irs, namModels, loading, importing, importingNamModel,
+    presets, irs, namModels, loading, importing, importingNamModel, irError, namError,
     savePreset, deletePreset, importIR, deleteIR, importNamModel, deleteNamModel, refresh,
   };
 };

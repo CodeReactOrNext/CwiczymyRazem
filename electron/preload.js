@@ -40,6 +40,15 @@ contextBridge.exposeInMainWorld("nativeAmp", {
   setParams: (params) => ipcRenderer.invoke("amp:set-params", params),
   stop: () => ipcRenderer.invoke("amp:stop"),
   getStatus: () => ipcRenderer.invoke("amp:status"),
+  /** Fires when the DSP chain (usually a NAM model) fell far enough behind
+   *  real time that the engine had to clear the output queue to recover —
+   *  a real, audible click just happened, not a hypothetical one. Payload:
+   *  { driftMs, namEnabled }. Returns an unsubscribe fn. */
+  onOverload: (cb) => {
+    const listener = (_event, info) => cb(info);
+    ipcRenderer.on("amp:overload", listener);
+    return () => ipcRenderer.removeListener("amp:overload", listener);
+  },
 });
 
 // Tone Studio: local preset + cabinet-IR CRUD (config, not the live audio stream —

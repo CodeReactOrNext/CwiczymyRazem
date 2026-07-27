@@ -179,7 +179,7 @@ function importNamModel(filePath) {
   const raw = fs.readFileSync(filePath, "utf8");
   const parsed = JSON.parse(raw); // throws on invalid JSON -- caller (main.js) surfaces it as a rejected IPC call
   if (!parsed.architecture || !parsed.weights) {
-    throw new Error("Nie wygląda to na prawidłowy plik modelu .nam (brak architecture/weights).");
+    throw new Error("This doesn't look like a valid .nam model file (missing architecture/weights).");
   }
 
   const id = `nam_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

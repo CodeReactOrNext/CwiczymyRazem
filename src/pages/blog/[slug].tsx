@@ -7,8 +7,10 @@ import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { Checklist } from 'components/Blog/Checklist';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
+import { MajorScaleDiagram } from 'components/Blog/MajorScaleDiagram';
 import { PatternBackground } from 'components/Blog/PatternBackground';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
+import { PracticePlanCard } from 'components/Blog/PracticePlanCard';
 import { PracticeTable } from 'components/Blog/PracticeTable';
 import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
 import { SessionTimeline } from 'components/Blog/SessionTimeline';
@@ -84,7 +86,9 @@ const components = {
   AppCard,
   Checklist,
   ExercisePromo,
+  MajorScaleDiagram,
   PhotoBlock,
+  PracticePlanCard,
   PracticeTable,
   SessionLengthChart,
   SessionTimeline,

@@ -15,25 +15,25 @@ export const ActionCard = ({
   href = '/signup' 
 }: ActionCardProps) => {
   return (
-    <div className="my-12 overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 shadow-2xl">
+    <div className="not-prose relative my-12 overflow-hidden rounded-lg bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 sm:p-10">
       <div className="relative z-10">
         <h3 className="mb-3 text-2xl font-bold tracking-tight text-white">
           {title}
         </h3>
-        <p className="mb-6 text-zinc-400">
+        <p className="mb-6 max-w-xl text-zinc-400">
           {description}
         </p>
         <Link
           href={href}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-zinc-950 no-underline transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           {ctaText}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-      
+
       {/* Decorative background element */}
-      <div className="absolute -right-12 -top-12 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
     </div>
   );
 };

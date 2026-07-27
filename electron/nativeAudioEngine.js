@@ -37,6 +37,12 @@ function resolveAmpPatch(patch, chain) {
 let captureConsumer = null; // { requested: {deviceId, channel, sampleRate, frameSize}, onFrame }
 let ampConsumer = null;     // { requested: {deviceId, channel, sampleRate, frameSize, outputDeviceId}, params }
 let ampChain = null;
+// Some ASIO wrappers (observed with "Realtek ASIO") report a preferredSampleRate
+// that they then refuse to actually switch to — probeDeviceOpen fails instead of
+// negotiating. Once we've found a rate a given device will actually open at,
+// remember it (per device id) so we ask for that rate directly next time instead
+// of re-triggering the same failed attempt + retry dance.
+const negotiatedSampleRateByDevice = new Map();
 // What's actually open right now: { deviceId, deviceName, channel, sampleRate,
 // requestedFrameSize, frameSize (actual negotiated), duplex, outDeviceId, outChannels,
 // streamLatencyFrames } | null
@@ -106,29 +112,59 @@ function isOversized(actualFrame, requestedFrameSize) {
   return actualFrame > requestedFrameSize * 2;
 }
 
-/** Opens the stream, retrying (close + short pause + reopen) while the driver
- *  keeps handing back a way-oversized buffer. Only starts the stream once it
- *  settles on an acceptable size or attempts run out, so a discarded oversized
- *  attempt never audibly starts. */
-async function openStreamWithRetry(rt, outParams, inParams, sampleRate, requestedFrameSize) {
-  let actualFrame;
-  for (let attempt = 1; attempt <= MAX_OPEN_ATTEMPTS; attempt++) {
-    actualFrame = rt.openStream(
-      outParams,
-      inParams,
-      RtAudioFormat.RTAUDIO_FLOAT32,
-      sampleRate,
-      requestedFrameSize,
-      "CwiczymyRazem-native",
-      onInputBlock,
-      DEBUG_TIMING ? debugOnFrameOutput : null
-    );
-    if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
-    shared.closeStream();
-    await sleep(REOPEN_DELAY_MS);
+const MAX_SAMPLE_RATE_CANDIDATES = 5;
+
+/** Builds an ordered list of sample rates to try opening at: the desired rate
+ *  first, then the usual suspects, then whatever else the driver claims to
+ *  support. Exists because some ASIO drivers report a rate as supported
+ *  (preferredSampleRate, or even in their own `sampleRates` list) and then
+ *  fail probeDeviceOpen for that exact rate — the only reliable way to know
+ *  what a given driver will actually open at is to try. */
+function buildSampleRateCandidates(desiredRate, supportedRates) {
+  const ordered = [desiredRate, 44100, 48000, ...(supportedRates || [])];
+  const candidates = [];
+  for (const rate of ordered) {
+    if (rate && !candidates.includes(rate)) candidates.push(rate);
+    if (candidates.length >= MAX_SAMPLE_RATE_CANDIDATES) break;
   }
-  rt.start();
-  return actualFrame;
+  return candidates;
+}
+
+/** Opens the stream, first across sample-rate candidates (falling through to the
+ *  next one if the driver throws opening at the previous one — see
+ *  buildSampleRateCandidates), then within the winning rate retrying (close +
+ *  short pause + reopen) while the driver keeps handing back a way-oversized
+ *  buffer. Only starts the stream once it settles on an acceptable size or
+ *  attempts run out, so a discarded oversized attempt never audibly starts. */
+async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates, requestedFrameSize) {
+  let lastErr;
+  for (const sampleRate of sampleRateCandidates) {
+    let actualFrame;
+    try {
+      for (let attempt = 1; attempt <= MAX_OPEN_ATTEMPTS; attempt++) {
+        actualFrame = rt.openStream(
+          outParams,
+          inParams,
+          RtAudioFormat.RTAUDIO_FLOAT32,
+          sampleRate,
+          requestedFrameSize,
+          "CwiczymyRazem-native",
+          onInputBlock,
+          DEBUG_TIMING ? debugOnFrameOutput : null
+        );
+        if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
+        shared.closeStream();
+        await sleep(REOPEN_DELAY_MS);
+      }
+    } catch (err) {
+      lastErr = err;
+      shared.closeStream(); // defensive: make sure a failed open never blocks the next candidate's attempt
+      continue;
+    }
+    rt.start();
+    return { frame: actualFrame, sampleRate };
+  }
+  throw lastErr;
 }
 
 function listDevices() {
@@ -147,6 +183,7 @@ function listDevices() {
       inputChannels: d.inputChannels,
       outputChannels: d.outputChannels,
       isDefaultInput: !!d.isDefaultInput,
+      isDefaultOutput: !!d.isDefaultOutput,
       preferredSampleRate: d.preferredSampleRate,
       sampleRates: d.sampleRates,
     })),
@@ -186,12 +223,14 @@ function computeDesiredShape() {
     if (!inDev) throw new Error("No suitable input device for amp sim");
   }
 
-  const sampleRate = primary.sampleRate || inDev.preferredSampleRate || 48000;
+  const sampleRate =
+    primary.sampleRate || negotiatedSampleRateByDevice.get(inDev.id) || inDev.preferredSampleRate || 48000;
   const requestedFrameSize = primary.frameSize || 256;
   const channel = Math.max(0, Math.min(primary.channel || 0, Math.max(0, inDev.inputChannels - 1)));
 
   const duplex = !!ampConsumer;
   let outDeviceId = null;
+  let outDeviceName = null;
   let outChannels = 0;
 
   if (duplex) {
@@ -216,10 +255,22 @@ function computeDesiredShape() {
     }
     if (!outDev) throw new Error("No output device available for amp monitoring");
     outDeviceId = outDev.id;
+    outDeviceName = outDev.name;
     outChannels = Math.min(2, outDev.outputChannels || 2) || 1;
   }
 
-  return { deviceId: inDev.id, deviceName: inDev.name, channel, sampleRate, requestedFrameSize, duplex, outDeviceId, outChannels };
+  return {
+    deviceId: inDev.id,
+    deviceName: inDev.name,
+    channel,
+    sampleRate,
+    sampleRates: inDev.sampleRates,
+    requestedFrameSize,
+    duplex,
+    outDeviceId,
+    outDeviceName,
+    outChannels,
+  };
 }
 
 function shapesEqual(open, desired) {
@@ -249,6 +300,7 @@ function recomputeInfos() {
 
   ampInfo = !ampConsumer || !openShape ? null : {
     deviceName: openShape.deviceName,
+    outDeviceName: openShape.outDeviceName,
     sampleRate: openShape.sampleRate,
     frameSize: openShape.frameSize,
     outChannels: openShape.outChannels,
@@ -258,16 +310,67 @@ function recomputeInfos() {
   };
 }
 
+// Reused output block for onInputBlock, keyed by (n, outChannels) — avoids a
+// fresh Float32Array + Buffer allocation on every single callback (750+/sec at
+// a 64-sample buffer). Those were previously garbage the very next callback;
+// harmless individually, but at that rate they add real GC churn to the same
+// process that's also running Chromium/IPC/rendering work, which shows up as
+// exactly the kind of sporadic multi-ms callback spike the overrun watchdog
+// below flags — indistinguishable from DSP being slow unless you stop
+// allocating and check whether the spikes go away.
+let outBufCache = { n: 0, outChannels: 0, out: null, outBytes: null };
+function getOutBuffer(n, outChannels) {
+  if (outBufCache.n !== n || outBufCache.outChannels !== outChannels) {
+    const out = new Float32Array(n * outChannels);
+    outBufCache = { n, outChannels, out, outBytes: Buffer.from(out.buffer, out.byteOffset, out.byteLength) };
+  } else {
+    outBufCache.out.fill(0);
+  }
+  return outBufCache;
+}
+
+// Overrun watchdog: a block whose DSP work (e.g. a heavy NAM model) takes
+// longer than its own real-time budget makes rt.write()'s output queue fall
+// further behind on every such block — and it never catches back up on its
+// own (only a stream reopen or the namEnabled-off flush in updateAmpParams
+// clears it). This is always-on (not gated behind AUDIO_LATENCY_DEBUG) because
+// it's just two hrtime reads + a comparison — negligible next to the DSP work
+// already happening in this callback — and a silently-growing perceived
+// latency with no console trace is much worse to debug than one log line.
+const OVERLOAD_WARN_INTERVAL_MS = 2000;
+let lastOverloadWarnAt = 0;
+
+// Bounded auto-recovery: a single slow block (JIT warmup, a GC pause) isn't
+// worth an audible glitch to fix — it'll be reabsorbed if the model has any
+// real-time headroom at all. But a client on hardware too weak for their
+// loaded model would otherwise drift further behind forever with nothing but
+// a console warning nobody sees. Track net drift (over budget adds, under
+// budget forgives) and only flush the queue once it crosses a threshold
+// clearly past normal jitter — trading one small click for capping how much
+// latency this stream can ever silently accumulate.
+const MAX_DRIFT_MS = 80;
+let driftMs = 0;
+
+// main.js registers this to forward recovery events to the renderer (a console
+// warning is invisible to a real client) — kept as a plain settable callback
+// rather than a full EventEmitter since there's only ever one subscriber (the
+// single BrowserWindow) and one event.
+let overloadListener = null;
+function onOverload(fn) {
+  overloadListener = fn;
+}
+
 /** Shared input callback for the one open stream — forwards to capture, runs the amp
  *  DSP chain and writes output (or silence, if amp isn't attached but the stream is
  *  duplex anyway) when duplex. Reads live module state on every call so attach/detach
  *  that doesn't change the stream's shape needs no new callback. */
 function onInputBlock(inputBuffer) {
-  const tStart = DEBUG_TIMING ? process.hrtime.bigint() : null;
+  const tStart = process.hrtime.bigint();
 
   if (captureConsumer) {
     try { captureConsumer.onFrame(inputBuffer); } catch { /* isolate: a bad consumer must not break amp output */ }
   }
+  const tCapture = process.hrtime.bigint();
 
   if (!openShape || !openShape.duplex) return;
 
@@ -281,7 +384,7 @@ function onInputBlock(inputBuffer) {
   }
 
   const outChannels = openShape.outChannels;
-  const out = new Float32Array(n * outChannels); // zero-filled = silence by default
+  const { out, outBytes } = getOutBuffer(n, outChannels); // .out zero-filled = silence by default
 
   const activeChain = ampChain;
   if (ampConsumer && activeChain) {
@@ -290,13 +393,41 @@ function onInputBlock(inputBuffer) {
       for (let ch = 0; ch < outChannels; ch++) out[i * outChannels + ch] = y;
     }
   }
+  const tDsp = process.hrtime.bigint();
 
-  try { rt.write(Buffer.from(out.buffer, out.byteOffset, out.byteLength)); }
+  try { rt.write(outBytes); }
   catch { /* stream closing — drop this block */ }
 
+  const tWrite = process.hrtime.bigint();
+  const elapsedMs = Number(tWrite - tStart) / 1e6;
+  const budgetMs = (n / openShape.sampleRate) * 1000;
+  const now = Date.now();
+  if (elapsedMs > budgetMs * 1.5 && now - lastOverloadWarnAt > OVERLOAD_WARN_INTERVAL_MS) {
+    // Split so a future overrun tells us WHERE the time went instead of just
+    // that it went somewhere: captureMs is note-detection (aubio) forwarding,
+    // dspMs is our own per-sample chain (incl. NAM), writeMs is audify's
+    // native write() — which synchronously memcpy's + locks a mutex against
+    // the real-time audio thread (see node_modules/audify/src/rt_audio.cpp),
+    // so it's a real, separate place time can go missing that isn't "our" DSP.
+    const captureMs = Number(tCapture - tStart) / 1e6;
+    const dspMs = Number(tDsp - tCapture) / 1e6;
+    const writeMs = Number(tWrite - tDsp) / 1e6;
+    console.warn(
+      `[audio] Block overrun: total ${elapsedMs.toFixed(2)}ms for a ${budgetMs.toFixed(2)}ms block (${(elapsedMs / budgetMs).toFixed(1)}x budget) — capture=${captureMs.toFixed(2)}ms dsp=${dspMs.toFixed(2)}ms write=${writeMs.toFixed(2)}ms — output is falling behind real time.`
+    );
+    lastOverloadWarnAt = now;
+  }
+
+  driftMs = Math.max(0, driftMs + (elapsedMs - budgetMs));
+  if (driftMs >= MAX_DRIFT_MS) {
+    try { rt.clearOutputQueue(); } catch { /* ignore */ }
+    console.warn(`[audio] Recovered from ${driftMs.toFixed(0)}ms of accumulated drift by clearing the output queue (expect a brief click).`);
+    try { overloadListener?.({ driftMs, namEnabled: !!(ampChain && ampChain.params.namEnabled) }); } catch { /* ignore */ }
+    driftMs = 0;
+  }
+
   if (DEBUG_TIMING) {
-    const tWrite = process.hrtime.bigint();
-    debugProcessMs.push(Number(tWrite - tStart) / 1e6);
+    debugProcessMs.push(elapsedMs);
     debugPendingWrites.push(tWrite);
   }
 }
@@ -325,6 +456,7 @@ async function ensureOpenInner() {
     if (DEBUG_TIMING) debugPendingWrites = []; // a closed stream will never consume these — don't let a future reopen dequeue stale timestamps
     openShape = null;
     ampChain = null;
+    driftMs = 0;
     recomputeInfos();
     return;
   }
@@ -344,19 +476,35 @@ async function ensureOpenInner() {
 
   shared.closeStream();
   if (DEBUG_TIMING) debugPendingWrites = []; // same — the old queue is gone, don't dequeue stale entries against the new stream
+  driftMs = 0; // fresh stream — nothing queued yet, so no drift carried over from the last one
 
   const outParams = desired.duplex ? { deviceId: desired.outDeviceId, nChannels: desired.outChannels, firstChannel: 0 } : null;
   const inParams = { deviceId: desired.deviceId, nChannels: 1, firstChannel: desired.channel };
 
-  ampChain = desired.duplex ? new AmpChain(desired.sampleRate) : null;
-  if (ampChain && ampConsumer) ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
+  const sampleRateCandidates = buildSampleRateCandidates(desired.sampleRate, desired.sampleRates);
+  const { frame: actualFrame, sampleRate: actualSampleRate } = await openStreamWithRetry(
+    rt,
+    outParams,
+    inParams,
+    sampleRateCandidates,
+    desired.requestedFrameSize
+  );
+  negotiatedSampleRateByDevice.set(desired.deviceId, actualSampleRate);
 
-  const actualFrame = await openStreamWithRetry(rt, outParams, inParams, desired.sampleRate, desired.requestedFrameSize);
+  // Built from the rate that actually opened, not the (possibly wrong) guess in
+  // desired.sampleRate — AmpChain's filters/delay lines are tuned to it.
+  ampChain = desired.duplex ? new AmpChain(actualSampleRate) : null;
+  if (ampChain && ampConsumer) ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
 
   let streamLatencyFrames = 0;
   try { streamLatencyFrames = rt.getStreamLatency ? rt.getStreamLatency() : 0; } catch { /* ignore */ }
 
-  openShape = { ...desired, frameSize: actualFrame || desired.requestedFrameSize, streamLatencyFrames };
+  openShape = {
+    ...desired,
+    sampleRate: actualSampleRate,
+    frameSize: actualFrame || desired.requestedFrameSize,
+    streamLatencyFrames,
+  };
   recomputeInfos();
 }
 
@@ -409,9 +557,22 @@ async function attachAmp(opts = {}) {
 }
 
 function updateAmpParams(params) {
+  const wasNamEnabled = !!(ampChain && ampChain.params.namEnabled);
   if (ampConsumer) ampConsumer.params = { ...ampConsumer.params, ...(params || {}) };
   if (ampChain) ampChain.setParams(resolveAmpPatch(params || {}, ampChain));
   if (ampInfo && ampChain) ampInfo.params = ampChain.params;
+
+  // A heavy NAM model can occasionally take longer to infer a block than that
+  // block's real-time budget (see dsp/nam.js) — when that happens, rt.write()'s
+  // internal output queue just keeps growing (a late block is still appended,
+  // never dropped), so the whole stream drifts further behind real time and
+  // stays behind: nothing about disabling NAM removes what's already queued.
+  // Flush it here so turning NAM off actually restores low latency right away
+  // instead of requiring a full amp restart to get a fresh (cleared) stream.
+  if (params && params.namEnabled === false && wasNamEnabled) {
+    try { shared.getRt().clearOutputQueue(); } catch { /* ignore */ }
+    driftMs = 0; // matches the watchdog's own recovery accounting in onInputBlock
+  }
   return ampInfo;
 }
 
@@ -428,4 +589,5 @@ module.exports = {
   listDevices,
   attachCapture, detachCapture, getCaptureStatus,
   attachAmp, updateAmpParams, detachAmp, getAmpStatus,
+  onOverload,
 };

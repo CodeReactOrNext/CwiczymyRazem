@@ -75,6 +75,10 @@ export const useNativeAudioAnalyzer = () => {
   const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
   const windowPosRef = useRef<number>(0);
   const streamInfoRef = useRef<NativeAudioStreamInfo | null>(null);
+  // Set once the stream is open and aubio detectors are built for its *actual*
+  // negotiated sample rate (see init() — the driver doesn't always grant the
+  // rate we ask for). Frames that arrive before that are safely dropped.
+  const processRef = useRef<((win: Float32Array) => void) | null>(null);
 
   const init = useCallback(async () => {
     const native = window.nativeAudio;
@@ -101,37 +105,16 @@ export const useNativeAudioAnalyzer = () => {
       }
       selectedDeviceIdRef.current = chosen.id;
 
-      // aubio detectors at the device sample rate.
-      // @ts-ignore — aubiojs has no types
-      const AubioModule = await import("aubiojs");
-      const Aubio = AubioModule.default || AubioModule;
-      const aubio = await Aubio();
-      const sampleRate = chosen.preferredSampleRate || 48000;
-      const detectors = createGuitarDetectors(aubio, sampleRate);
-
-      const process = createGuitarBufferProcessor({
-        detectors,
-        getGain: () => inputGainRef.current,
-        analyser: null, // no AnalyserNode in the native path → no chroma snapshots
-        targets: {
-          frequencyRef, volumeRef, rawVolumeRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
-        },
-        onActive: () => {
-          setState(prev =>
-            prev.isListening === true && prev.error === null
-              ? prev
-              : { ...prev, isListening: true, error: null }
-          );
-        },
-      });
-
       // Reset accumulator
       windowBufRef.current = new Float32Array(WINDOW_SIZE);
       windowPosRef.current = 0;
+      processRef.current = null;
 
       // Subscribe to PCM blocks: reinterpret raw bytes as FLOAT32, fill 2048
-      // windows, then run the shared DSP on each full window.
+      // windows, then run the shared DSP on each full window. Registered before
+      // native.start() so no frame is missed once the stream opens; processRef
+      // is still null at that point (detectors aren't built until we know the
+      // stream's actual sample rate below), so early frames are just dropped.
       unsubscribeRef.current = native.onFrame((bytes: Uint8Array) => {
         // Reinterpret raw bytes as FLOAT32. Float32Array requires a 4-byte
         // aligned offset; IPC buffers usually are, but copy if not.
@@ -148,7 +131,7 @@ export const useNativeAudioAnalyzer = () => {
         for (let i = 0; i < samples.length; i++) {
           win[pos++] = samples[i];
           if (pos === WINDOW_SIZE) {
-            process(win);
+            processRef.current?.(win);
             pos = 0;
           }
         }
@@ -156,13 +139,39 @@ export const useNativeAudioAnalyzer = () => {
       });
 
       // Open the low-latency stream. Small frameSize → minimal capture latency.
+      // No sampleRate hint: some ASIO drivers report a preferred rate they then
+      // refuse to open at, so the engine negotiates and reports back what it
+      // actually got — detectors below are built for that, not a guess.
       const info = await native.start({
         deviceId: chosen.id,
         channel: 0,
-        sampleRate,
         frameSize: 256,
       });
       streamInfoRef.current = info;
+
+      // aubio detectors at the stream's actual (negotiated) sample rate.
+      // @ts-ignore — aubiojs has no types
+      const AubioModule = await import("aubiojs");
+      const Aubio = AubioModule.default || AubioModule;
+      const aubio = await Aubio();
+      const detectors = createGuitarDetectors(aubio, info.sampleRate);
+
+      processRef.current = createGuitarBufferProcessor({
+        detectors,
+        getGain: () => inputGainRef.current,
+        analyser: null, // no AnalyserNode in the native path → no chroma snapshots
+        targets: {
+          frequencyRef, volumeRef, rawVolumeRef, confidenceRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
+        },
+        onActive: () => {
+          setState(prev =>
+            prev.isListening === true && prev.error === null
+              ? prev
+              : { ...prev, isListening: true, error: null }
+          );
+        },
+      });
 
       setState(prev => ({
         ...prev,
@@ -185,6 +194,7 @@ export const useNativeAudioAnalyzer = () => {
     }
     window.nativeAudio?.stop().catch(() => { /* ignore */ });
 
+    processRef.current = null;
     windowPosRef.current = 0;
     streamInfoRef.current = null;
     frequencyRef.current = 0;

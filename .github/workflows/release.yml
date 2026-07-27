@@ -4,8 +4,16 @@
 # this source repo is private and private-repo release assets aren't publicly
 # downloadable — electron-updater on users' machines needs public access.
 #
-# Windows and Linux build in parallel, each on its native OS (electron-builder
-# native modules — audify's ASIO/WASAPI/ALSA binary — can't be cross-built).
+# Windows, Linux and macOS build in parallel, each on its native OS
+# (electron-builder native modules — audify's ASIO/WASAPI/ALSA/CoreAudio binary
+# — can't be cross-built). The mac build is arm64-only (Apple Silicon) — the
+# macos-latest runner is arm64 hardware, so `npm ci` there naturally installs
+# audify's arm64 prebuilt binary matching electron-builder.yml's mac target;
+# adding Intel/x64 would need a separate x64 runner (e.g. macos-13) since a
+# native module built for one Mac arch can't load in a process of the other.
+# The mac app is unsigned/ad-hoc (no Apple Developer certificate) — see the
+# comments in electron-builder.yml's `mac:` block for the launch/signing and
+# known mic-capture-regression caveats.
 #
 # Release flow: bump the version and tag it locally, then push the tag —
 #   npm version patch   # or minor / major
@@ -30,6 +38,8 @@ jobs:
             script: electron:release
           - os: ubuntu-latest
             script: electron:release:linux
+          - os: macos-latest
+            script: electron:release:mac
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout

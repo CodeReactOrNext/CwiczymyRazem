@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AmpParams, AmpStreamInfo } from "types/nativeAudio";
+import type { AmpOverloadInfo, AmpParams, AmpStreamInfo } from "types/nativeAudio";
 
-import { readPersistedDeviceId } from "./useNativeAudioDevices";
+import { readPersistedDeviceId, readPersistedOutputDeviceId } from "./useNativeAudioDevices";
 
 // Electron-only amp simulator control. Talks to window.nativeAmp (preload bridge)
 // which runs a duplex ASIO/WASAPI stream + DSP chain in the main process.
@@ -66,6 +66,22 @@ export const useAmpSim = () => {
   const [bufferSize, setBufferSizeState] = useState<number>(DEFAULT_BUFFER_SIZE);
   useEffect(() => { setBufferSizeState(readPersistedBufferSize()); }, []);
 
+  // Surfaces nativeAudioEngine's overload-recovery events (a real audible click
+  // just happened because the DSP chain — usually a NAM model — fell behind
+  // real time) so the user gets an explanation instead of an unexplained
+  // glitch. Auto-clears after a few seconds so it reads as a toast, not a
+  // permanent banner.
+  const [overload, setOverload] = useState<(AmpOverloadInfo & { at: number }) | null>(null);
+  useEffect(() => {
+    if (!window.nativeAmp) return undefined;
+    return window.nativeAmp.onOverload((event) => setOverload({ ...event, at: Date.now() }));
+  }, []);
+  useEffect(() => {
+    if (!overload) return undefined;
+    const timer = setTimeout(() => setOverload(null), 6000);
+    return () => clearTimeout(timer);
+  }, [overload]);
+
   const paramsRef = useRef(params);
   paramsRef.current = params;
   const isOnRef = useRef(isOn);
@@ -77,12 +93,13 @@ export const useAmpSim = () => {
     setError(null);
     try {
       const deviceId = readPersistedDeviceId() ?? undefined;
+      const outputDeviceId = readPersistedOutputDeviceId() ?? undefined;
       const frameSize = readPersistedBufferSize();
-      const streamInfo = await window.nativeAmp.start({ deviceId, frameSize, params: paramsRef.current });
+      const streamInfo = await window.nativeAmp.start({ deviceId, outputDeviceId, frameSize, params: paramsRef.current });
       setInfo(streamInfo);
       setIsOn(true);
     } catch (e: any) {
-      setError(e?.message || "Nie udało się uruchomić symulatora");
+      setError(e?.message || "Failed to start the simulator");
       setIsOn(false);
     } finally {
       setIsBusy(false);
@@ -133,7 +150,7 @@ export const useAmpSim = () => {
   }, []);
 
   return {
-    available, isOn, isBusy, error, info, params, bufferSize,
+    available, isOn, isBusy, error, info, params, bufferSize, overload,
     toggle, start, stop, restart, setParams, setBufferSize,
   };
 };

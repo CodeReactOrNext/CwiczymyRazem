@@ -87,7 +87,7 @@ const isBlogStatsMode = (import.meta as any).env?.MODE === "blog-stats";
       const { sessionCount, totalMs, avgMs } = sessionsAggSnap.data();
 
       const sessionsSnap = await sessionsQuery
-        .select("timeSumary.sumTime")
+        .select("timeSumary.sumTime", "songId", "planId")
         .get();
       const sessionMinutes = sessionsSnap.docs
         .map((doc) => doc.get("timeSumary.sumTime") as number)
@@ -102,6 +102,48 @@ const isBlogStatsMode = (import.meta as any).env?.MODE === "blog-stats";
         avgMinutes: Math.round(avgMinutes * 10) / 10,
         medianMinutes: Math.round(medianMinutes * 10) / 10,
         sampledForMedian: sessionMinutes.length,
+      });
+
+      // --- Session "type" breakdown (mirrors getSessionType in
+      // feature/practiceLog/utils/practiceLog.utils.ts: planId wins over
+      // songId, otherwise "manual"). Answers "how much practice time is
+      // logged playing songs vs. a structured plan vs. freeform" — NOT the
+      // same thing as timeSumary.creativityTime, which is a skill-category
+      // (composition/improvisation) unrelated to session type. ---
+      const typeMs = { song: 0, plan: 0, manual: 0 };
+      const typeCount = { song: 0, plan: 0, manual: 0 };
+      let totalTypedMs = 0;
+      for (const doc of sessionsSnap.docs) {
+        const ms = doc.get("timeSumary.sumTime") as number;
+        if (typeof ms !== "number" || ms < 0) continue;
+        const planId = doc.get("planId");
+        const songId = doc.get("songId");
+        const type = planId ? "plan" : songId ? "song" : "manual";
+        typeMs[type] += ms;
+        typeCount[type] += 1;
+        totalTypedMs += ms;
+      }
+
+      console.log("[blog-stats] session type breakdown (by time):", {
+        totalTypedSessions: sessionsSnap.docs.length,
+        percentOfTimeByType: Object.fromEntries(
+          (Object.keys(typeMs) as (keyof typeof typeMs)[]).map((t) => [
+            t,
+            totalTypedMs
+              ? Math.round((typeMs[t] / totalTypedMs) * 1000) / 10
+              : 0,
+          ]),
+        ),
+        percentOfSessionsByType: Object.fromEntries(
+          (Object.keys(typeCount) as (keyof typeof typeCount)[]).map((t) => [
+            t,
+            sessionsSnap.docs.length
+              ? Math.round((typeCount[t] / sessionsSnap.docs.length) * 1000) /
+                10
+              : 0,
+          ]),
+        ),
+        rawCounts: typeCount,
       });
 
       // --- Streaks (users.statistics.dayWithoutBreak = max streak ever) ---
@@ -142,6 +184,84 @@ const isBlogStatsMode = (import.meta as any).env?.MODE === "blog-stats";
           ]),
         ),
       });
+
+      // --- Does a streak actually correlate with more practice? Splits all
+      // users into "ever built a streak of N+ days" vs. everyone else, and
+      // compares lifetime sessionCount/points/lvl between the two groups.
+      // This is the one number that directly backs the article's core claim
+      // ("tracking/accountability is what drives consistency, which drives
+      // skill development") with real product data, instead of just citing
+      // outside research for it. ---
+      const usersStatsSnap = await firestore
+        .collection("users")
+        .select(
+          "statistics.dayWithoutBreak",
+          "statistics.sessionCount",
+          "statistics.points",
+          "statistics.lvl",
+        )
+        .get();
+
+      const users = usersStatsSnap.docs.map((doc) => ({
+        streak: (doc.get("statistics.dayWithoutBreak") as number) ?? 0,
+        sessionCount: (doc.get("statistics.sessionCount") as number) ?? 0,
+        points: (doc.get("statistics.points") as number) ?? 0,
+        lvl: (doc.get("statistics.lvl") as number) ?? 0,
+      }));
+
+      const avg = (values: number[]) =>
+        values.length
+          ? values.reduce((a, b) => a + b, 0) / values.length
+          : 0;
+
+      const zeroSessionUsers = users.filter((u) => u.sessionCount === 0);
+      console.log("[blog-stats] all-users session count distribution:", {
+        totalUsers: users.length,
+        medianSessionCount: median(users.map((u) => u.sessionCount)),
+        avgSessionCount:
+          Math.round(avg(users.map((u) => u.sessionCount)) * 10) / 10,
+        zeroSessionUsers: zeroSessionUsers.length,
+        zeroSessionPercent:
+          Math.round((zeroSessionUsers.length / users.length) * 1000) / 10,
+      });
+
+      for (const streakThreshold of [7, 14, 30]) {
+        const withStreak = users.filter((u) => u.streak >= streakThreshold);
+        const withoutStreak = users.filter((u) => u.streak < streakThreshold);
+
+        console.log(
+          `[blog-stats] streak-vs-volume (>=${streakThreshold}-day streak):`,
+          {
+            withStreakCount: withStreak.length,
+            withoutStreakCount: withoutStreak.length,
+            avgSessionCount: {
+              withStreak:
+                Math.round(avg(withStreak.map((u) => u.sessionCount)) * 10) /
+                10,
+              withoutStreak:
+                Math.round(
+                  avg(withoutStreak.map((u) => u.sessionCount)) * 10,
+                ) / 10,
+            },
+            medianSessionCount: {
+              withStreak: median(withStreak.map((u) => u.sessionCount)),
+              withoutStreak: median(withoutStreak.map((u) => u.sessionCount)),
+            },
+            avgPoints: {
+              withStreak:
+                Math.round(avg(withStreak.map((u) => u.points)) * 10) / 10,
+              withoutStreak:
+                Math.round(avg(withoutStreak.map((u) => u.points)) * 10) / 10,
+            },
+            avgLvl: {
+              withStreak:
+                Math.round(avg(withStreak.map((u) => u.lvl)) * 10) / 10,
+              withoutStreak:
+                Math.round(avg(withoutStreak.map((u) => u.lvl)) * 10) / 10,
+            },
+          },
+        );
+      }
     },
     120 * 1000,
   );

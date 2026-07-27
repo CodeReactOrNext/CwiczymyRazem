@@ -26,7 +26,7 @@ activated (`emsdk install latest && emsdk activate latest`), then from a checkou
 of `NeuralAmpModelerCore` with submodules fetched (`git submodule update --init --depth 1`):
 
 ```sh
-emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions \
+emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions -msimd128 \
   -I<NeuralAmpModelerCore>/NAM \
   -I<NeuralAmpModelerCore>/Dependencies/eigen \
   -I<NeuralAmpModelerCore>/Dependencies/nlohmann \
@@ -55,6 +55,21 @@ emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions \
 `NAM_ENABLE_A2_FAST` / `NAM/wavenet/a2_fast.cpp` are deliberately NOT compiled
 in — that fast path wasn't needed to clear real-time, and skipping it keeps
 the build surface smaller.)
+
+`-msimd128` (added 2026-07-27) enables WASM SIMD — Eigen vectorizes the
+conv/matrix math with it. Verified bit-identical output vs. the non-SIMD build
+on three real captured `SlimmableContainer` models (rms diff = 0.0, no NaNs —
+see conversation history for the comparison script), ~1.4-1.7x faster per
+64-sample block on the dev machine. Chromium/Electron (V8) has supported WASM
+SIMD for years, so this is safe to assume present on any client's build.
+
+Note: in one real debugging session, a *much* larger gap showed up between
+this isolated per-block benchmark (a heavy SlimmableContainer submodel still
+ran at 3-5x real-time even on the pre-SIMD build) and what the live app
+measured for the same model (1.6-4.8x *over* budget). SIMD is a genuine,
+verified win, but it's very unlikely to be the whole story for a live overload
+— check `nativeAudioEngine.js`'s overrun watchdog log (capture/dsp/write ms
+breakdown) before assuming a slow model is the culprit.
 
 ## Loading a model — the stack-overflow trap
 

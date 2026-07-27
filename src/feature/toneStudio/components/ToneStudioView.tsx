@@ -62,12 +62,23 @@ const toggleBadgeClass = (active: boolean, accent: Accent) =>
  */
 export const ToneStudioView = () => {
   const amp = useAmpSim();
-  const { devices, api, selectedId, loading, refresh, select } = useNativeAudioDevices();
-  const { irs, namModels, importing, importingNamModel, importIR, deleteIR, importNamModel, deleteNamModel } =
+  const { devices, outputDevices, api, selectedId, selectedOutputId, loading, refresh, select, selectOutput } =
+    useNativeAudioDevices();
+  const { irs, namModels, importing, importingNamModel, irError, namError, importIR, deleteIR, importNamModel, deleteNamModel } =
     useTonePresets();
+
+  // ASIO is a single-device driver — the engine always routes output to the same
+  // device as input on ASIO (see nativeAudioEngine.js), so output selection only
+  // has an effect on WASAPI/other APIs.
+  const isAsio = /asio/i.test(api || "");
 
   const handleSelectDevice = async (id: number) => {
     select(id);
+    await amp.restart();
+  };
+
+  const handleSelectOutputDevice = async (id: number | null) => {
+    selectOutput(id);
     await amp.restart();
   };
 
@@ -105,41 +116,74 @@ export const ToneStudioView = () => {
         )}
 
         <div className='relative flex items-center gap-2'>
-          <select
-            value={selectedId ?? ""}
-            onChange={(e) => handleSelectDevice(Number(e.target.value))}
-            className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-            {devices.length === 0 && <option value=''>No input devices found</option>}
-            {devices.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({d.inputChannels} in) {api ? `· ${api}` : ""}
-              </option>
-            ))}
-          </select>
+          <div className='flex-1'>
+            <span className='mb-1 block text-xs text-zinc-400'>Input {api ? `(${api})` : ""}</span>
+            <select
+              value={selectedId ?? ""}
+              onChange={(e) => handleSelectDevice(Number(e.target.value))}
+              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
+              {devices.length === 0 && <option value=''>No input devices found</option>}
+              {devices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({d.inputChannels} in){d.isDefaultInput ? " · default" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
             type='button'
             onClick={() => refresh()}
             title='Refresh device list'
-            className='rounded-lg bg-zinc-800 p-2 text-zinc-400 hover:text-white'>
+            className='mt-5 shrink-0 rounded-lg bg-zinc-800 p-2 text-zinc-400 hover:text-white'>
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
+          <div className='w-36 shrink-0'>
+            <span className='mb-1 block text-xs text-zinc-400'>Buffer</span>
+            <select
+              value={amp.bufferSize}
+              onChange={(e) => amp.setBufferSize(Number(e.target.value))}
+              title='ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling'
+              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
+              {BUFFER_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size} smp (~{((size / (amp.info?.sampleRate || 48000)) * 1000).toFixed(1)}ms)
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className='relative mt-2'>
+          <span className='mb-1 block text-xs text-zinc-400'>Output</span>
           <select
-            value={amp.bufferSize}
-            onChange={(e) => amp.setBufferSize(Number(e.target.value))}
-            title='ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling'
-            className='w-36 shrink-0 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-            {BUFFER_SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size} smp (~{((size / (amp.info?.sampleRate || 48000)) * 1000).toFixed(1)}ms)
+            value={selectedOutputId ?? ""}
+            onChange={(e) => handleSelectOutputDevice(e.target.value === "" ? null : Number(e.target.value))}
+            disabled={isAsio}
+            title={isAsio ? "ASIO uses the same device for input and output" : "Output device for amp monitoring"}
+            className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-50'>
+            <option value=''>{isAsio ? "Same as input (ASIO)" : "System default output"}</option>
+            {outputDevices.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name} ({d.outputChannels} out){d.isDefaultOutput ? " · default" : ""}
               </option>
             ))}
           </select>
         </div>
 
         {amp.error && <p className='relative mt-2 text-xs text-red-400'>{amp.error}</p>}
+        {amp.overload && (
+          <p className='relative mt-2 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
+            The DSP chain fell behind real time and had to reset (~{Math.round(amp.overload.driftMs)}ms drift) — you
+            probably just heard a click.
+            {amp.overload.namEnabled && " Try a bigger buffer or a lighter NAM model."}
+          </p>
+        )}
         {amp.isOn && amp.info && (
           <p className='relative mt-2 text-[11px] text-zinc-500'>
-            {amp.info.deviceName} · {amp.info.sampleRate / 1000}kHz · ~{amp.info.roundTripMs.toFixed(0)}ms latency
+            {amp.info.deviceName}
+            {amp.info.outDeviceName && amp.info.outDeviceName !== amp.info.deviceName && ` → ${amp.info.outDeviceName}`}
+            {" · "}
+            {amp.info.sampleRate / 1000}kHz · ~{amp.info.roundTripMs.toFixed(0)}ms latency
           </p>
         )}
       </div>
@@ -196,6 +240,7 @@ export const ToneStudioView = () => {
           <Upload size={14} />
           {importingNamModel ? "Loading…" : "Upload model (.nam)"}
         </button>
+        {namError && <p className='mt-1 text-xs text-red-400'>{namError}</p>}
       </SectionPanel>
 
       {/* ── Overdrive: pre-amp pedal, own clip character from the amp's Drive ── */}
@@ -270,6 +315,7 @@ export const ToneStudioView = () => {
           <Upload size={14} />
           {importing ? "Loading…" : "Upload custom IR (.wav)"}
         </button>
+        {irError && <p className='mt-1 text-xs text-red-400'>{irError}</p>}
       </SectionPanel>
 
       {/* ── Delay ────────────────────────────────────────────────────────── */}

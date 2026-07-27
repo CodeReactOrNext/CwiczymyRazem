@@ -6,6 +6,7 @@ export interface NativeAudioDevice {
   inputChannels: number;
   outputChannels: number;
   isDefaultInput: boolean;
+  isDefaultOutput?: boolean;
   preferredSampleRate?: number;
   sampleRates?: number[];
 }
@@ -96,6 +97,9 @@ export interface AmpParams {
 
 export interface AmpStreamInfo {
   deviceName: string;
+  /** Output device actually in use. On ASIO this always equals the input device
+   *  (see nativeAudioEngine.js) regardless of any requested `outputDeviceId`. */
+  outDeviceName: string | null;
   sampleRate: number;
   frameSize: number;
   outChannels: number;
@@ -116,6 +120,15 @@ export interface AmpStartOpts {
   params?: Partial<AmpParams>;
 }
 
+/** Fired when the DSP chain (usually a NAM model too heavy for the current
+ *  buffer size) fell far enough behind real time that the engine had to clear
+ *  the output queue to recover — a real, audible click just happened. */
+export interface AmpOverloadInfo {
+  /** How much accumulated drift (ms) triggered the recovery. */
+  driftMs: number;
+  namEnabled: boolean;
+}
+
 export interface NativeAmpApi {
   isAvailable: true;
   listDevices: () => Promise<NativeAudioDeviceList>;
@@ -123,6 +136,8 @@ export interface NativeAmpApi {
   setParams: (params: Partial<AmpParams>) => Promise<AmpStreamInfo | null>;
   stop: () => Promise<boolean>;
   getStatus: () => Promise<{ isOpen: boolean; info: AmpStreamInfo | null }>;
+  /** Subscribe to overload-recovery events. Returns an unsubscribe fn. */
+  onOverload: (cb: (info: AmpOverloadInfo) => void) => () => void;
 }
 
 declare global {

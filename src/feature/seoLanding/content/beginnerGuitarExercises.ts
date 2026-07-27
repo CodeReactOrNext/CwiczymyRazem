@@ -234,7 +234,6 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
     "guitar-scale-practice-routine",
   ],
   relatedBlogSlugs: [
-    "guitar-learning-without-a-teacher",
     "beginner-guitar-practice-checklist-daily-essentials",
     "how-long-practice-guitar-daily",
   ],

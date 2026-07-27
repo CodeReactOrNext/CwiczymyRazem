@@ -48,7 +48,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
       <button
         type='button'
         onClick={() => setOpen((o) => !o)}
-        title='Symulator wzmacniacza (ASIO, na żywo)'
+        title='Amp simulator (ASIO, live)'
         className={cn(
           "flex items-center rounded-lg transition-all active:scale-95",
           compact ? "h-8 w-8 justify-center active:scale-90" : cn("gap-2 px-4", h),
@@ -61,7 +61,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
       {open && (
         <div className='absolute right-0 z-[9999] mt-2 w-72 rounded-lg bg-zinc-900/95 p-4 text-left text-white shadow-2xl backdrop-blur'>
           <div className='mb-3 flex items-center justify-between'>
-            <span className='text-sm font-semibold'>Wzmacniacz</span>
+            <span className='text-sm font-semibold'>Amplifier</span>
             <button
               type='button'
               onClick={() => amp.toggle()}
@@ -71,15 +71,15 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
                 amp.isOn ? "bg-red-600 text-white hover:bg-red-500" : "bg-zinc-700 text-white hover:bg-zinc-600"
               )}>
               <Power size={12} />
-              {amp.isOn ? "Wyłącz" : "Włącz"}
+              {amp.isOn ? "Turn off" : "Turn on"}
             </button>
           </div>
 
           {/* ── Interface selection ───────────────────────────────── */}
           <div className='mb-3'>
             <div className='mb-1 flex items-center justify-between text-xs text-zinc-400'>
-              <span>Interfejs {api ? `(${api})` : ""}</span>
-              <button type='button' onClick={() => refresh()} title='Odśwież listę' className='text-zinc-400 hover:text-white'>
+              <span>Interface {api ? `(${api})` : ""}</span>
+              <button type='button' onClick={() => refresh()} title='Refresh list' className='text-zinc-400 hover:text-white'>
                 <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
               </button>
             </div>
@@ -87,7 +87,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
               value={selectedId ?? ""}
               onChange={(e) => handleSelectDevice(Number(e.target.value))}
               className='w-full rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-              {devices.length === 0 && <option value=''>Brak urządzeń wejściowych</option>}
+              {devices.length === 0 && <option value=''>No input devices</option>}
               {devices.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name} ({d.inputChannels} in)
@@ -98,13 +98,13 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
 
           {/* ── Preset selection ──────────────────────────────────── */}
           <div className='mb-3'>
-            <span className='mb-1 block text-xs text-zinc-400'>Brzmienie</span>
+            <span className='mb-1 block text-xs text-zinc-400'>Tone</span>
             <select
               value={activePresetId ?? ""}
               onChange={(e) => handleSelectPreset(e.target.value)}
               className='w-full rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
               <option value='' disabled>
-                Wybierz preset…
+                Select preset…
               </option>
               {presets.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -115,6 +115,11 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
           </div>
 
           {amp.error && <p className='mb-2 text-xs text-red-400'>{amp.error}</p>}
+          {amp.overload && (
+            <p className='mb-2 rounded-lg bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-400'>
+              DSP fell behind and reset (~{Math.round(amp.overload.driftMs)}ms) — you may have heard a click.
+            </p>
+          )}
 
           <div className='flex flex-col gap-1'>
             <div className='flex justify-between text-xs text-zinc-400'>
@@ -140,7 +145,7 @@ export const AmpSimButton = ({ compact = false, h = "h-12" }: AmpSimButtonProps)
             href='/tone-studio'
             className='mt-3 flex items-center justify-center gap-2 rounded-lg bg-zinc-800/50 px-2 py-1.5 text-xs text-zinc-300 transition-colors hover:bg-zinc-800'>
             <SlidersHorizontal size={12} />
-            Otwórz Tone Studio
+            Open Tone Studio
           </Link>
         </div>
       )}

@@ -17,6 +17,7 @@ const {
 const path = require("path");
 const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
+const nativeAudioEngine = require("./nativeAudioEngine");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
 const toneStore = require("./toneStore");
@@ -391,6 +392,17 @@ ipcMain.handle("amp:stop", async () => {
   return true;
 });
 ipcMain.handle("amp:status", () => ampSim.getStatus());
+
+// A heavy DSP chain (typically a NAM model too big for the current buffer
+// size) can fall behind real time — nativeAudioEngine.js self-recovers by
+// clearing the output queue, but that's a console.warn nobody but a dev sees.
+// Forward it to the renderer so a real client gets an actual explanation
+// instead of just an unexplained click and a moment of "why did that glitch".
+nativeAudioEngine.onOverload((info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("amp:overload", info);
+  }
+});
 
 // ── Tone Studio IPC (local preset + cabinet-IR persistence) ──────────────────
 ipcMain.handle("tone:list-presets", () => toneStore.listPresets());

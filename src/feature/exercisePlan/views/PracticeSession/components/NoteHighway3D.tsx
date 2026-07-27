@@ -788,6 +788,27 @@ function gemTagTexture(): THREE.Texture {
   return tex;
 }
 
+/** Soft glowing ring — the hit shockwave that pops outward on impact. A blurred
+ *  stroked circle on transparent, not a filled disc, so it reads as an
+ *  expanding wave rather than another solid block. */
+function shockRingTexture(): THREE.Texture {
+  const size = 128;
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = size;
+  const ctx = cv.getContext("2d")!;
+  ctx.clearRect(0, 0, size, size);
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = size * 0.1;
+  ctx.shadowColor = "#ffffff";
+  ctx.shadowBlur = size * 0.09;
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, size * 0.36, 0, Math.PI * 2);
+  ctx.stroke();
+  const tex = new THREE.CanvasTexture(cv);
+  tex.anisotropy = 8;
+  return tex;
+}
+
 /** The single most relevant technique to badge a note with (or none). */
 function techBadge(n: NoteRD): { label: string; color: string } | null {
   if (n.isBend) return { label: "B", color: "#c084fc" };
@@ -1123,6 +1144,22 @@ export const NoteHighway3D = memo(function NoteHighway3D({
     const glowTex = glowTexture();
     textures.push(glowTex);
 
+    // ── Environment map for the metal strings ───────────────────────────────
+    // The string materials are metalness-heavy MeshStandardMaterials but had
+    // nothing to reflect, so "metal" only ever read as flat lit color. Reusing
+    // the theme's own nebula blob colors as a tiny equirect env keeps the
+    // reflection tied to whatever backdrop is active instead of dropping in
+    // an unrelated stock HDRI — the strings pick up a faint colored sheen
+    // that matches the theme rather than a generic studio highlight.
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envEquirect = nebulaTexture(theme.nebula);
+    envEquirect.mapping = THREE.EquirectangularReflectionMapping;
+    const envRT = pmremGenerator.fromEquirectangular(envEquirect);
+    scene.environment = envRT.texture;
+    envEquirect.dispose();
+    pmremGenerator.dispose();
+
     // ── Backdrop nebula (pulses on the beat + follows the camera pan) ──────
     const nebulaMat = trackM(
       new THREE.MeshBasicMaterial({
@@ -1166,6 +1203,37 @@ export const NoteHighway3D = memo(function NoteHighway3D({
     );
     const stars = new THREE.Points(starGeo, starsMat);
     scene.add(stars);
+
+    // Second, further/sparser layer drifting slower than the near one — one
+    // flat sprinkle of dots read as a backdrop sticker; two layers at
+    // different depths and speeds read as an actual sky with real depth.
+    const starCountFar = 220;
+    const starArrFar = new Float32Array(starCountFar * 3);
+    for (let i = 0; i < starCountFar; i++) {
+      starArrFar[i * 3] = (Math.random() - 0.5) * 320;
+      starArrFar[i * 3 + 1] = 10 + Math.random() * 80;
+      starArrFar[i * 3 + 2] = -110 - Math.random() * 140;
+    }
+    const starGeoFar = track(new THREE.BufferGeometry());
+    starGeoFar.setAttribute(
+      "position",
+      new THREE.BufferAttribute(starArrFar, 3),
+    );
+    const starsMatFar = trackM(
+      new THREE.PointsMaterial({
+        size: 0.28,
+        map: glowTex,
+        transparent: true,
+        opacity: 0.28,
+        color: 0x6b7aa0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        sizeAttenuation: true,
+      }),
+    );
+    const starsFar = new THREE.Points(starGeoFar, starsMatFar);
+    scene.add(starsFar);
 
     // ── Sheared highway container ──────────────────────────────────────────
     // x' = x + SHEAR·(z − HIT_LINE_Z): pinned at z = HIT_LINE_Z, not z = 0 —
@@ -1455,6 +1523,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
             metalness: 0.7,
             roughness: 0.45,
             emissive: base.clone().multiplyScalar(0.35),
+            envMapIntensity: 0.6,
           }),
         );
       } else {
@@ -1464,6 +1533,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
             metalness: 0.85,
             roughness: 0.22,
             emissive: base.clone().multiplyScalar(0.35),
+            envMapIntensity: 0.6,
           }),
         );
       }
@@ -1879,6 +1949,65 @@ export const NoteHighway3D = memo(function NoteHighway3D({
         const grow = 0.85 + (1 - t) * 0.55; // pops outward as it fades
         e.mesh.scale.set(grow * e.xScale, grow, grow);
         e.mat.opacity = t * t * settingsRef.current.echoStrength;
+      }
+    };
+
+    // ── Hit shockwave ring: a wide ring pulses outward from the hit point on
+    // impact, on top of the echo above — the echo alone is just the gem's own
+    // shape popping slightly bigger, easy to miss; a distinct expanding ring
+    // reads as an actual shockwave.
+    const SHOCK_N = 6;
+    const SHOCK_LIFE = 0.35;
+    const SHOCK_START = GEM_W * s0.gemSize * 0.6;
+    const SHOCK_END = GEM_W * s0.gemSize * 1.5;
+    const shockTex = shockRingTexture();
+    textures.push(shockTex);
+    const shockGeo = track(new THREE.PlaneGeometry(1, 1));
+    interface ShockRing {
+      mesh: THREE.Mesh;
+      mat: THREE.MeshBasicMaterial;
+      life: number;
+    }
+    const shockRings: ShockRing[] = [];
+    for (let i = 0; i < SHOCK_N; i++) {
+      const mat = trackM(
+        new THREE.MeshBasicMaterial({
+          map: shockTex,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }),
+      );
+      const mesh = new THREE.Mesh(shockGeo, mat);
+      mesh.visible = false;
+      scene.add(mesh);
+      shockRings.push({ mesh, mat, life: 0 });
+    }
+    let shockCursor = 0;
+    const spawnShock = (x: number, y: number, color: THREE.Color) => {
+      if (settingsRef.current.echoStrength <= 0) return;
+      const r = shockRings[shockCursor];
+      shockCursor = (shockCursor + 1) % SHOCK_N;
+      r.mesh.position.set(x, y, STRIP_LEN * 0.5 + 0.09);
+      r.mat.color.copy(color).lerp(ELECTRIC, 0.4);
+      r.life = SHOCK_LIFE;
+      r.mesh.visible = true;
+    };
+    const updateShocks = (dt: number) => {
+      for (const r of shockRings) {
+        if (!r.mesh.visible) continue;
+        r.life -= dt;
+        if (r.life <= 0) {
+          r.mesh.visible = false;
+          continue;
+        }
+        const t = r.life / SHOCK_LIFE; // 1 → 0
+        const size = SHOCK_START + (1 - t) * (SHOCK_END - SHOCK_START);
+        r.mesh.scale.set(size, size, 1);
+        // Bright the instant it appears, fully gone before the ring finishes
+        // expanding — a snappy pop, not a lingering static ring.
+        r.mat.opacity = t * t * 0.8 * settingsRef.current.echoStrength;
       }
     };
 
@@ -2467,9 +2596,15 @@ export const NoteHighway3D = memo(function NoteHighway3D({
       );
       {
         const norm = gemGeo.getAttribute("normal");
+        const pos = gemGeo.getAttribute("position");
         const shadeArr = new Float32Array(norm.count * 3);
         const FILL = 0.22; // dark fill on the flat faces (× hue)
         const BORDER = 1.25; // saturated colour on the rim/sides (× hue, clamps)
+        // Polished-gem top highlight: a tight band at the very top-front
+        // edge, like light catching a cut stone — not a wash over the whole
+        // top face.
+        const HIGHLIGHT = 0.6;
+        const halfH = (GEM_H * s0.gemSize) / 2 || 1;
         for (let v = 0; v < norm.count; v++) {
           const nz = norm.getZ(v);
           // nz² is 1 on the flat front/back faces and falls to 0 across the
@@ -2477,7 +2612,9 @@ export const NoteHighway3D = memo(function NoteHighway3D({
           // border saturates crisply over the bevel instead of fading in like a
           // glow — a dark fill ringed by a solid, mega-saturated edge.
           const rim = Math.min(1, (1 - nz * nz) * 2.2);
-          const shade = FILL + (BORDER - FILL) * rim;
+          const topT = THREE.MathUtils.clamp(pos.getY(v) / halfH, 0, 1);
+          const topBand = topT * topT * topT * Math.max(0, norm.getY(v));
+          const shade = FILL + (BORDER - FILL) * rim + HIGHLIGHT * topBand;
           shadeArr[v * 3] = shadeArr[v * 3 + 1] = shadeArr[v * 3 + 2] = shade;
         }
         gemGeo.setAttribute("color", new THREE.BufferAttribute(shadeArr, 3));
@@ -2554,10 +2691,19 @@ export const NoteHighway3D = memo(function NoteHighway3D({
 
       // Thin stems from the board up to each tag — makes the fret lane of a
       // floating note instantly readable (same trick as the real game).
+      // Additive (like the tails/glows) instead of normal blending: at this
+      // thinness, normal alpha over the dark board reads as a washed-out grey
+      // no matter how saturated the instance color is — additive lets the
+      // string's own hue actually punch through as a thin glowing thread.
       stemsMesh = new THREE.InstancedMesh(
         track(new THREE.BoxGeometry(0.022, 1, 0.022)),
         trackM(
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.45 }),
+          new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          }),
         ),
         flat.length,
       );
@@ -3254,6 +3400,8 @@ export const NoteHighway3D = memo(function NoteHighway3D({
       nebula.position.x = panX + shear * 60;
       stars.position.x = panX * 0.3;
       stars.rotation.y += dt * 0.008;
+      starsFar.position.x = panX * 0.12;
+      starsFar.rotation.y += dt * 0.003;
 
       // Anchor zone hugs the fret window the hand is about to cover.
       const hasWindow = mn !== Infinity;
@@ -3702,6 +3850,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
             if (!firstFrame && !n.hidden && n.holdT < HOLD_GRACE) {
               spawnBurst(n.x, n.y, n.color);
               spawnEcho(n.x, n.y, n.xScale, n.color);
+              spawnShock(n.x, n.y, n.color);
             }
           }
           // Depth cue: notes near the hit line burn at full color, far ones
@@ -3747,6 +3896,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
             if (celebrate) {
               spawnBurst(n.x, n.y, n.color);
               spawnEcho(n.x, n.y, n.xScale, n.color);
+              spawnShock(n.x, n.y, n.color);
             }
             if (next === "miss" && !firstFrame && !n.hidden) {
               // Mark the miss ON THE NECK, at the exact string+fret where the
@@ -3799,6 +3949,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
 
       updateParticles(dt);
       updateEchoes(dt);
+      updateShocks(dt);
       updateMissMarks(dt);
 
       // Ghost note preview: as soon as a note becomes "next", its full-color
@@ -3922,6 +4073,7 @@ export const NoteHighway3D = memo(function NoteHighway3D({
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
+      envRT.dispose();
       renderer.dispose();
       // Release the GPU context immediately — repeated exercise/mode switches
       // would otherwise pile up contexts until the browser drops the oldest.

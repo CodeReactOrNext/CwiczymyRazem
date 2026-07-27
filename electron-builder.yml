@@ -64,10 +64,44 @@ nsis:
   artifactName: riff.quest-Setup-${version}.${ext}
   shortcutName: riff.quest
 
+mac:
+  icon: build-resources/icon.png
+  category: public.app-category.music
+  # No Apple Developer certificate → unsigned, like the Windows NSIS build.
+  # "-" = ad-hoc signing, NOT the same as leaving this unset: Apple Silicon's
+  # kernel refuses to launch ANY arm64 binary with no signature at all (instant
+  # SIGKILL, no Gatekeeper prompt to click through) — ad-hoc is the minimum
+  # needed for it to even start. Unsigned/unnotarized still means Gatekeeper
+  # blocks first launch on download; users need to right-click → Open (or
+  # `xattr -cr riff.quest.app`) past it, same tradeoff as Windows SmartScreen.
+  # KNOWN RISK: electron-builder had a regression (userland issue #9529, ad-hoc
+  # signing since v26.0.13) where mic/camera capture silently returns empty
+  # frames despite the permission prompt succeeding — test guitar input on the
+  # first real build before shipping it; the fallback if it's still broken is
+  # an `afterSign` hook re-running `codesign --force --deep --sign -`.
+  identity: "-"
+  target:
+    - target: dmg
+      arch:
+        - arm64
+    - target: zip
+      arch:
+        - arm64
+
 linux:
   icon: build-resources/icon.png
   category: AudioVideo
   executableName: riff-quest
+  # Electron reads `desktopName` (package.json) at runtime to set its window's
+  # app_id/WM_CLASS. Without this, that falls back to the raw npm package name
+  # ("cwiczymy_razem") while the generated .desktop file's StartupWMClass used
+  # productName ("riff.quest") instead — the mismatch meant desktop environments
+  # (GNOME/KDE/Cinnamon) couldn't associate the running window with its .desktop
+  # entry, so the taskbar/dock fell back to showing the raw package name with a
+  # generic icon. syncDesktopName makes electron-builder derive the installed
+  # .desktop filename + StartupWMClass from desktopName, matching what Electron
+  # itself reports at runtime. https://www.electron.build/linux#window-association-desktopname--syncdesktopname
+  syncDesktopName: true
   target:
     - target: AppImage
       arch:
