@@ -426,8 +426,11 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <Library size={18} />,
       children: LIBRARY_SUB_NAV,
     },
-    { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} /> },
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} /> },
+  ];
+
+  const utilityNavigation = [
+    { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} />, muted: true },
+    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} />, muted: true },
   ];
 
   const renderNavLinks = (
@@ -541,6 +544,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         </div>
 
         <div className="space-y-1">
+          {renderNavLinks(utilityNavigation, mobile ? handleLinkClick : undefined)}
           <SidebarActionButton
             icon={<MessageSquarePlus size={16} />}
             label="Send Feedback"
