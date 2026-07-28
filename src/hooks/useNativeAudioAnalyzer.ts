@@ -65,6 +65,7 @@ export const useNativeAudioAnalyzer = () => {
   const frequencyRef = useRef<number>(0);
   const volumeRef = useRef<number>(0);
   const rawVolumeRef = useRef<number>(0);
+  const noiseFloorRef = useRef<number>(0);
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
@@ -75,12 +76,30 @@ export const useNativeAudioAnalyzer = () => {
   const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
   const windowPosRef = useRef<number>(0);
   const streamInfoRef = useRef<NativeAudioStreamInfo | null>(null);
+  // EMA of the main→renderer IPC hand-off delay (see native.onFrame below) —
+  // folded into getLatencyMs() so note-matching's compensation reflects this
+  // hop instead of silently assuming it's zero (it isn't: this is where the
+  // actual aubio DSP work happens, on the same thread as React/3D rendering).
+  const ipcDelayEmaRef = useRef<number>(0);
   // Set once the stream is open and aubio detectors are built for its *actual*
   // negotiated sample rate (see init() — the driver doesn't always grant the
   // rate we ask for). Frames that arrive before that are safely dropped.
   const processRef = useRef<((win: Float32Array) => void) | null>(null);
+  // Bumped by every init()/close() call; each init() snapshots it into
+  // myGeneration and rechecks after every await. React StrictMode (dev) double-
+  // invokes mount effects (and PracticeSession.tsx's own mic-enable effect adds
+  // a second, independent source of the same thing), so two overlapping init()
+  // calls sharing this ONE hook instance's refs is a real scenario, not just a
+  // theoretical race — a plain "return () => close()" cleanup isn't enough to
+  // prevent it, because close() runs (and no-ops) before the superseded call
+  // has reached anything to unsubscribe. Without this, BOTH calls ended up
+  // registering their own live native.onFrame listener against the SAME shared
+  // windowBufRef/windowPosRef, doubling every captured block into the analysis
+  // window and corrupting pitch detection for the whole session.
+  const generationRef = useRef(0);
 
   const init = useCallback(async () => {
+    const myGeneration = ++generationRef.current;
     const native = window.nativeAudio;
     if (!native) {
       setState(prev => ({ ...prev, error: "Native audio bridge unavailable" }));
@@ -89,6 +108,7 @@ export const useNativeAudioAnalyzer = () => {
 
     try {
       const { api, devices } = await native.listDevices();
+      if (myGeneration !== generationRef.current) return; // superseded while awaiting
       const inputDevices = devices.filter(d => d.inputChannels > 0);
 
       // Pick: persisted choice → default input → first available input device.
@@ -115,7 +135,20 @@ export const useNativeAudioAnalyzer = () => {
       // native.start() so no frame is missed once the stream opens; processRef
       // is still null at that point (detectors aren't built until we know the
       // stream's actual sample rate below), so early frames are just dropped.
-      unsubscribeRef.current = native.onFrame((bytes: Uint8Array) => {
+      unsubscribeRef.current = native.onFrame((bytes: Uint8Array, sentAt: number) => {
+        // Extra safety net on top of the checks around each `await` below: if a
+        // stale unsubscribe somehow didn't run (see generationRef above), still
+        // never let a superseded generation's frames touch the shared buffer.
+        if (myGeneration !== generationRef.current) return;
+        // Measure this block's actual main→renderer delivery delay (clocks are
+        // shared, no skew to correct for) and fold it into a smoothed running
+        // estimate. A single sample is noisy (structured-clone jitter, a GC
+        // tick) — the EMA is what getLatencyMs() below actually reads.
+        const ipcDelayMs = Date.now() - sentAt;
+        ipcDelayEmaRef.current = ipcDelayEmaRef.current === 0
+          ? ipcDelayMs
+          : ipcDelayEmaRef.current * 0.9 + ipcDelayMs * 0.1;
+
         // Reinterpret raw bytes as FLOAT32. Float32Array requires a 4-byte
         // aligned offset; IPC buffers usually are, but copy if not.
         let samples: Float32Array;
@@ -147,6 +180,12 @@ export const useNativeAudioAnalyzer = () => {
         channel: 0,
         frameSize: 256,
       });
+      if (myGeneration !== generationRef.current) {
+        // Superseded while the stream was opening — a newer generation already
+        // owns (or is opening its own) stream; this one must not linger.
+        native.stop().catch(() => { /* ignore */ });
+        return;
+      }
       streamInfoRef.current = info;
 
       // aubio detectors at the stream's actual (negotiated) sample rate.
@@ -154,6 +193,7 @@ export const useNativeAudioAnalyzer = () => {
       const AubioModule = await import("aubiojs");
       const Aubio = AubioModule.default || AubioModule;
       const aubio = await Aubio();
+      if (myGeneration !== generationRef.current) return; // superseded while aubio (wasm) loaded
       const detectors = createGuitarDetectors(aubio, info.sampleRate);
 
       processRef.current = createGuitarBufferProcessor({
@@ -161,7 +201,7 @@ export const useNativeAudioAnalyzer = () => {
         getGain: () => inputGainRef.current,
         analyser: null, // no AnalyserNode in the native path → no chroma snapshots
         targets: {
-          frequencyRef, volumeRef, rawVolumeRef, confidenceRef,
+          frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
         },
         onActive: () => {
@@ -188,6 +228,7 @@ export const useNativeAudioAnalyzer = () => {
   }, []);
 
   const close = useCallback(() => {
+    generationRef.current++; // invalidate any in-flight init() (see generationRef above)
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
@@ -200,10 +241,12 @@ export const useNativeAudioAnalyzer = () => {
     frequencyRef.current = 0;
     volumeRef.current = 0;
     rawVolumeRef.current = 0;
+    noiseFloorRef.current = 0;
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
     onsetChromaRef.current = null;
+    ipcDelayEmaRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, streamInfo: null }));
   }, []);
@@ -237,11 +280,12 @@ export const useNativeAudioAnalyzer = () => {
     const sr = info?.sampleRate || 48000;
     const captureMs = info?.latencyMs ?? 0;     // hardware → app (ASIO ≈ few ms)
     const windowMs = (WINDOW_SIZE / sr) * 1000; // DSP analysis window
-    return captureMs + windowMs;
+    const ipcMs = ipcDelayEmaRef.current;       // measured main→renderer hand-off (see native.onFrame)
+    return captureMs + windowMs + ipcMs;
   }, []);
 
   const audioRefs: AudioRefs = {
-    frequencyRef, volumeRef, rawVolumeRef, lastOnsetTimeRef,
+    frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef,
     lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef,
   };
 

@@ -313,8 +313,31 @@ export const PracticeSession = ({
   } = useCalibration(planHasTablature);
 
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
-  useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
-  useEffect(() => { if (isMicEnabled && !isListening) initAudio(); }, [isMicEnabled]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); }, []);
+  // No cleanup here used to mean React StrictMode's dev-only double-invoke
+  // (mount → cleanup → mount, meant to catch exactly this class of bug) had
+  // nothing to undo between its two invocations — both ran initAudio() with
+  // isListening still false in both closures, so BOTH opened a real native
+  // stream and BOTH registered their own native.onFrame listener. Since those
+  // listeners write into the SAME shared windowBufRef/windowPosRef/processRef
+  // (one useNativeAudioAnalyzer instance, not two), every captured block then
+  // got appended into the analysis window twice — corrupting every 2048-sample
+  // window aubio ever saw. The cleanup makes the dance start→stop→start
+  // (closeAudio is idempotent — safe even if the corresponding initAudio
+  // hadn't opened anything yet) instead of start→start, so only the second
+  // invocation's stream ends up live.
+  //
+  // isListening is deliberately not a dependency: it's read as a guard, not a
+  // trigger — adding it would re-run this effect (cleanup first) the instant
+  // initAudio() flips it to true, immediately closing the stream that was just
+  // opened. initAudio/closeAudio are stable (useCallback, see useAudioAnalyzer
+  // / useNativeAudioAnalyzer) so omitting them changes nothing.
+  useEffect(() => {
+    if (isMicEnabled && !isListening) initAudio();
+    return () => { closeAudio(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMicEnabled]);
 
   // Restore this exercise's persisted pitch-detection preference (exam mode
   // manages mic enablement itself via the mic_prompt flow above).

@@ -41,8 +41,13 @@ export interface NativeAudioApi {
   start: (opts: NativeAudioStartOpts) => Promise<NativeAudioStreamInfo>;
   stop: () => Promise<boolean>;
   getStatus: () => Promise<{ isOpen: boolean; info: NativeAudioStreamInfo | null }>;
-  /** Subscribe to captured FLOAT32 mono PCM blocks. Returns an unsubscribe fn. */
-  onFrame: (cb: (buf: Uint8Array) => void) => () => void;
+  /** Subscribe to captured FLOAT32 mono PCM blocks. Returns an unsubscribe fn.
+   *  `sentAt` is the main process's Date.now() when this block was sent — main
+   *  and renderer share the OS clock, so comparing it against Date.now() on
+   *  receipt measures the actual main→renderer hand-off delay (IPC + however
+   *  busy the renderer's event loop is right now), which isn't otherwise
+   *  visible to the renderer-side latency estimate. */
+  onFrame: (cb: (buf: Uint8Array, sentAt: number) => void) => () => void;
 }
 
 export interface AmpParams {

@@ -26,6 +26,13 @@ export interface ProcessorTargets {
   lastOnsetTimeRef: React.MutableRefObject<number>;
   lastTickTimeRef: React.MutableRefObject<number>;
   onsetChromaRef: React.MutableRefObject<Float32Array | null>;
+  /** Measured ambient noise floor, same 0–1 scale as rawVolumeRef. Updated only
+   *  during confirmed-silent windows (see below); 0 means "not measured yet" —
+   *  consumers (useNoteMatching) should fall back to a fixed gate until then.
+   *  Feeds noteUtils.ts's getAdaptiveVolumeGate() so the "is this note actually
+   *  being played" gate reflects this room/mic's real noise floor instead of a
+   *  single constant tuned for an average setup. */
+  noiseFloorRef: React.MutableRefObject<number>;
 }
 
 export interface BufferProcessorOptions {
@@ -80,7 +87,8 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     const volume = Math.max(0, Math.min(1, rms * 10));
     // Raw RMS without gain — gain-independent signal presence indicator
     const rawRms = gain > 0 ? rms / gain : rms;
-    targets.rawVolumeRef.current = Math.max(0, Math.min(1, rawRms * 10));
+    const rawVolume = Math.max(0, Math.min(1, rawRms * 10));
+    targets.rawVolumeRef.current = rawVolume;
 
     const nowMs = Date.now();
 
@@ -97,6 +105,12 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
         targets.frequencyRef.current  = 0;
         targets.volumeRef.current     = volume;
         targets.confidenceRef.current = 0;
+        // Confirmed silence (2+ windows) — a clean read of the ambient floor,
+        // not a note's decay tail. Slow EMA (0.05) so a single unusually-quiet
+        // or unusually-loud silent window can't swing the gate on its own.
+        targets.noiseFloorRef.current = targets.noiseFloorRef.current === 0
+          ? rawVolume
+          : targets.noiseFloorRef.current * 0.95 + rawVolume * 0.05;
         if (onActive && nowMs - lastStateUpdate >= 100) {
           lastStateUpdate = nowMs;
           onActive();
@@ -155,14 +169,21 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
       }
       const sorted = [...lastFrequencies].sort((a, b) => a - b);
       stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
-    } else {
-      if (rms <= VOLUME_THRESHOLD) {
-        lastFrequencies = [];
-      } else if (!isAttackPhase && lastFrequencies.length > 0) {
-        // Keep previous pitch if Aubio momentarily loses confidence but string rings
-        const sorted = [...lastFrequencies].sort((a, b) => a - b);
-        stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
-      }
+    } else if (rms <= VOLUME_THRESHOLD) {
+      lastFrequencies = [];
+    } else if (lastFrequencies.length > 0) {
+      // Either a momentary confidence dip mid-note, or the attack-phase window
+      // itself (which — since a window is ~43ms and the attack guard is only
+      // 30ms — is *every* window containing a fresh onset). Hold the last
+      // stable estimate without feeding this window's possibly-noisy (or
+      // absent) reading into the median. This used to zero the reported pitch
+      // for the entire attack-phase window instead, which meant a freshly
+      // attacked note couldn't register a hit until the window *after* its
+      // own onset — an extra ~43-85ms of felt detection latency on every
+      // single note attack, on top of whatever getLatencyMs() already
+      // compensates for.
+      const sorted = [...lastFrequencies].sort((a, b) => a - b);
+      stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
     }
 
     targets.frequencyRef.current = stabilizedFreq;

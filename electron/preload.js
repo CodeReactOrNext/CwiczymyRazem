@@ -20,9 +20,11 @@ contextBridge.exposeInMainWorld("nativeAudio", {
   getStatus: () => ipcRenderer.invoke("native-audio:status"),
 
   /** Subscribe to captured PCM blocks (FLOAT32 mono). Returns an unsubscribe fn.
-   *  The callback receives a Uint8Array view of the raw buffer. */
+   *  The callback receives a Uint8Array view of the raw buffer, and the main
+   *  process's Date.now() at the moment it sent this block (for measuring the
+   *  actual main→renderer hand-off delay — see native-audio:start in main.js). */
   onFrame: (cb) => {
-    const listener = (_event, buf) => cb(buf);
+    const listener = (_event, buf, sentAt) => cb(buf, sentAt);
     ipcRenderer.on("native-audio:frame", listener);
     return () => ipcRenderer.removeListener("native-audio:frame", listener);
   },

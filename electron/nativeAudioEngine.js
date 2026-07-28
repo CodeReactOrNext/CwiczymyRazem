@@ -161,6 +161,19 @@ async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates
       shared.closeStream(); // defensive: make sure a failed open never blocks the next candidate's attempt
       continue;
     }
+    if (isOversized(actualFrame, requestedFrameSize)) {
+      // All MAX_OPEN_ATTEMPTS retries came back oversized — the driver is stuck
+      // in its "safe" mode for this open and we're giving up rather than retry
+      // forever. This is exactly what makes latency feel random session-to-
+      // session with nothing else changed: usually a retry or two shakes the
+      // driver loose, but not always, and the caller only ever sees the final
+      // (possibly still-oversized) frameSize/roundTripMs — silently. Log it so
+      // "why does it feel different this time" has a real answer to check
+      // against, instead of being invisible.
+      console.warn(
+        `[audio] Stream opened with an oversized buffer after ${MAX_OPEN_ATTEMPTS} attempts: got ${actualFrame} frames, asked for ${requestedFrameSize} — this session's latency will be noticeably higher than usual until the amp is restarted (and may or may not shake loose next time).`
+      );
+    }
     rt.start();
     return { frame: actualFrame, sampleRate };
   }

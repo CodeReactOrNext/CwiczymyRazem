@@ -296,10 +296,19 @@ ipcMain.handle("native-audio:list-devices", () => audioBridge.listDevices());
 
 ipcMain.handle("native-audio:start", (_e, opts) => {
   return audioBridge.start(opts || {}, (buf) => {
-    // Forward each captured block to the renderer. Buffer is structured-cloned
-    // into a Uint8Array on the other side.
+    // Forward each captured block to the renderer, where useNativeAudioAnalyzer.ts
+    // does the actual windowing + aubio DSP (this main-process side is just a
+    // capture→IPC relay). Buffer is structured-cloned into a Uint8Array on the
+    // other side. sentAt lets the renderer measure how long that hand-off
+    // (IPC delivery + however busy the renderer's own event loop is right now)
+    // actually took — main and renderer share the same OS clock, so Date.now()
+    // is directly comparable across the two processes with no skew to correct
+    // for. Without this, note-matching's latency compensation only accounted
+    // for hardware capture + the analysis window and silently under-counted
+    // this hop, making detected notes read as later than the compensation
+    // assumed — worse whenever the renderer is busy (3D note highway, React).
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("native-audio:frame", buf);
+      mainWindow.webContents.send("native-audio:frame", buf, Date.now());
     }
   });
 });

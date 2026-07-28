@@ -4,10 +4,11 @@ import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { useNativeOutputDevice } from "hooks/useNativeOutputDevice";
-import { ChevronLeft, RefreshCw, Speaker } from "lucide-react";
+import { ChevronLeft, RefreshCw, Speaker, Wand2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronRight, FaHeadphones, FaMicrophone, FaPlug, FaTimes, FaVolumeOff } from "react-icons/fa";
 
+import { useAutoGain } from "../hooks/useAutoGain";
 import type { InputSource } from "./SourceStep";
 
 interface SetupStepProps {
@@ -31,6 +32,7 @@ export const SetupStep = React.memo(function SetupStep({
 }: SetupStepProps) {
   const [volume, setVolume] = useState(0);
   const rafRef = useRef(0);
+  const { autoState, countdown, startAutoGain } = useAutoGain(audioRefs, inputGain, onInputGainChange);
 
   useEffect(() => {
     if (!isListening) {
@@ -137,7 +139,11 @@ export const SetupStep = React.memo(function SetupStep({
                 </div>
               </div>
 
-              {/* Gain slider — manual only */}
+              {/* Gain — auto-calibrate first (recommended, esp. on the native/ASIO
+                  path: it bypasses the OS's shared-mode capture chain entirely,
+                  so the same guitar reads measurably quieter there than in a
+                  browser tab even at the same slider position), fine-tune with
+                  the slider after. */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold tracking-widest text-zinc-500">Input Sensitivity</span>
@@ -148,7 +154,21 @@ export const SetupStep = React.memo(function SetupStep({
                   value={[inputGain]}
                   onValueChange={([v]) => onInputGainChange(v)}
                 />
-
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={startAutoGain}
+                  disabled={autoState === "measuring"}
+                  className="w-full"
+                >
+                  <Wand2 className="mr-1.5 h-3 w-3" />
+                  {autoState === "measuring"
+                    ? `Play a few notes… ${countdown}s`
+                    : autoState === "done"
+                      ? "Calibrated ✓"
+                      : "Auto-Calibrate Gain"}
+                </Button>
               </div>
             </div>
 

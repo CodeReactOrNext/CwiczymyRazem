@@ -1,6 +1,6 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getCentsDistance } from "utils/audio/noteUtils";
+import { correctOctaveForLowStrings, getCentsDistance } from "utils/audio/noteUtils";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import type { GuitarString } from "../calibration.constants";
@@ -55,9 +55,7 @@ export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, st
       const vol  = audioRefs.volumeRef.current;
 
       if (freq > 40 && vol > 0.005) {
-        const corrected = targetHz < 165 &&
-          Math.abs(getCentsDistance(freq / 2, targetHz)) < Math.abs(getCentsDistance(freq, targetHz))
-          ? freq / 2 : freq;
+        const corrected = correctOctaveForLowStrings(freq, targetHz);
         if (Math.abs(getCentsDistance(corrected, targetHz)) <= ACCEPT_CENTS) {
           samplesRef.current.push(corrected);
           lastMatchRef.current = now;

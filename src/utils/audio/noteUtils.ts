@@ -58,6 +58,29 @@ export const getCentsDistance = (freqA: number, freqB: number): number => {
   return 1200 * Math.log2(freqA / freqB);
 };
 
+/** Below this target frequency, a detected reading close to 2x the target is
+ *  treated as a 2nd-harmonic misdetection rather than a genuinely different
+ *  (much higher) note — see correctOctaveForLowStrings. */
+export const LOW_STRING_OCTAVE_CORRECTION_MAX_HZ = 165;
+
+/**
+ * Corrects a common pitch-detector failure mode on low strings: aubio's
+ * yinfft occasionally locks onto the 2nd harmonic instead of the fundamental
+ * for low frequencies (E2/A2/D3 territory). If halving the detected frequency
+ * lands closer to the target than the raw reading does, assume that's what
+ * happened and return the halved value; otherwise return the reading
+ * unchanged. Only ever *relaxes* detection for genuinely low targets — it
+ * can't make a wrong note on a different string read as correct, since it's
+ * anchored on how close the halved reading is to *this specific* target.
+ */
+export function correctOctaveForLowStrings(detectedFreq: number, targetFreq: number): number {
+  if (targetFreq >= LOW_STRING_OCTAVE_CORRECTION_MAX_HZ) return detectedFreq;
+  const halved = detectedFreq / 2;
+  return Math.abs(getCentsDistance(halved, targetFreq)) < Math.abs(getCentsDistance(detectedFreq, targetFreq))
+    ? halved
+    : detectedFreq;
+}
+
 // Standard tuning open-string MIDI notes. String 1 is high E, string 6 is low E.
 export const STANDARD_OPEN_STRING_MIDI: Record<number, number> = {
   1: 64, // E4
@@ -152,9 +175,22 @@ export const HIGH_STRING_MIN_FREQ = midiToFrequency(HIGH_STRING_MIN_MIDI);
 export const HIGH_STRING_VOLUME_MULTIPLIER = 0.5;
 /** Chroma-threshold multiplier applied to high chord tones (weaker chroma energy). */
 export const HIGH_STRING_CHROMA_MULTIPLIER = 0.8;
-/** Pitch confidence (0–1) at/above which the expectation tolerance bonus applies. */
+/** Chroma-threshold multiplier applied when checking whether an already-hit
+ *  chord is still sounding (sustain), vs. the stricter threshold required to
+ *  register the initial hit. Hysteresis — easier to stay "open" than to open —
+ *  because a real chord naturally decays, and requiring the same threshold to
+ *  keep crediting sustain as was needed to attack it cuts the visual fill the
+ *  moment any one note's chroma energy dips slightly, even while the chord is
+ *  still audibly ringing. Never relaxes the *initial* hit requirement. */
+export const CHORD_SUSTAIN_CHROMA_MULTIPLIER = 0.7;
+/** Pitch confidence (0–1) at/above which the expectation tolerance bonus is fully applied. */
 export const EXPECT_NEAR_CONFIDENCE = 0.9;
-/** Extra cents of tolerance granted to a confidently-detected expected note. */
+/** Confidence (0–1) at which the bonus ramp starts (0 bonus at/below this). Between
+ *  this and EXPECT_NEAR_CONFIDENCE the bonus scales linearly — a smooth ramp
+ *  instead of a hard cliff, so ordinary confidence jitter right at the boundary
+ *  doesn't flicker a note between "gets the bonus" and "doesn't". */
+export const EXPECT_NEAR_CONFIDENCE_RAMP_START = 0.75;
+/** Extra cents of tolerance granted to a confidently-detected expected note (at full ramp). */
 export const EXPECT_NEAR_CENTS_BONUS = 15;
 
 export interface DetectionGates {
@@ -162,8 +198,11 @@ export interface DetectionGates {
   isHighString: boolean;
   /** Minimum raw volume for the note to be considered "played". */
   volumeGate: number;
-  /** Chroma-bin energy threshold for a chord tone to count as rung. */
+  /** Chroma-bin energy threshold for a chord tone to count as rung (initial hit). */
   chordChromaThreshold: number;
+  /** Lower chroma threshold for whether an already-hit chord tone is still
+   *  sounding (sustain fill) — see CHORD_SUSTAIN_CHROMA_MULTIPLIER. */
+  sustainChromaThreshold: number;
 }
 
 /**
@@ -178,22 +217,65 @@ export function getDetectionGates(
   baseChordChromaThreshold: number,
 ): DetectionGates {
   const isHighString = targetFreq >= HIGH_STRING_MIN_FREQ - 1;
+  const chordChromaThreshold = isHighString
+    ? baseChordChromaThreshold * HIGH_STRING_CHROMA_MULTIPLIER
+    : baseChordChromaThreshold;
   return {
     isHighString,
     volumeGate: isHighString ? baseVolumeGate * HIGH_STRING_VOLUME_MULTIPLIER : baseVolumeGate,
-    chordChromaThreshold: isHighString
-      ? baseChordChromaThreshold * HIGH_STRING_CHROMA_MULTIPLIER
-      : baseChordChromaThreshold,
+    chordChromaThreshold,
+    sustainChromaThreshold: chordChromaThreshold * CHORD_SUSTAIN_CHROMA_MULTIPLIER,
   };
 }
 
 /**
- * Widens the cents tolerance for a note the player is already aiming at, but only
- * when the pitch detector is highly confident. Anchored on the expected note, so
- * it forgives tuning drift without ever reaching a full semitone.
+ * Widens the cents tolerance for a note the player is already aiming at, ramping
+ * linearly from 0 bonus at EXPECT_NEAR_CONFIDENCE_RAMP_START up to the full
+ * EXPECT_NEAR_CENTS_BONUS at EXPECT_NEAR_CONFIDENCE. Anchored on the expected
+ * note, so it forgives tuning drift without ever reaching a full semitone.
  */
 export function getExpectationBiasedTolerance(baseToleranceCents: number, confidence: number): number {
-  return confidence >= EXPECT_NEAR_CONFIDENCE
-    ? baseToleranceCents + EXPECT_NEAR_CENTS_BONUS
-    : baseToleranceCents;
+  if (confidence <= EXPECT_NEAR_CONFIDENCE_RAMP_START) return baseToleranceCents;
+  const rampProgress = Math.min(
+    1,
+    (confidence - EXPECT_NEAR_CONFIDENCE_RAMP_START) / (EXPECT_NEAR_CONFIDENCE - EXPECT_NEAR_CONFIDENCE_RAMP_START)
+  );
+  return baseToleranceCents + rampProgress * EXPECT_NEAR_CENTS_BONUS;
+}
+
+// ── Adaptive (noise-floor-relative) volume gate ─────────────────────────────────
+//
+// The base volume gate used to be a single fixed constant, the same whether the
+// room/mic is dead silent or has a constant hum/hiss floor. That's a bad fit
+// either way: set high enough to reject a noisy room's floor, it also rejects
+// quiet fingerstyle playing in a quiet room; set low enough for quiet playing,
+// it lets a noisy room's floor read as "played" in someone else's setup.
+//
+// Fix: measure the actual ambient floor per session (guitarBufferProcessor.ts
+// tracks it during confirmed-silent windows) and require real signal to clear
+// a multiple of it — "played" now means "clearly above THIS room's noise", not
+// "above some number tuned for an average room". Bounded on both ends so it can
+// only ever get stricter in a noisy room and only ever get more lenient in a
+// quiet one than the original fixed constant — it never drifts to either
+// extreme (a hair-trigger gate in a silent room, or a wall nothing clears in a
+// loud one).
+
+/** How many multiples of the measured noise floor real signal must clear. ~12dB
+ *  above the floor — enough margin that normal floor jitter can't cross it. */
+export const NOISE_GATE_MULTIPLIER = 4;
+/** Absolute lower bound on the adaptive gate — a near-zero measured noise floor
+ *  (very clean input) still shouldn't produce a hair-trigger gate. */
+export const NOISE_GATE_ABSOLUTE_FLOOR = 0.002;
+/** Absolute upper bound — a very noisy room shouldn't require *louder* playing
+ *  than a well-tuned fixed gate ever did, only bring quieter rooms down to it. */
+export const NOISE_GATE_ABSOLUTE_CEIL = 0.015;
+
+/**
+ * Adaptive volume gate: the measured ambient noise floor scaled by
+ * `NOISE_GATE_MULTIPLIER`, clamped to `[NOISE_GATE_ABSOLUTE_FLOOR, NOISE_GATE_ABSOLUTE_CEIL]`.
+ * Pass the result as `getDetectionGates`'s `baseVolumeGate`.
+ */
+export function getAdaptiveVolumeGate(noiseFloor: number): number {
+  const scaled = noiseFloor * NOISE_GATE_MULTIPLIER;
+  return Math.min(NOISE_GATE_ABSOLUTE_CEIL, Math.max(NOISE_GATE_ABSOLUTE_FLOOR, scaled));
 }

@@ -1,6 +1,7 @@
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import type { Exercise,ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import type { NextRouter } from "next/router";
 import type { Dispatch, SetStateAction } from "react";
@@ -112,6 +113,12 @@ interface DesktopSessionViewProps {
 export const DesktopSessionView = React.memo(function DesktopSessionView(p: DesktopSessionViewProps) {
   const { openLeaderboard } = useSessionUI();
   const [isMobile, setIsMobile] = React.useState(false);
+  // The Electron desktop shell draws its own always-on-top titlebar (h-10,
+  // see ElectronTitleBar) that's portalled to document.body above every
+  // in-app z-index — this view's own `pt-4` isn't enough to clear it, so the
+  // hero header rendered underneath. Add the extra 40px only when running
+  // inside Electron; the web build has no titlebar and needs none of this.
+  const { isElectron } = useElectronWindowControls();
 
   const handleTablatureSeek = React.useCallback((beatPosition: number) => {
     if (!p.metronome.isPlaying) {
@@ -211,7 +218,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
       <TooltipProvider>
         <div>
-          <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8")}>
+          <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8", isElectron && (p.reportResult ? "pt-[72px]" : "pt-[56px]"))}>
             {p.reportResult && p.currentUserStats && p.previousUserStats ? (
               <div className="animate-in fade-in duration-700 slide-in-from-bottom-4">
                 <RatingPopUp

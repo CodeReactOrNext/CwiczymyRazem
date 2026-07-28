@@ -26,7 +26,7 @@ activated (`emsdk install latest && emsdk activate latest`), then from a checkou
 of `NeuralAmpModelerCore` with submodules fetched (`git submodule update --init --depth 1`):
 
 ```sh
-emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions -msimd128 \
+emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -DNAM_ENABLE_A2_FAST -fexceptions -msimd128 \
   -I<NeuralAmpModelerCore>/NAM \
   -I<NeuralAmpModelerCore>/Dependencies/eigen \
   -I<NeuralAmpModelerCore>/Dependencies/nlohmann \
@@ -43,6 +43,7 @@ emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions -msimd128 \
   <NeuralAmpModelerCore>/NAM/util.cpp \
   <NeuralAmpModelerCore>/NAM/wavenet/model.cpp \
   <NeuralAmpModelerCore>/NAM/wavenet/slimmable.cpp \
+  <NeuralAmpModelerCore>/NAM/wavenet/a2_fast.cpp \
   -sMODULARIZE=1 -sEXPORT_NAME=createNamModule -sENVIRONMENT=node \
   -sALLOW_MEMORY_GROWTH=1 -sDISABLE_EXCEPTION_CATCHING=0 \
   -sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","HEAPF32","HEAPU8","stringToUTF8","lengthBytesUTF8"]' \
@@ -51,10 +52,28 @@ emcc -O3 -std=c++20 -DNAM_SAMPLE_FLOAT -fexceptions -msimd128 \
 ```
 
 (`NAM/wavenet/slimmable.cpp` must be included — `model.cpp` references
-`nam::slimmable_wavenet::create_config` even for non-slimmable models.
-`NAM_ENABLE_A2_FAST` / `NAM/wavenet/a2_fast.cpp` are deliberately NOT compiled
-in — that fast path wasn't needed to clear real-time, and skipping it keeps
-the build surface smaller.)
+`nam::slimmable_wavenet::create_config` even for non-slimmable models.)
+
+`NAM_ENABLE_A2_FAST` / `NAM/wavenet/a2_fast.cpp` (added 2026-07-28, built from
+NeuralAmpModelerCore v0.5.5 — above TONE3000's stated v0.5.2 minimum for A2)
+**is now compiled in**. Originally left out on the reasoning that the generic
+path already cleared real-time for the architectures tested — but a real
+client on a small buffer (128 samples @48kHz, 2.67ms budget) hit sustained
+`driftMs` creep (see `nativeAudioEngine.js`) up to ~50ms over a minute of play
+with an A2 model: individual blocks only ran ~1.1-1.4x over budget (below the
+1.5x threshold that logs a `[audio] Block overrun` line), but thousands of
+such blocks per minute net-accumulate drift silently. `is_a2_shape()` in
+`a2_fast.cpp` requires an exact structural match (single layer array, 23
+layers, kernel/dilation sequence, all-LeakyReLU(0.01), no FiLM/gating/head1x1,
+k=16 head) — it's a compile-time-specialized `A2FastModel<Channels>` (Channels
+∈ {3, 8} = nano/standard) instead of the generic dynamic-Eigen `WaveNetConfig`,
+with a pow2 ring buffer and hand-unrolled/Eigen-GEMM per-layer kernels. No real
+`.nam` A2 file was available to verify against, so this was smoke-tested with
+synthetic weight streams shaped to pass `is_a2_shape()` for both Channels=3 and
+Channels=8 (`nam_load` succeeds, `process()` produces finite, bounded,
+non-passthrough output over 20k samples) — that confirms the fast path is
+reachable and doesn't crash/NaN, not sonic correctness against a real trained
+model.
 
 `-msimd128` (added 2026-07-27) enables WASM SIMD — Eigen vectorizes the
 conv/matrix math with it. Verified bit-identical output vs. the non-SIMD build

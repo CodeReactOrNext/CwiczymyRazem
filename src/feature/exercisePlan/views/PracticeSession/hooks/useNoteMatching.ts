@@ -1,6 +1,6 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useEffect, useMemo, useRef } from "react";
-import { computeChromagram, freqToPitchClass, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
+import { computeChromagram, correctOctaveForLowStrings, freqToPitchClass, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
@@ -138,6 +138,12 @@ export function useNoteMatching({
       const currentVolume = audioRefs.rawVolumeRef.current;
       const lastOnsetTime = audioRefs.lastOnsetTimeRef.current;
       const lastTickTime  = audioRefs.lastTickTimeRef.current;
+      // Noise-floor-relative gate once measured (see guitarBufferProcessor.ts);
+      // falls back to the fixed constant until a first confirmed-silent window
+      // has been observed this session.
+      const volumeGateBase = audioRefs.noiseFloorRef.current > 0
+        ? getAdaptiveVolumeGate(audioRefs.noiseFloorRef.current)
+        : VOLUME_GATE;
 
       // Lazy chromagram — computed at most once per tick, only for chord beats
       let chromagram: Float32Array | null | undefined = undefined;
@@ -207,17 +213,23 @@ export function useNoteMatching({
           // Drop C/D, 7-string, capo). Falls back to standard-tuning fret math for
           // regular exercises, where midiNote is undefined.
           let targetFreq = 0;
+          // Unbent pitch for an in-progress (not pre-bent) bend — see below.
+          // Only ever set for isBend notes; 0 elsewhere (never a real target).
+          let preBendTargetFreq = 0;
           if (!note.isDead) {
-            const bendOffset     = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
-            const baseTargetFreq = typeof note.midiNote === "number"
-              ? midiToFrequency(note.midiNote + bendOffset)
-              : getFrequencyFromTab(note.string, note.fret + bendOffset, tuningOffsets);
-            targetFreq = getAdjustedTargetFreq(note.string, baseTargetFreq);
+            const bendOffset = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
+            const freqForOffset = (semitoneOffset: number) => typeof note.midiNote === "number"
+              ? midiToFrequency(note.midiNote + semitoneOffset)
+              : getFrequencyFromTab(note.string, note.fret + semitoneOffset, tuningOffsets);
+            targetFreq = getAdjustedTargetFreq(note.string, freqForOffset(bendOffset));
+            if (note.isBend && !note.isPreBend && bendOffset !== 0) {
+              preBendTargetFreq = getAdjustedTargetFreq(note.string, freqForOffset(0));
+            }
           }
 
           // High strings (≥ E4) ring quieter and carry weaker chroma energy, so
           // relax the volume/chroma gates there to cut false negatives.
-          const gates = getDetectionGates(targetFreq, VOLUME_GATE, CHORD_CHROMA_THRESHOLD);
+          const gates = getDetectionGates(targetFreq, volumeGateBase, CHORD_CHROMA_THRESHOLD);
 
           // Is this note's correct pitch sounding *right now*? Shared by the initial
           // grade and the sustain tracking below. `liveChroma` forces the live FFT
@@ -226,7 +238,13 @@ export function useNoteMatching({
             if (note.isDead) return hasRecentTick || hasRecentOnset;
             if (beat.notes.length > 1) {
               const chroma = (liveChroma || !requiresOnset) ? getChromagram() : audioRefs.onsetChromaRef.current;
-              return !!chroma && chroma[freqToPitchClass(targetFreq)] >= gates.chordChromaThreshold;
+              // liveChroma is only ever true from the sustain-tracking call below
+              // (never the initial-hit grade) — use the lower hysteresis threshold
+              // there so a naturally decaying chord's fill doesn't cut off the
+              // instant one note's energy dips slightly below the (stricter)
+              // threshold that was needed to register the hit in the first place.
+              const threshold = liveChroma ? gates.sustainChromaThreshold : gates.chordChromaThreshold;
+              return !!chroma && chroma[freqToPitchClass(targetFreq)] >= threshold;
             }
             // Thicker strings (like E6) often drift sharp on attack and are harder to tune…
             const baseTolerance = targetFreq < 100 ? CENTS_TOLERANCE + 25 : (targetFreq < 165 ? CENTS_TOLERANCE + 15 : CENTS_TOLERANCE);
@@ -243,7 +261,30 @@ export function useNoteMatching({
             // harmonic ratio of the target scored a false hit. Confidence doesn't
             // distinguish "detector misread this string" from "a real different
             // note that happens to share a ratio" — so require the direct match.
-            return currentFreq > 20 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= tolerance;
+            //
+            // The one narrow exception: correctOctaveForLowStrings undoes a
+            // *specific, already-known* 2nd-harmonic misdetection on low strings
+            // (E2/A2/D3) — the same fix already shipped in the tuner
+            // (useTuningFrequency.ts) and calibration wizard
+            // (useCalibrationCapture.ts) for the exact same detector quirk,
+            // just never ported to actual gameplay matching. Unlike the removed
+            // broad harmonic-ratio matching above, this only ever applies when
+            // the *target* is below 165 Hz, not to every note everywhere.
+            const correctedFreq = correctOctaveForLowStrings(currentFreq, targetFreq);
+            if (correctedFreq > 20 && Math.abs(getCentsDistance(correctedFreq, targetFreq)) <= tolerance) return true;
+
+            // A bend-in-progress (isBend, not isPreBend) physically starts at the
+            // unbent pitch and rises to the full target sometime during the
+            // note's own span — grading only against the fully-bent target the
+            // whole time would miss a correctly-executed bend that just hasn't
+            // reached the top yet. Only while still within the note's own
+            // duration (loopedBeatsElapsed < beatEnd); past that the bend should
+            // be complete and only the full target counts, same as before.
+            if (preBendTargetFreq > 0 && loopedBeatsElapsed < beatEnd) {
+              const correctedPreBend = correctOctaveForLowStrings(currentFreq, preBendTargetFreq);
+              return correctedPreBend > 20 && Math.abs(getCentsDistance(correctedPreBend, preBendTargetFreq)) <= tolerance;
+            }
+            return false;
           };
 
           // ── Already scored: grow the green fill for as long as the note is

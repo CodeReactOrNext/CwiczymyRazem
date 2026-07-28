@@ -15,6 +15,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { AmpSimButton } from "feature/exercisePlan/views/PracticeSession/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
@@ -384,12 +385,14 @@ const TimerLayout = ({
               </div>
             </div>
 
-            <Accordion
-              type='multiple'
-              className='flex flex-col gap-3 lg:w-[320px] lg:shrink-0 lg:self-stretch'>
-              <FreeTimerMetronome />
-              <FreeTimerIntervalAlert elapsedMs={sumTime} isRunning={timerEnabled} />
-            </Accordion>
+            <div className='flex flex-col gap-3 lg:w-[320px] lg:shrink-0 lg:self-stretch'>
+              {/* Electron-only amp simulator (renders nothing on web) */}
+              <AmpSimButton h='h-10' />
+              <Accordion type='multiple' className='flex flex-col gap-3'>
+                <FreeTimerMetronome />
+                <FreeTimerIntervalAlert elapsedMs={sumTime} isRunning={timerEnabled} />
+              </Accordion>
+            </div>
           </div>
         </Card>
 

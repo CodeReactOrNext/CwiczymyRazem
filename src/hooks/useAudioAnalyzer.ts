@@ -23,6 +23,9 @@ export interface AudioRefs {
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
   /** Chromagram snapshot taken at the most recent onset — cleaner than live FFT */
   onsetChromaRef: React.MutableRefObject<Float32Array | null>;
+  /** Measured ambient noise floor (see guitarBufferProcessor.ts), same 0–1 scale
+   *  as rawVolumeRef. 0 means "not measured yet this session". */
+  noiseFloorRef: React.MutableRefObject<number>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -88,6 +91,7 @@ export const useAudioAnalyzer = () => {
   const frequencyRef = useRef<number>(0);
   const volumeRef = useRef<number>(0);
   const rawVolumeRef = useRef<number>(0);
+  const noiseFloorRef = useRef<number>(0);
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
@@ -163,7 +167,7 @@ export const useAudioAnalyzer = () => {
         getGain: () => inputGainRef.current,
         analyser: analyserNodeRef, // chromagram-at-onset snapshots (web path)
         targets: {
-          frequencyRef, volumeRef, rawVolumeRef, confidenceRef,
+          frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
         },
         onActive: () => {
@@ -244,6 +248,7 @@ export const useAudioAnalyzer = () => {
     frequencyRef.current = 0;
     volumeRef.current = 0;
     rawVolumeRef.current = 0;
+    noiseFloorRef.current = 0;
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
@@ -275,7 +280,7 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30;
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
 
   return useMemo(() => ({
     ...state,

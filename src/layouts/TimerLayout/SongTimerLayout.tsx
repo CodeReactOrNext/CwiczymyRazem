@@ -2,6 +2,7 @@ import { Accordion } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { AmpSimButton } from "feature/exercisePlan/views/PracticeSession/components/AmpSimButton";
 import { CommunityMapImportModal } from "feature/songs/components/SongSections/CommunityMapImportModal";
 import {
   nextSectionColor,
@@ -394,6 +395,10 @@ export const SongTimerLayout = ({
                 <Play className='ml-0.5 h-4 w-4 fill-current' />
               )}
             </button>
+
+            {/* Electron-only amp simulator (renders nothing on web). Non-compact
+                so the "AMP"/"AMP ON" label is visible, not just a bare icon. */}
+            <AmpSimButton h='h-10' />
 
             <Button
               onClick={async () => {
