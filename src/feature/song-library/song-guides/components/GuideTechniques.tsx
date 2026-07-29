@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { Sparkles, Zap } from "lucide-react";
 
 import type { SongGuide } from "../types";
 import { GuideSection } from "./GuideSection";
@@ -37,7 +38,20 @@ export const GuideTechniques = ({ guide }: GuideTechniquesProps) => {
               technique.role === "core" ? "bg-zinc-900/60" : "bg-zinc-900/30"
             )}>
             <div className='mb-2 flex items-center justify-between gap-3'>
-              <h3 className='font-semibold text-zinc-100'>{technique.name}</h3>
+              <h3 className='flex items-center gap-2 font-semibold text-zinc-100'>
+                {technique.role === "core" ? (
+                  <Zap
+                    className='h-4 w-4 shrink-0 text-cyan-400'
+                    aria-hidden='true'
+                  />
+                ) : (
+                  <Sparkles
+                    className='h-4 w-4 shrink-0 text-purple-400'
+                    aria-hidden='true'
+                  />
+                )}
+                {technique.name}
+              </h3>
               <TechniqueDots level={technique.difficulty} />
             </div>
             {technique.role === "bonus" && (

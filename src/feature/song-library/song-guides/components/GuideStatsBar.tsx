@@ -20,12 +20,14 @@ export const GuideStatsBar = ({ guide, liveData }: GuideStatsBarProps) => {
       label: "Difficulty",
       value: `${difficulty.toFixed(1)} / 10`,
       color: tier.color,
+      big: true,
     },
     {
       icon: Star,
       label: isLive ? "Community ratings" : "Rating source",
       value: isLive ? `${live?.ratingsCount}` : "Riff Quest editors",
       color: undefined,
+      big: isLive,
     },
     {
       icon: Users,
@@ -33,12 +35,14 @@ export const GuideStatsBar = ({ guide, liveData }: GuideStatsBarProps) => {
       value:
         live && live.popularity > 0 ? `${live.popularity}` : "Join the first",
       color: undefined,
+      big: Boolean(live && live.popularity > 0),
     },
     {
       icon: Clock,
       label: "Typical time to learn",
       value: guide.editorial.timeToLearn,
       color: undefined,
+      big: false,
     },
   ];
 
@@ -52,7 +56,11 @@ export const GuideStatsBar = ({ guide, liveData }: GuideStatsBarProps) => {
               <span className='text-xs text-zinc-500'>{stat.label}</span>
             </div>
             <p
-              className='text-lg font-bold text-zinc-100'
+              className={
+                stat.big
+                  ? "font-display text-3xl font-bold tabular-nums text-zinc-100"
+                  : "text-lg font-bold text-zinc-100"
+              }
               style={stat.color ? { color: stat.color } : undefined}>
               {stat.value}
             </p>

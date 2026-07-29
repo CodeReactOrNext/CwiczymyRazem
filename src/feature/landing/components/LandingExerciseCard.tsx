@@ -13,6 +13,7 @@ interface LandingExerciseCardProps {
     timeInMinutes: number;
   };
   href: string;
+  guideLabel: string;
 }
 
 // 1-4 filled dots, brightness scales with difficulty - same "intensity, not
@@ -39,6 +40,7 @@ const DIFFICULTY_LEVEL: Record<
 export const LandingExerciseCard: React.FC<LandingExerciseCardProps> = ({
   exercise,
   href,
+  guideLabel,
 }) => {
   const level = DIFFICULTY_LEVEL[exercise.difficulty] ?? 1;
 
@@ -81,7 +83,7 @@ export const LandingExerciseCard: React.FC<LandingExerciseCardProps> = ({
               : `${exercise.timeInMinutes} min`}
           </span>
           <span className='flex items-center gap-1 text-xs font-bold text-cyan-400 transition-transform duration-300 group-hover:translate-x-1'>
-            Explore
+            {guideLabel}
             <ArrowRight className='h-3 w-3' />
           </span>
         </div>

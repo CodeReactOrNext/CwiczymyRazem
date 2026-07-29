@@ -176,6 +176,16 @@ export const AmpSimButton = ({
               — you may have heard a click.
             </p>
           )}
+          {amp.connectionIssue && (amp.connectionIssue.status === "lost" || amp.connectionIssue.status === "retrying") && (
+            <p className='mb-2 rounded-lg bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-400'>
+              Audio interface disconnected — reconnecting…
+            </p>
+          )}
+          {amp.connectionIssue?.status === "recovered" && (
+            <p className='mb-2 rounded-lg bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-400'>
+              Audio interface reconnected.
+            </p>
+          )}
 
           <div className='flex justify-center'>
             <Knob

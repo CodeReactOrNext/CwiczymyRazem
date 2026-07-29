@@ -65,6 +65,17 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
                 name: song.title,
                 byArtist: { "@type": "MusicGroup", name: song.artist },
                 url: pageUrl,
+                ...(song.ratingsCount > 0
+                  ? {
+                      aggregateRating: {
+                        "@type": "AggregateRating",
+                        ratingValue: song.avgDifficulty,
+                        ratingCount: song.ratingsCount,
+                        bestRating: 10,
+                        worstRating: 1,
+                      },
+                    }
+                  : {}),
               },
             })),
           }),

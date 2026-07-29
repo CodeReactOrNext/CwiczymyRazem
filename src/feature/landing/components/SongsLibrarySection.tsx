@@ -2,8 +2,13 @@
 
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Reveal } from "feature/landing/components/Reveal";
-import { BookMarked, Disc3, Filter, Star } from "lucide-react";
+import { songGuides } from "feature/song-library/song-guides/content";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { ArrowRight, BookMarked, Disc3, Filter, Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+
+const featuredGuides = songGuides.slice(0, 3);
 
 const features = [
   {
@@ -46,10 +51,17 @@ export const SongsLibrarySection = () => {
               <span className='text-zinc-400'>to learn. Ranked.</span>
             </h2>
 
-            <p className='mb-8 max-w-md text-lg leading-relaxed text-zinc-400'>
+            <p className='mb-6 max-w-md text-lg leading-relaxed text-zinc-400'>
               Rated by the community, not algorithms. Find songs that match your
               level and start learning with context.
             </p>
+
+            <Link
+              href='/song-library'
+              className='mb-8 inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
+              Browse the song library
+              <ArrowRight className='h-3.5 w-3.5' />
+            </Link>
 
             {/* Feature list */}
             <ul className='space-y-5'>
@@ -69,6 +81,35 @@ export const SongsLibrarySection = () => {
                 </li>
               ))}
             </ul>
+
+            {/* Featured song guides */}
+            <div className='mt-8'>
+              <p className='mb-3 text-sm font-bold text-white'>
+                Popular guides
+              </p>
+              <div className='flex flex-wrap gap-2'>
+                {featuredGuides.map((guide) => {
+                  const tier = getSongTier(guide.editorial.difficulty);
+                  return (
+                    <Link
+                      key={guide.slug}
+                      href={`/song-library/${guide.slug}`}
+                      className='group inline-flex items-center gap-2 rounded-lg bg-zinc-900/40 px-3 py-2 text-sm transition-colors hover:bg-zinc-900/70'>
+                      <span
+                        translate='no'
+                        className='font-semibold text-zinc-200 transition-colors group-hover:text-white'>
+                        {guide.title}
+                      </span>
+                      <span
+                        className='text-xs font-bold'
+                        style={{ color: tier.color }}>
+                        {tier.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </Reveal>
 
           {/* Right - screenshot */}

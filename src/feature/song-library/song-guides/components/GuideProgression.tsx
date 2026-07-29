@@ -1,11 +1,12 @@
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 
-import type { SongGuide } from "../types";
+import type { GuideLiveData, SongGuide } from "../types";
 import { GuideSection } from "./GuideSection";
 
 interface GuideProgressionProps {
   guide: SongGuide;
+  liveData: GuideLiveData;
 }
 
 const LADDER: { tier: "D" | "C" | "B" | "A" | "S"; label: string }[] = [
@@ -16,13 +17,16 @@ const LADDER: { tier: "D" | "C" | "B" | "A" | "S"; label: string }[] = [
   { tier: "S", label: "Legendary" },
 ];
 
-export const GuideProgression = ({ guide }: GuideProgressionProps) => {
+export const GuideProgression = ({ guide, liveData }: GuideProgressionProps) => {
+  const difficulty = liveData.song?.avgDifficulty || guide.editorial.difficulty;
+  const activeTier = getSongTier(difficulty).tier;
+
   return (
     <GuideSection heading={guide.progression.heading}>
       <div className='mb-8 grid grid-cols-5 gap-2'>
         {LADDER.map((step) => {
           const tier = getSongTier(step.tier);
-          const isActive = step.tier === guide.progression.tier;
+          const isActive = step.tier === activeTier;
 
           return (
             <div

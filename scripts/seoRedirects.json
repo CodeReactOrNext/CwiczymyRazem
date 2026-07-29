@@ -908,30 +908,5 @@
     "source": "/exercises/strumming-pattern-32",
     "destination": "/beginner-guitar-exercises",
     "permanent": true
-  },
-  {
-    "source": "/blog/guitar-practice-routine-builder",
-    "destination": "/blog/beginner-guitar-practice-checklist-daily-essentials",
-    "permanent": true
-  },
-  {
-    "source": "/blog/guitar-practice-motivation-techniques",
-    "destination": "/blog/how-to-track-guitar-practice-progress-effectively",
-    "permanent": true
-  },
-  {
-    "source": "/blog/get-better-at-guitar-fast-app",
-    "destination": "/blog/best-app-for-guitar-practice",
-    "permanent": true
-  },
-  {
-    "source": "/blog/how-to-organize-guitar-lessons",
-    "destination": "/blog/beginner-guitar-practice-checklist-daily-essentials",
-    "permanent": true
-  },
-  {
-    "source": "/blog/guitar-learning-without-a-teacher",
-    "destination": "/blog/beginner-guitar-practice-checklist-daily-essentials",
-    "permanent": true
   }
 ]

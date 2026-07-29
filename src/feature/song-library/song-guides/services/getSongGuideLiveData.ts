@@ -1,18 +1,9 @@
 import { getTierFromDifficulty } from "feature/songs/utils/difficulty.utils";
 import { firestore } from "utils/firebase/api/firebase.config";
 
-import type { GuideLiveData, GuideLiveSong } from "../types";
+import type { CrossGuideDifficultyMap, GuideLiveData } from "../types";
 
-const SIMILAR_POOL_SIZE = 100;
-const SIMILAR_LIMIT = 3;
-const SIMILAR_WINDOW = 2.5;
-const SIMILAR_GAP = 0.4;
-
-const emptyLiveData: GuideLiveData = {
-  song: null,
-  easierSongs: [],
-  harderSongs: [],
-};
+const emptyLiveData: GuideLiveData = { song: null };
 
 interface RawSongDoc {
   title?: string;
@@ -23,20 +14,6 @@ interface RawSongDoc {
   coverUrl?: string;
   difficulties?: unknown[];
 }
-
-const toLiveSong = (id: string, data: RawSongDoc): GuideLiveSong => ({
-  id,
-  title: typeof data.title === "string" ? data.title : "",
-  artist: typeof data.artist === "string" ? data.artist : "",
-  avgDifficulty:
-    typeof data.avgDifficulty === "number" ? data.avgDifficulty : 0,
-  tier:
-    typeof data.tier === "string"
-      ? data.tier
-      : getTierFromDifficulty(data.avgDifficulty ?? 0),
-  popularity: typeof data.popularity === "number" ? data.popularity : 0,
-  coverUrl: typeof data.coverUrl === "string" ? data.coverUrl : null,
-});
 
 /**
  * Build-time / ISR fetch of community data for a song guide. Fails soft:
@@ -49,49 +26,13 @@ export async function getSongGuideLiveData(
   if (!songId) return emptyLiveData;
 
   try {
-    const [songSnap, poolSnap] = await Promise.all([
-      firestore.collection("songs").doc(songId).get(),
-      firestore
-        .collection("songs")
-        .orderBy("popularity", "desc")
-        .limit(SIMILAR_POOL_SIZE)
-        .get(),
-    ]);
+    const songSnap = await firestore.collection("songs").doc(songId).get();
 
     if (!songSnap.exists) return emptyLiveData;
 
     const data = (songSnap.data() ?? {}) as RawSongDoc;
     const avgDifficulty =
       typeof data.avgDifficulty === "number" ? data.avgDifficulty : 0;
-
-    const pool: GuideLiveSong[] = poolSnap.docs
-      .filter((doc: { id: string }) => doc.id !== songId)
-      .map((doc: { id: string; data: () => RawSongDoc }) =>
-        toLiveSong(doc.id, doc.data())
-      )
-      .filter((song: GuideLiveSong) => song.avgDifficulty > 0 && song.title);
-
-    const easierSongs =
-      avgDifficulty > 0
-        ? pool
-            .filter(
-              (song) =>
-                song.avgDifficulty <= avgDifficulty - SIMILAR_GAP &&
-                song.avgDifficulty >= avgDifficulty - SIMILAR_WINDOW
-            )
-            .slice(0, SIMILAR_LIMIT)
-        : [];
-
-    const harderSongs =
-      avgDifficulty > 0
-        ? pool
-            .filter(
-              (song) =>
-                song.avgDifficulty >= avgDifficulty + SIMILAR_GAP &&
-                song.avgDifficulty <= avgDifficulty + SIMILAR_WINDOW
-            )
-            .slice(0, SIMILAR_LIMIT)
-        : [];
 
     return {
       song: {
@@ -106,10 +47,85 @@ export async function getSongGuideLiveData(
         popularity: typeof data.popularity === "number" ? data.popularity : 0,
         coverUrl: typeof data.coverUrl === "string" ? data.coverUrl : null,
       },
-      easierSongs,
-      harderSongs,
     };
   } catch {
     return emptyLiveData;
   }
+}
+
+/**
+ * Fetches live avgDifficulty/tier for songs that other guides link to via
+ * `learningPath.easier/harder[].guideSlug`. Without this, a cross-linked
+ * mini-card would show a hand-written `difficulty` guess that can silently
+ * disagree with the real tier the linked song's own page displays once
+ * community ratings come in — see the master-of-puppets 8.6-vs-7.2 case.
+ * Fails soft per-song: a missing/unreadable doc just falls out of the map so
+ * the caller's editorial fallback takes over for that entry.
+ */
+export async function getCrossGuideDifficulties(
+  entries: { guideSlug: string; songId: string | null }[]
+): Promise<CrossGuideDifficultyMap> {
+  const result: CrossGuideDifficultyMap = {};
+
+  const validEntries = entries.filter(
+    (entry): entry is { guideSlug: string; songId: string } =>
+      Boolean(entry.songId)
+  );
+
+  await Promise.all(
+    validEntries.map(async ({ guideSlug, songId }) => {
+      try {
+        const snap = await firestore.collection("songs").doc(songId).get();
+        if (!snap.exists) return;
+
+        const data = (snap.data() ?? {}) as RawSongDoc;
+        const avgDifficulty =
+          typeof data.avgDifficulty === "number" ? data.avgDifficulty : 0;
+        if (avgDifficulty <= 0) return;
+
+        result[guideSlug] = {
+          avgDifficulty,
+          tier:
+            typeof data.tier === "string" && data.tier !== "?"
+              ? data.tier
+              : getTierFromDifficulty(avgDifficulty),
+        };
+      } catch {
+        // Fall through — caller falls back to the editorial estimate.
+      }
+    })
+  );
+
+  return result;
+}
+
+/**
+ * Fetches cover art for a batch of songIds, keyed by songId. Used by the
+ * song-library index page to show real album art on the "Deep-dive song
+ * guides" cards without pulling the full live-data payload for each one.
+ * Fails soft per-song, same as the functions above.
+ */
+export async function getGuideCoverUrls(
+  songIds: (string | null)[]
+): Promise<Record<string, string | null>> {
+  const result: Record<string, string | null> = {};
+
+  const uniqueIds = [...new Set(songIds.filter((id): id is string => Boolean(id)))];
+
+  await Promise.all(
+    uniqueIds.map(async (songId) => {
+      try {
+        const snap = await firestore.collection("songs").doc(songId).get();
+        if (!snap.exists) return;
+
+        const data = (snap.data() ?? {}) as RawSongDoc;
+        result[songId] =
+          typeof data.coverUrl === "string" ? data.coverUrl : null;
+      } catch {
+        // Fall through — caller falls back to no cover for this song.
+      }
+    })
+  );
+
+  return result;
 }

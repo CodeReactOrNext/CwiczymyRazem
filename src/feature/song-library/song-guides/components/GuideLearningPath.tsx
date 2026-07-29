@@ -2,16 +2,23 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
-import type { GuideLiveData, GuidePathSong, SongGuide } from "../types";
+import type { CrossGuideDifficultyMap, GuidePathSong, SongGuide } from "../types";
 import { GuideSection } from "./GuideSection";
 
 interface GuideLearningPathProps {
   guide: SongGuide;
-  liveData: GuideLiveData;
+  crossGuideDifficulty: CrossGuideDifficultyMap;
 }
 
-const PathSongCard = ({ song }: { song: GuidePathSong }) => {
-  const tier = getSongTier(song.difficulty);
+const PathSongCard = ({
+  song,
+  crossGuideDifficulty,
+}: {
+  song: GuidePathSong;
+  crossGuideDifficulty: CrossGuideDifficultyMap;
+}) => {
+  const live = song.guideSlug ? crossGuideDifficulty[song.guideSlug] : undefined;
+  const tier = getSongTier(live ? live.tier : song.difficulty);
 
   const body = (
     <div className='h-full rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-900/70'>
@@ -46,38 +53,9 @@ const PathSongCard = ({ song }: { song: GuidePathSong }) => {
   );
 };
 
-const LiveSimilarStrip = ({
-  label,
-  songs,
-}: {
-  label: string;
-  songs: GuideLiveData["easierSongs"];
-}) => {
-  if (songs.length === 0) return null;
-
-  return (
-    <div className='mt-4 rounded-lg bg-zinc-900/40 p-4'>
-      <p className='mb-3 text-xs text-zinc-500'>{label}</p>
-      <div className='flex flex-wrap gap-2'>
-        {songs.map((song) => (
-          <span
-            key={song.id}
-            translate='no'
-            className='rounded bg-zinc-800/60 px-3 py-1.5 text-xs text-zinc-300'>
-            {song.title} — {song.artist}
-            <span className='ml-2 font-bold text-cyan-400'>
-              {song.avgDifficulty.toFixed(1)}
-            </span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export const GuideLearningPath = ({
   guide,
-  liveData,
+  crossGuideDifficulty,
 }: GuideLearningPathProps) => {
   return (
     <GuideSection
@@ -93,13 +71,13 @@ export const GuideLearningPath = ({
           </div>
           <div className='grid gap-4 md:grid-cols-3'>
             {guide.learningPath.easier.map((song) => (
-              <PathSongCard key={song.title} song={song} />
+              <PathSongCard
+                key={song.title}
+                song={song}
+                crossGuideDifficulty={crossGuideDifficulty}
+              />
             ))}
           </div>
-          <LiveSimilarStrip
-            label='Slightly easier songs the Riff Quest community is playing right now'
-            songs={liveData.easierSongs}
-          />
         </div>
 
         <div>
@@ -111,13 +89,13 @@ export const GuideLearningPath = ({
           </div>
           <div className='grid gap-4 md:grid-cols-3'>
             {guide.learningPath.harder.map((song) => (
-              <PathSongCard key={song.title} song={song} />
+              <PathSongCard
+                key={song.title}
+                song={song}
+                crossGuideDifficulty={crossGuideDifficulty}
+              />
             ))}
           </div>
-          <LiveSimilarStrip
-            label='Harder songs the Riff Quest community is playing right now'
-            songs={liveData.harderSongs}
-          />
         </div>
 
         <p className='text-sm text-zinc-500'>

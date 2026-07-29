@@ -9,7 +9,7 @@
 // shape (device/channel/rate/frameSize/duplex) needs to change, not on every
 // attach/detach — attaching a second consumer onto an already-correctly-shaped
 // stream is free.
-const { RtAudioFormat, RtAudioApi } = require("audify");
+const { RtAudioFormat, RtAudioApi, RtAudioErrorType } = require("audify");
 const { AmpChain } = require("./ampSim");
 const shared = require("./rtaudio");
 const toneStore = require("./toneStore");
@@ -150,7 +150,9 @@ async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates
           requestedFrameSize,
           "CwiczymyRazem-native",
           onInputBlock,
-          DEBUG_TIMING ? debugOnFrameOutput : null
+          DEBUG_TIMING ? debugOnFrameOutput : null,
+          0,
+          onStreamError
         );
         if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
         shared.closeStream();
@@ -178,6 +180,131 @@ async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates
     return { frame: actualFrame, sampleRate };
   }
   throw lastErr;
+}
+
+// ── Connection loss / hot-plug recovery ──────────────────────────────────────
+// RtAudio's own ASIO backend closes the stream out from under us, from an internal
+// thread, whenever: the driver's control panel buffer/sample rate is changed while
+// the stream is open, the interface is physically disconnected, or (in practice) a
+// laptop resumes from sleep with a USB interface that came back in a different state
+// (see vendor/rtaudio/RtAudio.cpp's asioMessages/sampleRateChanged → asioStopStream →
+// closeStream()). None of that reaches our onInputBlock callback — the only way to
+// notice is the errorCallback wired into openStreamWithRetry below (for the cases
+// RtAudio does surface one) and the periodic isStreamOpen() health check further down
+// (for when it just closes silently, which is what ASIO actually does above).
+const RECOVERY_DELAYS_MS = [300, 800, 2000, 5000];
+const MAX_RECOVERY_ATTEMPTS = 6; // beyond this, stop retrying and tell the user instead
+
+let connectionListener = null; // single BrowserWindow, same shape as onOverload below
+function onConnectionIssue(fn) {
+  connectionListener = fn;
+}
+function notifyConnectionIssue(info) {
+  try { connectionListener?.(info); } catch { /* ignore */ }
+}
+
+let devicesChangedListener = null;
+function onDevicesChanged(fn) {
+  devicesChangedListener = fn;
+}
+
+let recoveryTimer = null;
+let recoveryAttempt = 0;
+// Stops the health poll from re-triggering a "lost" notification every tick forever
+// after MAX_RECOVERY_ATTEMPTS gives up — otherwise a genuinely-gone device (user
+// closed the interface on purpose) would spam recovery cycles indefinitely. Cleared
+// by whatever gives a reopen a real chance of succeeding: a fresh attach, the device
+// list actually changing (hot-plug), or a resume-from-sleep.
+let recoveryGaveUp = false;
+
+/** ASIO drivers only allow one client — the most common real cause of an open
+ *  failure is something else (a DAW, Discord/OBS set to ASIO) already holding the
+ *  device, but RtAudio doesn't give us a distinguishable error code for that on
+ *  Windows, so this is a best-effort hint rather than a definitive diagnosis. */
+function decorateOpenError(err) {
+  try {
+    if (err && /asio/i.test(shared.getRt().getApi())) {
+      err.message = `${err.message} — if another app (a DAW, Discord, OBS, ...) has this ASIO device open, close it and try again.`;
+    }
+  } catch { /* best-effort hint only */ }
+  return err;
+}
+
+/** Debounced to one recovery cycle at a time. Each attempt is just a normal
+ *  ensureOpen() — computeDesiredShape() re-resolves the device from a fresh
+ *  getDevices() every call, so a replugged/rebooted interface is picked up for
+ *  free, and a still-missing one fails exactly like a first attach would. */
+function scheduleRecovery(reason) {
+  if (recoveryTimer || recoveryGaveUp) return; // already scheduled/in flight, or already gave up
+  if (!captureConsumer && !ampConsumer) return; // nothing to recover for
+
+  recoveryAttempt++;
+  notifyConnectionIssue({
+    status: recoveryAttempt === 1 ? "lost" : "retrying",
+    message: reason,
+    attempt: recoveryAttempt,
+  });
+
+  if (recoveryAttempt > MAX_RECOVERY_ATTEMPTS) {
+    recoveryAttempt = 0;
+    recoveryGaveUp = true;
+    notifyConnectionIssue({ status: "failed", message: decorateOpenError(new Error(reason || "Audio stream lost")).message });
+    return;
+  }
+
+  const delay = RECOVERY_DELAYS_MS[Math.min(recoveryAttempt - 1, RECOVERY_DELAYS_MS.length - 1)];
+  recoveryTimer = setTimeout(async () => {
+    recoveryTimer = null;
+    try { await ensureOpen(); } catch { /* checked via isStreamOpen() below either way */ }
+    if (shared.isStreamOpen()) {
+      recoveryAttempt = 0;
+      notifyConnectionIssue({ status: "recovered" });
+    } else {
+      scheduleRecovery(reason);
+    }
+  }, delay);
+}
+
+/** Called from main.js on Electron's powerMonitor "resume". A USB interface commonly
+ *  comes back in a state isStreamOpen() still (wrongly) reports as fine, so this forces
+ *  a clean close+reopen unconditionally instead of waiting for the health poll to notice. */
+function recoverAfterResume() {
+  if (!captureConsumer && !ampConsumer) return;
+  recoveryGaveUp = false;
+  shared.closeStream();
+  scheduleRecovery("System resumed from sleep");
+}
+
+function devicesKey(devices) {
+  return devices.map((d) => `${d.id}:${d.name}:${d.inputChannels}:${d.outputChannels}`).join("|");
+}
+
+let lastDevicesKey = null;
+const HEALTH_POLL_MS = 2000;
+const healthPollTimer = setInterval(() => {
+  shared.maybeUpgradeToAsio();
+
+  try {
+    const key = devicesKey(shared.getRt().getDevices());
+    if (lastDevicesKey !== null && key !== lastDevicesKey) {
+      recoveryGaveUp = false; // device list changed — worth another shot even after giving up
+      try { devicesChangedListener?.(); } catch { /* ignore */ }
+    }
+    lastDevicesKey = key;
+  } catch { /* device enumeration itself failing isn't fatal here */ }
+
+  // openShape says the stream should be open, but it isn't anymore — RtAudio closed
+  // it out from under us (see comment above) without ever reaching our error callback.
+  if (openShape && (captureConsumer || ampConsumer) && !shared.isStreamOpen()) {
+    scheduleRecovery("Audio stream closed unexpectedly (device disconnected or driver reset)");
+  }
+}, HEALTH_POLL_MS);
+if (healthPollTimer.unref) healthPollTimer.unref();
+
+function onStreamError(type, msg) {
+  if (type === RtAudioErrorType.WARNING || type === RtAudioErrorType.DEBUG_WARNING) return;
+  console.warn(`[audio] RtAudio error (type=${type}): ${msg}`);
+  scheduleRecovery(msg);
 }
 
 function listDevices() {
@@ -470,6 +597,9 @@ async function ensureOpenInner() {
     openShape = null;
     ampChain = null;
     driftMs = 0;
+    if (recoveryTimer) { clearTimeout(recoveryTimer); recoveryTimer = null; } // nothing left to recover for
+    recoveryAttempt = 0;
+    recoveryGaveUp = false;
     recomputeInfos();
     return;
   }
@@ -531,11 +661,12 @@ async function attachCapture(opts, onFrame) {
     },
     onFrame,
   };
+  recoveryGaveUp = false; // a fresh attach always deserves a real attempt
   try {
     await ensureOpen();
   } catch (err) {
     captureConsumer = null;
-    throw err;
+    throw decorateOpenError(err);
   }
   return captureInfo;
 }
@@ -560,11 +691,12 @@ async function attachAmp(opts = {}) {
     },
     params: opts.params || {},
   };
+  recoveryGaveUp = false; // a fresh attach always deserves a real attempt
   try {
     await ensureOpen();
   } catch (err) {
     ampConsumer = null;
-    throw err;
+    throw decorateOpenError(err);
   }
   return ampInfo;
 }
@@ -603,4 +735,5 @@ module.exports = {
   attachCapture, detachCapture, getCaptureStatus,
   attachAmp, updateAmpParams, detachAmp, getAmpStatus,
   onOverload,
+  onConnectionIssue, onDevicesChanged, recoverAfterResume,
 };

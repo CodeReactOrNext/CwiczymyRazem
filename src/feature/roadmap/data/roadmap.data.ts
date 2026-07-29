@@ -76,7 +76,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
       "A much better tab editor, Fame Points every time someone practices a plan you made, plus a bunch of smaller tweaks and quality of life improvements across the whole exercise builder.",
     done: true,
   },
-  { id: "t90", goal: 90, icon: Guitar, label: "+10 New Guitars & Pedals", kind: "content" },
+  { id: "t90", goal: 90, icon: Guitar, label: "+10 New Guitars & Pedals", kind: "content", done: true },
   { id: "t105", goal: 105, icon: Palette, label: "Fully Customizable Tablature", kind: "feature", done: true },
   {
     id: "t115",
@@ -86,6 +86,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     kind: "feature",
     description:
       "A desktop app you can download, where you build your own tones right inside it, load your own IRs, and play with zero latency.",
+    done: true,
   },
   {
     id: "t130",

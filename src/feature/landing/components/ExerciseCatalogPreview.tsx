@@ -2,7 +2,11 @@
 
 import { LandingExerciseCard } from "feature/landing/components/LandingExerciseCard";
 import { Reveal } from "feature/landing/components/Reveal";
-import { getExerciseLandingHref } from "lib/exerciseLandingLink";
+import {
+  getExerciseLandingPageKey,
+  SEO_LANDING_PAGES,
+  SEO_LANDING_TITLES,
+} from "lib/exerciseLandingLink";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -43,21 +47,25 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
           <Link
             href='/beginner-guitar-exercises'
             className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
-            Explore the free practice guides
+            Explore free beginner guitar exercises
             <ArrowRight className='h-3.5 w-3.5' />
           </Link>
         </Reveal>
 
         {exercises.length > 0 && (
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-            {exercises.map((ex, i) => (
-              <Reveal key={ex.id} delay={i * 0.06} className='h-full'>
-                <LandingExerciseCard
-                  exercise={ex}
-                  href={getExerciseLandingHref(ex.id, ex)}
-                />
-              </Reveal>
-            ))}
+            {exercises.map((ex, i) => {
+              const pageKey = getExerciseLandingPageKey(ex.id, ex);
+              return (
+                <Reveal key={ex.id} delay={i * 0.06} className='h-full'>
+                  <LandingExerciseCard
+                    exercise={ex}
+                    href={SEO_LANDING_PAGES[pageKey]}
+                    guideLabel={SEO_LANDING_TITLES[pageKey]}
+                  />
+                </Reveal>
+              );
+            })}
           </div>
         )}
       </div>

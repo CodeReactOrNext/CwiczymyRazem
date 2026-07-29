@@ -12,6 +12,8 @@ export type GuideSectionId =
   | "progression"
   | "inlineCta"
   | "relatedExercises"
+  | "sources"
+  | "videoLessons"
   | `custom:${string}`;
 
 export interface GuideSeo {
@@ -70,6 +72,20 @@ export interface GuideFaqEntry {
   message: string;
 }
 
+export interface GuideSource {
+  /** What the link backs up — shown next to the citation. */
+  label: string;
+  /** Real, verified URL — never a guessed or fabricated one. */
+  url: string;
+}
+
+export interface GuideVideoLesson {
+  /** The YouTube video id, e.g. the `v=` param — real videos only, checked against oEmbed. */
+  videoId: string;
+  title: string;
+  channelName: string;
+}
+
 /** Per-song custom blocks — this is what makes each page structurally unique. */
 export type GuideCustomBlock =
   | {
@@ -117,6 +133,8 @@ export interface SongGuide {
   songId: string | null;
   title: string;
   artist: string;
+  /** Key into `AUTHORS` in `lib/authors.ts` — same registry the blog uses. */
+  author: string;
   /** ISO date, bump when content changes — used in sitemap + article schema. */
   publishedAt: string;
   updatedAt: string;
@@ -174,8 +192,13 @@ export interface SongGuide {
   relatedLandingSlugs: SeoLandingPageKey[];
   progression: {
     heading: string;
-    /** Which tier the song sits in on the D→S ladder. */
-    tier: "D" | "C" | "B" | "A" | "S";
+    /**
+     * Tier is deliberately NOT stored here — it's derived at render time from
+     * live community data (falling back to `editorial.difficulty`) so the
+     * ladder highlight can never drift out of sync with the score shown
+     * elsewhere on the page. Keep `description` free of hardcoded tier
+     * letters/numbers for the same reason.
+     */
     description: string;
   };
   inlineCta: {
@@ -188,22 +211,16 @@ export interface SongGuide {
     text: string;
   };
   faq: GuideFaqEntry[];
+  /** Optional citations backing specific factual claims (tempo, quotes, etc.) — E-E-A-T signal, real outbound links only. */
+  sources?: GuideSource[];
+  /** Optional third-party video lessons for this song — real, checked videos only. */
+  videoLessons?: GuideVideoLesson[];
   customBlocks: GuideCustomBlock[];
   /** Render order — every page gets its own structure. */
   sectionOrder: GuideSectionId[];
 }
 
 /** Live data resolved server-side from Firestore when `songId` is set. */
-export interface GuideLiveSong {
-  id: string;
-  title: string;
-  artist: string;
-  avgDifficulty: number;
-  tier: string;
-  popularity: number;
-  coverUrl: string | null;
-}
-
 export interface GuideLiveData {
   song: {
     avgDifficulty: number;
@@ -212,6 +229,16 @@ export interface GuideLiveData {
     popularity: number;
     coverUrl: string | null;
   } | null;
-  easierSongs: GuideLiveSong[];
-  harderSongs: GuideLiveSong[];
 }
+
+/**
+ * Live rating for a song referenced by `guideSlug` in another guide's
+ * `learningPath`, keyed by that guideSlug. Lets cross-linked mini-cards show
+ * the same real-time tier/score as the linked song's own page, instead of
+ * trusting a hand-written `difficulty` guess that can drift once community
+ * ratings come in.
+ */
+export type CrossGuideDifficultyMap = Record<
+  string,
+  { avgDifficulty: number; tier: string }
+>;

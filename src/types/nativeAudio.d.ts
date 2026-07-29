@@ -35,6 +35,18 @@ export interface NativeAudioStartOpts {
   frameSize?: number;
 }
 
+/** Fired when the shared native stream is lost (device disconnected, driver reset
+ *  from its own control panel, system resume) and again as the engine retries in
+ *  the background — see nativeAudioEngine.js's scheduleRecovery. `"lost"` fires
+ *  once, `"retrying"` on each subsequent attempt, `"recovered"` once the stream is
+ *  back, `"failed"` once retries are exhausted (the user needs to act: replug the
+ *  interface, close whatever else is holding the ASIO driver, then restart). */
+export interface ConnectionIssueInfo {
+  status: "lost" | "retrying" | "recovered" | "failed";
+  message?: string;
+  attempt?: number;
+}
+
 export interface NativeAudioApi {
   isAvailable: true;
   listDevices: () => Promise<NativeAudioDeviceList>;
@@ -48,6 +60,10 @@ export interface NativeAudioApi {
    *  busy the renderer's event loop is right now), which isn't otherwise
    *  visible to the renderer-side latency estimate. */
   onFrame: (cb: (buf: Uint8Array, sentAt: number) => void) => () => void;
+  /** Subscribe to stream-loss/recovery events. Returns an unsubscribe fn. */
+  onConnectionIssue: (cb: (info: ConnectionIssueInfo) => void) => () => void;
+  /** Subscribe to native device-list changes (hot-plug). Returns an unsubscribe fn. */
+  onDevicesChanged: (cb: () => void) => () => void;
 }
 
 export interface AmpParams {
@@ -143,6 +159,11 @@ export interface NativeAmpApi {
   getStatus: () => Promise<{ isOpen: boolean; info: AmpStreamInfo | null }>;
   /** Subscribe to overload-recovery events. Returns an unsubscribe fn. */
   onOverload: (cb: (info: AmpOverloadInfo) => void) => () => void;
+  /** Subscribe to stream-loss/recovery events (the amp shares the one underlying
+   *  stream with capture, so it can be affected too). Returns an unsubscribe fn. */
+  onConnectionIssue: (cb: (info: ConnectionIssueInfo) => void) => () => void;
+  /** Subscribe to native device-list changes (hot-plug). Returns an unsubscribe fn. */
+  onDevicesChanged: (cb: () => void) => () => void;
 }
 
 declare global {

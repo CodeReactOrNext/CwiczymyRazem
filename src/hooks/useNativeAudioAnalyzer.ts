@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
+import { toast } from "sonner";
+import type { ConnectionIssueInfo, NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
 
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 import type { AudioRefs } from "./useAudioAnalyzer";
@@ -45,6 +46,9 @@ interface NativeAnalyzerState {
   api: string | null;
   /** Negotiated stream info incl. measured capture latency. */
   streamInfo: NativeAudioStreamInfo | null;
+  /** "ok" outside of a connection-issue event; see ConnectionIssueInfo. Distinct
+   *  from `error` so a transient "retrying" doesn't have to flip isListening off. */
+  connectionStatus: ConnectionIssueInfo["status"] | "ok";
 }
 
 export const useNativeAudioAnalyzer = () => {
@@ -55,11 +59,13 @@ export const useNativeAudioAnalyzer = () => {
     devices: [],
     api: null,
     streamInfo: null,
+    connectionStatus: "ok",
   });
 
   const inputGainRef = useRef<number>(loadPersistedGain());
   const selectedDeviceIdRef = useRef<number | null>(loadPersistedDeviceId());
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const connectionUnsubscribeRef = useRef<(() => void) | null>(null);
 
   // Realtime refs (same shape the rest of the app consumes)
   const frequencyRef = useRef<number>(0);
@@ -171,6 +177,40 @@ export const useNativeAudioAnalyzer = () => {
         windowPosRef.current = pos;
       });
 
+      // Surfaces stream-loss/recovery from nativeAudioEngine.js's scheduleRecovery
+      // (device disconnected, driver reset from its own control panel, system
+      // resume) — without this, a lost stream just silently stops delivering
+      // frames with nothing telling the user why. On "recovered" we deliberately
+      // don't tear down and re-init: this onFrame subscription is a persistent
+      // IPC listener the engine's internal reopen never touches, so frames just
+      // resume on their own, and the engine remembers the last negotiated sample
+      // rate per device (see negotiatedSampleRateByDevice in nativeAudioEngine.js),
+      // so a reopen almost always lands back on the rate these detectors were
+      // already built for — just refresh the displayed stream info and clear the
+      // indicator.
+      connectionUnsubscribeRef.current = native.onConnectionIssue((info) => {
+        if (myGeneration !== generationRef.current) return;
+        if (info.status === "recovered") {
+          // The gap mid-window (samples stopped arriving, then resumed) would
+          // otherwise splice pre-loss and post-recovery audio into one 2048-sample
+          // analysis window — cheap to avoid by just starting the next window fresh.
+          windowPosRef.current = 0;
+          native.getStatus().then((status) => {
+            if (myGeneration !== generationRef.current) return;
+            if (status.info) streamInfoRef.current = status.info;
+            setState(prev => ({ ...prev, connectionStatus: "ok", streamInfo: status.info ?? prev.streamInfo }));
+          }).catch(() => { /* ignore — indicator staying until the next event is harmless */ });
+          return;
+        }
+        setState(prev => ({
+          ...prev,
+          connectionStatus: info.status,
+          ...(info.status === "failed"
+            ? { isListening: false, error: info.message || "Audio interface disconnected" }
+            : {}),
+        }));
+      });
+
       // Open the low-latency stream. Small frameSize → minimal capture latency.
       // No sampleRate hint: some ASIO drivers report a preferred rate they then
       // refuse to open at, so the engine negotiates and reports back what it
@@ -217,6 +257,7 @@ export const useNativeAudioAnalyzer = () => {
         ...prev,
         isListening: true,
         error: null,
+        connectionStatus: "ok",
         devices: inputDevices,
         api,
         streamInfo: info,
@@ -233,6 +274,10 @@ export const useNativeAudioAnalyzer = () => {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
+    if (connectionUnsubscribeRef.current) {
+      connectionUnsubscribeRef.current();
+      connectionUnsubscribeRef.current = null;
+    }
     window.nativeAudio?.stop().catch(() => { /* ignore */ });
 
     processRef.current = null;
@@ -248,12 +293,26 @@ export const useNativeAudioAnalyzer = () => {
     onsetChromaRef.current = null;
     ipcDelayEmaRef.current = 0;
 
-    setState(prev => ({ ...prev, isListening: false, streamInfo: null }));
+    setState(prev => ({ ...prev, isListening: false, streamInfo: null, connectionStatus: "ok" }));
   }, []);
 
   useEffect(() => {
     return () => { close(); };
   }, [close]);
+
+  // Toasts on connectionStatus transitions (see onConnectionIssue subscription in
+  // init() above) — the only user-visible signal that a live session's capture
+  // stream was silently lost and (usually) recovered in the background.
+  const prevConnectionStatusRef = useRef(state.connectionStatus);
+  useEffect(() => {
+    if (prevConnectionStatusRef.current === state.connectionStatus) return;
+    prevConnectionStatusRef.current = state.connectionStatus;
+    if (state.connectionStatus === "lost") toast.warning("Audio interface disconnected — reconnecting…");
+    else if (state.connectionStatus === "recovered") toast.success("Audio interface reconnected.");
+    else if (state.connectionStatus === "failed") toast.error("Couldn't reconnect the audio interface. Check the cable/driver and restart mic input.");
+    // "retrying" is deliberately silent — one toast for the whole cycle (the
+    // "lost" one above), not per attempt.
+  }, [state.connectionStatus]);
 
   const setInputGain = useCallback((value: number) => {
     const clamped = Math.max(0.5, Math.min(10.0, value));
