@@ -1,3 +1,4 @@
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, ChevronRight, Music } from "lucide-react";
 import Link from "next/link";
@@ -13,11 +14,18 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
   const difficulty = liveData.song?.avgDifficulty || guide.editorial.difficulty;
   const tier = getSongTier(difficulty);
   const coverUrl = liveData.song?.coverUrl;
+  const updatedLabel = new Date(guide.updatedAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 
   return (
     <div className='relative overflow-hidden'>
       {/* Blurred cover as ambient backdrop — falls back to a cyan glow. */}
       <div className='pointer-events-none absolute inset-0' aria-hidden='true'>
+        <GuitarPatternBackground />
         {coverUrl ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,8 +62,14 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
 
         <div className='flex flex-col gap-10 md:flex-row md:items-start md:justify-between'>
           <div className='min-w-0'>
-            <p className='mb-3 text-sm font-semibold text-cyan-400'>
-              Song guide · {guide.artist}
+            <p className='mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-cyan-400'>
+              <span>Song guide · {guide.artist}</span>
+              <span className='text-zinc-600' aria-hidden='true'>
+                ·
+              </span>
+              <time dateTime={guide.updatedAt} className='font-normal text-zinc-500'>
+                Updated {updatedLabel}
+              </time>
             </p>
             <h1 className='font-display max-w-3xl text-balance text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl'>
               {guide.h1}

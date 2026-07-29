@@ -18,9 +18,9 @@ export const GuideCustomBlock = ({ block }: GuideCustomBlockProps) => {
               <div
                 key={step.bpm}
                 className='flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-5 sm:flex-row sm:items-center'>
-                <div className='flex shrink-0 items-center gap-2 sm:w-40'>
-                  <Gauge className='h-4 w-4 text-orange-400' />
-                  <span className='font-display text-2xl font-bold text-orange-400'>
+                <div className='flex shrink-0 items-center gap-2 sm:w-48'>
+                  <Gauge className='h-4 w-4 shrink-0 text-orange-400' />
+                  <span className='font-display whitespace-nowrap text-2xl font-bold text-orange-400'>
                     {step.bpm}
                   </span>
                   <span className='text-xs text-zinc-500'>BPM</span>

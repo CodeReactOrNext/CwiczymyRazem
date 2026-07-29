@@ -45,4 +45,27 @@ function closeStream() {
   try { rt.closeStream(); } catch { /* ignore */ }
 }
 
-module.exports = { getRt, isStreamOpen, closeStream };
+/** getRt()'s ASIO probe only ever runs once, at first use (see createRt above) — if
+ *  ASIO genuinely wasn't ready yet at that moment (interface still booting, driver
+ *  still loading) the app is stuck on WASAPI for the rest of the process, and no
+ *  amount of clicking "Refresh" in the device picker changes that, since it only
+ *  calls getDevices() on the same cached instance. Call this from anywhere that
+ *  already re-lists devices (manual refresh, the hot-plug poll) to give ASIO a
+ *  second chance — only when nothing is currently open, so a live stream is never
+ *  interrupted just to check whether a better API showed up.
+ */
+function maybeUpgradeToAsio() {
+  if (!rt || isStreamOpen()) return;
+  try {
+    if (/asio/i.test(rt.getApi())) return; // getApi() returns a display name, e.g. "Windows ASIO"
+  } catch { return; }
+  try {
+    const asio = new RtAudio(RtAudioApi.WINDOWS_ASIO);
+    if (asio.getDevices().length > 0) {
+      rt = asio;
+      console.log("[audio] ASIO became available — upgraded from the fallback API.");
+    }
+  } catch { /* still not available */ }
+}
+
+module.exports = { getRt, isStreamOpen, closeStream, maybeUpgradeToAsio };

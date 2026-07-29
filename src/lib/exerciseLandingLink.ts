@@ -11,6 +11,15 @@ export const SEO_LANDING_PAGES = {
 
 export type SeoLandingPageKey = keyof typeof SEO_LANDING_PAGES;
 
+/** Short display names, kept in sync with the footer's "Practice guides" links. */
+export const SEO_LANDING_TITLES: Record<SeoLandingPageKey, string> = {
+  beginner: "Beginner Exercises",
+  speed: "Speed & Hand Sync",
+  scales: "Scale Practice Routine",
+  intermediate: "Intermediate Routine",
+  daily: "Daily Practice Plan",
+};
+
 /**
  * Exercises embedded (with an anchor) on one of the landing pages.
  * Kept in sync with feature/seoLanding content configs by content.test.ts —
@@ -115,6 +124,17 @@ export function classifyExerciseLanding(
     return "intermediate";
   }
   return "daily";
+}
+
+/** Which landing page an exercise belongs to, embedded or classified. */
+export function getExerciseLandingPageKey(
+  exerciseId: string,
+  meta?: ExerciseLandingMeta
+): SeoLandingPageKey {
+  return (
+    EMBEDDED_EXERCISE_PAGE[exerciseId] ??
+    classifyExerciseLanding(exerciseId, meta)
+  );
 }
 
 /**

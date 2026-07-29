@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AmpOverloadInfo, AmpParams, AmpStreamInfo } from "types/nativeAudio";
+import type { AmpOverloadInfo, AmpParams, AmpStreamInfo, ConnectionIssueInfo } from "types/nativeAudio";
 
 import { readPersistedDeviceId, readPersistedOutputDeviceId } from "./useNativeAudioDevices";
 
@@ -82,6 +82,32 @@ export const useAmpSim = () => {
     return () => clearTimeout(timer);
   }, [overload]);
 
+  // Surfaces nativeAudioEngine's stream-loss/recovery (device disconnected, driver
+  // reset from its own control panel, system resume) — the amp shares the one
+  // underlying stream with capture, so it can be knocked out the same way. "failed"
+  // (retries exhausted) turns monitoring off for real, since the stream really is
+  // gone; "lost"/"retrying" just show a banner while the engine keeps trying in the
+  // background, and "recovered" refreshes the displayed stream info (frameSize/
+  // latency can shift slightly on reopen) and self-clears like the overload banner.
+  const [connectionIssue, setConnectionIssue] = useState<ConnectionIssueInfo | null>(null);
+  useEffect(() => {
+    if (!window.nativeAmp) return undefined;
+    return window.nativeAmp.onConnectionIssue((event) => {
+      setConnectionIssue(event);
+      if (event.status === "failed") {
+        setIsOn(false);
+        setError(event.message || "Audio interface disconnected");
+      } else if (event.status === "recovered") {
+        window.nativeAmp?.getStatus().then((s) => { if (s.info) setInfo(s.info); }).catch(() => { /* ignore */ });
+      }
+    });
+  }, []);
+  useEffect(() => {
+    if (!connectionIssue || connectionIssue.status === "lost" || connectionIssue.status === "retrying") return undefined;
+    const timer = setTimeout(() => setConnectionIssue(null), 6000);
+    return () => clearTimeout(timer);
+  }, [connectionIssue]);
+
   const paramsRef = useRef(params);
   paramsRef.current = params;
   const isOnRef = useRef(isOn);
@@ -150,7 +176,7 @@ export const useAmpSim = () => {
   }, []);
 
   return {
-    available, isOn, isBusy, error, info, params, bufferSize, overload,
+    available, isOn, isBusy, error, info, params, bufferSize, overload, connectionIssue,
     toggle, start, stop, restart, setParams, setBufferSize,
   };
 };

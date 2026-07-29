@@ -72,6 +72,15 @@ export function useNativeAudioDevices() {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  // Hot-plug: the main process diffs the device list on a background poll and
+  // notifies on any change (see nativeAudioEngine.js) — without this, a newly
+  // plugged-in interface only shows up after the user manually clicks refresh.
+  useEffect(() => {
+    const bridge = (typeof window !== "undefined" && (window.nativeAudio || window.nativeAmp)) || null;
+    if (!bridge) return undefined;
+    return bridge.onDevicesChanged(() => refresh());
+  }, [refresh]);
+
   const select = useCallback((id: number) => {
     setSelectedId(id);
     try { localStorage.setItem(DEVICE_STORAGE_KEY, String(id)); } catch { /* ignore */ }

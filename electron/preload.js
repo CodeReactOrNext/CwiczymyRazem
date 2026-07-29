@@ -28,6 +28,24 @@ contextBridge.exposeInMainWorld("nativeAudio", {
     ipcRenderer.on("native-audio:frame", listener);
     return () => ipcRenderer.removeListener("native-audio:frame", listener);
   },
+
+  /** Fires when the shared stream is lost (device disconnected, driver reset from
+   *  its own control panel, system resume) and again as the engine retries/recovers
+   *  in the background. Payload: { status: "lost"|"retrying"|"recovered"|"failed",
+   *  message?, attempt? }. Returns an unsubscribe fn. */
+  onConnectionIssue: (cb) => {
+    const listener = (_event, info) => cb(info);
+    ipcRenderer.on("native-audio:connection-issue", listener);
+    return () => ipcRenderer.removeListener("native-audio:connection-issue", listener);
+  },
+
+  /** Fires when the native device list changes (hot-plug) so a picker can refresh
+   *  itself instead of only updating on a manual click. Returns an unsubscribe fn. */
+  onDevicesChanged: (cb) => {
+    const listener = () => cb();
+    ipcRenderer.on("native-audio:devices-changed", listener);
+    return () => ipcRenderer.removeListener("native-audio:devices-changed", listener);
+  },
 });
 
 // Amp simulator: real-time monitoring with a tube-style effect chain.
@@ -50,6 +68,21 @@ contextBridge.exposeInMainWorld("nativeAmp", {
     const listener = (_event, info) => cb(info);
     ipcRenderer.on("amp:overload", listener);
     return () => ipcRenderer.removeListener("amp:overload", listener);
+  },
+  /** Same connection-loss/recovery event as nativeAudio.onConnectionIssue above —
+   *  the amp shares the one underlying stream, so it can be affected too. Returns
+   *  an unsubscribe fn. */
+  onConnectionIssue: (cb) => {
+    const listener = (_event, info) => cb(info);
+    ipcRenderer.on("native-audio:connection-issue", listener);
+    return () => ipcRenderer.removeListener("native-audio:connection-issue", listener);
+  },
+  /** Same hot-plug event as nativeAudio.onDevicesChanged above. Returns an
+   *  unsubscribe fn. */
+  onDevicesChanged: (cb) => {
+    const listener = () => cb();
+    ipcRenderer.on("native-audio:devices-changed", listener);
+    return () => ipcRenderer.removeListener("native-audio:devices-changed", listener);
   },
 });
 

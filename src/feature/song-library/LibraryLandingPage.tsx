@@ -44,9 +44,14 @@ const faqQuestions = [
 interface LibraryLandingPageProps {
   songs: LibrarySong[];
   totalSongs: number;
+  guideCovers: Record<string, string | null>;
 }
 
-const LibraryLandingPage = ({ songs, totalSongs }: LibraryLandingPageProps) => {
+const LibraryLandingPage = ({
+  songs,
+  totalSongs,
+  guideCovers,
+}: LibraryLandingPageProps) => {
   return (
     <>
       <LibrarySEO songs={songs} totalSongs={totalSongs} faqQuestions={faqQuestions} />
@@ -56,7 +61,7 @@ const LibraryLandingPage = ({ songs, totalSongs }: LibraryLandingPageProps) => {
         <LibraryHeroSection totalSongs={totalSongs} />
         <LibraryStatsBar totalSongs={totalSongs} />
         <LibrarySongGrid songs={songs} totalSongs={totalSongs} />
-        <LibraryGuidesSection />
+        <LibraryGuidesSection guideCovers={guideCovers} />
         <LibraryTierGuide />
         <LibraryCTASection />
         <LibraryFaqSection questions={faqQuestions} />

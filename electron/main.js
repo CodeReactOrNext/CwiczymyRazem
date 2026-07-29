@@ -11,6 +11,7 @@ const {
   clipboard,
   nativeImage,
   powerSaveBlocker,
+  powerMonitor,
   shell,
   dialog,
 } = require("electron");
@@ -79,9 +80,9 @@ function routeFromArgv(argv) {
 // Quick actions shared by the tray (Windows/Linux) and dock (macOS) menus.
 // Routes are pushed through the renderer's Next router (see app:navigate).
 const QUICK_NAV = [
-  { label: "Panel główny", route: "/dashboard" },
-  { label: "Moje ćwiczenia", route: "/my-exercises" },
-  { label: "Dziennik ćwiczeń", route: "/practice-log" },
+  { label: "Dashboard", route: "/dashboard" },
+  { label: "My Exercises", route: "/my-exercises" },
+  { label: "Practice Log", route: "/practice-log" },
 ];
 
 function showMainWindow() {
@@ -265,7 +266,7 @@ function createWindow() {
       if (!isMainFrame) return;
       if (errorCode === -3) return; // ERR_ABORTED — usually just a redirect/navigation
       if (!mainWindow || mainWindow.isDestroyed()) return;
-      setSplashStatus("Nie można połączyć się z aplikacją — ponawiam próbę…");
+      setSplashStatus("Can't connect to the app — retrying…");
       if (!offlineShown) {
         offlineShown = true;
         mainWindow.loadFile(path.join(__dirname, "offline.html"));
@@ -413,6 +414,28 @@ nativeAudioEngine.onOverload((info) => {
   }
 });
 
+// Surfaces stream-loss/recovery (device disconnected, driver reset from its own
+// control panel, hot-plug) and device-list changes — see nativeAudioEngine.js's
+// scheduleRecovery/health poll for why the renderer can't just infer this from a
+// silently-stopped frame flow.
+nativeAudioEngine.onConnectionIssue((info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("native-audio:connection-issue", info);
+  }
+});
+nativeAudioEngine.onDevicesChanged(() => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("native-audio:devices-changed");
+  }
+});
+
+// A USB audio interface commonly comes back from system sleep in a state RtAudio
+// doesn't notice on its own — force a clean reconnect rather than leaving a
+// practice session silently dead until the user restarts it themselves.
+powerMonitor.on("resume", () => {
+  nativeAudioEngine.recoverAfterResume();
+});
+
 // ── Tone Studio IPC (local preset + cabinet-IR persistence) ──────────────────
 ipcMain.handle("tone:list-presets", () => toneStore.listPresets());
 ipcMain.handle("tone:save-preset", (_e, preset) => toneStore.savePreset(preset));
@@ -421,7 +444,7 @@ ipcMain.handle("tone:list-irs", () => toneStore.listIRs());
 ipcMain.handle("tone:delete-ir", (_e, id) => toneStore.deleteIR(id));
 ipcMain.handle("tone:import-ir", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: "Wybierz plik IR (WAV)",
+    title: "Select IR file (WAV)",
     filters: [{ name: "WAV", extensions: ["wav"] }],
     properties: ["openFile"],
   });
@@ -432,7 +455,7 @@ ipcMain.handle("tone:list-nam-models", () => toneStore.listNamModels());
 ipcMain.handle("tone:delete-nam-model", (_e, id) => toneStore.deleteNamModel(id));
 ipcMain.handle("tone:import-nam-model", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: "Wybierz plik modelu NAM (.nam)",
+    title: "Select NAM model file (.nam)",
     filters: [{ name: "NAM", extensions: ["nam"] }],
     properties: ["openFile"],
   });
@@ -455,14 +478,14 @@ function createTray() {
   tray.setToolTip("riff.quest");
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: "Otwórz riff.quest", click: () => showMainWindow() },
+      { label: "Open riff.quest", click: () => showMainWindow() },
       { type: "separator" },
       ...QUICK_NAV.map(({ label, route }) => ({
         label,
         click: () => navigateTo(route),
       })),
       { type: "separator" },
-      { label: "Zamknij", click: () => app.quit() },
+      { label: "Quit", click: () => app.quit() },
     ]),
   );
   tray.on("click", showMainWindow);

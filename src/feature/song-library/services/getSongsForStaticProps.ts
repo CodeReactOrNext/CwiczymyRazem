@@ -5,6 +5,7 @@ export interface LibrarySong {
   title: string;
   artist: string;
   avgDifficulty: number;
+  ratingsCount: number;
   tier: string;
   genres: string[];
   popularity: number;
@@ -35,6 +36,7 @@ export async function getSongsForStaticProps(limit = 24): Promise<GetSongsResult
         title: typeof data.title === "string" ? data.title : "",
         artist: typeof data.artist === "string" ? data.artist : "",
         avgDifficulty: typeof data.avgDifficulty === "number" ? data.avgDifficulty : 0,
+        ratingsCount: Array.isArray(data.difficulties) ? data.difficulties.length : 0,
         tier: typeof data.tier === "string" ? data.tier : "?",
         genres: Array.isArray(data.genres) ? data.genres : [],
         popularity: typeof data.popularity === "number" ? data.popularity : 0,

@@ -24,47 +24,47 @@ function buildMenu({ isDev, shell, dialog, getMainWindow }) {
         }]
       : []),
     {
-      label: "Edytuj",
+      label: "Edit",
       submenu: [
-        { role: "undo", label: "Cofnij" },
-        { role: "redo", label: "Ponów" },
+        { role: "undo", label: "Undo" },
+        { role: "redo", label: "Redo" },
         { type: "separator" },
-        { role: "cut", label: "Wytnij" },
-        { role: "copy", label: "Kopiuj" },
-        { role: "paste", label: "Wklej" },
-        { role: "selectAll", label: "Zaznacz wszystko" },
+        { role: "cut", label: "Cut" },
+        { role: "copy", label: "Copy" },
+        { role: "paste", label: "Paste" },
+        { role: "selectAll", label: "Select All" },
       ],
     },
     {
-      label: "Widok",
+      label: "View",
       submenu: [
-        { role: "reload", label: "Odśwież" },
-        { role: "forceReload", label: "Wymuś odświeżenie" },
-        ...(isDev ? [{ role: "toggleDevTools", label: "Narzędzia deweloperskie" }] : []),
+        { role: "reload", label: "Reload" },
+        { role: "forceReload", label: "Force Reload" },
+        ...(isDev ? [{ role: "toggleDevTools", label: "Toggle Developer Tools" }] : []),
         { type: "separator" },
-        { role: "resetZoom", label: "Domyślny rozmiar" },
-        { role: "zoomIn", label: "Powiększ" },
-        { role: "zoomOut", label: "Pomniejsz" },
+        { role: "resetZoom", label: "Actual Size" },
+        { role: "zoomIn", label: "Zoom In" },
+        { role: "zoomOut", label: "Zoom Out" },
         { type: "separator" },
-        { role: "togglefullscreen", label: "Pełny ekran" },
+        { role: "togglefullscreen", label: "Toggle Full Screen" },
       ],
     },
     {
-      label: "Okno",
+      label: "Window",
       submenu: [
-        { role: "minimize", label: "Minimalizuj" },
-        { role: "close", label: "Zamknij" },
+        { role: "minimize", label: "Minimize" },
+        { role: "close", label: "Close" },
       ],
     },
     {
-      label: "Pomoc",
+      label: "Help",
       submenu: [
         {
-          label: "Strona riff.quest",
+          label: "riff.quest Website",
           click: () => shell.openExternal("https://riff.quest"),
         },
         {
-          label: "Zgłoś problem",
+          label: "Report an Issue",
           click: () => shell.openExternal("https://github.com/CodeReactOrNext/CwiczymyRazem/issues"),
         },
         ...(isMac
@@ -72,13 +72,13 @@ function buildMenu({ isDev, shell, dialog, getMainWindow }) {
           : [
               { type: "separator" },
               {
-                label: "O aplikacji",
+                label: "About",
                 click: () => {
                   dialog.showMessageBox(getMainWindow(), {
                     type: "info",
                     title: "riff.quest",
                     message: "riff.quest",
-                    detail: `Wersja ${app.getVersion()}`,
+                    detail: `Version ${app.getVersion()}`,
                   });
                 },
               },

@@ -58,10 +58,10 @@ describe("buildMenuItems", () => {
     );
 
     expect(items.map((i) => i.label)).toEqual([
-      "Wytnij",
-      "Kopiuj",
-      "Wklej",
-      "Zaznacz wszystko",
+      "Cut",
+      "Copy",
+      "Paste",
+      "Select All",
     ]);
     expect(items.map((i) => i.enabled)).toEqual([false, false, true, true]);
   });
@@ -92,7 +92,7 @@ describe("buildMenuItems", () => {
   it("offers only copy for a plain text selection", () => {
     const items = buildMenuItems(api, params({ selectionText: "riff" }));
 
-    expect(items.map((i) => i.label)).toEqual(["Kopiuj"]);
+    expect(items.map((i) => i.label)).toEqual(["Copy"]);
     expect(items[0]?.enabled).toBe(true);
   });
 
@@ -108,7 +108,7 @@ describe("buildMenuItems", () => {
       params({ linkURL: "https://riff.quest/dashboard" })
     );
 
-    expect(items.map((i) => i.label)).toEqual(["Kopiuj adres linku"]);
+    expect(items.map((i) => i.label)).toEqual(["Copy Link Address"]);
     items[0]?.action();
     expect(api.copyText).toHaveBeenCalledWith("https://riff.quest/dashboard");
   });

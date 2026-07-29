@@ -37,25 +37,25 @@ export const buildMenuItems = (
   if (params.isEditable) {
     items.push(
       {
-        label: "Wytnij",
+        label: "Cut",
         icon: Scissors,
         enabled: params.editFlags.canCut,
         action: () => api.editCommand("cut"),
       },
       {
-        label: "Kopiuj",
+        label: "Copy",
         icon: Copy,
         enabled: params.editFlags.canCopy,
         action: () => api.editCommand("copy"),
       },
       {
-        label: "Wklej",
+        label: "Paste",
         icon: ClipboardPaste,
         enabled: params.editFlags.canPaste,
         action: () => api.editCommand("paste"),
       },
       {
-        label: "Zaznacz wszystko",
+        label: "Select All",
         icon: TextCursorInput,
         enabled: params.editFlags.canSelectAll,
         action: () => api.editCommand("selectAll"),
@@ -63,7 +63,7 @@ export const buildMenuItems = (
     );
   } else if (params.selectionText.trim()) {
     items.push({
-      label: "Kopiuj",
+      label: "Copy",
       icon: Copy,
       enabled: true,
       action: () => api.editCommand("copy"),
@@ -72,7 +72,7 @@ export const buildMenuItems = (
 
   if (params.linkURL) {
     items.push({
-      label: "Kopiuj adres linku",
+      label: "Copy Link Address",
       icon: Link2,
       enabled: true,
       action: () => api.copyText(params.linkURL),
