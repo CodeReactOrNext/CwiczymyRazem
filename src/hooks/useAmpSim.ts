@@ -91,7 +91,10 @@ export const useAmpSim = () => {
   // latency can shift slightly on reopen) and self-clears like the overload banner.
   const [connectionIssue, setConnectionIssue] = useState<ConnectionIssueInfo | null>(null);
   useEffect(() => {
-    if (!window.nativeAmp) return undefined;
+    // onConnectionIssue landed after some already-installed desktop builds — the
+    // web bundle updates instantly but the Electron shell only on its own update
+    // cycle, so an older preload.js may not expose it yet. Skip instead of crashing.
+    if (!window.nativeAmp || typeof window.nativeAmp.onConnectionIssue !== "function") return undefined;
     return window.nativeAmp.onConnectionIssue((event) => {
       setConnectionIssue(event);
       if (event.status === "failed") {
