@@ -188,7 +188,10 @@ export const useNativeAudioAnalyzer = () => {
       // so a reopen almost always lands back on the rate these detectors were
       // already built for — just refresh the displayed stream info and clear the
       // indicator.
-      connectionUnsubscribeRef.current = native.onConnectionIssue((info) => {
+      // Same version-skew guard as useAmpSim.ts: an older desktop build's
+      // preload.js may not expose onConnectionIssue yet even though `native`
+      // (window.nativeAudio) itself is present.
+      connectionUnsubscribeRef.current = typeof native.onConnectionIssue !== "function" ? null : native.onConnectionIssue((info) => {
         if (myGeneration !== generationRef.current) return;
         if (info.status === "recovered") {
           // The gap mid-window (samples stopped arriving, then resumed) would
