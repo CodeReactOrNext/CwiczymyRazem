@@ -49,6 +49,7 @@ import { useRiddleSequenceMatcher } from "./hooks/useRiddleSequenceMatcher";
 import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
+import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -109,6 +110,33 @@ export const PracticeSession = ({
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
+
+  // Desktop-only: a downloaded update sat unapplied too long (see
+  // useUpdateRequiredGate). Checked once at session start, never mid-session.
+  const updateRequired = useUpdateRequiredGate();
+
+  if (updateRequired) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
+        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500 space-y-6 text-center">
+          <h1 className="text-xl font-semibold text-zinc-100">Update ready</h1>
+          <p className="text-sm text-zinc-400">
+            A new version of riff.quest has been ready to install for a while. Restart the app to keep practicing.
+          </p>
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={() => window.electronApp?.installUpdate()}
+              className="rounded-lg bg-cyan-500 px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-cyan-400">
+              Restart now
+            </button>
+            <button onClick={onClose} className="mt-2 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
+              ← Return
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (planHasGpFile && !isPremium) {
     return (

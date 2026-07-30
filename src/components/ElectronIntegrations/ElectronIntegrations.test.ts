@@ -8,6 +8,7 @@ import { buildMenuItems } from "./ElectronIntegrations";
 
 const api = {
   isAvailable: true,
+  appVersion: "0.1.4",
   onContextMenu: vi.fn(),
   onNavigate: vi.fn(),
   editCommand: vi.fn(),
@@ -15,6 +16,9 @@ const api = {
   setKeepAwake: vi.fn(),
   setProgress: vi.fn(),
   retryConnect: vi.fn(),
+  onUpdateReady: vi.fn(),
+  installUpdate: vi.fn(),
+  getUpdateStatus: vi.fn(),
 } satisfies ElectronAppApi;
 
 const params = (

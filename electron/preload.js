@@ -108,6 +108,10 @@ contextBridge.exposeInMainWorld("toneStudio", {
 contextBridge.exposeInMainWorld("electronApp", {
   isAvailable: true,
 
+  /** Installed desktop app version (root package.json — same version electron-builder
+   *  packages), shown in the sidebar so a stale build is obvious at a glance. */
+  appVersion: require("../package.json").version,
+
   /** Right-click params forwarded from the main process (webContents "context-menu"). */
   onContextMenu: (cb) => {
     const listener = (_event, params) => cb(params);
@@ -137,6 +141,23 @@ contextBridge.exposeInMainWorld("electronApp", {
 
   /** Offline page's "try now" button — reload the app URL immediately. */
   retryConnect: () => ipcRenderer.invoke("app:retry-connect"),
+
+  /** Fires once a downloaded update is ready — install requires a restart.
+   *  Returns an unsubscribe fn. */
+  onUpdateReady: (cb) => {
+    const listener = (_event, info) => cb(info);
+    ipcRenderer.on("app:update-ready", listener);
+    return () => ipcRenderer.removeListener("app:update-ready", listener);
+  },
+
+  /** Quits and installs the already-downloaded update. */
+  installUpdate: () => ipcRenderer.invoke("app:install-update"),
+
+  /** Current pending-update snapshot, or null if none is downloaded yet.
+   *  Unlike onUpdateReady this can be polled any time (e.g. right before
+   *  starting a new practice session) — it doesn't rely on having been
+   *  mounted when the update-downloaded event originally fired. */
+  getUpdateStatus: () => ipcRenderer.invoke("app:get-update-status"),
 });
 
 // Frameless window controls: the renderer draws its own title bar (see

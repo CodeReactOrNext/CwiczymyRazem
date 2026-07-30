@@ -73,7 +73,10 @@ export const useAmpSim = () => {
   // permanent banner.
   const [overload, setOverload] = useState<(AmpOverloadInfo & { at: number }) | null>(null);
   useEffect(() => {
-    if (!window.nativeAmp) return undefined;
+    // Same version-skew guard as onConnectionIssue below: an older desktop
+    // build's preload.js may not expose onOverload yet even though
+    // window.nativeAmp itself is present.
+    if (!window.nativeAmp || typeof window.nativeAmp.onOverload !== "function") return undefined;
     return window.nativeAmp.onOverload((event) => setOverload({ ...event, at: Date.now() }));
   }, []);
   useEffect(() => {

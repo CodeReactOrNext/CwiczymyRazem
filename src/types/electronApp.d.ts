@@ -23,8 +23,20 @@ export interface ElectronContextMenuParams {
 
 export type ElectronEditCommand = "cut" | "copy" | "paste" | "selectAll";
 
+export interface ElectronUpdateReadyInfo {
+  version: string;
+}
+
+export interface ElectronUpdateStatus {
+  version: string;
+  /** ms epoch (Date.now()) when this update finished downloading. */
+  readyAt: number;
+}
+
 export interface ElectronAppApi {
   isAvailable: true;
+  /** Installed desktop app version (electron-builder packages the root package.json version). */
+  appVersion: string;
   /** Subscribe to right-click events forwarded from the main process. Returns an unsubscribe fn. */
   onContextMenu: (cb: (params: ElectronContextMenuParams) => void) => () => void;
   /** Subscribe to tray/dock navigation requests (SPA routes). Returns an unsubscribe fn. */
@@ -39,6 +51,12 @@ export interface ElectronAppApi {
   setProgress: (value: number | null) => Promise<void>;
   /** Reload the app URL immediately (offline screen's "try now"). */
   retryConnect: () => Promise<void>;
+  /** Subscribe to a downloaded-and-ready-to-install update. Returns an unsubscribe fn. */
+  onUpdateReady: (cb: (info: ElectronUpdateReadyInfo) => void) => () => void;
+  /** Quits and installs the already-downloaded update. */
+  installUpdate: () => Promise<void>;
+  /** Poll the current pending-update snapshot; null if none is downloaded yet. */
+  getUpdateStatus: () => Promise<ElectronUpdateStatus | null>;
 }
 
 declare global {

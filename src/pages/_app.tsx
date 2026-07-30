@@ -29,6 +29,7 @@ const teko = Teko({
 });
 
 import Analytics from "components/Analytics/Analytics";
+import { DesktopUpdateRequired } from "components/DesktopUpdateRequired";
 import { ElectronIntegrations } from "components/ElectronIntegrations";
 import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
@@ -113,6 +114,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <ElectronTitleBar />
                     <ElectronIntegrations />
                     <DesktopNotifications />
+                    <DesktopUpdateRequired />
                     <NextTopLoader color='#06b6d4' />
                     <div id='overlays'></div>
                     {page}
@@ -142,6 +144,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <ElectronTitleBar />
                     <ElectronIntegrations />
                     <DesktopNotifications />
+                    <DesktopUpdateRequired />
                     <Toaster position='top-right' toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />

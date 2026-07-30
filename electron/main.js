@@ -493,6 +493,13 @@ function createTray() {
 }
 
 // ── Auto-update (GitHub Releases via electron-updater) ───────────────────────
+// Tracks the currently-downloaded-but-not-yet-installed update, if any. Lives
+// only in this module-level variable (not persisted) — quitAndInstall() ends
+// the process, so a fresh launch always starts with no pending update, which
+// is exactly correct: whatever was pending has either been installed or
+// never happened in this run.
+let pendingUpdate = null; // { version, readyAt } | null
+
 function setupAutoUpdater() {
   if (isDev) return; // dev runs from source — nothing to update
   let autoUpdater;
@@ -504,10 +511,25 @@ function setupAutoUpdater() {
   }
   autoUpdater.on("error", (err) => console.error("autoUpdater:", err));
   // Downloads in the background, shows a system notification when ready,
-  // installs on quit. Re-check every 4h for long-running sessions.
+  // installs on quit. The tray icon (see createTray) means this app can stay
+  // open for weeks without a real quit, so waiting for that alone lets the
+  // renderer (loaded fresh from the instantly-redeployed web bundle) drift
+  // far ahead of this shell's preload.js. Prompt in-app so the user can
+  // apply it right away instead; PracticeSession additionally hard-blocks
+  // starting a *new* session once it's been sitting unapplied too long (see
+  // useUpdateRequiredGate) — never mid-session, only checked at session start.
+  autoUpdater.on("update-downloaded", (info) => {
+    pendingUpdate = { version: info.version, readyAt: Date.now() };
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("app:update-ready", { version: info.version });
+    }
+  });
   const check = () => autoUpdater.checkForUpdatesAndNotify().catch(() => {});
   check();
   setInterval(check, 4 * 60 * 60 * 1000);
+
+  ipcMain.handle("app:install-update", () => autoUpdater.quitAndInstall());
+  ipcMain.handle("app:get-update-status", () => pendingUpdate);
 }
 
 // ── Windows jump list (taskbar right-click → quick actions) ──────────────────

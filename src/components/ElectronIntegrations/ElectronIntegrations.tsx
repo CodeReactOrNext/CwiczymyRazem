@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ClipboardPaste,
   Copy,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type {
   ElectronAppApi,
   ElectronContextMenuParams,
@@ -94,6 +96,7 @@ export const buildMenuItems = (
  */
 export const ElectronIntegrations = () => {
   const router = useRouter();
+  const { t } = useTranslation("toast");
   const [menu, setMenu] = useState<ContextMenuState | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +107,27 @@ export const ElectronIntegrations = () => {
       router.push(route);
     });
   }, [router]);
+
+  // The desktop shell only updates on its own cycle (electron-updater) and,
+  // with the app parked in the tray for weeks at a time, a downloaded update
+  // can otherwise sit unapplied far longer than the web bundle it loads
+  // (which redeploys instantly) — the exact mismatch that broke
+  // window.nativeAmp.onOverload for users on a stale shell. Prompt instead
+  // of waiting for a natural quit.
+  useEffect(() => {
+    const api = window.electronApp;
+    if (!api || typeof api.onUpdateReady !== "function") return undefined;
+    return api.onUpdateReady(() => {
+      toast.info(t("info.update_ready"), {
+        id: "desktop-update-ready",
+        duration: Infinity,
+        action: {
+          label: t("info.update_ready_action"),
+          onClick: () => api.installUpdate(),
+        },
+      });
+    });
+  }, [t]);
 
   useEffect(() => {
     const api = window.electronApp;

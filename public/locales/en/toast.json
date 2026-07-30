@@ -18,7 +18,9 @@
   "info": {
     "new_user_tip": "Check out the FAQ to learn how to use 'Riff Quest'",
     "log_in_again": "To change data you have to log in again.",
-    "copy_link": "Copy to clipboard"
+    "copy_link": "Copy to clipboard",
+    "update_ready": "A new version of riff.quest is ready to install.",
+    "update_ready_action": "Restart now"
   },
   "success": {
     "update_email": "Email updated",
