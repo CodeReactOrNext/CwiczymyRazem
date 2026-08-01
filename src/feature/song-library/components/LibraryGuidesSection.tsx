@@ -1,16 +1,17 @@
 "use client";
 
 import { songGuides } from "feature/song-library/song-guides/content";
+import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, Music } from "lucide-react";
 import Link from "next/link";
 
 interface LibraryGuidesSectionProps {
-  guideCovers: Record<string, string | null>;
+  guideLiveData: PathSongLiveDataMap;
 }
 
 export const LibraryGuidesSection = ({
-  guideCovers,
+  guideLiveData,
 }: LibraryGuidesSectionProps) => {
   return (
     <section className='bg-zinc-950 py-20'>
@@ -28,8 +29,11 @@ export const LibraryGuidesSection = ({
 
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {songGuides.map((guide) => {
-            const tier = getSongTier(guide.editorial.difficulty);
-            const coverUrl = guide.songId ? guideCovers[guide.songId] : null;
+            const live = guide.songId ? guideLiveData[guide.songId] : undefined;
+            const liveRating = live && live.avgDifficulty > 0 ? live : undefined;
+            const difficulty = liveRating?.avgDifficulty ?? guide.editorial.difficulty;
+            const tier = getSongTier(liveRating?.tier ?? difficulty);
+            const coverUrl = live?.coverUrl ?? null;
 
             return (
               <Link
@@ -70,7 +74,7 @@ export const LibraryGuidesSection = ({
                     <span
                       className='text-xs font-bold'
                       style={{ color: tier.color }}>
-                      {guide.editorial.difficulty.toFixed(1)} / 10
+                      {difficulty.toFixed(1)} / 10
                     </span>
                   </div>
                 </div>

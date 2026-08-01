@@ -1,3 +1,5 @@
+import { masterOfPuppetsRiffPreviewExercise } from "feature/exercisePlan/data/exerises/masterOfPuppetsRiffPreview/masterOfPuppetsRiffPreview";
+
 import type { SongGuide } from "../types";
 
 export const masterOfPuppets: SongGuide = {
@@ -23,6 +25,8 @@ export const masterOfPuppets: SongGuide = {
     ],
   },
   h1: "Master of Puppets on Guitar: How Hard Is It Really?",
+  quickAnswer:
+    "Hard, but not for the reason you'd assume — the problem is eight minutes of downpicking at 212 BPM, not any single lick.",
   intro: [
     "Few songs test a guitarist's right arm the way Master of Puppets does. No single riff here is unplayable on its own (most are learnable in an afternoon at half speed); the demand is downpicking nearly all of it relentlessly at roughly 212 BPM for over eight minutes straight. It's a physical benchmark as much as a song.",
     "Since Stranger Things put the song in front of a new generation, 'can I learn Master of Puppets?' has become one of the most-asked questions in guitar. The honest answer: yes, almost anyone can, but on a timeline of months, not weeks, and only if you train it like an athlete instead of grinding it like a chord sheet. Here's how that actually plays out.",
@@ -43,9 +47,8 @@ export const masterOfPuppets: SongGuide = {
   verdict: {
     heading: "The verdict: an endurance sport with a guitar attached",
     paragraphs: [
-      "On the Riff Quest ladder, Master of Puppets sits near the top of the difficulty scale (the tier badge above shows exactly where today's community rating lands it), and it earns its place. The difficulty is not in the notes. The intro chromatic descent, the E5 gallops, the verse riff: at 120 BPM these are intermediate material. The difficulty is that Hetfield downpicks nearly all of it at 212 BPM, with palm-muted precision, for the length of two normal songs.",
-      "This makes Master of Puppets a different kind of hard from, say, a shred solo. A fast solo is a coordination problem; this is a conditioning problem. Your picking forearm will fail before your brain does, and the only fix is structured tempo training over weeks, exactly like building up a running pace.",
-      "There are two genuinely technical checkpoints too: Kirk Hammett's frantic wah solo, and the interlude's clean arpeggio section with its harmonized lead: beautiful, exposed, and unforgiving. But ask anyone who's performed this song what the hard part is, and they'll point at their right arm.",
+      "On the Riff Quest ladder, Master of Puppets sits near the top of the difficulty scale (the tier badge above shows exactly where today's community rating lands it), and it earns its place. The difficulty is not in the notes. The intro chromatic descent, the E5 gallops, the verse riff: at 120 BPM these are intermediate material. The difficulty is that Hetfield downpicks nearly all of it at 212 BPM, with palm-muted precision, for the length of two normal songs — a conditioning problem, not a coordination one, closer to building a running pace than untangling a solo.",
+      "Two sections add real technical demand on top of that stamina test: Kirk Hammett's frantic wah solo, and the interlude's clean arpeggio section with its harmonized lead, exposed and unforgiving on a clean tone.",
     ],
   },
   whoFor: {
@@ -53,12 +56,9 @@ export const masterOfPuppets: SongGuide = {
     ready: [
       "You already play intermediate metal rhythm: Enter Sandman and For Whom the Bell Tolls feel comfortable at tempo.",
       "You can downpick continuous eighth notes at 160+ BPM without your forearm seizing up.",
-      "You're willing to run a metronome program for weeks and log your BPM progress.",
-      "You want the song that permanently upgrades your right hand.",
     ],
     notYet: [
       "Palm muting still feels inconsistent (the song is 90% palm-muted); fix that first on slower material.",
-      "You've been playing under a year: build stamina on easier metal rhythm first before this endurance marathon.",
       "You expect to play along with the record within a fortnight: that expectation is the #1 reason people quit it.",
     ],
   },
@@ -150,6 +150,15 @@ export const masterOfPuppets: SongGuide = {
     hardestSummary:
       "The hardest part isn't a moment; it's the accumulation. Bars 1–8 of the main riff are achievable for most intermediates at 180 BPM. The song asks for 212, and asks again, and again, for eight minutes. That's why the tempo ladder below matters more than any tab.",
   },
+  riffPreview: {
+    heading: "Riff preview",
+    intro: "A short tab from the song's iconic opening riff.",
+    measures: masterOfPuppetsRiffPreviewExercise.tablature!,
+    bpm: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.recommended,
+    bpmMin: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.min,
+    bpmMax: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.max,
+    practiceExerciseId: masterOfPuppetsRiffPreviewExercise.id,
+  },
   timeline: {
     heading: "Realistic timelines (yes, months)",
     intro:
@@ -169,36 +178,6 @@ export const masterOfPuppets: SongGuide = {
         level: "Below intermediate",
         time: "Not yet: 6+ months of prep",
         note: "Train downpicking on For Whom the Bell Tolls and Creeping Death first. Puppets punishes skipped steps.",
-      },
-    ],
-  },
-  mistakes: {
-    heading: "The five classic failure modes",
-    items: [
-      {
-        title: "Alternate picking the main riff 'for now'",
-        why: "It feels faster immediately, and builds a habit you'll have to demolish later. The downpicked attack is the sound of the song.",
-        fix: "Downpick from day one at whatever BPM keeps it clean. 120 downpicked beats 212 cheated.",
-      },
-      {
-        title: "Practicing at max tempo every session",
-        why: "Grinding at your ceiling wires in tension and sloppy muting. Fatigue practice is bad practice.",
-        fix: "Run the tempo ladder: most reps at comfortable speed, short controlled visits to the edge, +4 BPM only after two clean days.",
-      },
-      {
-        title: "Death-gripping the pick",
-        why: "Forearm pump at minute three is almost always grip tension, not weak muscles.",
-        fix: "Loosest grip that doesn't drop the pick, motion from the wrist, elbow quiet. Film your right hand; tension is visible.",
-      },
-      {
-        title: "Ignoring the clean interlude until 'later'",
-        why: "It needs different skills (clean tone, arpeggio accuracy, harmony timing) that don't improve while you chug.",
-        fix: "Give the interlude its own ten minutes per session from week one. It's also the best recovery slot between stamina sets.",
-      },
-      {
-        title: "Skipping rest days",
-        why: "Downpicking stamina is muscle adaptation; it grows during rest. Daily max-effort grinding plateaus hard and can hurt.",
-        fix: "Treat it like lifting: hard days, easy days, and at least one full rest day a week for the picking arm.",
       },
     ],
   },
@@ -224,18 +203,21 @@ export const masterOfPuppets: SongGuide = {
         artist: "Metallica",
         difficulty: 5,
         why: "The perfect downpicking primer: same attack, same muting, half the speed pressure.",
+        songId: "Llqs4ctn2vjTugrVHxnq",
       },
       {
         title: "Enter Sandman",
         artist: "Metallica",
         difficulty: 5.5,
         why: "Groove-first metal rhythm with manageable tempo: confirms your palm-muting contrast is solid.",
+        songId: "htHQ0wEmYlGtuSS9xoBY",
       },
       {
         title: "Creeping Death",
         artist: "Metallica",
         difficulty: 7.5,
         why: "The real warm-up: serious downpicking demands at a slightly kinder tempo. If this feels good, Puppets is in range.",
+        songId: "5MMsi76x10KeuC0QZGUX",
       },
     ],
     harder: [
@@ -244,25 +226,28 @@ export const masterOfPuppets: SongGuide = {
         artist: "Metallica",
         difficulty: 9,
         why: "Same album, faster tempo, nastier picking patterns: the next stamina benchmark.",
+        songId: "DNKII6yyUaboGCd7tLDa",
       },
       {
         title: "Disposable Heroes",
         artist: "Metallica",
         difficulty: 9,
         why: "Longer, denser riffing than Puppets: the deep-cut test of whether your stamina generalizes.",
+        songId: "o6Cxi5jhYK0sYdET4nZC",
       },
       {
         title: "Blackened",
         artist: "Metallica",
         difficulty: 9.2,
         why: "…And Justice-era precision riffing. When Puppets feels comfortable, this is the next benchmark.",
+        songId: "kR7wfb4rE7q4NcI6dSuC",
       },
     ],
   },
   progression: {
     heading: "Where it sits on the ladder",
     description:
-      "Master of Puppets anchors one of the toughest rungs on the Riff Quest ladder (the badge above shows exactly where the community's ratings place it today). It's the classic 'proof of rhythm hand' song: players who genuinely own it at tempo rarely have much left to prove except speed for its own sake.",
+      "One of the toughest rungs on the ladder: the classic 'proof of rhythm hand' song. Own it at tempo and there's little left to prove but speed.",
   },
   relatedLandingSlugs: ["speed", "intermediate"],
   inlineCta: {
@@ -275,16 +260,6 @@ export const masterOfPuppets: SongGuide = {
     text: "Add Master of Puppets to your list, track your BPM ladder session by session, and let community difficulty data tell you when you've actually got it down.",
   },
   faq: [
-    {
-      title: "How hard is Master of Puppets on guitar?",
-      message:
-        "Master of Puppets currently rates {{difficulty}}/10 on Riff Quest's community difficulty scale ({{tier}}). The riffs themselves are intermediate-friendly at slow speed; the difficulty is downpicking them at roughly 212 BPM with clean palm muting for eight and a half minutes. It's a stamina and precision challenge more than a finger-twister.",
-    },
-    {
-      title: "How long does it take to learn Master of Puppets?",
-      message:
-        "An intermediate player with some metal background typically needs 3–6 months to play it at full tempo, because picking stamina builds slowly, like running pace. Advanced rhythm players usually need 4–8 weeks. Learning the notes takes days; the tempo takes the rest.",
-    },
     {
       title: "Do I really have to downpick the whole thing?",
       message:
@@ -351,19 +326,17 @@ export const masterOfPuppets: SongGuide = {
     },
   ],
   sectionOrder: [
+    "riffPreview",
+    "videoLessons",
     "verdict",
     "songMap",
     "custom:tempo-ladder",
     "techniques",
-    "relatedExercises",
     "whoFor",
-    "mistakes",
-    "timeline",
     "inlineCta",
-    "practicePlan",
     "learningPath",
-    "videoLessons",
     "progression",
     "sources",
+    "relatedExercises",
   ],
 };

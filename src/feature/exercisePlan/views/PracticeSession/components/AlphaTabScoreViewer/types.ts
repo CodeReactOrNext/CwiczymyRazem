@@ -44,4 +44,16 @@ export interface AlphaTabScoreViewerProps {
   heightPx?: number;
   /** Optional resize handle rendered over the bottom edge of the score viewport. */
   resizeHandle?: ReactNode;
+  /**
+   * Forces dark/light board regardless of the persisted `useTablatureSettings`
+   * store. For standalone embeds outside a practice session (e.g. a public
+   * guide page) that must not read or mutate the user's shared, persisted
+   * appearance preference.
+   */
+  notationDarkModeOverride?: boolean;
+  /** Forces AlphaTab's `stretchForce` (note spacing) instead of reading the
+   *  persisted store — same rationale as notationDarkModeOverride. */
+  notationSpacingOverride?: number;
+  /** AlphaTab's own `display.justifyLastSystem` — see useAlphaTabApi. */
+  justifyLastSystem?: boolean;
 }

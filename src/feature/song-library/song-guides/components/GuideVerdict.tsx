@@ -1,48 +1,32 @@
-import { getSongTier } from "feature/songs/utils/getSongTier";
-
-import type { GuideLiveData, SongGuide } from "../types";
-import { DifficultyMeter } from "./DifficultyMeter";
-import { GuideSection } from "./GuideSection";
+import type { SongGuide } from "../types";
 
 interface GuideVerdictProps {
   guide: SongGuide;
-  liveData: GuideLiveData;
 }
 
-export const GuideVerdict = ({ guide, liveData }: GuideVerdictProps) => {
-  const difficulty = liveData.song?.avgDifficulty || guide.editorial.difficulty;
-  const tier = getSongTier(difficulty);
-
+/**
+ * The direct answer to the guide's H1 question — deliberately broken out of
+ * the shared dark GuideSection treatment into a white card. One intentional
+ * "light beat" against an otherwise all-dark page gives the scroll a visual
+ * rhythm and marks this as the section that matters most.
+ */
+export const GuideVerdict = ({ guide }: GuideVerdictProps) => {
   return (
-    <GuideSection heading={guide.verdict.heading}>
-      <div className='flex flex-col gap-6 lg:flex-row lg:items-start'>
-        <div className='shrink-0 rounded-lg bg-zinc-900/60 p-6 lg:w-72'>
-          <div className='mb-1 flex items-baseline gap-2'>
-            <span
-              className='font-display text-5xl font-bold tabular-nums'
-              style={{ color: tier.color }}>
-            {difficulty.toFixed(1)}
-            </span>
-            <span className='text-sm text-zinc-500'>/ 10</span>
-          </div>
-          <p className='mb-4 text-sm font-semibold' style={{ color: tier.color }}>
-            {tier.label}
-          </p>
-          <DifficultyMeter value={difficulty} />
-          <p className='mt-5 text-sm leading-relaxed text-zinc-400'>
-            {guide.editorial.oneLiner}
-          </p>
-        </div>
+    <section className='mx-auto w-full max-w-5xl px-6 py-12'>
+      <div className='rounded-lg bg-white p-8 sm:p-10'>
+        <h2 className='font-display mb-4 text-balance text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl'>
+          {guide.verdict.heading}
+        </h2>
         <div className='space-y-4'>
           {guide.verdict.paragraphs.map((paragraph) => (
             <p
               key={paragraph.slice(0, 32)}
-              className='leading-relaxed text-zinc-400'>
+              className='leading-relaxed text-zinc-700'>
               {paragraph}
             </p>
           ))}
         </div>
       </div>
-    </GuideSection>
+    </section>
   );
 };

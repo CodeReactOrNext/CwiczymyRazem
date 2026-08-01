@@ -1,7 +1,11 @@
 import { getTierFromDifficulty } from "feature/songs/utils/difficulty.utils";
 import { firestore } from "utils/firebase/api/firebase.config";
 
-import type { CrossGuideDifficultyMap, GuideLiveData } from "../types";
+import type {
+  CrossGuideDifficultyMap,
+  GuideLiveData,
+  PathSongLiveDataMap,
+} from "../types";
 
 const emptyLiveData: GuideLiveData = { song: null };
 
@@ -100,17 +104,18 @@ export async function getCrossGuideDifficulties(
 }
 
 /**
- * Fetches cover art for a batch of songIds, keyed by songId. Used by the
- * song-library index page to show real album art on the "Deep-dive song
- * guides" cards without pulling the full live-data payload for each one.
- * Fails soft per-song, same as the functions above.
+ * Fetches live cover + difficulty/tier for learningPath entries that carry a
+ * `songId`, keyed by that id. Same rationale as getCrossGuideDifficulties
+ * (avoid a hand-written tier guess silently disagreeing with reality), but
+ * keyed off the song doc directly so it also covers path songs that don't
+ * have their own guide page yet — most of them. Fails soft per-song.
  */
-export async function getGuideCoverUrls(
-  songIds: (string | null)[]
-): Promise<Record<string, string | null>> {
-  const result: Record<string, string | null> = {};
+export async function getPathSongLiveData(
+  songIds: string[]
+): Promise<PathSongLiveDataMap> {
+  const result: PathSongLiveDataMap = {};
 
-  const uniqueIds = [...new Set(songIds.filter((id): id is string => Boolean(id)))];
+  const uniqueIds = [...new Set(songIds)];
 
   await Promise.all(
     uniqueIds.map(async (songId) => {
@@ -119,10 +124,19 @@ export async function getGuideCoverUrls(
         if (!snap.exists) return;
 
         const data = (snap.data() ?? {}) as RawSongDoc;
-        result[songId] =
-          typeof data.coverUrl === "string" ? data.coverUrl : null;
+        const avgDifficulty =
+          typeof data.avgDifficulty === "number" ? data.avgDifficulty : 0;
+
+        result[songId] = {
+          coverUrl: typeof data.coverUrl === "string" ? data.coverUrl : null,
+          avgDifficulty,
+          tier:
+            typeof data.tier === "string" && data.tier !== "?"
+              ? data.tier
+              : getTierFromDifficulty(avgDifficulty),
+        };
       } catch {
-        // Fall through — caller falls back to no cover for this song.
+        // Fall through — caller falls back to editorial data for this song.
       }
     })
   );

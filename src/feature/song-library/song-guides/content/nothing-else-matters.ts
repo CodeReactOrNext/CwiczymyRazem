@@ -23,6 +23,8 @@ export const nothingElseMatters: SongGuide = {
     ],
   },
   h1: "How Hard Is Nothing Else Matters on Guitar? An Honest Breakdown",
+  quickAnswer:
+    "Easier than its reputation for the first sixteen bars — the real difficulty starts after the second chorus, in the interlude and solo.",
   intro: [
     "Nothing Else Matters is the song that turns strummers into fingerstyle players. The intro is built on an open E minor arpeggio that sounds beautiful from the very first day, which is exactly why it has been the gateway into fingerpicking for millions of guitarists since 1991.",
     "But the song is sneaky. The first sixteen bars are genuinely beginner-friendly, then the interlude and the solo quietly climb two difficulty tiers. This guide breaks the song into its real layers, so you know exactly which parts you can play today, which parts need work, and whether it's the right song for your level at all.",
@@ -166,31 +168,6 @@ export const nothingElseMatters: SongGuide = {
       },
     ],
   },
-  mistakes: {
-    heading: "Where players go wrong",
-    items: [
-      {
-        title: "Picking the intro with a pick",
-        why: "It sounds thin and mechanical, and it dodges the one skill the song is trying to teach you.",
-        fix: "Commit to fingers from day one: thumb on the low strings, index and middle on the top two. Slow is fine; even is everything.",
-      },
-      {
-        title: "Rushing the 6/8 feel",
-        why: "Players hear 'slow ballad' and drift ahead of the beat, which turns the flowing arpeggio into nervous plucking.",
-        fix: "Practice with a metronome accenting beats 1 and 4. Let each open string ring its full length before the next one.",
-      },
-      {
-        title: "Letting the interlude chords buzz",
-        why: "Fretted arpeggios expose lazy finger placement; one muted string kills the whole ringing texture.",
-        fix: "Freeze each shape, pick the strings one by one, and fix the finger that mutes. Only then add the pattern.",
-      },
-      {
-        title: "Learning the solo by speed instead of pitch",
-        why: "This solo is slow enough that every out-of-tune bend is fully audible. Speed isn't the problem; intonation is.",
-        fix: "Check each bend against the fretted target note. A bend that lands 90% of the way there sounds 100% wrong.",
-      },
-    ],
-  },
   practicePlan: {
     heading: "The smart order to learn it",
     intro:
@@ -213,18 +190,21 @@ export const nothingElseMatters: SongGuide = {
         artist: "America",
         difficulty: 1.5,
         why: "Two chords and a simple strum: confirms your rhythm hand before fingerpicking enters.",
+        songId: "Yyt69SBUs5DQA27nWNsn",
       },
       {
         title: "Come as You Are",
         artist: "Nirvana",
         difficulty: 3,
         why: "Single-note riff over a steady pulse: trains the same 'melody over drone' feel with a pick.",
+        songId: "UgfElrEYe13NL5NmbPvo",
       },
       {
         title: "Wish You Were Here",
         artist: "Pink Floyd",
         difficulty: 3.8,
         why: "Open-position riffing mixed with strumming: the ideal warm-up act for NEM's chord-plus-melody world.",
+        songId: "OZPnA7SLVbL4J5ghIQs2",
       },
     ],
     harder: [
@@ -234,12 +214,14 @@ export const nothingElseMatters: SongGuide = {
         difficulty: 7,
         why: "The natural next summit: same fingerpicked-intro DNA, but with a far bigger journey and a real lead-guitar exam at the end.",
         guideSlug: "stairway-to-heaven",
+        songId: "6FYgvvvp2VSUkIzuHtIo",
       },
       {
         title: "Fade to Black",
         artist: "Metallica",
         difficulty: 7,
         why: "Metallica's own step up: clean arpeggios again, but faster solos and a heavy second half.",
+        songId: "KVdM1RGahqdFosb0qgfu",
       },
       {
         title: "Hotel California",
@@ -247,6 +229,7 @@ export const nothingElseMatters: SongGuide = {
         difficulty: 6.5,
         why: "Trades open-string comfort for barre chords and a harmonized solo: the next rung for your fretting hand.",
         guideSlug: "hotel-california",
+        songId: "2EJ3e2txxh0VBCkaxUMU",
       },
     ],
   },
@@ -297,6 +280,24 @@ export const nothingElseMatters: SongGuide = {
         "If the fingerpicking hooked you, Stairway to Heaven is the natural next climb. If you want to stay with Metallica, Fade to Black uses the same clean-arpeggio DNA with a bigger challenge. Both are one tier up: a real step, not a leap.",
     },
   ],
+  videoLessons: [
+    {
+      videoId: "7silbMA9UME",
+      title: "Metallica Nothing Else Matters Guitar Lesson Part 1",
+      channelName: "Marty Music",
+    },
+    {
+      videoId: "Y3WzbPyovbE",
+      title: "Metallica - Nothing Else Matters - Guitar Tab | Lesson | Cover | Tutorial",
+      channelName: "Mr. Tabs",
+    },
+    {
+      videoId: "-kVY5NxIPwU",
+      title:
+        "Nothing Else Matters Guitar Lesson 🎸 Metallica Guitar Tutorial |Fingerpicking + Solo + TAB|",
+      channelName: "GuitarZero2Hero",
+    },
+  ],
   customBlocks: [
     {
       kind: "patternBreakdown",
@@ -332,14 +333,14 @@ export const nothingElseMatters: SongGuide = {
     "verdict",
     "whoFor",
     "custom:picking-roadmap",
+    "videoLessons",
     "techniques",
-    "relatedExercises",
     "songMap",
     "timeline",
-    "mistakes",
     "inlineCta",
     "practicePlan",
     "learningPath",
     "progression",
+    "relatedExercises",
   ],
 };

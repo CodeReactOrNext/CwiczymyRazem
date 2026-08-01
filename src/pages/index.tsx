@@ -1,6 +1,9 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { serializeExercises } from "feature/exercises/lib/serializeExercise";
 import LandingPage from "feature/landing/LandingPage";
+import { songGuides } from "feature/song-library/song-guides/content";
+import { getPathSongLiveData } from "feature/song-library/song-guides/services/getSongGuideLiveData";
+import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import type { BlogFrontmatter} from "lib/blog";
 import {getAllBlogs } from "lib/blog";
 import type { GetStaticProps } from "next";
@@ -16,10 +19,21 @@ interface HomeProps {
     description: string;
     timeInMinutes: number;
   }>;
+  guideLiveData: PathSongLiveDataMap;
 }
 
-const Home: NextPageWithLayout<HomeProps> = ({ blogs, spotlightExercises }) => {
-  return <LandingPage blogs={blogs} spotlightExercises={spotlightExercises} />;
+const Home: NextPageWithLayout<HomeProps> = ({
+  blogs,
+  spotlightExercises,
+  guideLiveData,
+}) => {
+  return (
+    <LandingPage
+      blogs={blogs}
+      spotlightExercises={spotlightExercises}
+      guideLiveData={guideLiveData}
+    />
+  );
 };
 
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
@@ -38,10 +52,18 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
       timeInMinutes: ex.timeInMinutes,
     }));
 
+  // Only the first 3 guides are featured in the "Popular guides" list.
+  const featuredSongIds = songGuides
+    .slice(0, 3)
+    .map((guide) => guide.songId)
+    .filter((id): id is string => Boolean(id));
+  const guideLiveData = await getPathSongLiveData(featuredSongIds);
+
   return {
     props: {
       blogs,
       spotlightExercises,
+      guideLiveData,
     },
   };
 };

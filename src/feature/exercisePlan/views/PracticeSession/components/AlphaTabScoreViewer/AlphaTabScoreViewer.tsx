@@ -34,10 +34,15 @@ export const AlphaTabScoreViewer = ({
   missedNotes,
   heightPx,
   resizeHandle,
+  notationDarkModeOverride,
+  notationSpacingOverride,
+  justifyLastSystem,
 }: AlphaTabScoreViewerProps) => {
-  const notationDarkMode = useTablatureSettings((s) => s.notationDarkMode);
+  const storeNotationDarkMode = useTablatureSettings((s) => s.notationDarkMode);
+  const notationDarkMode = notationDarkModeOverride ?? storeNotationDarkMode;
   const notationZoom = useTablatureSettings((s) => s.notationZoom);
-  const notationSpacing = useTablatureSettings((s) => s.notationSpacing);
+  const storeNotationSpacing = useTablatureSettings((s) => s.notationSpacing);
+  const notationSpacing = notationSpacingOverride ?? storeNotationSpacing;
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Refs kept in sync so AT callbacks always read the latest values
   const origBpmRef         = useRef(120);
@@ -76,6 +81,7 @@ export const AlphaTabScoreViewer = ({
     notationSpacing,
     trackConfigs,
     backingTrackIds,
+    justifyLastSystem,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.

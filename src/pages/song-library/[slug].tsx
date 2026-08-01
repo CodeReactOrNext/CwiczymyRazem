@@ -6,12 +6,14 @@ import {
 } from "feature/song-library/song-guides/content";
 import {
   getCrossGuideDifficulties,
+  getPathSongLiveData,
   getSongGuideLiveData,
 } from "feature/song-library/song-guides/services/getSongGuideLiveData";
 import SongGuidePage from "feature/song-library/song-guides/SongGuidePage";
 import type {
   CrossGuideDifficultyMap,
   GuideLiveData,
+  PathSongLiveDataMap,
   SongGuide,
 } from "feature/song-library/song-guides/types";
 import { SEO_LANDING_PAGES } from "lib/exerciseLandingLink";
@@ -22,6 +24,7 @@ interface SongGuideRouteProps {
   liveData: GuideLiveData;
   crossGuideDifficulty: CrossGuideDifficultyMap;
   relatedLandingLinks: SeoLandingGuideLink[];
+  pathSongLiveData: PathSongLiveDataMap;
 }
 
 const SongGuideRoute: NextPage<SongGuideRouteProps> = ({
@@ -29,6 +32,7 @@ const SongGuideRoute: NextPage<SongGuideRouteProps> = ({
   liveData,
   crossGuideDifficulty,
   relatedLandingLinks,
+  pathSongLiveData,
 }) => {
   return (
     <SongGuidePage
@@ -36,6 +40,7 @@ const SongGuideRoute: NextPage<SongGuideRouteProps> = ({
       liveData={liveData}
       crossGuideDifficulty={crossGuideDifficulty}
       relatedLandingLinks={relatedLandingLinks}
+      pathSongLiveData={pathSongLiveData}
     />
   );
 };
@@ -71,6 +76,14 @@ export const getStaticProps: GetStaticProps<SongGuideRouteProps> = async ({
 
   const crossGuideDifficulty = await getCrossGuideDifficulties(crossGuideRefs);
 
+  const pathSongIds = [
+    ...guide.learningPath.easier,
+    ...guide.learningPath.harder,
+  ]
+    .map((song) => song.songId)
+    .filter((id): id is string => Boolean(id));
+  const pathSongLiveData = await getPathSongLiveData(pathSongIds);
+
   const relatedLandingLinks: SeoLandingGuideLink[] =
     guide.relatedLandingSlugs.map((key) => {
       const landingSlug = SEO_LANDING_PAGES[key].slice(1);
@@ -88,7 +101,13 @@ export const getStaticProps: GetStaticProps<SongGuideRouteProps> = async ({
     });
 
   return {
-    props: { guide, liveData, crossGuideDifficulty, relatedLandingLinks },
+    props: {
+      guide,
+      liveData,
+      crossGuideDifficulty,
+      relatedLandingLinks,
+      pathSongLiveData,
+    },
     revalidate: 86400, // refresh community stats daily
   };
 };

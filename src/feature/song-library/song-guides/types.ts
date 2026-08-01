@@ -1,3 +1,4 @@
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { SeoLandingPageKey } from "lib/exerciseLandingLink";
 
 export type GuideSectionId =
@@ -5,8 +6,8 @@ export type GuideSectionId =
   | "whoFor"
   | "techniques"
   | "songMap"
+  | "riffPreview"
   | "timeline"
-  | "mistakes"
   | "practicePlan"
   | "learningPath"
   | "progression"
@@ -51,12 +52,6 @@ export interface GuideTimelineEntry {
   note: string;
 }
 
-export interface GuideMistake {
-  title: string;
-  why: string;
-  fix: string;
-}
-
 export interface GuidePathSong {
   title: string;
   artist: string;
@@ -65,6 +60,8 @@ export interface GuidePathSong {
   why: string;
   /** Set when we also have a guide page for that song — renders as a link. */
   guideSlug?: string;
+  /** Firestore doc id in `songs` — set to pull real cover art for the mini-card. */
+  songId?: string;
 }
 
 export interface GuideFaqEntry {
@@ -140,12 +137,20 @@ export interface SongGuide {
   updatedAt: string;
   seo: GuideSeo;
   h1: string;
+  /**
+   * One bolded sentence rendered directly under the H1, before `intro` —
+   * the direct answer to "how hard is this song", stated up front instead of
+   * making the reader wait through warm-up paragraphs for it. Also what
+   * Google has the best shot at lifting into a featured snippet.
+   */
+  quickAnswer: string;
   intro: string[];
   facts: GuideFact[];
   /** Editorial fallbacks — overridden by live community data when available. */
   editorial: {
     difficulty: number;
     timeToLearn: string;
+    /** Used as the card blurb on /song-library and SEO landing "related guides". */
     oneLiner: string;
   };
   verdict: {
@@ -168,14 +173,28 @@ export interface SongGuide {
     sections: GuideSongSection[];
     hardestSummary: string;
   };
+  /**
+   * Optional rendered-notation excerpt (AlphaTab). `measures` must be an
+   * original/illustrative pattern or a properly licensed transcription —
+   * never a copied excerpt from a commercial tab site. `note` should say so
+   * plainly to the reader when the pattern is illustrative, not the real riff.
+   */
+  riffPreview?: {
+    heading: string;
+    intro?: string;
+    note?: string;
+    measures: TablatureMeasure[];
+    bpm: number;
+    /** BPM stepper bounds shown next to the player. Falls back to a generic range. */
+    bpmMin?: number;
+    bpmMax?: number;
+    /** Id into `exercisesAgregat` — set to link a "Try it in Practice Session" CTA. */
+    practiceExerciseId?: string;
+  };
   timeline: {
     heading: string;
     intro: string;
     entries: GuideTimelineEntry[];
-  };
-  mistakes: {
-    heading: string;
-    items: GuideMistake[];
   };
   practicePlan: {
     heading: string;
@@ -241,4 +260,13 @@ export interface GuideLiveData {
 export type CrossGuideDifficultyMap = Record<
   string,
   { avgDifficulty: number; tier: string }
+>;
+
+/**
+ * Live cover + difficulty/tier for learningPath entries keyed by `songId`,
+ * regardless of whether that song also has its own Riff Quest guide page.
+ */
+export type PathSongLiveDataMap = Record<
+  string,
+  { coverUrl: string | null; avgDifficulty: number; tier: string }
 >;

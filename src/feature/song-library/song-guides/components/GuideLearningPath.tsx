@@ -2,39 +2,71 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
-import type { CrossGuideDifficultyMap, GuidePathSong, SongGuide } from "../types";
+import type {
+  CrossGuideDifficultyMap,
+  GuidePathSong,
+  PathSongLiveDataMap,
+  SongGuide,
+} from "../types";
 import { GuideSection } from "./GuideSection";
 
 interface GuideLearningPathProps {
   guide: SongGuide;
   crossGuideDifficulty: CrossGuideDifficultyMap;
+  pathSongLiveData: PathSongLiveDataMap;
 }
 
 const PathSongCard = ({
   song,
   crossGuideDifficulty,
+  live,
 }: {
   song: GuidePathSong;
   crossGuideDifficulty: CrossGuideDifficultyMap;
+  live: PathSongLiveDataMap[string] | undefined;
 }) => {
-  const live = song.guideSlug ? crossGuideDifficulty[song.guideSlug] : undefined;
-  const tier = getSongTier(live ? live.tier : song.difficulty);
+  // Prefer the linked guide's own live number, then the song doc's live
+  // rating, then fall back to the hand-written editorial estimate — same
+  // "don't trust a stale guess once real data exists" rule as elsewhere.
+  const guideLive = song.guideSlug
+    ? crossGuideDifficulty[song.guideSlug]
+    : undefined;
+  const liveDifficulty =
+    guideLive ?? (live && live.avgDifficulty > 0 ? live : undefined);
+  const tier = getSongTier(liveDifficulty ? liveDifficulty.tier : song.difficulty);
+  const coverUrl = live?.coverUrl ?? null;
 
   const body = (
     <div className='h-full rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-900/70'>
-      <div className='mb-1 flex items-start justify-between gap-3'>
-        <h4 translate='no' className='font-semibold text-zinc-100'>
-          {song.title}
-        </h4>
-        {song.guideSlug && (
-          <span className='shrink-0 text-xs font-medium text-cyan-400'>
-            Full guide
-          </span>
+      <div className='mb-3 flex items-start gap-3'>
+        {coverUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverUrl}
+            alt=''
+            width={44}
+            height={44}
+            className='h-11 w-11 shrink-0 rounded-md object-cover'
+          />
+        ) : (
+          <div className='h-11 w-11 shrink-0 rounded-md bg-zinc-800/60' />
         )}
+        <div className='min-w-0 flex-1'>
+          <div className='flex items-start justify-between gap-3'>
+            <h4 translate='no' className='font-semibold text-zinc-100'>
+              {song.title}
+            </h4>
+            {song.guideSlug && (
+              <span className='shrink-0 text-xs font-medium text-cyan-400'>
+                Full guide
+              </span>
+            )}
+          </div>
+          <p translate='no' className='truncate text-sm text-zinc-500'>
+            {song.artist}
+          </p>
+        </div>
       </div>
-      <p translate='no' className='mb-3 text-sm text-zinc-500'>
-        {song.artist}
-      </p>
       <span
         className={`mb-3 inline-block rounded px-2 py-0.5 text-xs font-bold ${tier.bgColor}`}
         style={{ color: tier.color }}>
@@ -56,6 +88,7 @@ const PathSongCard = ({
 export const GuideLearningPath = ({
   guide,
   crossGuideDifficulty,
+  pathSongLiveData,
 }: GuideLearningPathProps) => {
   return (
     <GuideSection
@@ -75,6 +108,7 @@ export const GuideLearningPath = ({
                 key={song.title}
                 song={song}
                 crossGuideDifficulty={crossGuideDifficulty}
+                live={song.songId ? pathSongLiveData[song.songId] : undefined}
               />
             ))}
           </div>
@@ -93,6 +127,7 @@ export const GuideLearningPath = ({
                 key={song.title}
                 song={song}
                 crossGuideDifficulty={crossGuideDifficulty}
+                live={song.songId ? pathSongLiveData[song.songId] : undefined}
               />
             ))}
           </div>

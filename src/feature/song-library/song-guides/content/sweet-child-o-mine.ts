@@ -23,6 +23,8 @@ export const sweetChildOMine: SongGuide = {
     ],
   },
   h1: "Sweet Child O' Mine on Guitar: From the Intro Riff to the Solo",
+  quickAnswer:
+    "The famous intro riff is honest intermediate work — the real test starts after the second chorus, in Slash's two solos.",
   intro: [
     "Sweet Child O' Mine begins with the most famous finger exercise in rock history. Slash has said the intro riff started as a joke (a 'circus' string-skipping pattern he noodled at rehearsal), and it became the phrase that launched a million guitarists. That origin story is the key to the whole song: it really is an exercise, which means learning it properly will physically upgrade your picking hand.",
     "But the intro is only the opening act. Behind it waits a full-length Slash masterclass: verse fills, two solo sections that build from bluesy talking phrases to fast E-flat-minor runs, and the frantic wah-drenched outro under 'Where do we go now'. This guide grades every layer, decodes the riff's anatomy move by move, and gives you an honest schedule from first pluck to final bend.",
@@ -166,36 +168,6 @@ export const sweetChildOMine: SongGuide = {
       },
     ],
   },
-  mistakes: {
-    heading: "The traps everyone falls into",
-    items: [
-      {
-        title: "Learning the riff in E standard",
-        why: "The record is tuned down a half step. In E standard you'll be sharp against every recording, backing track, and bandmate, and the strings fight back harder than the slinky feel the riff was written with.",
-        fix: "Tune all six strings down a half step (E♭ A♭ D♭ G♭ B♭ E♭). Two minutes with a tuner; problem gone forever.",
-      },
-      {
-        title: "Anchoring the picking hand rigidly",
-        why: "String skipping fails when the hand is planted: the pick can't travel the skip distance and clips the middle string.",
-        fix: "Let the forearm float lightly; the motion is a small arc from the wrist. Slow-motion reps engrain the travel path.",
-      },
-      {
-        title: "Speeding the riff up before it's clean",
-        why: "At tempo, a 90%-accurate riff sounds broken: the pattern is so exposed that every miss rings out.",
-        fix: "Metronome at 60% until you get ten consecutive clean loops. Only then add 5 BPM. The riff rewards boring discipline absurdly well.",
-      },
-      {
-        title: "Copying the fast runs, skipping the slow bends",
-        why: "Players grind the second solo's speed and play the first solo's bends approximately: backwards priorities. Listeners forgive a slower run; they never forgive a sour bend.",
-        fix: "Daily bend calibration: fret the target note, then bend to match it, then add vibrato only after the pitch is true.",
-      },
-      {
-        title: "Ignoring the outro until 'the end'",
-        why: "The outro is long, has its own riff, and lands when your hands are tired; under-practiced, it collapses live.",
-        fix: "Rehearse the outro fresh, at the start of sessions, twice a week. Stamina sections deserve prime practice time, not leftovers.",
-      },
-    ],
-  },
   practicePlan: {
     heading: "The layer-by-layer plan",
     intro:
@@ -218,6 +190,7 @@ export const sweetChildOMine: SongGuide = {
         artist: "Deep Purple",
         difficulty: 3,
         why: "The first single-note riff milestone: teaches riff discipline with zero skip risk.",
+        songId: "3vZNl6um01tBIr2qwqUo",
       },
       {
         title: "Hotel California",
@@ -225,6 +198,7 @@ export const sweetChildOMine: SongGuide = {
         difficulty: 6.5,
         why: "The neighboring epic one rung down: trains sustained rhythm and melodic soloing before Sweet Child's speed arrives.",
         guideSlug: "hotel-california",
+        songId: "2EJ3e2txxh0VBCkaxUMU",
       },
       {
         title: "Stairway to Heaven",
@@ -232,6 +206,7 @@ export const sweetChildOMine: SongGuide = {
         difficulty: 7,
         why: "The classic previous summit: its solo teaches the pentatonic phrasing Sweet Child's solos assume you have.",
         guideSlug: "stairway-to-heaven",
+        songId: "6FYgvvvp2VSUkIzuHtIo",
       },
     ],
     harder: [
@@ -240,6 +215,7 @@ export const sweetChildOMine: SongGuide = {
         artist: "Guns N' Roses",
         difficulty: 7.8,
         why: "Slash's next masterclass: longer-form solo storytelling where sustain and taste do even more of the work.",
+        songId: "xTEe9ObC8eT2D9EsBFP7",
       },
       {
         title: "Master of Puppets",
@@ -247,6 +223,7 @@ export const sweetChildOMine: SongGuide = {
         difficulty: 8.5,
         why: "A similarly demanding summit from the other direction: where Sweet Child tests your lead hands, Puppets tests your rhythm engine.",
         guideSlug: "master-of-puppets",
+        songId: "KwZ17fUDZNnEw32VM6mS",
       },
       {
         title: "Paradise City",
@@ -303,6 +280,23 @@ export const sweetChildOMine: SongGuide = {
         "If the lead playing hooked you, November Rain extends Slash's solo vocabulary into longer storytelling. If you want to balance your hands, Master of Puppets is the rhythm counterpart at a similar level; everything Sweet Child asks of your left hand, it asks of your right. Both are one honest step up the same ladder.",
     },
   ],
+  videoLessons: [
+    {
+      videoId: "iWxMMWOmkNQ",
+      title: "Sweet Child O' Mine Guitar Lesson Pt.1 - Guns N' Roses - Intro - Slash",
+      channelName: "GuitarLessons365Song",
+    },
+    {
+      videoId: "WW_iOXWCGLE",
+      title: "Guns N' Roses - Sweet Child O' Mine - Guitar Tab (remake) | Lesson | Cover | Tutorial",
+      channelName: "Mr. Tabs",
+    },
+    {
+      videoId: "0GsukWKx5Ao",
+      title: "How Slash REALLY Plays The Sweet Child O' Mine Solo! - Guns N' Roses",
+      channelName: "GuitarLessons365Song",
+    },
+  ],
   customBlocks: [
     {
       kind: "patternBreakdown",
@@ -337,15 +331,15 @@ export const sweetChildOMine: SongGuide = {
   sectionOrder: [
     "verdict",
     "custom:riff-anatomy",
+    "videoLessons",
     "songMap",
     "techniques",
-    "relatedExercises",
     "timeline",
     "whoFor",
-    "mistakes",
     "inlineCta",
     "practicePlan",
     "learningPath",
     "progression",
+    "relatedExercises",
   ],
 };

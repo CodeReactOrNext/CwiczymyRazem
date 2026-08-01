@@ -29,6 +29,12 @@ interface UseAlphaTabApiOptions {
   trackConfigs?: Record<string, { isMuted: boolean; volume: number }>;
   /** Dynamic backing-track ids, used to map `trackConfigs` onto the score's tracks — MUST be memoized by the caller. */
   backingTrackIds?: string[];
+  /** AlphaTab's own `display.justifyLastSystem` — stretches the final system
+   *  (row) to fill the width too, instead of leaving it at natural spacing.
+   *  Off by default (matches normal sheet-music convention, used by the real
+   *  practice session); short standalone previews turn it on so a 1-2 measure
+   *  excerpt doesn't look stranded on the left. */
+  justifyLastSystem?: boolean;
 }
 
 interface UseAlphaTabApiReturn {
@@ -61,6 +67,7 @@ export function useAlphaTabApi({
   origBpmRef,
   trackConfigs = {},
   backingTrackIds = [],
+  justifyLastSystem = false,
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -106,6 +113,7 @@ export function useAlphaTabApi({
         staveProfile: mode === "tab" ? "Tab" : "ScoreTab",
         scale: notationZoom,
         stretchForce: notationSpacing,
+        justifyLastSystem,
         // Only the ink needs flipping — the black board itself comes from the
         // container's own background (see AlphaTabScoreViewer), same as the tab.
         resources: notationDarkMode
@@ -202,7 +210,7 @@ export function useAlphaTabApi({
       scoreRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawGpFile, measures, mode, notationDarkMode, notationZoom, notationSpacing]);
+  }, [rawGpFile, measures, mode, notationDarkMode, notationZoom, notationSpacing, justifyLastSystem]);
 
   // Per-track mute / volume — independent of which track is rendered visually.
   // trackConfigs and backingTrackIds MUST be memoized by the caller.

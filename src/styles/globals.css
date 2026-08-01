@@ -24,6 +24,16 @@ html {
   scrollbar-gutter: stable;
   /* Firefox */
   scrollbar-color: #a1a1aa #18181b;
+  /* Full-bleed sections (e.g. the song guide riff player) use `w-screen` +
+     negative margins to break out of their reading column. `100vw` includes
+     the vertical scrollbar's width, so that trick overshoots the real
+     viewport by a few pixels and would otherwise add a horizontal
+     scrollbar. Clipping it here (only on `html`, the actual root scroller —
+     NOT also on `body`, which would create a second, nested scroll
+     container and break normal page scrolling) keeps the fix scoped away
+     from `main`'s own overflow-x, which previously broke `position: sticky`
+     for its descendants when set there directly. */
+  overflow-x: hidden;
 }
 
 html,

@@ -23,6 +23,8 @@ export const hotelCalifornia: SongGuide = {
     ],
   },
   h1: "Hotel California on Guitar: Difficulty, Chords, and That Solo",
+  quickAnswer:
+    "Not one difficulty level but two — the rhythm part is beginner-friendly barre-chord work; the outro solo is a separate, much harder exam.",
   intro: [
     "Hotel California is two exams in one song. The first is a rhythm exam: an eight-chord progression that cycles for six and a half minutes, demanding clean barre chords and a groove that never wobbles. The second is a lead exam: the outro solo, a two-guitar conversation between Don Felder and Joe Walsh that ends in harmonized arpeggio cascades regularly voted among the greatest solos ever recorded.",
     "The good news: the two exams can be taken years apart. Thousands of guitarists strum Hotel California confidently around a campfire; far fewer play the outro note for note. This guide grades both halves honestly, shows you the chord map that unlocks the rhythm part in a weekend, and breaks the solo into phrases you can actually schedule.",
@@ -166,36 +168,6 @@ export const hotelCalifornia: SongGuide = {
       },
     ],
   },
-  mistakes: {
-    heading: "The classic wrong turns",
-    items: [
-      {
-        title: "Muting the high strings on Bm and F#",
-        why: "A half-ringing barre survives strumming casually but collapses the picked textures; the top strings carry the song's shimmer.",
-        fix: "Roll the index slightly onto its bony edge and check all six strings, one by one, every practice. Two honest minutes a day fixes barres in weeks.",
-      },
-      {
-        title: "Rushing the tempo",
-        why: "74 BPM feels slow, and repetition breeds impatience; by verse three most players have crept to 80+ and the languid menace is gone.",
-        fix: "Play along with the record regularly. The groove sits behind the beat; let the song feel almost too slow.",
-      },
-      {
-        title: "Skipping the capo",
-        why: "Playing the intro's concert-pitch Bm shapes without a capo turns an elegant picked figure into a barre-chord wrestling match, and it still doesn't ring right.",
-        fix: "Capo 7, open-position shapes, let the strings do the work. That's how the record's chime happens.",
-      },
-      {
-        title: "Learning the solo as one long blur",
-        why: "The outro is a structured dialogue with clear phrase boundaries. Ignoring the structure makes it ten times harder to memorize and impossible to phrase.",
-        fix: "Label the phrases (Felder 1, Walsh 1, Felder 2…), learn them as call-and-response, and always know whose 'voice' you're playing.",
-      },
-      {
-        title: "Attempting the cascades at full speed first",
-        why: "The harmonized triplets look pattern-simple on tab, so players sprint, and bake in sloppy shifts between shapes.",
-        fix: "One shape per day, shifts practiced as their own move, metronome at 60% for a full week before climbing. The cascade rewards patience like nothing else in the song.",
-      },
-    ],
-  },
   practicePlan: {
     heading: "A two-track plan",
     intro:
@@ -218,12 +190,14 @@ export const hotelCalifornia: SongGuide = {
         artist: "Bob Dylan",
         difficulty: 2.5,
         why: "Four open chords, endless cycle: the training wheels version of 'keep a progression alive'.",
+        songId: "0z309S2r22U4vfJYWfpg",
       },
       {
         title: "Wonderwall",
         artist: "Oasis",
         difficulty: 3.5,
         why: "Capo work and a repeating progression with strumming stamina: one honest step below.",
+        songId: "YPmaQIKfQBpsI5IzdLEg",
       },
       {
         title: "Nothing Else Matters",
@@ -231,6 +205,7 @@ export const hotelCalifornia: SongGuide = {
         difficulty: 4.6,
         why: "If the picked intro textures appeal, this is the fingerstyle-first route to the same tier.",
         guideSlug: "nothing-else-matters",
+        songId: "IezBmdxsh9DqsBwKg5du",
       },
     ],
     harder: [
@@ -240,6 +215,7 @@ export const hotelCalifornia: SongGuide = {
         difficulty: 7,
         why: "The parallel epic at a similar level: more sections to master, and a solo exam of similar weight in a different dialect.",
         guideSlug: "stairway-to-heaven",
+        songId: "6FYgvvvp2VSUkIzuHtIo",
       },
       {
         title: "Sweet Child O' Mine",
@@ -247,12 +223,14 @@ export const hotelCalifornia: SongGuide = {
         difficulty: 7.5,
         why: "The next lead-guitar rung: faster runs and a solo that carries even more of the song.",
         guideSlug: "sweet-child-o-mine",
+        songId: "U79ddvoBhbUXD3JtBXik",
       },
       {
         title: "Comfortably Numb",
         artist: "Pink Floyd",
         difficulty: 7.5,
         why: "Where 'talking' bends and long-form solo storytelling go next: the phrasing skills from this outro, doubled.",
+        songId: "1Fa5YMCeNKOiTXpRuOZF",
       },
     ],
   },
@@ -303,6 +281,23 @@ export const hotelCalifornia: SongGuide = {
         "The rhythm part: one to three weeks depending on your barre chords. Adding one full solo guitar part: another one to two months of phrase-by-phrase work, with the harmonized cascade section taking the longest. As a pure strumming song it's one of the fastest famous songs to make performable.",
     },
   ],
+  videoLessons: [
+    {
+      videoId: "pgH83y4kYkU",
+      title: "Play Hotel California CORRECTLY! with Tabs & chord charts",
+      channelName: "Anthony Parker and the Near Life Experience",
+    },
+    {
+      videoId: "NmERFLc7Ukg",
+      title: "Eagles - Hotel California solo (Guitar lesson with TAB)",
+      channelName: "Nikola Gugoski",
+    },
+    {
+      videoId: "JLcL4MkpJQ4",
+      title: 'Don Felder teaches you how to play the Eagles\' "Hotel California"',
+      channelName: "Guitar World",
+    },
+  ],
   customBlocks: [
     {
       kind: "chordMap",
@@ -325,15 +320,15 @@ export const hotelCalifornia: SongGuide = {
   sectionOrder: [
     "verdict",
     "custom:chord-map",
+    "videoLessons",
     "techniques",
-    "relatedExercises",
     "songMap",
     "whoFor",
-    "mistakes",
     "timeline",
     "inlineCta",
     "practicePlan",
     "learningPath",
     "progression",
+    "relatedExercises",
   ],
 };

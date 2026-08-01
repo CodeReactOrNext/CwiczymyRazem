@@ -3,12 +3,17 @@
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Reveal } from "feature/landing/components/Reveal";
 import { songGuides } from "feature/song-library/song-guides/content";
+import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, BookMarked, Disc3, Filter, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 const featuredGuides = songGuides.slice(0, 3);
+
+interface SongsLibrarySectionProps {
+  guideLiveData?: PathSongLiveDataMap;
+}
 
 const features = [
   {
@@ -33,7 +38,9 @@ const features = [
   },
 ];
 
-export const SongsLibrarySection = () => {
+export const SongsLibrarySection = ({
+  guideLiveData = {},
+}: SongsLibrarySectionProps) => {
   return (
     <section className='relative overflow-hidden bg-zinc-950 py-24'>
       {/* Background ambience */}
@@ -89,7 +96,14 @@ export const SongsLibrarySection = () => {
               </p>
               <div className='flex flex-wrap gap-2'>
                 {featuredGuides.map((guide) => {
-                  const tier = getSongTier(guide.editorial.difficulty);
+                  const live = guide.songId
+                    ? guideLiveData[guide.songId]
+                    : undefined;
+                  const liveRating =
+                    live && live.avgDifficulty > 0 ? live : undefined;
+                  const tier = getSongTier(
+                    liveRating?.tier ?? guide.editorial.difficulty
+                  );
                   return (
                     <Link
                       key={guide.slug}

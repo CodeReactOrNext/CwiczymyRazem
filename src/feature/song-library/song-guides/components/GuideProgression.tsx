@@ -25,7 +25,7 @@ export const GuideProgression = ({ guide, liveData }: GuideProgressionProps) => 
     <GuideSection heading={guide.progression.heading}>
       <div className='mb-8 grid grid-cols-5 gap-2'>
         {LADDER.map((step) => {
-          const tier = getSongTier(step.tier);
+          const stepTier = getSongTier(step.tier);
           const isActive = step.tier === activeTier;
 
           return (
@@ -37,7 +37,7 @@ export const GuideProgression = ({ guide, liveData }: GuideProgressionProps) => 
               )}>
               <p
                 className='font-display text-xl font-bold sm:text-2xl'
-                style={{ color: isActive ? tier.color : "#52525b" }}>
+                style={{ color: isActive ? stepTier.color : "#52525b" }}>
                 {step.tier}
               </p>
               <p

@@ -1,5 +1,12 @@
 import { Button } from "assets/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  Library,
+  ListChecks,
+  Mic,
+  Repeat,
+} from "lucide-react";
 import Link from "next/link";
 
 import type { SongGuide } from "../types";
@@ -10,37 +17,94 @@ interface GuideCtaProps {
   coverUrl?: string | null;
 }
 
+const inlineCtaFeatures = [
+  {
+    icon: Repeat,
+    label: "Loop any section",
+    desc: "Isolate the intro, solo, or chorus and loop just that part until it's clean.",
+  },
+  {
+    icon: ListChecks,
+    label: "Track what's left",
+    desc: "Mark each section Mastered, Medium, Bad, or Not learned, so you always know what still needs work.",
+  },
+  {
+    icon: Clock,
+    label: "Time spent per song",
+    desc: "Every practice minute is logged against the song itself, not just a generic timer.",
+  },
+  {
+    icon: Library,
+    label: "Your own song library",
+    desc: "Build a library of the songs you actually know, ready to revisit any time.",
+  },
+  {
+    icon: Mic,
+    label: "Import your own tabs",
+    desc: "Upload a Guitar Pro file and turn on real-time note recognition through your mic — the same engine behind the built-in exercises.",
+  },
+];
+
 export const GuideInlineCta = ({ guide, coverUrl }: GuideCtaProps) => {
   return (
     <section className='mx-auto w-full max-w-5xl px-6 py-10'>
-      <div className='flex flex-col items-start gap-6 rounded-lg bg-cyan-500/10 p-8 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='flex items-start gap-5'>
-          {coverUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
+      <div className='overflow-hidden rounded-lg bg-cyan-500/10'>
+        <div className='p-8 pb-0'>
+          <div className='overflow-hidden rounded-lg bg-zinc-950/60 p-2'>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={coverUrl}
-              alt=''
-              aria-hidden='true'
-              width={64}
-              height={64}
-              className='hidden h-16 w-16 shrink-0 rounded-lg object-cover sm:block'
+              src='/images/song-sections.png'
+              alt='Song section tracker: loop a section, see per-section progress (Mastered, Medium, Bad, Not learned) across Intro, Verse, Solo, and Chorus'
+              width={1028}
+              height={450}
+              className='h-auto w-full rounded-md'
             />
-          )}
-          <div>
-            <h2 className='font-display mb-2 text-xl font-bold text-zinc-100'>
-              {guide.inlineCta.heading}
-            </h2>
-            <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-              {guide.inlineCta.text}
-            </p>
           </div>
         </div>
-        <Link href='/signup' className='shrink-0'>
-          <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
-            Start free
-            <ArrowRight className='ml-1.5 h-4 w-4' />
-          </Button>
-        </Link>
+        <div className='p-8'>
+          <div className='mb-4 flex items-center gap-3'>
+            {coverUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverUrl}
+                alt=''
+                aria-hidden='true'
+                width={48}
+                height={48}
+                className='h-12 w-12 shrink-0 rounded-lg object-cover'
+              />
+            )}
+            <h2 className='font-display text-xl font-bold text-zinc-100'>
+              {guide.inlineCta.heading}
+            </h2>
+          </div>
+          <p className='mb-6 max-w-xl text-sm leading-relaxed text-zinc-400'>
+            {guide.inlineCta.text}
+          </p>
+          <ul className='mb-6 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2'>
+            {inlineCtaFeatures.map((feature) => (
+              <li key={feature.label} className='flex items-start gap-3'>
+                <div className='mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-cyan-500/10 text-cyan-400'>
+                  <feature.icon className='h-3.5 w-3.5' aria-hidden='true' />
+                </div>
+                <div>
+                  <div className='text-sm font-bold text-zinc-100'>
+                    {feature.label}
+                  </div>
+                  <div className='text-xs leading-relaxed text-zinc-400'>
+                    {feature.desc}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Link href='/signup'>
+            <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
+              Start free
+              <ArrowRight className='ml-1.5 h-4 w-4' />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );

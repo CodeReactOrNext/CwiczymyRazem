@@ -74,7 +74,10 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
             <h1 className='font-display max-w-3xl text-balance text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl'>
               {guide.h1}
             </h1>
-            <div className='mt-8 space-y-4'>
+            <p className='mt-5 max-w-3xl text-lg font-bold leading-snug text-zinc-100'>
+              {guide.quickAnswer}
+            </p>
+            <div className='mt-6 space-y-4'>
               {guide.intro.map((paragraph) => (
                 <p
                   key={paragraph.slice(0, 32)}

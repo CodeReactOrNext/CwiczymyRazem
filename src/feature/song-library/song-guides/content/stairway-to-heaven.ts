@@ -23,6 +23,8 @@ export const stairwayToHeaven: SongGuide = {
     ],
   },
   h1: "Stairway to Heaven on Guitar: Difficulty, Roadmap, and What to Learn First",
+  quickAnswer:
+    "No single difficulty score means much here — it's five songs of rising difficulty stitched into one, from a beginner-friendly intro to an advanced solo.",
   intro: [
     "Stairway to Heaven isn't one song; it's a guitar curriculum with a tracklist of one. Across eight minutes it moves from a fingerpicked Am arpeggio, through folk-style chord melody, into strummed 12-string textures, and finally erupts into arguably the most famous rock solo ever recorded. Every stage demands a different skill, and every stage is harder than the one before.",
     "That structure is why 'how hard is Stairway to Heaven?' has no single answer, and why this guide doesn't give one number and move on. Instead, we walk the song the way you'll actually learn it: as five ascending stages, each with its own difficulty, its own techniques, and its own traps. By the end you'll know exactly which stage matches your level today.",
@@ -126,36 +128,6 @@ export const stairwayToHeaven: SongGuide = {
       },
     ],
   },
-  mistakes: {
-    heading: "Where the staircase trips people",
-    items: [
-      {
-        title: "Playing the intro too fast",
-        why: "Everyone has heard the song a thousand times, and adrenaline sets the tempo. The intro is slower than you think: around 72 BPM.",
-        fix: "Play along with the record for a week before trusting your own clock. The space between notes is the atmosphere.",
-      },
-      {
-        title: "Ignoring the descending bassline",
-        why: "The intro isn't 'Am arpeggio'; it's a bass melody (A–G♯–G–F♯–F) walking under chords. Miss that and it sounds like an exercise.",
-        fix: "Practice thumb-only first: just the bass walk, in rhythm. Then rebuild the arpeggio around it.",
-      },
-      {
-        title: "Treating the middle as filler",
-        why: "Players sprint from intro to solo and leave the verses and 12-string section sloppy, which is 70% of the song's runtime.",
-        fix: "Give each stage its own practice block. The middle stages are where the recording's magic actually lives.",
-      },
-      {
-        title: "Learning the solo front-to-back at full speed",
-        why: "The solo escalates: the final triplet run is two difficulty levels above the opening phrases. Starting fast means finishing never.",
-        fix: "Split it into its phrases. Master the opening (it's the easy 40%), then the middle runs, and only then the climax, at 60% speed with a metronome.",
-      },
-      {
-        title: "Bending flat on the signature phrases",
-        why: "The solo's identity is in full-tone bends that land dead in tune. Nearly-there bends make the most recognizable solo on Earth sound wrong.",
-        fix: "For every bend, play the target fret first, then bend up to match it. Ears first, fingers second.",
-      },
-    ],
-  },
   practicePlan: {
     heading: "The stage-by-stage plan",
     intro:
@@ -179,6 +151,7 @@ export const stairwayToHeaven: SongGuide = {
         difficulty: 4.6,
         why: "The classic previous step: the same fingerpicked-arpeggio DNA at a friendlier grade, with a gentler solo exam.",
         guideSlug: "nothing-else-matters",
+        songId: "IezBmdxsh9DqsBwKg5du",
       },
       {
         title: "Babe I'm Gonna Leave You",
@@ -191,6 +164,7 @@ export const stairwayToHeaven: SongGuide = {
         artist: "Kansas",
         difficulty: 4.5,
         why: "Pure fingerpicking-pattern endurance: perfect prep for keeping arpeggios flowing across minutes.",
+        songId: "bEwIfRajwBDkbhHBcOQX",
       },
     ],
     harder: [
@@ -200,12 +174,14 @@ export const stairwayToHeaven: SongGuide = {
         difficulty: 6.5,
         why: "A sideways-then-up move: less fingerpicking, more barre-chord stamina, and a harmonized solo that demands two-guitar thinking.",
         guideSlug: "hotel-california",
+        songId: "2EJ3e2txxh0VBCkaxUMU",
       },
       {
         title: "Since I've Been Loving You",
         artist: "Led Zeppelin",
         difficulty: 7.8,
         why: "Page's real lead-guitar exam: slow blues phrasing where every note is exposed. The solo skills Stairway starts, this finishes.",
+        songId: "tszFOh8hPTScFiLzhelU",
       },
       {
         title: "Sweet Child O' Mine",
@@ -213,6 +189,7 @@ export const stairwayToHeaven: SongGuide = {
         difficulty: 7.5,
         why: "The next famous-solo summit: faster runs, longer sustain, and a full-song lead role rather than one climactic minute.",
         guideSlug: "sweet-child-o-mine",
+        songId: "U79ddvoBhbUXD3JtBXik",
       },
     ],
   },
@@ -261,6 +238,23 @@ export const stairwayToHeaven: SongGuide = {
       title: "What should I learn before attempting the solo?",
       message:
         "Be comfortable with the A-minor pentatonic box around the 5th fret, full-tone bends that land in tune, and basic pull-off runs. If those are shaky, spend two weeks on them in isolation; the solo then assembles from vocabulary you already own instead of fighting you note by note.",
+    },
+  ],
+  videoLessons: [
+    {
+      videoId: "iGleR_5yiaE",
+      title: "Stairway To Heaven Led Zeppelin Guitar Lesson + Tutorial",
+      channelName: "Marty Music",
+    },
+    {
+      videoId: "hyefrmWZL6s",
+      title: "Led Zeppelin - Stairway to Heaven - Guitar Tab | Lesson | Cover | Tutorial",
+      channelName: "Mr. Tabs",
+    },
+    {
+      videoId: "Q5Qku_H8VZg",
+      title: "Let's learn the Stairway to Heaven solo properly.",
+      channelName: "Sped Spedding",
     },
   ],
   customBlocks: [
@@ -316,15 +310,15 @@ export const stairwayToHeaven: SongGuide = {
   ],
   sectionOrder: [
     "custom:five-stages",
+    "videoLessons",
     "verdict",
     "whoFor",
     "techniques",
-    "relatedExercises",
     "timeline",
-    "mistakes",
     "inlineCta",
     "learningPath",
     "practicePlan",
     "progression",
+    "relatedExercises",
   ],
 };

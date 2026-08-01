@@ -5,6 +5,7 @@ import { nothingElseMatters } from "./nothing-else-matters";
 import { sevenNationArmy } from "./seven-nation-army";
 import { stairwayToHeaven } from "./stairway-to-heaven";
 import { sweetChildOMine } from "./sweet-child-o-mine";
+import { thunderstruck } from "./thunderstruck";
 
 export const songGuides: SongGuide[] = [
   nothingElseMatters,
@@ -13,6 +14,7 @@ export const songGuides: SongGuide[] = [
   hotelCalifornia,
   sweetChildOMine,
   sevenNationArmy,
+  thunderstruck,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>

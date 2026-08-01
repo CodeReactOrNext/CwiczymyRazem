@@ -1,3 +1,5 @@
+import { sevenNationArmyRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sevenNationArmyRiffPreview/sevenNationArmyRiffPreview";
+
 import type { SongGuide } from "../types";
 
 export const sevenNationArmy: SongGuide = {
@@ -23,6 +25,8 @@ export const sevenNationArmy: SongGuide = {
     ],
   },
   h1: "Seven Nation Army on Guitar: How Hard Is It Really?",
+  quickAnswer:
+    "The four-note riff takes five minutes to learn — the real challenge is keeping it locked to a beat with no drummer, not the notes themselves.",
   intro: [
     "Ask any guitarist to name a riff you can learn in five minutes, and Seven Nation Army comes up almost every time. Four notes, one string, no chords: it genuinely is one of the easiest famous riffs in rock to get under your fingers. What most beginners don't realize is that the bass-like tone on the record isn't a bass at all; it's Jack White's guitar pushed down an octave through a pitch-shift pedal, which is why the riff sounds heavier on the album than it does played clean.",
     "That's also why this guide exists: the riff being easy is only half the story. Playing it in time without a drummer to keep you honest, muting the other five strings cleanly, and eventually tackling the song's quiet-loud dynamics and guitar solo take it from campfire trick to something you can actually perform. Here's the honest breakdown.",
@@ -138,6 +142,15 @@ export const sevenNationArmy: SongGuide = {
     hardestSummary:
       "The riff will never be the hard part. The solo is where the song's real difficulty lives, and it's entirely optional if all you want is the part everyone recognizes.",
   },
+  riffPreview: {
+    heading: "Riff preview",
+    intro: "A short tab from the song's iconic riff.",
+    measures: sevenNationArmyRiffPreviewExercise.tablature!,
+    bpm: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.recommended,
+    bpmMin: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.min,
+    bpmMax: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.max,
+    practiceExerciseId: sevenNationArmyRiffPreviewExercise.id,
+  },
   timeline: {
     heading: "How long will it actually take?",
     intro:
@@ -157,36 +170,6 @@ export const sevenNationArmy: SongGuide = {
         level: "Advanced",
         time: "2–3 days",
         note: "The whole song is quick work; the interesting part is playing the solo with real phrasing instead of just hitting the notes.",
-      },
-    ],
-  },
-  mistakes: {
-    heading: "Where players go wrong",
-    items: [
-      {
-        title: "Overthinking the picking hand",
-        why: "The record's tone comes from a pick attack through a pitch-shifted signal, not from a specific picking technique. Getting precious about alternate picking usually just drifts the timing off.",
-        fix: "Simple, relaxed downstrokes with a metronome. Consistency matters far more than picking technique here.",
-      },
-      {
-        title: "Letting the other strings ring",
-        why: "The riff lives on one string, and every other string buzzing or ringing sympathetically muddies the whole thing.",
-        fix: "Rest your picking-hand palm lightly across the unused strings and check by ear, one string at a time.",
-      },
-      {
-        title: "Playing the verses at chorus volume",
-        why: "Without the dynamic drop, the song's biggest moment, the chorus slamming back in, has nowhere to go.",
-        fix: "Practice the verse deliberately quiet, almost under-confident. The contrast is the whole effect.",
-      },
-      {
-        title: "Speeding up over the four-minute runtime",
-        why: "A simple repeating riff is the easiest thing in the world to rush without a drummer keeping you honest.",
-        fix: "Loop the riff against a metronome or the actual track for the full length before calling it learned.",
-      },
-      {
-        title: "Expecting the solo to be riff-easy",
-        why: "The solo is a genuine step up in difficulty: bends, vibrato, and wah control that the riff never asks for.",
-        fix: "Learn it as its own project, phrase by phrase, separate from the riff.",
       },
     ],
   },
@@ -211,18 +194,21 @@ export const sevenNationArmy: SongGuide = {
         artist: "America",
         difficulty: 1.5,
         why: "If fretting a clean single note is still new, this two-chord song builds the rhythm hand first.",
+        songId: "Yyt69SBUs5DQA27nWNsn",
       },
       {
         title: "Come as You Are",
         artist: "Nirvana",
         difficulty: 3,
         why: "Another single-note riff over a steady pulse; trains the same muted, hypnotic groove.",
+        songId: "UgfElrEYe13NL5NmbPvo",
       },
       {
         title: "Smoke on the Water",
         artist: "Deep Purple",
         difficulty: 3,
         why: "The other classic 'first real riff' song; slightly more finger movement, similar single-line simplicity.",
+        songId: "3vZNl6um01tBIr2qwqUo",
       },
     ],
     harder: [
@@ -232,12 +218,14 @@ export const sevenNationArmy: SongGuide = {
         difficulty: 4.6,
         why: "The natural next step: still beginner-friendly at the start, with a real fingerstyle and solo challenge waiting.",
         guideSlug: "nothing-else-matters",
+        songId: "IezBmdxsh9DqsBwKg5du",
       },
       {
         title: "Sunshine of Your Love",
         artist: "Cream",
         difficulty: 4,
         why: "Another iconic riff-first blues-rock song, with a similarly bendy, wah-adjacent solo to grow into.",
+        songId: "H25deTMIo4dqw2oFHP1X",
       },
       {
         title: "Hotel California",
@@ -245,6 +233,7 @@ export const sevenNationArmy: SongGuide = {
         difficulty: 6.5,
         why: "Trades single-note simplicity for barre chords and a much longer lead-guitar exam.",
         guideSlug: "hotel-california",
+        songId: "2EJ3e2txxh0VBCkaxUMU",
       },
     ],
   },
@@ -330,12 +319,12 @@ export const sevenNationArmy: SongGuide = {
         {
           label: "1. The note pattern",
           description:
-            "A held root note, then a quick descending-and-returning run, all on the low E string. Nothing above the 5th fret.",
+            "A quick syncopated pickup, then a short run up and back down, all on the A string.",
         },
         {
           label: "2. The muting",
           description:
-            "Every other string has to stay silent while the low E rings out. Rest your palm lightly across the A, D, G, B, and high E strings and check each one by ear.",
+            "Every other string has to stay silent while the A string rings out. Rest your palm lightly across the low E, D, G, B, and high E strings and check each one by ear.",
         },
         {
           label: "3. The illusion",
@@ -346,19 +335,19 @@ export const sevenNationArmy: SongGuide = {
     },
   ],
   sectionOrder: [
+    "riffPreview",
+    "videoLessons",
     "verdict",
     "songMap",
     "custom:riff-anatomy",
     "techniques",
-    "relatedExercises",
     "whoFor",
-    "mistakes",
     "timeline",
     "inlineCta",
     "practicePlan",
     "learningPath",
-    "videoLessons",
     "progression",
     "sources",
+    "relatedExercises",
   ],
 };

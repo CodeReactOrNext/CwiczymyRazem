@@ -6,6 +6,7 @@ import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { LandingStickyNav } from "feature/landing/components/LandingStickyNav";
 import { jakartaLanding } from "feature/landing/lib/fonts";
+import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import type { BlogFrontmatter } from "lib/blog";
 import dynamic from "next/dynamic";
 
@@ -71,9 +72,14 @@ interface LandingPageProps {
     description: string;
     timeInMinutes: number;
   }>;
+  guideLiveData?: PathSongLiveDataMap;
 }
 
-const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
+const LandingPage = ({
+  blogs,
+  spotlightExercises = [],
+  guideLiveData = {},
+}: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
     {
       title: "Who is this app for?",
@@ -125,7 +131,7 @@ const LandingPage = ({ blogs, spotlightExercises = [] }: LandingPageProps) => {
         )}
         <StatisticsSection />
         <SectionSeam from='900' to='950' />
-        <SongsLibrarySection />
+        <SongsLibrarySection guideLiveData={guideLiveData} />
         <PracticePlansSection />
         <TestimonialsSection />
         <MidCTASection />

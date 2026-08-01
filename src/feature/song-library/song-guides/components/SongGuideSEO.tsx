@@ -63,6 +63,7 @@ export const SongGuideSEO = ({
           "@type": "MusicRecording",
           name: guide.title,
           byArtist: { "@type": "MusicGroup", name: guide.artist },
+          recordingOf: { "@id": `${pageUrl}#composition` },
           ...(liveData.song && liveData.song.ratingsCount > 0
             ? {
                 aggregateRating: {
@@ -75,6 +76,12 @@ export const SongGuideSEO = ({
               }
             : {}),
         },
+      },
+      {
+        "@type": "MusicComposition",
+        "@id": `${pageUrl}#composition`,
+        name: guide.title,
+        composer: { "@type": "MusicGroup", name: guide.artist },
       },
       {
         "@type": "BreadcrumbList",

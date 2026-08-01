@@ -12,6 +12,7 @@ import { LibrarySongGrid } from "feature/song-library/components/LibrarySongGrid
 import { LibraryStatsBar } from "feature/song-library/components/LibraryStatsBar";
 import { LibraryTierGuide } from "feature/song-library/components/LibraryTierGuide";
 import type { LibrarySong } from "feature/song-library/services/getSongsForStaticProps";
+import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 
 const faqQuestions = [
   {
@@ -44,13 +45,13 @@ const faqQuestions = [
 interface LibraryLandingPageProps {
   songs: LibrarySong[];
   totalSongs: number;
-  guideCovers: Record<string, string | null>;
+  guideLiveData: PathSongLiveDataMap;
 }
 
 const LibraryLandingPage = ({
   songs,
   totalSongs,
-  guideCovers,
+  guideLiveData,
 }: LibraryLandingPageProps) => {
   return (
     <>
@@ -61,7 +62,7 @@ const LibraryLandingPage = ({
         <LibraryHeroSection totalSongs={totalSongs} />
         <LibraryStatsBar totalSongs={totalSongs} />
         <LibrarySongGrid songs={songs} totalSongs={totalSongs} />
-        <LibraryGuidesSection guideCovers={guideCovers} />
+        <LibraryGuidesSection guideLiveData={guideLiveData} />
         <LibraryTierGuide />
         <LibraryCTASection />
         <LibraryFaqSection questions={faqQuestions} />

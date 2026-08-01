@@ -12,6 +12,7 @@ import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises
 import { legatoHammerPullRunExercise } from "feature/exercisePlan/data/exerises/legatoHammerPullRun/legatoHammerPullRun";
 import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
 import { legatoTrillSprintExercise } from "feature/exercisePlan/data/exerises/legatoTrillSprint/legatoTrillSprint";
+import { masterOfPuppetsRiffPreviewExercise } from "feature/exercisePlan/data/exerises/masterOfPuppetsRiffPreview/masterOfPuppetsRiffPreview";
 import {
   metalPlayalongExercise,
   musicianFitnessLvl1S1Exercise,
@@ -30,6 +31,7 @@ import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneCh
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
+import { sevenNationArmyRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sevenNationArmyRiffPreview/sevenNationArmyRiffPreview";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
@@ -174,6 +176,9 @@ const FREE_EXERCISE_IDS = new Set([
   "gp_music_theory_essential",
   "gp_drop2_chords_arpeggios",
   "gp_pentatonic_tutorial",
+  // Song-guide riff previews — free
+  "master_of_puppets_riff_preview",
+  "seven_nation_army_riff_preview",
 ]);
 
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
@@ -387,6 +392,8 @@ const rawExercises: Exercise[] = [
   metalGallopExercise,
   metalTremoloPickingExercise,
   downPickingDoomPulseExercise,
+  masterOfPuppetsRiffPreviewExercise,
+  sevenNationArmyRiffPreviewExercise,
   nakedToneMelodyExercise,
   mutingSpotlightDrillExercise,
   chordSpotlightDrillExercise,
