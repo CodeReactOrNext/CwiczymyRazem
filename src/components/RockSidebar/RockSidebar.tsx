@@ -8,6 +8,7 @@ import {
 import { FeedbackModal } from "components/FeedbackBubble";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
+import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import {
@@ -29,6 +30,7 @@ import {
   ChevronDown,
   ClipboardList,
   Clock,
+  Download,
   FilePlus2,
   Home,
   LayoutDashboard,
@@ -36,7 +38,6 @@ import {
   ListChecks,
   ListMusic,
   LogOut,
-  Map,
   MessageSquarePlus,
   Mic2,
   Milestone,
@@ -563,20 +564,20 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
       <div className="hidden lg:block lg:flex-1" />
 
-      <Link
-        href="/roadmap"
-        onClick={mobile ? handleLinkClick : undefined}
-        className="mt-10 flex items-start gap-3 rounded-xl bg-amber-500/10 p-3 transition-all duration-200 active:scale-[0.98] hover:bg-amber-500/15">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
-          <Map size={18} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-300">Community Roadmap</p>
-          <p className="mt-0.5 text-xs leading-snug text-amber-400/60">
-            Help build Riff Quest
-          </p>
-        </div>
-      </Link>
+      {!isElectron && (
+        <a
+          href={DESKTOP_APP_RELEASES_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-10 flex items-center gap-3 rounded-xl bg-cyan-500/10 p-3 transition-all duration-200 active:scale-[0.98] hover:bg-cyan-500/15">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
+            <Download size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-cyan-300">Get the desktop app</p>
+          </div>
+        </a>
+      )}
 
       {mobile && (
         <>

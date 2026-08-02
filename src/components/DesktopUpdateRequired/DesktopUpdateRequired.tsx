@@ -1,10 +1,8 @@
 import { Button } from "assets/components/ui/button";
-import { MIN_DESKTOP_APP_VERSION } from "constants/desktopApp";
+import { DESKTOP_APP_RELEASES_URL, MIN_DESKTOP_APP_VERSION } from "constants/desktopApp";
 import { useDesktopAppVersion } from "hooks/useDesktopAppVersion";
 import { Download } from "lucide-react";
 import { isVersionBelow } from "utils/version";
-
-const RELEASES_URL = "https://github.com/Michaljapko/riff-quest-releases/releases/latest";
 
 /**
  * Full-app, non-dismissable block for desktop shells older than
@@ -29,7 +27,7 @@ export const DesktopUpdateRequired = () => {
           the latest version to continue.
         </p>
         <Button asChild size="lg">
-          <a href={RELEASES_URL} target="_blank" rel="noreferrer">
+          <a href={DESKTOP_APP_RELEASES_URL} target="_blank" rel="noreferrer">
             <Download className="mr-2 h-4 w-4" />
             Download latest version
           </a>
