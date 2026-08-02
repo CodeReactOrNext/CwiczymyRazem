@@ -10,8 +10,8 @@ const FAQ = [
       <>
         Riff Quest stays free for everyone, full stop. When you support it you
         are not buying access for yourself, you are paying for development that
-        the whole community gets to use. There are no paywalls and no features
-        locked behind a subscription, and there never will be.
+        the whole community gets to use. It works as a running total, not a
+        subscription, so once a goal is reached it stays unlocked for good.
       </>
     ),
   },

@@ -13,7 +13,10 @@ export const SupportBanner = () => {
 
   const covered = Math.min(raisedThisMonth, MONTHLY_RUNNING_COST);
   const isCovered = raisedThisMonth >= MONTHLY_RUNNING_COST;
-  const costPct = Math.min(100, Math.max(0, (covered / MONTHLY_RUNNING_COST) * 100));
+  const costPct = Math.min(
+    100,
+    Math.max(0, (covered / MONTHLY_RUNNING_COST) * 100),
+  );
 
   const nextTierIndex = ROADMAP_TIERS.findIndex((t) => totalRaised < t.goal);
   const nextTier = nextTierIndex === -1 ? null : ROADMAP_TIERS[nextTierIndex];
@@ -44,8 +47,8 @@ export const SupportBanner = () => {
               Help build Riff Quest
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
-              Riff Quest is free and built in the open. See what your support
-              unlocks next on the roadmap.
+              Riff Quest is a one-person project, free and built in the open.
+              Your support keeps it that way.
             </p>
           </div>
         </div>
@@ -58,7 +61,10 @@ export const SupportBanner = () => {
                 {isCovered ? (
                   <Check size={14} className='shrink-0 text-emerald-400' />
                 ) : (
-                  <TriangleAlert size={14} className='shrink-0 text-orange-400' />
+                  <TriangleAlert
+                    size={14}
+                    className='shrink-0 text-orange-400'
+                  />
                 )}
                 <span
                   className={cn(
@@ -111,7 +117,7 @@ export const SupportBanner = () => {
         )}
 
         <span className='flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 transition-background group-hover:bg-white sm:text-sm'>
-          <span className='hidden sm:inline'>View roadmap</span>
+          <span className='hidden sm:inline'>Support</span>
           <ArrowRight
             size={16}
             className='transition-transform duration-300 group-hover:translate-x-0.5'
