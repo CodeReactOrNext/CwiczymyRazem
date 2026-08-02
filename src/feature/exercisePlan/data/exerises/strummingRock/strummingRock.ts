@@ -7,7 +7,7 @@ export const strummingRockExercise: Exercise = {
   whyItMatters: "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 3.5,
+  timeInMinutes: 1.5,
   instructions: [
     "Execute strums with a loose, relaxed wrist, maintaining a steady tempo.",
     "Vary your strumming force to create a clear contrast between soft and loud beats."

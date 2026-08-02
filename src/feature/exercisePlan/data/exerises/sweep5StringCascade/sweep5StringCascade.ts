@@ -7,7 +7,7 @@ export const sweep5StringCascadeExercise: Exercise = {
   whyItMatters: "This exercise develops muting discipline and fluid motion across almost the entire fretboard width. It trains your picking hand to execute a broad, uniform sweep stroke, and builds the string-to-string muting control required to play clean, note-separated arpeggios at any speed.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 3,
   instructions: [
     "Sweep across five adjacent strings in a single, continuous pick motion.",
     "Mute each note instantly using both hands as you cross onto the next string.",

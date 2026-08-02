@@ -8,7 +8,7 @@ export const vibratoFingerIsolationExercise: Exercise = {
   whyItMatters: "Most guitarists can only vibrate with their index or middle finger. Isolating each finger builds uniform strength and wrist rotation, allowing you to add expression to any note regardless of the fingering.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 3,
   instructions: [
     "Execute wavelike pitch modulation using only the active fretting finger.",
     "Rotate your wrist and forearm to drive the oscillation cleanly."

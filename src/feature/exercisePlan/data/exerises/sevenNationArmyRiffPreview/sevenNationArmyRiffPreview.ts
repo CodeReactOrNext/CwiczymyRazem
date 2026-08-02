@@ -17,7 +17,7 @@ export const sevenNationArmyRiffPreviewExercise: Exercise = {
     "One string, one repeating shape — the syncopated pickup and the held notes are what make it instantly recognizable, not the fretting.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Palm-mute the other five strings so only the A string rings — that's the real skill here, not the fretting.",
     "Nail the syncopated pickup on the first two notes before worrying about speed.",

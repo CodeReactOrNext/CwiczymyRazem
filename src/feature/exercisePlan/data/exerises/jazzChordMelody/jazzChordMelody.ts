@@ -7,7 +7,7 @@ export const jazzChordMelodyExercise: Exercise = {
   whyItMatters: "This exercise develops highly independent control between your pick and fingers. By separating low-frequency bass lines from high-frequency harmony voicings, you build the essential hand coordination needed to play solo arrangements, manage polyrhythms, and achieve precise chord comping.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 2,
   instructions: [
     "Strike the low-register bass notes cleanly on the beat using your pick or fingers.",
     "Use your middle, ring, and pinky fingers to pluck the higher chord voicings on alternate beats.",

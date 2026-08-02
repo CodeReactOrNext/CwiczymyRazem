@@ -27,7 +27,7 @@ export const spiderXExercise: Exercise = {
   whyItMatters: "Diagonal fretboard movement is highly common in real solos but rarely practiced. The Spider X drill breaks up linear muscle memory, training your brain and fingers to navigate the fretboard dynamically.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 1.5,
   instructions: [
     "Sync diagonal string changes with precise alternate pick strokes.",
     "Move smoothly between positions without disrupting the rhythmic grid."

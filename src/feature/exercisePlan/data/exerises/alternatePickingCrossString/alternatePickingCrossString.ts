@@ -7,7 +7,7 @@ export const alternatePickingCrossStringExercise: Exercise = {
   whyItMatters: "This exercise develops clean alternate picking across string changes. It improves picking consistency, string transition control, and synchronization between both hands.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Use strict alternate picking throughout the exercise.",
     "Keep the rhythm even while moving between strings.",

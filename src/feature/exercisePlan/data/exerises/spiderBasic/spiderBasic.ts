@@ -10,7 +10,7 @@ export const spiderBasicExercise: Exercise = {
   whyItMatters: "This exercise develops solid finger autonomy. It prevents fingers from 'flying away' from the fretboard, vastly improves economy of motion, and synchronizes both hands for clean, fast lead playing.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 2,
   instructions: [
     "Play 4 even notes per beat using strict alternate picking (down-up-down-up).",
     "Shift your entire hand up by one fret each time you complete a full pattern cycle.",

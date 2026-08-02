@@ -7,7 +7,7 @@ export const precisionBendingDrillExercise: Exercise = {
   whyItMatters: "This exercise gives you total control over string tension during sustained bends and releases. You will learn to hold bent notes perfectly in tune and guide them back down smoothly without any abrupt noise.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 3,
+  timeInMinutes: 2.5,
   instructions: [
     "Bend the string smoothly to reach the exact target pitch with perfect intonation.",
     "Maintain steady finger pressure and hand stability at the peak of the bend.",

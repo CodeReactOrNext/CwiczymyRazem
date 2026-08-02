@@ -8,7 +8,7 @@ export const metalGallopExercise: Exercise = {
   whyItMatters: "The gallop (one eighth note followed by two sixteenth notes) is the rhythmic heartbeat of heavy metal and hard rock. Achieving a tight, aggressive gallop requires strict pick stroke direction and palm-muting discipline.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   instructions: [
     "Maintain a strict Down-Down-Up picking pattern for each gallop sequence.",
     "Rest the side of your picking-hand palm on the strings near the bridge for a tight mute."

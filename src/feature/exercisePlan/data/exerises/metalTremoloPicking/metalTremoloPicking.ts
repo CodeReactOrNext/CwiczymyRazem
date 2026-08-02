@@ -7,7 +7,7 @@ export const metalTremoloPickingExercise: Exercise = {
   whyItMatters: "This exercise builds speed and endurance for your picking hand. It tightens your alternate picking accuracy, locks in palm-mute consistency, and trains your hand to stay completely relaxed during high-intensity metal riffing.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 2,
   instructions: [
     "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
     "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",

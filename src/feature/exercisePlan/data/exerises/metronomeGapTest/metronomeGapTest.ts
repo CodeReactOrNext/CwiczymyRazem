@@ -7,7 +7,7 @@ export const metronomeGapTestExercise: Exercise = {
   whyItMatters: "It reveals whether you've truly internalised the tempo or are just riding an external click. Holding the grid through silence builds the deep internal timing you need to lock in with a drummer, lead a band, and stop rushing or dragging.",
   difficulty: "medium",
   category: "theory",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Press Start — the metronome plays 2 bars (1·2·3·4) so you can lock onto the tempo.",
     "The click then goes silent for a few bars; keep counting the pulse in your head.",

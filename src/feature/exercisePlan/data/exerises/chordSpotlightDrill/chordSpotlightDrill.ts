@@ -7,7 +7,7 @@ export const chordSpotlightDrillExercise: Exercise = {
   whyItMatters: "This exercise develops independent fretting hand tension control. By holding a full chord shape and selectively releasing pressure on specific fingers, you learn to mute unwanted strings without breaking your structural hand position—an essential skill for clean rhythm playing and funky percussive strumming.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3.5,
   instructions: [
     "Maintain the D major chord shape throughout the entire exercise.",
     "To mute a note, release the pressure from that fretting finger while keeping it lightly touching the string.",

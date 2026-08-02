@@ -7,7 +7,7 @@ export const speedBurstChromaticBlitzExercise: Exercise = {
   whyItMatters: "This exercise develops fast-twitch muscle response in both hands. It trains your fingers to fire quickly in sync, and teaches you how to release tension instantly during rests, preventing hand fatigue.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
     "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",

@@ -10,7 +10,7 @@ export const hammerOnSequence579Exercise: Exercise = {
   whyItMatters: "Hammer-ons allow you to play fluid, rapid lines with a soft, vocal-like attack. The 5-7-9 sequence requires stretching the fingers, which helps build both reach and independent hammer strength in the ring and pinky fingers.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Strike the first note with the pick, then execute the subsequent notes purely with hammer-ons.",
     "Bring each finger down sharply and vertically onto the target fret."

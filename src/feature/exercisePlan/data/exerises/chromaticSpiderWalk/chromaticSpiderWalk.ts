@@ -7,7 +7,7 @@ export const chromaticSpiderWalkExercise: Exercise = {
   whyItMatters: "The spider walk is a fundamental warm-up that isolates each finger of the fretting hand. By coordinating finger movement with alternate picking, you build rhythmic accuracy, reduce excess tension, and lay a solid foundation for advanced speed and endurance.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Coordinate each pick stroke with precise, synchronized fretting finger contact.",
     "Maintain strict alternate picking, keeping the motion small and close to the strings."

@@ -14,7 +14,7 @@ export const fingerIndependence1aExercise: Exercise = {
   whyItMatters: "Finger independence prevents secondary muscle tension and sympathetic finger movement. Developing isolated control over each finger ensures clean note execution, smoother transitions, and superior economy of motion during complex playing.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Anchor the designated fingers firmly to the fretboard without squeezing.",
     "Move the active finger slowly and deliberately without letting the anchored fingers lift."

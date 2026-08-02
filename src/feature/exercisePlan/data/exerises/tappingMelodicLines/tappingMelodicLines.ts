@@ -7,7 +7,7 @@ export const tappingMelodicLinesExercise: Exercise = {
   whyItMatters: "Two-handed tapping turns the guitar into a piano-like instrument. Learning to tap melodic lines rather than just fast arpeggios adds a highly lyrical, unique texture to your solos.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 3.5,
   instructions: [
     "Tap melodic lines cleanly, balancing the volume of both hands.",
     "Sync string changes smoothly between tapped and fretted notes."

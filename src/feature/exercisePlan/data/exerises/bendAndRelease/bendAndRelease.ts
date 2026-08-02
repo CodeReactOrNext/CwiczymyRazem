@@ -11,7 +11,7 @@ export const bendAndReleaseExercise: Exercise = {
   whyItMatters: "This exercise develops accurate pitch control and micro-intonation. The slow, controlled release trains your fingers to guide the string back to its starting position without losing fret pressure, eliminating pitch wobbles and ensuring a smooth, expressive vocal-like quality to your bends.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Push the string up cleanly to a full whole-step bend using three fingers (ring finger on the target fret supported by middle and index). Do not attempt to bend with a single finger.",
     "Hold the peak of the bend briefly, then slowly release the string back to its starting pitch without re-picking.",

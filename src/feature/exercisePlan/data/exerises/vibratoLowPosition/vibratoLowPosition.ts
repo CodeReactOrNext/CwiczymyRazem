@@ -8,7 +8,7 @@ export const vibratoLowPositionExercise: Exercise = {
   whyItMatters: "Fretting near the nut requires more physical force to modulate the string's pitch. This drill builds the foundational hand strength and wrist mechanics needed to execute clean, wide vibrato on low frets.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 3,
   instructions: [
     "Apply firm finger and wrist force to overcome the high string tension near the nut.",
     "Rotate your wrist wide, keeping the oscillation rhythmically even."

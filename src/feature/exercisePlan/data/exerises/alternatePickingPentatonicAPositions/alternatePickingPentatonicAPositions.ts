@@ -7,7 +7,7 @@ export const alternatePickingPentatonicAPositionsExercise: Exercise = {
   whyItMatters: "This exercise anchors your picking hand synchronization by isolating the moment of string crossing. Playing each note four times allows your brain to settle into the alternate picking pulse before navigating the physical change of string plane, resulting in extremely clean and stable picking runs.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 4,
   instructions: [
     "Play the A minor pentatonic box 1, picking each fret position exactly four times.",
     "Maintain a strict alternate picking (down-up-down-up) pulse across all notes.",

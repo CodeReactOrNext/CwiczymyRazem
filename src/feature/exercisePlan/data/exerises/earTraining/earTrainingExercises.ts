@@ -8,7 +8,7 @@ export const earTrainingEasy: Exercise = {
   whyItMatters: "A well-trained ear allows you to translate the melodies in your head directly onto the guitar, transcribe songs quickly, and react dynamically to other musicians during a performance.",
   difficulty: "easy",
   category: "hearing",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Listen closely to the reference pitches and sing or hum them internally before playing.",
     "Focus on recognizing the spatial distance between the two notes."
@@ -38,7 +38,7 @@ export const earTrainingMedium: Exercise = {
   description: "Listen to a short melody and repeat it.",
   difficulty: "medium",
   category: "hearing",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Listen to the 4-note melody.",
     "Replicate the melody on your guitar."
@@ -65,7 +65,7 @@ export const earTrainingHard: Exercise = {
   description: "Complex intervals and wider range.",
   difficulty: "hard",
   category: "hearing",
-  timeInMinutes: 10,
+  timeInMinutes: 3,
   instructions: [
     "A complex 6-note sequence will play.",
     "Good luck!"

@@ -10,7 +10,7 @@ export const spiderOneStringExercise: Exercise = {
   whyItMatters: "This exercise establishes precise finger coordination on a single string. It helps build initial finger strength, ensures clear note separation, and trains your fingers to find frets without looking.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 3,
   instructions: [
     "Position your hand on a single string and play frets 1-2-3-4 sequentially.",
     "Ensure each note rings out completely clear before moving to the next fret.",

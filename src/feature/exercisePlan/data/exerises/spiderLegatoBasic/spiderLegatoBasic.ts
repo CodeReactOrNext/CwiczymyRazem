@@ -10,7 +10,7 @@ export const spiderLegatoBasicExercise: Exercise = {
   whyItMatters: "Removing the pick forces your fretting hand to do all the work. This builds massive strength, finger independence, and timing control, leading to incredibly fluid legato runs.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3.5,
   instructions: [
     "Strike only the first note of each string, executing the rest with pure legato.",
     "Ensure hammer-ons are strong and pull-offs are clean and snapped."

@@ -8,7 +8,7 @@ export const downPickingDoomPulseExercise: Exercise = {
   whyItMatters: "Consistent, heavy down-picking is crucial for genres like metal, rock, and punk. This exercise trains the wrist and forearm muscles to maintain a constant dynamic attack and timing precision at solid tempos, preventing fatigue during long rhythm parts.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Execute strict down-strokes only, driving the motion entirely from your wrist.",
     "Apply constant palm muting near the bridge for a tight, chugging sound."

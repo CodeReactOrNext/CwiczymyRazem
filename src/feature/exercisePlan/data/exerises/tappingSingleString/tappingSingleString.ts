@@ -12,7 +12,7 @@ export const tappingSingleStringExercise: Exercise = {
   whyItMatters: "Starting with a simple melody lets you focus entirely on the physical mechanics of tapping: landing exactly in the middle of the fret and executing a clean pull-off without string noise.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3.5,
   instructions: [
     "Execute each tap cleanly, keeping the finger curved and landing vertically.",
     "Flick the tapped finger off the string cleanly to sound the fretted note."

@@ -13,7 +13,7 @@ export const tappingPullHammerExercise: Exercise = {
   whyItMatters: "Playing independent voices with both hands builds incredible brain-to-finger coordination. This advanced technique lets you play both basslines/chords and melodies simultaneously on a single guitar.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 4,
   instructions: [
     "Play the bass/rhythm line with your fretting hand and the melody with your tapping hand.",
     "Maintain strict independence, ensuring both voices sound distinct and balanced."

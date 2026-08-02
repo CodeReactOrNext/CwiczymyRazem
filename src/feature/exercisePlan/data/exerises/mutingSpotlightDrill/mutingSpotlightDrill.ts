@@ -8,7 +8,7 @@ export const mutingSpotlightDrillExercise: Exercise = {
   whyItMatters: "High gain amplifies every minor vibration on the guitar. Isolating a single note while resting your picking hand palm on lower strings and fretting index finger on higher strings creates a dead-silent background for your leads.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 4.5,
   instructions: [
     "Dampen the lower strings firmly with the side of your picking palm.",
     "Rest your unused fretting fingers lightly over the higher strings to deaden them."

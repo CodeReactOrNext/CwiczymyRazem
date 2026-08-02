@@ -10,7 +10,7 @@ export const legatoSextuplets457Exercise: Exercise = {
   whyItMatters: "Sextuplets are a standard rhythmic subdivision for high-speed runs. Practicing them with legato techniques on frets 4, 5, and 7 improves pinky strength and teaches you to divide beats evenly without relying on the metronome click for every note.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 1.5,
   instructions: [
     "Focus on equal spacing between all six notes, keeping the subdivisions perfectly even.",
     "Drive the hammers and pulls with equal force to maintain uniform volume."

@@ -7,7 +7,7 @@ export const stringSkippingBasicExercise: Exercise = {
   whyItMatters: "Pentatonic scales can sound repetitive if played sequentially. Adding string skips opens up the scale, creating larger interval jumps that sound highly expressive and modern.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 1.5,
   instructions: [
     "Skip strings accurately, keeping your pick strokes compact and efficient.",
     "Sync fretting finger placement perfectly with picking hand skips."

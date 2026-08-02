@@ -7,7 +7,7 @@ export const legatoTrillSprintExercise: Exercise = {
   whyItMatters: "Trills require rapid, continuous hammer-ons and pull-offs between two notes. Sprints build fast-twitch muscle response in individual finger pairs, which dramatically improves overall legato speed and control.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 3,
   instructions: [
     "Hammer and pull rapidly between two notes, keeping the motion highly compact.",
     "Maintain constant, high-frequency oscillation until the end of the sprint."

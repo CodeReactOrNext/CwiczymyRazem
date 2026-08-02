@@ -7,7 +7,7 @@ export const legatoHammerPullRunExercise: Exercise = {
   whyItMatters: "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 3,
+  timeInMinutes: 2,
   instructions: [
     "Pick only the first note on each string, executing all other notes with legato.",
     "Coordinate string transitions quickly to prevent gaps in the rhythmic flow."

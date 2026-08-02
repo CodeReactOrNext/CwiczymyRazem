@@ -15,8 +15,8 @@ export const warmUp30MinutesPlan: ExercisePlan = {
   id: "warm_up_30_minutes",
   icon: "flame",
   color: "orange",
-  title: "Warm-up - 30 Minutes",
-  description: "Basic 30-minute warm-up before your main practice session",
+  title: "Warm-up - 20 Minutes",
+  description: "Basic 20-minute warm-up before your main practice session",
   difficulty: "medium",
   category: "technique",
   exercises: [

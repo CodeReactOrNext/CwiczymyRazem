@@ -7,7 +7,7 @@ export const sweepPicking3StringExercise: Exercise = {
   whyItMatters: "This exercise coordinates the exact micro-timing between your hands required for clean sweep picking. It eliminates note bleeding by training your fretting hand to lift fingers sequentially, and teaches your picking hand to execute a single, continuous fluid sweep stroke rather than individual picking motions.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 3.5,
   instructions: [
     "Perform 3-string triad shapes using a single, continuous sweeping motion in one direction.",
     "Synchronize the pick stroke with the exact moment each fretting finger presses the fret.",

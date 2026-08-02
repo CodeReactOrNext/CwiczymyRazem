@@ -10,7 +10,7 @@ export const chromaticAccentsExercise: Exercise = {
   whyItMatters: "This exercise develops precise dynamic control over your pick attack. It teaches you to differentiate accented and normal notes, which is essential for groove, phrasing, and expressive playing.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Play the chromatic sequence across the strings, strictly following the accent markers (>).",
     "Make accented notes significantly louder and non-accented notes whisper-soft.",

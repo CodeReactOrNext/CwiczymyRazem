@@ -9,7 +9,7 @@ export const economyPickingAngularExercise: Exercise = {
   whyItMatters: "This exercise develops picking hand efficiency through directional economy picking. By allowing the pick to continue its path through adjacent strings rather than forcing strict alternate strokes, you minimize wasted physical movement, increase potential playing speed, and build a smooth, sweeping cross-string motion.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 2,
   instructions: [
     "Let the pick continue in the same direction when crossing onto an adjacent string.",
     "Use a tiny sweeping motion for sequential notes falling on adjacent strings.",

@@ -90,7 +90,7 @@ export const rhythmTrainingEasy: Exercise = {
   whyItMatters: "This exercise strips away all melodic and harmonic distractions, forcing you to focus entirely on rhythmic precision. Developing a strong quarter-note pulse is the foundational prerequisite for all complex strumming and lead playing.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Rest your fretting hand lightly on one string so it's muted and produces only a percussive click, no clear pitch.",
     "Pick that muted string on each note shown, holding quarter and half notes for their full length.",
@@ -116,7 +116,7 @@ export const rhythmTrainingMedium: Exercise = {
   whyItMatters: "This exercise develops your ability to accurately divide the beat and execute off-beat rhythms. Mastering eighth-note syncopation provides the rhythmic vocabulary necessary for standard pop, rock, and funk guitar parts.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Mute a single string with your fretting hand.",
     "Maintain a continuous down-up motion with your picking hand for all eighth notes.",
@@ -142,7 +142,7 @@ export const rhythmTrainingHard: Exercise = {
   whyItMatters: "This exercise challenges your fine motor control and deep rhythmic grid. Navigating rapid sixteenths, shifting to triplet feels, and executing 3-over-4 polyrhythms trains ultimate rhythmic independence and strict metronomic alignment.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Mute a single string and execute precise rapid subdivisions using strict alternate picking.",
     "For sixteenth notes, maintain an uninterrupted down-up-down-up sequence.",

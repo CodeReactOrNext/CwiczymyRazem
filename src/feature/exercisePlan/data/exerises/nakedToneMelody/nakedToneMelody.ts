@@ -8,7 +8,7 @@ export const nakedToneMelodyExercise: Exercise = {
   whyItMatters: "Use a plain, clean sound: an acoustic guitar as-is, or an electric on a clean setting with no added echo (reverb/delay) or distortion. A clean sound has nowhere to hide, so you can clearly hear how well each note sounds — its timing, its length, and how firmly you press the string.",
   difficulty: "beginner",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.3,
   instructions: [
     "Play on an acoustic guitar, or on an electric with a clean sound and no added echo or distortion.",
     "Let each note ring for its full length, connecting them smoothly without gaps."

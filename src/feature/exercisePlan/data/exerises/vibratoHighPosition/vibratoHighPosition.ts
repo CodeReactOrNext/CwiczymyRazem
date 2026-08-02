@@ -8,7 +8,7 @@ export const vibratoHighPositionExercise: Exercise = {
   whyItMatters: "The mechanical leverage of the fingers is lower in the high register. Practicing vibrato above the 12th fret trains you to use precise wrist rotation and forearm push/pull to achieve even, expressive pitch modulation.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 3,
   instructions: [
     "Execute tight, controlled wavelike oscillations, adjusting for the narrow fret spacing.",
     "Use precise wrist rotation, keeping your finger tip centered in the fret."

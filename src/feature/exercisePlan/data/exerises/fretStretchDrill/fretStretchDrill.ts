@@ -7,7 +7,7 @@ export const fretStretchDrillExercise: Exercise = {
   whyItMatters: "Flexibility in the fretting hand enables you to play complex chord shapes, sweeping arpeggios, and legato lines that span multiple frets. Building proper reach mechanics—rather than just applying force—prevents hand fatigue, minimizes muscle tension, and lowers the risk of tendon strain.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 3,
   instructions: [
     "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
     "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",

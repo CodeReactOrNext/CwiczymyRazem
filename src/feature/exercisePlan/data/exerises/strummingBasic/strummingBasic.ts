@@ -7,7 +7,7 @@ export const strummingBasicExercise: Exercise = {
   whyItMatters: "This is the basic up-and-down arm movement used in all rhythm playing. Strumming steady downbeats locks your timing to the metronome, keeps your wrist relaxed, and helps you hit all the strings of the chord evenly.",
   difficulty: "beginner",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Hold an Em chord (the easiest open chord) and let it ring through the whole exercise.",
     "Strum only downward, one stroke on each beat, with a relaxed swing of the wrist and forearm.",

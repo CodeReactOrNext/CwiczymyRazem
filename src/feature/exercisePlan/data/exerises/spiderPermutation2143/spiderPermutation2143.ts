@@ -8,7 +8,7 @@ export const spiderPermutation2143Exercise: Exercise = {
   whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 2-1-4-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
     "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",

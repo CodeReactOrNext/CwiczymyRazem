@@ -28,7 +28,7 @@ export const SpiderStringSkippingExercise: Exercise = {
   whyItMatters: "String skipping can easily cause missed notes or accidental string noise. Combining it with the spider walk forces both hands to sync perfectly, building elite-level coordinate agility.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Coordinate large string skips with precise alternate picking strokes.",
     "Keep your picking hand movement highly controlled when crossing strings."

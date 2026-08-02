@@ -7,7 +7,7 @@ export const stringSkippingMelodicExercise: Exercise = {
   whyItMatters: "Melodic string skips add dramatic pitch changes to your solos. This exercise trains your picking hand to find strings instantly without looking, building excellent spatial accuracy.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 1.5,
   instructions: [
     "Maintain strict pick control, keeping your hand relaxed during wide jumps.",
     "Ensure notes do not bleed together during string-skipping transitions."

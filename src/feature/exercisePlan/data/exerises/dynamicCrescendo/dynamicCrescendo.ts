@@ -7,7 +7,7 @@ export const dynamicCrescendoExercise: Exercise = {
   whyItMatters: "This exercise trains exact physical control over pick depth and attack velocity. Differentiating volume levels smoothly (crescendo and decrescendo) separates expressive, professional guitarists from mechanical ones.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 3,
   instructions: [
     "Execute notes cleanly while suppressing all sympathetic string vibrations.",
     "Audit your dynamic consistency and attack angle using a clean tone.",

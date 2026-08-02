@@ -7,7 +7,7 @@ export const vibratoControlDrillExercise: Exercise = {
   whyItMatters: "Sustaining clean vibrato requires maintaining uniform oscillation width and speed across different fretboard locations. Practicing vibrato on regular notes, during string changes, and on bent pitches develops the finger strength and forearm rotational control needed for high-level expression and pitch consistency.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2.5,
   instructions: [
     "Sustain each note cleanly before starting a steady, controlled pitch modulation.",
     "Maintain consistent width and speed throughout the duration of the note.",

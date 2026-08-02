@@ -12,7 +12,7 @@ export const sweepPickingMotionDrillExercise: Exercise = {
   whyItMatters: "Three-string sweeps are the perfect entry point to mastering the sweeping motion. Focusing on a continuous, fluid pick stroke across a small number of strings builds excellent muscle memory for larger sweeps.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Sweep the pick smoothly across three strings, avoiding separate individual pick strokes.",
     "Coordinate fretting finger rolls to ensure only one note rings at a time."

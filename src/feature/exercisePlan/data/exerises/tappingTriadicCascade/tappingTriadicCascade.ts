@@ -7,7 +7,7 @@ export const tappingTriadicCascadeExercise: Exercise = {
   whyItMatters: "Tapped arpeggios that cascade diagonally across the fretboard sound modern and complex. Combining tapping with slides and string changes creates a fluid, harp-like effect that elevates your lead guitar vocabulary.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Combine taps, slides, and string changes into a single, continuous flow.",
     "Execute diagonal slides cleanly, maintaining constant string contact."

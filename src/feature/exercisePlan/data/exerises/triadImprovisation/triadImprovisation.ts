@@ -8,7 +8,7 @@ export const triadImprovisationExercise: Exercise = {
   requiresBackingTrack: true,
   difficulty: "hard",
   category: "creativity",
-  timeInMinutes: 12,
+  timeInMinutes: 5,
   instructions: [
     "Start a backing track and improvise freely over it using only triad shapes.",
     "Construct melodic phrases using only the notes of the active triad shapes.",

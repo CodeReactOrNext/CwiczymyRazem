@@ -9,7 +9,7 @@ export const spiderStairsHardExercise: Exercise = {
   whyItMatters: "This exercise develops extreme finger independence and wide stretching capacity. By crossing multiple strings non-sequentially while maintaining a wide fret stretch, it trains your hand to stay relaxed under technical strain and prevents your fingers from tensing up during large interval leaps.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Coordinate each pick stroke with precise finger placement to ensure clean articulation.",
     "Maintain a steady alternate picking pattern, keeping pick depth minimal and consistent.",

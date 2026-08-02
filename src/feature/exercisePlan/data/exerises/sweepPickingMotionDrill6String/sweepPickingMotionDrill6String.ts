@@ -31,7 +31,7 @@ export const sweepPickingMotionDrill6StringExercise: Exercise = {
   whyItMatters: "Six-string sweeps require exceptional coordination and palm muting. This drill teaches you to roll across multiple strings to prevent note bleeding while using your palm to keep the low strings completely quiet.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Sweep smoothly across all six strings, maintaining a constant pick velocity.",
     "Roll across adjacent strings cleanly, lifting each finger instantly after the note is struck."

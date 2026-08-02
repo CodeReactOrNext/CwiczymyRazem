@@ -22,7 +22,7 @@ export const strummingPattern2: Exercise = {
   whyItMatters: "This pattern introduces basic subdivision control, allowing you to insert an upstroke without disrupting the primary downbeat pulse.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   instructions: [
@@ -41,7 +41,7 @@ export const strummingPattern3: Exercise = {
   whyItMatters: "This pattern establishes the core mechanics of alternate strumming, ensuring equal weight and timing between downstrokes and upstrokes.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 65 },
   instructions: [
@@ -59,7 +59,7 @@ export const strummingPattern4: Exercise = {
   whyItMatters: "This introduces syncopation by omitting a subdivision, training your arm to maintain the pendulum motion even when skipping the strings.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   instructions: [
@@ -77,7 +77,7 @@ export const strummingPattern5: Exercise = {
   whyItMatters: "Omitting specific upstrokes develops selective targeting, allowing you to create breathing room within a rhythm without losing momentum.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 115, recommended: 70 },
   instructions: [
@@ -95,7 +95,7 @@ export const strummingPattern6: Exercise = {
   whyItMatters: "Consecutive upstrokes force you to rely entirely on the internal pendulum pulse, developing advanced syncopation and timing independence.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -113,7 +113,7 @@ export const strummingPattern7: Exercise = {
   whyItMatters: "By isolating the upstrokes, this exercise balances your strumming attack and ensures your upward motions are as authoritative as your downward motions.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 65 },
   instructions: [
@@ -131,7 +131,7 @@ export const strummingPattern8: Exercise = {
   whyItMatters: "Mixing rhythmic densities trains your hand to transition smoothly between sparse and busy strumming without altering your core tempo.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 3.5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 115, recommended: 70 },
   instructions: [
@@ -149,7 +149,7 @@ export const strummingPattern9: Exercise = {
   whyItMatters: "This pattern builds stamina and consistency in continuous eighth-note strumming, using a single rest to reset the phrasing loop.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -167,7 +167,7 @@ export const strummingPattern10: Exercise = {
   whyItMatters: "Extended runs of upstrokes test your timing accuracy and arm control, ensuring your silent downswings remain perfectly anchored to the beat.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -185,7 +185,7 @@ export const strummingPattern11: Exercise = {
   whyItMatters: "Inserting a surprise downstroke into a syncopated run trains rapid motor switching and breaks predictability in your rhythm playing.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -203,7 +203,7 @@ export const strummingPattern12: Exercise = {
   whyItMatters: "Starting on an upbeat forces you to internalize the downbeat silently, dramatically improving your internal pulse and metronome alignment.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 60 },
   instructions: [
@@ -221,7 +221,7 @@ export const strummingPattern13: Exercise = {
   whyItMatters: "This exercise isolates the upstroke motion within a downstroke-heavy context, refining your dynamic control and subtle accenting.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 75 },
   instructions: [
@@ -239,7 +239,7 @@ export const strummingPattern14: Exercise = {
   whyItMatters: "Isolating upstrokes builds tone consistency and precise pick depth control, as upward strums are naturally weaker and require focused mechanics.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -257,7 +257,7 @@ export const strummingPattern15: Exercise = {
   whyItMatters: "This inversion of standard strumming conventions sharpens your coordination and forces you to treat upstrokes as the primary rhythmic driver.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -275,7 +275,7 @@ export const strummingPattern16: Exercise = {
   whyItMatters: "Navigating dense alternating pairs surrounded by silence and syncopation challenges your rhythmic stability and strict pendulum mechanics.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 60 },
   instructions: [
@@ -293,7 +293,7 @@ export const strummingPattern18: Exercise = {
   whyItMatters: "Sparse patterns require intense internal counting to prevent rushing. This exercise builds patience and sustained tempo control.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 80 },
   instructions: [
@@ -311,7 +311,7 @@ export const strummingPattern19: Exercise = {
   whyItMatters: "Transitioning immediately from subdivisions to quarter notes stabilizes your tempo and prevents rushing after busy rhythmic figures.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
   instructions: [
@@ -329,7 +329,7 @@ export const strummingPattern20: Exercise = {
   whyItMatters: "This develops rhythmic vocabulary by combining common structural building blocks into a cohesive, musical phrase.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -347,7 +347,7 @@ export const strummingPattern21: Exercise = {
   whyItMatters: "Managing long silences followed by rapid subdivisions builds dynamic pacing and prevents tempo drag during rests.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 65 },
   instructions: [
@@ -365,7 +365,7 @@ export const strummingPattern22: Exercise = {
   whyItMatters: "Displacing standard rhythmic figures to unexpected beats trains your concentration and disrupts automatic muscle memory patterns.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -383,7 +383,7 @@ export const strummingPattern23: Exercise = {
   whyItMatters: "This structural contrast requires you to rapidly shift rhythmic gears without losing the underlying quarter-note pulse.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 115, recommended: 70 },
   instructions: [
@@ -401,7 +401,7 @@ export const strummingPattern24: Exercise = {
   whyItMatters: "Starting off-beat before settling into a strong downbeat groove trains recovery mechanics and subdivision awareness.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 60 },
   instructions: [
@@ -419,7 +419,7 @@ export const strummingPattern25: Exercise = {
   whyItMatters: "Delayed accents build tension and release in your rhythm playing, requiring strict adherence to the silent pendulum swings.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -437,7 +437,7 @@ export const strummingPattern26: Exercise = {
   whyItMatters: "Isolating short rhythmic bursts trains explosive control and immediate muting awareness between active strumming phrases.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -455,7 +455,7 @@ export const strummingPattern27: Exercise = {
   whyItMatters: "Entering a busy pattern on an upstroke requires excellent pick depth control to prevent the pick from digging in and disrupting the flow.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -473,7 +473,7 @@ export const strummingPattern28: Exercise = {
   whyItMatters: "This pattern demands precise switching between off-beats, on-beats, and continuous subdivisions, challenging overall rhythmic agility.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -491,7 +491,7 @@ export const strummingPattern29: Exercise = {
   whyItMatters: "Omitting a single subdivision within a continuous flow develops selective string avoidance and subtle syncopation mechanics.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 100, recommended: 65 },
   instructions: [
@@ -509,7 +509,7 @@ export const strummingPattern30: Exercise = {
   whyItMatters: "Accelerating the rhythmic density builds momentum and phrasing awareness, essential for creating dynamic rhythm guitar parts.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   instructions: [
@@ -527,7 +527,7 @@ export const strummingPattern31: Exercise = {
   whyItMatters: "Dropping the final subdivision creates a brief resting window, useful for executing complex chord transitions on the subsequent downbeat.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 115, recommended: 70 },
   instructions: [
@@ -545,7 +545,7 @@ export const strummingPattern32: Exercise = {
   whyItMatters: "This highly syncopated pattern entirely avoids the strong downbeats, forcing complete reliance on internal timing and subdivision accuracy.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 7,
+  timeInMinutes: 1.5,
   relatedSkills: ["rhythm"],
   metronomeSpeed: { min: 50, max: 95, recommended: 60 },
   instructions: [

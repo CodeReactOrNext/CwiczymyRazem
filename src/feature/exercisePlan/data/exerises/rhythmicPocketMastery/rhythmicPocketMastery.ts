@@ -7,7 +7,7 @@ export const rhythmicPocketMasteryExercise: Exercise = {
   whyItMatters: "Rhythmic flexibility allows you to vary the speed of your solos and rhythm parts without changing the song's BPM. Mastering subdivision control keeps you locked in 'the pocket' during complex rhythm shifts.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 2.5,
   instructions: [
     "Switch between quarter, eighth, and sixteenth notes without changing your speed.",
     "Keep your hand relaxed during rapid subdivision shifts."

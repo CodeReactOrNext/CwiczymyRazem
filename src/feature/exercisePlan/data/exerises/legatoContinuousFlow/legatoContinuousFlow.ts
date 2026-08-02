@@ -7,7 +7,7 @@ export const legatoContinuousFlowExercise: Exercise = {
   whyItMatters: "Legato playing minimizes picking hand involvement to create a smooth, flowing sound. Developing continuous flow trains your fretting hand to generate consistent note volume and tone purely through finger strength and coordination.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 1.5,
   instructions: [
     "Generate all notes purely through strong hammer-ons and clean pull-offs.",
     "Execute pull-offs with a slight downward flicking motion of the finger."

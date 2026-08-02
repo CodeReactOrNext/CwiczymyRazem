@@ -7,7 +7,7 @@ export const stringSkippingArpeggiosExercise: Exercise = {
   whyItMatters: "Spread triads sound open, majestic, and less predictable than standard block chords. Practicing them with string skipping builds great picking hand control and introduces highly modern melodic textures.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 2,
   instructions: [
     "Use alternate picking or hybrid picking to cross wide string gaps cleanly.",
     "Roll your fretting fingers to prevent notes from bleeding together."

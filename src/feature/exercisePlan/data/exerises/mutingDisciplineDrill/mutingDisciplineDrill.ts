@@ -7,7 +7,7 @@ export const mutingDisciplineDrillExercise: Exercise = {
   whyItMatters: "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in clear, professional-grade performances.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 3,
   instructions: [
     "Mute all strings below the active note with your picking-hand palm.",
     "Mute all strings above the active note with the underside of your fretting index finger."

@@ -8,7 +8,7 @@ export const oneStringBackingExercise: Exercise = {
   requiresBackingTrack: true,
   difficulty: "medium",
   category: "creativity",
-  timeInMinutes: 10,
+  timeInMinutes: 7,
   instructions: [
     "Pick one string and improvise over the backing track using only that string.",
     "Move along the string to find the notes that sound good — slide between them instead of jumping.",

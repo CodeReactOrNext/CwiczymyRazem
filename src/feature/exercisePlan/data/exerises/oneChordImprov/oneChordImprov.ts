@@ -7,7 +7,7 @@ export const oneChordImprovExercise: Exercise = {
   whyItMatters: "When the harmony doesn't change, you cannot rely on chord changes to create interest. This exercise forces you to focus on rhythm, dynamics, interval selection, and phrasing to build tension and resolution.",
   difficulty: "medium",
   category: "creativity",
-  timeInMinutes: 10,
+  timeInMinutes: 5,
   instructions: [
     "Create melodic ideas over a single, unchanging chord backing track.",
     "Focus entirely on rhythmic variety, pauses, and dynamic shifts to build tension."

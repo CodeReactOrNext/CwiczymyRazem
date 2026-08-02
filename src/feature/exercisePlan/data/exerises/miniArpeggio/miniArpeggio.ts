@@ -18,7 +18,7 @@ export const miniArpeggioExercise: Exercise = {
   whyItMatters: "Mini arpeggios are the building blocks of sweep picking. Learning to roll your fretting fingers across the same fret on adjacent strings prevents notes from bleeding together, ensuring a clean, articulated arpeggio line.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Use a single, continuous downward pick stroke to sweep across the strings.",
     "Roll your fretting fingers across the frets to prevent notes from ringing together."

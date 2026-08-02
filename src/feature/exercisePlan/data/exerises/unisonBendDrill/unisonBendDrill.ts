@@ -7,7 +7,7 @@ export const unisonBendDrillExercise: Exercise = {
   whyItMatters: "Unison bends (holding one note while bending an adjacent string to match its pitch) sound powerful and aggressive. Achieving perfect pitch unison eliminates beat frequencies, creating a massive, focused rock sound.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4.5,
   instructions: [
     "Hold the lower note steady while bending the adjacent string to match its pitch.",
     "Listen carefully for the microtonal 'beats' and adjust the bend until they disappear."

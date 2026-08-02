@@ -32,7 +32,7 @@ export const jpStretching: Exercise = {
   whyItMatters: "Developing wide fretboard reach requires careful conditioning of the hand muscles. This exercise helps build structural reach, making complex jazz chords and wide-span metal/shred runs feel effortless and comfortable.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 4,
+  timeInMinutes: 2,
   instructions: [
     "Position your thumb low behind the middle of the neck to maximize finger span.",
     "Execute each note cleanly, ensuring all fingers remain curved and relaxed."

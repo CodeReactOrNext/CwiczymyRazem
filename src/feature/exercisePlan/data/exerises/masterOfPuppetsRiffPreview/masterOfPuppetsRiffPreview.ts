@@ -23,7 +23,7 @@ export const masterOfPuppetsRiffPreviewExercise: Exercise = {
     "This is the riff that opens (and keeps returning through) the whole song: chromatic palm-muted picking that snaps into power chords, testing both alternate-picking stamina and clean chord transitions.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Palm-mute the single-note picking; let the power chords ring out briefly before the next phrase.",
     "Keep a steady eighth-note pulse; the open string acts as a pedal tone under the fretted notes.",
