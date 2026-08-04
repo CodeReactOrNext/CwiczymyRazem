@@ -107,6 +107,13 @@ bg-emerald-500/10 border border-emerald-500/20 text-emerald-400  // sukces
 ```
 Schemat: `bg-{kolor}-500/10` + `border-{kolor}-500/20..30` + `text-{kolor}-400`. To jest sygnatura wizualna tej aplikacji.
 
+**Wariant „Chip" (`rounded-lg`, bez borderu)** — dla tagów/badge'y w gęstym feedzie (np. Exercise/Plan/Score w feedzie aktywności), gdzie zwykły podświetlony wzorzec powyżej byłby zbyt subtelny. Komponent: `src/assets/components/ui/chip.tsx` (`<Chip color="emerald">`). Świadomy wyjątek od zasady nadrzędnej #1 (`rounded-lg` zamiast `rounded`) — na życzenie właściciela. To właściwie ten sam wzorzec-sygnatura co wyżej (`bg-{kolor}-500/10 + text-{kolor}-400`, bez borderu), tylko na `-950` (ciemniej) i z `rounded-lg`:
+```
+bg-{kolor}-950/30 text-{kolor}-400      // nazwane kolory (cyan/emerald/purple/amber/yellow/blue)
+bg-zinc-800/40 text-zinc-300            // neutralny/gray (np. poziom itemu, licznik dni)
+```
+Dla dynamicznych kolorów (hex z rzadkości/tieru, nie ma stałej klasy Tailwind) użyj `getChipCustomStyle(hex)` z tego samego pliku — daje `backgroundColor: hex+"1a"` + `color: hex`. **Nigdy pełne nasycone tło (`bg-emerald-600`) + biały tekst** — to nie pasuje do reszty aplikacji i ma gorszy kontrast niż tinted-dark + tinted-text.
+
 ### ⚙️ Tokeny semantyczne z configu (dozwolone, częściowo wdrożone)
 Zdefiniowane w `tailwind.config.js`, ale w praktyce rzadziej używane niż surowe `zinc/cyan/emerald`:
 - `surface-base|elevated|pressed|disabled` — powierzchnie i ich stany.
@@ -256,7 +263,7 @@ Aliasy importów (z `components.json`): `components` → `assets/components`, `u
 - **Liczniki / waluty**: ikona + liczba w kolorze roli (gemy cyan, Fame amber). `+N` przy zdarzeniach w akcencie (np. `+10` amber, `+3 💎` cyan).
 - **Heatmapa aktywności**: siatka kwadracików `rounded` (4px), intensywność = odcień cyan (`bg-cyan-500/20` → `bg-cyan-400`), puste = `bg-zinc-800`.
 - **Taby** (Activity/Chat/...): aktywny tab podświetlony tłem, ikona + label.
-- **Feed aktywności**: wiersze-karty `rounded-lg bg-zinc-900/40`, avatar (kółko), tekst `text-zinc-400` + nazwy/wartości w akcentach, po prawej kolorowe **badge'y** `rounded` (Exercise/Plan = cyan, Score = blue/purple, rating ⭐ = amber). Wiersze oddzielone odstępem, nie linią.
+- **Feed aktywności**: wiersze-karty `rounded-lg bg-zinc-900/40`, avatar (kółko), tekst `text-zinc-400` + nazwy/wartości w akcentach, po prawej kolorowe **Chip-badge'y** `rounded-lg` (Song = purple, Plan = cyan, Exercise = emerald, Score/mic = blue, Claimed/quest = yellow, on-market/ear-training = amber, rarity/level/days-left = gray lub dynamiczny hex) — patrz komponent `Chip` w sekcji 4. Wiersze oddzielone odstępem, nie linią.
 
 ## 15. Szybka checklista dla AI przy pisaniu stylów
 

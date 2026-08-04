@@ -53,7 +53,7 @@ export const RoadmapPitch = ({
               Why support Riff Quest
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
-              Riff Quest is a one-person project, free and built in the open.
+              Riff Quest is a one person project, free and built in the open.
               Support covers the domain, hosting, database, and Vercel first —
               the rest funds the roadmap above.
             </p>

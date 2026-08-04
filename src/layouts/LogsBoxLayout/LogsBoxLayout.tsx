@@ -4,7 +4,8 @@ import Changelog, {
   useChangelogData,
 } from "components/Changelog/Changelog";
 import type { AchievementList } from "feature/achievements/types";
-import DiscordChatEmbed from "feature/discordBot/components/DiscordChatEmbed";
+import Chat from "feature/chat/Chat";
+import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/useUnreadMessages";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
@@ -17,8 +18,10 @@ import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
-import { FaDiscord, FaGuitar, FaMedal } from "react-icons/fa";
+import { FaMedal } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
+import { IoChatboxEllipses } from "react-icons/io5";
+import { LuLogs } from "react-icons/lu";
 
 import Logs from "./components/Logs";
 
@@ -32,6 +35,8 @@ interface LogsBoxLayoutProps {
   userAchievements: AchievementList[];
   currentUserId: string;
   className?: string; // Allow custom styles
+  hasMoreLogs?: boolean;
+  onLoadMoreLogs?: () => void;
 }
 
 const LogsBoxLayout = ({
@@ -39,9 +44,11 @@ const LogsBoxLayout = ({
   userAchievements,
   currentUserId,
   className = "",
+  hasMoreLogs = false,
+  onLoadMoreLogs,
 }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "discord" | "excerise" | "changelog"
+    "logs" | "achievements" | "chat" | "excerise" | "changelog"
   >("logs");
   const [changelogDotHidden, setChangelogDotHidden] = useState(false);
 
@@ -50,6 +57,12 @@ const LogsBoxLayout = ({
     hasNewMessages: hasNewLogs,
     markAsRead: markLogsAsRead,
   } = useUnreadMessages();
+
+  const {
+    unreadCount: unreadChats,
+    hasNewMessages: hasNewChats,
+    markAsRead: markChatsAsRead,
+  } = useUnreadChatMessages("chats");
 
   const { changelog } = useChangelogData("2026-05");
 
@@ -64,7 +77,9 @@ const LogsBoxLayout = ({
   const { t } = useTranslation("common");
 
   const handleCategoryChange = (category: typeof showedCategory) => {
-    if (category === "logs") {
+    if (category === "chat" || showedCategory === "chat") {
+      markChatsAsRead();
+    } else if (category === "logs") {
       markLogsAsRead();
     } else if (category === "changelog") {
       // Zapis "przeczytane" robi sam <Changelog/> po zamontowaniu — dzięki temu
@@ -77,7 +92,7 @@ const LogsBoxLayout = ({
   return (
     <Card
       className={`relative m-auto flex ${
-        showedCategory !== "achievements" && !className.includes("h-")
+        showedCategory !== "achievements" && showedCategory !== "logs" && !className.includes("h-")
           ? "sm:h-[650px] lg:h-[800px]"
           : ""
       } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
@@ -86,15 +101,17 @@ const LogsBoxLayout = ({
           title='Activity'
           active={showedCategory === "logs"}
           onClick={() => handleCategoryChange("logs")}
-          Icon={FaGuitar}
+          Icon={LuLogs}
           notificationCount={unreadLogs}
           hasNewMessages={hasNewLogs}
         />
         <LogsBoxButton
-          title='Discord'
-          active={showedCategory === "discord"}
-          onClick={() => handleCategoryChange("discord")}
-          Icon={FaDiscord}
+          title='Chat'
+          active={showedCategory === "chat"}
+          onClick={() => handleCategoryChange("chat")}
+          Icon={IoChatboxEllipses}
+          notificationCount={unreadChats}
+          hasNewMessages={hasNewChats}
         />
         {!className.includes("border-none") && (
           <>
@@ -136,25 +153,36 @@ const LogsBoxLayout = ({
             <Changelog month='2026-05' />
           </m.div>
         )}
-        {(showedCategory === "logs" || showedCategory === "discord") && (
+        {showedCategory === "logs" && (
           <m.div
-            key={showedCategory}
+            key='logs'
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className='mb-2 overflow-visible scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600 sm:h-full sm:overflow-y-auto'>
-            {showedCategory === "logs" && logs && (
+            className='mb-2'>
+            {logs && (
               <div onClick={markLogsAsRead}>
                 <Logs
                   logs={logs}
                   marksLogsAsRead={markLogsAsRead}
                   currentUserId={currentUserId}
+                  hasMoreLogs={hasMoreLogs}
+                  onLoadMoreLogs={onLoadMoreLogs}
                 />
               </div>
             )}
-
-            {showedCategory === "discord" && <DiscordChatEmbed />}
+          </m.div>
+        )}
+        {showedCategory === "chat" && (
+          <m.div
+            key='chat'
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='mb-2 min-h-0 flex-1'>
+            <Chat />
           </m.div>
         )}
       </AnimatePresence>

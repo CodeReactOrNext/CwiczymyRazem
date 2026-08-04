@@ -51,7 +51,12 @@ const RippleTabsTrigger = ({
     <TabsTrigger
       value={value}
       onClick={createRipple}
-      className="relative shrink-0 gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold transition-background data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 hover:text-zinc-200"
+      className={cn(
+        "relative shrink-0 gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold text-zinc-400 transition-background hover:text-zinc-300",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-cyan-400/50",
+        "data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:shadow-none",
+        "data-[state=active]:hover:bg-zinc-200 data-[state=active]:hover:text-zinc-900",
+      )}
     >
       {ripple}
       {icon}
@@ -66,7 +71,9 @@ const RippleTabsTrigger = ({
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
-        <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+        <TooltipTrigger asChild>
+          <span className="contents">{trigger}</span>
+        </TooltipTrigger>
         <TooltipContent className="max-w-[200px] text-center">
           <p>{tooltip}</p>
         </TooltipContent>
@@ -176,8 +183,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
     const chipClass = (active: boolean) =>
       cn(
-        "text-xs font-medium tracking-wide transition-colors",
-        active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+        "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors",
+        active
+          ? "bg-zinc-100 text-zinc-900"
+          : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
       );
 
     return (
@@ -290,15 +299,15 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" isActive={activeTab === "community"} />
               </TabsList>
 
-              <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-12">
+              <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-8">
                 {renderDifficultyGroups(routinePlans)}
               </TabsContent>
 
-              <TabsContent value="playalongs" className="mt-6 focus-visible:outline-none space-y-12">
+              <TabsContent value="playalongs" className="mt-6 focus-visible:outline-none space-y-8">
                 {renderDifficultyGroups(playalongPlans)}
               </TabsContent>
 
-              <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-12">
+              <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-8">
                 {customPlans.length === 0 ? (
                   <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
                     <p className='text-zinc-400 text-sm'>
@@ -330,7 +339,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 )}
               </TabsContent>
 
-              <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-12">
+              <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-8">
                 {communityPlans.length === 0 ? (
                   <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
                     <p className='text-zinc-400 text-sm'>No community plans published yet.</p>

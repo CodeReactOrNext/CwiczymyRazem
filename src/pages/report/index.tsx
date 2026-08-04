@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import ReportView from "feature/user/view/ReportView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
@@ -21,6 +21,7 @@ const ReportPage: NextPageWithLayout = () => {
             ]}
           />
         }
+        backgroundContent={<HeroPattern variant="log" />}
         compact
         className="w-full !rounded-none !shadow-none"
       />

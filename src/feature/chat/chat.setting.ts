@@ -1,0 +1,2 @@
+export const CHAT_LIMIT_MESSAGE = 20;
+export const CHAT_LIMIT_MESSAGE_LENGTH = 2000;

@@ -40,10 +40,10 @@ export const PageTabs = ({
           href={href}
           aria-current={isActive ? "page" : undefined}
           className={cn(
-            "shrink-0 rounded-lg px-4 py-2 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "shrink-0 rounded-lg px-4 py-2 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50",
             isActive
-              ? "bg-zinc-800 text-white"
-              : "text-zinc-500 hover:text-zinc-300"
+              ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+              : "text-zinc-400 hover:text-zinc-300"
           )}>
           {label}
         </Link>

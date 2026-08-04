@@ -56,10 +56,14 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
   </Card>
 );
 
+const LOGS_PAGE_SIZE = 20;
+
 const LogsBoxView = ({ className }: { className?: string }) => {
   const [logs, setLogs] = useState<
     (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[] | null
   >(null);
+  const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
+  const [hasLoadedMore, setHasLoadedMore] = useState(false);
 
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentUserId = useAppSelector(selectUserAuth);
@@ -68,10 +72,14 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
       return setLogs(logsData);
-    });
+    }, logsLimit);
 
     return () => unsubscribe();
-  }, []);
+  }, [logsLimit]);
+
+  // Firestore doesn't return a total count — if we got a full page, assume there's more.
+  // Only offer "Show more" once — after that the button disappears even if more logs remain.
+  const hasMoreLogs = !hasLoadedMore && (logs?.length ?? 0) >= logsLimit;
 
   return logs && userAchievement && currentUserId ? (
     <LogsBoxLayout
@@ -79,6 +87,11 @@ const LogsBoxView = ({ className }: { className?: string }) => {
       userAchievements={userAchievement}
       currentUserId={currentUserId}
       className={className}
+      hasMoreLogs={hasMoreLogs}
+      onLoadMoreLogs={() => {
+        setHasLoadedMore(true);
+        setLogsLimit((prev) => prev + LOGS_PAGE_SIZE);
+      }}
     />
   ) : (
     <LogsBoxSkeleton className={className} />

@@ -15,7 +15,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import type {
   Exercise,
   ExercisePlan,
@@ -60,6 +60,7 @@ import {
   Folder,
   FolderOpen,
   FolderPlus,
+  GripVertical,
   Infinity,
   Loader2,
   Music2,
@@ -579,6 +580,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             ]}
           />
         }
+        backgroundContent={<HeroPattern variant="tabs" />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText="Upload Files"
         onClick={openFilePicker}
@@ -756,7 +758,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       {...makeFolderDropHandlers(folder.id)}
                     >
                       <div className="flex items-start justify-between">
-                        <Folder className="h-8 w-8 text-cyan-400/80" />
+                        <Folder className="h-8 w-8 text-zinc-400" />
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -802,6 +804,11 @@ const GpTabsPage: NextPageWithLayout = () => {
                   className="flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4 transition-colors hover:bg-zinc-700/40"
                 >
                   <div className="flex items-center gap-3">
+                    {/* Drag handle */}
+                    {folders.length > 0 && (
+                      <GripVertical className="h-4 w-4 flex-shrink-0 cursor-grab text-zinc-600" />
+                    )}
+
                     {/* Icon */}
                     <div className="flex-shrink-0 h-11 w-11 rounded-lg overflow-hidden">
                       {linked[0]?.coverUrl ? (
@@ -811,8 +818,8 @@ const GpTabsPage: NextPageWithLayout = () => {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-full w-full rounded-lg border border-cyan-500/20 bg-cyan-500/10 flex items-center justify-center">
-                          <FileMusic className="h-5 w-5 text-cyan-400" />
+                        <div className="h-full w-full rounded-lg bg-zinc-800 flex items-center justify-center">
+                          <FileMusic className="h-5 w-5 text-zinc-400" />
                         </div>
                       )}
                     </div>
@@ -830,15 +837,6 @@ const GpTabsPage: NextPageWithLayout = () => {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button
-                        onClick={() => handleLoadForPractice(file)}
-                        loading={isThisLoading}
-                        disabled={!!loadingFileId}
-                        className="h-9 px-4 rounded-lg text-[10px] font-bold capitalize tracking-wider border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20 transition-all"
-                      >
-                        <Play className="h-3.5 w-3.5 mr-1.5 fill-current" />
-                        <span>Practice</span>
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -882,6 +880,19 @@ const GpTabsPage: NextPageWithLayout = () => {
                           <Trash2 className="h-3.5 w-3.5" />
                         )}
                       </Button>
+                      <button
+                        type="button"
+                        aria-label={`Practice ${file.name}`}
+                        onClick={() => handleLoadForPractice(file)}
+                        disabled={!!loadingFileId}
+                        className="click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 transition-background hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        {isThisLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Play className="h-4 w-4 fill-current" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
@@ -993,7 +1004,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       className={cn(
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold capitalize tracking-wider transition-colors",
                         staged.selectedTrackIndex === idx
-                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
                           : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
@@ -1016,7 +1027,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                   className={cn(
                     "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     !configFreeMode
-                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
                       : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
@@ -1028,7 +1039,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                   className={cn(
                     "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
                     configFreeMode
-                      ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                      ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
                       : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                   )}
                 >
@@ -1052,7 +1063,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       className={cn(
                         "px-4 py-2 rounded-lg text-xs font-bold capitalize tracking-wider transition-colors",
                         configTimeMinutes === min
-                          ? "border border-cyan-500/50 bg-cyan-500/10 text-cyan-400"
+                          ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
                           : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
@@ -1069,7 +1080,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
               loading={isStarting}
-              className="w-full h-12 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
+              className="w-full h-12 rounded-lg bg-white text-zinc-950 font-bold hover:bg-zinc-100 transition-colors"
             >
               <span>Start Practice</span>
               <Zap className={cn("h-4 w-4 ml-2 fill-current", isStarting && "hidden")} />

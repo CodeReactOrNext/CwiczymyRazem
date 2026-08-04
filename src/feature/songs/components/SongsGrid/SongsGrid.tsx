@@ -2,14 +2,12 @@ import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongCardRow, SongRowSkeleton } from "feature/songs/components/SongsGrid/SongCardRow";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
-import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { ITEMS_PER_PAGE } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import posthog from "posthog-js";
-import { useState } from "react";
 
 interface SongsGridProps {
   songs: Song[];
@@ -21,6 +19,7 @@ interface SongsGridProps {
   onAddSong: () => void;
   onStatusChange: () => void;
   onPractice?: (song: Song) => void;
+  onOpenDetails: (song: Song) => void;
   userSongs: {
     wantToLearn: Song[];
     learning: Song[];
@@ -45,14 +44,12 @@ export const SongsGrid = ({
   hasFilters,
   onStatusChange,
   onPractice,
+  onOpenDetails,
   userSongs,
   updateUserSongsCache,
   progressMap,
   onPartsChange,
 }: SongsGridProps) => {
-
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
     onChange: updateUserSongsCache,
@@ -95,8 +92,7 @@ export const SongsGrid = ({
 
   const openDetails = (song: Song) => {
     posthog.capture("song_library_action", { action: "open_details", song_id: song.id });
-    setSelectedSong(song);
-    setIsDetailsOpen(true);
+    onOpenDetails(song);
   };
 
   const changeStatus = (song: Song, status: SongStatus | undefined) => {
@@ -115,7 +111,7 @@ export const SongsGrid = ({
             ))}
           </div>
           {/* Tablet / desktop: card grid */}
-          <div className='hidden gap-x-6 gap-y-8 sm:grid sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5'>
+          <div className='hidden gap-x-5 gap-y-7 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6'>
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
               <SongCardSkeleton key={i} />
             ))}
@@ -149,7 +145,7 @@ export const SongsGrid = ({
           </div>
 
           {/* Tablet / desktop: card grid */}
-          <div className='hidden gap-x-6 gap-y-8 sm:grid sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 animate-in fade-in duration-500'>
+          <div className='hidden gap-x-5 gap-y-7 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 animate-in fade-in duration-500'>
             {songs.map((song) => {
               const userStatus = getUserStatus(song);
               return (
@@ -170,33 +166,6 @@ export const SongsGrid = ({
           </div>
         </>
       )}
-
-      <SongSheet
-        song={songs.find((s) => s.id === selectedSong?.id) || selectedSong}
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
-        onStatusChange={async (newStatus) => {
-          if (selectedSong) {
-            if (newStatus === undefined) {
-              await handleSongRemoval(selectedSong.id);
-            } else {
-              await handleStatusChange(
-                selectedSong.id,
-                newStatus,
-                selectedSong.title,
-                selectedSong.artist
-              );
-            }
-          }
-        }}
-        onRatingChange={onStatusChange}
-        status={
-          userSongs.wantToLearn.some(s => s.id === selectedSong?.id) ? "wantToLearn" :
-          userSongs.learning.some(s => s.id === selectedSong?.id) ? "learning" :
-          userSongs.learned.some(s => s.id === selectedSong?.id) ? "learned" : 
-          undefined
-        }
-      />
 
       {/* Pagination Container */}
       <div className='mt-auto pt-8'>

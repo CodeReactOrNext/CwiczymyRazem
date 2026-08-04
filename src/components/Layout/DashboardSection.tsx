@@ -22,7 +22,7 @@ export const DashboardSection = ({
   const isTitle = title || subtitle
 
   return (
-    <div className={`relative overflow-hidden rounded-xl  ${className}`}>
+    <div className={`relative rounded-xl  ${className}`}>
       <div className='relative'>
       {isTitle &&  <div
           className={`flex items-center ${

@@ -85,7 +85,7 @@ export const ArsenalView = () => {
             <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
               <TabsTrigger
                 value="cases"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
                 <PackageOpen size={16} />
                 {/* On mobile only the active tab shows its label, so all tabs
@@ -94,7 +94,7 @@ export const ArsenalView = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="collection"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
                 <Swords size={16} />
                 <span className={activeTab === "collection" ? "inline" : "hidden sm:inline"}>Collection</span>
@@ -104,21 +104,21 @@ export const ArsenalView = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="dex"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
                 <BookMarked size={16} />
                 <span className={activeTab === "dex" ? "inline" : "hidden sm:inline"}>Dex</span>
               </TabsTrigger>
               <TabsTrigger
                 value="rig"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
                 <Guitar size={16} />
                 <span className={activeTab === "rig" ? "inline" : "hidden sm:inline"}>Rig</span>
               </TabsTrigger>
               <TabsTrigger
                 value="market"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
                 <Store size={16} />
                 <span className={activeTab === "market" ? "inline" : "hidden sm:inline"}>Market</span>

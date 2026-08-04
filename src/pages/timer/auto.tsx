@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
@@ -64,6 +64,7 @@ const TimerAuto: NextPageWithLayout = () => {
                 ]}
               />
             }
+            backgroundContent={<HeroPattern withShuffle />}
             className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
           />
           <AutoPlanGenerator

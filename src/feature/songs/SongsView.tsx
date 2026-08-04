@@ -21,7 +21,6 @@ import { PlaylistsView } from "feature/songs/components/Playlists/PlaylistsView"
 import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
-import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { SongSearchAutocomplete } from "feature/songs/components/SongSearch/SongSearchAutocomplete";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
@@ -38,6 +37,7 @@ import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
+  LayoutGrid,
   Library as LibraryIcon,
   ListMusic,
   Music,
@@ -57,7 +57,7 @@ interface SongsViewProps {
   initialSongId?: string;
 }
 
-const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => {
+const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
   const router = useRouter();
   const { t } = useTranslation("songs");
 
@@ -131,8 +131,8 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   // so by dragEnd findContainer(activeId) already returns the *new* list — we need the
   // original to know whether the status actually changed and must be persisted.
   const dragSourceContainer = useRef<SongStatus | null>(null);
-  const [mobileTab, setMobileTab] = useState<'explore' | 'collection'>('explore');
   const [isMobile, setIsMobile] = useState(false);
+  const [boardSearchQuery, setBoardSearchQuery] = useState("");
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
@@ -348,54 +348,6 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
   return (
     <>
       <div className="flex flex-col h-[calc(100dvh-6rem)] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
-        {/* Mobile View Switcher */}
-        {!detailsTarget && (
-          <div className="flex xl:hidden bg-zinc-900/80 p-1.5 backdrop-blur-md">
-            <button
-              onClick={() => {
-                setMobileTab('explore');
-                if (view === 'playlists') handleSwitchView('explore');
-              }}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
-                mobileTab === 'explore' && view !== 'playlists'
-                  ? "text-white bg-white/10"
-                  : "text-zinc-500 hover:text-zinc-400"
-              )}
-            >
-              <Search size={14} />
-              Explore
-            </button>
-            <button
-              onClick={() => {
-                setMobileTab('explore');
-                if (view !== 'playlists') handleSwitchView('playlists');
-              }}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
-                mobileTab === 'explore' && view === 'playlists'
-                  ? "text-white bg-white/10"
-                  : "text-zinc-500 hover:text-zinc-400"
-              )}
-            >
-              <ListMusic size={14} />
-              Playlists
-            </button>
-            <button
-              onClick={() => setMobileTab('collection')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 text-[12px] font-medium transition-all duration-300 rounded-lg",
-                mobileTab === 'collection'
-                  ? "text-white bg-white/10"
-                  : "text-zinc-500 hover:text-zinc-400"
-              )}
-            >
-              <LibraryIcon size={14} />
-              My Songs
-            </button>
-          </div>
-        )}
-
         <DndContext
           sensors={activeSensors}
           collisionDetection={closestCenter}
@@ -403,37 +355,47 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-        <div className="flex-1 flex overflow-hidden relative">
-          {/* Sidebar (Left) - Desktop only */}
-          <aside id="sidebar-root" className="hidden xl:flex w-[300px] shrink-0 bg-zinc-900/30 border-r border-white/5 flex-col overflow-hidden">
-             <div className="flex-1 overflow-y-auto no-scrollbar py-3 px-3">
-                <SongLearningSection
-
-                  isLanding={false}
-                  userSongs={userSongs}
-                  onChange={updateUserSongsCache}
-                  onStatusChange={refreshSongs}
-                  progressMap={progressMap}
-                  isPremium={isPremium}
-                  onPracticeWithGp={(song) => setPracticeTarget(song)}
-                  onOpenDetails={(song) => {
-                    setDetailsTarget(song);
-                  }}
-                  onExploreLibrary={handleSwitchView}
-                  isLibraryActive={view === 'explore' && !detailsTarget}
-                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
-                  activeId={activeId}
-                  disableDnd={disableDnd}
-                  isMobile={isMobile}
-                />
-             </div>
-          </aside>
-
+        <div className="flex-1 flex min-h-0 overflow-hidden relative">
           <main className={cn(
-            "flex-1 overflow-y-auto no-scrollbar relative bg-black/20",
+            "flex-1 min-h-0 overflow-y-auto no-scrollbar relative bg-black/20",
             // Playlists view manages its own padding so the header hue wash can bleed to the edges.
             !detailsTarget && view !== 'playlists' ? "p-4 sm:p-6 md:p-10" : ""
           )}>
+            {/* View switcher — Board / Explore / Playlists. Scrolls away with the content instead of pinning as a second header bar. */}
+            {!detailsTarget && (
+              <div className={cn(
+                "mb-6 flex items-center gap-1",
+                view === 'playlists' ? "px-4 pt-4 sm:px-6 sm:pt-6 md:px-10 md:pt-8" : ""
+              )}>
+                {(
+                  [
+                    { key: "board", label: "Board", icon: LayoutGrid },
+                    { key: "explore", label: "Explore", icon: Search },
+                    { key: "playlists", label: "Playlists", icon: ListMusic },
+                  ] as const
+                ).map((tab) => {
+                  const isActive = view === tab.key || (tab.key === "board" && view !== "explore" && view !== "playlists");
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => handleSwitchView(tab.key)}
+                      className={cn(
+                        "relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors active:scale-95",
+                        isActive
+                          ? "bg-zinc-100 text-zinc-900"
+                          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                      )}
+                    >
+                      <Ripple />
+                      <Icon size={16} />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {detailsTarget ? (
               <div className="h-full flex flex-col">
                 <SongDetailView
@@ -448,8 +410,12 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   onStatusChange={handleStatusChange}
                   onPartsChange={setSongParts}
                   onBack={() => setDetailsTarget(null)}
-                  backLabel={view === 'playlists' ? 'Back to playlist' : 'Back to Explore'}
-                  showBackOnDesktop={view === 'playlists'}
+                  backLabel={
+                    view === 'playlists' ? 'Back to playlist' :
+                    view === 'board' ? 'Back to Board' :
+                    'Back to Explore'
+                  }
+                  showBackOnDesktop
                 />
               </div>
             ) : view === 'board' ? (
@@ -462,55 +428,100 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   totalPracticeMs={totalPracticeMs}
                   nextTierProgress={nextTierProgress}
                 />
-                
+
+                {totalSongsCount > 0 && (
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="relative flex-1 sm:max-w-xs">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
+                      <input
+                        value={boardSearchQuery}
+                        onChange={(e) => setBoardSearchQuery(e.target.value)}
+                        placeholder="Search your songs..."
+                        className="h-10 w-full rounded-lg border-none bg-zinc-900/50 pl-9 pr-3 text-sm text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900/70 focus:outline-none focus:ring-4 focus:ring-cyan-500/5"
+                      />
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-900/40 px-4 py-2 text-xs font-bold text-zinc-400">
+                      <LibraryIcon size={14} />
+                      {totalSongsCount} {totalSongsCount === 1 ? "song" : "songs"} total
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-10">
-                  {(
-                    [
+                  {(() => {
+                    const query = boardSearchQuery.toLowerCase().trim();
+                    const matchesQuery = (song: Song) =>
+                      !query ||
+                      song.title.toLowerCase().includes(query) ||
+                      song.artist.toLowerCase().includes(query);
+
+                    const sections = [
                       {
                         key: "learning",
                         title: "Currently learning",
                         icon: <Play size={16} className="fill-current" />,
-                        songs: userSongs.learning,
+                        songs: userSongs.learning.filter(matchesQuery),
                       },
                       {
                         key: "wantToLearn",
                         title: "Want to learn",
                         icon: <Music size={16} />,
-                        songs: userSongs.wantToLearn,
+                        songs: userSongs.wantToLearn.filter(matchesQuery),
                       },
                       {
                         key: "learned",
                         title: "Mastered songs",
                         icon: <Trophy size={16} />,
-                        songs: userSongs.learned,
+                        songs: userSongs.learned.filter(matchesQuery),
                       },
-                    ] as const
-                  ).map(
-                    (section) =>
-                      section.songs.length > 0 && (
-                        <div key={section.key} className="space-y-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300">
-                              {section.icon}
+                    ] as const;
+
+                    const visibleCount = sections.reduce((sum, s) => sum + s.songs.length, 0);
+
+                    return (
+                      <>
+                        {sections.map(
+                          (section) =>
+                            section.songs.length > 0 && (
+                              <div key={section.key} className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300">
+                                    {section.icon}
+                                  </div>
+                                  <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+                                  <span className="text-xs font-bold text-zinc-500">{section.songs.length}</span>
+                                </div>
+                                <div className="space-y-2">
+                                  {section.songs.map((song) => (
+                                    <SongBoardRow
+                                      key={song.id}
+                                      song={song}
+                                      progress={progressMap[song.id] ?? null}
+                                      hasSectionMap={verifiedSectionMaps.has(song.id)}
+                                      onOpenDetails={() => setDetailsTarget(song)}
+                                      onPractice={() => setPracticeTarget(song)}
+                                      onPartsChange={(parts) => setSongParts(song.id, parts)}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )
+                        )}
+
+                        {query && visibleCount === 0 && (
+                          <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
+                              <Search size={32} className="text-zinc-500" />
                             </div>
-                            <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+                            <h3 className="mb-2 text-xl font-bold text-white">No songs match &ldquo;{boardSearchQuery}&rdquo;</h3>
+                            <p className="max-w-xs text-sm text-zinc-400">
+                              Try a different title or artist.
+                            </p>
                           </div>
-                          <div className="space-y-2">
-                            {section.songs.map((song) => (
-                              <SongBoardRow
-                                key={song.id}
-                                song={song}
-                                progress={progressMap[song.id] ?? null}
-                                hasSectionMap={verifiedSectionMaps.has(song.id)}
-                                onOpenDetails={() => setDetailsTarget(song)}
-                                onPractice={() => setPracticeTarget(song)}
-                                onPartsChange={(parts) => setSongParts(song.id, parts)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )
-                  )}
+                        )}
+                      </>
+                    );
+                  })()}
 
                   {totalSongsCount === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -530,30 +541,6 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                     </div>
                   )}
                 </div>
-              </div>
-            ) : mobileTab === 'collection' ? (
-              <div className="xl:hidden h-full overflow-y-auto p-4 bg-zinc-900/20 overscroll-none scroll-smooth">
-                 <SongLearningSection
-                  isLanding={false}
-                  userSongs={userSongs}
-                  onChange={updateUserSongsCache}
-                  onStatusChange={refreshSongs}
-                  progressMap={progressMap}
-                  isPremium={isPremium}
-                  onPracticeWithGp={(song) => setPracticeTarget(song)}
-                  onOpenDetails={(song) => {
-                    setDetailsTarget(song);
-                  }}
-                  onExploreLibrary={(v) => {
-                    handleSwitchView(v);
-                    if (v === 'explore' || v === 'playlists') setMobileTab('explore');
-                  }}
-                  isLibraryActive={view === 'explore' && !detailsTarget}
-                  isPlaylistsActive={view === 'playlists' && !detailsTarget}
-                  activeId={activeId}
-                  disableDnd={disableDnd}
-                  isMobile={isMobile}
-                />
               </div>
             ) : view === 'playlists' ? (
               <PlaylistsView
@@ -669,6 +656,7 @@ const SongsView = ({ view = "explore", initialSongId = "" }: SongsViewProps) => 
                   hasFilters={tierFilters.length > 0 || genreFilters.length > 0}
                   onStatusChange={refreshSongs}
                   onPractice={(song) => setPracticeTarget(song)}
+                  onOpenDetails={(song) => setDetailsTarget(song)}
                   userSongs={userSongs}
                   updateUserSongsCache={updateUserSongsCache}
                   progressMap={progressMap}

@@ -3,7 +3,6 @@ import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
 // ActiveChallengeWidget removed
-import { AnimatedNumber } from "components/UI/AnimatedNumber/AnimatedNumber";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
@@ -208,35 +207,6 @@ const ProfileLandingLayout = ({
                 <span className="truncate font-semibold text-zinc-200">{lastSession.title}</span>
                 <ArrowRight className="h-3.5 w-3.5 shrink-0 text-zinc-500 transition-transform duration-300 group-hover/last:translate-x-0.5" />
               </button>
-            )}
-            {(userStats?.fame ?? 0) >= 30 && (
-              <TooltipProvider>
-                <Tooltip delayDuration={300}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => router.push("/arsenal")}
-                      className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-900 hover:bg-zinc-800 text-amber-300 px-4 py-2 text-sm font-normal transition-all duration-300 active:scale-95"
-                    >
-                      <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
-                      {/* Mobile: compact */}
-                      <AnimatedNumber value={userStats.fame ?? 0} className="md:hidden text-amber-300 font-bold" />
-                      <span className="md:hidden text-amber-300/70 text-xs">pts</span>
-                      <span className="md:hidden text-amber-300/40 text-xs">·</span>
-                      <span className="md:hidden text-amber-300">Arsenal</span>
-                      {/* Desktop: full */}
-                      <span className="hidden md:inline text-amber-300">
-                        {(userStats.fame ?? 0).toLocaleString()} Fame Points
-                      </span>
-                      <span className="hidden md:inline text-amber-300/40 text-xs">·</span>
-                      <span className="hidden md:inline text-amber-300">Arsenal</span>
-                      <ArrowRight className="h-3.5 w-3.5 text-amber-300 transition-transform duration-300 group-hover/fame:translate-x-0.5 shrink-0" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-[200px] text-center">
-                    <p>Fame points are awarded for likes received and community activity — spend them in the Arsenal.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             )}
           </div>
         }

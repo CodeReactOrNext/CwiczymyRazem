@@ -65,18 +65,20 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (!data || data.minutes == null || data.minutes === 0) return null;
 
   return (
-    <div className="bg-zinc-900 border border-white/10 rounded-[8px] p-3 shadow-xl min-w-[180px] max-w-[240px]">
+    <div className="bg-zinc-900 border border-white/10 rounded-[8px] p-3 shadow-xl w-max min-w-[140px] max-w-[calc(100vw-2rem)] sm:max-w-[220px]">
       <p className="text-[11px] font-semibold text-zinc-400 mb-2">{data.dateLabel}</p>
       {data.activities && data.activities.length > 0 ? (
-        <div className="space-y-1.5">
-          {data.activities.map((act: ActivityDetail, i: number) => (
-            <div key={i} className="flex items-center justify-between gap-3">
-              <span className="text-xs text-zinc-200 truncate">{act.title}</span>
-              <span className="text-[11px] text-zinc-500 shrink-0 tabular-nums">
-                {formatMin(act.time)}
-              </span>
-            </div>
-          ))}
+        <div>
+          <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+            {data.activities.map((act: ActivityDetail, i: number) => (
+              <div key={i} className="flex items-center justify-between gap-3">
+                <span className="text-xs text-zinc-200 truncate min-w-0">{act.title}</span>
+                <span className="text-[11px] text-zinc-500 shrink-0 tabular-nums">
+                  {formatMin(act.time)}
+                </span>
+              </div>
+            ))}
+          </div>
           <div className="border-t border-white/10 pt-1.5 mt-1.5 flex items-center justify-between">
             <span className="text-[11px] text-zinc-500">Total</span>
             <span className={cn(
@@ -156,7 +158,7 @@ export const PracticeStatsWidget = ({
   }));
 
   return (
-    <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm p-5 sm:p-6", className)}>
+    <Card className={cn("relative z-20 flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm p-5 sm:p-6", className)}>
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -174,8 +176,8 @@ export const PracticeStatsWidget = ({
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-black text-orange-500 tabular-nums">{dayWithoutBreak}</span>
-                <span className="text-[11px] text-orange-500/80 font-bold tracking-tight">Streak</span>
+                <span className="text-base font-black text-white tabular-nums">{dayWithoutBreak}</span>
+                <span className="text-[11px] text-white/80 font-bold tracking-tight">Streak</span>
               </div>
             )}
           </div>
@@ -266,6 +268,8 @@ export const PracticeStatsWidget = ({
               <Tooltip
                 content={<CustomTooltip />}
                 cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                allowEscapeViewBox={{ x: false, y: true }}
+                wrapperStyle={{ zIndex: 20 }}
               />
 
               <Bar
@@ -293,7 +297,7 @@ export const PracticeStatsWidget = ({
                     fill = "rgba(255,255,255,0.06)";
                   }
 
-                  const labelColor = payload.isGoalMet ? "#4ade80" : "rgb(6,182,212)";
+                  const labelColor = payload.isGoalMet ? "#4ade80" : "#ffffff";
                   const label = formatBarLabel(payload.totalMs);
 
                   return (
@@ -304,8 +308,8 @@ export const PracticeStatsWidget = ({
                           x={x + width / 2}
                           y={y - 5}
                           textAnchor="middle"
-                          fontSize={8}
-                          fontWeight={700}
+                          fontSize={9}
+                          fontWeight={600}
                           fill={labelColor}
                         >
                           {label}

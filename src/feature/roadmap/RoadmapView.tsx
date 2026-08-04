@@ -4,10 +4,14 @@ import { RoadmapFaq } from "./components/RoadmapFaq";
 import { RoadmapHowItWorks } from "./components/RoadmapHowItWorks";
 import { RoadmapPitch } from "./components/RoadmapPitch";
 import { RoadmapThanks } from "./components/RoadmapThanks";
+import { ROADMAP_RAISED_OFFSET } from "./data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "./hooks/useBuyMeACoffeeFunding";
 
 export const RoadmapView = () => {
-  const { totalRaised, raisedThisMonth, isLoading } = useBuyMeACoffeeFunding();
+  const { totalRaised: rawTotalRaised, raisedThisMonth, isLoading } = useBuyMeACoffeeFunding();
+  // Tiers count from $0 again as of the reset — the real lifetime total
+  // (used for accounting) is untouched, only what drives the ladder here.
+  const totalRaised = Math.max(0, rawTotalRaised - ROADMAP_RAISED_OFFSET);
 
   return (
     <div className='w-full space-y-8 p-4 sm:p-6'>

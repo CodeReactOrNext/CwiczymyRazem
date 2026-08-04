@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
@@ -123,6 +123,7 @@ const TimerPlans: NextPageWithLayout = () => {
             items={[{ label: "Practice", href: "/timer" }, { label: "Routines" }]}
           />
         }
+        backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       <PlanSelector onSelectPlan={handleSelectPlanFromList} loadingPlanId={loadingPlanId} />

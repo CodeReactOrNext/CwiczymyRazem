@@ -29,9 +29,6 @@ const UserHeader = ({
 
   return (
     <header className='sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 shadow-lg backdrop-blur-xl'>
-      {/* Subtle top accent */}
-      <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent'></div>
-
       <div className='relative w-full'>
         <div className='flex items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8'>
           {/* Left Section - Level & Progress */}

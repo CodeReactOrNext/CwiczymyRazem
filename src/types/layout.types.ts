@@ -30,4 +30,6 @@ export type NavPagesTypes =
   | "practice-log"
   | "tone-studio"
   | "recordings"
+  | "wiki"
+  | "tools"
   | null;

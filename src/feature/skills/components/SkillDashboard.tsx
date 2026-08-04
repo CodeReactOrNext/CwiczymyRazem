@@ -294,7 +294,7 @@ export const SkillDashboard = ({
           <TabsList className="flex gap-1 bg-zinc-900 rounded p-1 h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
             <TabsTrigger
               value="skill-tree"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
             >
               <Network className="h-4 w-4 shrink-0" />
               {/* On mobile only the active tab shows its label, so all tabs stay
@@ -303,14 +303,14 @@ export const SkillDashboard = ({
             </TabsTrigger>
             <TabsTrigger
               value="browse"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
             >
               <Search className="h-4 w-4 shrink-0" />
               <span className={activeTab === "browse" ? "inline" : "hidden sm:inline"}>Browse Exercises</span>
             </TabsTrigger>
             <TabsTrigger
               value="community"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
             >
               <Users className="h-4 w-4 shrink-0" />
               <span className={activeTab === "community" ? "inline" : "hidden sm:inline"}>Community</span>

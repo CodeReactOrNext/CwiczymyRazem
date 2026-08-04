@@ -1,9 +1,64 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { Checkbox } from "assets/components/ui/checkbox";
 import { Slider } from "assets/components/ui/slider";
+import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import type { DifficultyLevel, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
+
+const RadioOption = ({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    role="radio"
+    aria-checked={selected}
+    onClick={onClick}
+    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize text-zinc-400 transition-colors hover:text-zinc-200"
+  >
+    <span
+      className={cn(
+        "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors",
+        selected ? "border-zinc-100" : "border-zinc-600"
+      )}
+    >
+      {selected && <span className="h-2 w-2 rounded-full bg-zinc-100" />}
+    </span>
+    <span className={selected ? "text-zinc-100" : undefined}>{label}</span>
+  </button>
+);
+
+const CheckboxOption = ({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    role="checkbox"
+    aria-checked={selected}
+    onClick={onClick}
+    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize text-zinc-400 transition-colors hover:text-zinc-200"
+  >
+    <Checkbox
+      checked={selected}
+      tabIndex={-1}
+      className="pointer-events-none border-zinc-600 data-[state=checked]:border-zinc-100 data-[state=checked]:bg-zinc-100 data-[state=checked]:text-zinc-900"
+    />
+    <span className={selected ? "text-zinc-100" : undefined}>{label}</span>
+  </button>
+);
 
 interface PlanSetupProps {
   time: number;
@@ -46,7 +101,7 @@ export const PlanSetup = ({
   const difficulties: (DifficultyLevel | "all")[] = ["easy", "medium", "hard", "all"];
 
   return (
-    <MainContainer>
+    <MainContainer noBorder>
       <div className='mx-auto max-w-3xl space-y-8 p-8 font-openSans'>
 
         <Card className='space-y-8 p-6'>
@@ -97,17 +152,14 @@ export const PlanSetup = ({
         {/* Categories Section */}
         <div className='space-y-4'>
           <h2 className='text-xl font-semibold'>Categories (Optional)</h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1" role="group" aria-label="Categories">
             {categories.map((cat) => (
-              <Button
+              <CheckboxOption
                 key={cat}
-                variant={selectedCategories.includes(cat) ? "default" : "outline"}
-                size="sm"
+                label={cat}
+                selected={selectedCategories.includes(cat)}
                 onClick={() => toggleCategory(cat)}
-                className="capitalize"
-              >
-                {cat}
-              </Button>
+              />
             ))}
           </div>
           <p className="text-xs text-muted-foreground">Select specific categories to focus on, or leave empty for all.</p>
@@ -116,17 +168,14 @@ export const PlanSetup = ({
         {/* Difficulty Section */}
         <div className='space-y-4'>
           <h2 className='text-xl font-semibold'>Difficulty</h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1" role="radiogroup" aria-label="Difficulty">
             {difficulties.map((diff) => (
-              <Button
+              <RadioOption
                 key={diff}
-                variant={selectedDifficulty === diff ? "default" : "outline"}
-                size="sm"
+                label={diff}
+                selected={selectedDifficulty === diff}
                 onClick={() => setSelectedDifficulty(diff)}
-                className="capitalize"
-              >
-                {diff}
-              </Button>
+              />
             ))}
           </div>
         </div>

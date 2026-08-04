@@ -47,7 +47,7 @@ export const SupportBanner = () => {
               Help build Riff Quest
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
-              Riff Quest is a one-person project, free and built in the open.
+              Riff Quest is a one person project, free and built in the open.
               Your support keeps it that way.
             </p>
           </div>
@@ -96,7 +96,7 @@ export const SupportBanner = () => {
             </div>
 
             {nextTier && (
-              <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-500'>
+              <div className='mt-3 flex items-center justify-between gap-4 text-sm text-zinc-500'>
                 <span className='flex min-w-0 items-center gap-1.5'>
                   {NextTierIcon && (
                     <NextTierIcon size={12} className='shrink-0' />
@@ -108,7 +108,7 @@ export const SupportBanner = () => {
                     </span>
                   </span>
                 </span>
-                <span className='shrink-0 font-medium text-cyan-400'>
+                <span className='shrink-0 font-medium text-white'>
                   ${nextTier.goal - totalRaised} to go
                 </span>
               </div>

@@ -7,6 +7,7 @@ import type {
   LocalizedContent,
 } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
+import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 
@@ -54,6 +55,7 @@ export const GeneratedPlan = ({
             {t("common:back")}
           </Button>
           <Button variant='secondary' onClick={onRegenerate} disabled={isStarting}>
+            <RefreshCw className='mr-2 h-4 w-4' />
             Regenerate
           </Button>
           <Button

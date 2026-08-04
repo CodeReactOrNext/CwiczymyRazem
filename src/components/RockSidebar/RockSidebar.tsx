@@ -25,7 +25,6 @@ import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import {
-  Activity,
   Brain,
   ChevronDown,
   ClipboardList,
@@ -38,7 +37,6 @@ import {
   ListChecks,
   ListMusic,
   LogOut,
-  MessageSquarePlus,
   Mic2,
   Milestone,
   Music2,
@@ -58,6 +56,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { FaArrowTrendUp } from "react-icons/fa6";
 import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -181,9 +180,9 @@ const LIBRARY_SUB_NAV: SidebarSubLink[] = [
   { id: "library-create-exercise", name: "Create Exercise", href: "/tab-editor", icon: <FilePlus2 size={16} /> },
 ];
 
-/** Views a page falls back to when its query param is absent (bare /songs renders Explore). */
+/** Views a page falls back to when its query param is absent (bare /songs renders Board). */
 const DEFAULT_QUERY_BY_PATH: Record<string, Record<string, string>> = {
-  "/songs": { view: "explore" },
+  "/songs": { view: "board" },
 };
 
 const SidebarExpandableNavLink = ({
@@ -275,35 +274,8 @@ const SidebarExpandableNavLink = ({
   );
 };
 
-const SidebarActionButton = ({
-  icon,
-  iconClass = "text-zinc-600",
-  label,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  iconClass?: string;
-  label: string;
-  onClick: () => void;
-}) => {
-  const { createRipple, ripple } = useRipple();
-  return (
-    <button
-      onClick={(e) => {
-        createRipple(e);
-        onClick();
-      }}
-      className="relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] text-zinc-500 hover:bg-white/5 hover:text-zinc-300">
-      {ripple}
-      <span className={`${NAV_ICON_SLOT} ${iconClass}`}>{icon}</span>
-      <span>{label}</span>
-    </button>
-  );
-};
-
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
@@ -408,7 +380,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <PiCassetteTapeLight size={18} />,
       children: SONGS_SUB_NAV,
     },
-    { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
+    { id: "progress", name: "Progress", href: "/profile/activity", icon: <FaArrowTrendUp size={18} /> },
     {
       id: "summary",
       name: "Milestones",
@@ -551,14 +523,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
         <div className="space-y-1">
           {renderNavLinks(utilityNavigation, mobile ? handleLinkClick : undefined)}
-          <SidebarActionButton
-            icon={<MessageSquarePlus size={16} />}
-            label="Send Feedback"
-            onClick={() => {
-              if (mobile) handleLinkClick();
-              setIsFeedbackOpen(true);
-            }}
-          />
         </div>
       </div>
 
@@ -680,7 +644,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         )}
       </AnimatePresence>
 
-      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
       <FeedbackModal
         variant="prompt"
         isOpen={showFeedbackPrompt}

@@ -1,9 +1,11 @@
 import { Ripple } from "components/Ripple/Ripple";
 import { HeroPattern } from "components/UI/HeroBanner";
+import type { ModeProgressSummary } from "feature/practice/hooks/usePracticeModeProgress";
+import { usePracticeModeProgress } from "feature/practice/hooks/usePracticeModeProgress";
 import type { LastSessionInfo } from "feature/practice/utils/lastSession";
 import { loadLastSessions } from "feature/practice/utils/lastSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-import { selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useRipple } from "hooks/useRipple";
 import {
   ArrowRight,
@@ -13,6 +15,8 @@ import {
   History,
   ListChecks,
   Lock,
+  NotebookPen,
+  Route,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -73,6 +77,8 @@ interface ModeCardProps {
   lockLabel?: string;
   hero?: boolean;
   links?: ModeLink[];
+  progress?: ModeProgressSummary;
+  progressUnit?: string;
   onActivate: () => void;
 }
 
@@ -86,6 +92,8 @@ const ModeCard = ({
   lockLabel,
   hero,
   links,
+  progress,
+  progressUnit,
   onActivate,
 }: ModeCardProps) => {
   const c = colorMap[ck];
@@ -96,9 +104,7 @@ const ModeCard = ({
 
   return (
     <div
-      className={`group relative flex gap-3 overflow-hidden rounded-xl transition-background duration-300 ${
-        hero || isGroup ? "items-start" : "items-center"
-      } ${
+      className={`group relative flex items-start gap-3 overflow-hidden rounded-xl transition-background duration-300 ${
         hero
           ? `${c.cardBg} bg-gradient-to-br from-white/[0.03] to-transparent p-[18px] backdrop-blur-md`
           : `${c.cardBg} bg-gradient-to-br from-white/[0.02] to-transparent p-3.5 backdrop-blur-sm`
@@ -170,6 +176,35 @@ const ModeCard = ({
           }>
           {description}
         </p>
+        {/* Reserved for every non-hero card (visible or not) so tiles share one height
+            across the whole grid — a card with no progress data would otherwise sit
+            shorter than its neighbours and make the rows look uneven. */}
+        {!hero && (
+          <div
+            className={`mt-2.5 space-y-1 ${
+              !locked && progress && progress.total > 0 ? "" : "invisible"
+            }`}>
+            <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/5'>
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  progress && progress.done === progress.total ? "bg-emerald-400" : "bg-cyan-400"
+                }`}
+                style={{
+                  width:
+                    progress && progress.total > 0
+                      ? `max(${Math.round((progress.done / progress.total) * 100)}%, 3px)`
+                      : 0,
+                }}
+              />
+            </div>
+            <p
+              className={`text-[11px] font-semibold tabular-nums ${
+                progress && progress.done === progress.total ? "text-emerald-400" : "text-zinc-500"
+              }`}>
+              {progress ? progress.done : 0} of {progress ? progress.total : 0} {progressUnit}
+            </p>
+          </div>
+        )}
         {links && links.length > 0 && (
           <div className='relative z-10 mt-4 flex flex-col gap-1.5'>
             {links.map((link) => (
@@ -189,14 +224,6 @@ const ModeCard = ({
           </div>
         )}
       </div>
-      {!locked && !isGroup && (
-        <div
-          className={`flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 ${
-            hero ? "ml-2" : ""
-          }`}>
-          <ArrowRight className='h-4 w-4 text-zinc-400 transition-all group-hover:translate-x-1 group-hover:text-white' />
-        </div>
-      )}
     </div>
   );
 };
@@ -208,6 +235,8 @@ export const PracticeModeSelector = () => {
     userInfo?.role === "master" ||
     userInfo?.role === "admin";
   const isMaster = userInfo?.role === "master" || userInfo?.role === "admin";
+  const userAuth = useAppSelector(selectUserAuth);
+  const modeProgress = usePracticeModeProgress(userAuth);
 
   const [loadingMode, setLoadingMode] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -239,6 +268,8 @@ export const PracticeModeSelector = () => {
       locked?: boolean;
       lockLabel?: string;
       links?: { label: string; href: string }[];
+      progress?: ModeProgressSummary;
+      progressUnit?: string;
     }
   ) => (
     <ModeCard
@@ -254,6 +285,8 @@ export const PracticeModeSelector = () => {
         label: link.label,
         onClick: () => nav(link.href, `${id}:${link.label}`, options?.locked),
       }))}
+      progress={options?.progress}
+      progressUnit={options?.progressUnit}
       onActivate={() => nav(href, id, options?.locked)}
     />
   );
@@ -266,7 +299,7 @@ export const PracticeModeSelector = () => {
           maskImage='linear-gradient(to bottom, black 0%, black 20%, transparent 80%)'
         />
         <div className='container relative z-10 mx-auto max-w-6xl px-4 py-12 font-sans sm:px-6'>
-          <div className='flex flex-col gap-12'>
+          <div className='flex flex-col gap-6'>
             {lastSessions.length > 0 && (
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
                 {lastSessions.map((session) => (
@@ -300,7 +333,7 @@ export const PracticeModeSelector = () => {
             )}
 
             <div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
+              <div className='grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:gap-6'>
                 {modeItem(
                   "routine",
                   ListChecks,
@@ -320,7 +353,7 @@ export const PracticeModeSelector = () => {
                 )}
                 {modeItem(
                   "log",
-                  ClipboardList,
+                  NotebookPen,
                   "Log",
                   "Track a session by hand or with a stopwatch",
                   "/report",
@@ -367,17 +400,16 @@ export const PracticeModeSelector = () => {
               </div>
             </div>
 
-            <div className='h-px bg-white/5' />
-
             <div>
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
                 {modeItem(
                   "learning-path",
-                  Brain,
+                  Route,
                   "Learning Path",
                   "Step-by-step progress",
                   "/journey",
-                  "rose"
+                  "rose",
+                  { progress: modeProgress.learningPath, progressUnit: "steps" }
                 )}
                 {modeItem(
                   "roadmaps",
@@ -385,7 +417,8 @@ export const PracticeModeSelector = () => {
                   "Mastery Roadmaps",
                   "Goal-based practice roadmaps",
                   "/ai-coach",
-                  "rose"
+                  "rose",
+                  { progress: modeProgress.roadmaps, progressUnit: "steps" }
                 )}
                 {modeItem(
                   "scales",
@@ -393,12 +426,11 @@ export const PracticeModeSelector = () => {
                   "Scale Map",
                   "Interactive scale fretboard tree",
                   "/scale-tree",
-                  "rose"
+                  "rose",
+                  { progress: modeProgress.scaleMap, progressUnit: "scales" }
                 )}
               </div>
             </div>
-
-            <div className='h-px bg-white/5' />
 
             <div>
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
@@ -408,7 +440,8 @@ export const PracticeModeSelector = () => {
                   "Skills",
                   "Specific skill focus",
                   "/profile/skills",
-                  "emerald"
+                  "emerald",
+                  { progress: modeProgress.skills, progressUnit: "exercises" }
                 )}
                 {modeItem(
                   "exercises",

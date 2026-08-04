@@ -8,7 +8,7 @@ import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const view = (router.query.view as string) || "explore";
+  const view = (router.query.view as string) || "board";
   const songId = (router.query.songId as string) || "";
 
   return (

@@ -16,10 +16,11 @@ import { db } from "utils/firebase/client/firebase.utils";
 export const firebaseGetLogsStream = (
   callback: (
     logs: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[]
-  ) => void
+  ) => void,
+  logsLimit = 20
 ) => {
   const logsDocRef = collection(db, "logs");
-  const sortLogs = query(logsDocRef, orderBy("timestamp", "desc"), limit(20));
+  const sortLogs = query(logsDocRef, orderBy("timestamp", "desc"), limit(logsLimit));
 
   return onSnapshot(sortLogs, (snapshot) => {
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[] = [];

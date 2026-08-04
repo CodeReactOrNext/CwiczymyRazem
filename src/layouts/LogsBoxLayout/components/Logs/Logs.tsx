@@ -1,3 +1,4 @@
+import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -7,6 +8,7 @@ import {
 import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { formatDistanceToNow } from "date-fns";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
@@ -46,7 +48,19 @@ import { type SongTierInfo, useSongTiers } from "feature/songs/hooks/useSongTier
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
-import { ExternalLink, Star,Video, X } from "lucide-react";
+import {
+  Dumbbell,
+  Ear,
+  ExternalLink,
+  Gift,
+  ListChecks,
+  Music,
+  Star,
+  Tag,
+  Target,
+  Video,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
@@ -260,20 +274,21 @@ const ItemPill = ({
               </span>
               {/* Badges stay on one line and keep together */}
               <span className="order-2 flex shrink-0 items-center gap-1.5 sm:order-1">
-                <span
-                  className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide"
-                  style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                <Chip
+                  color="custom"
+                  className="whitespace-nowrap px-1.5 py-0.5 text-[10px] tracking-wide"
+                  style={getChipCustomStyle(color)}
                 >
                   {itemRarity}
-                </span>
+                </Chip>
                 {level !== null && (
-                  <span
-                    className="inline-flex items-center whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-black tabular-nums tracking-wide text-zinc-200"
-                    style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+                  <Chip
+                    color="gray"
+                    className="whitespace-nowrap px-1.5 py-0.5 text-[10px] tabular-nums tracking-wide"
                     title="Item level"
                   >
                     Lv {level}
-                  </span>
+                  </Chip>
                 )}
               </span>
             </span>
@@ -309,6 +324,8 @@ interface LogsBoxLayoutProps {
   logs: AnyFirebaseLog[];
   marksLogsAsRead: () => void;
   currentUserId: string;
+  hasMoreLogs?: boolean;
+  onLoadMoreLogs?: () => void;
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
@@ -429,11 +446,11 @@ const SeasonHeader = ({
     {/* Right side with date info - on larger screens */}
     <div className='ml-auto hidden items-center gap-3 text-xs text-secondText sm:flex'>
       {daysLeftInSeason !== undefined && (
-        <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 border border-white/5'>
-          <IoCalendarOutline className='text-zinc-400' />
-          <span className='font-semibold text-zinc-300'>{daysLeftInSeason}</span>
+        <Chip color="gray">
+          <IoCalendarOutline className="h-3.5 w-3.5 shrink-0" />
+          <span className="tabular-nums">{daysLeftInSeason}</span>
           <span>{t("logsBox.days_left")}</span>
-        </div>
+        </Chip>
       )}
       <span className='opacity-60'>
         {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
@@ -444,11 +461,11 @@ const SeasonHeader = ({
     {/* Days left - on mobile only */}
     {daysLeftInSeason !== undefined && (
       <div className='mt-2 flex w-full items-center justify-end text-xs text-secondText sm:hidden'>
-        <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 border border-white/5'>
-          <IoCalendarOutline className='text-zinc-400' />
-          <span className='font-semibold text-zinc-300'>{daysLeftInSeason}</span>
+        <Chip color="gray">
+          <IoCalendarOutline className="h-3.5 w-3.5 shrink-0" />
+          <span className="tabular-nums">{daysLeftInSeason}</span>
           <span>{t("logsBox.days_left")}</span>
-        </div>
+        </Chip>
       </div>
     )}
   </div>
@@ -561,17 +578,9 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
-/** Compact per-line timestamp used inside a grouped feed row, where the group header already owns the full date. */
-const LineTimeStamp = ({ date }: { date: Date }) => (
-  <span className="hidden sm:block w-9 shrink-0 text-[11px] leading-5 tabular-nums text-secondText opacity-50">
-    {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
-  </span>
-);
-
-/** One activity line: fixed time column + content that wraps in its own column (never under the time). */
-const GroupedLine = ({ date, children }: { date: Date; children: React.ReactNode }) => (
+/** One activity line's content, wrapping in its own column. */
+const GroupedLine = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-center gap-2">
-    <LineTimeStamp date={date} />
     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2">{children}</div>
   </div>
 );
@@ -587,19 +596,18 @@ const SongBadge = ({
   songTitle: string;
 }) =>
   songId ? (
-    <Link
-      href={`/songs?view=management&songId=${songId}`}
-      title="Click to open this song"
-      className="group inline-flex items-center text-left text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 hover:opacity-100 transition-opacity max-w-full whitespace-normal break-words align-middle">
-      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-      <span className="font-medium group-hover:underline underline-offset-2 decoration-purple-500/40">{songArtist} - {songTitle}</span>
-      <ExternalLink className="ml-1 h-3 w-3 shrink-0 opacity-60" />
+    <Link href={`/songs?view=management&songId=${songId}`} title="Click to open this song">
+      <Chip color="purple" className="cursor-pointer">
+        <Music className="h-3.5 w-3.5 shrink-0" />
+        <span className="underline-offset-2 hover:underline">{songArtist} - {songTitle}</span>
+        <ExternalLink className="h-3 w-3 shrink-0 opacity-70" />
+      </Chip>
     </Link>
   ) : (
-    <span className="inline-block text-xs text-purple-400 bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-500/20 opacity-90 max-w-full whitespace-normal break-words align-middle">
-      <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Song</span>
-      <span className="font-medium">{songArtist} - {songTitle}</span>
-    </span>
+    <Chip color="purple">
+      <Music className="h-3.5 w-3.5 shrink-0" />
+      {songArtist} - {songTitle}
+    </Chip>
   );
 
 /** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
@@ -622,13 +630,12 @@ const GroupedLogLine = ({
 
   if (type === "song") {
     const songLog = log as FirebaseLogsSongsInterface;
-    const date = new Date(songLog.data);
     const message = getSongStatusMessage(songLog.status, t);
     const showRating = songLog.status === "difficulty_rate" && songLog.difficulty_rate !== undefined;
     const ratingTier = showRating ? getSongTier(songLog.difficulty_rate as number) : null;
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <p className="text-secondText text-sm flex flex-wrap items-center gap-1.5">
           {message}
           {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
@@ -645,18 +652,14 @@ const GroupedLogLine = ({
           )}
         </p>
         {showRating && ratingTier && (
-          <span
-            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-bold"
-            style={{
-              color: ratingTier.color,
-              backgroundColor: `${ratingTier.color}1a`,
-              borderColor: `${ratingTier.color}40`,
-            }}
+          <Chip
+            color="custom"
+            style={getChipCustomStyle(ratingTier.color)}
             title={`Difficulty rated ${songLog.difficulty_rate}/10 (${ratingTier.label})`}
           >
-            <Star className="h-2.5 w-2.5 fill-current" />
+            <Star className="h-3 w-3 shrink-0 fill-current" />
             {songLog.difficulty_rate}/10
-          </span>
+          </Chip>
         )}
       </GroupedLine>
     );
@@ -664,10 +667,9 @@ const GroupedLogLine = ({
 
   if (type === "recording") {
     const recLog = log as FirebaseLogsRecordingsInterface;
-    const date = new Date(recLog.timestamp);
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <p className="text-secondText text-sm">
           <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
           added a new recording:{" "}
@@ -699,7 +701,6 @@ const GroupedLogLine = ({
 
   if (type === "caseOpen") {
     const caseLog = log as FirebaseLogsCaseOpenInterface;
-    const date = new Date(caseLog.timestamp);
     const rolled = caseLog.rolledItem;
     const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
     const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
@@ -713,7 +714,7 @@ const GroupedLogLine = ({
     }
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <span className="text-secondText text-sm">opened</span>
         <span className="text-white font-bold text-sm">{caseLog.caseName}</span>
         <span className="text-secondText text-sm">and got</span>
@@ -733,7 +734,6 @@ const GroupedLogLine = ({
 
   if (type === "marketplace") {
     const marketLog = log as FirebaseLogsMarketplaceInterface;
-    const date = new Date(marketLog.timestamp);
     const rolled = marketLog.rolledItem;
     const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
     const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
@@ -747,7 +747,7 @@ const GroupedLogLine = ({
     }
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <span className="text-secondText text-sm">listed</span>
         <ItemPill
           itemType={marketLog.itemType}
@@ -759,24 +759,23 @@ const GroupedLogLine = ({
           rolledGuitar={rolledGuitar}
           rolledEffect={rolledEffect}
         />
-        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-          <span className="text-[10px] font-semibold capitalize tracking-wider opacity-70">on market</span>
-          <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+        <Chip color="amber">
+          <Tag className="h-3.5 w-3.5 shrink-0" />
+          <span className="inline-flex items-center gap-1 tabular-nums">
             {marketLog.price}
-            <img src="/images/coin.png" alt="coin" className="h-3 w-3 object-contain" />
+            <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
           </span>
-        </span>
+        </Chip>
       </GroupedLine>
     );
   }
 
   if (type === "playlist") {
     const playlistLog = log as FirebaseLogsPlaylistInterface;
-    const date = new Date(playlistLog.timestamp);
     const kindLabel = PLAYLIST_KIND_LABEL[playlistLog.playlistKind] ?? "playlist";
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <p className="text-secondText text-sm">
           created a new {kindLabel}:{" "}
           <Link
@@ -796,27 +795,25 @@ const GroupedLogLine = ({
 
   if (type === "dailyQuest") {
     const questLog = log as FirebaseLogsDailyQuestInterface;
-    const date = new Date(questLog.timestamp);
 
     return (
-      <GroupedLine date={date}>
+      <GroupedLine>
         <p className="text-secondText text-sm">
           completed all <span className="text-zinc-200 font-semibold">Daily Quests!</span>
         </p>
-        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-yellow-400 bg-yellow-950/30 border-yellow-500/20">
-          <span className="text-[10px] font-semibold capitalize tracking-wider opacity-70">Claimed</span>
-          <span className="inline-flex items-center gap-1 font-bold tabular-nums">
+        <Chip color="yellow">
+          <Gift className="h-3.5 w-3.5 shrink-0" />
+          <span className="inline-flex items-center gap-1 tabular-nums">
             +{questLog.points}
-            <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+            <img src="/images/points.png" alt="points" className="h-4 w-4 object-contain" />
           </span>
-        </span>
+        </Chip>
       </GroupedLine>
     );
   }
 
   // "exercise" | "exercisePlan" — general practice log (points, level ups, achievements, plan/exercise/song refs).
   const genericLog = log as FirebaseLogsInterface;
-  const date = new Date(genericLog.timestamp as string);
   const plan: any = genericLog.planId ? defaultPlans.find((p) => p.id === genericLog.planId) : null;
   const matchedExercise: Exercise | null = genericLog.exerciseTitle
     ? exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ?? null
@@ -824,11 +821,11 @@ const GroupedLogLine = ({
   const planTitle = plan ? plan.title : null;
 
   return (
-    <GroupedLine date={date}>
+    <GroupedLine>
       <span className="text-secondText text-sm">{t("common:logsBox.get")}</span>
       <span className="flex items-center gap-1 text-main text-sm">
         +{genericLog.points}
-        <img src="/images/points.png" alt="points" className="h-4 w-4 object-contain" />
+        <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
       </span>
 
       {genericLog.newLevel?.isNewLevel && (
@@ -854,19 +851,17 @@ const GroupedLogLine = ({
 
       {planTitle && (
         plan ? (
-          <button
-            type="button"
-            onClick={() => onPreviewPlan(plan)}
-            title="Click to preview and start this plan"
-            className="group inline-flex items-center text-left text-xs px-2.5 py-1 rounded-md border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
-            <span className="font-medium group-hover:underline underline-offset-2 decoration-cyan-500/40">{planTitle}</span>
+          <button type="button" onClick={() => onPreviewPlan(plan)} title="Click to preview and start this plan">
+            <Chip color="cyan" className="cursor-pointer text-left">
+              <ListChecks className="h-3.5 w-3.5 shrink-0" />
+              <span className="hover:underline underline-offset-2">{planTitle}</span>
+            </Chip>
           </button>
         ) : (
-          <span className="inline-block text-xs px-2.5 py-1 rounded-md border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Plan</span>
-            <span className="font-medium">{planTitle}</span>
-          </span>
+          <Chip color="cyan">
+            <ListChecks className="h-3.5 w-3.5 shrink-0" />
+            {planTitle}
+          </Chip>
         )
       )}
 
@@ -876,33 +871,35 @@ const GroupedLogLine = ({
             type="button"
             onClick={() => onPreviewExercise(matchedExercise)}
             title="Click to preview and start this exercise"
-            className="group inline-flex items-center text-left text-xs px-2.5 py-1 rounded-md border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 hover:opacity-100 transition-opacity cursor-pointer max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
-            <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-500/40">{genericLog.exerciseTitle}</span>
+          >
+            <Chip color="emerald" className="cursor-pointer text-left">
+              <Dumbbell className="h-3.5 w-3.5 shrink-0" />
+              <span className="hover:underline underline-offset-2">{genericLog.exerciseTitle}</span>
+            </Chip>
           </button>
         ) : (
-          <span className="inline-block text-xs px-2.5 py-1 rounded-md border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-full whitespace-normal break-words align-middle">
-            <span className="text-[10px] font-semibold capitalize tracking-wider mr-1.5 opacity-70">Exercise</span>
-            <span className="font-medium">{genericLog.exerciseTitle}</span>
-          </span>
+          <Chip color="emerald">
+            <Dumbbell className="h-3.5 w-3.5 shrink-0" />
+            {genericLog.exerciseTitle}
+          </Chip>
         )
       )}
 
-      {genericLog.micPerformance && !(genericLog.micPerformance.score === 0 && genericLog.micPerformance.accuracy === 100) && (
-        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
-          <span className="flex items-center gap-1">
-            <span className="text-[10px] font-semibold capitalize opacity-70 tracking-wider mr-0.5">Score:</span>
-            <span className="font-bold tabular-nums text-main">{genericLog.micPerformance.score}</span>
-          </span>
-          <span className="w-px h-2.5 bg-blue-500/30" />
-          <span className="flex items-center gap-1 font-bold tabular-nums">{genericLog.micPerformance.accuracy}%</span>
+      {genericLog.micPerformance && genericLog.micPerformance.score !== 0 && (
+        <span className="inline-flex items-center gap-1.5 text-sm">
+          <Target className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+          <span className="text-secondText">Score:</span>
+          <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.score}</span>
+          <span className="text-secondText">|</span>
+          <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.accuracy}%</span>
         </span>
       )}
 
-      {genericLog.earTrainingPerformance && (
-        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-          <span className="text-[10px] font-semibold capitalize opacity-70 tracking-wider">Score:</span>
-          <span className="font-bold tabular-nums">{genericLog.earTrainingPerformance.score}</span>
+      {genericLog.earTrainingPerformance && genericLog.earTrainingPerformance.score !== 0 && (
+        <span className="inline-flex items-center gap-1.5 text-sm">
+          <Ear className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+          <span className="text-secondText">Score:</span>
+          <span className="font-semibold text-white tabular-nums">{genericLog.earTrainingPerformance.score}</span>
         </span>
       )}
 
@@ -956,8 +953,8 @@ const GroupedLogItem = ({
           <span className="inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary">
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl ?? undefined} lvl={userAvatarFrame} />
           </span>
-          <span className="hidden sm:flex sm:items-center shrink-0 text-[11px] text-secondText opacity-50 tabular-nums">
-            {date.toLocaleDateString()}
+          <span className="hidden sm:flex sm:items-center shrink-0 text-[11px] text-secondText opacity-50">
+            {formatDistanceToNow(date, { addSuffix: true })}
           </span>
 
           {logId && (
@@ -973,7 +970,7 @@ const GroupedLogItem = ({
           )}
         </div>
 
-        <div className="flex flex-col gap-4 pl-1 sm:gap-2.5 sm:pl-10">
+        <div className="flex flex-col gap-4 sm:gap-2.5">
           {group.logs.map((log, index) => (
             <GroupedLogLine
               key={(log as { id?: string }).id ?? `${getLogTimestampMs(log)}-${index}`}
@@ -991,7 +988,7 @@ const GroupedLogItem = ({
   );
 };
 
-const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
+const Logs = ({ logs, marksLogsAsRead, currentUserId, hasMoreLogs, onLoadMoreLogs }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages();
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
@@ -1070,6 +1067,18 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
           </div>
         );
       })}
+
+      {hasMoreLogs && onLoadMoreLogs && (
+        <div className="mt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={onLoadMoreLogs}
+            className="rounded-lg bg-zinc-800/60 px-4 py-2 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+          >
+            Show more
+          </button>
+        </div>
+      )}
 
       <RecordingViewModal
         isOpen={!!activeRecordingId}

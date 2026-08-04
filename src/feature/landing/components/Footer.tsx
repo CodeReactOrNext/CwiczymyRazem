@@ -110,6 +110,14 @@ export const Footer = () => {
                 </li>
                 <li>
                   <Link
+                    href='/tools'
+                    className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
+                    Guitar Tools{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href='/about'
                     className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                     About{" "}
