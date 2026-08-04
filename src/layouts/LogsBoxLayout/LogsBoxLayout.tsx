@@ -78,7 +78,7 @@ const LogsBoxLayout = ({
     <Card
       className={`relative m-auto flex ${
         showedCategory !== "achievements" && !className.includes("h-")
-          ? "h-[520px] sm:h-[650px] lg:h-[800px]"
+          ? "sm:h-[650px] lg:h-[800px]"
           : ""
       } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
       <div className='left-0 top-0 mb-2 flex flex-row justify-around gap-4 font-bold'>
@@ -132,7 +132,7 @@ const LogsBoxLayout = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className='mb-2 h-full overflow-y-auto p-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600'>
+            className='mb-2 overflow-visible p-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600 sm:h-full sm:overflow-y-auto'>
             <Changelog month='2026-05' />
           </m.div>
         )}
@@ -143,7 +143,7 @@ const LogsBoxLayout = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className='mb-2 h-full overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600'>
+            className='mb-2 overflow-visible scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600 sm:h-full sm:overflow-y-auto'>
             {showedCategory === "logs" && logs && (
               <div onClick={markLogsAsRead}>
                 <Logs
