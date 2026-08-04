@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import {
   MONTHLY_RUNNING_COST,
+  ROADMAP_RAISED_OFFSET,
   ROADMAP_TIERS,
 } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
@@ -9,7 +10,14 @@ import { ArrowRight, Check, Heart, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 
 export const SupportBanner = () => {
-  const { totalRaised, raisedThisMonth, isLoading } = useBuyMeACoffeeFunding();
+  const {
+    totalRaised: rawTotalRaised,
+    raisedThisMonth,
+    isLoading,
+  } = useBuyMeACoffeeFunding();
+  // Same tier ladder as /roadmap — must apply the same reset offset,
+  // otherwise "next unlock" here disagrees with the roadmap page.
+  const totalRaised = Math.max(0, rawTotalRaised - ROADMAP_RAISED_OFFSET);
 
   const covered = Math.min(raisedThisMonth, MONTHLY_RUNNING_COST);
   const isCovered = raisedThisMonth >= MONTHLY_RUNNING_COST;

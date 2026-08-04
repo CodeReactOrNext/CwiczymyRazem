@@ -1,12 +1,9 @@
 import { Footer } from "feature/landing/components/Footer";
-import AppLayout from "layouts/AppLayout";
 import { AudioLines, ExternalLink, Grid3x3, ListMusic, Rewind, Sparkles, Target, Timer } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import type { ComponentType, ReactElement } from "react";
-import type { NextPageWithLayout } from "types/page";
+import type { ComponentType } from "react";
 
 type PriceTier = "free" | "freemium" | "paid";
 
@@ -223,10 +220,7 @@ const PRICE_CLASSES: Record<PriceTier, string> = {
 const totalTools = CATEGORIES.reduce((sum, category) => sum + category.tools.length, 0);
 const siteUrl = "https://riff.quest/tools";
 
-const ToolsPage: NextPageWithLayout = () => {
-  const { status } = useSession();
-  const isLogged = status === "authenticated";
-
+const ToolsPage = () => {
   return (
     <>
       <Head>
@@ -260,33 +254,20 @@ const ToolsPage: NextPageWithLayout = () => {
         />
       </Head>
 
-      <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
-        {!isLogged && (
-          <nav className="border-b border-white/5 bg-zinc-950/50 backdrop-blur-xl">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-              <Link href="/" className="flex items-center gap-2">
-                <Image
-                  src='/images/longlightlogo.svg'
-                  alt='Riff Quest'
-                  width={120}
-                  height={32}
-                  className='h-6 w-auto'
-                  priority
-                />
-              </Link>
-              <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-                  Login
-                </Link>
-                <Link href="/signup" className="rounded-full bg-cyan-500 px-4 py-1.5 text-sm font-bold text-black hover:bg-cyan-400 transition-colors">
-                  Start Free
-                </Link>
-              </div>
+      <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-zinc-950/90 backdrop-blur-sm">
+          <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
+            <Link href="/" className="transition-opacity hover:opacity-70">
+              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' priority />
+            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Login</Link>
+              <Link href="/signup" className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors">Start Free →</Link>
             </div>
-          </nav>
-        )}
+          </div>
+        </nav>
 
-        <div className="mx-auto max-w-5xl px-6 py-20">
+        <div className="mx-auto max-w-5xl px-6 pb-24 pt-32">
           <div className="mb-16 max-w-2xl">
             <p className="text-xs font-black uppercase tracking-[0.4em] text-cyan-500 mb-4">Resources</p>
             <h1 className="text-4xl font-black text-white mb-6">Guitar practice tools worth knowing about</h1>
@@ -370,17 +351,9 @@ const ToolsPage: NextPageWithLayout = () => {
           </p>
         </div>
 
-        {!isLogged && <Footer />}
-      </div>
+        <Footer />
+      </main>
     </>
-  );
-};
-
-ToolsPage.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <AppLayout pageId="tools" isPublic={true}>
-      {page}
-    </AppLayout>
   );
 };
 
