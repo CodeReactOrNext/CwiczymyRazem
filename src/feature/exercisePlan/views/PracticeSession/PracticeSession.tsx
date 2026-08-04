@@ -342,7 +342,7 @@ export const PracticeSession = ({
 
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); }, []);
+  useEffect(() => { if (isExamMode && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke
   // (mount → cleanup → mount, meant to catch exactly this class of bug) had
   // nothing to undo between its two invocations — both ran initAudio() with

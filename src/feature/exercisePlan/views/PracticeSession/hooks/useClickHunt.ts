@@ -50,9 +50,18 @@ function buildState(
   lastClick: ClickHuntState["lastClick"],
   hitId: number,
   scoreOffset = 0,
+  bankedFound = 0,
+  bankedTotal = 0,
 ): ClickHuntState {
   const foundCount = targetPositions.filter((p) => found.has(keyOf(p))).length;
   const multiplier = Math.min(8, Math.floor(foundCount / 5) + 1);
+  // Cumulative across every target rotated through this exam, not just the
+  // currently active one — otherwise an exam that ends mid-rotation (the
+  // exercise timer, not the per-note countdown) would grade on whatever
+  // fraction of the CURRENT note happens to be found, ignoring every note
+  // already solved 100% before it. Same fix as the sweep hunt's banked set.
+  const cumulativeFound = bankedFound + foundCount;
+  const cumulativeTotal = bankedTotal + targetPositions.length;
   return {
     targetPositions,
     foundKeys: Array.from(found),
@@ -63,7 +72,7 @@ function buildState(
       combo: foundCount,
       multiplier,
     },
-    accuracy: targetPositions.length > 0 ? Math.round((foundCount / targetPositions.length) * 100) : 0,
+    accuracy: cumulativeTotal > 0 ? Math.round((cumulativeFound / cumulativeTotal) * 100) : 0,
     maxPossibleScore: scoreForCount(targetPositions.length),
     maxCombo: foundCount,
   };
@@ -96,6 +105,10 @@ export function useClickHunt(
   const prevFoundCountRef = useRef(0);
   const firstTargetRef = useRef(true);
   const targetsRef = useRef<ClickTarget[]>(computeTargets(note, startFret, endFret, strings));
+  // Cumulative found/total across every finished target — banked alongside the
+  // score, see buildState's accuracy comment.
+  const bankedFoundRef = useRef(0);
+  const bankedTotalRef = useRef(0);
   // When the current target note appeared — lets each correct click report how
   // long it took to find, for the "✓ 1.3s" feedback tooltip. Set for real by the
   // retarget effect below (which also runs on mount) — 0 here is just a pure
@@ -109,14 +122,21 @@ export function useClickHunt(
   // Retarget in place when the note/window/strings change — bank the finishing
   // target's score first (skip the initial mount), same pattern as useNoteHunt.
   useEffect(() => {
-    if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundCountRef.current);
+    if (!firstTargetRef.current) {
+      sessionScoreRef.current += scoreForCount(prevFoundCountRef.current);
+      bankedFoundRef.current += prevFoundCountRef.current;
+      bankedTotalRef.current += targetsRef.current.length;
+    }
     firstTargetRef.current = false;
     targetsRef.current = computeTargets(note, startFret, endFret, strings);
     foundRef.current = new Set();
     hitIdRef.current = 0;
     prevFoundCountRef.current = 0;
     targetStartRef.current = Date.now();
-    setState(buildState(targetsRef.current, foundRef.current, null, 0, sessionScoreRef.current));
+    setState(buildState(
+      targetsRef.current, foundRef.current, null, 0,
+      sessionScoreRef.current, bankedFoundRef.current, bankedTotalRef.current,
+    ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
 
@@ -143,6 +163,8 @@ export function useClickHunt(
           { string, fret, correct: isTarget, id: hitIdRef.current, elapsedSeconds },
           hitIdRef.current,
           sessionScoreRef.current,
+          bankedFoundRef.current,
+          bankedTotalRef.current,
         ),
       );
     },
