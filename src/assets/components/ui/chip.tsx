@@ -23,7 +23,7 @@ const chipVariants = cva(
 );
 
 export interface ChipProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
+  extends Omit<React.HTMLAttributes<HTMLSpanElement>, "color">,
     VariantProps<typeof chipVariants> {}
 
 /** Pill badge (icon + label): tinted translucent fill + bright colored text, same hue, no border. */
