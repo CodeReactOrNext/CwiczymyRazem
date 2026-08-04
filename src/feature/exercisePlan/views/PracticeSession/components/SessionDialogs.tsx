@@ -39,6 +39,7 @@ interface SessionDialogsProps {
   setInputGain: (v: number) => void;
   isNative: boolean;
   onSelectDevice?: (deviceId: number) => Promise<void>;
+  onSelectChannel?: (channel: number) => Promise<void>;
 
   // Leaderboard
   exerciseId: string;
@@ -74,6 +75,7 @@ export const SessionDialogs = ({
   setInputGain,
   isNative,
   onSelectDevice,
+  onSelectChannel,
   exerciseId,
   isMounted,
   hasReportResult,
@@ -145,6 +147,7 @@ export const SessionDialogs = ({
         onInputGainChange={setInputGain}
         isNative={isNative}
         onSelectDevice={onSelectDevice}
+        onSelectChannel={onSelectChannel}
       />
 
       <EarTrainingLeaderboardDialog

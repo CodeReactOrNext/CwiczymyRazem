@@ -1,4 +1,5 @@
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
+import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -19,6 +20,21 @@ const isValidTimeMs = (value: unknown): value is number =>
   Number.isInteger(value) &&
   value >= 0 &&
   value <= MAX_TIME_MS;
+
+// Reports written before the `seasonId` field existed don't carry it — fall
+// back to the month the report was made for, which is what the original
+// write would have resolved to via getCurrentSeason() in the common case
+// (non-backdated report).
+const resolveSeasonId = (data: FirebaseFirestore.DocumentData): string => {
+  if (typeof data.seasonId === "string") return data.seasonId;
+  const reportDate: Date =
+    typeof data.reportDate?.toDate === "function"
+      ? data.reportDate.toDate()
+      : new Date();
+  return `${reportDate.getFullYear()}-${String(
+    reportDate.getMonth() + 1
+  ).padStart(2, "0")}`;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -62,8 +78,41 @@ export default async function handler(
       .json({ error: "Only manual reports can be modified" });
   }
 
+  const oldTimeSumary = data.timeSumary ?? {};
+  const seasonUserRef = firestore
+    .collection("seasons")
+    .doc(resolveSeasonId(data))
+    .collection("users")
+    .doc(uid);
+
   if (req.method === "DELETE") {
-    await docRef.delete();
+    // The original report additively bumped the season's time.* totals; since
+    // those are never re-derived from the still-existing exerciseData docs,
+    // deleting the report must subtract back what it originally added or the
+    // season leaderboard keeps counting time for a report that no longer
+    // exists. longestSession is intentionally left alone — it's a running
+    // max, not a sum, and can't be safely decremented without re-scanning
+    // every report the user has for the season.
+    await Promise.all([
+      docRef.delete(),
+      seasonUserRef.set(
+        {
+          "time.technique": FieldValue.increment(
+            -(oldTimeSumary.techniqueTime || 0)
+          ),
+          "time.theory": FieldValue.increment(
+            -(oldTimeSumary.theoryTime || 0)
+          ),
+          "time.hearing": FieldValue.increment(
+            -(oldTimeSumary.hearingTime || 0)
+          ),
+          "time.creativity": FieldValue.increment(
+            -(oldTimeSumary.creativityTime || 0)
+          ),
+        },
+        { merge: true }
+      ),
+    ]);
     invalidateActivityLogsCache(uid);
     return res.status(200).json({ success: true });
   }
@@ -114,18 +163,40 @@ export default async function handler(
   // and isDateBackReport untouched — edits do not affect earned stats.
   // bonusPoints.time mirrors the session duration and drives day totals in
   // the activity calendar, so it must follow the edited time.
-  await docRef.update({
-    exceriseTitle: title,
-    ...(description !== undefined && { description }),
-    timeSumary: {
-      techniqueTime: timeSumary.techniqueTime,
-      theoryTime: timeSumary.theoryTime,
-      hearingTime: timeSumary.hearingTime,
-      creativityTime: timeSumary.creativityTime,
-      sumTime,
-    },
-    "bonusPoints.time": sumTime,
-  });
+  // The season's time.* totals were additively bumped by the original
+  // report and must move by the same delta, or a corrected (usually
+  // reduced) report leaves the leaderboard showing the stale pre-edit time.
+  await Promise.all([
+    docRef.update({
+      exceriseTitle: title,
+      ...(description !== undefined && { description }),
+      timeSumary: {
+        techniqueTime: timeSumary.techniqueTime,
+        theoryTime: timeSumary.theoryTime,
+        hearingTime: timeSumary.hearingTime,
+        creativityTime: timeSumary.creativityTime,
+        sumTime,
+      },
+      "bonusPoints.time": sumTime,
+    }),
+    seasonUserRef.set(
+      {
+        "time.technique": FieldValue.increment(
+          timeSumary.techniqueTime - (oldTimeSumary.techniqueTime || 0)
+        ),
+        "time.theory": FieldValue.increment(
+          timeSumary.theoryTime - (oldTimeSumary.theoryTime || 0)
+        ),
+        "time.hearing": FieldValue.increment(
+          timeSumary.hearingTime - (oldTimeSumary.hearingTime || 0)
+        ),
+        "time.creativity": FieldValue.increment(
+          timeSumary.creativityTime - (oldTimeSumary.creativityTime || 0)
+        ),
+      },
+      { merge: true }
+    ),
+  ]);
 
   invalidateActivityLogsCache(uid);
   return res.status(200).json({ success: true });

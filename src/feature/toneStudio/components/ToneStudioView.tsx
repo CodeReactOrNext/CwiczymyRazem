@@ -173,10 +173,14 @@ export const ToneStudioView = () => {
     api,
     selectedId,
     selectedOutputId,
+    selectedChannel,
+    selectedOutputChannel,
     loading,
     refresh,
     select,
     selectOutput,
+    selectChannel,
+    selectOutputChannel,
   } = useNativeAudioDevices();
   const {
     presets,
@@ -211,6 +215,24 @@ export const ToneStudioView = () => {
     selectOutput(id);
     await amp.restart();
   };
+
+  const handleSelectChannel = async (channel: number) => {
+    selectChannel(channel);
+    await amp.restart();
+  };
+
+  const handleSelectOutputChannel = async (channel: number) => {
+    selectOutputChannel(channel);
+    await amp.restart();
+  };
+
+  const selectedInputDevice = devices.find((d) => d.id === selectedId);
+  // On ASIO the engine always routes output through the input device (see
+  // isAsio above), so that's whose channel count/name governs the output
+  // channel picker too — outputDevices/selectedOutputId only apply on WASAPI.
+  const outputChannelCount = isAsio
+    ? selectedInputDevice?.outputChannels || 0
+    : (outputDevices.find((d) => d.id === selectedOutputId) ?? outputDevices[0])?.outputChannels || 0;
 
   const set = (patch: Partial<AmpParams>) => {
     amp.setParams(patch);
@@ -381,6 +403,22 @@ export const ToneStudioView = () => {
               ))}
             </select>
           </div>
+          {(selectedInputDevice?.inputChannels || 0) > 1 && (
+            <div className='w-28 shrink-0'>
+              <span className='mb-1 block text-xs text-zinc-400'>Channel</span>
+              <select
+                value={selectedChannel}
+                onChange={(e) => handleSelectChannel(Number(e.target.value))}
+                title='Which input channel to capture from — e.g. the guitar jack on a multi-channel interface'
+                className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
+                {Array.from({ length: selectedInputDevice?.inputChannels || 0 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <button
             type='button'
             onClick={() => refresh()}
@@ -406,32 +444,50 @@ export const ToneStudioView = () => {
           </div>
         </div>
 
-        <div>
-          <span className='mb-1 block text-xs text-zinc-400'>Output</span>
-          <select
-            value={selectedOutputId ?? ""}
-            onChange={(e) =>
-              handleSelectOutputDevice(
-                e.target.value === "" ? null : Number(e.target.value),
-              )
-            }
-            disabled={isAsio}
-            title={
-              isAsio
-                ? "ASIO uses the same device for input and output"
-                : "Output device for amp monitoring"
-            }
-            className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-50'>
-            <option value=''>
-              {isAsio ? "Same as input (ASIO)" : "System default output"}
-            </option>
-            {outputDevices.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({d.outputChannels} out)
-                {d.isDefaultOutput ? " · default" : ""}
+        <div className='flex items-center gap-2'>
+          <div className='flex-1'>
+            <span className='mb-1 block text-xs text-zinc-400'>Output</span>
+            <select
+              value={selectedOutputId ?? ""}
+              onChange={(e) =>
+                handleSelectOutputDevice(
+                  e.target.value === "" ? null : Number(e.target.value),
+                )
+              }
+              disabled={isAsio}
+              title={
+                isAsio
+                  ? "ASIO uses the same device for input and output"
+                  : "Output device for amp monitoring"
+              }
+              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-50'>
+              <option value=''>
+                {isAsio ? "Same as input (ASIO)" : "System default output"}
               </option>
-            ))}
-          </select>
+              {outputDevices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({d.outputChannels} out)
+                  {d.isDefaultOutput ? " · default" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          {outputChannelCount > 1 && (
+            <div className='w-28 shrink-0'>
+              <span className='mb-1 block text-xs text-zinc-400'>Channel</span>
+              <select
+                value={selectedOutputChannel}
+                onChange={(e) => handleSelectOutputChannel(Number(e.target.value))}
+                title='First output channel to monitor through — e.g. outputs 3/4 instead of 1/2 on a multi-channel interface'
+                className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
+                {Array.from({ length: outputChannelCount }, (_, i) => (
+                  <option key={i} value={i}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </SectionPanel>
 

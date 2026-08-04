@@ -12,6 +12,9 @@ interface NoteHuntDetectorProps {
   description?: string;
   isMicEnabled: boolean;
   isListening: boolean;
+  /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly.
+   *  Undefined outside exam mode. */
+  onDevPassExam?: () => void;
 }
 
 const SUPERSCRIPT = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"];
@@ -23,8 +26,9 @@ export function NoteHuntDetector({
   description,
   isMicEnabled,
   isListening,
+  onDevPassExam,
 }: NoteHuntDetectorProps) {
-  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, customGoalPrompt, huntTarget, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, customGoalPrompt, huntTarget, sweepProgress, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
   // Read the live target from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the target rotates. Falls back to the
@@ -55,6 +59,16 @@ export function NoteHuntDetector({
     <div className={cn("flex w-full flex-col items-center gap-2.5 sm:gap-4", noteHuntRegion ? "max-w-xl" : "max-w-sm")}>
       {/* Score (mic only) + countdown */}
       <div className="flex items-center justify-center gap-3">
+        {sweepProgress && (
+          <span
+            className={cn(
+              "rounded px-3.5 py-1.5 text-base font-extrabold tracking-wide",
+              sweepProgress.found >= sweepProgress.total ? "bg-emerald-500/20 text-emerald-300" : "bg-cyan-500/15 text-cyan-300",
+            )}
+          >
+            {sweepProgress.found}/{sweepProgress.total} notes
+          </span>
+        )}
         {isMicEnabled && (
           <span className="rounded bg-amber-500/15 px-3.5 py-1.5 text-base font-extrabold tracking-wide text-amber-300">
             ★ {score} pts
@@ -212,6 +226,16 @@ export function NoteHuntDetector({
           className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
         >
           Next <FaArrowRight className="h-3.5 w-3.5" />
+        </button>
+      )}
+      {onDevPassExam && (
+        <button
+          type="button"
+          onClick={onDevPassExam}
+          className="inline-flex items-center gap-2 rounded-lg border border-dashed border-emerald-400/50 bg-transparent px-4 py-2 text-xs font-bold tracking-wide text-emerald-300/90 transition-colors hover:bg-emerald-400/10"
+          title="Dev-only: ends the WHOLE EXAM right now and runs the normal finish flow"
+        >
+          🏁 Pass whole exam (dev)
         </button>
       )}
       </div>

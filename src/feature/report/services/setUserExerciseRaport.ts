@@ -22,6 +22,7 @@ export const firebaseSetUserExerciseRaprot = async (
     creativityTime: number;
     sumTime: number;
   },
+  seasonId: string,
   planId?: string | null,
   songDetails?: {
     songId?: string;
@@ -34,6 +35,7 @@ export const firebaseSetUserExerciseRaprot = async (
     exceriseTitle,
     timeSumary,
     isDateBackReport,
+    seasonId,
     ...(planId !== undefined && { planId }),
     ...songDetails
   };

@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AmpOverloadInfo, AmpParams, AmpStreamInfo, ConnectionIssueInfo } from "types/nativeAudio";
 
-import { readPersistedDeviceId, readPersistedOutputDeviceId } from "./useNativeAudioDevices";
+import {
+  readPersistedChannel,
+  readPersistedDeviceId,
+  readPersistedOutputChannel,
+  readPersistedOutputDeviceId,
+} from "./useNativeAudioDevices";
 
 // Electron-only amp simulator control. Talks to window.nativeAmp (preload bridge)
 // which runs a duplex ASIO/WASAPI stream + DSP chain in the main process.
@@ -125,9 +130,13 @@ export const useAmpSim = () => {
     setError(null);
     try {
       const deviceId = readPersistedDeviceId() ?? undefined;
+      const channel = readPersistedChannel();
       const outputDeviceId = readPersistedOutputDeviceId() ?? undefined;
+      const outputChannel = readPersistedOutputChannel();
       const frameSize = readPersistedBufferSize();
-      const streamInfo = await window.nativeAmp.start({ deviceId, outputDeviceId, frameSize, params: paramsRef.current });
+      const streamInfo = await window.nativeAmp.start({
+        deviceId, channel, outputDeviceId, outputChannel, frameSize, params: paramsRef.current,
+      });
       setInfo(streamInfo);
       setIsOn(true);
     } catch (e: any) {

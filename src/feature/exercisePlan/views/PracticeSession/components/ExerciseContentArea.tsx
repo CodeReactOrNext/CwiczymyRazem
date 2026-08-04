@@ -7,6 +7,7 @@ import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
+import { ClickHuntPanel } from "./ClickHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
@@ -68,6 +69,8 @@ interface ExerciseContentAreaProps {
   onSeek?: (beatPosition: number) => void;
   onLoopRestart?: (loopStartBeat: number) => void;
   isExamMode?: boolean;
+  /** Dev-only (non-production): fast-tracks the exam-finish flow instantly. Undefined outside exam mode. */
+  onDevPassExam?: () => void;
 
   // Video / playalong
   startTimer: () => void;
@@ -127,6 +130,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   onSeek,
   onLoopRestart,
   isExamMode,
+  onDevPassExam,
   rewardSkillId,
   rewardAmount,
   controlsSlot,
@@ -199,12 +203,23 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
             />
+          ) : currentExercise.noteHuntConfig?.mode === "click" ? (
+            <ClickHuntPanel
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              startFret={currentExercise.customGoalRegion?.startFret ?? 0}
+              endFret={currentExercise.customGoalRegion?.endFret ?? 12}
+              strings={currentExercise.customGoalStrings}
+              isPlaying={isPlaying}
+              onDevPassExam={onDevPassExam}
+            />
           ) : (
             <NoteHuntDetector
               targetNote={currentExercise.customGoal}
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+              onDevPassExam={onDevPassExam}
             />
           )}
         </div>

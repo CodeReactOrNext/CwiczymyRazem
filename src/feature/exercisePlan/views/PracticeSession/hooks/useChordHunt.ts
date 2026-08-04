@@ -101,13 +101,17 @@ export function useChordHunt(
   frequencyRef: FreqRef,
   volumeRef: FreqRef,
   active: boolean,
+  /** Semitone shift applied to every tone before matching the mic's detected
+   *  pitch class — see getUniformTuningShift. 0 (default) matches literal absolute pitch. */
+  tuningShift = 0,
 ): ChordHuntControls {
+  const shiftedTones = tuningShift === 0 ? tones : tones.map(pc => (pc + tuningShift + 12 * 10) % 12);
   const [state, setState] = useState<ChordHuntState>(() =>
-    buildState(tones, labels, new Set(), null, null, 0, false, 0),
+    buildState(shiftedTones, labels, new Set(), null, null, 0, false, 0),
   );
 
   // Primitive key so a fresh tones array each render doesn't reset progress.
-  const targetKey = tones.join(",");
+  const targetKey = shiftedTones.join(",");
 
   const rafRef         = useRef(0);
   const lastSampleRef  = useRef(0);
@@ -116,7 +120,7 @@ export function useChordHunt(
   const foundRef       = useRef<Set<number>>(new Set());
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
-  const tonesRef       = useRef<number[]>(tones);
+  const tonesRef       = useRef<number[]>(shiftedTones);
   const labelsRef      = useRef<string[]>(labels);
   // Score banked from previous chords — keeps the total accumulating across rotations.
   const sessionScoreRef = useRef(0);
@@ -125,7 +129,7 @@ export function useChordHunt(
   useEffect(() => {
     if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
     firstTargetRef.current = false;
-    tonesRef.current      = tones;
+    tonesRef.current      = shiftedTones;
     labelsRef.current     = labels;
     foundRef.current      = new Set();
     stableRef.current     = null;

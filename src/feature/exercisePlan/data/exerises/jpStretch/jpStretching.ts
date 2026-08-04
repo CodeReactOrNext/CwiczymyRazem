@@ -41,7 +41,7 @@ export const jpStretching: Exercise = {
     "Stop immediately if you feel sharp pain—stretch slowly and build reach over time.",
     "Keep your shoulder and elbow relaxed to allow your hand to rotate naturally."
   ],
-  metronomeSpeed: null,
+  metronomeSpeed: { min: 40, max: 100, recommended: 60 },
   relatedSkills: ["finger_independence"],
   tablature
 };

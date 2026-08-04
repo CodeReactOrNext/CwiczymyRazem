@@ -15,6 +15,7 @@ export const firebaseUpdateUserStats = async (
     sumTime: number;
   },
   pointsGained: number,
+  seasonId: string,
   fameEarned: number = 0
 ) => {
   const userDocRef = doc(db, "users", userAuth);
@@ -40,6 +41,6 @@ export const firebaseUpdateUserStats = async (
 
   await Promise.all([
     updateDoc(userDocRef, updates),
-    updateSeasonalStats(userAuth, statistics, sessionTime, pointsGained),
+    updateSeasonalStats(userAuth, statistics, sessionTime, pointsGained, seasonId),
   ]);
 };

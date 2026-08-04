@@ -1,4 +1,3 @@
-import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -13,10 +12,10 @@ export const updateSeasonalStats = async (
     creativityTime: number;
     sumTime: number;
   },
-  pointsGained: number
+  pointsGained: number,
+  seasonId: string
 ) => {
-  const season = await getCurrentSeason();
-  const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
+  const userSeasonRef = doc(db, "seasons", seasonId, "users", userId);
   const userSeasonDoc = await getDoc(userSeasonRef);
 
   const userDocRef = doc(db, "users", userId);
@@ -66,7 +65,7 @@ export const updateSeasonalStats = async (
     selectedGuitar: userData?.selectedGuitar || "",
     selectedGuitarYear: userData?.selectedGuitarYear || 0,
     selectedGuitarCountry: userData?.selectedGuitarCountry || "",
-    seasonId: season.seasonId,
+    seasonId,
   };
 
   await setDoc(userSeasonRef, updatedSeasonData, { merge: true });

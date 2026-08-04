@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
-import { fundamentalsModule, placeholderModules } from "../data/fundamentalsJourney";
+import { journeyModules, placeholderModules } from "../data/journeyModules";
 import {
   firebaseCompleteJourneyStep,
   firebaseGetJourneyProgress,
@@ -13,6 +13,7 @@ import {
   firebaseStartJourneyStep,
 } from "../services/journey.service";
 import type {
+  JourneyModule,
   JourneyModuleWithStatus,
   JourneyProgressDocument,
   JourneyStep,
@@ -44,13 +45,14 @@ function mergeStepsWithProgress(
 }
 
 function buildModuleWithStatus(
+  module: JourneyModule,
   progressDoc: JourneyProgressDocument | null
 ): JourneyModuleWithStatus {
-  const savedModule = progressDoc?.moduleProgress?.[fundamentalsModule.id];
-  const allSteps = fundamentalsModule.stages.flatMap((s) => s.steps);
+  const savedModule = progressDoc?.moduleProgress?.[module.id];
+  const allSteps = module.stages.flatMap((s) => s.steps);
   const stepsWithStatus = mergeStepsWithProgress(allSteps, savedModule?.steps);
 
-  const stages = fundamentalsModule.stages.map((stage) => ({
+  const stages = module.stages.map((stage) => ({
     ...stage,
     steps: stepsWithStatus.filter((s) => s.stageId === stage.id),
   }));
@@ -58,7 +60,7 @@ function buildModuleWithStatus(
   const completedCount = stepsWithStatus.filter((s) => s.status === "completed").length;
 
   return {
-    ...fundamentalsModule,
+    ...module,
     stages,
     completedCount,
     totalCount: allSteps.length,
@@ -74,14 +76,21 @@ const JourneyView: React.FC = () => {
   const [progressDoc, setProgressDoc] = useState<JourneyProgressDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModuleSelection, setShowModuleSelection] = useState(true);
-  const [selectedModuleId, setSelectedModuleId] = useState(fundamentalsModule.id);
+  const [selectedModuleId, setSelectedModuleId] = useState(journeyModules[0].id);
   const [selectedStep, setSelectedStep] = useState<JourneyStepWithStatus | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const examResultHandled = useRef(false);
   const queryApplied = useRef(false);
 
-  const activeModule = useMemo(() => buildModuleWithStatus(progressDoc), [progressDoc]);
+  const modulesWithStatus = useMemo<JourneyModuleWithStatus[]>(
+    () => journeyModules.map((m) => buildModuleWithStatus(m, progressDoc)),
+    [progressDoc]
+  );
+  const activeModule = useMemo(
+    () => modulesWithStatus.find((m) => m.id === selectedModuleId) ?? modulesWithStatus[0],
+    [modulesWithStatus, selectedModuleId]
+  );
 
   useEffect(() => {
     if (!userAuth) return;
@@ -110,14 +119,19 @@ const JourneyView: React.FC = () => {
     setSelectedModuleId(qModule as string);
     setShowModuleSelection(false);
     if (qStep) {
-      const allSteps = activeModule.stages.flatMap((s) => s.steps);
+      // Look up the raw module directly (not the status-decorated `activeModule`,
+      // which still reflects the PREVIOUS selectedModuleId in this same render —
+      // setSelectedModuleId above hasn't flushed yet).
+      const targetModule = journeyModules.find((m) => m.id === qModule) ?? modulesWithStatus[0];
+      const targetWithStatus = modulesWithStatus.find((m) => m.id === targetModule.id);
+      const allSteps = (targetWithStatus ?? buildModuleWithStatus(targetModule, progressDoc)).stages.flatMap((s) => s.steps);
       const found = allSteps.find((s) => s.id === qStep);
       if (found) {
         setSelectedStep(found);
         setIsModalOpen(true);
       }
     }
-  }, [loading, router.query, activeModule]);
+  }, [loading, router.query, modulesWithStatus, progressDoc]);
 
   // Handle returning from exam
   useEffect(() => {
@@ -237,7 +251,7 @@ const JourneyView: React.FC = () => {
   if (showModuleSelection) {
     return (
       <ModuleSelectionScreen
-        activeModule={activeModule}
+        modules={modulesWithStatus}
         placeholders={placeholderModules}
         onSelectModule={(id) => {
           setSelectedModuleId(id);

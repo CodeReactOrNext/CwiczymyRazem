@@ -371,6 +371,7 @@ function computeDesiredShape() {
   const duplex = !!ampConsumer;
   let outDeviceId = null;
   let outDeviceName = null;
+  let outFirstChannel = 0;
   let outChannels = 0;
 
   if (duplex) {
@@ -396,7 +397,8 @@ function computeDesiredShape() {
     if (!outDev) throw new Error("No output device available for amp monitoring");
     outDeviceId = outDev.id;
     outDeviceName = outDev.name;
-    outChannels = Math.min(2, outDev.outputChannels || 2) || 1;
+    outFirstChannel = Math.max(0, Math.min(ampConsumer.requested.outputChannel || 0, Math.max(0, (outDev.outputChannels || 1) - 1)));
+    outChannels = Math.min(2, Math.max(1, (outDev.outputChannels || 2) - outFirstChannel));
   }
 
   return {
@@ -409,6 +411,7 @@ function computeDesiredShape() {
     duplex,
     outDeviceId,
     outDeviceName,
+    outFirstChannel,
     outChannels,
   };
 }
@@ -422,6 +425,7 @@ function shapesEqual(open, desired) {
     open.requestedFrameSize === desired.requestedFrameSize &&
     open.duplex === desired.duplex &&
     open.outDeviceId === desired.outDeviceId &&
+    open.outFirstChannel === desired.outFirstChannel &&
     open.outChannels === desired.outChannels
   );
 }
@@ -444,6 +448,7 @@ function recomputeInfos() {
     sampleRate: openShape.sampleRate,
     frameSize: openShape.frameSize,
     outChannels: openShape.outChannels,
+    outFirstChannel: openShape.outFirstChannel,
     inChannel: openShape.channel,
     roundTripMs: ((openShape.streamLatencyFrames + openShape.frameSize * 2) / openShape.sampleRate) * 1000,
     params: ampChain ? ampChain.params : ampConsumer.params,
@@ -621,7 +626,7 @@ async function ensureOpenInner() {
   if (DEBUG_TIMING) debugPendingWrites = []; // same — the old queue is gone, don't dequeue stale entries against the new stream
   driftMs = 0; // fresh stream — nothing queued yet, so no drift carried over from the last one
 
-  const outParams = desired.duplex ? { deviceId: desired.outDeviceId, nChannels: desired.outChannels, firstChannel: 0 } : null;
+  const outParams = desired.duplex ? { deviceId: desired.outDeviceId, nChannels: desired.outChannels, firstChannel: desired.outFirstChannel } : null;
   const inParams = { deviceId: desired.deviceId, nChannels: 1, firstChannel: desired.channel };
 
   const sampleRateCandidates = buildSampleRateCandidates(desired.sampleRate, desired.sampleRates);
@@ -688,6 +693,7 @@ async function attachAmp(opts = {}) {
       sampleRate: opts.sampleRate,
       frameSize: opts.frameSize || 256,
       outputDeviceId: opts.outputDeviceId,
+      outputChannel: opts.outputChannel || 0,
     },
     params: opts.params || {},
   };

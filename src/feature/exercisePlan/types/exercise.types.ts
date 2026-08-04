@@ -173,8 +173,19 @@ export interface Exercise {
    *   - "region": also rotates a fretboard window (customGoalRegion) + renders the neck.
    *   - "interval": customGoal is the (hidden) answer; show customGoalPrompt instead.
    *   - "chord": customGoal is a chord name; track its tones via useChordHunt.
+   *   - "click": no mic — the player clicks the target note's position(s) directly
+   *     on a fretboard diagram (customGoalRegion + customGoalStrings scope the
+   *     valid cells). See useClickHunt / ClickHuntPanel.
+   *   - "sweep": like "octaves", but progress accumulates ACROSS rotations instead
+   *     of resetting per-target — the exam accuracy is (distinct notes completed
+   *     so far) / 12, for "hit every chromatic note before the clock runs out"
+   *     exams. See the fretboard-mastery per-string exam exercises.
    *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
-  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" };
+  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "sweep" };
+  /** For "click" mode hunts: restricts which strings (1-6, 1 = high e) are in
+   *  play. Omitted = all 6 strings. Combined with customGoalRegion's fret window
+   *  to compute the exact set of valid (string, fret) click targets. */
+  customGoalStrings?: number[];
   /** Rotating hunts: returns a fresh target each call. A plain function (not a
    *  getter) so it survives object spreads/clones — the rotation hook holds the
    *  result in React state. See randomNoteHunt / intervalHunt / buildTheChord. */

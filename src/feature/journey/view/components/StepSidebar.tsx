@@ -13,6 +13,8 @@ import { useAppSelector } from "store/hooks";
 
 import { getSongsByIds } from "../../services/journey.service";
 import type { JourneyStepWithStatus } from "../../types/journey.types";
+import { getStepIcon } from "../../utils/stepIcons";
+import { FretDiagram } from "./FretDiagram";
 
 interface StepSidebarProps {
   step: JourneyStepWithStatus;
@@ -26,7 +28,7 @@ interface StepSidebarProps {
 const STATUS_CFG: Record<string, { label: string; cls: string }> = {
   locked:        { label: "Locked",      cls: "text-zinc-500 bg-zinc-800" },
   available:     { label: "Available",   cls: "text-cyan-400 bg-cyan-500/10" },
-  "in-progress": { label: "In Progress", cls: "text-amber-400 bg-amber-500/10" },
+  "in-progress": { label: "In Progress", cls: "text-cyan-400 bg-cyan-500/10" },
   completed:     { label: "Completed",   cls: "text-emerald-400 bg-emerald-500/10" },
 };
 
@@ -70,26 +72,34 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
   return (
     <div className="flex h-full w-full flex-col bg-zinc-950">
       {/* Header */}
-      <div className="relative h-24 sm:h-48 flex-shrink-0">
-        <Image src={step.image} alt={step.title} fill className="object-cover opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
+      <div className="relative flex-shrink-0 px-4 pb-5 pt-5 sm:px-6 sm:pt-6">
         <button
           onClick={onClose}
           data-vaul-no-drag
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 rounded-full bg-black/60 p-2 text-zinc-200 backdrop-blur-md transition-background hover:bg-black/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="absolute right-4 top-4 z-10 rounded-full bg-zinc-900/70 p-2 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:right-6 sm:top-6"
         >
           <X size={20} />
         </button>
 
-        <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
-          <div className="mb-1.5 flex items-center gap-2">
-            <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-widest", status.cls)}>
-              {status.label}
-            </span>
-            <span className="text-[10px] font-bold tracking-widest text-zinc-500">Step {step.order}</span>
+        <div className="flex items-center gap-4 pr-12">
+          <div
+            className={cn(
+              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full",
+              isCompleted ? "bg-emerald-500/10 text-emerald-400" : isLocked ? "bg-zinc-800 text-zinc-600" : "bg-cyan-500/10 text-cyan-400"
+            )}
+          >
+            {isCompleted ? <CheckCircle2 size={26} /> : getStepIcon(step.stepIcon, 24)}
           </div>
-          <h2 className="font-display text-xl font-black text-zinc-100 sm:text-2xl">{step.title}</h2>
+          <div className="min-w-0">
+            <div className="mb-1.5 flex items-center gap-2">
+              <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-widest", status.cls)}>
+                {status.label}
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-zinc-500">Step {step.order}</span>
+            </div>
+            <h2 className="font-display text-xl font-black leading-tight text-zinc-100 sm:text-2xl">{step.title}</h2>
+          </div>
         </div>
       </div>
 
@@ -102,7 +112,15 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
           {step.contentBlocks && step.contentBlocks.length > 0 ? (
             step.contentBlocks.map((block, i) => (
               <div key={i} className="text-sm leading-relaxed text-zinc-300">
-                {block.type === "text" && <p>{block.body}</p>}
+                {block.type === "text" && (
+                  block.body?.includes("\n") ? (
+                    <pre className="overflow-x-auto rounded-lg bg-zinc-950/60 p-3 font-mono text-[11px] leading-relaxed text-zinc-300">
+                      {block.body}
+                    </pre>
+                  ) : (
+                    <p>{block.body}</p>
+                  )
+                )}
                 {block.type === "callout" && (
                     <div className="rounded-lg bg-zinc-800/40 p-4">
                         <p className="mb-1 font-bold text-zinc-200">{block.label}</p>
@@ -114,6 +132,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                         <Image src={block.url || ""} alt="" fill className="object-cover" />
                     </div>
                 )}
+                {block.type === "fretDiagram" && block.diagram && <FretDiagram data={block.diagram} />}
               </div>
             ))
           ) : (
@@ -204,7 +223,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 onComplete(step.id);
               }}
               disabled={isLocked || isSaving || !canComplete}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-white py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {isSaving ? "Saving..." : "Done & Complete"}
               <CheckCircle2 size={18} />
@@ -227,7 +246,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 router.push(`/practice/exercise/${step.suggestedExerciseId}?mode=exam&bpm=${bpm}&stepId=${step.id}&moduleId=${moduleId}`);
               }}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-lg bg-amber-400 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Target size={16} />
               {isCompleted ? "Retake" : "Exam"}

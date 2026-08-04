@@ -4,6 +4,7 @@ import type { ConnectionIssueInfo, NativeAudioDevice, NativeAudioStreamInfo } fr
 
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 import type { AudioRefs } from "./useAudioAnalyzer";
+import { readPersistedChannel } from "./useNativeAudioDevices";
 
 // Mirrors useAudioAnalyzer's public contract so PracticeSession is agnostic to
 // the input source. The difference: PCM comes from a native low-latency stream
@@ -64,6 +65,7 @@ export const useNativeAudioAnalyzer = () => {
 
   const inputGainRef = useRef<number>(loadPersistedGain());
   const selectedDeviceIdRef = useRef<number | null>(loadPersistedDeviceId());
+  const selectedChannelRef = useRef<number>(readPersistedChannel());
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const connectionUnsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -130,6 +132,9 @@ export const useNativeAudioAnalyzer = () => {
         return;
       }
       selectedDeviceIdRef.current = chosen.id;
+      // Re-read storage so a channel picked elsewhere (e.g. the amp panel)
+      // applies, same as the device id above.
+      selectedChannelRef.current = readPersistedChannel();
 
       // Reset accumulator
       windowBufRef.current = new Float32Array(WINDOW_SIZE);
@@ -220,7 +225,7 @@ export const useNativeAudioAnalyzer = () => {
       // actually got — detectors below are built for that, not a guess.
       const info = await native.start({
         deviceId: chosen.id,
-        channel: 0,
+        channel: selectedChannelRef.current,
         frameSize: 256,
       });
       if (myGeneration !== generationRef.current) {
@@ -326,11 +331,22 @@ export const useNativeAudioAnalyzer = () => {
     setState(prev => ({ ...prev, inputGain: clamped }));
   }, []);
 
-  /** Switch the active input device (e.g. user picks their interface/channel).
+  /** Switch the active input device (e.g. user picks their interface).
    *  Restarts the stream if currently listening. */
   const selectDevice = useCallback(async (deviceId: number) => {
     selectedDeviceIdRef.current = deviceId;
     try { localStorage.setItem(DEVICE_STORAGE_KEY, String(deviceId)); } catch { /* ignore */ }
+    if (state.isListening) {
+      close();
+      await init();
+    }
+  }, [state.isListening, close, init]);
+
+  /** Switch which physical input channel on the current device is captured
+   *  (e.g. the guitar is plugged into jack 3 instead of 1). Restarts the
+   *  stream if currently listening. */
+  const selectChannel = useCallback(async (channel: number) => {
+    selectedChannelRef.current = channel;
     if (state.isListening) {
       close();
       await init();
@@ -359,5 +375,6 @@ export const useNativeAudioAnalyzer = () => {
     getLatencyMs,
     setInputGain,
     selectDevice,
-  }), [state, init, close, audioRefs, getLatencyMs, setInputGain, selectDevice]);
+    selectChannel,
+  }), [state, init, close, audioRefs, getLatencyMs, setInputGain, selectDevice, selectChannel]);
 };

@@ -1,6 +1,17 @@
-import { Guitar, Headphones, Music } from "lucide-react";
+import { Guitar, Headphones, type LucideIcon, Music } from "lucide-react";
 import { useId } from "react";
 import { TbGuitarPick } from "react-icons/tb";
+
+// Fixed offsets for the 4 icon slots inside one tile — scattered, not grid-aligned,
+// so neighbouring tiles read as an overlapping cluster rather than a repeating stamp.
+const SLOTS = [
+  { x: 20, y: 20 },
+  { x: 100, y: 40 },
+  { x: 40, y: 100 },
+  { x: 110, y: 110 },
+] as const;
+
+const DEFAULT_ICONS: LucideIcon[] = [Guitar, Music, TbGuitarPick as unknown as LucideIcon, Headphones];
 
 interface GuitarPatternBackgroundProps {
   /** Pattern opacity. Keep this low — it's a texture, not a graphic. */
@@ -10,25 +21,34 @@ interface GuitarPatternBackgroundProps {
   /**
    * `dark` (default) draws white icons for use on near-black surfaces.
    * `light` draws ink-colored icons for the ivory section.
+   * Ignored when `color` is set.
    */
   variant?: "dark" | "light";
+  /** Raw color (hex/rgb) for the icons — overrides `variant`, for tinting to a specific surface. */
+  color?: string;
+  /** Up to 4 icons filling the tile's 4 slots. Defaults to the guitar/music set used on /login. */
+  icons?: LucideIcon[];
   className?: string;
 }
 
 /**
- * Tiled guitar/music icon watermark, extracted from the pattern used on
- * `/login`. Reused at most twice on the landing page (see PR writeup) so it
- * stays a texture rather than becoming visual noise.
+ * Tiled icon watermark, extracted from the pattern used on `/login`. Reused
+ * at most twice on the landing page (see PR writeup) so it stays a texture
+ * rather than becoming visual noise. `icons`/`color` let other surfaces reuse
+ * the same layering technique with a set that matches their own subject.
  */
 export const GuitarPatternBackground = ({
   opacity = 0.03,
   scale = 1,
   variant = "dark",
+  color,
+  icons = DEFAULT_ICONS,
   className,
 }: GuitarPatternBackgroundProps) => {
   const patternId = useId();
   const tile = 160 * scale;
   const iconColorClass = variant === "light" ? "text-ivory-fg" : "text-white";
+  const tileIcons = SLOTS.map((slot, i) => ({ slot, Icon: icons[i % icons.length] }));
 
   return (
     <svg
@@ -46,30 +66,16 @@ export const GuitarPatternBackground = ({
           height={tile}
           patternUnits='userSpaceOnUse'
           patternTransform='rotate(-15)'>
-          <g
-            transform={`translate(${20 * scale}, ${20 * scale}) scale(${scale})`}>
-            <Guitar size={32} className={iconColorClass} strokeWidth={1.5} />
-          </g>
-          <g
-            transform={`translate(${100 * scale}, ${40 * scale}) scale(${scale})`}>
-            <Music size={28} className={iconColorClass} strokeWidth={1.5} />
-          </g>
-          <g
-            transform={`translate(${40 * scale}, ${100 * scale}) scale(${scale})`}>
-            <TbGuitarPick
-              size={30}
-              className={iconColorClass}
-              strokeWidth={1.5}
-            />
-          </g>
-          <g
-            transform={`translate(${110 * scale}, ${110 * scale}) scale(${scale})`}>
-            <Headphones
-              size={32}
-              className={iconColorClass}
-              strokeWidth={1.5}
-            />
-          </g>
+          {tileIcons.map(({ slot, Icon }, i) => (
+            <g key={i} transform={`translate(${slot.x * scale}, ${slot.y * scale}) scale(${scale})`}>
+              <Icon
+                size={30}
+                strokeWidth={1.5}
+                className={color ? undefined : iconColorClass}
+                color={color}
+              />
+            </g>
+          ))}
         </pattern>
       </defs>
       <rect

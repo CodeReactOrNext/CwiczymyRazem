@@ -1,344 +1,138 @@
 import { cn } from "assets/lib/utils";
-import type { Song } from "feature/songs/types/songs.type";
-import {
-  ArrowDown, ArrowUpDown, AudioWaveform, Bug,   Check, ChevronDown, ChevronLeft,
-ClipboardCheck, GitMerge, Guitar,
-Hammer, Hand, Info, Layers,
-LayoutGrid, Link2,
-  MoveHorizontal,   Music, Play, SkipForward, SlidersHorizontal, Target, Timer, TrendingUp,
-Waves,   Zap, } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { motion } from "framer-motion";
+import { Check, ChevronLeft, Guitar } from "lucide-react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { FaStar } from "react-icons/fa";
 
-import { getSongsByIds } from "../../services/journey.service";
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";
+import { getStepIcon } from "../../utils/stepIcons";
 
-// ─── Icon map ─────────────────────────────────────────────────────────────────
+const WAVE_AMPLITUDE = 56;
 
-const STEP_ICONS: Record<string, React.ReactNode> = {
-  ArrowDown:        <ArrowDown size={18} />,
-  ArrowUpDown:      <ArrowUpDown size={18} />,
-  GitMerge:         <GitMerge size={18} />,
-  Timer:            <Timer size={18} />,
-  Link2:            <Link2 size={18} />,
-  MoveHorizontal:   <MoveHorizontal size={18} />,
-  Hand:             <Hand size={18} />,
-  SkipForward:      <SkipForward size={18} />,
-  TrendingUp:       <TrendingUp size={18} />,
-  Zap:              <Zap size={18} />,
-  AudioWaveform:    <AudioWaveform size={18} />,
-  Layers:           <Layers size={18} />,
-  Music:            <Music size={18} />,
-  Hammer:           <Hammer size={18} />,
-  ChevronDown:      <ChevronDown size={18} />,
-  LayoutGrid:       <LayoutGrid size={18} />,
-  Waves:            <Waves size={18} />,
-  SlidersHorizontal:<SlidersHorizontal size={18} />,
-  Bug:              <Bug size={18} />,
-  ClipboardCheck:   <ClipboardCheck size={18} />,
-  Guitar:           <Guitar size={18} />,
-};
+// ─── PathNode ─────────────────────────────────────────────────────────────────
 
-// Stage theme configs — semantic accents only (orange/amber/cyan)
-const STAGE_THEME: Record<string, {
-  iconBg: string;
-  iconText: string;
-  badge: string;
-  imgTint: string;
-  cardFade: string;
-  ring: string;
-}> = {
-  stage_1: {
-    iconBg: "bg-orange-500/10",
-    iconText: "text-orange-400",
-    badge: "bg-orange-500/10 text-orange-400",
-    imgTint: "bg-orange-900/30",
-    cardFade: "from-zinc-900 via-zinc-900/90 to-zinc-900/20",
-    ring: "ring-orange-500/40",
-  },
-  stage_2: {
-    iconBg: "bg-amber-500/10",
-    iconText: "text-amber-400",
-    badge: "bg-amber-500/10 text-amber-400",
-    imgTint: "bg-amber-900/30",
-    cardFade: "from-zinc-900 via-zinc-900/90 to-zinc-900/20",
-    ring: "ring-amber-500/40",
-  },
-  stage_3: {
-    iconBg: "bg-cyan-500/10",
-    iconText: "text-cyan-400",
-    badge: "bg-cyan-500/10 text-cyan-400",
-    imgTint: "bg-cyan-900/30",
-    cardFade: "from-zinc-900 via-zinc-900/90 to-zinc-900/20",
-    ring: "ring-cyan-500/40",
-  },
-};
-
-// ─── StepNode ─────────────────────────────────────────────────────────────────
-
-function StepNode({ step, onClick, isLast, moduleId }: {
+function PathNode({
+  step,
+  x,
+  side,
+  onClick,
+  registerRef,
+}: {
   step: JourneyStepWithStatus;
+  x: number;
+  side: "left" | "right";
   onClick: () => void;
-  isLast: boolean;
-  moduleId: string;
+  registerRef: (el: HTMLButtonElement | null) => void;
 }) {
-  const router = useRouter();
-  const isLocked     = step.status === "locked";
-  const isCompleted  = step.status === "completed";
-  const isAvailable  = step.status === "available";
-  const isInProgress = step.status === "in-progress";
-
-  const theme  = STAGE_THEME[step.stageId] ?? STAGE_THEME.stage_1;
-  const padNum = String(step.order).padStart(2, "0");
-
-  const goToExercise = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push(`/practice/exercise/${step.suggestedExerciseId}`);
-  };
-
-  const goToExam = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const bpm = step.examBpm ?? 60;
-    router.push(`/practice/exercise/${step.suggestedExerciseId}?mode=exam&bpm=${bpm}&stepId=${step.id}&moduleId=${moduleId}`);
-  };
+  const isLocked = step.status === "locked";
+  const isCompleted = step.status === "completed";
+  const isCurrent = step.status === "available" || step.status === "in-progress";
 
   return (
-    <div className="flex w-full max-w-3xl flex-col items-center">
-      {/* ── Card ── */}
-      <div
-        className={cn(
-          "relative w-full overflow-hidden rounded-lg backdrop-blur-md transition-background",
-          isCompleted  && "bg-zinc-900/40",
-          isInProgress && "bg-zinc-900/60",
-          isAvailable  && cn("bg-zinc-900/60 ring-1", theme.ring),
-          isLocked     && "bg-zinc-900/30"
-        )}
-      >
-        {/* Background image bleeding from right */}
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-3/5">
-            <Image
-              src={step.image} alt="" fill className="object-cover"
-              style={{
-                filter: isLocked
-                  ? "brightness(0.12) saturate(0) blur(1px)"
-                  : isCompleted
-                  ? "brightness(0.2) saturate(0.5) contrast(0.9)"
-                  : "brightness(0.35) saturate(1.8) contrast(1.1)",
-              }}
-            />
-            {!isLocked && <div className={`absolute inset-0 ${isCompleted ? "bg-emerald-900/20" : theme.imgTint}`} />}
-            <div className={`absolute inset-0 bg-gradient-to-r ${isCompleted ? "from-zinc-950 via-zinc-950/70 to-transparent" : theme.cardFade}`} />
-          </div>
-
-        {/* Watermark number */}
-        <div
-          className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 select-none font-black leading-none tracking-tighter text-transparent"
-          style={{ fontSize: "7rem", WebkitTextStroke: "1px rgba(255,255,255,0.08)" }}
-        >
-          {padNum}
-        </div>
-
-        {/* ── Top: clickable info area → opens modal ── */}
+    <div
+      className="relative z-10 flex justify-center"
+      style={{ transform: `translateX(${x}px)` }}
+    >
+      {/* Halo — cuts a clean gap between the node and the connector line behind it */}
+      <div className="rounded-full bg-zinc-950 p-2 pb-3">
         <button
+          ref={registerRef}
           onClick={onClick}
           disabled={isLocked}
-          aria-label={`Open details: ${step.title}`}
-          className="group relative flex min-h-[140px] w-full items-center gap-7 px-10 pb-6 pt-8 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed enabled:hover:bg-white/[0.02]"
+          aria-label={step.title}
+          className={cn(
+            "relative flex h-20 w-20 items-center justify-center rounded-full transition-[transform,box-shadow,background-color] duration-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
+            isLocked &&
+              "bg-zinc-700 text-zinc-500 shadow-[0_4px_0_0_rgb(24,24,27)]",
+            isCompleted &&
+              "bg-emerald-500 text-zinc-950 shadow-[0_5px_0_0_rgb(4,120,87)] hover:bg-emerald-400 active:translate-y-[5px] active:shadow-none",
+            isCurrent &&
+              "bg-cyan-500 text-zinc-950 shadow-[0_5px_0_0_rgb(14,116,144)] hover:bg-cyan-400 active:translate-y-[5px] active:shadow-none"
+          )}
         >
-          {/* Details hint */}
-          {!isLocked && (
+          {/* Glossy top-light — sells the extruded/3D read */}
+          <span
+            className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-white/0 to-black/10"
+            aria-hidden
+          />
+
+          {isCurrent && (
             <span
-              className="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-zinc-900/70 py-1 pl-2 pr-2 text-[11px] font-medium text-zinc-400 backdrop-blur-sm transition-background group-hover:bg-cyan-500/15 group-hover:text-cyan-300"
+              className="absolute inset-0 rounded-full bg-cyan-200/30 animate-[ping-slow_1.8s_ease-out_infinite]"
               aria-hidden
-            >
-              <Info size={14} />
-              <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:max-w-[5rem] group-hover:opacity-100">
-                Details
+            />
+          )}
+          <span className="relative">{getStepIcon(step.stepIcon, 26)}</span>
+
+          {isCompleted && (
+            <span className="absolute -bottom-2 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-zinc-950 p-0.5">
+              <span className="flex h-full w-full items-center justify-center rounded-full bg-emerald-400 text-zinc-950 shadow-[0_2px_0_0_rgb(4,120,87)]">
+                <Check size={12} strokeWidth={3.5} />
               </span>
             </span>
           )}
-
-          {/* Icon badge */}
-          <div className={cn(
-            "flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg",
-            isLocked
-              ? "bg-zinc-800 text-zinc-600"
-              : isCompleted
-              ? "bg-emerald-500/10 text-emerald-400"
-              : cn(theme.iconBg, theme.iconText)
-          )}>
-            {isCompleted
-              ? <Check size={22} strokeWidth={2.5} className="text-emerald-400" />
-              : (STEP_ICONS[step.stepIcon] ?? <Zap size={22} />)
-            }
-          </div>
-
-          {/* Text */}
-          <div className="min-w-0 flex-1 pr-4">
-            <div className="mb-1 flex items-baseline gap-2.5">
-              <span className={cn("text-[12px] font-bold tabular-nums", isLocked ? "text-zinc-700" : "text-zinc-500")}>
-                #{step.order}
-              </span>
-              {isInProgress && (
-                <span className={cn("rounded px-2 py-0.5 text-[10px] font-bold tracking-wide", theme.badge)}>
-                  In Progress
-                </span>
-              )}
-              {isCompleted && (
-                <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-400">
-                  Done
-                </span>
-              )}
-            </div>
-            <p className={cn(
-              "text-xl font-black leading-tight tracking-tight",
-              isCompleted ? "text-zinc-500 line-through decoration-zinc-600" : isLocked ? "text-zinc-600" : "text-zinc-100"
-            )}>
-              {step.title}
-            </p>
-            <p className={cn("mt-2 line-clamp-2 text-[15px] leading-relaxed", isLocked ? "text-zinc-700" : "text-zinc-400")}>
-              {step.shortDescription}
-            </p>
-          </div>
         </button>
+      </div>
 
-        {/* ── Bottom: Practice / Exam buttons ── */}
-        {!isLocked && !step.modalOnly && (
-          <div className="relative flex flex-col gap-2 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:pb-5">
-            {/* Exam result badge */}
-            {isCompleted && step.stars ? (
-              <div className="flex items-center gap-2 self-start rounded-lg bg-amber-500/10 px-3 py-1.5">
-                <div className="flex items-center gap-0.5">
-                  {[1, 2, 3].map((i) => (
-                    <FaStar
-                      key={i}
-                      size={12}
-                      className={i <= step.stars! ? "text-amber-400" : "text-zinc-600"}
-                    />
-                  ))}
-                </div>
-                <span className="text-[11px] font-bold tabular-nums text-amber-400">
-                  {step.stars}/3
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3].map((i) => (
-                  <FaStar key={i} size={11} className="text-zinc-700" />
-                ))}
-                <span className="ml-1 text-[10px] font-medium text-zinc-600">No exam yet</span>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              {/* Practice */}
-              <button
-                onClick={goToExercise}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-2 text-[13px] font-medium text-zinc-200 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
-              >
-                <Play size={14} fill="currentColor" />
-                Practice
-              </button>
-
-              {/* Exam */}
-              <button
-                onClick={goToExam}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-[13px] font-bold text-zinc-950 transition-background hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
-              >
-                <Target size={14} />
-                {isCompleted ? "Retake Exam" : "Start Exam"}
-              </button>
-            </div>
+      {/* Label — sits beside the node instead of stacking below it */}
+      <div
+        className={cn(
+          "absolute top-1/2 flex w-28 -translate-y-1/2 flex-col",
+          side === "left" ? "right-full mr-3 items-end text-right" : "left-full ml-3 items-start text-left"
+        )}
+      >
+        <span className={cn("text-[10px] font-bold tabular-nums", isLocked ? "text-zinc-700" : "text-zinc-500")}>
+          #{step.order}
+        </span>
+        <p className={cn(
+          "mt-0.5 line-clamp-3 text-xs font-semibold leading-snug",
+          isLocked ? "text-zinc-600" : isCompleted ? "text-zinc-400" : "text-zinc-200"
+        )}>
+          {step.title}
+        </p>
+        {step.status === "in-progress" && (
+          <span className="mt-1 rounded bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-cyan-400">
+            In progress
+          </span>
+        )}
+        {isCompleted && step.stars && (
+          <div className="mt-1 flex items-center gap-0.5">
+            {[1, 2, 3].map((i) => (
+              <FaStar key={i} size={9} className={i <= step.stars! ? "text-amber-400" : "text-zinc-700"} />
+            ))}
           </div>
         )}
       </div>
-
-      {/* ── Spacing ── */}
-      {!isLast && <div className="h-8 w-full" />}
     </div>
   );
 }
 
-// ─── BranchNode — song picker step ───────────────────────────────────────────
+// ─── StageDivider ─────────────────────────────────────────────────────────────
 
-function BranchNode({ step, onClick }: { step: JourneyStepWithStatus; onClick: () => void }) {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const isLocked = step.status === "locked";
-  const isCompleted = step.status === "completed";
-
-  useEffect(() => {
-    if (!step.songPicker?.length) return;
-    getSongsByIds(step.songPicker).then(setSongs);
-  }, [step.songPicker]);
-
+function StageDivider({ label }: { label: string }) {
   return (
-    <div className="flex w-full max-w-3xl flex-col items-center pt-8">
-      {/* label */}
-      <span className="mb-5 text-[11px] font-bold tracking-widest text-zinc-500">
-        Pick your first song
+    <div className="relative z-10 flex items-center gap-3 text-zinc-600">
+      <span className="rounded bg-zinc-900/60 px-3 py-1 text-[11px] font-bold tracking-widest text-zinc-500">
+        {label}
       </span>
-
-      {/* 3 cards */}
-      <div className="grid w-full grid-cols-3 gap-3">
-        {songs.length === 0
-          ? [0, 1, 2].map((i) => (
-              <div key={i} className="h-40 animate-pulse rounded-lg bg-zinc-900/40" />
-            ))
-          : songs.map((song) => (
-              <button
-                key={song.id}
-                onClick={isLocked ? undefined : onClick}
-                disabled={isLocked}
-                className={cn(
-                  "group flex flex-col overflow-hidden rounded-lg text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
-                  isCompleted
-                    ? "bg-zinc-900/60"
-                    : isLocked
-                    ? "bg-zinc-900/20 opacity-40"
-                    : "bg-zinc-900/60 hover:bg-zinc-800/60"
-                )}
-              >
-                {/* Cover */}
-                <div className="relative h-28 w-full overflow-hidden bg-zinc-800">
-                  {song.coverUrl ? (
-                    <Image
-                      src={song.coverUrl}
-                      alt={song.title}
-                      fill
-                      className="object-cover"
-                      style={{ filter: isLocked ? "brightness(0.3) saturate(0)" : "brightness(0.7)" }}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <Music size={24} className="text-zinc-600" />
-                    </div>
-                  )}
-                  {isCompleted && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                      <Check size={24} className="text-emerald-400" strokeWidth={2.5} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="px-3 py-2.5">
-                  <p className={cn("truncate text-xs font-bold leading-snug", isLocked ? "text-zinc-600" : "text-zinc-200")}>
-                    {song.title}
-                  </p>
-                  <p className="truncate text-[11px] text-zinc-500">{song.artist}</p>
-                </div>
-              </button>
-            ))}
-      </div>
-
-      {/* hint */}
-      {!isLocked && !isCompleted && (
-        <p className="mt-3 text-[11px] text-zinc-500">Click any card to open &amp; choose</p>
-      )}
     </div>
   );
+}
+
+// ─── Path entries ─────────────────────────────────────────────────────────────
+
+type PathEntry =
+  | { kind: "divider"; id: string; label: string }
+  | { kind: "step"; id: string; step: JourneyStepWithStatus };
+
+function buildEntries(module: JourneyModuleWithStatus): PathEntry[] {
+  const entries: PathEntry[] = [];
+  module.stages.forEach((stage) => {
+    if (stage.label) entries.push({ kind: "divider", id: `divider_${stage.id}`, label: stage.label });
+    stage.steps.forEach((step) => entries.push({ kind: "step", id: step.id, step }));
+  });
+  return entries;
 }
 
 // ─── JourneyPath ──────────────────────────────────────────────────────────────
@@ -350,34 +144,77 @@ interface JourneyPathProps {
 }
 
 export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, onBack }) => {
-  const allSteps = module.stages.flatMap((s) => s.steps);
+  const entries = buildEntries(module);
+  const stepEntries = entries.filter((e): e is Extract<PathEntry, { kind: "step" }> => e.kind === "step");
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [points, setPoints] = useState<Record<string, { x: number; y: number }>>({});
+  const [canvas, setCanvas] = useState({ width: 0, height: 0 });
+
+  const measure = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const next: Record<string, { x: number; y: number }> = {};
+    nodeRefs.current.forEach((el, id) => {
+      const r = el.getBoundingClientRect();
+      next[id] = {
+        x: r.left + r.width / 2 - containerRect.left,
+        y: r.top + r.height / 2 - containerRect.top,
+      };
+    });
+    setPoints(next);
+    setCanvas({ width: container.offsetWidth, height: container.offsetHeight });
+  }, []);
+
+  useLayoutEffect(() => {
+    measure();
+    const ro = new ResizeObserver(() => measure());
+    if (containerRef.current) ro.observe(containerRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [measure, module.completedCount, module.totalCount]);
+
+  const segments: { d: string; stroke: string; dashed: boolean }[] = [];
+  for (let i = 1; i < stepEntries.length; i++) {
+    const p0 = points[stepEntries[i - 1].id];
+    const p1 = points[stepEntries[i].id];
+    if (!p0 || !p1) continue;
+    const dy = (p1.y - p0.y) / 2;
+    const d = `M ${p0.x} ${p0.y} C ${p0.x} ${p0.y + dy}, ${p1.x} ${p1.y - dy}, ${p1.x} ${p1.y}`;
+    const destStatus = stepEntries[i].step.status;
+    const stroke =
+      destStatus === "completed" ? "rgb(16,185,129)" : destStatus === "locked" ? "rgb(63,63,70)" : "rgb(6,182,212)";
+    segments.push({ d, stroke, dashed: destStatus === "locked" });
+  }
+
+  const allComplete = module.completedCount === module.totalCount && module.totalCount > 0;
+  const waveX = new Map(
+    stepEntries.map((entry, i) => [entry.id, WAVE_AMPLITUDE * Math.sin((i * Math.PI) / 2)] as const)
+  );
+  const labelSide = new Map<string, "left" | "right">(
+    stepEntries.map((entry, i) => {
+      const x = waveX.get(entry.id) ?? 0;
+      const side = x > 0 ? "left" : x < 0 ? "right" : i % 4 === 0 ? "right" : "left";
+      return [entry.id, side] as const;
+    })
+  );
 
   return (
-    <div className="relative flex-1 overflow-y-auto">
-
+    <div className="relative flex-1 overflow-y-auto bg-zinc-950">
       {/* ── Hero banner ── */}
-      <div className="relative overflow-hidden bg-zinc-950" style={{ minHeight: 200 }}>
-        {/* Background photo — visible on right, fades left */}
-        <div className="absolute inset-0">
-          <Image
-            src="https://images.unsplash.com/photo-1471478331149-c72f17e33c73?w=1400&q=80"
-            alt=""
-            fill
-            className="object-cover object-[72%_18%]"
-            priority
-            style={{ filter: "brightness(0.5) saturate(1.6) contrast(1.05)" }}
-          />
-        </div>
-        {/* Dark left zone — text readable */}
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 from-[30%] via-zinc-950/75 to-transparent" />
-        {/* Subtle cyan glow bottom-left */}
-        <div className="pointer-events-none absolute bottom-0 left-0 h-32 w-64 opacity-30"
-             style={{ background: "radial-gradient(ellipse at 0% 100%, rgba(6,182,212,0.5) 0%, transparent 70%)" }} />
-        {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-zinc-950 to-transparent" />
+      <div className="relative overflow-hidden px-6 py-10 md:px-10">
+        <GuitarPatternBackground className="pointer-events-none absolute inset-0 h-full w-full" />
+        <div
+          className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-30"
+          style={{ background: "radial-gradient(ellipse at center, rgba(6,182,212,0.25) 0%, transparent 70%)" }}
+        />
 
-        <div className="relative px-6 py-10 md:px-10">
-          {/* Nav row */}
+        <div className="relative">
           <div className="mb-6 flex w-fit items-center gap-2 rounded-lg bg-zinc-900/50 p-1 px-1.5 backdrop-blur-md">
             <button
               onClick={onBack}
@@ -386,20 +223,21 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
               <ChevronLeft size={12} strokeWidth={3} className="transition-transform group-hover:-translate-x-0.5" />
               Modules
             </button>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold tracking-widest text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-500" />
-              {module.title.split(" ")[0]} 01
+          </div>
+
+          <div className="flex items-center gap-5">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/30">
+              <Guitar size={30} className="text-cyan-400" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl">
+                {module.title}
+              </h1>
+              <p className="mt-1 max-w-xs text-sm text-zinc-400">{module.subtitle}</p>
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl">
-            {module.title}
-          </h1>
-          <p className="mt-2 max-w-xs text-sm text-zinc-400">{module.subtitle}</p>
-
-          {/* Progress */}
-          <div className="mt-5 flex items-center gap-3">
+          <div className="mt-6 flex items-center gap-3">
             <div className="h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800">
               <div
                 className="h-full rounded-full bg-cyan-500"
@@ -414,64 +252,72 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
       </div>
 
       {/* ── Path ── */}
-      <div className="px-4 py-10 md:px-10">
-        <div className="flex flex-col items-center">
-          {module.stages.map((stage, stageIdx) => (
-            <div key={stage.id} className="flex w-full max-w-3xl flex-col items-center">
-              {stageIdx > 0 && <div className="h-10 w-full" />}
+      <div className="relative px-3 py-4 md:px-10">
+        {/* Ambient texture — same tiled watermark used on /login, not a graphic */}
+        <GuitarPatternBackground className="pointer-events-none absolute inset-0 h-full w-full" />
 
-              {/* Stage label */}
-              {stage.label && (
-                <div className="mb-5 w-full">
-                  <span className={cn("inline-block whitespace-nowrap rounded px-4 py-1.5 text-[11px] font-bold tracking-widest", stage.colorClass)}>
-                    {stage.label}
-                  </span>
-                </div>
-              )}
+        <div
+          ref={containerRef}
+          className="relative mx-auto flex w-full max-w-[480px] flex-col items-center gap-14 pb-14 pt-2"
+        >
+          <svg className="pointer-events-none absolute left-0 top-0 z-0" width={canvas.width} height={canvas.height} aria-hidden>
+            {segments.map((seg, i) => (
+              <path
+                key={i}
+                d={seg.d}
+                fill="none"
+                stroke={seg.stroke}
+                strokeWidth={4}
+                strokeLinecap="round"
+                strokeDasharray={seg.dashed ? "2 10" : undefined}
+              />
+            ))}
+          </svg>
 
-              {/* Steps */}
-              {stage.steps.map((step, stepIdx) => {
-                const globalIdx = allSteps.findIndex((s) => s.id === step.id);
-                const isLastGlobal = globalIdx === allSteps.length - 1;
-                const isLastInStage = stepIdx === stage.steps.length - 1;
-                const isLast = isLastGlobal || (isLastInStage && stageIdx < module.stages.length - 1);
-
-                if (step.songPicker?.length) {
-                  return (
-                    <BranchNode
-                      key={step.id}
-                      step={step}
-                      onClick={() => onStepClick(step)}
-                    />
-                  );
-                }
-
-                return (
-                  <StepNode
-                    key={step.id}
-                    step={step}
-                    onClick={() => onStepClick(step)}
-                    isLast={isLast}
-                    moduleId={module.id}
-                  />
-                );
-              })}
-            </div>
-          ))}
+          {entries.map((entry) => {
+            if (entry.kind === "divider") {
+              return <StageDivider key={entry.id} label={entry.label} />;
+            }
+            const x = waveX.get(entry.id) ?? 0;
+            const side = labelSide.get(entry.id) ?? "right";
+            return (
+              <PathNode
+                key={entry.id}
+                step={entry.step}
+                x={x}
+                side={side}
+                onClick={() => onStepClick(entry.step)}
+                registerRef={(el) => {
+                  if (el) nodeRefs.current.set(entry.id, el);
+                  else nodeRefs.current.delete(entry.id);
+                }}
+              />
+            );
+          })}
 
           {/* Completion */}
-          {module.completedCount === module.totalCount && module.totalCount > 0 && (
-            <div className="mt-8 flex w-full max-w-3xl flex-col items-center gap-3 rounded-lg bg-orange-500/10 px-8 py-7 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-500/15">
-                <Check size={26} className="text-orange-400" strokeWidth={2.5} />
+          {allComplete && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 240, damping: 22 }}
+              className="relative z-10 flex w-full max-w-xs flex-col items-center gap-3 overflow-hidden rounded-lg bg-emerald-500/10 px-8 py-8 text-center"
+            >
+              <div
+                className="pointer-events-none absolute inset-0 animate-glow-float-1 opacity-40"
+                style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.35), transparent 70%)" }}
+                aria-hidden
+              />
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20">
+                <Check size={28} className="text-emerald-400" strokeWidth={3} />
               </div>
-              <div>
-                <p className="text-lg font-bold text-orange-400">Module Complete!</p>
+              <div className="relative">
+                <p className="text-lg font-black text-emerald-400">Module Complete!</p>
                 <p className="mt-1 text-xs text-zinc-400">
                   Congratulations — you&apos;ve mastered all guitar fundamentals.
                 </p>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>

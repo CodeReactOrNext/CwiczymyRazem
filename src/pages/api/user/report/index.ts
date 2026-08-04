@@ -1,3 +1,4 @@
+import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import {
@@ -86,6 +87,8 @@ export default async function handler(
     const pointsGained = report.raitingData.totalPoints || 0;
     const fameEarned = Math.round(pointsGained);
 
+    const season = await getCurrentSeason();
+
     const writePromises = [];
 
     writePromises.push(firebaseUpdateUserStats(
@@ -93,6 +96,7 @@ export default async function handler(
       report.currentUserStats,
       report.timeSummary,
       pointsGained,
+      season.seasonId,
       fameEarned
     ));
 
@@ -102,6 +106,7 @@ export default async function handler(
       inputData.reportTitle,
       report.isDateBackReport,
       report.timeSummary,
+      season.seasonId,
       inputData.planId ?? null,
       inputData.songId || inputData.songTitle || inputData.songArtist ? {
         ...(inputData.songId && { songId: inputData.songId }),

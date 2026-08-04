@@ -1,14 +1,32 @@
 type JourneyStepStatus = "locked" | "available" | "in-progress" | "completed";
-type JourneyStageId = "stage_1" | "stage_2" | "stage_3";
+type JourneyStageId = "stage_1" | "stage_2" | "stage_3" | "stage_4" | "stage_5";
+
+export interface FretDiagramString {
+  /** 1-6, 1 = high e. */
+  string: number;
+  /** False = string is out of scope for this exercise — rendered dimmed, no labels. */
+  active: boolean;
+  /** Note name at each fret from `startFret` to `endFret` inclusive. Required when `active`. */
+  notes?: string[];
+}
+
+export interface FretDiagramData {
+  startFret: number;
+  endFret: number;
+  /** Exactly 6 entries (string 1..6) — inactive strings are still listed so the whole neck renders for context. */
+  strings: FretDiagramString[];
+}
 
 export interface StepContentBlock {
-  type: "text" | "callout" | "image";
+  type: "text" | "callout" | "image" | "fretDiagram";
   variant?: "warning" | "info" | "success";
   label?: string;
   icon?: string;  // Lucide icon name
   body?: string;
   url?: string;
   caption?: string;
+  /** Present when type === "fretDiagram" — a real SVG fretboard visualization. */
+  diagram?: FretDiagramData;
 }
 
 interface ChecklistItem {
@@ -45,7 +63,6 @@ export interface JourneyStep {
   examGoal: string;
   suggestedExerciseId: string;
   stepIcon: string;     // Lucide icon name
-  image: string;        // URL — replace with your own later
   modalOnly?: boolean;  // if true: no Practice/Exam buttons — only a confirmation action
   examBpm?: number;             // locked BPM for exam mode
   contentBlocks?: StepContentBlock[];  // rich content blocks replacing fullDescription
@@ -57,7 +74,6 @@ interface JourneyStage {
   id: JourneyStageId;
   label?: string;
   order: number;
-  colorClass: string;
   steps: JourneyStep[];
 }
 

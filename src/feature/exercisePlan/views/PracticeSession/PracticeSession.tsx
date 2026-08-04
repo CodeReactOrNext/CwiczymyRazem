@@ -332,7 +332,7 @@ export const PracticeSession = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice } = useGuitarAudioInput();
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput();
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
@@ -417,6 +417,54 @@ export const PracticeSession = ({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
   });
 
+  // Exam mode, hunt exercises only (customGoal set — there's no tablature to
+  // "finish" by playing through it): auto-run the same finish sequence the
+  // manual Finish button uses, the moment the exercise's own timer
+  // (Exercise.timeInMinutes) runs out — a real "beat the clock" exam instead of
+  // requiring the player to press Finish themselves.
+  const examAutoFinishedRef = useRef(false);
+  useEffect(() => {
+    if (!showSuccessView || !isExamMode || !currentExercise.customGoal) return;
+    if (examAutoFinishedRef.current) return;
+    examAutoFinishedRef.current = true;
+    (async () => {
+      const snap = noteMatchingHandle.current?.snapshot();
+      metronome.stopMetronome();
+      await saveCurrentScores();
+      autoSubmitReport(
+        exerciseRecordsRef.current,
+        isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+        null,
+      );
+      onExamComplete?.(snap?.accuracy ?? 0);
+    })();
+    // Intentionally narrow deps — this should fire exactly once per showSuccessView
+    // transition, not re-run when metronome/save/report identities change each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessView, isExamMode, currentExercise.customGoal]);
+
+  // Dev-only shortcut: skip waiting for the exam timer and run the exact same
+  // finish sequence right now, with whatever score/accuracy has been racked up
+  // so far — lets us test the pass/stars/journey-completion flow without
+  // playing out the full exam duration.
+  const handleDevCompleteExam = useCallback(async () => {
+    if (examAutoFinishedRef.current) return;
+    examAutoFinishedRef.current = true;
+    const snap = noteMatchingHandle.current?.snapshot();
+    metronome.stopMetronome();
+    stopTimer();
+    await saveCurrentScores();
+    // Force a clean pass (100%) regardless of actual progress — this is a
+    // "skip to the end and pass" dev shortcut, not a snapshot of real play.
+    autoSubmitReport(
+      exerciseRecordsRef.current,
+      isMicEnabled && snap ? { score: snap.maxPossibleScore, accuracy: 100 } : null,
+      null,
+    );
+    onExamComplete?.(100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Controls & handlers ───────────────────────────────────────────────────
 
   const {
@@ -498,6 +546,7 @@ export const PracticeSession = ({
       customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
       customGoalRegion={huntTarget ? huntTarget.region : currentExercise.customGoalRegion}
       customGoalPrompt={huntTarget ? huntTarget.prompt : currentExercise.customGoalPrompt}
+      customGoalStrings={currentExercise.customGoalStrings}
       noteHuntMode={currentExercise.noteHuntConfig?.mode}
       noteHuntSecondsLeft={noteHuntSecondsLeft}
       solvedRef={huntSolvedRef}
@@ -545,6 +594,7 @@ export const PracticeSession = ({
             if (isExamMode) onExamComplete?.(successSnapshot.accuracy);
           }}
           onRestart={() => {
+            examAutoFinishedRef.current = false;
             resetSuccessView(); resetTimer(); metronome.restartMetronome(); startTimer();
             if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();
           }}
@@ -633,6 +683,7 @@ export const PracticeSession = ({
         backingTrackIds={backingTrackIds}
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
+        onDevPassExam={process.env.NODE_ENV !== "production" && isExamMode && currentExercise.customGoal ? handleDevCompleteExam : undefined}
         handleRestart={handleRestart}
         canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}
@@ -654,7 +705,7 @@ export const PracticeSession = ({
         handleCalibrationCancel={handleCalibrationCancel} handleCalibrationComplete={handleCalibrationComplete}
         audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
-        isNative={isNative} onSelectDevice={selectDevice}
+        isNative={isNative} onSelectDevice={selectDevice} onSelectChannel={selectChannel}
         exerciseId={activeExercise.id} isMounted={isMounted}
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}

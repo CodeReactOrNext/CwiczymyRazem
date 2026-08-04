@@ -131,7 +131,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
         onClick={handleCreate}
       />
 
-      <div className="max-w-4xl mx-auto w-full px-4 lg:px-6 mb-6">
+      <div className="px-4 lg:px-6 mb-6">
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref="/my-exercises"
@@ -139,7 +139,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
         />
       </div>
 
-      <div className="max-w-4xl mx-auto w-full px-4 lg:px-6 pb-24">
+      <div className="px-4 lg:px-6 pb-24">
         {isLoading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (

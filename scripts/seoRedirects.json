@@ -155,6 +155,116 @@
     "permanent": true
   },
   {
+    "source": "/exercises/fret-click-low-e-open",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-low-e-high",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-a-open",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-a-high",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-fret5-all",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-fret7-all",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-fret9-all",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-octaves-dg-open",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-octaves-dg-high",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-octaves-be-open",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-octaves-be-high",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-box-0-4",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-box-4-8",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-box-8-12",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-whole-natural",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-whole-chromatic",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-sweep-low-e",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-sweep-a",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-sweep-d",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-sweep-g",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-sweep-b",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/whole-neck-sweep",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
     "source": "/exercises/interval-hunt",
     "destination": "/guitar-scale-practice-routine",
     "permanent": true
@@ -672,6 +782,16 @@
   {
     "source": "/exercises/down-picking-doom-pulse",
     "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/master-of-puppets-riff-preview",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/seven-nation-army-riff-preview",
+    "destination": "/beginner-guitar-exercises",
     "permanent": true
   },
   {

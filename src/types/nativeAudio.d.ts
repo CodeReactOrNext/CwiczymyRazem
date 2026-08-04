@@ -124,6 +124,9 @@ export interface AmpStreamInfo {
   sampleRate: number;
   frameSize: number;
   outChannels: number;
+  /** First output channel actually in use (0-based) — e.g. 2 means the stream
+   *  writes to the device's 3rd/4th channels instead of 1st/2nd. */
+  outFirstChannel: number;
   inChannel: number;
   /** Estimated input→output round-trip latency in ms. */
   roundTripMs: number;
@@ -138,6 +141,8 @@ export interface AmpStartOpts {
   frameSize?: number;
   /** Optional output device (defaults to the input device — required for ASIO). */
   outputDeviceId?: number;
+  /** First output channel (0-based) to write to on the output device. */
+  outputChannel?: number;
   params?: Partial<AmpParams>;
 }
 

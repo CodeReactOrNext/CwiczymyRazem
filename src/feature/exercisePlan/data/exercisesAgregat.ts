@@ -200,6 +200,22 @@ import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/
 import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
 import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
 import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
+import { fretClickAHighExercise } from "feature/exercisePlan/data/exerises/fretClickAHigh/fretClickAHigh";
+import { fretClickAOpenExercise } from "feature/exercisePlan/data/exerises/fretClickAOpen/fretClickAOpen";
+import { fretClickBox04Exercise } from "feature/exercisePlan/data/exerises/fretClickBox04/fretClickBox04";
+import { fretClickBox48Exercise } from "feature/exercisePlan/data/exerises/fretClickBox48/fretClickBox48";
+import { fretClickBox812Exercise } from "feature/exercisePlan/data/exerises/fretClickBox812/fretClickBox812";
+import { fretClickFret5AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret5All/fretClickFret5All";
+import { fretClickFret7AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret7All/fretClickFret7All";
+import { fretClickFret9AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret9All/fretClickFret9All";
+import { fretClickLowEHighExercise } from "feature/exercisePlan/data/exerises/fretClickLowEHigh/fretClickLowEHigh";
+import { fretClickLowEOpenExercise } from "feature/exercisePlan/data/exerises/fretClickLowEOpen/fretClickLowEOpen";
+import { fretClickOctavesBeHighExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesBeHigh/fretClickOctavesBeHigh";
+import { fretClickOctavesBeOpenExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesBeOpen/fretClickOctavesBeOpen";
+import { fretClickOctavesDgHighExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesDgHigh/fretClickOctavesDgHigh";
+import { fretClickOctavesDgOpenExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesDgOpen/fretClickOctavesDgOpen";
+import { fretClickWholeChromaticExercise } from "feature/exercisePlan/data/exerises/fretClickWholeChromatic/fretClickWholeChromatic";
+import { fretClickWholeNaturalExercise } from "feature/exercisePlan/data/exerises/fretClickWholeNatural/fretClickWholeNatural";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
@@ -227,6 +243,11 @@ import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exeri
 import { stringSkippingBasicExercise } from "feature/exercisePlan/data/exerises/stringSkippingBasic/stringSkippingBasic";
 import { stringSkippingMelodicExercise } from "feature/exercisePlan/data/exerises/stringSkippingMelodic/stringSkippingMelodic";
 import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
+import { stringSweepAExercise } from "feature/exercisePlan/data/exerises/stringSweepA/stringSweepA";
+import { stringSweepBExercise } from "feature/exercisePlan/data/exerises/stringSweepB/stringSweepB";
+import { stringSweepDExercise } from "feature/exercisePlan/data/exerises/stringSweepD/stringSweepD";
+import { stringSweepGExercise } from "feature/exercisePlan/data/exerises/stringSweepG/stringSweepG";
+import { stringSweepLowEExercise } from "feature/exercisePlan/data/exerises/stringSweepLowE/stringSweepLowE";
 import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
 import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
 import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
@@ -246,6 +267,7 @@ import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exeris
 import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
 import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/vibratoLowPosition/vibratoLowPosition";
 import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
+import { wholeNeckSweepExercise } from "feature/exercisePlan/data/exerises/wholeNeckSweep/wholeNeckSweep";
 
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
 import { spiderPermutation1243Exercise } from "./exerises/spiderPermutation1243/spiderPermutation1243";
@@ -291,6 +313,28 @@ const rawExercises: Exercise[] = [
   randomNoteHuntExercise,
   chromaticNoteHuntExercise,
   fretboardRegionHuntExercise,
+  fretClickLowEOpenExercise,
+  fretClickLowEHighExercise,
+  fretClickAOpenExercise,
+  fretClickAHighExercise,
+  fretClickFret5AllExercise,
+  fretClickFret7AllExercise,
+  fretClickFret9AllExercise,
+  fretClickOctavesDgOpenExercise,
+  fretClickOctavesDgHighExercise,
+  fretClickOctavesBeOpenExercise,
+  fretClickOctavesBeHighExercise,
+  fretClickBox04Exercise,
+  fretClickBox48Exercise,
+  fretClickBox812Exercise,
+  fretClickWholeNaturalExercise,
+  fretClickWholeChromaticExercise,
+  stringSweepLowEExercise,
+  stringSweepAExercise,
+  stringSweepDExercise,
+  stringSweepGExercise,
+  stringSweepBExercise,
+  wholeNeckSweepExercise,
   intervalHuntExercise,
   buildTheChordExercise,
   fingerstyleArpeggiosExercise,

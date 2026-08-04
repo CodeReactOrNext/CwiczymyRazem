@@ -10,7 +10,7 @@ export const fundamentalsModule: JourneyModule = {
     {
       id: "stage_1",
       order: 1,
-      colorClass: "text-emerald-400 bg-emerald-500/10 ring-emerald-500/20",
+      label: "Foundations",
       steps: [
         {
           id: "step_before_you_begin",
@@ -25,7 +25,6 @@ export const fundamentalsModule: JourneyModule = {
           examGoal: "Tick all the boxes below — that confirms you're ready to begin.",
           suggestedExerciseId: "",
           stepIcon: "ClipboardCheck",
-          image: "/images/journey/fundametnals/1.png",
           contentBlocks: [
             {
               type: "text",
@@ -72,7 +71,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 50,
           suggestedExerciseId: "first_melody",
           stepIcon: "Music",
-          image: "/images/journey/fundametnals/2.jpeg",
           contentBlocks: [
             {
               type: "text",
@@ -106,7 +104,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 60,
           suggestedExerciseId: "quarter_notes_drill",
           stepIcon: "Timer",
-          image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&q=80&fit=crop",
           contentBlocks: [
             {
               type: "text",
@@ -139,8 +136,7 @@ export const fundamentalsModule: JourneyModule = {
             "Play the Am pentatonic pattern on 3 strings up and down at 50 BPM — no stumbles, equal volume on every string.",
           examBpm: 50,
           suggestedExerciseId: "pentatonic_string_crossing_3",
-          stepIcon: "GitMerge",
-          image: "https://loremflickr.com/800/600/guitar,strings?lock=40",
+          stepIcon: "Shuffle",
           contentBlocks: [
             {
               type: "text",
@@ -174,7 +170,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 60,
           suggestedExerciseId: "vibrato_sustain_drill",
           stepIcon: "AudioWaveform",
-          image: "https://loremflickr.com/800/600/guitar,electric?lock=80",
           contentBlocks: [
             {
               type: "text",
@@ -208,7 +203,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 70,
           suggestedExerciseId: "open_g_repetition",
           stepIcon: "ArrowUpDown",
-          image: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=800&q=80&fit=crop",
           contentBlocks: [
             {
               type: "text",
@@ -233,7 +227,7 @@ export const fundamentalsModule: JourneyModule = {
     {
       id: "stage_2",
       order: 2,
-      colorClass: "text-amber-400 bg-amber-500/10 ring-amber-500/20",
+      label: "Legato & Scale Shapes",
       steps: [
         {
           id: "step_legato_ho",
@@ -249,7 +243,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 60,
           suggestedExerciseId: "hammer_on_pentatonic_run",
           stepIcon: "Hammer",
-          image: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=800&q=80&fit=crop",
           contentBlocks: [
             {
               type: "text",
@@ -282,8 +275,7 @@ export const fundamentalsModule: JourneyModule = {
             "Play a pull-off sequence (7→5) on every string at 60 BPM — every note must ring clearly with no silent gaps.",
           examBpm: 60,
           suggestedExerciseId: "pull_off_pentatonic_run",
-          stepIcon: "ChevronDown",
-          image: "https://loremflickr.com/800/600/guitar,hands?lock=70",
+          stepIcon: "ArrowDownLeft",
           contentBlocks: [
             {
               type: "text",
@@ -317,7 +309,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 70,
           suggestedExerciseId: "pentatonic_box1_up_down",
           stepIcon: "LayoutGrid",
-          image: "https://loremflickr.com/800/600/guitar,solo?lock=100",
           contentBlocks: [
             {
               type: "text",
@@ -342,7 +333,7 @@ export const fundamentalsModule: JourneyModule = {
     {
       id: "stage_3",
       order: 3,
-      colorClass: "text-cyan-400 bg-cyan-500/10 ring-cyan-500/20",
+      label: "Advanced Techniques",
       steps: [
         {
           id: "step_string_skipping",
@@ -358,7 +349,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 50,
           suggestedExerciseId: "string_skipping_two_notes",
           stepIcon: "SkipForward",
-          image: "https://loremflickr.com/800/600/guitar,performance?lock=110",
           contentBlocks: [
             {
               type: "text",
@@ -392,7 +382,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 45,
           suggestedExerciseId: "rhythm_triole",
           stepIcon: "Waves",
-          image: "https://loremflickr.com/800/600/guitar,music,art?lock=120",
           contentBlocks: [
             {
               type: "text",
@@ -426,7 +415,6 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 60,
           suggestedExerciseId: "first_bend",
           stepIcon: "TrendingUp",
-          image: "https://loremflickr.com/800/600/guitar,fretboard?lock=90",
           contentBlocks: [
             {
               type: "text",
@@ -458,8 +446,7 @@ export const fundamentalsModule: JourneyModule = {
           commonMistakes: [],
           examGoal: "Pick one song from the list below and add it to your library. This is your first real target.",
           suggestedExerciseId: "",
-          stepIcon: "Music",
-          image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80&fit=crop",
+          stepIcon: "ListMusic",
           contentBlocks: [
             {
               type: "text",

@@ -33,6 +33,21 @@ export function isStandardTuning(id: string | null | undefined): boolean {
   return !id || id === STANDARD_TUNING_ID;
 }
 
+/**
+ * A single semitone shift representing the whole tuning, valid only when every
+ * string is detuned by the same amount (Standard, Half/Whole Step Down — not
+ * Drop D or the other per-string alternate tunings, which have no one true shift).
+ * Used by exercises that target a bare note/chord name with no string attached
+ * (note hunt, chord hunt): the goal is authored as if standard-tuned, so the pitch
+ * actually expected out of the strings needs shifting by the same amount a tab
+ * note would be (see getFrequencyFromTab) — otherwise a half-step-down player has
+ * to fret a half-step sharp of where they'd naturally play it to register a hit.
+ */
+export function getUniformTuningShift(offsets?: readonly number[]): number {
+  if (!offsets || offsets.length === 0) return 0;
+  return offsets.every(o => o === offsets[0]) ? offsets[0] : 0;
+}
+
 export interface TuningStringRef {
   string: number; // 1-6
   name: string;   // e.g. "D2"

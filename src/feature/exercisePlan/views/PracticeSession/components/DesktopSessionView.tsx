@@ -91,6 +91,9 @@ interface DesktopSessionViewProps {
   setMasterVolume:          (v: number) => void;
   examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
   isExamMode:               boolean;
+  /** Dev-only (non-production): fast-tracks the exam-finish flow instantly, using
+   *  whatever score/accuracy has been racked up so far. Undefined outside exam mode. */
+  onDevPassExam?:           () => void;
   isScaleExam:              boolean;
   exerciseKey:              number;
   isLastExercise:           boolean;
@@ -286,6 +289,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     onSeek={handleTablatureSeek}
                     onLoopRestart={handleLoopRestart}
                     isExamMode={p.isExamMode}
+                    onDevPassExam={p.onDevPassExam}
                     rewardSkillId={p.skillRewardSkillId}
                     rewardAmount={p.skillRewardAmount}
                     controlsSlot={playbackControls}

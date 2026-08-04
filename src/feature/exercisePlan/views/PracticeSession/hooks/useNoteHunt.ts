@@ -4,6 +4,13 @@ import { getNoteFromFrequency, NOTES } from "utils/audio/noteUtils";
 
 import type { GameState } from "./noteMatchingFeedback";
 
+/** Shift a note name by `shift` semitones (wrapping), e.g. shiftNote("A", -1) === "G#". */
+function shiftNote(note: string, shift: number): string {
+  const idx = NOTES.indexOf(note);
+  if (idx < 0 || shift === 0) return note;
+  return NOTES[(idx + shift + 12 * 10) % 12];
+}
+
 export interface NoteHuntState {
   /** Live detected note name (e.g. "C#"), or null when silent. */
   detectedNote: string | null;
@@ -127,14 +134,18 @@ export function useNoteHunt(
   volumeRef: FreqRef,
   active: boolean,
   fretRange?: [number, number],
+  /** Semitone shift applied to the target before matching the mic's detected
+   *  pitch — see getUniformTuningShift. 0 (default) matches literal absolute pitch. */
+  tuningShift = 0,
 ): NoteHuntControls {
+  const shiftedTargetNote = shiftNote(targetNote, tuningShift);
   const [state, setState] = useState<NoteHuntState>(() =>
-    buildState(targetOctaves(targetNote, fretRange), new Set(), null, null, 0, false, 0),
+    buildState(targetOctaves(shiftedTargetNote, fretRange), new Set(), null, null, 0, false, 0),
   );
 
-  // Re-roll progress when EITHER the note or the region window changes. Derived as
+  // Re-roll progress when the note, region window, or tuning changes. Derived as
   // a primitive key so a fresh fretRange array each render doesn't reset us.
-  const targetKey = `${targetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}`;
+  const targetKey = `${shiftedTargetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}`;
 
   const rafRef         = useRef(0);
   const lastSampleRef  = useRef(0);
@@ -143,8 +154,8 @@ export function useNoteHunt(
   const foundRef       = useRef<Set<number>>(new Set());
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
-  const targetRef      = useRef(targetNote);
-  const octavesRef     = useRef<number[]>(targetOctaves(targetNote, fretRange));
+  const targetRef      = useRef(shiftedTargetNote);
+  const octavesRef     = useRef<number[]>(targetOctaves(shiftedTargetNote, fretRange));
   // Score banked from previous targets — keeps the total accumulating across rotations.
   const sessionScoreRef = useRef(0);
   const firstTargetRef  = useRef(true);
@@ -155,8 +166,8 @@ export function useNoteHunt(
     // Bank the finishing target's score before clearing (skip the initial mount).
     if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
     firstTargetRef.current = false;
-    targetRef.current     = targetNote;
-    octavesRef.current    = targetOctaves(targetNote, fretRange);
+    targetRef.current     = shiftedTargetNote;
+    octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange);
     foundRef.current      = new Set();
     stableRef.current     = null;
     wasMatchingRef.current = false;

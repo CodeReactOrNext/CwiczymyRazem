@@ -20,6 +20,7 @@ interface SetupStepProps {
   onInputGainChange: (v: number) => void;
   isNative:          boolean;
   onSelectDevice?:   (deviceId: number) => Promise<void>;
+  onSelectChannel?:  (channel: number) => Promise<void>;
   onGrant:           () => void;
   onNext:            () => void;
   onBack:            () => void;
@@ -28,7 +29,7 @@ interface SetupStepProps {
 
 export const SetupStep = React.memo(function SetupStep({
   isListening, isLoading, inputSource, audioRefs, inputGain, onInputGainChange,
-  isNative, onSelectDevice, onGrant, onNext, onBack, onCancel,
+  isNative, onSelectDevice, onSelectChannel, onGrant, onNext, onBack, onCancel,
 }: SetupStepProps) {
   const [volume, setVolume] = useState(0);
   const rafRef = useRef(0);
@@ -82,7 +83,7 @@ export const SetupStep = React.memo(function SetupStep({
 
         {/* Source-specific tips — always visible */}
         {isNative ? (
-          <NativeInterfaceSelector isListening={isListening} onSelectDevice={onSelectDevice} />
+          <NativeInterfaceSelector isListening={isListening} onSelectDevice={onSelectDevice} onSelectChannel={onSelectChannel} />
         ) : inputSource === "microphone" ? (
           <MicrophoneTips />
         ) : (
@@ -227,12 +228,13 @@ function MicrophoneTips() {
  * so a choice made here or in the amp panel applies everywhere.
  */
 function NativeInterfaceSelector({
-  isListening, onSelectDevice,
+  isListening, onSelectDevice, onSelectChannel,
 }: {
   isListening: boolean;
   onSelectDevice?: (deviceId: number) => Promise<void>;
+  onSelectChannel?: (channel: number) => Promise<void>;
 }) {
-  const { devices, api, selectedId, loading, refresh, select } = useNativeAudioDevices();
+  const { devices, api, selectedId, selectedChannel, loading, refresh, select, selectChannel } = useNativeAudioDevices();
   const output = useNativeOutputDevice(devices.find((d) => d.id === selectedId)?.name);
   const [outputExpanded, setOutputExpanded] = useState(false);
 
@@ -240,6 +242,13 @@ function NativeInterfaceSelector({
     select(id);
     if (isListening) await onSelectDevice?.(id); // live stream → restart on the new device
   };
+
+  const handleSelectChannel = async (channel: number) => {
+    selectChannel(channel);
+    if (isListening) await onSelectChannel?.(channel); // live stream → restart on the new channel
+  };
+
+  const selectedDevice = devices.find((d) => d.id === selectedId);
 
   const selectedOutput = output.devices.find((d) => d.deviceId === output.selectedId);
   const showOutputPicker = outputExpanded || !output.selectedId;
@@ -275,6 +284,21 @@ function NativeInterfaceSelector({
           </option>
         ))}
       </select>
+
+      {(selectedDevice?.inputChannels || 0) > 1 && (
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-zinc-500">Which jack is your guitar plugged into?</span>
+          <select
+            value={selectedChannel}
+            onChange={(e) => handleSelectChannel(Number(e.target.value))}
+            className="w-20 shrink-0 rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+          >
+            {Array.from({ length: selectedDevice?.inputChannels || 0 }, (_, i) => (
+              <option key={i} value={i}>Channel {i + 1}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <p className="text-[11px] text-zinc-500 leading-relaxed">
         Native low-latency capture — bypasses the browser entirely. Plug your guitar straight into the interface above.
