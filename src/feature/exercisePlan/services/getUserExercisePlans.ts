@@ -1,9 +1,12 @@
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { logger } from "feature/logger/Logger";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-import type { ExercisePlan } from "../types/exercise.types";
+import type { Exercise, ExercisePlan } from "../types/exercise.types";
 import { EXERCISE_PLANS_COLLECTION } from "./constants";
+
+const exercisesById = new Map(exercisesAgregat.map((exercise) => [exercise.id, exercise]));
 
 
 export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan[]> => {
@@ -23,7 +26,16 @@ export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan
         description: data.description,
         difficulty: data.difficulty,
         category: data.category,
-        exercises: data.exercises,
+        // Firestore can't persist function fields (e.g. rollHuntTarget, rerollCustomGoal),
+        // so they're stripped on save — restore them from the in-memory catalog.
+        exercises: data.exercises.map((exercise: Exercise) => {
+          const canonical = exercisesById.get(exercise.id);
+          return {
+            ...exercise,
+            rollHuntTarget: canonical?.rollHuntTarget,
+            rerollCustomGoal: canonical?.rerollCustomGoal,
+          };
+        }),
         totalDuration: data.totalDuration,
         isPrivate: data.isPrivate,
         isPublic: data.isPublic ?? false,
