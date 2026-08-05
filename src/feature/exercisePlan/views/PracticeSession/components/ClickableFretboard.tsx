@@ -1,5 +1,7 @@
+import { Checkbox } from "assets/components/ui/checkbox";
+import { Label } from "assets/components/ui/label";
 import { motion } from "framer-motion";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -23,6 +25,12 @@ const DOUBLE_INLAY_FRETS = new Set([12, 24]);
 // gives no sense of where it sits on the neck. These extra columns are never
 // clickable.
 const CONTEXT_FRETS = 3;
+
+// Furthest fret any exercise's search window reaches — the ceiling for the
+// "show whole neck" toggle so it always covers every exercise, not just this one.
+const FULL_NECK_END_FRET = 12;
+
+const SHOW_FULL_NECK_LS_KEY = "riffquest.clickableFretboard.showFullNeck";
 
 const TIME_PILL_W = 165;
 const TIME_PILL_H = 60;
@@ -78,8 +86,25 @@ export function ClickableFretboard({
   const found = new Set(foundKeys);
   const allFound = totalTargets > 0 && found.size >= totalTargets;
 
-  const displayStart = Math.max(0, startFret - CONTEXT_FRETS);
-  const displayEnd = endFret + CONTEXT_FRETS;
+  // Persisted across sessions — some players prefer to always see the whole
+  // neck for orientation instead of the zoomed search window + context frets.
+  const [showFullNeck, setShowFullNeck] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(SHOW_FULL_NECK_LS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const toggleShowFullNeck = (checked: boolean) => {
+    setShowFullNeck(checked);
+    try {
+      localStorage.setItem(SHOW_FULL_NECK_LS_KEY, checked ? "1" : "0");
+    } catch {}
+  };
+
+  const displayStart = showFullNeck ? 0 : Math.max(0, startFret - CONTEXT_FRETS);
+  const displayEnd = showFullNeck ? Math.max(endFret, FULL_NECK_END_FRET) : endFret + CONTEXT_FRETS;
   const fretCount = displayEnd - displayStart + 1;
   const showNut = displayStart === 0;
   const neckX = LEFT_PAD;
@@ -109,9 +134,17 @@ export function ClickableFretboard({
 
   return (
     <div className="flex w-full flex-col items-center">
-      <p className="mb-3 text-center text-sm font-bold tracking-widest text-zinc-200">
-        FRETS {startFret}–{endFret}
-      </p>
+      <div className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+        <p className="text-center text-sm font-bold tracking-widest text-zinc-200">
+          FRETS {startFret}–{endFret}
+        </p>
+        <div className="flex items-center gap-2">
+          <Checkbox id="show-full-neck" checked={showFullNeck} onCheckedChange={(checked) => toggleShowFullNeck(checked === true)} />
+          <Label htmlFor="show-full-neck" className="cursor-pointer text-xs font-semibold tracking-wide text-zinc-400">
+            Show whole neck
+          </Label>
+        </div>
+      </div>
       <div className="flex w-full justify-center">
         <svg
           viewBox={`0 0 ${vw} ${vh}`}

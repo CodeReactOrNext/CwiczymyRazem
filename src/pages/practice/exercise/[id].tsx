@@ -2,7 +2,9 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { journeyModules } from "feature/journey/data/journeyModules";
 import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/journey/services/journey.service";
+import { firebaseAddExamPassedLog } from "feature/logs/services/addExamPassedLog.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -57,6 +59,20 @@ export default function PracticeExercisePage() {
         stepId as string,
         stars
       );
+
+      const journeyModule = journeyModules.find((m) => m.id === moduleId);
+      const step = journeyModule?.stages.flatMap((s) => s.steps).find((s) => s.id === stepId);
+      if (journeyModule && step) {
+        await firebaseAddExamPassedLog(
+          userAuth,
+          journeyModule.id,
+          journeyModule.title,
+          step.id,
+          step.title,
+          stars,
+          accuracy
+        );
+      }
     }
     router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy) } });
   };

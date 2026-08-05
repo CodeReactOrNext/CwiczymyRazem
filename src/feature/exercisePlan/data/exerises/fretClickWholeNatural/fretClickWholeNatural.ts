@@ -15,7 +15,7 @@ export const fretClickWholeNaturalExercise: Exercise = {
   id: "fret_click_whole_natural",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Click the Note — Whole Neck (Naturals)",
+  title: "Whole Neck: Natural Notes — Click Drill",
   description: "A natural note name appears — click every spot it occupies across the entire fretboard, frets 0 to 12.",
   difficulty: "medium",
   category: "theory",

@@ -182,7 +182,7 @@ export const ExerciseBrowseTab = ({
       setIsLoadingRanks(true);
       const rankPromises = pageExercises.map(async (ex) => {
         const progress = progressMap.get(ex.id);
-        const score = progress?.micHighScore || progress?.earTrainingHighScore;
+        const score = progress?.micHighScore || progress?.earTrainingHighScore || progress?.clickHighScore;
         if (score && score > 0) {
           const rank = await getExerciseUserRank(ex.id, score);
           if (rank !== null) {
@@ -395,11 +395,13 @@ export const ExerciseBrowseTab = ({
                 const completedBpms = progress?.completedBpms || [];
                 const micScore = progress?.micHighScore;
                 const earScore = progress?.earTrainingHighScore;
+                const clickScore = progress?.clickHighScore;
                 const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
                 const hasBeenAttempted = !!progress && (
                   completedBpms.length > 0 ||
                   (micScore != null && micScore > 0) ||
-                  (earScore != null && earScore > 0)
+                  (earScore != null && earScore > 0) ||
+                  (clickScore != null && clickScore > 0)
                 );
                 const title = typeof exercise.title === "string"
                   ? exercise.title
@@ -409,9 +411,10 @@ export const ExerciseBrowseTab = ({
                 const skillData = skillId ? guitarSkills.find(s => s.id === skillId) : null;
                 const SkillIcon = skillData?.icon;
                 const bpmPct = hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0;
-                const hasLeaderboard = bpmStages.length > 0 || !!exercise.riddleConfig || (!!exercise.tablature && exercise.tablature.length > 0);
+                const hasLeaderboard = bpmStages.length > 0 || !!exercise.riddleConfig || exercise.noteHuntConfig?.mode === "click" || (!!exercise.tablature && exercise.tablature.length > 0);
                 const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
                 const micAccuracy = progress?.micHighScoreAccuracy;
+                const clickAccuracy = progress?.clickHighScoreAccuracy;
                 const rank = leaderboardRanks[exercise.id];
                 const isFavorite = favoriteExerciseIds.includes(exercise.id);
                 const resultText = hasBpmProgress
@@ -420,7 +423,9 @@ export const ExerciseBrowseTab = ({
                     ? micAccuracy != null ? `${micAccuracy}%` : `${micScore} pts`
                     : earScore != null && earScore > 0
                       ? `${earScore} pts`
-                      : null;
+                      : clickScore != null && clickScore > 0
+                        ? clickAccuracy != null ? `${clickAccuracy}%` : `${clickScore} pts`
+                        : null;
 
                 const cellBg = cn(
                   "border-y border-zinc-800 transition-colors",

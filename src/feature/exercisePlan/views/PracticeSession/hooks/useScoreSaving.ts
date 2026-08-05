@@ -3,7 +3,7 @@ import type { RefObject } from "react";
 import { useRef } from "react";
 import { useAppSelector } from "store/hooks";
 
-import { saveLeaderboardEntry, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
+import { saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 
@@ -18,6 +18,7 @@ interface UseScoreSavingOptions {
 export interface ScoreRecords {
   micHighScore?:         { exerciseTitle: string; score: number; accuracy: number };
   earTrainingHighScore?: { exerciseTitle: string; score: number };
+  clickHighScore?:       { exerciseTitle: string; score: number; accuracy: number };
 }
 
 export function useScoreSaving({
@@ -53,6 +54,17 @@ export function useScoreSaving({
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,
           earTrainingHighScore: { exerciseTitle: exTitle, score: earTrainingScore },
+        };
+      }
+    }
+
+    if (userAuth && currentExercise.noteHuntConfig?.mode === "click" && snap && snap.score > 0) {
+      const result = await updateClickHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
+      saveLeaderboardEntry(userAuth, exId, snap.score, userName || "Anonymous", userAvatar || "");
+      if (result.isNewRecord) {
+        exerciseRecordsRef.current = {
+          ...exerciseRecordsRef.current,
+          clickHighScore: { exerciseTitle: exTitle, score: snap.score, accuracy: snap.accuracy },
         };
       }
     }

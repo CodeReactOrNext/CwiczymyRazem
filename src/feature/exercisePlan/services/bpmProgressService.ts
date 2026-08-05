@@ -15,6 +15,8 @@ export interface BpmProgressData {
   micHighScore?: number;
   micHighScoreAccuracy?: number;
   earTrainingHighScore?: number;
+  clickHighScore?: number;
+  clickHighScoreAccuracy?: number;
 }
 
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
@@ -156,6 +158,45 @@ export const updateEarTrainingHighScore = async (
     return { isNewRecord: true, previousScore: currentHighScore };
   } catch (error) {
     logger.error(error, { context: "updateEarTrainingHighScore" });
+    return { isNewRecord: false, previousScore: 0 };
+  }
+};
+
+export const updateClickHighScore = async (
+  userId: string,
+  exerciseId: string,
+  score: number,
+  accuracy: number,
+  exerciseTitle: string,
+  exerciseCategory: string
+): Promise<{ isNewRecord: boolean; previousScore: number }> => {
+  try {
+    const docRef = doc(
+      db,
+      "users",
+      userId,
+      BPM_PROGRESS_SUBCOLLECTION,
+      exerciseId
+    );
+    const snapshot = await trackedGetDoc(docRef);
+
+    const existing = snapshot.exists() ? snapshot.data() : {};
+    const currentHighScore = existing.clickHighScore || 0;
+
+    if (score <= currentHighScore) return { isNewRecord: false, previousScore: currentHighScore };
+
+    await trackedSetDoc(docRef, {
+      ...existing,
+      completedBpms: existing.completedBpms || [],
+      exerciseTitle,
+      exerciseCategory,
+      clickHighScore: score,
+      clickHighScoreAccuracy: accuracy,
+      lastUpdated: Timestamp.now(),
+    });
+    return { isNewRecord: true, previousScore: currentHighScore };
+  } catch (error) {
+    logger.error(error, { context: "updateClickHighScore" });
     return { isNewRecord: false, previousScore: 0 };
   }
 };

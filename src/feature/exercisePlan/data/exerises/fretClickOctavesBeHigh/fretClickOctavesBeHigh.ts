@@ -12,7 +12,7 @@ export const fretClickOctavesBeHighExercise: Exercise = {
   id: "fret_click_octaves_be_high",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Click the Note — B & High e Strings (Upper)",
+  title: "B & High e Strings: Frets 6–12 — Click Drill",
   description: "A note name appears — click every spot on the B and high e strings, frets 6 to 12, where it lands.",
   difficulty: "medium",
   category: "theory",

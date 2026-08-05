@@ -175,6 +175,24 @@ export interface FirebaseLogsDailyQuestInterface {
   reactions?: string[];
 }
 
+export interface FirebaseLogsExamPassedInterface {
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  type: "journey_exam_passed";
+  data: string;
+  moduleId: string;
+  moduleTitle: string;
+  stepId: string;
+  stepTitle: string;
+  stars: 1 | 2 | 3;
+  accuracy: number;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  id?: string;
+  reactions?: string[];
+}
+
 export interface FirebaseLogsMarketplaceInterface {
   type: "marketplace_listing";
   uid: string;

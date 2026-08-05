@@ -1,6 +1,7 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsPlaylistInterface,
@@ -17,7 +18,8 @@ export type AnyFirebaseLog =
   | FirebaseLogsDailyQuestInterface
   | FirebaseLogsCaseOpenInterface
   | FirebaseLogsMarketplaceInterface
-  | FirebaseLogsPlaylistInterface;
+  | FirebaseLogsPlaylistInterface
+  | FirebaseLogsExamPassedInterface;
 
 export const isFirebaseLogsSongs = (
   log: AnyFirebaseLog
@@ -61,6 +63,12 @@ export const isFirebaseLogsPlaylist = (
   return (log as FirebaseLogsPlaylistInterface).type === "playlist_created";
 };
 
+export const isFirebaseLogsExamPassed = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsExamPassedInterface => {
+  return (log as FirebaseLogsExamPassedInterface).type === "journey_exam_passed";
+};
+
 export type LogActivityType =
   | "song"
   | "recording"
@@ -69,6 +77,7 @@ export type LogActivityType =
   | "marketplace"
   | "playlist"
   | "topPlayers"
+  | "examPassed"
   | "exercisePlan"
   | "exercise";
 
@@ -81,16 +90,21 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsCaseOpen(log)) return "caseOpen";
   if (isFirebaseLogsMarketplace(log)) return "marketplace";
   if (isFirebaseLogsPlaylist(log)) return "playlist";
+  if (isFirebaseLogsExamPassed(log)) return "examPassed";
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";
 };
 
 /** Coarser grouping category: case openings and marketplace listings are both guitar-arsenal
- * activity, so they're bucketed together in the feed even though they render differently. */
-export type LogGroupType = Exclude<LogActivityType, "caseOpen" | "marketplace"> | "arsenal";
+ * activity, so they're bucketed together in the feed even though they render differently.
+ * An exam pass is likewise bucketed with the practice-session log the exam auto-submits right
+ * before it — same user, same moment — so they land in one card instead of two. */
+export type LogGroupType = Exclude<LogActivityType, "caseOpen" | "marketplace" | "examPassed"> | "arsenal";
 
 export const getLogGroupType = (log: AnyFirebaseLog): LogGroupType => {
   const type = getLogActivityType(log);
-  return type === "caseOpen" || type === "marketplace" ? "arsenal" : type;
+  if (type === "caseOpen" || type === "marketplace") return "arsenal";
+  if (type === "examPassed") return "exercisePlan";
+  return type;
 };
 
 const getLogUid = (log: AnyFirebaseLog): string | undefined => (log as { uid?: string }).uid;

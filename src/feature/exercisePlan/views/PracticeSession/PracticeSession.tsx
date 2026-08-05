@@ -24,7 +24,7 @@ import { TuningSettingsModal } from "./components/TuningSettingsModal";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
-import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
+import { CLICK_EXAM_MISTAKE_LIMIT, NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
@@ -410,6 +410,10 @@ export const PracticeSession = ({
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
+  // Set by the click-hunt mistake-limit fail path below — shows the same
+  // success/fail modal as a normal exam finish, forced into its failed state,
+  // instead of redirecting away before the player sees why they failed.
+  const [examMistakeFailed, setExamMistakeFailed] = useState(false);
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
@@ -467,17 +471,18 @@ export const PracticeSession = ({
 
   // Exam mode, click hunts only: 3 wrong clicks ends the exam immediately as a
   // failure instead of just diluting accuracy (see NoteMatchingProvider's
-  // mistake-tracking effect, which calls this once the limit is hit). Forces
-  // accuracy to 0 so accuracyToStars always fails it, no matter how much
-  // accuracy had been banked before the 3rd miss.
-  const handleExamMistakeFail = useCallback(async () => {
+  // mistake-tracking effect, which calls this once the limit is hit). Freezes
+  // the session and shows the same success/fail modal as a normal finish,
+  // forced into its failed state — score saving, report submission, and
+  // navigation only happen once the player acknowledges the modal, instead of
+  // silently redirecting away before they see why they failed.
+  const handleExamMistakeFail = useCallback(() => {
     if (examAutoFinishedRef.current) return;
     examAutoFinishedRef.current = true;
     metronome.stopMetronome();
     stopTimer();
-    await saveCurrentScores();
-    autoSubmitReport(exerciseRecordsRef.current, null, null);
-    onExamComplete?.(0);
+    setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null);
+    setExamMistakeFailed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -598,20 +603,21 @@ export const PracticeSession = ({
 
       <GpLoadingOverlay isLoading={isFetchingGpFile} />
 
-      {showSuccessView && !reportResult && successSnapshot && (
+      {(showSuccessView || examMistakeFailed) && !reportResult && successSnapshot && (
         <ExerciseSuccessView
           planTitle={planTitleString} examMode={isExamMode}
-          score={successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
-          stats={{ accuracy: successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
+          score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
+          stats={{ accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
           timeline={successSnapshot.noteTimeline}
+          failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              isMicEnabled && !isEarTrainingRiddle ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
+              isMicEnabled && !isEarTrainingRiddle ? { score: examMistakeFailed ? 0 : successSnapshot.score, accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy } : null,
               isEarTrainingRiddle ? { score: earTrainingScore } : null);
-            if (isExamMode) onExamComplete?.(successSnapshot.accuracy);
+            if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy);
           }}
-          onRestart={() => {
+          onRestart={examMistakeFailed ? undefined : () => {
             examAutoFinishedRef.current = false;
             resetSuccessView(); resetTimer(); metronome.restartMetronome(); startTimer();
             if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();

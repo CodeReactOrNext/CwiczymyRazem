@@ -23,7 +23,7 @@ export const fretClickFret9AllExercise: Exercise = {
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
   isHiddenFromLibrary: true,
-  title: "Click the Note — Fret 9 (All Strings)",
+  title: "Fret 9, All Strings — Click Drill",
   description: "A note name appears — click every string where it lands exactly on fret 9.",
   difficulty: "easy",
   category: "theory",

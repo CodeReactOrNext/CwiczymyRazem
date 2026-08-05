@@ -55,7 +55,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   }, [complete]);
 
   return (
-    <div className="relative flex w-full max-w-4xl flex-col items-center gap-2.5 sm:gap-4">
+    <div className="relative flex w-full max-w-6xl flex-col items-center gap-2.5 sm:gap-4">
       <AnimatePresence>
         {!isPlaying && (
           <motion.div

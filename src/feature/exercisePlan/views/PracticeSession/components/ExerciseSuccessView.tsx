@@ -26,6 +26,10 @@ interface ExerciseSuccessViewProps {
   maxScore?: number;
   stats?: ExerciseStats;
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
+  /** Overrides the default "Missed by X pts…" subtitle for a failed exam —
+   *  used when the fail wasn't a score shortfall (e.g. the click-hunt mistake
+   *  limit), where that message would be misleading. */
+  failMessage?: ReactNode;
 }
 
 type TierKey = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -81,6 +85,7 @@ export const ExerciseSuccessView = ({
   maxScore,
   stats,
   timeline,
+  failMessage,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation("common");
   const [isVisible, setIsVisible] = useState(false);
@@ -216,7 +221,7 @@ export const ExerciseSuccessView = ({
                       ? 'Flawless performance.'
                       : isPassed
                       ? 'Nice work — a couple more runs and you\'ll nail every note.'
-                      : <>Missed by <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span> pts. Give it another shot!</>
+                      : failMessage ?? <>Missed by <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span> pts. Give it another shot!</>
                     }
                   </p>
                 </motion.div>

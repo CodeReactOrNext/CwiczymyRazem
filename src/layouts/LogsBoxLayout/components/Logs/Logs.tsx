@@ -28,6 +28,7 @@ import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsPlaylistInterface,
@@ -54,6 +55,7 @@ import {
   Ear,
   ExternalLink,
   Gift,
+  GraduationCap,
   ListChecks,
   Music,
   Star,
@@ -792,6 +794,25 @@ const GroupedLogLine = ({
             <span className="text-xs opacity-70"> ({playlistLog.songCount} {playlistLog.songCount === 1 ? "song" : "songs"})</span>
           )}
         </p>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "examPassed") {
+    const examLog = log as FirebaseLogsExamPassedInterface;
+
+    return (
+      <GroupedLine>
+        <p className="text-secondText text-sm">
+          <GraduationCap className="mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400" />
+          passed the <span className="text-white font-bold">{examLog.stepTitle}</span> exam
+        </p>
+        <Chip color="emerald">
+          {Array.from({ length: examLog.stars }).map((_, i) => (
+            <Star key={i} className="h-3.5 w-3.5 shrink-0 fill-current" />
+          ))}
+          <span className="tabular-nums">{examLog.accuracy}%</span>
+        </Chip>
       </GroupedLine>
     );
   }
