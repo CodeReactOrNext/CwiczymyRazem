@@ -59,6 +59,36 @@ function extractAmount(data: Record<string, any>): number {
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+/** Posts a celebratory card into the shared Activity feed — same broadcast pattern as
+ * the support-ask cron (no `uid`, everyone sees it). Never throws: a failure here
+ * shouldn't turn a successfully-recorded donation into a 500 for BMC's retry logic. */
+async function postDonationActivity(
+  supporterName: string | null,
+  amount: number,
+  kind: "one_off" | "recurring"
+): Promise<void> {
+  try {
+    await firestore.collection("logs").add({
+      type: "donation_received",
+      data: new Date().toISOString(),
+      supporterName,
+      amount,
+      kind,
+      // The `logs` collection's `timestamp` field is a plain ISO string
+      // everywhere else it's written (see addQuestLog/addSongsLog/etc. and
+      // daily-top-players.ts) — a real Firestore Timestamp here would sort
+      // as a different value type in `orderBy("timestamp", "desc")` and get
+      // pushed out of the feed's `limit(20)` window.
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.warn("Failed to post donation Activity card", {
+      context: "bmcWebhook",
+      extra: { error: error instanceof Error ? error.message : String(error) },
+    });
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -93,8 +123,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .collection("bmcFundingEvents")
         .doc(eventKey);
 
-      await firestore.runTransaction(async (tx: admin.firestore.Transaction) => {
-        if ((await tx.get(eventRef)).exists) return;
+      const isNewDonation = await firestore.runTransaction(async (tx: admin.firestore.Transaction) => {
+        if ((await tx.get(eventRef)).exists) return false;
         const snap = await tx.get(fundingRef);
         const cur = snap.exists ? snap.data() ?? {} : {};
         tx.set(
@@ -107,7 +137,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           { merge: true }
         );
         tx.set(eventRef, { type, amount, at: TS() });
+        return true;
       });
+
+      if (isNewDonation) {
+        await postDonationActivity(data.supporter_name ?? null, amount, "one_off");
+      }
     } else if (
       type === "recurring_donation.started" ||
       type === "recurring_donation.created"
@@ -117,6 +152,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const ref: admin.firestore.DocumentReference = firestore
         .collection("bmcRecurring")
         .doc(String(data.id ?? crypto.randomUUID()));
+      const isNewSubscription = !(await ref.get()).exists;
       await ref.set(
         {
           amount: extractAmount(data),
@@ -130,6 +166,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         { merge: true }
       );
+
+      if (isNewSubscription) {
+        await postDonationActivity(data.supporter_name ?? null, extractAmount(data), "recurring");
+      }
     } else if (
       type === "recurring_donation.updated" ||
       type === "recurring_donation.cancelled" ||

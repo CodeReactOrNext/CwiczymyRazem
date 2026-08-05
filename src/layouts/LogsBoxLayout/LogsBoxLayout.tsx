@@ -7,12 +7,7 @@ import type { AchievementList } from "feature/achievements/types";
 import Chat from "feature/chat/Chat";
 import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/useUnreadMessages";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
-import type {
-  FirebaseLogsInterface,
-  FirebaseLogsMarketplaceInterface,
-  FirebaseLogsSongsInterface,
-  FirebaseLogsTopPlayersInterface,
-} from "feature/logs/types/logs.type";
+import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
 import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
@@ -26,12 +21,7 @@ import { LuLogs } from "react-icons/lu";
 import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
-  logs: (
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsMarketplaceInterface
-  )[];
+  logs: AnyFirebaseLog[];
   userAchievements: AchievementList[];
   currentUserId: string;
   className?: string; // Allow custom styles

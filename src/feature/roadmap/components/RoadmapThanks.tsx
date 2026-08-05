@@ -1,7 +1,6 @@
 import { HeroPattern } from "components/UI/HeroBanner";
+import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { Coffee, PartyPopper } from "lucide-react";
-
-const BMC_URL = "https://buymeacoffee.com/riffquest";
 
 /**
  * The "no strings attached" block — for people who don't care about the
@@ -25,7 +24,7 @@ export const RoadmapThanks = () => {
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
               Some support isn&apos;t about unlocking anything. Knowing Riff
-              Quest is useful to you is already the good part — a coffee on top
+              Quest is useful to you is already the good part. A coffee on top
               of that genuinely makes my day.
             </p>
           </div>

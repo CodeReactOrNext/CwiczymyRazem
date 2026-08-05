@@ -45,6 +45,9 @@ export interface RoadmapTier {
  */
 export const MONTHLY_RUNNING_COST = 20;
 
+/** Buy Me a Coffee page — the single donate destination used everywhere. */
+export const BMC_URL = "https://buymeacoffee.com/riffquest";
+
 /**
  * Snapshot of the real lifetime total (USD) at the moment the roadmap tiers
  * were reset. Subtracted from the live Buy Me a Coffee total so the tier

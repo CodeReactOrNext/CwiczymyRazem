@@ -57,7 +57,7 @@ export const SupportPulse = ({ className = "" }: { className?: string }) => {
           side='bottom'
           className='max-w-[230px] border-white/10 bg-zinc-900 font-normal leading-relaxed text-zinc-300'>
           {hasSupport
-            ? `${supporters} supporters have chipped in $${raisedThisMonth} this month. It keeps Riff Quest free and funds the roadmap — tap to see where it goes.`
+            ? `${supporters} supporters have chipped in $${raisedThisMonth} this month. It keeps Riff Quest free and funds the roadmap. Tap to see where it goes.`
             : "Riff Quest is free and funded by the community. Tap to see the roadmap and what your support unlocks next."}
         </TooltipContent>
       </Tooltip>

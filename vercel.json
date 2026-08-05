@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/notifications",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/support-ask-update",
+      "schedule": "0 20 */2 * *"
     }
   ]
 }

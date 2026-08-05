@@ -7,6 +7,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
+import { HeroPattern } from "components/UI/HeroBanner";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { formatDistanceToNow } from "date-fns";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
@@ -28,12 +29,14 @@ import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
+  FirebaseLogsSupportAskInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { calculateActivityFame, EXERCISE_PLAN_FAME } from "feature/logs/utils/activityFame";
@@ -45,19 +48,24 @@ import {
   type LogGroup,
 } from "feature/logs/utils/groupConsecutiveLogs";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { type SongTierInfo, useSongTiers } from "feature/songs/hooks/useSongTiers";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { getSupportVariantCopy } from "feature/support/content/supportVariants";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
+  Coffee,
   Dumbbell,
   Ear,
   ExternalLink,
   Gift,
   GraduationCap,
+  Heart,
   ListChecks,
   Music,
+  PartyPopper,
   Star,
   Tag,
   Target,
@@ -581,6 +589,102 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
+const FirebaseLogsSupportAskItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsSupportAskInterface;
+  isNew: boolean;
+}) => {
+  const date = new Date(log.data);
+  const copy = getSupportVariantCopy(log.variant, {
+    raisedThisMonth: log.raisedThisMonth,
+    monthlyGoal: log.monthlyGoal,
+    totalRaised: log.totalRaised,
+    supporters: log.supporters,
+    nextTierLabel: log.nextTierLabel,
+    nextTierAmountToGo: log.nextTierAmountToGo,
+  });
+
+  return (
+    <div
+      className={`my-4 flex flex-col overflow-hidden bg-main-opposed-bg transition-all duration-300 rounded-xl ${
+        isNew ? "border border-white/30" : ""
+      }`}>
+      <div className='flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10'>
+          <Heart size={16} className='text-amber-400' fill='currentColor' />
+        </div>
+        <div className='min-w-0 flex-1'>
+          <p className='text-[10px] font-semibold uppercase tracking-widest text-amber-500/80'>
+            {copy.eyebrow}
+          </p>
+          <h3 className='text-sm font-bold text-white sm:text-base'>{copy.headline}</h3>
+        </div>
+        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+          {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+          {addZeroToTime(date.getMinutes())}
+        </span>
+      </div>
+
+      <div className='px-3 pb-4 sm:px-5'>
+        <p className='text-sm text-secondText'>{copy.body}</p>
+        <a
+          href={BMC_URL}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-zinc-950 transition-all hover:bg-amber-400 sm:text-sm'>
+          <Coffee size={14} />
+          Support Riff Quest
+        </a>
+      </div>
+    </div>
+  );
+};
+
+const FirebaseLogsDonationItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsDonationInterface;
+  isNew: boolean;
+}) => {
+  const date = new Date(log.data);
+  const name = log.supporterName?.trim() || "Someone";
+  const headline =
+    log.kind === "recurring"
+      ? `${name} became a monthly supporter`
+      : `${name} bought Riff Quest a $${log.amount} coffee`;
+
+  return (
+    <div
+      className={`relative my-4 flex flex-col overflow-hidden rounded-xl bg-main-opposed-bg transition-all duration-300 ${
+        isNew ? "border border-white/30" : ""
+      }`}>
+      <HeroPattern
+        className='opacity-[0.1]'
+        maskImage='linear-gradient(to right, black 0%, transparent 60%)'
+      />
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/15 via-transparent to-transparent' />
+      <div className='relative z-10 flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/15'>
+          <PartyPopper size={16} className='text-orange-400' />
+        </div>
+        <div className='min-w-0 flex-1'>
+          <p className='text-[10px] font-semibold uppercase tracking-widest text-orange-400'>
+            New supporter
+          </p>
+          <h3 className='text-sm font-bold text-white sm:text-base'>{headline}</h3>
+        </div>
+        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+          {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+          {addZeroToTime(date.getMinutes())}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 /** One activity line's content, wrapping in its own column. */
 const GroupedLine = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-center gap-2">
@@ -1107,6 +1211,16 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId, hasMoreLogs, onLoadMoreLog
             {group.type === "topPlayers" ? (
               <FirebaseLogsTopPlayersItem
                 log={representative as FirebaseLogsTopPlayersInterface}
+                isNew={isNew}
+              />
+            ) : group.type === "supportAsk" ? (
+              <FirebaseLogsSupportAskItem
+                log={representative as FirebaseLogsSupportAskInterface}
+                isNew={isNew}
+              />
+            ) : group.type === "donationReceived" ? (
+              <FirebaseLogsDonationItem
+                log={representative as FirebaseLogsDonationInterface}
                 isNew={isNew}
               />
             ) : (

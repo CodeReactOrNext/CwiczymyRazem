@@ -1,12 +1,14 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
+  FirebaseLogsSupportAskInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 
@@ -19,7 +21,9 @@ export type AnyFirebaseLog =
   | FirebaseLogsCaseOpenInterface
   | FirebaseLogsMarketplaceInterface
   | FirebaseLogsPlaylistInterface
-  | FirebaseLogsExamPassedInterface;
+  | FirebaseLogsExamPassedInterface
+  | FirebaseLogsSupportAskInterface
+  | FirebaseLogsDonationInterface;
 
 export const isFirebaseLogsSongs = (
   log: AnyFirebaseLog
@@ -69,6 +73,18 @@ export const isFirebaseLogsExamPassed = (
   return (log as FirebaseLogsExamPassedInterface).type === "journey_exam_passed";
 };
 
+export const isFirebaseLogsSupportAsk = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsSupportAskInterface => {
+  return (log as FirebaseLogsSupportAskInterface).type === "support_ask_update";
+};
+
+export const isFirebaseLogsDonation = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsDonationInterface => {
+  return (log as FirebaseLogsDonationInterface).type === "donation_received";
+};
+
 export type LogActivityType =
   | "song"
   | "recording"
@@ -78,6 +94,8 @@ export type LogActivityType =
   | "playlist"
   | "topPlayers"
   | "examPassed"
+  | "supportAsk"
+  | "donationReceived"
   | "exercisePlan"
   | "exercise";
 
@@ -91,6 +109,8 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsMarketplace(log)) return "marketplace";
   if (isFirebaseLogsPlaylist(log)) return "playlist";
   if (isFirebaseLogsExamPassed(log)) return "examPassed";
+  if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
+  if (isFirebaseLogsDonation(log)) return "donationReceived";
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";
 };
 

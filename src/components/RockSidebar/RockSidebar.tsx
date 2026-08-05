@@ -11,6 +11,7 @@ import Avatar from "components/UI/Avatar";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
+import { SupportModal } from "feature/support/components/SupportModal";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -24,6 +25,7 @@ import { useDesktopAppVersion } from "hooks/useDesktopAppVersion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
+import { useSupportPrompt } from "hooks/useSupportPrompt";
 import {
   Brain,
   ChevronDown,
@@ -277,6 +279,11 @@ const SidebarExpandableNavLink = ({
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
+  const {
+    show: showSupportPrompt,
+    markAsDismissed: markSupportAsDismissed,
+    markAsDonate: markSupportAsDonate,
+  } = useSupportPrompt();
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -649,6 +656,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         isOpen={showFeedbackPrompt}
         onClose={markAsDismissed}
         onSent={markAsSent}
+      />
+
+      <SupportModal
+        isOpen={showSupportPrompt}
+        onClose={markSupportAsDismissed}
+        onDonate={markSupportAsDonate}
       />
     </>
   );

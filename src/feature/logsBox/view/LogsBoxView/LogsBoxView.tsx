@@ -1,11 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
-import type {
-  FirebaseLogsInterface,
-  FirebaseLogsMarketplaceInterface,
-  FirebaseLogsSongsInterface,
-  FirebaseLogsTopPlayersInterface,
-} from "feature/logs/types/logs.type";
+import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 import { useEffect, useState } from "react";
@@ -59,9 +54,7 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
 const LOGS_PAGE_SIZE = 20;
 
 const LogsBoxView = ({ className }: { className?: string }) => {
-  const [logs, setLogs] = useState<
-    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[] | null
-  >(null);
+  const [logs, setLogs] = useState<AnyFirebaseLog[] | null>(null);
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
 

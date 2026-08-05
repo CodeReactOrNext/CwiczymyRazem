@@ -2,9 +2,7 @@ import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { Check, Coffee, Heart, TriangleAlert } from "lucide-react";
 
-import { MONTHLY_RUNNING_COST, ROADMAP_TIERS } from "../data/roadmap.data";
-
-const BMC_URL = "https://buymeacoffee.com/riffquest";
+import { BMC_URL, MONTHLY_RUNNING_COST, ROADMAP_TIERS } from "../data/roadmap.data";
 
 /**
  * Single-row banner: pitch text left, compact "server cost this month" stat
@@ -54,8 +52,8 @@ export const RoadmapPitch = ({
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
               Riff Quest is a one person project, free and built in the open.
-              Support covers the domain, hosting, database, and Vercel first —
-              the rest funds the roadmap above.
+              Support covers the domain, hosting, database, and Vercel first.
+              The rest funds the roadmap above.
             </p>
           </div>
         </div>
@@ -118,7 +116,7 @@ export const RoadmapPitch = ({
               </>
             ) : (
               <span className='font-medium text-emerald-400'>
-                Every goal above is funded — thank you
+                Every goal above is funded, thank you
               </span>
             )}
           </div>

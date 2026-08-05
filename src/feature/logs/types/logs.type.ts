@@ -1,6 +1,7 @@
 import type { AchievementList } from "feature/achievements/types";
 import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import type { SupportVariantId } from "feature/support/content/supportVariants";
 
 export type FirebaseLogsSongsStatuses =
   | "learned"
@@ -211,6 +212,32 @@ export interface FirebaseLogsMarketplaceInterface {
   rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
+}
+
+export interface FirebaseLogsSupportAskInterface {
+  type: "support_ask_update";
+  data: string;
+  variant: SupportVariantId;
+  raisedThisMonth: number;
+  monthlyGoal: number;
+  totalRaised: number;
+  supporters: number;
+  nextTierLabel?: string | null;
+  nextTierAmountToGo?: number | null;
+  id?: string;
+  reactions?: string[];
+  timestamp: string | number | Date;
+}
+
+export interface FirebaseLogsDonationInterface {
+  type: "donation_received";
+  data: string;
+  supporterName?: string | null;
+  amount: number;
+  kind: "one_off" | "recurring";
+  id?: string;
+  reactions?: string[];
+  timestamp: string | number | Date;
 }
 
 export interface FirebaseLogsCaseOpenInterface {

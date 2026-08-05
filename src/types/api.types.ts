@@ -174,6 +174,10 @@ export interface userSliceInitialState {
     feedbackAskedAt?: Timestamp | null;
     feedbackDismissCount?: number;
     feedbackLastDismissedAt?: Timestamp | null;
+    supportAskLastShownAt?: Timestamp | null;
+    supportAskLastShownSessionCount?: number;
+    supportAskDismissCount?: number;
+    supportAskLastDismissedAt?: Timestamp | null;
     emailNotifications?: EmailNotificationPreferences;
     favoritePlanIds?: string[];
     favoriteExerciseIds?: string[];

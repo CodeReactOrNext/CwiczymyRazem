@@ -1,9 +1,4 @@
-import type {
-  FirebaseLogsInterface,
-  FirebaseLogsMarketplaceInterface,
-  FirebaseLogsSongsInterface,
-  FirebaseLogsTopPlayersInterface
-} from "feature/logs/types/logs.type";
+import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
 import {
   collection,
   limit,
@@ -14,23 +9,21 @@ import {
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const firebaseGetLogsStream = (
-  callback: (
-    logs: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[]
-  ) => void,
+  callback: (logs: AnyFirebaseLog[]) => void,
   logsLimit = 20
 ) => {
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("timestamp", "desc"), limit(logsLimit));
 
   return onSnapshot(sortLogs, (snapshot) => {
-    const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface)[] = [];
+    const logsArr: AnyFirebaseLog[] = [];
 
     snapshot.forEach((doc) => {
       const data = doc.data();
       const log = {
         ...data,
         id: doc.id
-      } as (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface | FirebaseLogsMarketplaceInterface) & { id: string };
+      } as AnyFirebaseLog & { id: string };
       logsArr.push(log);
     });
 
@@ -40,4 +33,3 @@ export const firebaseGetLogsStream = (
     callback([]);
   });
 };
-
