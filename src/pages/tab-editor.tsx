@@ -54,7 +54,8 @@ type ArticulationType =
   | "isDead"
   | "isVibrato"
   | "isTap"
-  | "isPalmMute";
+  | "isPalmMute"
+  | "isBend";
 
 const ARTICULATIONS: {
   type: ArticulationType;
@@ -104,6 +105,12 @@ const ARTICULATIONS: {
     letter: "M",
     label: "Palm mute",
     activeClass: "bg-amber-600/20 text-amber-500 ring-1 ring-amber-600/40",
+  },
+  {
+    type: "isBend",
+    letter: "B",
+    label: "Bend (whole step)",
+    activeClass: "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40",
   },
 ];
 
@@ -488,6 +495,9 @@ export default function TabEditor() {
               isAccented: !!n.isAccented,
               isHammerOn: !!n.isHammerOn,
               isPullOff: !!n.isPullOff,
+              isBend: !!n.isBend,
+              bendSemitones: n.bendSemitones,
+              bendCurve: n.bendCurve,
             })),
           })),
         }));
@@ -504,6 +514,9 @@ export default function TabEditor() {
                 isAccented: !!n.isAccented,
                 isHammerOn: !!n.isHammerOn,
                 isPullOff: !!n.isPullOff,
+                isBend: !!n.isBend,
+                bendSemitones: n.bendSemitones,
+                bendCurve: n.bendCurve,
               })),
             }));
 
@@ -688,6 +701,19 @@ export default function TabEditor() {
         note.isTap = !note.isTap;
       } else if (type === "isPalmMute") {
         note.isPalmMute = !note.isPalmMute;
+      } else if (type === "isBend") {
+        note.isBend = !note.isBend;
+        if (note.isBend) {
+          // Manual bends are authored as a plain whole-step shift — bendCurve
+          // is reserved for the richer automation captured from GP imports.
+          note.bendSemitones = 2;
+          note.bendCurve = undefined;
+        } else {
+          note.bendSemitones = undefined;
+          note.bendCurve = undefined;
+          note.isPreBend = false;
+          note.isRelease = false;
+        }
       }
     }
 
@@ -1009,7 +1035,7 @@ export default function TabEditor() {
         setMeasures(newMeasures);
         saveHistory(newMeasures);
       } else if (
-        ["h", "p", "a", "d", "v", "t", "m"].includes(e.key.toLowerCase())
+        ["h", "p", "a", "d", "v", "t", "m", "b"].includes(e.key.toLowerCase())
       ) {
         const typeMap: Record<string, ArticulationType> = {
           h: "isHammerOn",
@@ -1019,6 +1045,7 @@ export default function TabEditor() {
           v: "isVibrato",
           t: "isTap",
           m: "isPalmMute",
+          b: "isBend",
         };
         const type = typeMap[e.key.toLowerCase()];
         if (activeSelection) {
@@ -1058,6 +1085,18 @@ export default function TabEditor() {
                 else if (type === "isTap") note.isTap = !note.isTap;
                 else if (type === "isPalmMute")
                   note.isPalmMute = !note.isPalmMute;
+                else if (type === "isBend") {
+                  note.isBend = !note.isBend;
+                  if (note.isBend) {
+                    note.bendSemitones = 2;
+                    note.bendCurve = undefined;
+                  } else {
+                    note.bendSemitones = undefined;
+                    note.bendCurve = undefined;
+                    note.isPreBend = false;
+                    note.isRelease = false;
+                  }
+                }
               }
             }
           }
@@ -1882,7 +1921,8 @@ export default function TabEditor() {
                                               {(note.isHammerOn ||
                                                 note.isPullOff ||
                                                 note.isTap ||
-                                                note.isVibrato) && (
+                                                note.isVibrato ||
+                                                note.isBend) && (
                                                 <span className='pointer-events-none absolute right-0 top-0 z-10 flex gap-px text-[8px] font-black leading-none'>
                                                   {note.isHammerOn && (
                                                     <span className='text-amber-400'>
@@ -1902,6 +1942,11 @@ export default function TabEditor() {
                                                   {note.isVibrato && (
                                                     <span className='text-emerald-400'>
                                                       ~
+                                                    </span>
+                                                  )}
+                                                  {note.isBend && (
+                                                    <span className='text-cyan-400'>
+                                                      B
                                                     </span>
                                                   )}
                                                 </span>

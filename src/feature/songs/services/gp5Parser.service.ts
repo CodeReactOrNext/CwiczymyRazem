@@ -177,11 +177,13 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
             let bendCurve: BendPoint[] | undefined;
             let bendSemitones: number | undefined;
             if (altNote.bendPoints && altNote.bendPoints.length > 0) {
-              // AlphaTab bend point: offset 0-60 (position), value in quarter-tones
-              // 1 quarter-tone = 25 cents, so cents = value * 25
+              // AlphaTab bend point: offset is 0..60 across the note. `value` is in half-semitone
+              // (50 cents) units — confirmed against MidiFileGenerator.getPitchWheel, which derives
+              // the actual playback pitch shift as `value / 2` semitones (see tablatureToAlphaTex.ts
+              // for the matching export-direction conversion).
               bendCurve = (altNote.bendPoints as any[]).map((p: any) => ({
                 position: p.offset / 60,   // normalise to 0.0–1.0
-                cents:    p.value * 25,     // quarter-tones → cents
+                cents:    p.value * 50,     // half-semitones → cents
               }));
               // Keep peak semitones for the visual badge (max cents / 100)
               const maxCents = Math.max(...bendCurve.map(p => p.cents));
