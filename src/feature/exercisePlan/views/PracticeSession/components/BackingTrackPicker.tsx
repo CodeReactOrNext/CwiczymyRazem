@@ -29,20 +29,24 @@ interface VideoResult {
 
 interface BackingTrackPickerProps {
   exerciseTitle: string;
+  searchQueries?: string[];
 }
 
-export function BackingTrackPicker({ exerciseTitle }: BackingTrackPickerProps) {
+export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrackPickerProps) {
   const { setBackingVideoId } = useSessionUI();
   const [state, setState] = useState<PickerState>("idle");
   const [videos, setVideos] = useState<VideoResult[]>([]);
   const lastPhraseRef = useRef<string | null>(null);
 
   function nextPhrase() {
+    const phrases = searchQueries && searchQueries.length > 0 ? searchQueries : SEARCH_PHRASES;
+    if (phrases.length === 1) return phrases[0];
+
     // Pick a random phrase, but never the same one twice in a row so
     // "Search again" always changes what comes up.
     let phrase = lastPhraseRef.current;
     while (phrase === lastPhraseRef.current) {
-      phrase = SEARCH_PHRASES[Math.floor(Math.random() * SEARCH_PHRASES.length)];
+      phrase = phrases[Math.floor(Math.random() * phrases.length)];
     }
     lastPhraseRef.current = phrase;
     return phrase!;

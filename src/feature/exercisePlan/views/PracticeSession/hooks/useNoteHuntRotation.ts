@@ -21,6 +21,12 @@ export interface NoteHuntRotation {
 // to at most this many seconds so it advances to the next target quickly.
 const SOLVED_FASTFORWARD_SECONDS = 3;
 
+// Click-mode hunts (no mic, no physical constraint) get a much shorter rotation
+// in exam mode than in free practice — the wide-open practice window (25s) let
+// players brute-force every cell on the board with zero risk. 10s still allows a
+// careful scan but no longer tolerates aimlessly clicking the whole diagram.
+const EXAM_CLICK_ROTATE_SECONDS = 10;
+
 /**
  * Drives a rotating hunt (Random/Chromatic/Region Note Hunt, Interval Hunt, Build
  * the Chord): every `noteHuntConfig.rotateSeconds` it rolls a fresh target via the
@@ -36,8 +42,11 @@ export function useNoteHuntRotation(
   exercise: Exercise,
   isPlaying: boolean,
   solvedRef?: React.MutableRefObject<boolean>,
+  isExamMode = false,
 ): NoteHuntRotation {
-  const rotateSeconds = exercise.noteHuntConfig?.rotateSeconds ?? 0;
+  const configuredRotateSeconds = exercise.noteHuntConfig?.rotateSeconds ?? 0;
+  const isExamClickHunt = isExamMode && exercise.noteHuntConfig?.mode === "click";
+  const rotateSeconds = isExamClickHunt && configuredRotateSeconds > 0 ? EXAM_CLICK_ROTATE_SECONDS : configuredRotateSeconds;
   const enabled = rotateSeconds > 0 && typeof exercise.rollHuntTarget === "function";
 
   // Fresh ref to the roll fn so the interval/advance never hold a stale closure.

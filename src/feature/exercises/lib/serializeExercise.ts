@@ -32,6 +32,7 @@ export interface SerializedExercise {
   whyItMatters?: string;
   isHiddenFromLibrary?: boolean;
   requiresBackingTrack?: boolean;
+  backingTrackSearchQueries?: string[];
   examBacking?: { url: string; sourceBpm: number };
   additionalText?: string;
   isHiddenFromLanding?: boolean;

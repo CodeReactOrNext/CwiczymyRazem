@@ -19,6 +19,7 @@ import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -618,6 +619,7 @@ const GroupedLogLine = ({
   onPreviewPlan,
   onPreviewExercise,
   onViewRecording,
+  onOpenLeaderboard,
 }: {
   log: AnyFirebaseLog;
   type: LogActivityType;
@@ -625,6 +627,7 @@ const GroupedLogLine = ({
   onPreviewPlan: (plan: ExercisePlan) => void;
   onPreviewExercise: (exercise: Exercise) => void;
   onViewRecording: (id: string) => void;
+  onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -886,21 +889,49 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.micPerformance && genericLog.micPerformance.score !== 0 && (
-        <span className="inline-flex items-center gap-1.5 text-sm">
-          <Target className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-          <span className="text-secondText">Score:</span>
-          <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.score}</span>
-          <span className="text-secondText">|</span>
-          <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.accuracy}%</span>
-        </span>
+        matchedExercise ? (
+          <button
+            type="button"
+            onClick={() => onOpenLeaderboard(matchedExercise.id, matchedExercise.title)}
+            title="Click to view the ranking for this exercise"
+            className="inline-flex items-center gap-1.5 text-sm underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60"
+          >
+            <Target className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+            <span className="text-secondText">Score:</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.score}</span>
+            <span className="text-secondText">|</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.accuracy}%</span>
+          </button>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-sm">
+            <Target className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+            <span className="text-secondText">Score:</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.score}</span>
+            <span className="text-secondText">|</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.micPerformance.accuracy}%</span>
+          </span>
+        )
       )}
 
       {genericLog.earTrainingPerformance && genericLog.earTrainingPerformance.score !== 0 && (
-        <span className="inline-flex items-center gap-1.5 text-sm">
-          <Ear className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-          <span className="text-secondText">Score:</span>
-          <span className="font-semibold text-white tabular-nums">{genericLog.earTrainingPerformance.score}</span>
-        </span>
+        matchedExercise ? (
+          <button
+            type="button"
+            onClick={() => onOpenLeaderboard(matchedExercise.id, matchedExercise.title)}
+            title="Click to view the ranking for this exercise"
+            className="inline-flex items-center gap-1.5 text-sm underline decoration-dotted decoration-white/40 underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60"
+          >
+            <Ear className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+            <span className="text-secondText">Score:</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.earTrainingPerformance.score}</span>
+          </button>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-sm">
+            <Ear className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+            <span className="text-secondText">Score:</span>
+            <span className="font-semibold text-white tabular-nums">{genericLog.earTrainingPerformance.score}</span>
+          </span>
+        )
       )}
 
       {genericLog.songTitle && genericLog.songArtist && (
@@ -932,6 +963,7 @@ const GroupedLogItem = ({
   onPreviewPlan,
   onPreviewExercise,
   onViewRecording,
+  onOpenLeaderboard,
 }: {
   group: LogGroup;
   isNew: boolean;
@@ -940,6 +972,7 @@ const GroupedLogItem = ({
   onPreviewPlan: (plan: ExercisePlan) => void;
   onPreviewExercise: (exercise: Exercise) => void;
   onViewRecording: (id: string) => void;
+  onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
@@ -980,6 +1013,7 @@ const GroupedLogItem = ({
               onPreviewPlan={onPreviewPlan}
               onPreviewExercise={onPreviewExercise}
               onViewRecording={onViewRecording}
+              onOpenLeaderboard={onOpenLeaderboard}
             />
           ))}
         </div>
@@ -993,6 +1027,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId, hasMoreLogs, onLoadMoreLog
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+  const [leaderboardExercise, setLeaderboardExercise] = useState<{ id: string; title: string } | null>(null);
   const spanRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -1062,6 +1097,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId, hasMoreLogs, onLoadMoreLog
                 onPreviewPlan={setPreviewPlan}
                 onPreviewExercise={setPreviewExercise}
                 onViewRecording={setActiveRecordingId}
+                onOpenLeaderboard={(id, title) => setLeaderboardExercise({ id, title })}
               />
             )}
           </div>
@@ -1093,6 +1129,13 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId, hasMoreLogs, onLoadMoreLog
           setPreviewPlan(null);
           setPreviewExercise(null);
         }}
+      />
+
+      <EarTrainingLeaderboardDialog
+        isOpen={!!leaderboardExercise}
+        onClose={() => setLeaderboardExercise(null)}
+        exerciseId={leaderboardExercise?.id ?? ""}
+        exerciseTitle={leaderboardExercise?.title ?? ""}
       />
     </>
   );

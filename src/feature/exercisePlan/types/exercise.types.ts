@@ -211,6 +211,12 @@ export interface Exercise {
   disableTuner?: boolean;
   isHiddenFromLibrary?: boolean;
   requiresBackingTrack?: boolean;
+  /** Overrides the generic YouTube search phrases in BackingTrackPicker with
+   *  phrasing tailored to this exercise (e.g. "Single Chord Backing Track"
+   *  instead of just "Guitar Backing Track"). Only used when requiresBackingTrack
+   *  is set. Picked randomly, never repeating the previous pick — same rotation
+   *  logic as the default phrase list. */
+  backingTrackSearchQueries?: string[];
   additionalText?: string;
   isHiddenFromLanding?: boolean;
 }

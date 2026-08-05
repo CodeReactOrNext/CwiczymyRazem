@@ -3,65 +3,58 @@ import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { motion } from "framer-motion";
 import {
-  BookOpen,
   Check,
   ChevronRight,
   Compass,
-  Drum,
   Grid3x3,
   Guitar,
   Lightbulb,
   type LucideIcon,
   MapPin,
-  Mic2,
   Music2,
-  Music3,
-  Music4,
-  Play,
   PlayCircle,
-  Radio,
   RotateCcw,
   Sparkles,
   Target,
-  Timer,
-  Wand2,
-  Waves,
-  Zap,
 } from "lucide-react";
 import React, { useState } from "react";
 
 import type { JourneyModuleWithStatus, LockedModulePlaceholder } from "../../types/journey.types";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-// Each module gets its own duotone, plus a small icon set that stands in for
-// the login page's guitar/music watermark — same tiled-pattern technique
-// (see GuitarPatternBackground), just recolored and re-themed per module.
+// One accent per module, drawn from the app's semantic palette (cyan/emerald/...)
+// rather than an arbitrary hue — each module gets its own icon, watermark set
+// and color so the sections read as distinct at a glance.
 
 const MODULE_CFG: Record<string, {
-  from:  string;
-  to:    string;
-  Icon:  LucideIcon;
-  icons: LucideIcon[];
+  Icon:    LucideIcon;
+  icons:   LucideIcon[];
+  hex:     string;
+  tileBg:  string;
+  tileFg:  string;
+  wash:    string;
+  bar:     string;
+  label:   string;
 }> = {
   fundamentals: {
-    from: "#2bb9cc", to: "#0a414c", Icon: Guitar,
+    Icon: Guitar,
     icons: [Guitar, Music2, Sparkles, PlayCircle],
+    hex: "#22d3ee",
+    tileBg: "bg-cyan-500/10",
+    tileFg: "text-cyan-400",
+    wash: "bg-cyan-500/[0.06] hover:bg-cyan-500/10",
+    bar: "bg-cyan-500",
+    label: "text-cyan-400",
   },
   fretboard: {
-    from: "#34c795", to: "#0b4531", Icon: Grid3x3,
+    Icon: Grid3x3,
     icons: [Grid3x3, Target, Compass, MapPin],
-  },
-  rhythm: {
-    from: "#e8a845", to: "#6e430b", Icon: Drum,
-    icons: [Drum, Music4, Waves, Timer],
-  },
-  scales: {
-    from: "#9b72e0", to: "#3a2064", Icon: Music2,
-    icons: [Music2, Wand2, BookOpen, Sparkles],
-  },
-  improvisation: {
-    from: "#e8815f", to: "#7a3226", Icon: Mic2,
-    icons: [Mic2, Zap, Radio, Music3],
+    hex: "#a78bfa",
+    tileBg: "bg-purple-500/10",
+    tileFg: "text-purple-400",
+    wash: "bg-purple-500/[0.06] hover:bg-purple-500/10",
+    bar: "bg-purple-500",
+    label: "text-purple-400",
   },
 };
 
@@ -82,7 +75,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 }) => {
   const [suggestOpen, setSuggestOpen] = useState(false);
 
-  // First module that isn't fully finished yet — gets the "pick up here" treatment.
+  // First module that isn't fully finished yet — gets the "continue" treatment.
   const activeIdx = modules.findIndex((m) => m.totalCount === 0 || m.completedCount < m.totalCount);
 
   return (
@@ -94,87 +87,80 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-5xl px-4 py-8 md:px-8">
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {modules.map((module, idx) => {
-              const cfg = MODULE_CFG[module.id] ?? MODULE_CFG.fundamentals;
-              const Icon = cfg.Icon;
-              const pct = module.totalCount > 0
-                ? Math.round((module.completedCount / module.totalCount) * 100)
-                : 0;
-              const completed = module.completedCount;
-              const total = module.totalCount;
-              const isComplete = total > 0 && completed === total;
-              const isCurrent = idx === activeIdx;
-              const CtaIcon = isComplete ? RotateCcw : completed > 0 ? ChevronRight : Play;
+      <div className="relative mx-auto max-w-3xl px-4 py-10 md:px-8">
+        <div className="mb-6">
+          <h1 className="font-display text-2xl font-bold text-white">Learning path</h1>
+          <p className="mt-1 text-sm text-zinc-400">Pick up where you left off, or jump into any module.</p>
+        </div>
 
-              return (
-                <motion.button
-                  key={module.id}
-                  type="button"
-                  onClick={() => onSelectModule(module.id)}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.08, ease: "easeOut" }}
-                  aria-label={module.title}
-                  className={cn(
-                    "group relative flex aspect-square flex-col justify-between overflow-hidden rounded-lg bg-zinc-800/50 p-4 text-left transition-background hover:bg-zinc-800/70 active:click-behavior focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60",
-                    isCurrent && "bg-zinc-800/70 ring-1 ring-white/15"
+        <div className="space-y-3">
+          {modules.map((module, idx) => {
+            const cfg = MODULE_CFG[module.id] ?? MODULE_CFG.fundamentals;
+            const Icon = cfg.Icon;
+            const pct = module.totalCount > 0
+              ? Math.round((module.completedCount / module.totalCount) * 100)
+              : 0;
+            const completed = module.completedCount;
+            const total = module.totalCount;
+            const isComplete = total > 0 && completed === total;
+            const isCurrent = idx === activeIdx;
+            const CtaIcon = isComplete ? RotateCcw : ChevronRight;
+
+            return (
+              <motion.button
+                key={module.id}
+                type="button"
+                onClick={() => onSelectModule(module.id)}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05, ease: "easeOut" }}
+                aria-label={module.title}
+                className={cn(
+                  "group relative flex w-full items-center gap-4 overflow-hidden rounded-lg p-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior",
+                  cfg.wash
+                )}
+              >
+                {/* Each module gets its own watermark — a different icon set and
+                    tint per section instead of one shared texture. */}
+                <GuitarPatternBackground opacity={0.09} scale={0.85} color={cfg.hex} icons={cfg.icons} />
+
+                <div className={cn("relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg", isComplete ? "bg-emerald-500/10" : cfg.tileBg)}>
+                  {isComplete ? (
+                    <Check className="h-5 w-5 text-emerald-400" strokeWidth={2.5} />
+                  ) : (
+                    <Icon className={cn("h-5 w-5", cfg.tileFg)} strokeWidth={2} />
                   )}
-                >
-                  {/* Same tiled-icon watermark used on /login and the dashboard support banner
-                      (GuitarPatternBackground / HeroPattern) — re-themed per module, kept as a
-                      quiet texture rather than a colored background. */}
-                  <GuitarPatternBackground opacity={0.07} scale={0.65} icons={cfg.icons} />
+                </div>
 
-                  {/* Module color as a confident wash from the corner — strong enough that
-                      cards read as distinct from each other at a glance, not just a hint. */}
-                  <div
-                    className="pointer-events-none absolute inset-0"
-                    style={{ background: `linear-gradient(160deg, ${cfg.from}59 0%, ${cfg.to}40 55%, transparent 100%)` }}
-                    aria-hidden
-                  />
-
-                  <div className="relative flex items-start justify-between">
-                    <Icon size={18} strokeWidth={2} style={{ color: cfg.from }} />
-                    {isComplete && (
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-950 p-1">
-                        <span className="flex h-full w-full items-center justify-center rounded-full bg-emerald-400 text-zinc-950">
-                          <Check size={11} strokeWidth={3.5} />
-                        </span>
+                <div className="relative min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h2 className="truncate font-display text-base font-bold text-white">{module.title}</h2>
+                    {isCurrent && !isComplete && (
+                      <span className={cn("shrink-0 text-xs font-semibold", cfg.label)}>
+                        {completed > 0 ? "Continue" : "Start"}
                       </span>
                     )}
                   </div>
-
-                  {/* Title + completion — the only two facts the card needs */}
-                  <div className="relative mt-auto">
-                    <h2 className="text-balance font-display text-lg font-black leading-tight text-white">
-                      {module.title}
-                    </h2>
-
-                    <div className="mt-2.5 flex items-end justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-900/60">
-                          <div
-                            className="h-full rounded-full transition-[width] duration-500 ease-out"
-                            style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${cfg.from}b3, ${cfg.from})` }}
-                          />
-                        </div>
-                        <p className="mt-1 text-[11px] font-medium tabular-nums text-zinc-400">
-                          {completed}/{total}
-                        </p>
-                      </div>
-
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-900 transition-background group-hover:bg-white">
-                        <CtaIcon size={12} strokeWidth={2.5} />
-                      </span>
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-800/80">
+                      <div
+                        className={cn("h-full rounded-full transition-[width] duration-500 ease-out", isComplete ? "bg-emerald-500" : cfg.bar)}
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
+                    <span className="shrink-0 text-xs font-medium tabular-nums text-zinc-500">
+                      {completed}/{total}
+                    </span>
                   </div>
-                </motion.button>
-              );
-            })}
-          </div>
+                </div>
+
+                <CtaIcon
+                  className="relative h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200"
+                  strokeWidth={2.5}
+                />
+              </motion.button>
+            );
+          })}
 
           {/* ─── Suggest a path ─── */}
           <button
@@ -193,11 +179,10 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               </p>
             </div>
           </button>
-
-          <FeedbackModal isOpen={suggestOpen} onClose={() => setSuggestOpen(false)} />
-
         </div>
       </div>
+
+      <FeedbackModal isOpen={suggestOpen} onClose={() => setSuggestOpen(false)} />
     </div>
   );
 };

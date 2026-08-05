@@ -81,6 +81,10 @@ export interface NoteMatchingHandle {
 
 const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1 };
 
+// Click-hunt exams only (see the mistake-tracking effect below) — 3 wrong
+// clicks ends the exam as a failure, regardless of accumulated accuracy.
+export const CLICK_EXAM_MISTAKE_LIMIT = 3;
+
 const _fallbackRef = { current: 0 } as MutableRefObject<number>;
 
 const NoteMatchingContext = createContext<NoteMatchingContextValue>({
@@ -154,6 +158,11 @@ interface NoteMatchingProviderProps {
   onEnableMic: () => void;
   // callback
   onReset: () => void;
+  // whether the session is running as a journey exam (gates the click-hunt mistake limit)
+  isExamMode?: boolean;
+  // fired once when a click-hunt exam hits the mistake limit — PracticeSession
+  // uses this to abort the exam immediately as a failure
+  onExamFail?: () => void;
 }
 
 export function NoteMatchingProvider({
@@ -184,6 +193,8 @@ export function NoteMatchingProvider({
   onAdvanceHunt,
   onEnableMic,
   onReset,
+  isExamMode = false,
+  onExamFail,
 }: NoteMatchingProviderProps) {
   const {
     hitNotes,
@@ -273,6 +284,18 @@ export function NoteMatchingProvider({
     regionEnd ?? 12,
     customGoalStrings,
   );
+
+  // Exam mode, click hunts only: too many wrong clicks fails the exam outright
+  // instead of just diluting accuracy — closes the "brute-force every cell"
+  // loophole the untimed, unpenalized click hunt otherwise leaves wide open.
+  const examFailFiredRef = useRef(false);
+  useEffect(() => {
+    if (!isExamMode || !isClickHunt || examFailFiredRef.current) return;
+    if (clickHunt.mistakeCount >= CLICK_EXAM_MISTAKE_LIMIT) {
+      examFailFiredRef.current = true;
+      onExamFail?.();
+    }
+  }, [isExamMode, isClickHunt, clickHunt.mistakeCount, onExamFail]);
 
   const huntGameState = isChordHunt ? chordHunt.gameState : isClickHunt ? clickHunt.gameState : noteHunt.gameState;
   const huntMaxScore = isChordHunt ? chordHunt.maxPossibleScore : isClickHunt ? clickHunt.maxPossibleScore : noteHunt.maxPossibleScore;

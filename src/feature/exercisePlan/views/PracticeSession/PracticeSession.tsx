@@ -406,7 +406,7 @@ export const PracticeSession = ({
   // Rotating hunts: the provider flips this to true once the whole goal is solved,
   // so the rotation hook can fast-forward to the next target.
   const huntSolvedRef = useRef(false);
-  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef);
+  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode);
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
@@ -462,6 +462,22 @@ export const PracticeSession = ({
       null,
     );
     onExamComplete?.(100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Exam mode, click hunts only: 3 wrong clicks ends the exam immediately as a
+  // failure instead of just diluting accuracy (see NoteMatchingProvider's
+  // mistake-tracking effect, which calls this once the limit is hit). Forces
+  // accuracy to 0 so accuracyToStars always fails it, no matter how much
+  // accuracy had been banked before the 3rd miss.
+  const handleExamMistakeFail = useCallback(async () => {
+    if (examAutoFinishedRef.current) return;
+    examAutoFinishedRef.current = true;
+    metronome.stopMetronome();
+    stopTimer();
+    await saveCurrentScores();
+    autoSubmitReport(exerciseRecordsRef.current, null, null);
+    onExamComplete?.(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -553,6 +569,8 @@ export const PracticeSession = ({
       onAdvanceHunt={advanceHunt}
       onEnableMic={handleMicToggle}
       onReset={handleNoteMatchingReset}
+      isExamMode={isExamMode}
+      onExamFail={handleExamMistakeFail}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>

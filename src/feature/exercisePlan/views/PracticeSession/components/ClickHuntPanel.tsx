@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { ClickableFretboard } from "./ClickableFretboard";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
 
@@ -16,6 +16,8 @@ interface ClickHuntPanelProps {
   /** Whether the session timer is running — the note-rotation countdown is
    *  frozen until it is, even though clicking itself always works. */
   isPlaying: boolean;
+  /** Shows the mistake counter and puts it under the exam's 3-strike limit. */
+  isExamMode?: boolean;
   /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly.
    *  Undefined outside exam mode — distinct from the per-note "complete instantly"
    *  button below, which only solves the current rotating target. */
@@ -26,8 +28,9 @@ interface ClickHuntPanelProps {
  * Click-to-answer counterpart to NoteHuntDetector: shows the target note name
  * and a clickable fretboard diagram instead of mic-driven pitch detection.
  */
-export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, onDevPassExam }: ClickHuntPanelProps) {
+export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, isExamMode, onDevPassExam }: ClickHuntPanelProps) {
   const { clickHunt, huntTarget, noteHuntSecondsLeft, advanceHunt, registerFretClick } = useNoteMatchingContext();
+  const mistakeCount = clickHunt?.mistakeCount ?? 0;
 
   const targetNote = huntTarget ?? targetNoteProp;
   const targetPositions = clickHunt?.targetPositions ?? [];
@@ -75,6 +78,11 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
         <span className="rounded bg-amber-500/15 px-3.5 py-1.5 text-base font-extrabold tracking-wide text-amber-300">
           ★ {score} pts
         </span>
+        {isExamMode && (
+          <span className="rounded border border-dashed border-white/10 bg-zinc-800/40 px-3.5 py-1.5 text-base font-extrabold tabular-nums text-zinc-400">
+            ✕ {mistakeCount}/{CLICK_EXAM_MISTAKE_LIMIT}
+          </span>
+        )}
         {isRotating && (
           <span
             className={cn(

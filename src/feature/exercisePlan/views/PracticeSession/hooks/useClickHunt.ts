@@ -25,6 +25,8 @@ export interface ClickHuntState {
   accuracy: number;
   maxPossibleScore: number;
   maxCombo: number;
+  /** Wrong clicks made across the whole hunt (every rotation), never reset on retarget. */
+  mistakeCount: number;
 }
 
 const keyOf = (p: ClickTarget) => `${p.string}-${p.fret}`;
@@ -52,6 +54,7 @@ function buildState(
   scoreOffset = 0,
   bankedFound = 0,
   bankedTotal = 0,
+  mistakeCount = 0,
 ): ClickHuntState {
   const foundCount = targetPositions.filter((p) => found.has(keyOf(p))).length;
   const multiplier = Math.min(8, Math.floor(foundCount / 5) + 1);
@@ -75,6 +78,7 @@ function buildState(
     accuracy: cumulativeTotal > 0 ? Math.round((cumulativeFound / cumulativeTotal) * 100) : 0,
     maxPossibleScore: scoreForCount(targetPositions.length),
     maxCombo: foundCount,
+    mistakeCount,
   };
 }
 
@@ -109,6 +113,10 @@ export function useClickHunt(
   // score, see buildState's accuracy comment.
   const bankedFoundRef = useRef(0);
   const bankedTotalRef = useRef(0);
+  // Wrong clicks across the WHOLE hunt — deliberately never cleared by the
+  // retarget effect below, unlike foundRef/hitIdRef. An exam-mode mistake limit
+  // needs to see every miss made since the exam started, not just the current note.
+  const mistakeCountRef = useRef(0);
   // When the current target note appeared — lets each correct click report how
   // long it took to find, for the "✓ 1.3s" feedback tooltip. Set for real by the
   // retarget effect below (which also runs on mount) — 0 here is just a pure
@@ -135,7 +143,7 @@ export function useClickHunt(
     targetStartRef.current = Date.now();
     setState(buildState(
       targetsRef.current, foundRef.current, null, 0,
-      sessionScoreRef.current, bankedFoundRef.current, bankedTotalRef.current,
+      sessionScoreRef.current, bankedFoundRef.current, bankedTotalRef.current, mistakeCountRef.current,
     ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
@@ -154,6 +162,8 @@ export function useClickHunt(
         const foundCount = targets.filter((p) => foundRef.current.has(keyOf(p))).length;
         prevFoundCountRef.current = foundCount;
         elapsedSeconds = (Date.now() - targetStartRef.current) / 1000;
+      } else if (!isTarget) {
+        mistakeCountRef.current += 1;
       }
 
       setState(
@@ -165,6 +175,7 @@ export function useClickHunt(
           sessionScoreRef.current,
           bankedFoundRef.current,
           bankedTotalRef.current,
+          mistakeCountRef.current,
         ),
       );
     },

@@ -211,6 +211,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}
               isPlaying={isPlaying}
+              isExamMode={isExamMode}
               onDevPassExam={onDevPassExam}
             />
           ) : (
@@ -272,7 +273,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       ) : currentExercise.requiresBackingTrack ? (
         backingVideoId
           ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
-          : <BackingTrackPicker exerciseTitle={currentExercise.title} />
+          : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <StrummingSection
           patterns={currentExercise.strummingPatterns}

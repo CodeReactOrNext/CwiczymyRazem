@@ -13,7 +13,7 @@ import { useAppSelector } from "store/hooks";
 
 import { getSongsByIds } from "../../services/journey.service";
 import type { JourneyStepWithStatus } from "../../types/journey.types";
-import { getStepIcon } from "../../utils/stepIcons";
+import { getContentIcon, getStepIcon } from "../../utils/stepIcons";
 import { FretDiagram } from "./FretDiagram";
 
 interface StepSidebarProps {
@@ -107,6 +107,17 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         {/* Short info */}
         <p className="text-zinc-400 text-sm leading-relaxed">{step.shortDescription}</p>
 
+        {/* Goal */}
+        {step.examGoal && (
+          <div className="rounded-lg bg-zinc-800/40 p-4">
+            <div className="mb-1 flex items-center gap-2 font-bold text-zinc-200">
+              <Target size={16} className="shrink-0 text-zinc-400" />
+              <p>Goal</p>
+            </div>
+            <p className="text-sm leading-relaxed text-zinc-400">{step.examGoal}</p>
+          </div>
+        )}
+
         {/* Content blocks or description */}
         <div className="space-y-6">
           {step.contentBlocks && step.contentBlocks.length > 0 ? (
@@ -123,7 +134,10 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 )}
                 {block.type === "callout" && (
                     <div className="rounded-lg bg-zinc-800/40 p-4">
-                        <p className="mb-1 font-bold text-zinc-200">{block.label}</p>
+                        <div className="mb-1 flex items-center gap-2 font-bold text-zinc-200">
+                            {getContentIcon(block.icon, 16, "shrink-0 text-zinc-400")}
+                            <p>{block.label}</p>
+                        </div>
                         <p className="text-zinc-400">{block.body}</p>
                     </div>
                 )}
@@ -166,7 +180,8 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                       checklistState[i] ? "bg-emerald-500/10 text-emerald-400" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800"
                     )}
                   >
-                    {checklistState[i] ? <SquareCheck size={18} /> : <Square size={18} />}
+                    {checklistState[i] ? <SquareCheck size={18} className="shrink-0" /> : <Square size={18} className="shrink-0" />}
+                    {getContentIcon(item.icon, 15, "shrink-0")}
                     <span className="text-xs font-medium">{item.text}</span>
                   </button>
                 ))}
@@ -211,23 +226,30 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
       <div className="mt-auto space-y-3 bg-zinc-950 p-4 sm:p-6">
         {step.modalOnly ? (
           !isCompleted && (
-            <button
-              onClick={async () => {
-                if (isSaving || !canComplete) return;
-                if (step.songPicker && selectedSongId && userId) {
-                  const song = pickerSongs.find((s) => s.id === selectedSongId);
-                  if (song) {
-                    await updateSongStatus(userId as string, selectedSongId, song.title, song.artist, "wantToLearn", undefined);
+            <div className="space-y-2">
+              <button
+                onClick={async () => {
+                  if (isSaving || !canComplete) return;
+                  if (step.songPicker && selectedSongId && userId) {
+                    const song = pickerSongs.find((s) => s.id === selectedSongId);
+                    if (song) {
+                      await updateSongStatus(userId as string, selectedSongId, song.title, song.artist, "wantToLearn", undefined);
+                    }
                   }
-                }
-                onComplete(step.id);
-              }}
-              disabled={isLocked || isSaving || !canComplete}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            >
-              {isSaving ? "Saving..." : "Done & Complete"}
-              <CheckCircle2 size={18} />
-            </button>
+                  onComplete(step.id);
+                }}
+                disabled={isLocked || isSaving || !canComplete}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              >
+                {isSaving ? "Saving..." : "Done & Complete"}
+                <CheckCircle2 size={18} />
+              </button>
+              {!canComplete && !isLocked && (
+                <p className="text-center text-[11px] font-medium text-zinc-500">
+                  Read through the content and check all the boxes above to unlock this
+                </p>
+              )}
+            </div>
           )
         ) : (
           <div className="grid grid-cols-2 gap-3">

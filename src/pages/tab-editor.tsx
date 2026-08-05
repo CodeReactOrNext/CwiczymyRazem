@@ -109,9 +109,19 @@ const ARTICULATIONS: {
   {
     type: "isBend",
     letter: "B",
-    label: "Bend (whole step)",
+    label: "Bend",
     activeClass: "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40",
   },
+];
+
+// bendSemitones is expressed in semitones (1 = half step); alphaTab renders
+// these as the familiar "1/4", "1/2", "full" bend labels on the tab.
+const BEND_AMOUNTS: { value: number; short: string; label: string }[] = [
+  { value: 0.5, short: "1/4", label: "Quarter-step bend (curl)" },
+  { value: 1, short: "1/2", label: "Half-step bend" },
+  { value: 2, short: "Full", label: "Whole-step bend" },
+  { value: 3, short: "1½", label: "Step-and-a-half bend" },
+  { value: 4, short: "2", label: "Two-step bend" },
 ];
 
 const QUICK_FRETS = [0, 1, 2, 3, 5, 7, 9, 12, 15, 17, 19, 22];
@@ -1359,6 +1369,21 @@ export default function TabEditor() {
     saveHistory(measures);
   };
 
+  const setSelectedBendAmount = (semitones: number) => {
+    if (!selectedCell || !selectedNote) return;
+    const string = selectedCell.stringIdx + 1;
+    const newMeasures = [...measures];
+    const note = newMeasures[selectedCell.measureIdx].beats[
+      selectedCell.beatIdx
+    ].notes.find((n) => n.string === string);
+    if (!note) return;
+    note.isBend = true;
+    note.bendSemitones = semitones;
+    note.bendCurve = undefined;
+    setMeasures(newMeasures);
+    saveHistory(newMeasures);
+  };
+
   const cellFromPointer = (e: React.MouseEvent, mIdx: number) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const localX = e.clientX - rect.left;
@@ -2112,6 +2137,32 @@ export default function TabEditor() {
                     </button>
                   ))}
                 </div>
+                <AnimatePresence initial={false}>
+                  {selectedNote?.isBend && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className='overflow-hidden'>
+                      <div className='flex gap-1 pt-1.5'>
+                        {BEND_AMOUNTS.map((b) => (
+                          <button
+                            key={b.value}
+                            title={b.label}
+                            onClick={() => setSelectedBendAmount(b.value)}
+                            className={cn(
+                              "flex h-7 flex-1 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                              (selectedNote?.bendSemitones ?? 2) === b.value
+                                ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40"
+                                : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                            )}>
+                            {b.short}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
