@@ -38,11 +38,32 @@ const CATEGORIES: ToolCategory[] = [
         price: "freemium",
       },
       {
+        name: "Songsterr",
+        url: "https://www.songsterr.com/",
+        description: "Tab database with synced audio playback: mute or solo individual tracks, slow down the tempo, and follow along as it plays.",
+        logo: "/images/tools/songsterr.ico",
+        price: "freemium",
+      },
+      {
         name: "Guitar Pro",
         url: "https://www.guitar-pro.com/",
         description: "Tab editor and player. Guitar Pro 8 lets you add an audio track synced to the tab, then slow it down, speed it up, or change its pitch without losing sync.",
         logo: "/images/tools/guitar-pro.png",
         price: "paid",
+      },
+      {
+        name: "MuseScore Studio",
+        url: "https://musescore.org/",
+        description: "Free notation and tab editor for writing and editing your own scores from scratch.",
+        logo: "/images/tools/musescore.ico",
+        price: "free",
+      },
+      {
+        name: "TuxGuitar",
+        url: "https://tuxguitar.app/",
+        description: "Open-source tab editor that reads and writes Guitar Pro files, handy for converting a MuseScore or MIDI file into a GP file to import into Riff Quest.",
+        logo: "/images/tools/tuxguitar.png",
+        price: "free",
       },
       {
         name: "StrumForge",
@@ -224,16 +245,16 @@ const ToolsPage = () => {
   return (
     <>
       <Head>
-        <title>19 Guitar Tools Worth Using Alongside Riff Quest</title>
-        <meta name="description" content="19 tools for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription, the things Riff Quest doesn't cover, marked free, freemium, or paid." />
+        <title>22 Guitar Tools Worth Using Alongside Riff Quest</title>
+        <meta name="description" content="22 tools for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription, the things Riff Quest doesn't cover, marked free, freemium, or paid." />
         <link rel='canonical' href={siteUrl} />
-        <meta property="og:title" content="19 Guitar Tools Worth Using Alongside Riff Quest" />
+        <meta property="og:title" content="22 Guitar Tools Worth Using Alongside Riff Quest" />
         <meta property="og:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://riff.quest/images/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="19 Guitar Tools Worth Using Alongside Riff Quest" />
+        <meta name="twitter:title" content="22 Guitar Tools Worth Using Alongside Riff Quest" />
         <meta name="twitter:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
         <script
