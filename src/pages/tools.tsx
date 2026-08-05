@@ -40,7 +40,7 @@ const CATEGORIES: ToolCategory[] = [
       {
         name: "Guitar Pro",
         url: "https://www.guitar-pro.com/",
-        description: "Tab editor and player. Guitar Pro 8 lets you add an audio track synced to the tab — slow it down, speed it up, or change its pitch without losing sync with the notation.",
+        description: "Tab editor and player. Guitar Pro 8 lets you add an audio track synced to the tab, then slow it down, speed it up, or change its pitch without losing sync.",
         logo: "/images/tools/guitar-pro.png",
         price: "paid",
       },
@@ -68,7 +68,7 @@ const CATEGORIES: ToolCategory[] = [
       {
         name: "Fretboard Forever",
         url: "https://fretboardforever.app/",
-        description: "Learn the notes on your fretboard until they become second nature — no more hesitating.",
+        description: "Learn the notes on your fretboard until they become second nature, no more hesitating.",
         logo: "/images/tools/fretboard-forever.png",
         price: "free",
       },
@@ -96,14 +96,14 @@ const CATEGORIES: ToolCategory[] = [
       {
         name: "Flicktool",
         url: "https://flicktool.com/online-metronome/",
-        description: "A simple online metronome with no clutter — tempo and time signature, straight to the point.",
+        description: "A simple online metronome with no clutter: tempo and time signature, straight to the point.",
         logo: "/images/tools/flicktool.png",
         price: "free",
       },
       {
         name: "Polyrhythm Metronome",
         url: "https://poly.ozieblowski.dev/",
-        description: "An open-source polyrhythm generator — practice divisions like 13:7, 3:4:5, or any other split.",
+        description: "An open-source polyrhythm generator for practice divisions like 13:7, 3:4:5, or any other split.",
         logo: "/images/tools/polyrhythm.png",
         price: "free",
       },
@@ -146,7 +146,7 @@ const CATEGORIES: ToolCategory[] = [
       {
         name: "MVSEP",
         url: "https://mvsep.com/en",
-        description: "Splits a recording into vocals and instruments, and extracts lyrics from audio. Free — an account speeds up processing.",
+        description: "Splits a recording into vocals and instruments, and extracts lyrics from audio. Free, though an account speeds up processing.",
         logo: "/images/tools/mvsep.ico",
         price: "free",
         ai: true,
@@ -189,7 +189,7 @@ const CATEGORIES: ToolCategory[] = [
       {
         name: "riff.quest",
         url: "/",
-        description: "Session tracking, exercise and practice plans, scoring, leaderboards, songs, and playlists — the app this list lives on.",
+        description: "Session tracking, exercise and practice plans, scoring, leaderboards, songs, and playlists: the app this list lives on.",
         logo: "/images/logolight.svg",
         price: "freemium",
         isOwnApp: true,
@@ -224,17 +224,17 @@ const ToolsPage = () => {
   return (
     <>
       <Head>
-        <title>19 Guitar Practice Tools (Free & Paid) | Riff Quest</title>
-        <meta name="description" content="A curated list of external tools for guitar practice — tabs and chords, fretboard trainers, metronomes, AI-powered backing tracks, and ear-transcription software. Each one marked free, freemium, or paid." />
+        <title>19 Guitar Tools Worth Using Alongside Riff Quest</title>
+        <meta name="description" content="19 tools for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription, the things Riff Quest doesn't cover, marked free, freemium, or paid." />
         <link rel='canonical' href={siteUrl} />
-        <meta property="og:title" content="19 Guitar Practice Tools (Free & Paid) | Riff Quest" />
-        <meta property="og:description" content="A curated list of external tools for guitar practice — tabs, fretboard trainers, metronomes, AI backing tracks, and ear-transcription software." />
+        <meta property="og:title" content="19 Guitar Tools Worth Using Alongside Riff Quest" />
+        <meta property="og:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://riff.quest/images/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="19 Guitar Practice Tools (Free & Paid) | Riff Quest" />
-        <meta name="twitter:description" content="A curated list of external tools for guitar practice — tabs, fretboard trainers, metronomes, AI backing tracks, and ear-transcription software." />
+        <meta name="twitter:title" content="19 Guitar Tools Worth Using Alongside Riff Quest" />
+        <meta name="twitter:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
         <script
           type="application/ld+json"
@@ -269,10 +269,12 @@ const ToolsPage = () => {
 
         <div className="mx-auto max-w-5xl px-6 pb-24 pt-32">
           <div className="mb-16 max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[0.4em] text-cyan-500 mb-4">Resources</p>
-            <h1 className="text-4xl font-black text-white mb-6">Guitar practice tools worth knowing about</h1>
+            <p className="mb-4 text-xs text-zinc-500">
+              Michael Apfel, riff.quest founder. Last checked August 2026.
+            </p>
+            <h1 className="text-4xl font-black text-white mb-6">Tools worth using alongside Riff Quest</h1>
             <p className="text-lg text-zinc-400 leading-relaxed">
-              {totalTools} tools the guitar community actually uses alongside Riff Quest — tabs and chords, fretboard trainers, metronomes, backing tracks, and ear-transcription software. Every entry is marked free, freemium, or paid, and AI-powered tools carry a badge.
+              Riff Quest handles session tracking, practice plans, and scoring, but it won&apos;t give you a tab, slow a recording down for ear training, or generate a backing track. These are the {totalTools} tools I use for that instead, grouped by what you&apos;d reach for them to do. Every entry is marked free, freemium, or paid, and anything leaning on a model to do the work carries an AI badge.
             </p>
           </div>
 
@@ -282,15 +284,8 @@ const ToolsPage = () => {
               return (
                 <section key={category.id} id={category.id}>
                   <div className="mb-5 flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-900/60 text-cyan-400">
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <div>
-                      <h2 className="text-lg font-bold text-white">{category.name}</h2>
-                      <p className="text-xs text-zinc-500">
-                        {category.tools.length} {category.tools.length === 1 ? "tool" : "tools"}
-                      </p>
-                    </div>
+                    <Icon className="h-4 w-4 shrink-0 text-cyan-400" />
+                    <h2 className="text-lg font-bold text-white">{category.name}</h2>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -347,7 +342,7 @@ const ToolsPage = () => {
           </div>
 
           <p className="mt-16 max-w-2xl text-xs leading-relaxed text-zinc-600">
-            Logos belong to their respective owners and are shown for identification only. Pricing can change — check each tool&apos;s site for current terms.
+            Logos belong to their respective owners and are shown for identification only. Pricing can change, so check each tool&apos;s site for current terms.
           </p>
         </div>
 
