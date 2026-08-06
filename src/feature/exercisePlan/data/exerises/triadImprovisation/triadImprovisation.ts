@@ -18,6 +18,7 @@ export const triadImprovisationExercise: Exercise = {
     "Focus on rhythmic phrasing and dynamics to make the limited note selection interesting.",
     "Use slides and bends to connect triad shapes across the neck."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["harmony", "improvisation", "chords"],
   additionalText: `Most guitarists learn scales and never escape them — pentatonic boxes become autopilot highways that produce technically clean but harmonically vague solos. Triad improvisation is the antidote. A triad is just three notes — root, third, fifth — but those three notes define the chord more precisely than any scale run. Every note you play is directly tied to the harmony, so your solos stop being "in the key" and start being "on the chord."

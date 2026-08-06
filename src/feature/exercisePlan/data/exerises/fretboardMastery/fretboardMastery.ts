@@ -27,6 +27,7 @@ instructions: [
     "Try short moments without looking at the fretboard to test your mental map.",
     "Consistency matters more than speed — accuracy builds real fretboard knowledge."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: [
     "music_theory",

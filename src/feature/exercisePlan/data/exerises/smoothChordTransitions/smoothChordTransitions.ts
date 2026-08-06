@@ -26,6 +26,7 @@ export const smoothChordTransitionsExercise: Exercise = {
     "Watch which fingers stay on the fretboard and which move — this awareness is key.",
     "Once comfortable, try the same progression in a different key or on another string set."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: [
     "harmony",

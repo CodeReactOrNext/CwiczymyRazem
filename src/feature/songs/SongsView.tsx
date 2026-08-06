@@ -133,6 +133,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
   const dragSourceContainer = useRef<SongStatus | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [boardSearchQuery, setBoardSearchQuery] = useState("");
+  // null = "not picked yet", so the board can open on the first tab that actually
+  // has songs instead of a permanently empty "Currently learning".
+  const [boardTab, setBoardTab] = useState<SongStatus | null>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)");
@@ -448,7 +451,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 )}
 
                 <div className="space-y-10">
-                  {(() => {
+                  {totalSongsCount > 0 && (() => {
                     const query = boardSearchQuery.toLowerCase().trim();
                     const matchesQuery = (song: Song) =>
                       !query ||
@@ -459,67 +462,107 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       {
                         key: "learning",
                         title: "Currently learning",
-                        icon: <Play size={16} className="fill-current" />,
+                        icon: <Play size={15} className="fill-current" />,
                         songs: userSongs.learning.filter(matchesQuery),
                       },
                       {
                         key: "wantToLearn",
                         title: "Want to learn",
-                        icon: <Music size={16} />,
+                        icon: <Music size={15} />,
                         songs: userSongs.wantToLearn.filter(matchesQuery),
                       },
                       {
                         key: "learned",
                         title: "Mastered songs",
-                        icon: <Trophy size={16} />,
+                        icon: <Trophy size={15} />,
                         songs: userSongs.learned.filter(matchesQuery),
                       },
                     ] as const;
 
                     const visibleCount = sections.reduce((sum, s) => sum + s.songs.length, 0);
+                    // Fall back to the first tab that has matches so an empty
+                    // "Currently learning" never hides the rest of the board.
+                    const activeTab =
+                      boardTab ?? (sections.find((s) => s.songs.length > 0)?.key ?? "learning");
+                    const activeSection =
+                      sections.find((s) => s.key === activeTab) ?? sections[0];
 
                     return (
-                      <>
-                        {sections.map(
-                          (section) =>
-                            section.songs.length > 0 && (
-                              <div key={section.key} className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300">
-                                    {section.icon}
-                                  </div>
-                                  <h2 className="text-xl font-semibold text-white">{section.title}</h2>
-                                  <span className="text-xs font-bold text-zinc-500">{section.songs.length}</span>
-                                </div>
-                                <div className="space-y-2">
-                                  {section.songs.map((song) => (
-                                    <SongBoardRow
-                                      key={song.id}
-                                      song={song}
-                                      progress={progressMap[song.id] ?? null}
-                                      hasSectionMap={verifiedSectionMaps.has(song.id)}
-                                      onOpenDetails={() => setDetailsTarget(song)}
-                                      onPractice={() => setPracticeTarget(song)}
-                                      onPartsChange={(parts) => setSongParts(song.id, parts)}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            )
-                        )}
+                      <div className="space-y-6">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {sections.map((section) => {
+                            const isActive = section.key === activeTab;
+                            return (
+                              <button
+                                key={section.key}
+                                onClick={() => setBoardTab(section.key)}
+                                className={cn(
+                                  "relative flex items-center gap-2.5 rounded-lg py-2 pl-2 pr-4 text-base font-semibold transition-colors active:scale-95",
+                                  isActive
+                                    ? "bg-zinc-800/60 text-white"
+                                    : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                                )}>
+                                <Ripple />
+                                <span
+                                  className={cn(
+                                    "flex h-8 w-8 items-center justify-center rounded-[4px]",
+                                    isActive ? "bg-white/10 text-zinc-100" : "bg-white/5 text-zinc-500"
+                                  )}>
+                                  {section.icon}
+                                </span>
+                                {section.title}
+                                <span
+                                  className={cn(
+                                    "text-xs font-bold",
+                                    isActive ? "text-zinc-400" : "text-zinc-600"
+                                  )}>
+                                  {section.songs.length}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
 
-                        {query && visibleCount === 0 && (
+                        {activeSection.songs.length > 0 ? (
+                          <div className="space-y-2">
+                            {activeSection.songs.map((song) => (
+                              <SongBoardRow
+                                key={song.id}
+                                song={song}
+                                progress={progressMap[song.id] ?? null}
+                                hasSectionMap={verifiedSectionMaps.has(song.id)}
+                                onOpenDetails={() => setDetailsTarget(song)}
+                                onPractice={() => setPracticeTarget(song)}
+                                onPartsChange={(parts) => setSongParts(song.id, parts)}
+                              />
+                            ))}
+                          </div>
+                        ) : query ? (
                           <div className="flex flex-col items-center justify-center py-20 text-center">
                             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
                               <Search size={32} className="text-zinc-500" />
                             </div>
                             <h3 className="mb-2 text-xl font-bold text-white">No songs match &ldquo;{boardSearchQuery}&rdquo;</h3>
                             <p className="max-w-xs text-sm text-zinc-400">
-                              Try a different title or artist.
+                              {visibleCount > 0
+                                ? "Nothing here — check the other tabs."
+                                : "Try a different title or artist."}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center rounded-xl bg-zinc-900/30 py-16 text-center">
+                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 text-zinc-500">
+                              {activeSection.icon}
+                            </div>
+                            <h3 className="mb-2 text-lg font-bold text-white">
+                              Nothing in &ldquo;{activeSection.title}&rdquo; yet
+                            </h3>
+                            <p className="max-w-xs text-sm text-zinc-400">
+                              Move a song here from another tab, or add a new one from the library.
                             </p>
                           </div>
                         )}
-                      </>
+                      </div>
                     );
                   })()}
 

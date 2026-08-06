@@ -24,6 +24,7 @@ export const oneChordImprovExercise: Exercise = {
     "Limit your note choices initially to master the expressive power of just a few pitches.",
     "Experiment with sliding, bending, and vibrato to vary the texture of your lines."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
 }; 

@@ -25,6 +25,7 @@ export const chordToneImprovisationExercise: Exercise = {
     "Resist falling back into scale patterns — every note must be justified by the chord.",
     "Focus on clarity and timing; even single notes should strongly imply the harmony."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: [
     "harmony",

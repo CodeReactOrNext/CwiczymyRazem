@@ -104,6 +104,7 @@ export const improvPromptEasy: Exercise = {
     "Commit fully to the constraint, even if it feels uncomfortable or unnatural at first.",
     "If a prompt is challenging, drastically reduce the number of notes you play to give yourself processing time.",
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
   riddleConfig: easyConfig
@@ -127,6 +128,7 @@ export const improvPromptMedium: Exercise = {
     "Use the constraint as a seed for inspiration, rather than a cage.",
     "Listen to your phrasing and prioritize musicality over strict technical execution.",
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
   riddleConfig: mediumConfig
@@ -151,6 +153,7 @@ export const improvPromptHard: Exercise = {
     "Slow down your playing significantly to allow your brain to process the dual requirements.",
     "Embrace the struggle; the cognitive friction is the primary benefit of the exercise.",
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["improvisation", "phrasing"],
   riddleConfig: hardConfig

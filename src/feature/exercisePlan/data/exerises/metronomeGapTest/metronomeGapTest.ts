@@ -22,6 +22,7 @@ export const metronomeGapTestExercise: Exercise = {
   // No app metronome: the interactive MetronomeGapTest panel provides its own
   // click track (audible bars → silence → target). A non-null metronomeSpeed
   // would make the session auto-start its continuous metronome on top of ours.
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["rhythm"],
 };

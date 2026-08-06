@@ -90,6 +90,7 @@ export const compositionChallengeExercise: Exercise = {
     "Record your result! Comparing sessions over time shows real growth.",
     "Restart the exercise for a completely new set of constraints."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["composition"],
   riddleConfig: compositionChallengeConfig

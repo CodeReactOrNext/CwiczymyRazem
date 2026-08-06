@@ -26,6 +26,7 @@ export const minimalMotionVoiceLeadingExercise: Exercise = {
     "Avoid autopilot shapes — the goal is choosing the nearest target, not running familiar patterns.",
     "Prioritize timing: land exactly on the chord change even if you play fewer notes."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: [
     "chords",

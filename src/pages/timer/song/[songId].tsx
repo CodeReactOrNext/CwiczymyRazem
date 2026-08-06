@@ -2,6 +2,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
+import { resolveSongsReturnPath } from "feature/songs/utils/songsReturnPath";
 import { selectCurrentUserStats, selectPreviousUserStats, selectRaitingData,selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { setActivity } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
@@ -24,8 +25,11 @@ import { db } from "utils/firebase/client/firebase.utils";
 
 const SongPracticeTimer: NextPageWithLayout = () => {
     const router = useRouter();
-    const { songId } = router.query;
-    
+    const { songId, returnTo } = router.query;
+    // Songs are practised in a run — finishing one should leave the user on the
+    // songs page, ready to pick the next one, not on the dashboard.
+    const songsReturnPath = resolveSongsReturnPath(returnTo);
+
     const timer = useTimer();
     const dispatch = useAppDispatch();
     const userId = useAppSelector(selectUserAuth);
@@ -183,7 +187,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             if (typeof window !== "undefined" && window.history.length > 1) {
                 router.back();
             } else {
-                router.push("/songs?view=board");
+                router.push(songsReturnPath);
             }
         };
         if (timer.getTime() > 0) {
@@ -241,7 +245,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     if (showSuccess && raitingData && currentUserStats && previousUserStats) {
         return (
             <RatingPopUpLayout
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push(songsReturnPath)}
                 ratingData={raitingData}
                 currentUserStats={currentUserStats}
                 previousUserStats={previousUserStats}

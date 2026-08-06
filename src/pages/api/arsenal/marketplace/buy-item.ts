@@ -42,6 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!sellerDoc.exists) throw new Error("SELLER_NOT_FOUND");
 
       const buyerData = buyerDoc.data()!;
+      const sellerData = sellerDoc.data()!;
       const price: number = listing.price;
       const buyerFame: number = buyerData.statistics?.fame || 0;
       if (buyerFame < price) throw new Error("INSUFFICIENT_FAME");
@@ -73,6 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         item: transferredItem,
         price,
         sellerId: listing.sellerId,
+        sellerName: sellerData.displayName || listing.sellerName || "Unknown",
         itemName: listing.itemName,
         itemBrand: listing.itemBrand,
         itemImageId: listing.itemImageId,
@@ -103,6 +105,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     } catch (notifError) {
       console.error("[marketplace/buy-item] notification failed:", notifError);
+    }
+
+    // Public activity log (panel only) — mirrors the listing log so purchases are visible
+    // in the feed and can be motivated like any other activity.
+    try {
+      await firestore.collection("logs").add({
+        type: "marketplace_purchase",
+        uid: buyerId,
+        userName: result.buyerName,
+        avatarUrl: result.buyerAvatarUrl,
+        userAvatarFrame: result.buyerFrame,
+        timestamp: new Date().toISOString(),
+        data: new Date().toISOString(),
+        sellerId: result.sellerId,
+        sellerName: result.sellerName,
+        itemType: result.itemType,
+        itemName: result.itemName,
+        itemBrand: result.itemBrand,
+        itemRarity: result.itemRarity,
+        itemImageId: result.itemImageId,
+        price: result.price,
+        rolledItem: result.item,
+      });
+    } catch (logError) {
+      console.error("[marketplace/buy-item] log write failed:", logError);
     }
 
     return res.status(200).json({

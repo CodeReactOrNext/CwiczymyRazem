@@ -19,6 +19,7 @@ export const oneStringBackingExercise: Exercise = {
     "Listen to the backing track and aim to land on notes that fit the chord underneath.",
     "Start with just 2-3 notes and a simple rhythm; add range only once it feels musical."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["phrasing", "improvisation"],
 }; 

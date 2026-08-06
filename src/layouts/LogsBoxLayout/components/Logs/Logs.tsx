@@ -17,6 +17,7 @@ import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDe
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
+import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -33,6 +34,7 @@ import type {
   FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
+  FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
@@ -66,6 +68,7 @@ import {
   ListChecks,
   Music,
   PartyPopper,
+  ShoppingCart,
   Star,
   Tag,
   Target,
@@ -89,6 +92,24 @@ const getGroupFameAmount = (group: LogGroup): number =>
 
 const getLogTimestampMs = (log: AnyFirebaseLog): number =>
   new Date((log as any).timestamp ?? (log as any).data).getTime();
+
+/** Splits a rolled inventory instance into its guitar/effect shape and resolves its level,
+ * so arsenal feed rows can hand the full card to `ItemPill`. */
+const resolveRolledItem = (rolled: InventoryItem | EffectInventoryItem | undefined) => {
+  const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
+  const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
+  let level: number | null = null;
+
+  if (rolledGuitar) {
+    const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
+    if (def) level = getItemLevel(rolledGuitar, def);
+  } else if (rolledEffect) {
+    const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
+    if (def) level = getEffectLevel(rolledEffect, def);
+  }
+
+  return { rolledGuitar, rolledEffect, level };
+};
 
 const PLAYLIST_KIND_LABEL: Record<string, string> = {
   playlist: "playlist",
@@ -810,17 +831,7 @@ const GroupedLogLine = ({
 
   if (type === "caseOpen") {
     const caseLog = log as FirebaseLogsCaseOpenInterface;
-    const rolled = caseLog.rolledItem;
-    const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
-    const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
-    let level: number | null = null;
-    if (rolledGuitar) {
-      const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
-      if (def) level = getItemLevel(rolledGuitar, def);
-    } else if (rolledEffect) {
-      const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
-      if (def) level = getEffectLevel(rolledEffect, def);
-    }
+    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(caseLog.rolledItem);
 
     return (
       <GroupedLine>
@@ -843,17 +854,7 @@ const GroupedLogLine = ({
 
   if (type === "marketplace") {
     const marketLog = log as FirebaseLogsMarketplaceInterface;
-    const rolled = marketLog.rolledItem;
-    const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
-    const rolledEffect = rolled && "effectId" in rolled ? rolled : null;
-    let level: number | null = null;
-    if (rolledGuitar) {
-      const def = GUITARS_BY_ID.get(rolledGuitar.guitarId);
-      if (def) level = getItemLevel(rolledGuitar, def);
-    } else if (rolledEffect) {
-      const def = EFFECTS_BY_ID.get(rolledEffect.effectId);
-      if (def) level = getEffectLevel(rolledEffect, def);
-    }
+    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(marketLog.rolledItem);
 
     return (
       <GroupedLine>
@@ -872,6 +873,49 @@ const GroupedLogLine = ({
           <Tag className="h-3.5 w-3.5 shrink-0" />
           <span className="inline-flex items-center gap-1 tabular-nums">
             {marketLog.price}
+            <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
+          </span>
+        </Chip>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "marketplacePurchase") {
+    const purchaseLog = log as FirebaseLogsMarketplacePurchaseInterface;
+    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(purchaseLog.rolledItem);
+
+    return (
+      <GroupedLine>
+        <span className="text-secondText text-sm">
+          <ShoppingCart className="mr-1.5 inline-block h-3.5 w-3.5 text-amber-400" />
+          bought
+        </span>
+        <ItemPill
+          itemType={purchaseLog.itemType}
+          itemName={purchaseLog.itemName}
+          itemBrand={purchaseLog.itemBrand}
+          itemRarity={purchaseLog.itemRarity}
+          itemImageId={purchaseLog.itemImageId}
+          level={level}
+          rolledGuitar={rolledGuitar}
+          rolledEffect={rolledEffect}
+        />
+        <span className="text-secondText text-sm">
+          from{" "}
+          {purchaseLog.sellerId ? (
+            <Link
+              href={`/user/${purchaseLog.sellerId}`}
+              className="font-bold text-white transition-colors hover:text-cyan-400 hover:underline">
+              {purchaseLog.sellerName}
+            </Link>
+          ) : (
+            <span className="font-bold text-white">{purchaseLog.sellerName}</span>
+          )}
+        </span>
+        <Chip color="amber">
+          <Tag className="h-3.5 w-3.5 shrink-0" />
+          <span className="inline-flex items-center gap-1 tabular-nums">
+            {purchaseLog.price}
             <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
           </span>
         </Chip>

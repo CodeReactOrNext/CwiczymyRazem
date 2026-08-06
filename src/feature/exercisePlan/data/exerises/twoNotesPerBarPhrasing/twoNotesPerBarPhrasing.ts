@@ -18,6 +18,7 @@ export const twoNotesPerBarPhrasingExercise: Exercise = {
     "Embrace the silence—rests are just as important as the notes you play.",
     "Vary the length and dynamic accent of your two notes to create contrast."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["phrasing", "improvisation"],
 };

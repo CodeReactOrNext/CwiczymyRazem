@@ -341,7 +341,17 @@ export const PracticeSession = ({
     getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
   } = useCalibration(planHasTablature);
 
-  const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
+  // disableMic marks exercises with nothing to detect (click drills, improv
+  // prompts, backing-track jams). It has to gate the mic HERE, not just the mic
+  // controls in SessionModal/DesktopSessionView — the mic preference is global
+  // (mic_tracking_enabled in localStorage), so once enabled anywhere it would
+  // otherwise open a real getUserMedia stream in every exercise, guitar or not.
+  const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong && !currentExercise.disableMic;
+  // Click hunts are scored from mouse clicks, so their snapshot is a real
+  // performance worth reporting even though the mic never opens (useScoreSaving
+  // persists them on its own click branch). Everything else only has a snapshot
+  // worth submitting when the mic was actually listening.
+  const hasTrackedPerformance = isMicEnabled || currentExercise.noteHuntConfig?.mode === "click";
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (isExamMode && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke
@@ -438,7 +448,7 @@ export const PracticeSession = ({
       await saveCurrentScores();
       autoSubmitReport(
         exerciseRecordsRef.current,
-        isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+        hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
         null,
       );
       onExamComplete?.(snap?.accuracy ?? 0);
@@ -463,7 +473,7 @@ export const PracticeSession = ({
     // "skip to the end and pass" dev shortcut, not a snapshot of real play.
     autoSubmitReport(
       exerciseRecordsRef.current,
-      isMicEnabled && snap ? { score: snap.maxPossibleScore, accuracy: 100 } : null,
+      hasTrackedPerformance && snap ? { score: snap.maxPossibleScore, accuracy: 100 } : null,
       null,
     );
     onExamComplete?.(100);
@@ -614,7 +624,7 @@ export const PracticeSession = ({
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              isMicEnabled && !isEarTrainingRiddle ? { score: examMistakeFailed ? 0 : successSnapshot.score, accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy } : null,
+              hasTrackedPerformance && !isEarTrainingRiddle ? { score: examMistakeFailed ? 0 : successSnapshot.score, accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy } : null,
               isEarTrainingRiddle ? { score: earTrainingScore } : null);
             if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy);
           }}
@@ -639,7 +649,7 @@ export const PracticeSession = ({
             const snap = noteMatchingHandle.current?.snapshot();
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              isMicEnabled && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+              hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
               isEarTrainingRiddle ? { score: earTrainingScore } : null);
             if (isExamMode && snap) onExamComplete?.(snap.accuracy);
           } : onFinish}
@@ -745,7 +755,4 @@ export const PracticeSession = ({
     </BpmProgressProvider>
     </TimerProvider>
     </NoteMatchingProvider>
-    </GuitarTuningProvider>
-  );
-};
-
+    </Guit

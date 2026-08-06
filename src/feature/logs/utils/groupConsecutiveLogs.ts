@@ -5,6 +5,7 @@ import type {
   FirebaseLogsExamPassedInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
+  FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
@@ -20,6 +21,7 @@ export type AnyFirebaseLog =
   | FirebaseLogsDailyQuestInterface
   | FirebaseLogsCaseOpenInterface
   | FirebaseLogsMarketplaceInterface
+  | FirebaseLogsMarketplacePurchaseInterface
   | FirebaseLogsPlaylistInterface
   | FirebaseLogsExamPassedInterface
   | FirebaseLogsSupportAskInterface
@@ -61,6 +63,12 @@ export const isFirebaseLogsMarketplace = (
   return (log as FirebaseLogsMarketplaceInterface).type === "marketplace_listing";
 };
 
+export const isFirebaseLogsMarketplacePurchase = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsMarketplacePurchaseInterface => {
+  return (log as FirebaseLogsMarketplacePurchaseInterface).type === "marketplace_purchase";
+};
+
 export const isFirebaseLogsPlaylist = (
   log: AnyFirebaseLog
 ): log is FirebaseLogsPlaylistInterface => {
@@ -91,6 +99,7 @@ export type LogActivityType =
   | "dailyQuest"
   | "caseOpen"
   | "marketplace"
+  | "marketplacePurchase"
   | "playlist"
   | "topPlayers"
   | "examPassed"
@@ -107,6 +116,7 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsDailyQuest(log)) return "dailyQuest";
   if (isFirebaseLogsCaseOpen(log)) return "caseOpen";
   if (isFirebaseLogsMarketplace(log)) return "marketplace";
+  if (isFirebaseLogsMarketplacePurchase(log)) return "marketplacePurchase";
   if (isFirebaseLogsPlaylist(log)) return "playlist";
   if (isFirebaseLogsExamPassed(log)) return "examPassed";
   if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
@@ -114,15 +124,17 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";
 };
 
-/** Coarser grouping category: case openings and marketplace listings are both guitar-arsenal
- * activity, so they're bucketed together in the feed even though they render differently.
- * An exam pass is likewise bucketed with the practice-session log the exam auto-submits right
- * before it — same user, same moment — so they land in one card instead of two. */
-export type LogGroupType = Exclude<LogActivityType, "caseOpen" | "marketplace" | "examPassed"> | "arsenal";
+/** Coarser grouping category: case openings and marketplace listings/purchases are all
+ * guitar-arsenal activity, so they're bucketed together in the feed even though they render
+ * differently. An exam pass is likewise bucketed with the practice-session log the exam
+ * auto-submits right before it — same user, same moment — so they land in one card instead of two. */
+export type LogGroupType =
+  | Exclude<LogActivityType, "caseOpen" | "marketplace" | "marketplacePurchase" | "examPassed">
+  | "arsenal";
 
 export const getLogGroupType = (log: AnyFirebaseLog): LogGroupType => {
   const type = getLogActivityType(log);
-  if (type === "caseOpen" || type === "marketplace") return "arsenal";
+  if (type === "caseOpen" || type === "marketplace" || type === "marketplacePurchase") return "arsenal";
   if (type === "examPassed") return "exercisePlan";
   return type;
 };

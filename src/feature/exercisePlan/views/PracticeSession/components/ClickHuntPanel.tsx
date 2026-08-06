@@ -1,9 +1,18 @@
+import { Checkbox } from "assets/components/ui/checkbox";
+import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
+import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
 import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import {
+  loadClickHuntNoteSoundPreference,
+  midiForPosition,
+  pickReferenceMidi,
+  saveClickHuntNoteSoundPreference,
+} from "../helpers/clickHuntNoteSound";
 import { ClickableFretboard } from "./ClickableFretboard";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
 
@@ -33,7 +42,8 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   const mistakeCount = clickHunt?.mistakeCount ?? 0;
 
   const targetNote = huntTarget ?? targetNoteProp;
-  const targetPositions = clickHunt?.targetPositions ?? [];
+  // Memoized so the note-audio hooks below don't see a fresh array every render.
+  const targetPositions = useMemo(() => clickHunt?.targetPositions ?? [], [clickHunt?.targetPositions]);
   const foundKeys = clickHunt?.foundKeys ?? [];
   const lastClick = clickHunt?.lastClick ?? null;
   const score = clickHunt?.gameState.score ?? 0;
@@ -53,6 +63,51 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
     const t = setTimeout(() => advanceHuntRef.current(), 900);
     return () => clearTimeout(t);
   }, [complete]);
+
+  // ── Reference note audio ───────────────────────────────────────────────────
+  // Asked for on Discord: hear the note the exercise is asking for. Opt-out and
+  // persisted, so the choice is made once and carries into every later session.
+  const [noteSound, setNoteSound] = useState(loadClickHuntNoteSoundPreference);
+  const toggleNoteSound = (enabled: boolean) => {
+    setNoteSound(enabled);
+    saveClickHuntNoteSoundPreference(enabled);
+  };
+
+  // Fetch the sampled guitar as the panel opens, so the first note the player
+  // hears is the real instrument and not the synthesised stand-in.
+  useEffect(() => { preloadGuitarNotePreview(); }, []);
+
+  const referenceMidi = useMemo(
+    () => pickReferenceMidi(targetPositions, targetNote),
+    [targetPositions, targetNote],
+  );
+  const playReference = useCallback(() => {
+    if (referenceMidi !== null) playGuitarNotePreview(referenceMidi);
+  }, [referenceMidi]);
+
+  // Sound the new target as it appears. Deliberately gated on the session
+  // actually running: the panel is live (and clickable) well before Play is
+  // pressed, so without this the note fires the moment the exercise loads —
+  // while the player is still reading the screen — and again on every remount.
+  // The "Hear the note" button covers wanting it early.
+  useEffect(() => {
+    if (!noteSound || !isPlaying) return;
+    playReference();
+  }, [noteSound, isPlaying, playReference]);
+
+  // A correct click sounds the pitch of the cell that was hit — same note as the
+  // target, in whichever octave the player found it. Wrong clicks stay silent;
+  // the red flash already says enough.
+  const handleCellClick = useCallback(
+    (string: number, fret: number) => {
+      if (noteSound && targetPositions.some((p) => p.string === string && p.fret === fret)) {
+        const midi = midiForPosition(string, fret);
+        if (midi >= 0) playGuitarNotePreview(midi);
+      }
+      registerFretClick(string, fret);
+    },
+    [noteSound, targetPositions, registerFretClick],
+  );
 
   return (
     <div className="relative flex w-full max-w-6xl flex-col items-center gap-2.5 sm:gap-4">
@@ -135,6 +190,27 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
         <p className="text-center text-sm font-semibold tracking-wide text-zinc-200">{description}</p>
       )}
 
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <button
+          type="button"
+          onClick={playReference}
+          disabled={referenceMidi === null}
+          className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95 disabled:opacity-40"
+          title="Play the note you are looking for">
+          <FaVolumeUp className="h-3.5 w-3.5" /> Hear the note
+        </button>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="click-hunt-note-sound"
+            checked={noteSound}
+            onCheckedChange={(checked) => toggleNoteSound(checked === true)}
+          />
+          <Label htmlFor="click-hunt-note-sound" className="cursor-pointer text-xs font-semibold tracking-wide text-zinc-400">
+            Play it automatically
+          </Label>
+        </div>
+      </div>
+
       <ClickableFretboard
         startFret={startFret}
         endFret={endFret}
@@ -142,7 +218,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
         foundKeys={foundKeys}
         totalTargets={totalTargets}
         lastClick={lastClick}
-        onCellClick={registerFretClick}
+        onCellClick={handleCellClick}
       />
 
       <div className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2">

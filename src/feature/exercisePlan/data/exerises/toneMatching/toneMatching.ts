@@ -22,6 +22,7 @@ export const toneMatchingExercise: Exercise = {
     "Consider the pick attack and where you are picking on the string.",
     "Listen for specific effects like reverb, delay, chorus, or compression."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["audio_production"],
 };

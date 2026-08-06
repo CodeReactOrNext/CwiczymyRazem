@@ -18,6 +18,7 @@ export const callAndResponsePhrasingExercise: Exercise = {
     "Vary the rhythm or length of the response to create immediate contrast with the question.",
     "Stay within a single scale shape initially to focus entirely on rhythmic phrasing and structural contour.",
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: [
     "phrasing",

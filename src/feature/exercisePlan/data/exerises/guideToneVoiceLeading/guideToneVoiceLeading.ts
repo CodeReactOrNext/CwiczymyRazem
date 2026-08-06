@@ -26,6 +26,7 @@ instructions: [
     "Avoid jumping to guide tones in different octaves if a closer option exists.",
     "With so few notes, use dynamics and sustain to keep the line musical."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["chords", "harmony", "music_theory", "ear_training"],
 };

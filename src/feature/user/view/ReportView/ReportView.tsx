@@ -44,6 +44,7 @@ import {
   inputTimeConverter,
 } from "utils/converter";
 import { getDailyStreakMultiplier, getStreakFromActivityLog } from "utils/gameLogic";
+import { resolveInternalPath } from "utils/resolveInternalPath";
 import { i18n } from "utils/translation";
 
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
@@ -411,7 +412,7 @@ const ReportView = () => {
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
         <RatingPopUpLayout
-          onClick={() => returnTo ? router.push(returnTo as string) : setView('form')}
+          onClick={() => returnTo ? router.push(resolveInternalPath(returnTo, "/dashboard")) : setView('form')}
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}

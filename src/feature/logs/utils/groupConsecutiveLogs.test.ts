@@ -1,11 +1,12 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsMarketplaceInterface,
+  FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsSongsInterface,
 } from "feature/logs/types/logs.type";
 import { describe, expect, it } from "vitest";
 
-import { groupConsecutiveLogs } from "./groupConsecutiveLogs";
+import { getLogActivityType, groupConsecutiveLogs } from "./groupConsecutiveLogs";
 
 const caseOpenLog = (
   overrides: Partial<FirebaseLogsCaseOpenInterface> = {}
@@ -44,6 +45,26 @@ const marketplaceLog = (
   ...overrides,
 });
 
+const marketplacePurchaseLog = (
+  overrides: Partial<FirebaseLogsMarketplacePurchaseInterface> = {}
+): FirebaseLogsMarketplacePurchaseInterface => ({
+  type: "marketplace_purchase",
+  uid: "user-1",
+  userName: "Cookie",
+  avatarUrl: null,
+  timestamp: "2026-07-09T21:20:00.000Z",
+  data: "2026-07-09T21:20:00.000Z",
+  sellerId: "user-2",
+  sellerName: "Other",
+  itemType: "guitar",
+  itemName: "JSC",
+  itemBrand: "Izanor",
+  itemRarity: "Common",
+  itemImageId: 1,
+  price: 70,
+  ...overrides,
+});
+
 const songLog = (
   overrides: Partial<FirebaseLogsSongsInterface> = {}
 ): FirebaseLogsSongsInterface => ({
@@ -67,6 +88,18 @@ describe("groupConsecutiveLogs", () => {
     expect(groups).toHaveLength(1);
     expect(groups[0].type).toBe("arsenal");
     expect(groups[0].logs).toHaveLength(4);
+  });
+
+  it("classifies a marketplace purchase as its own activity type inside the arsenal group", () => {
+    const purchase = marketplacePurchaseLog();
+
+    expect(getLogActivityType(purchase)).toBe("marketplacePurchase");
+
+    const groups = groupConsecutiveLogs([marketplaceLog(), purchase, caseOpenLog()]);
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0].type).toBe("arsenal");
+    expect(groups[0].logs).toHaveLength(3);
   });
 
   it("breaks the arsenal group when a different user's log appears", () => {

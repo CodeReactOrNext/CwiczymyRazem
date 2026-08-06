@@ -214,6 +214,29 @@ export interface FirebaseLogsMarketplaceInterface {
   reactions?: string[];
 }
 
+export interface FirebaseLogsMarketplacePurchaseInterface {
+  type: "marketplace_purchase";
+  /** Buyer — the log belongs to them, so they're the one who can't motivate it. */
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  sellerId: string;
+  sellerName: string;
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  price: number;
+  /** Full transferred instance — drives the card tooltip + level. */
+  rolledItem?: InventoryItem | EffectInventoryItem;
+  id?: string;
+  reactions?: string[];
+}
+
 export interface FirebaseLogsSupportAskInterface {
   type: "support_ask_update";
   data: string;

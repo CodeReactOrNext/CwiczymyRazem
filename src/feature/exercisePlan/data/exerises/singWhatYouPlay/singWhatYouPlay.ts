@@ -19,6 +19,7 @@ export const singWhatYouPlayExercise: Exercise = {
     "Begin with small, conjunct intervals (moving stepwise up or down the scale) before attempting large jumps.",
     "Use a clean, undistorted guitar tone so you can clearly hear the fundamental pitch of the notes.",
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["ear_training", "phrasing", "improvisation"],
 };

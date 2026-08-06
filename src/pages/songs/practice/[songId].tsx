@@ -9,6 +9,7 @@ import {
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
+import { resolveSongsReturnPath } from "feature/songs/utils/songsReturnPath";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
 import { Music } from "lucide-react";
@@ -122,7 +123,9 @@ export default function SongPracticePage() {
       }
     }
 
-    router.push("/report");
+    // `returnTo` sends the report's "Continue" button back to the songs page
+    // once the time is logged, instead of leaving the user on the log form.
+    router.push(`/report?returnTo=${encodeURIComponent(resolveSongsReturnPath(router.query.returnTo))}`);
   };
 
   const handleClose = () => {

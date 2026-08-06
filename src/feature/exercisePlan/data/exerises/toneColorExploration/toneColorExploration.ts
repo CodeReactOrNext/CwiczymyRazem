@@ -28,6 +28,7 @@ export const toneColorExplorationExercise: Exercise = {
     "Each position has a purpose in the sonic palette - learn when to use each.",
     "Combine with dynamics for even more tonal variations."
   ],
+  disableMic: true,
   metronomeSpeed: null,
   relatedSkills: ["audio_production"],
 };
