@@ -55,8 +55,22 @@ interface WorkerBridgeOptions {
   zoom?:           number;
   /** Left-gutter tuning legend; when non-empty the worker insets the content by TAB_GUTTER_W. */
   tuningStrings?:  TuningGutterString[];
+  /** Editor selection to mark on the board. Pass a stable object — every new identity posts a message. */
+  selection?:      TablatureSelection | null;
   /** Visual settings patch forwarded to the worker's STYLE message. Omit to keep its defaults. */
   style?:          TablatureStylePatch;
+}
+
+/**
+ * A highlight drawn on the board to mirror what an editor has selected: the
+ * beat span (in quarter notes from the start) and the strings it covers
+ * (1 = high e … 6 = low E).
+ */
+export interface TablatureSelection {
+  startBeat: number;
+  endBeat: number;
+  startString: number;
+  endString: number;
 }
 
 /** The look settings the worker accepts. Mirrors the STYLE message payload. */
@@ -86,7 +100,7 @@ export function useTablatureWorkerBridge({
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
   hitNotes, missedNotes, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
-  loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style,
+  loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -198,6 +212,7 @@ export function useTablatureWorkerBridge({
   useEffect(() => { workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes }); }, [missedNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'TUNING', strings: tuningStrings ?? [] }); }, [tuningStrings]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'SELECTION', selection: selection ?? null }); }, [selection]);
   useEffect(() => {
     if (!style) return;
     workerRef.current?.postMessage({ type: 'STYLE', ...style });
@@ -345,5 +360,32 @@ export function useTablatureWorkerBridge({
     workerRef.current?.postMessage({ type: 'HOVER', startX: null });
   };
 
-  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker };
+  // Park the viewport so `beat` sits at the left edge, leaving the cursor where
+  // it is. Used to mirror an external horizontal scrollbar (the tab editor's
+  // grid) — seekWorker's "cursor at a quarter of the view" framing would fight
+  // the scrolling instead of following it.
+  //
+  // `keepVisibleBeat` is nudged into view if the requested position would leave
+  // it off-screen: the board fits fewer beats than the editor's grid, so the
+  // cell being edited can sit outside the mirrored window.
+  const scrollToBeat = (beat: number, keepVisibleBeat?: number | null) => {
+    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
+    const viewW = containerSize.width / vscale;
+    let target = beat * dynBW;
+
+    if (keepVisibleBeat != null) {
+      const keepX  = keepVisibleBeat * dynBW;
+      const margin = Math.min(viewW / 4, dynBW);
+      if (keepX < target + margin) target = keepX - margin;
+      else if (keepX > target + viewW - margin) target = keepX - viewW + margin;
+    }
+
+    const maxScrollX = Math.max(0, renderData.totalBeats * dynBW - viewW);
+    const newScrollX = Math.min(Math.max(0, target), maxScrollX);
+    if (newScrollX === pausedScrollRef.current.scrollX) return;
+    pausedScrollRef.current = { ...pausedScrollRef.current, scrollX: newScrollX };
+    workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: pausedScrollRef.current.cursorPos });
+  };
+
+  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat };
 }

@@ -24,6 +24,10 @@ import {
   DEFAULT_TIME_SIGNATURE,
   regridMeasure,
 } from "feature/exercisePlan/utils/measureGrid";
+import {
+  beatAtScrollLeft,
+  beatRangeForCells,
+} from "feature/exercisePlan/utils/tabPreviewSync";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { AnimatePresence, motion } from "framer-motion";
@@ -287,6 +291,11 @@ export default function TabEditor() {
   } | null>(null);
   const [isGpModalOpen, setIsGpModalOpen] = useState(false);
   const gridRef = React.useRef<HTMLDivElement>(null);
+  const gridScrollRef = React.useRef<HTMLDivElement>(null);
+  // Filled in by the preview: parks its viewport at a given beat.
+  const previewScrollToBeatRef = React.useRef<
+    ((beat: number, keepVisibleBeat?: number | null) => void) | null
+  >(null);
   const selectionStartRef = React.useRef<{
     mIdx: number;
     bIdx: number;
@@ -670,7 +679,8 @@ export default function TabEditor() {
 
     const formattedCode = `tablature: ${JSON.stringify(
       cleanMeasures,
-      (key, value) => (NOTE_BOOLEAN_FLAGS.has(key) ? value || undefined : value),
+      (key, value) =>
+        NOTE_BOOLEAN_FLAGS.has(key) ? value || undefined : value,
       2,
     )},`;
 
@@ -835,6 +845,105 @@ export default function TabEditor() {
     grid.addEventListener("wheel", onWheel, { passive: false });
     return () => grid.removeEventListener("wheel", onWheel);
   }, [commit]);
+
+  /**
+   * What the grid has selected, in the preview's coordinates — a drag selection
+   * maps to its whole rectangle, a click to the single cell. The preview marks
+   * this on the board, so the note being edited is findable up there too.
+   */
+  const previewSelection = React.useMemo(() => {
+    const cells = activeSelection
+      ? {
+          measureIdx: activeSelection.measureIdx,
+          beats: [activeSelection.startBeat, activeSelection.endBeat],
+          strings: [activeSelection.startString, activeSelection.endString],
+        }
+      : selectedCell
+        ? {
+            measureIdx: selectedCell.measureIdx,
+            beats: [selectedCell.beatIdx, selectedCell.beatIdx],
+            strings: [selectedCell.stringIdx, selectedCell.stringIdx],
+          }
+        : null;
+    if (!cells) return null;
+
+    const range = beatRangeForCells(
+      measures,
+      cells.measureIdx,
+      cells.beats[0],
+      cells.beats[1],
+    );
+    if (!range) return null;
+
+    // The grid indexes strings from 0 (high e); the board numbers them 1–6.
+    return {
+      ...range,
+      startString: Math.min(...cells.strings) + 1,
+      endString: Math.max(...cells.strings) + 1,
+    };
+  }, [activeSelection, selectedCell, measures]);
+
+  /**
+   * Mirrors the grid's horizontal scroll onto the live preview: whatever beat
+   * sits at the left edge of the tab strip is put at the left edge of the
+   * preview. Measure boxes are read from the DOM rather than recomputed from
+   * cell widths, so measure separators and per-measure step counts are already
+   * baked into the numbers.
+   *
+   * The board fits fewer beats than the grid, so the selection is passed along
+   * as a "keep this on screen" hint — otherwise clicking a cell on the right of
+   * the strip would mark a spot the preview isn't showing.
+   */
+  const syncPreviewScroll = useCallback(() => {
+    const scroller = gridScrollRef.current;
+    const content = gridRef.current;
+    const scrollPreview = previewScrollToBeatRef.current;
+    // While playing, the preview follows the playback cursor — leave it alone.
+    if (!scroller || !content || !scrollPreview || isPlaying) return;
+
+    const contentLeft = content.getBoundingClientRect().left;
+    const boxes = measures.map((_, mIdx) => {
+      const el = document.getElementById(`measure-grid-${mIdx}`);
+      if (!el) return { left: 0, width: 0 };
+      const rect = el.getBoundingClientRect();
+      return { left: rect.left - contentLeft, width: rect.width };
+    });
+
+    scrollPreview(
+      beatAtScrollLeft(scroller.scrollLeft, measures, boxes),
+      previewSelection?.startBeat ?? null,
+    );
+  }, [isPlaying, measures, previewSelection]);
+
+  // One rAF per frame at most: a scroll gesture fires far more events than the
+  // preview can repaint, and each sync reads layout for every measure.
+  useEffect(() => {
+    const scroller = gridScrollRef.current;
+    if (!scroller) return undefined;
+
+    let frame: number | null = null;
+    const onScroll = () => {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        syncPreviewScroll();
+      });
+    };
+
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  }, [syncPreviewScroll]);
+
+  // Editing the tab resets the preview's viewport, and moving the selection can
+  // pull it out of view (syncPreviewScroll is rebuilt whenever either changes),
+  // so re-apply the scroll position afterwards — otherwise each keystroke snaps
+  // the preview back to bar 1 while the grid stays where the user left it.
+  useEffect(() => {
+    syncPreviewScroll();
+  }, [syncPreviewScroll]);
 
   const clearSelectedNote = useCallback(() => {
     if (!selectedCell) return;
@@ -1726,6 +1835,8 @@ export default function TabEditor() {
                 bpm={bpm}
                 isPlaying={isPlaying}
                 startTime={startTime}
+                selection={previewSelection}
+                scrollToBeatRef={previewScrollToBeatRef}
                 className='relative z-10 h-[280px] rounded-lg backdrop-blur-3xl'
               />
             </div>
@@ -1760,7 +1871,9 @@ export default function TabEditor() {
                   ))}
                 </div>
 
-                <div className='custom-scrollbar flex-1 overflow-x-auto pb-2'>
+                <div
+                  ref={gridScrollRef}
+                  className='custom-scrollbar flex-1 overflow-x-auto pb-2'>
                   <div className='flex min-w-max' ref={gridRef}>
                     <div className='flex overflow-hidden rounded-lg border border-zinc-800'>
                       {measures.map((measure, mIdx) => {

@@ -755,4 +755,7 @@ export const PracticeSession = ({
     </BpmProgressProvider>
     </TimerProvider>
     </NoteMatchingProvider>
-    </Guit
+    </GuitarTuningProvider>
+  );
+};
+

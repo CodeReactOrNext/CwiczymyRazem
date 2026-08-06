@@ -6,7 +6,7 @@ import React, { memo, useEffect, useRef, useState } from "react";
 import { CountInOverlay } from "./CountInOverlay";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
 import { useTablatureRenderData } from "./useTablatureRenderData";
-import type { TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
+import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
 import { TAB_BASE_HEIGHT, useTablatureWorkerBridge } from "./useTablatureWorkerBridge";
 
 interface TablatureViewerProps {
@@ -36,6 +36,13 @@ interface TablatureViewerProps {
   loopEndBeat?: number | null;
   /** Populated by the viewer so callers (e.g. minimap) can drive the canvas cursor without a canvas click */
   seekWorkerRef?: React.MutableRefObject<((beat: number) => void) | null>;
+  /** Populated with a "park the view at this beat" callback — lets a caller mirror
+   *  its own horizontal scrollbar (the tab editor's grid) onto the preview,
+   *  without moving the playback cursor. The second argument names a beat that
+   *  must stay on screen even if that means overriding the first. */
+  scrollToBeatRef?: React.MutableRefObject<
+    ((beat: number, keepVisibleBeat?: number | null) => void) | null
+  >;
   /** Populated with the CSS pixel width of the canvas container so parent can derive viewport beats */
   viewerWidthRef?: React.MutableRefObject<number>;
   /** Horizontal zoom multiplier for the score (1 = default). */
@@ -47,6 +54,9 @@ interface TablatureViewerProps {
   tuningStrings?: TuningGutterString[];
   /** Look settings forwarded to the worker (pill shape, colours, visible layers). */
   style?: TablatureStylePatch;
+  /** Highlights the beats/strings an editor has selected. Memoize it — a new
+   *  object identity means a new message to the worker. */
+  selection?: TablatureSelection | null;
   /** Per-string fret-pill colours. Baked into the render data, so it must be
    *  passed here — the worker only uses its own copy for slide lines. */
   palette?: readonly string[];
@@ -77,11 +87,13 @@ const TablatureViewerInner = ({
   loopStartBeat,
   loopEndBeat,
   seekWorkerRef,
+  scrollToBeatRef,
   viewerWidthRef,
   zoom = 1,
   heightPx = TAB_BASE_HEIGHT,
   tuningStrings,
   style,
+  selection,
   ambientGlow = true,
   palette,
   isLightBoard = false,
@@ -96,18 +108,23 @@ const TablatureViewerInner = ({
   // same spacing this render data was built with (both come from `style`).
   const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing);
 
-  const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker } = useTablatureWorkerBridge({
+  const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
-    loopStartBeat, loopEndBeat, zoom, tuningStrings, style,
+    loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection,
   });
 
   // Expose seekWorker so parent (TablatureSection minimap) can drive the canvas cursor
   useEffect(() => {
     if (seekWorkerRef) seekWorkerRef.current = seekWorker;
   }, [seekWorkerRef, seekWorker]);
+
+  // Same deal for the scroll-only variant (tab editor grid → preview).
+  useEffect(() => {
+    if (scrollToBeatRef) scrollToBeatRef.current = scrollToBeat;
+  }, [scrollToBeatRef, scrollToBeat]);
 
   // Expose CSS container width so parent can compute viewport beats for the minimap
   useEffect(() => {
@@ -211,6 +228,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.heightPx         === next.heightPx           &&
   prev.tuningStrings    === next.tuningStrings      &&
   prev.style            === next.style              &&
+  prev.selection        === next.selection          &&
   prev.ambientGlow      === next.ambientGlow        &&
   prev.palette          === next.palette            &&
   prev.isLightBoard     === next.isLightBoard

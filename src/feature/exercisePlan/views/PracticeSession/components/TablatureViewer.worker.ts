@@ -209,6 +209,11 @@ let pausedScrollX = 0;
 // Hover preview — world-X of the measure start being hovered (null = no hover)
 let hoverStartX: number | null = null;
 
+// What the tab editor currently has selected, mirrored here so the preview can
+// mark the same spot. Beats are world positions, strings are 1–6 (1 = high e).
+// null = nothing selected (or no editor driving this viewer at all).
+let selection: { startBeat: number; endBeat: number; startString: number; endString: number } | null = null;
+
 // Sub-loop range in beats (null = full song loop)
 let loopStartBeat: number | null = null;
 let loopEndBeat:   number | null = null;
@@ -1337,6 +1342,26 @@ function render() {
     ctx.fillText("⟳", lsx + 4, 3);
   }
 
+  // ── Editor selection — mirrors the cell(s) picked in the tab editor grid ─
+  // Playback owns the board while it runs, so this only shows when stopped.
+  if (selection && !isPlaying) {
+    const selX = selection.startBeat * dynBW;
+    const selW = Math.max(6, (selection.endBeat - selection.startBeat) * dynBW);
+    const topY = STAFF_TOP + (selection.startString - 1) * STRING_SPACING;
+    const botY = STAFF_TOP + (selection.endString   - 1) * STRING_SPACING;
+
+    // Wash over the whole staff at that beat: an empty cell has no note to ring,
+    // and this is what makes the spot findable at a glance.
+    ctx.fillStyle = "rgba(6,182,212,0.10)";
+    ctx.fillRect(selX, STAFF_TOP - 16, selW, 5 * STRING_SPACING + 32);
+
+    // Ring around the selected string(s) — the note-level "you are here".
+    ctx.strokeStyle = "rgba(34,211,238,0.85)";
+    ctx.lineWidth = 1.5;
+    drawPill(selX - 2, topY - BLOCK_H / 2 - 3, selW + 4, botY - topY + BLOCK_H + 6, BLOCK_CORNER + 2);
+    ctx.stroke();
+  }
+
   // ── Hover seek preview — dashed line at measure snap point ───────────────
   if (hoverStartX !== null && !isPlaying) {
     // Dashed vertical line showing where cursor would jump to
@@ -1480,6 +1505,10 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'HOVER': {
       hoverStartX = msg.startX ?? null;
+      break;
+    }
+    case 'SELECTION': {
+      selection = msg.selection ?? null;
       break;
     }
     case 'LOOP_RANGE': {
