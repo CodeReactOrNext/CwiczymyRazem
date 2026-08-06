@@ -61,6 +61,43 @@ export type GuitarRarity =
   | "Legendary"
   | "Mythic";
 
+/** Scrap parts run on their own 3-step scale — item rarity decides which tiers roll. */
+export type PartTier = "Standard" | "Epic" | "Legendary" | "Unique";
+
+export type PartId =
+  // Guitar teardown
+  | "body"
+  | "neck"
+  | "bridge"
+  | "pickup"
+  | "tuners"
+  // Pedal teardown
+  | "enclosure"
+  | "opamp"
+  | "diode"
+  // Dropped by both
+  | "pot"
+  | "screws";
+
+export interface ScrapSlot {
+  partId: PartId;
+  qty: number;
+}
+
+/**
+ * What an item physically holds — the hand-authored half of the scrap system.
+ * The order is the salvage priority: earlier slots come off first and at a higher
+ * tier, and low-rarity gear only ever reaches the first slot or two.
+ */
+export type ScrapBom = ScrapSlot[];
+
+/** One stack of recovered parts. Parts are a currency: they stack by (partId, tier). */
+export interface ScrapPart {
+  partId: PartId;
+  tier: PartTier;
+  qty: number;
+}
+
 export type CaseType =
   | "standard"
   | "premium-guitar"
@@ -177,6 +214,15 @@ export interface ArsenalUserData {
   equippedItemId: string | null;
   rig: RigSetup;
   effectInventory: EffectInventoryItem[];
+  /** Parts recovered from teardowns. A currency: stacked by (partId, tier). */
+  parts: ScrapPart[];
+}
+
+export interface ScrapResult {
+  /** What this teardown paid out. */
+  parts: ScrapPart[];
+  /** The full wallet after the teardown. */
+  newParts: ScrapPart[];
 }
 
 export interface OpenCaseResult {

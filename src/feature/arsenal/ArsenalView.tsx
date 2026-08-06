@@ -3,12 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { BookMarked,Guitar,PackageOpen, Store,Swords } from "lucide-react";
+import { BookMarked,Guitar,Hammer,PackageOpen, Store,Swords } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-const ARSENAL_TABS = ["cases", "collection", "dex", "rig", "market"] as const;
+const ARSENAL_TABS = ["cases", "collection", "workshop", "dex", "rig", "market"] as const;
 type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
@@ -17,7 +17,9 @@ import { DexView } from "./components/Dex/DexView";
 import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
 import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
+import { PartsWallet } from "./components/Parts/PartsWallet";
 import { RigView } from "./components/Rig/RigView";
+import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
 import { getRigLevel } from "./data/rigLevel";
 import { useArsenalData } from "./hooks/useArsenalData";
@@ -103,6 +105,13 @@ export const ArsenalView = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger
+                value="workshop"
+                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
+              >
+                <Hammer size={16} />
+                <span className={activeTab === "workshop" ? "inline" : "hidden sm:inline"}>Workshop</span>
+              </TabsTrigger>
+              <TabsTrigger
                 value="dex"
                 className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
               >
@@ -143,10 +152,15 @@ export const ArsenalView = () => {
                 </div>
               ) : data ? (
                 <>
+                  <PartsWallet parts={data.parts ?? []} />
                   <GuitarInventory data={data} />
                   <EffectCollection data={data} />
                 </>
               ) : null}
+            </TabsContent>
+
+            <TabsContent value="workshop" className="mt-4">
+              <WorkshopTab parts={data?.parts ?? []} />
             </TabsContent>
 
             <TabsContent value="dex" className="mt-4">

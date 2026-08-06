@@ -4,11 +4,13 @@ import { getItemLevel, getItemValue } from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
+import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { useSellGuitarsBulk } from "feature/arsenal/hooks/useSellGuitarsBulk";
 import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { getGuitarScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers,PackageOpen } from "lucide-react";
 import { useEffect,useMemo,useState } from "react";
@@ -17,6 +19,7 @@ import { useAppSelector } from "store/hooks";
 import type { ArsenalUserData, InventoryItem, RigSetup } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
+import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
 import { RARITY_RANK } from "../RarityProgress";
 import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
@@ -39,6 +42,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellGuitarsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
+  const { mutate: scrap, isPending: isScrapping } = useScrapGuitar();
   const { mutate: saveRig } = useUpdateRig();
   const queryClient = useQueryClient();
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -122,6 +126,22 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   const [listItemId, setListItemId] = useState<string | null>(null);
   const [listGuitarId, setListGuitarId] = useState<number | string | null>(null);
   const [isBulkSellOpen, setIsBulkSellOpen] = useState(false);
+  const [scrapItemId, setScrapItemId] = useState<string | null>(null);
+  const [scrapGuitarId, setScrapGuitarId] = useState<number | string | null>(null);
+
+  const handleScrapClick = (inventoryItemId: string, guitarId: number | string) => {
+    setScrapItemId(inventoryItemId);
+    setScrapGuitarId(guitarId);
+  };
+
+  const closeScrapDialog = () => {
+    setScrapItemId(null);
+    setScrapGuitarId(null);
+  };
+
+  const handleConfirmScrap = () => {
+    if (scrapItemId) scrap(scrapItemId, { onSuccess: closeScrapDialog });
+  };
 
   const handleConfirmBulkSell = () => {
     if (duplicateIds.length === 0) return;
@@ -242,6 +262,8 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
             isSelling={isSelling}
             onListClick={handleListClick}
             isListing={isListing}
+            onScrapClick={handleScrapClick}
+            isScrapping={isScrapping}
           />
         ))}
       </div>
@@ -281,6 +303,22 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
             onConfirm={handleConfirmList}
             onCancel={closeListDialog}
             isLoading={isListing}
+          />
+        ) : null;
+      })()}
+
+      {(() => {
+        const guitar = scrapGuitarId != null ? GUITARS_BY_ID.get(scrapGuitarId) : null;
+        const item = scrapItemId ? data.inventory.find((i) => i.id === scrapItemId) : null;
+        return guitar && item ? (
+          <ScrapConfirmDialog
+            isOpen
+            itemType="Guitar"
+            itemName={`${guitar.brand} ${guitar.name}`}
+            parts={getGuitarScrapYield(item, guitar)}
+            onConfirm={handleConfirmScrap}
+            onCancel={closeScrapDialog}
+            isLoading={isScrapping}
           />
         ) : null;
       })()}

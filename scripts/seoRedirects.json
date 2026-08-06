@@ -795,6 +795,21 @@
     "permanent": true
   },
   {
+    "source": "/exercises/sweet-child-o-mine-riff-preview",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/thunderstruck-riff-preview",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/crazy-train-riff-preview",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
     "source": "/exercises/naked-tone-melody",
     "destination": "/beginner-guitar-exercises",
     "permanent": true

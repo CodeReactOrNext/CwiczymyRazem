@@ -1,8 +1,12 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectFeatures, getEffectLevel } from "feature/arsenal/data/effectStats";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition } from "feature/arsenal/data/itemStats";
-import { Store,Trash2 } from "lucide-react";
+import { countScrapParts, getEffectScrapYield } from "feature/arsenal/utils/scrap";
+import { Store,Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
+
+import { ScrapYieldList } from "../Parts/ScrapYieldList";
 
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
@@ -16,6 +20,8 @@ interface EffectCardProps {
   isSelling?: boolean;
   onListClick?: (inventoryItemId: string, effectId: number | string) => void;
   isListing?: boolean;
+  onScrapClick?: (inventoryItemId: string, effectId: number | string) => void;
+  isScrapping?: boolean;
   /** Hide the Sell footer — for tooltips, reveals and read-only previews. */
   readOnly?: boolean;
   /** Custom footer rendered inside the card frame in place of the Sell row
@@ -23,7 +29,7 @@ interface EffectCardProps {
   footer?: ReactNode;
 }
 
-export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSelling, onListClick, isListing, readOnly = false, footer }: EffectCardProps) => {
+export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSelling, onListClick, isListing, onScrapClick, isScrapping, readOnly = false, footer }: EffectCardProps) => {
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
 
@@ -34,6 +40,10 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
   const conditionTier = getConditionTier(condition);
   const level = getEffectLevel(item, effect);
   const features = getEffectFeatures(item);
+
+  // Scrap potential is deterministic, so the exact payout can be shown up front.
+  const scrapParts = getEffectScrapYield(item, effect);
+  const scrapTotal = countScrapParts(scrapParts);
 
   // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
   const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
@@ -287,6 +297,39 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
             <Store size={9} strokeWidth={2.5} />
             Market
           </button>
+        )}
+
+        {onScrapClick && (
+          <TooltipProvider>
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                <span className="flex flex-1">
+                  <button
+                    onClick={() => onScrapClick(item.id, item.effectId)}
+                    disabled={isScrapping || isOnPedalboard}
+                    className="w-full py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-orange-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
+                    style={{ borderColor: `${rs.baseColor}15` }}
+                  >
+                    <Wrench size={9} strokeWidth={2.5} />
+                    Scrap
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-white max-w-[260px]">
+                {isOnPedalboard ? (
+                  <span className="text-xs">Remove from the pedalboard before scrapping</span>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-400">
+                      Scraps into {scrapTotal} parts
+                    </span>
+                    <ScrapYieldList parts={scrapParts} compact />
+                  </div>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         <button

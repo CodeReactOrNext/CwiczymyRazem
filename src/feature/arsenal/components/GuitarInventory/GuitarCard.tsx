@@ -3,8 +3,11 @@ import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition, getItemFeatures, getItemLevel } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { Check, Store,Trash2 } from "lucide-react";
+import { countScrapParts, getGuitarScrapYield } from "feature/arsenal/utils/scrap";
+import { Check, Store,Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
+
+import { ScrapYieldList } from "../Parts/ScrapYieldList";
 
 // SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -24,6 +27,8 @@ interface GuitarCardProps {
   isSelling?: boolean;
   onListClick?: (inventoryItemId: string, guitarId: number | string) => void;
   isListing?: boolean;
+  onScrapClick?: (inventoryItemId: string, guitarId: number | string) => void;
+  isScrapping?: boolean;
   /** Rig slot index (0-2) this item occupies, or null/undefined if not in the rig. */
   rigSlot?: number | null;
   /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
@@ -33,7 +38,7 @@ interface GuitarCardProps {
   footer?: ReactNode;
 }
 
-export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, onListClick, isListing, rigSlot, readOnly = false, footer }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping, onSellClick, isSelling, onListClick, isListing, onScrapClick, isScrapping, rigSlot, readOnly = false, footer }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -54,6 +59,10 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
   const sellTooltip = isEquipped
     ? "Unequip from your profile before selling"
     : "Sell for fame";
+
+  // Scrap potential is deterministic, so the exact payout can be shown up front.
+  const scrapParts = getGuitarScrapYield(item, guitar);
+  const scrapTotal = countScrapParts(scrapParts);
 
   // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
   const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
@@ -335,12 +344,12 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
           onClick={() => onEquipClick?.()}
           disabled={isEquipping}
           className={cn(
-            "flex-1 py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r",
+            "flex-1 py-3.5 px-1 text-[10px] font-semibold capitalize tracking-wide transition-colors flex items-center justify-center gap-1 border-r",
             isEquipped ? "text-amber-400" : "text-zinc-500 hover:text-white disabled:opacity-30"
           )}
           style={{ borderColor: `${rs.baseColor}15`, background: isEquipped ? "rgba(251,191,36,0.06)" : undefined }}
         >
-          {isEquipped && <Check size={11} strokeWidth={3} />}
+          {isEquipped && <Check size={10} strokeWidth={3} />}
           Equip
         </button>
 
@@ -353,16 +362,48 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
                   <button
                     onClick={() => onListClick(item.id, guitar.id)}
                     disabled={isListing || isEquipped || rigSlot != null}
-                    className="w-full py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
+                    className="w-full py-3.5 px-1 text-[10px] font-semibold capitalize tracking-wide transition-colors flex items-center justify-center gap-1 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
                     style={{ borderColor: `${rs.baseColor}15` }}
                   >
-                    <Store size={11} strokeWidth={2.5} />
+                    <Store size={10} strokeWidth={2.5} />
                     Market
                   </button>
                 </span>
               </TooltipTrigger>
               <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-xs text-white">
                 {marketTooltip}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {onScrapClick && (
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <span className="flex flex-1">
+                  <button
+                    onClick={() => onScrapClick(item.id, guitar.id)}
+                    disabled={isScrapping || isEquipped || rigSlot != null}
+                    className="w-full py-3.5 px-1 text-[10px] font-semibold capitalize tracking-wide transition-colors flex items-center justify-center gap-1 text-zinc-600 hover:text-orange-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
+                    style={{ borderColor: `${rs.baseColor}15` }}
+                  >
+                    <Wrench size={10} strokeWidth={2.5} />
+                    Scrap
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-white max-w-[260px]">
+                {isEquipped ? (
+                  <span className="text-xs">Unequip from your profile before scrapping</span>
+                ) : rigSlot != null ? (
+                  <span className="text-xs">Remove from rig slot {rigSlot + 1} before scrapping</span>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-400">
+                      Scraps into {scrapTotal} parts
+                    </span>
+                    <ScrapYieldList parts={scrapParts} compact />
+                  </div>
+                )}
               </TooltipContent>
             </Tooltip>
           )}
@@ -374,9 +415,9 @@ export const GuitarCard = ({ item, isEquipped = false, onEquipClick, isEquipping
                 <button
                   onClick={() => onSellClick?.(item.id, guitar.id)}
                   disabled={isSelling || isEquipped}
-                  className="w-full py-3.5 text-[11px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 px-1 text-[10px] font-semibold capitalize tracking-wide transition-colors flex items-center justify-center gap-1 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
                 >
-                  <Trash2 size={11} strokeWidth={2.5} />
+                  <Trash2 size={10} strokeWidth={2.5} />
                   Sell
                 </button>
               </span>

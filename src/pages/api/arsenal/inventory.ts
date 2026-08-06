@@ -38,6 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         equippedItemId: null,
         rig: DEFAULT_RIG,
         effectInventory: [],
+        parts: [],
       };
       await userRef.update({ arsenal, rigLevel: 0 });
       return res.status(200).json({ ...arsenal, fame });
@@ -66,6 +67,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ampId: storedRig?.ampId ?? null,
       },
       effectInventory: data.arsenal.effectInventory || [],
+      // Accounts created before the scrap system have no wallet yet.
+      parts: data.arsenal.parts || [],
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals

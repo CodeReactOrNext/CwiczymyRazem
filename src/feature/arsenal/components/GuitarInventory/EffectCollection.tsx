@@ -3,9 +3,11 @@ import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDe
 import { getEffectLevel, getEffectValue } from "feature/arsenal/data/effectStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
+import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
 import { useEffect, useMemo,useState } from "react";
@@ -13,6 +15,7 @@ import { useAppSelector } from "store/hooks";
 
 import type { ArsenalUserData, EffectInventoryItem } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
+import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
 import { RARITY_RANK } from "../RarityProgress";
 import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
@@ -31,6 +34,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const { mutate: sellEffect, isPending: isSelling } = useSellEffect();
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
+  const { mutate: scrap, isPending: isScrapping } = useScrapEffect();
   const queryClient = useQueryClient();
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
@@ -41,6 +45,22 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const [listItemId, setListItemId] = useState<string | null>(null);
   const [listEffectId, setListEffectId] = useState<number | string | null>(null);
   const [isBulkSellOpen, setIsBulkSellOpen] = useState(false);
+  const [scrapItemId, setScrapItemId] = useState<string | null>(null);
+  const [scrapEffectId, setScrapEffectId] = useState<number | string | null>(null);
+
+  const handleScrapClick = (inventoryItemId: string, effectId: number | string) => {
+    setScrapItemId(inventoryItemId);
+    setScrapEffectId(effectId);
+  };
+
+  const closeScrapDialog = () => {
+    setScrapItemId(null);
+    setScrapEffectId(null);
+  };
+
+  const handleConfirmScrap = () => {
+    if (scrapItemId) scrap(scrapItemId, { onSuccess: closeScrapDialog });
+  };
 
   // Sellable duplicates: for every pedal owned more than once, keep the
   // highest-level copy and mark the lower-level ones for bulk selling.
@@ -196,10 +216,30 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
               isSelling={isSelling}
               onListClick={handleListClick}
               isListing={isListing}
+              onScrapClick={handleScrapClick}
+              isScrapping={isScrapping}
             />
           ))}
         </div>
       </div>
+
+      {(() => {
+        const effect = scrapEffectId != null ? EFFECTS_BY_ID.get(scrapEffectId) : null;
+        const item = scrapItemId
+          ? data.effectInventory.find((i) => i.id === scrapItemId)
+          : null;
+        return effect && item ? (
+          <ScrapConfirmDialog
+            isOpen
+            itemType="Effect"
+            itemName={`${effect.brand} ${effect.name}`}
+            parts={getEffectScrapYield(item, effect)}
+            onConfirm={handleConfirmScrap}
+            onCancel={closeScrapDialog}
+            isLoading={isScrapping}
+          />
+        ) : null;
+      })()}
 
       <BulkSellConfirmDialog
         isOpen={isBulkSellOpen}

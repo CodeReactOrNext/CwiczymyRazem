@@ -67,6 +67,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Recycle,
     label: "Scrap Guitars for Parts",
     kind: "feature",
+    done: true,
     description:
       "Scrap guitars you don't want. Different guitars break down into different parts, so what you keep (and what you scrap) actually matters.",
   },
