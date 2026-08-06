@@ -1,3 +1,4 @@
+import { Chip, chipVariants, getChipCustomStyle } from "assets/components/ui/chip";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
@@ -29,19 +30,21 @@ interface ExerciseBrowseTabProps {
 
 const PAGE_SIZE = 15;
 
-const CATEGORY_COLORS: Record<string, string> = {
-  technique: "bg-blue-500/[0.12] text-blue-400",
-  theory: "bg-violet-500/[0.12] text-violet-400",
-  hearing: "bg-cyan-500/[0.12] text-cyan-400",
-  creativity: "bg-green-500/[0.12] text-green-400",
-  mixed: "bg-zinc-500/[0.12] text-zinc-400",
+// Hex values match this app's usual tinted-Chip look for hues that have no
+// named Chip variant (see `getChipCustomStyle`).
+const CATEGORY_HEX: Record<string, string> = {
+  technique: "#60a5fa", // blue-400
+  theory: "#a78bfa", // violet-400
+  hearing: "#22d3ee", // cyan-400
+  creativity: "#4ade80", // green-400
+  mixed: "#a1a1aa", // zinc-400
 };
 
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: "bg-sky-500/[0.12] text-sky-400",
-  easy: "bg-emerald-500/[0.12] text-emerald-400",
-  medium: "bg-amber-500/[0.12] text-amber-400",
-  hard: "bg-rose-500/[0.12] text-rose-400",
+const DIFFICULTY_HEX: Record<string, string> = {
+  beginner: "#38bdf8", // sky-400
+  easy: "#34d399", // emerald-400
+  medium: "#fbbf24", // amber-400
+  hard: "#fb7185", // rose-400
 };
 
 const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
@@ -54,10 +57,8 @@ const exTitle = (ex: { title: unknown; id: string }): string =>
 
 const filterPill = (active: boolean) =>
   cn(
-    "px-3 py-1 rounded text-[11px] font-semibold transition-colors capitalize whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-    active
-      ? "bg-cyan-500/15 text-cyan-300"
-      : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+    chipVariants({ color: active ? "cyan" : "gray" }),
+    "cursor-pointer whitespace-nowrap px-3 py-1 text-[11px] capitalize focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
   );
 
 export const ExerciseBrowseTab = ({
@@ -454,10 +455,9 @@ export const ExerciseBrowseTab = ({
                               {title}
                             </span>
                             {isNew && (
-                              <span className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-2 py-0.5 ring-1 ring-inset ring-sky-500/20">
-                                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-                                <span className="text-[9px] font-semibold tracking-wider text-sky-300">New</span>
-                              </span>
+                              <Chip color="cyan" className="flex-shrink-0 px-2 py-0.5 text-[9px] tracking-wider">
+                                New
+                              </Chip>
                             )}
                             {isLocked && (
                               <span className="flex-shrink-0 flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/25">
@@ -479,16 +479,24 @@ export const ExerciseBrowseTab = ({
 
                     {/* Category */}
                     <td className={cn(cellBg, "px-3 py-4")}>
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider", CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed)}>
+                      <Chip
+                        color="custom"
+                        style={getChipCustomStyle(CATEGORY_HEX[exercise.category] ?? CATEGORY_HEX.mixed)}
+                        className="px-2 py-0.5 text-[10px] capitalize tracking-wider"
+                      >
                         {exercise.category}
-                      </span>
+                      </Chip>
                     </td>
 
                     {/* Difficulty */}
                     <td className={cn(cellBg, "px-3 py-4")}>
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider", DIFFICULTY_COLORS[exercise.difficulty])}>
+                      <Chip
+                        color="custom"
+                        style={getChipCustomStyle(DIFFICULTY_HEX[exercise.difficulty])}
+                        className="px-2 py-0.5 text-[10px] capitalize tracking-wider"
+                      >
                         {exercise.difficulty}
-                      </span>
+                      </Chip>
                     </td>
 
                     {/* Skill */}
