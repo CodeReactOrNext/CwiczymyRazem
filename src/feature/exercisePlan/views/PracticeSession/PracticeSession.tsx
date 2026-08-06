@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
+import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
@@ -619,8 +620,11 @@ export const PracticeSession = ({
           }}
           onRestart={examMistakeFailed ? undefined : () => {
             examAutoFinishedRef.current = false;
-            resetSuccessView(); resetTimer(); metronome.restartMetronome(); startTimer();
-            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();
+            const usesMetronome = !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
+            resetSuccessView(); resetTimer(); metronome.restartMetronome();
+            // Hold the timer for the count-in — it must not eat practice time.
+            startTimer(usesMetronome ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm) : 0);
+            if (usesMetronome) metronome.startMetronome();
           }}
           isLoading={isFinishing || isSubmittingReport}
         />

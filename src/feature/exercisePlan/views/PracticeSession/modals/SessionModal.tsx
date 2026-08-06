@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useIsLandscape } from "hooks/useIsLandscape";
 import type { Dispatch, SetStateAction } from "react";
@@ -32,7 +33,7 @@ interface SessionModalProps {
   handleBackExercise: () => void;
   setVideoDuration: (duration: number) => void;
   setTimerTime: (time: number) => void;
-  startTimer: () => void;
+  startTimer: (delayMs?: number) => void;
   stopTimer: () => void;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
@@ -94,13 +95,23 @@ const SessionModal = ({
 
   if (!isOpen || !isMounted) return null;
 
+  // Only these exercises start the metronome on Play, so only they get a count-in —
+  // and the timer is held for its length so it doesn't eat practice time.
+  const startsMetronome =
+    !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
+  const countInDelayMs = () => (
+    startsMetronome
+      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm ?? metronome.bpm)
+      : 0
+  );
+
   const handleToggleTimer = () => {
     if (isPlaying) {
       stopTimer();
       metronome.stopMetronome();
     } else {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      startTimer(countInDelayMs());
+      if (startsMetronome) {
         metronome.startMetronome();
       }
     }
@@ -111,8 +122,8 @@ const SessionModal = ({
   const handleRestart = () => {
     stopTimer(); metronome.restartMetronome(); setTimerTime(0); setTabResetKey(prev => prev + 1);
     setTimeout(() => {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();
+      startTimer(countInDelayMs());
+      if (startsMetronome) metronome.startMetronome();
     }, 100);
   };
 

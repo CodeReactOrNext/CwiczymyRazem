@@ -3,7 +3,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export interface useTimerInterface {
   getTime: () => number;
   restartTime: () => void;
-  startTimer: () => void;
+  /**
+   * `delayMs` holds the clock frozen for that long before it starts accruing —
+   * used for the metronome count-in, which must not eat practice time.
+   */
+  startTimer: (delayMs?: number) => void;
   stopTimer: () => void;
   timerEnabled: boolean;
   setInitialStartTime: (startTime: number) => void;
@@ -18,9 +22,11 @@ const useTimer = () => {
   const timerEnabledRef = useRef(false);
   const subscribersRef = useRef<Set<(time: number) => void>>(new Set());
 
+  // Elapsed is clamped at 0 so a start anchored in the future (count-in delay)
+  // reads as "not moving yet" instead of running the clock backwards.
   const getTime = useCallback(() => {
     if (startTimeRef.current !== null) {
-      return initialTimeRef.current + (Date.now() - startTimeRef.current);
+      return initialTimeRef.current + Math.max(0, Date.now() - startTimeRef.current);
     }
     return initialTimeRef.current;
   }, []);
@@ -30,10 +36,10 @@ const useTimer = () => {
     subscribersRef.current.forEach(cb => cb(time));
   }, [getTime]);
 
-  const startTimer = useCallback(() => {
+  const startTimer = useCallback((delayMs = 0) => {
     if (timerEnabledRef.current) return;
     timerEnabledRef.current = true;
-    startTimeRef.current = Date.now();
+    startTimeRef.current = Date.now() + Math.max(0, delayMs);
     setTimerEnabled(true);
     notify();
   }, [notify]);
@@ -43,7 +49,8 @@ const useTimer = () => {
     timerEnabledRef.current = false;
 
     if (startTimeRef.current !== null) {
-      const sessionDuration = Date.now() - startTimeRef.current;
+      // Stopping mid-count-in banks nothing — the delay window counts as 0.
+      const sessionDuration = Math.max(0, Date.now() - startTimeRef.current);
       initialTimeRef.current += sessionDuration;
       startTimeRef.current = null;
     }

@@ -28,7 +28,7 @@ function CountInOverlayInner({ count, bpm, className }: CountInOverlayProps) {
       {count > 0 && (
         <motion.div
           className={cn(
-            "absolute inset-0 z-20 flex items-center justify-center bg-zinc-950/70 backdrop-blur-[2px]",
+            "absolute inset-0 z-20 flex items-center justify-center bg-zinc-950/70",
             className,
           )}
           initial={{ opacity: 0 }}

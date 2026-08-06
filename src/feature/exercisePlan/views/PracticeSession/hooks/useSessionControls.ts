@@ -1,3 +1,4 @@
+import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -15,12 +16,14 @@ interface Metronome {
   minBpm:                 number;
   maxBpm:                 number;
   handleSetRecommendedBpm: () => void;
+  /** One entry per beat of the meter — its length is how many count-in beats play. */
+  accentPattern?:         unknown[];
 }
 
 interface UseSessionControlsOptions {
   isPlaying:              boolean;
   stopTimer:              () => void;
-  startTimer:             () => void;
+  startTimer:             (delayMs?: number) => void;
   resetTimer:             () => void;
   metronome:              Metronome;
   currentExercise:        Exercise;
@@ -61,16 +64,28 @@ export function useSessionControls({
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
+  // Only these exercises start the metronome on Play, so only they get a count-in.
+  const startsMetronome =
+    !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
+
+  // Practice time starts on the first real beat, not on the Play click — hold the
+  // timer for as long as the count-in will take.
+  const countInDelayMs = useCallback(() => (
+    startsMetronome
+      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, metronome.bpm * (speedMultiplier || 1))
+      : 0
+  ), [startsMetronome, metronome, speedMultiplier]);
+
   const handleToggleTimer = useCallback(() => {
     if (isPlaying) {
       stopTimer(); metronome.stopMetronome();
     } else {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      startTimer(countInDelayMs());
+      if (startsMetronome) {
         metronome.startMetronome();
       }
     }
-  }, [isPlaying, stopTimer, metronome, startTimer, currentExercise]);
+  }, [isPlaying, stopTimer, metronome, startTimer, startsMetronome, countInDelayMs]);
 
   const handleRestart = useCallback(() => {
     stopTimer(); metronome.restartMetronome(); resetTimer();
@@ -79,12 +94,12 @@ export function useSessionControls({
     setEarTrainingScore(0);
     noteMatchingHandle.current?.resetGame();
     setTimeout(() => {
-      startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      startTimer(countInDelayMs());
+      if (startsMetronome) {
         metronome.startMetronome();
       }
     }, 100);
-  }, [stopTimer, metronome, resetTimer, startTimer, currentExercise, setEarTrainingScore, noteMatchingHandle]);
+  }, [stopTimer, metronome, resetTimer, startTimer, startsMetronome, countInDelayMs, setEarTrainingScore, noteMatchingHandle]);
 
   const handleRestartFullSession = useCallback(() => {
     restartFullSession(); setTabRestartKey(prev => prev + 1);
