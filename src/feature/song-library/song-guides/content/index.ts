@@ -1,4 +1,5 @@
 import type { SongGuide } from "../types";
+import { crazyTrain } from "./crazy-train";
 import { hotelCalifornia } from "./hotel-california";
 import { masterOfPuppets } from "./master-of-puppets";
 import { nothingElseMatters } from "./nothing-else-matters";
@@ -15,6 +16,7 @@ export const songGuides: SongGuide[] = [
   sweetChildOMine,
   sevenNationArmy,
   thunderstruck,
+  crazyTrain,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>

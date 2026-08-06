@@ -2,6 +2,7 @@ import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/e
 import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
+import { crazyTrainRiffPreviewExercise } from "feature/exercisePlan/data/exerises/crazyTrainRiffPreview/crazyTrainRiffPreview";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
@@ -95,6 +96,8 @@ import {
   strummingPattern32,
 } from "feature/exercisePlan/data/exerises/strummingPatterns/strummingPatterns";
 import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
+import { sweetChildOMineRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sweetChildOMineRiffPreview/sweetChildOMineRiffPreview";
+import { thunderstruckRiffPreviewExercise } from "feature/exercisePlan/data/exerises/thunderstruckRiffPreview/thunderstruckRiffPreview";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -192,7 +195,11 @@ import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/
 import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
 import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
-import { earTrainingEasy, earTrainingHard,earTrainingMedium } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
+import {
+  earTrainingEasy,
+  earTrainingHard,
+  earTrainingMedium,
+} from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
 import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
 import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
@@ -220,7 +227,11 @@ import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fre
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
 import { hybridPickingIndependenceExercise } from "feature/exercisePlan/data/exerises/hybridPickingIndependence/hybridPickingIndependence";
-import { improvPromptEasy, improvPromptHard,improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import {
+  improvPromptEasy,
+  improvPromptHard,
+  improvPromptMedium,
+} from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
 import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
@@ -236,7 +247,11 @@ import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises
 import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
-import { rhythmTrainingEasy, rhythmTrainingHard,rhythmTrainingMedium } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
+import {
+  rhythmTrainingEasy,
+  rhythmTrainingHard,
+  rhythmTrainingMedium,
+} from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 import { scalePracticeExercise } from "feature/exercisePlan/data/exerises/scalePractice/scalePractice";
 import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
 import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exerises/stringSkippingArpeggios/stringSkippingArpeggios";
@@ -278,7 +293,6 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
-
 
 const rawExercises: Exercise[] = [
   spiderQuarterNotesExercise,
@@ -338,7 +352,6 @@ const rawExercises: Exercise[] = [
   intervalHuntExercise,
   buildTheChordExercise,
   fingerstyleArpeggiosExercise,
-
 
   spiderPermutation1234Exercise,
   spiderPermutation1243Exercise,
@@ -438,6 +451,9 @@ const rawExercises: Exercise[] = [
   downPickingDoomPulseExercise,
   masterOfPuppetsRiffPreviewExercise,
   sevenNationArmyRiffPreviewExercise,
+  sweetChildOMineRiffPreviewExercise,
+  thunderstruckRiffPreviewExercise,
+  crazyTrainRiffPreviewExercise,
   nakedToneMelodyExercise,
   mutingSpotlightDrillExercise,
   chordSpotlightDrillExercise,
@@ -487,7 +503,7 @@ const rawExercises: Exercise[] = [
   strummingPattern32,
 ];
 
-export const exercisesAgregat: Exercise[] = rawExercises.map(ex => ({
+export const exercisesAgregat: Exercise[] = rawExercises.map((ex) => ({
   ...ex,
   premium: !FREE_EXERCISE_IDS.has(ex.id),
 }));

@@ -16,21 +16,20 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // bar. Bar 4 resolves the descent as single notes on string 6: 5-4-3-2-1.
 export const masterOfPuppetsRiffPreviewExercise: Exercise = {
   id: "master_of_puppets_riff_preview",
-  title: "Main Riff Excerpt — Master of Puppets",
+  addedAt: "2026-08-06",
+  title: "Riff Vault — Master of Puppets",
   description:
     "A short excerpt from the song's iconic palm-muted opening riff, including its power-chord accents.",
   whyItMatters:
     "This is the riff that opens (and keeps returning through) the whole song: chromatic palm-muted picking that snaps into power chords, testing both alternate-picking stamina and clean chord transitions.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 1.5,
+  timeInMinutes: 2,
   instructions: [
     "Palm-mute the single-note picking; let the power chords ring out briefly before the next phrase.",
     "Keep a steady eighth-note pulse; the open string acts as a pedal tone under the fretted notes.",
   ],
-  tips: [
-    "Start well under tempo and prioritize even note volume over speed.",
-  ],
+  tips: ["Start well under tempo and prioritize even note volume over speed."],
   metronomeSpeed: { min: 80, max: 220, recommended: 212 },
   relatedSkills: ["finger_independence"],
   tablature: [

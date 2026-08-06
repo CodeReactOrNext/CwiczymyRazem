@@ -1,3 +1,5 @@
+import { thunderstruckRiffPreviewExercise } from "feature/exercisePlan/data/exerises/thunderstruckRiffPreview/thunderstruckRiffPreview";
+
 import type { SongGuide } from "../types";
 
 export const thunderstruck: SongGuide = {
@@ -38,7 +40,8 @@ export const thunderstruck: SongGuide = {
   ],
   editorial: {
     difficulty: 6,
-    timeToLearn: "2–4 weeks for the riff at full tempo; 4–8 weeks for the full song",
+    timeToLearn:
+      "2–4 weeks for the riff at full tempo; 4–8 weeks for the full song",
     oneLiner:
       "The best-sounding 'easy' riff in rock: one four-note pattern, one string, and a reputation far scarier than the fingering.",
   },
@@ -145,6 +148,15 @@ export const thunderstruck: SongGuide = {
     hardestSummary:
       "The intro riff takes minutes to understand and weeks to play clean at full tempo: that gap between 'I get it' and 'I can do it at speed' is where the entire difficulty rating lives. Nothing later in the song asks for more.",
   },
+  riffPreview: {
+    heading: "Riff preview",
+    intro: "A short tab from the song's iconic intro riff.",
+    measures: thunderstruckRiffPreviewExercise.tablature!,
+    bpm: thunderstruckRiffPreviewExercise.metronomeSpeed!.recommended,
+    bpmMin: thunderstruckRiffPreviewExercise.metronomeSpeed!.min,
+    bpmMax: thunderstruckRiffPreviewExercise.metronomeSpeed!.max,
+    practiceExerciseId: thunderstruckRiffPreviewExercise.id,
+  },
   timeline: {
     heading: "Honest timelines",
     intro:
@@ -211,6 +223,8 @@ export const thunderstruck: SongGuide = {
         artist: "Ozzy Osbourne",
         difficulty: 7,
         why: "The next speed benchmark: a similarly iconic repeating riff plus a genuinely advanced Randy Rhoads solo.",
+        guideSlug: "crazy-train",
+        songId: "OLQsRdKrPMgz8ZPO86oU",
       },
       {
         title: "Sweet Child O' Mine",
@@ -310,11 +324,13 @@ export const thunderstruck: SongGuide = {
   ],
   sources: [
     {
-      label: "Thunderstruck's intro is picked, not tapped: Guitar Club lesson breakdown",
+      label:
+        "Thunderstruck's intro is picked, not tapped: Guitar Club lesson breakdown",
       url: "https://www.guitarclub.io/blog/thunderstruck-guitar-lesson-acdc",
     },
     {
-      label: "Angus Young on writing Thunderstruck and the taped-string studio trick: Songfacts",
+      label:
+        "Angus Young on writing Thunderstruck and the taped-string studio trick: Songfacts",
       url: "https://www.songfacts.com/facts/ac-dc/thunderstruck",
     },
   ],
@@ -336,6 +352,7 @@ export const thunderstruck: SongGuide = {
     },
   ],
   sectionOrder: [
+    "riffPreview",
     "videoLessons",
     "verdict",
     "songMap",

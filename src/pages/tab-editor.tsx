@@ -29,6 +29,7 @@ import { ImportTablature } from "feature/songs/components/ImportTablature/Import
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LucideChevronsRight,
+  LucideCopy,
   LucideEraser,
   LucideFileMusic,
   LucideMinus,
@@ -632,6 +633,51 @@ export default function TabEditor() {
       setSelectedCell(null);
       setActiveSelection(null);
     }
+  };
+
+  // Boolean articulation flags that default to false/undefined — stripped from
+  // the export when unset so pasted code stays readable instead of every beat
+  // spelling out every flag it doesn't use.
+  const NOTE_BOOLEAN_FLAGS = new Set([
+    "isAccented",
+    "isHammerOn",
+    "isPullOff",
+    "isDead",
+    "isVibrato",
+    "isTap",
+    "isPalmMute",
+    "isBend",
+    "isPreBend",
+    "isRelease",
+  ]);
+
+  /**
+   * Copies the tab as a `tablature: [...]` TypeScript snippet, ready to paste
+   * into an Exercise's `tablature` field (or a song guide's `riffPreview.measures`).
+   * Only wholly-empty measures are dropped — every beat inside a measure that
+   * has at least one note is kept as-is, rests included, since each beat is a
+   * fixed-duration grid slot and dropping one would shift everything after it.
+   */
+  const copyCode = () => {
+    const cleanMeasures = measures.filter((m) =>
+      m.beats.some((b) => b.notes.length > 0),
+    );
+
+    if (cleanMeasures.length === 0) {
+      showToast("Nothing to export — the tab is empty.", "error");
+      return;
+    }
+
+    const formattedCode = `tablature: ${JSON.stringify(
+      cleanMeasures,
+      (key, value) => (NOTE_BOOLEAN_FLAGS.has(key) ? value || undefined : value),
+      2,
+    )},`;
+
+    navigator.clipboard
+      .writeText(formattedCode)
+      .then(() => showToast("Tablature code copied to clipboard!", "success"))
+      .catch(() => showToast("Couldn't copy — try again.", "error"));
   };
 
   const updateDuration = (
@@ -1440,6 +1486,12 @@ export default function TabEditor() {
                   className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
                   <LucideFileMusic size={13} className='text-zinc-400' />
                   <span>Import GP</span>
+                </button>
+                <button
+                  onClick={copyCode}
+                  className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+                  <LucideCopy size={13} className='text-zinc-400' />
+                  <span>Copy code</span>
                 </button>
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <ToolbarIconButton

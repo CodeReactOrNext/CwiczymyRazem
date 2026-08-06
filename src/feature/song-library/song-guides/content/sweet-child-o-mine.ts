@@ -1,3 +1,5 @@
+import { sweetChildOMineRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sweetChildOMineRiffPreview/sweetChildOMineRiffPreview";
+
 import type { SongGuide } from "../types";
 
 export const sweetChildOMine: SongGuide = {
@@ -30,7 +32,10 @@ export const sweetChildOMine: SongGuide = {
     "But the intro is only the opening act. Behind it waits a full-length Slash masterclass: verse fills, two solo sections that build from bluesy talking phrases to fast E-flat-minor runs, and the frantic wah-drenched outro under 'Where do we go now'. This guide grades every layer, decodes the riff's anatomy move by move, and gives you an honest schedule from first pluck to final bend.",
   ],
   facts: [
-    { label: "Artist", value: "Guns N' Roses (Appetite for Destruction, 1987)" },
+    {
+      label: "Artist",
+      value: "Guns N' Roses (Appetite for Destruction, 1987)",
+    },
     { label: "Tuning", value: "E♭ standard (half step down)" },
     { label: "Key", value: "D♭ major / E♭ minor (sounding)" },
     { label: "Tempo", value: "≈125 BPM" },
@@ -145,6 +150,15 @@ export const sweetChildOMine: SongGuide = {
     ],
     hardestSummary:
       "The hardest sixteen bars are the second solo's climactic runs: the fastest playing in the song and the moment where clean alternate picking either exists or doesn't. Almost as hard, in a sneakier way: making the first solo's slow bends actually sing. Speed can be scheduled; taste has to be practiced deliberately.",
+  },
+  riffPreview: {
+    heading: "Riff preview",
+    intro: "A short tab from the song's iconic intro riff.",
+    measures: sweetChildOMineRiffPreviewExercise.tablature!,
+    bpm: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.recommended,
+    bpmMin: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.min,
+    bpmMax: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.max,
+    practiceExerciseId: sweetChildOMineRiffPreviewExercise.id,
   },
   timeline: {
     heading: "Honest timelines",
@@ -283,17 +297,20 @@ export const sweetChildOMine: SongGuide = {
   videoLessons: [
     {
       videoId: "iWxMMWOmkNQ",
-      title: "Sweet Child O' Mine Guitar Lesson Pt.1 - Guns N' Roses - Intro - Slash",
+      title:
+        "Sweet Child O' Mine Guitar Lesson Pt.1 - Guns N' Roses - Intro - Slash",
       channelName: "GuitarLessons365Song",
     },
     {
       videoId: "WW_iOXWCGLE",
-      title: "Guns N' Roses - Sweet Child O' Mine - Guitar Tab (remake) | Lesson | Cover | Tutorial",
+      title:
+        "Guns N' Roses - Sweet Child O' Mine - Guitar Tab (remake) | Lesson | Cover | Tutorial",
       channelName: "Mr. Tabs",
     },
     {
       videoId: "0GsukWKx5Ao",
-      title: "How Slash REALLY Plays The Sweet Child O' Mine Solo! - Guns N' Roses",
+      title:
+        "How Slash REALLY Plays The Sweet Child O' Mine Solo! - Guns N' Roses",
       channelName: "GuitarLessons365Song",
     },
   ],
@@ -329,6 +346,7 @@ export const sweetChildOMine: SongGuide = {
     },
   ],
   sectionOrder: [
+    "riffPreview",
     "verdict",
     "custom:riff-anatomy",
     "videoLessons",
