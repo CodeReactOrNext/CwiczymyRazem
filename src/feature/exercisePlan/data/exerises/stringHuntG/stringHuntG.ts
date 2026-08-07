@@ -13,11 +13,13 @@ const shuffle = (arr: string[]): string[] => {
 let queue: string[] = shuffle(NOTES);
 let currentTarget = queue.shift()!;
 
-export const stringSweepGExercise: Exercise = {
+export const stringHuntGExercise: Exercise = {
+  // Renamed from "String Sweep" (too close to sweep picking) — the id keeps the
+  // old wording on purpose: favorites, quests and records in Firestore key off it.
   id: "string_sweep_g",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "String Sweep — G",
+  title: "String Hunt — G",
   description: "Beat the clock: play every one of the 12 notes on the G string within 90 seconds, at 60 BPM.",
   difficulty: "hard",
   category: "theory",
@@ -28,7 +30,7 @@ export const stringSweepGExercise: Exercise = {
     "You have exactly 90 seconds. The exam ends automatically when time runs out and scores whatever you completed.",
   ],
   tips: [
-    "Pitch detection hears the note, not the string — it can't literally verify you played it on the G string specifically. Use this exercise honestly, the same way you would with a teacher watching.",
+    "Pitch detection can't tell which string you plucked, but it does hear the octave — and inside frets 0–11 the G string holds each note in exactly one octave. Grab the same note on another string and it lands in the wrong octave, so it won't count.",
     "Frets 0–11 cover the full chromatic octave exactly once per string — no repeats, no gaps.",
     "Lean on the fret-5/7/9 landmarks from earlier in this journey to jump straight to a note instead of counting from open string.",
   ],
@@ -39,10 +41,11 @@ export const stringSweepGExercise: Exercise = {
   customGoal: currentTarget,
   customGoalDescription: "Play this note on the G string (frets 0–11)",
   customGoalRegion: { startFret: 0, endFret: 11 },
+  customGoalStrings: [3],
   rollHuntTarget: () => {
     if (queue.length === 0) queue = shuffle(NOTES);
     currentTarget = queue.shift()!;
     return { goal: currentTarget, region: { startFret: 0, endFret: 11 } };
   },
-  noteHuntConfig: { rotateSeconds: 8, mode: "sweep" },
+  noteHuntConfig: { rotateSeconds: 8, mode: "accumulate" },
 };

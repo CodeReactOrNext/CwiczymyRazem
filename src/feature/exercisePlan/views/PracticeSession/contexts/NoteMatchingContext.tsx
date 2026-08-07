@@ -32,13 +32,16 @@ interface NoteMatchingContextValue {
   chordHunt: ChordHuntState | null;
   /** Live click-hunt state — populated only for click-mode exercises. */
   clickHunt: ClickHuntState | null;
-  /** Cumulative progress for "sweep" mode hunts (distinct notes completed across
-   *  rotations, out of 12) — null outside sweep mode. */
-  sweepProgress: { found: number; total: number } | null;
+  /** Cumulative progress for "accumulate" mode hunts (distinct notes completed
+   *  across rotations, out of 12) — null in every other mode. */
+  chromaticProgress: { found: number; total: number } | null;
   /** Seconds until the hunt target rotates, or null when not rotating. */
   noteHuntSecondsLeft: number | null;
   /** Fret window for region-mode note hunts, or null when not in region mode. */
   noteHuntRegion: { startFret: number; endFret: number } | null;
+  /** Strings the hunt is restricted to (1 = high e … 6 = low E), or null for the
+   *  whole neck. Scopes both detection (which octaves count) and the neck diagram. */
+  noteHuntStrings: number[] | null;
   /** Prompt shown instead of the answer (interval mode), or null. */
   customGoalPrompt: { title: string; subtitle?: string } | null;
   /** The live hunt target (note name / chord name). Read this — not a prop —
@@ -98,9 +101,10 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   noteHunt: null,
   chordHunt: null,
   clickHunt: null,
-  sweepProgress: null,
+  chromaticProgress: null,
   noteHuntSecondsLeft: null,
   noteHuntRegion: null,
+  noteHuntStrings: null,
   customGoalPrompt: null,
   huntTarget: null,
   volumeRef: _fallbackRef,
@@ -144,10 +148,10 @@ interface NoteMatchingProviderProps {
   customGoalRegion: { startFret: number; endFret: number } | undefined;
   // prompt shown instead of the answer (interval mode)
   customGoalPrompt: { title: string; subtitle?: string } | undefined;
-  // strings in play for click-mode hunts (undefined = all 6)
+  // strings in play for click- and mic-mode hunts (undefined = all 6)
   customGoalStrings: number[] | undefined;
   // which hunt variant the current exercise is (selects the detection hook)
-  noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "sweep" | undefined;
+  noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | undefined;
   // countdown until the note-hunt target rotates (null when not rotating)
   noteHuntSecondsLeft: number | null;
   // flipped to true once the current hunt goal is fully solved (drives fast-forward)
@@ -241,8 +245,8 @@ export function NoteMatchingProvider({
   const isHunt = !!customGoal;
   const isChordHunt = isHunt && noteHuntMode === "chord";
   const isClickHunt = isHunt && noteHuntMode === "click";
-  const isNoteHunt = isHunt && !isChordHunt && !isClickHunt; // octaves / region / interval / sweep
-  const isSweepHunt = isNoteHunt && noteHuntMode === "sweep";
+  const isNoteHunt = isHunt && !isChordHunt && !isClickHunt; // octaves / region / interval / accumulate
+  const isAccumulatingHunt = isNoteHunt && noteHuntMode === "accumulate";
   // Note/chord hunts target a bare note name with no string attached, authored as
   // if standard-tuned — on a uniformly detuned guitar (half/whole step down) the
   // pitch that actually needs to come out of the strings shifts by the same amount
@@ -257,12 +261,20 @@ export function NoteMatchingProvider({
     () => (regionStart !== undefined && regionEnd !== undefined ? [regionStart, regionEnd] : undefined),
     [regionStart, regionEnd],
   );
+  // Same treatment for the string scope: keyed by its contents so a fresh array
+  // from an exercise spread doesn't retarget the hunt every render.
+  const stringsKey = customGoalStrings?.join(",") ?? "";
+  const huntStrings = useMemo<number[] | undefined>(
+    () => (stringsKey ? stringsKey.split(",").map(Number) : undefined),
+    [stringsKey],
+  );
   const { state: noteHunt, markOctave: markNoteHuntOctave } = useNoteHunt(
     customGoal ?? "",
     audioRefs.frequencyRef,
     audioRefs.volumeRef,
     isMicEnabled && isNoteHunt,
     fretRange,
+    huntStrings,
     huntTuningShift,
   );
 
@@ -282,7 +294,7 @@ export function NoteMatchingProvider({
     customGoal ?? "",
     regionStart ?? 0,
     regionEnd ?? 12,
-    customGoalStrings,
+    huntStrings,
   );
 
   // Exam mode, click hunts only: too many wrong clicks fails the exam outright
@@ -302,7 +314,7 @@ export function NoteMatchingProvider({
   const huntMaxCombo = isChordHunt ? chordHunt.maxCombo : isClickHunt ? clickHunt.maxCombo : noteHunt.maxCombo;
 
   // Whole goal solved? Chord: all tones. Click: every valid position. Interval:
-  // found the target once. Octave/region/sweep: every reachable octave. Reported
+  // found the target once. Octave/region/accumulate: every reachable octave. Reported
   // to the rotation hook so it can fast-forward to the next target.
   const huntComplete = isChordHunt
     ? chordHunt.tones.length > 0 && chordHunt.foundTones.length === chordHunt.tones.length
@@ -317,24 +329,24 @@ export function NoteMatchingProvider({
     if (solvedRef) solvedRef.current = huntComplete;
   }, [huntComplete, solvedRef]);
 
-  // Sweep mode: unlike every other hunt, progress must survive across rotations
+  // Accumulate mode: unlike every other hunt, progress must survive across rotations
   // — each time the CURRENT target is fully solved, bank its pitch class into a
   // running set. Exam accuracy is (distinct notes banked) / 12, not the current
   // target's own found-ratio, so "hit every chromatic note before time runs out"
   // exams score correctly even mid-rotation.
-  const [sweepFound, setSweepFound] = useState<Set<number>>(() => new Set());
+  const [accumulatedNotes, setAccumulatedNotes] = useState<Set<number>>(() => new Set());
   const currentPitchClass = customGoal ? NOTES.indexOf(customGoal) : -1;
   useEffect(() => {
-    if (!isSweepHunt || !huntComplete || currentPitchClass < 0) return;
+    if (!isAccumulatingHunt || !huntComplete || currentPitchClass < 0) return;
     // Genuine accumulator across renders (history of past targets) — cannot be
     // derived from current props alone, so this isn't the "you might not need
     // an effect" case the rule is built for.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSweepFound(prev => (prev.has(currentPitchClass) ? prev : new Set(prev).add(currentPitchClass)));
-  }, [isSweepHunt, huntComplete, currentPitchClass]);
-  const sweepAccuracy = Math.round((sweepFound.size / 12) * 100);
+    setAccumulatedNotes(prev => (prev.has(currentPitchClass) ? prev : new Set(prev).add(currentPitchClass)));
+  }, [isAccumulatingHunt, huntComplete, currentPitchClass]);
+  const accumulatedAccuracy = Math.round((accumulatedNotes.size / 12) * 100);
 
-  const huntAccuracy = isChordHunt ? chordHunt.accuracy : isClickHunt ? clickHunt.accuracy : isSweepHunt ? sweepAccuracy : noteHunt.accuracy;
+  const huntAccuracy = isChordHunt ? chordHunt.accuracy : isClickHunt ? clickHunt.accuracy : isAccumulatingHunt ? accumulatedAccuracy : noteHunt.accuracy;
 
   const isStrummingExercise = !!activeStrumPattern;
   const gameState = isHunt ? huntGameState : isStrummingExercise ? strumGameState : tabGameState;
@@ -386,14 +398,14 @@ export function NoteMatchingProvider({
   const latestRef = useRef({ score: 0, accuracy: 100, maxCombo: 0, maxPossibleScore: 0, noteTimeline: [] as ("hit" | "miss")[] });
   latestRef.current = { score: gameState.score, accuracy: sessionAccuracy, maxCombo: effectiveMaxCombo, maxPossibleScore: effectiveMaxPossibleScore, noteTimeline };
 
-  const resetGameAndSweep = useCallback(() => {
+  const resetGameAndProgress = useCallback(() => {
     resetGame();
-    setSweepFound(new Set());
+    setAccumulatedNotes(new Set());
   }, [resetGame]);
 
   // Populate the imperative handle on every render — safe, it's just a ref assignment
   handleRef.current = {
-    resetGame: resetGameAndSweep,
+    resetGame: resetGameAndProgress,
     snapshot: () => ({ ...latestRef.current }),
   };
 
@@ -404,9 +416,10 @@ export function NoteMatchingProvider({
       noteHunt: isNoteHunt ? noteHunt : null,
       chordHunt: isChordHunt ? chordHunt : null,
       clickHunt: isClickHunt ? clickHunt : null,
-      sweepProgress: isSweepHunt ? { found: sweepFound.size, total: 12 } : null,
+      chromaticProgress: isAccumulatingHunt ? { found: accumulatedNotes.size, total: 12 } : null,
       noteHuntSecondsLeft: isHunt ? noteHuntSecondsLeft : null,
       noteHuntRegion: isNoteHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
+      noteHuntStrings: isNoteHunt ? (huntStrings ?? null) : null,
       customGoalPrompt: isHunt ? (customGoalPrompt ?? null) : null,
       huntTarget: isHunt ? (customGoal ?? null) : null,
       volumeRef: audioRefs.volumeRef,
@@ -419,7 +432,7 @@ export function NoteMatchingProvider({
       registerFretClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isSweepHunt, sweepFound, isHunt, noteHuntSecondsLeft, fretRange, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (

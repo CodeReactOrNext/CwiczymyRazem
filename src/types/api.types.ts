@@ -6,6 +6,7 @@ import type {
 import type { SignUpCredentials } from "feature/user/view/SingupView/SingupView";
 import type { IdTokenResult } from "firebase/auth";
 import type { Timestamp } from "firebase/firestore";
+import type { FameDayState } from "utils/gameLogic/calculateSessionFame";
 
 // Challenges removed
 
@@ -118,6 +119,9 @@ export interface StatisticsDataInterface {
   };
   dailyQuest?: DailyQuest | null;
   fame?: number;
+  /** Daily fame counter — fame scales on a curve over the day's total practice
+   * time, so the payout needs to know how much of today is already paid for. */
+  fameDay?: FameDayState | null;
   availablePoints?: {
     technique: number;
     theory: number;

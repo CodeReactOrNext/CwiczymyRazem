@@ -32,6 +32,25 @@ export function createNoteHitVisualState(): NoteHitVisualState {
   };
 }
 
+/** Snapshot the pass that just finished — BOTH maps together, once per wrap.
+ *  Hits and misses arrive as two separate messages but describe one and the
+ *  same repetition, and freezing them independently let them come from
+ *  different ones: misses always pile up on a pass the user sits out, so their
+ *  freeze kept re-arming every loop while the green snapshot stayed behind from
+ *  the last pass actually played — repainting that stale set of greens on every
+ *  subsequent loop, forever, with nothing being played.
+ *
+ *  Both messages of one flush carry the same `finishedTile`, so the second one
+ *  finds the boundary already frozen and leaves the snapshot alone instead of
+ *  overwriting it with the sibling map's post-reset (empty) contents. */
+function freezeFinishedPass(state: NoteHitVisualState, finishedTile: number): void {
+  if (state.hasFrozen && state.frozenTile === finishedTile) return;
+  state.frozenHitNotes = state.hitNotes;
+  state.frozenMissedNotes = state.missedNotes;
+  state.frozenTile = finishedTile;
+  state.hasFrozen = true;
+}
+
 /** HIT_NOTES message. Hits only ever grow within a pass — a shrink means the
  *  loop wrapped and matching reset, so freeze the finishing pass's state for
  *  the outgoing tail, and stamp newly-hit notes for the pop animation. */
@@ -39,12 +58,10 @@ export function applyHitNotes(
   state: NoteHitVisualState,
   newHits: Record<string, boolean | number>,
   now: number,
-  activeTile: number,
+  finishedTile: number,
 ): void {
   if (Object.keys(newHits).length < Object.keys(state.hitNotes).length) {
-    state.frozenHitNotes = state.hitNotes;
-    state.frozenTile = activeTile;
-    state.hasFrozen = true;
+    freezeFinishedPass(state, finishedTile);
   }
   for (const key of Object.keys(newHits)) {
     if (newHits[key] && !state.hitNotes[key]) {
@@ -66,12 +83,10 @@ export function applyHitNotes(
 export function applyMissedNotes(
   state: NoteHitVisualState,
   newMissed: Record<string, boolean>,
-  activeTile: number,
+  finishedTile: number,
 ): void {
   if (Object.keys(newMissed).length < Object.keys(state.missedNotes).length) {
-    state.frozenMissedNotes = state.missedNotes;
-    state.frozenTile = activeTile;
-    state.hasFrozen = true;
+    freezeFinishedPass(state, finishedTile);
   }
   state.missedNotes = newMissed;
 }

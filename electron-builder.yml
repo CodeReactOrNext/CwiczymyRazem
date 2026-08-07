@@ -67,6 +67,22 @@ nsis:
 mac:
   icon: build-resources/icon.png
   category: public.app-category.music
+  # Microphone access on macOS needs THREE separate things; missing any one of
+  # them ends with CoreAudio handing back an all-zeros stream — devices list,
+  # the stream opens, nothing is ever detected, and no error is raised anywhere:
+  #   1. this usage string in Info.plist — without it macOS refuses to even show
+  #      the consent prompt, so the user is never asked;
+  #   2. the com.apple.security.device.audio-input entitlement below (required
+  #      because hardened runtime is on by default);
+  #   3. an explicit askForMediaAccess() call before opening a stream — see
+  #      electron/macPermissions.js for why the renderer-side Chromium
+  #      permission handler does not cover the native capture path.
+  extendInfo:
+    NSMicrophoneUsageDescription: >-
+      riff.quest listens to your guitar through the audio input you select, so it
+      can detect the notes you play and score your practice.
+  entitlements: build-resources/entitlements.mac.plist
+  entitlementsInherit: build-resources/entitlements.mac.plist
   # No Apple Developer certificate → unsigned, like the Windows NSIS build.
   # "-" = ad-hoc signing, NOT the same as leaving this unset: Apple Silicon's
   # kernel refuses to launch ANY arm64 binary with no signature at all (instant
@@ -79,6 +95,11 @@ mac:
   # frames despite the permission prompt succeeding — test guitar input on the
   # first real build before shipping it; the fallback if it's still broken is
   # an `afterSign` hook re-running `codesign --force --deep --sign -`.
+  # Also note ad-hoc signing interacts badly with TCC: macOS keys a granted
+  # permission to the binary's code-signing identity, and ad-hoc builds get a
+  # fresh one on every rebuild, so a testing machine accumulates stale grants
+  # and can end up denied-without-prompting. Clear it with
+  # `tccutil reset Microphone quest.riff.desktop` before re-testing a new build.
   identity: "-"
   target:
     - target: dmg

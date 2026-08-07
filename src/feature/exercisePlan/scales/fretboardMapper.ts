@@ -42,17 +42,20 @@ function getPositionsForNote(
 
 /**
  * Get every position of a pitch class (0=C … 11=B) within a fret window, across
- * all six strings. Each result carries its concrete octave (Math.floor(midi/12)-1)
- * so the note-hunt can light positions and track found octaves. Sorted by pitch.
+ * all six strings — or only `strings` (1 = high e … 6 = low E) when given. Each
+ * result carries its concrete octave (Math.floor(midi/12)-1) so the note-hunt can
+ * light positions and track found octaves. Sorted by pitch.
  */
 export function getNotePositionsInRange(
   pitchClass: number,
   startFret: number,
-  endFret: number
+  endFret: number,
+  strings?: readonly number[]
 ): (FretPosition & { octave: number })[] {
   const positions: (FretPosition & { octave: number })[] = [];
 
   for (let string = 1; string <= 6; string++) {
+    if (strings && !strings.includes(string)) continue;
     const openNote = STANDARD_TUNING[string - 1];
     for (let fret = Math.max(0, startFret); fret <= endFret; fret++) {
       const midiNote = openNote + fret;

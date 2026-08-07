@@ -62,7 +62,7 @@ function buildState(
   // currently active one — otherwise an exam that ends mid-rotation (the
   // exercise timer, not the per-note countdown) would grade on whatever
   // fraction of the CURRENT note happens to be found, ignoring every note
-  // already solved 100% before it. Same fix as the sweep hunt's banked set.
+  // already solved 100% before it. Same fix as the accumulating hunt's banked set.
   const cumulativeFound = bankedFound + foundCount;
   const cumulativeTotal = bankedTotal + targetPositions.length;
   return {

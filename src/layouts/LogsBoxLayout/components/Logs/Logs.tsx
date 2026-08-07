@@ -58,6 +58,7 @@ import { getSupportVariantCopy } from "feature/support/content/supportVariants";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
+  Clock,
   Coffee,
   Dumbbell,
   Ear,
@@ -89,6 +90,18 @@ import { addZeroToTime } from "utils/converter";
 /** Fame reward for a group of `count` non-plan activities of the same type. */
 const getGroupFameAmount = (group: LogGroup): number =>
   group.type === "exercisePlan" ? EXERCISE_PLAN_FAME : calculateActivityFame(group.logs.length);
+
+/** Compact practice duration shown next to the points in a feed row — "1h 20m", "45m",
+ * or seconds for sub-minute sessions (so a short drill never reads as "0m"). */
+const formatSessionTime = (ms: number): string => {
+  const totalMinutes = Math.floor(ms / 60000);
+  if (totalMinutes < 1) return `${Math.round(ms / 1000)}s`;
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
 
 const getLogTimestampMs = (log: AnyFirebaseLog): number =>
   new Date((log as any).timestamp ?? (log as any).data).getTime();
@@ -991,6 +1004,7 @@ const GroupedLogLine = ({
     ? exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ?? null
     : null;
   const planTitle = plan ? plan.title : null;
+  const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;
 
   return (
     <GroupedLine>
@@ -999,6 +1013,15 @@ const GroupedLogLine = ({
         +{genericLog.points}
         <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
       </span>
+
+      {sessionTimeMs > 0 && (
+        <span
+          className="inline-flex items-center gap-1.5 text-sm text-secondText"
+          title="Practice time logged in this session">
+          <Clock className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+          <span className="tabular-nums">{formatSessionTime(sessionTimeMs)}</span>
+        </span>
+      )}
 
       {genericLog.newLevel?.isNewLevel && (
         <span className="text-secondText text-sm">

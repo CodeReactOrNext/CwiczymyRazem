@@ -593,7 +593,7 @@ export const fretboardMasteryModule: JourneyModule = {
           contentBlocks: [
             {
               type: "text",
-              body: "Everything up to now had you pointing at a diagram. This one puts the guitar back in your hands. A note name pops up, and you find it and play it, live, on this string, while the mic listens. It's the first of six real playing exams: five single-string sweeps, then a whole-neck finale, each one a hard 90-second countdown.",
+              body: "Everything up to now had you pointing at a diagram. This one puts the guitar back in your hands. A note name pops up, and you find it and play it, live, on this string, while the mic listens. It's the first of six real playing exams: five single-string hunts, then a whole-neck finale, each one a hard 90-second countdown.",
             },
             { type: "fretDiagram", diagram: diagram(0, 11, [6]) },
             {

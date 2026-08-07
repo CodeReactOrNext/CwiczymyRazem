@@ -1,5 +1,6 @@
 import { AchievementManager } from "feature/achievements/utils/AchievementsManager";
 
+import { calculateSessionFame } from "./calculateSessionFame";
 import { checkIsPracticeToday } from "./checkIsPracticeToday";
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { getDisplayStreak } from "./getDisplayStreak";
@@ -12,6 +13,7 @@ import { makeRatingData } from "./makeRatingData";
 
 export {
   AchievementManager,
+  calculateSessionFame,
   checkIsPracticeToday,
   getDailyStreakMultiplier,
   getDisplayStreak,

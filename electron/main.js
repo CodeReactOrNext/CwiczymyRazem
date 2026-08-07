@@ -22,6 +22,7 @@ const nativeAudioEngine = require("./nativeAudioEngine");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
 const toneStore = require("./toneStore");
+const { requireMicrophoneAccess } = require("./macPermissions");
 
 const isDev = !app.isPackaged;
 const isMac = process.platform === "darwin";
@@ -295,7 +296,11 @@ function createWindow() {
 // ── Native audio IPC ─────────────────────────────────────────────────────────
 ipcMain.handle("native-audio:list-devices", () => audioBridge.listDevices());
 
-ipcMain.handle("native-audio:start", (_e, opts) => {
+ipcMain.handle("native-audio:start", async (_e, opts) => {
+  // macOS gates this; on Windows/Linux it resolves immediately. Must come
+  // before the stream is opened — an unauthorized stream on macOS opens
+  // "successfully" and delivers silence (see macPermissions.js).
+  await requireMicrophoneAccess(mainWindow);
   return audioBridge.start(opts || {}, (buf) => {
     // Forward each captured block to the renderer, where useNativeAudioAnalyzer.ts
     // does the actual windowing + aubio DSP (this main-process side is just a
@@ -393,7 +398,11 @@ ipcMain.handle("edit:copy-text", (_e, text) => {
 
 // ── Amp simulator IPC (duplex monitoring with effect chain) ──────────────────
 ipcMain.handle("amp:list-devices", () => audioBridge.listDevices());
-ipcMain.handle("amp:start", (_e, opts) => ampSim.start(opts || {}));
+// The amp sim captures the same guitar input, so it needs the same consent.
+ipcMain.handle("amp:start", async (_e, opts) => {
+  await requireMicrophoneAccess(mainWindow);
+  return ampSim.start(opts || {});
+});
 ipcMain.handle("amp:set-params", (_e, params) =>
   ampSim.setParams(params || {}),
 );

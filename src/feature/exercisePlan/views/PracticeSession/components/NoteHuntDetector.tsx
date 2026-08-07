@@ -1,11 +1,13 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { huntPositions } from "../hooks/useNoteHunt";
+import { ClickableFretboard } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
-import { NoteHuntFretboard } from "./NoteHuntFretboard";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -21,6 +23,10 @@ const SUPERSCRIPT = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸",
 const toSuperscript = (n: number) =>
   String(n).split("").map(d => SUPERSCRIPT[Number(d)] ?? d).join("");
 
+// Index = string number (1 = high e … 6 = low E).
+const STRING_NAMES = ["", "high e", "B", "G", "D", "A", "low E"];
+const STRING_ORDINALS = ["", "1st", "2nd", "3rd", "4th", "5th", "6th"];
+
 export function NoteHuntDetector({
   targetNote: targetNoteProp,
   description,
@@ -28,7 +34,7 @@ export function NoteHuntDetector({
   isListening,
   onDevPassExam,
 }: NoteHuntDetectorProps) {
-  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, customGoalPrompt, huntTarget, sweepProgress, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
   // Read the live target from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the target rotates. Falls back to the
@@ -55,18 +61,42 @@ export function NoteHuntDetector({
   const foundUnits = isPrompt ? (solved ? 1 : 0) : foundInRange;
   const complete = isPrompt ? solved : allFound;
 
+  // The one string the exercise is asking for, when it asks for one — drives the
+  // badge under the card and the neck's own highlighting.
+  const soleString = noteHuntStrings?.length === 1 ? noteHuntStrings[0] : null;
+
+  // Every fretboard cell the target lives on inside the region (and on the
+  // strings in play). Found octaves map straight back onto cells because the mic
+  // reports the octave it heard; unfound ones stay blank — the neck never gives
+  // the answer away.
+  const regionPositions = useMemo(
+    () =>
+      noteHuntRegion
+        ? huntPositions(targetNote, [noteHuntRegion.startFret, noteHuntRegion.endFret], noteHuntStrings ?? undefined)
+        : [],
+    [targetNote, noteHuntRegion, noteHuntStrings],
+  );
+  const foundKeys = regionPositions.filter(p => foundOctaves.includes(p.octave)).map(p => `${p.string}-${p.fret}`);
+  const liveCell = isMatch && detectedOctave !== null
+    ? regionPositions.find(p => p.octave === detectedOctave)
+    : undefined;
+  // Only meaningful where the goal narrows the octaves down — in whole-neck mode
+  // every octave the guitar can produce already counts.
+  const wrongOctave = !isPrompt && !!noteHuntRegion && isMatch && detectedOctave !== null
+    && octaves.length > 0 && !octaves.includes(detectedOctave);
+
   return (
-    <div className={cn("flex w-full flex-col items-center gap-2.5 sm:gap-4", noteHuntRegion ? "max-w-xl" : "max-w-sm")}>
+    <div className={cn("flex w-full flex-col items-center gap-2.5 sm:gap-4", noteHuntRegion ? "max-w-6xl" : "max-w-sm")}>
       {/* Score (mic only) + countdown */}
       <div className="flex items-center justify-center gap-3">
-        {sweepProgress && (
+        {chromaticProgress && (
           <span
             className={cn(
               "rounded px-3.5 py-1.5 text-base font-extrabold tracking-wide",
-              sweepProgress.found >= sweepProgress.total ? "bg-emerald-500/20 text-emerald-300" : "bg-cyan-500/15 text-cyan-300",
+              chromaticProgress.found >= chromaticProgress.total ? "bg-emerald-500/20 text-emerald-300" : "bg-cyan-500/15 text-cyan-300",
             )}
           >
-            {sweepProgress.found}/{sweepProgress.total} notes
+            {chromaticProgress.found}/{chromaticProgress.total} notes
           </span>
         )}
         {isMicEnabled && (
@@ -126,6 +156,20 @@ export function NoteHuntDetector({
             <span className="text-base font-bold tracking-wide text-emerald-300">✓ it was {targetNote}</span>
           )}
         </div>
+      ) : soleString ? (
+        // Says the quiet part loudly: the note alone isn't the task — the string
+        // is half of it. Replaces the prose description, which said the same.
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <span className="rounded-lg bg-cyan-500/15 px-4 py-2 text-base font-extrabold tracking-wide text-cyan-200">
+            Play it on the {STRING_NAMES[soleString]} string
+            <span className="ml-1.5 font-bold text-cyan-400/70">({STRING_ORDINALS[soleString]})</span>
+          </span>
+          {noteHuntRegion && (
+            <span className="rounded-lg bg-zinc-800/80 px-4 py-2 text-base font-bold tracking-wide text-zinc-300">
+              frets {noteHuntRegion.startFret}–{noteHuntRegion.endFret}
+            </span>
+          )}
+        </div>
       ) : (
         description && (
           <p className="text-center text-sm font-semibold tracking-wide text-zinc-200">{description}</p>
@@ -143,14 +187,44 @@ export function NoteHuntDetector({
         <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
       )}
 
-      {/* Region neck — shows WHERE to search, never the answer positions. */}
+      {/* The right note in an octave the goal doesn't cover — i.e. found on the
+          wrong string. The waveform goes green either way (it hears the note),
+          so without this the score just silently refuses to move. */}
+      {isMicEnabled && wrongOctave && (
+        <p className="text-center text-sm font-bold tracking-wide text-amber-300">
+          Right note, wrong octave — that was {targetNote}{toSuperscript(detectedOctave!)}.{" "}
+          {soleString
+            ? `The ${STRING_NAMES[soleString]} string gives you ${targetNote}${toSuperscript(octaves[0])}.`
+            : `Stay inside frets ${noteHuntRegion?.startFret}–${noteHuntRegion?.endFret}.`}
+        </p>
+      )}
+
+      {/* Region neck — the click drills' fretboard, read-only: it shows WHERE to
+          search and which string is in play, and only fills in a position once
+          the mic has actually heard it there. */}
       {noteHuntRegion && (
-        <NoteHuntFretboard
-          targetNote={targetNote}
+        <ClickableFretboard
           startFret={noteHuntRegion.startFret}
           endFret={noteHuntRegion.endFret}
-          foundOctaves={foundOctaves}
-          isMatch={isMatch}
+          strings={noteHuntStrings ?? undefined}
+          foundKeys={foundKeys}
+          totalTargets={regionPositions.length}
+          lastClick={null}
+          liveKey={liveCell ? `${liveCell.string}-${liveCell.fret}` : null}
+          title={
+            isPrompt ? (
+              <>FIND THE TARGET NOTE IN FRETS {noteHuntRegion.startFret}–{noteHuntRegion.endFret}</>
+            ) : soleString ? (
+              <>
+                PLAY <span className="text-cyan-300">{targetNote}</span> ON THE{" "}
+                <span className="text-cyan-300">{STRING_NAMES[soleString]}</span> STRING
+              </>
+            ) : (
+              <>
+                PLAY <span className="text-cyan-300">{targetNote}</span> IN FRETS {noteHuntRegion.startFret}–{noteHuntRegion.endFret}
+              </>
+            )
+          }
         />
       )}
 

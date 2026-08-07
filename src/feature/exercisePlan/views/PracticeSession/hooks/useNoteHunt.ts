@@ -55,14 +55,33 @@ export function playableOctaves(note: string): number[] {
 }
 
 /**
- * Octaves of `note` the player should hunt: the whole neck normally, or — in
- * region mode — only those reachable inside the `[startFret, endFret]` window.
+ * Every position of `note` inside the hunt's fret window, restricted to `strings`
+ * (1 = high e … 6 = low E) when the exercise names specific ones. Exported so the
+ * UI can map found octaves back onto concrete fretboard cells.
  */
-function targetOctaves(note: string, fretRange?: [number, number]): number[] {
-  if (!fretRange) return playableOctaves(note);
+export function huntPositions(
+  note: string,
+  fretRange: [number, number],
+  strings?: readonly number[],
+): { string: number; fret: number; octave: number }[] {
   const idx = NOTES.indexOf(note);
   if (idx < 0) return [];
-  const positions = getNotePositionsInRange(idx, fretRange[0], fretRange[1]);
+  return getNotePositionsInRange(idx, fretRange[0], fretRange[1], strings);
+}
+
+/**
+ * Octaves of `note` the player should hunt: the whole neck normally, or — in
+ * region mode — only those reachable inside the `[startFret, endFret]` window
+ * on the strings in play.
+ *
+ * The string filter is what makes "play this note on the G string" honest: on
+ * one string a pitch class appears in exactly one octave per 12-fret window, so
+ * the same note played on a different string lands in the wrong octave and is
+ * not counted — the mic can't hear which string was plucked, but it can hear that.
+ */
+function targetOctaves(note: string, fretRange?: [number, number], strings?: readonly number[]): number[] {
+  if (!fretRange) return playableOctaves(note);
+  const positions = huntPositions(note, fretRange, strings);
   return Array.from(new Set(positions.map(p => p.octave))).sort((a, b) => a - b);
 }
 
@@ -134,18 +153,22 @@ export function useNoteHunt(
   volumeRef: FreqRef,
   active: boolean,
   fretRange?: [number, number],
+  /** Strings in play (1 = high e … 6 = low E). Omitted = the whole neck. Only
+   *  meaningful together with `fretRange`. */
+  strings?: readonly number[],
   /** Semitone shift applied to the target before matching the mic's detected
    *  pitch — see getUniformTuningShift. 0 (default) matches literal absolute pitch. */
   tuningShift = 0,
 ): NoteHuntControls {
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
   const [state, setState] = useState<NoteHuntState>(() =>
-    buildState(targetOctaves(shiftedTargetNote, fretRange), new Set(), null, null, 0, false, 0),
+    buildState(targetOctaves(shiftedTargetNote, fretRange, strings), new Set(), null, null, 0, false, 0),
   );
 
-  // Re-roll progress when the note, region window, or tuning changes. Derived as
-  // a primitive key so a fresh fretRange array each render doesn't reset us.
-  const targetKey = `${shiftedTargetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}`;
+  // Re-roll progress when the note, region window, strings or tuning change.
+  // Derived as a primitive key so a fresh fretRange/strings array each render
+  // doesn't reset us.
+  const targetKey = `${shiftedTargetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}|${strings?.join(",") ?? ""}`;
 
   const rafRef         = useRef(0);
   const lastSampleRef  = useRef(0);
@@ -155,7 +178,7 @@ export function useNoteHunt(
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
   const targetRef      = useRef(shiftedTargetNote);
-  const octavesRef     = useRef<number[]>(targetOctaves(shiftedTargetNote, fretRange));
+  const octavesRef     = useRef<number[]>(targetOctaves(shiftedTargetNote, fretRange, strings));
   // Score banked from previous targets — keeps the total accumulating across rotations.
   const sessionScoreRef = useRef(0);
   const firstTargetRef  = useRef(true);
@@ -167,7 +190,7 @@ export function useNoteHunt(
     if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
     firstTargetRef.current = false;
     targetRef.current     = shiftedTargetNote;
-    octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange);
+    octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange, strings);
     foundRef.current      = new Set();
     stableRef.current     = null;
     wasMatchingRef.current = false;

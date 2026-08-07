@@ -2,6 +2,10 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ChallengeCover } from "feature/challenges/components/ChallengeCover";
 import { PlayerStack } from "feature/challenges/components/PlayerStack";
+import {
+  FameIcon,
+  PointsIcon,
+} from "feature/challenges/components/RewardIcons";
 import { SubmissionsDialog } from "feature/challenges/components/SubmissionsDialog";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
 import type {
@@ -313,27 +317,32 @@ export const ChallengeBoard = ({
             <div className='flex flex-wrap gap-2 pt-1'>
               {isLive ? (
                 <>
-                  <span className='rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                    <PointsIcon />
                     <span className='font-bold text-white'>
                       +{POINTS_PER_SUBMISSION}
-                    </span>{" "}
+                    </span>
                     points per run
                   </span>
-                  <span className='rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                    <FameIcon />
                     <span className='font-bold text-amber-300'>
                       +{FAME_PER_SUBMISSION}
-                    </span>{" "}
+                    </span>
                     fame per run
                   </span>
-                  <span className='rounded-lg bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200/80'>
+                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200/80'>
+                    <FameIcon />
                     <span className='font-bold text-amber-300'>
                       +{FAME_CLEAR_BONUS}
-                    </span>{" "}
+                    </span>
                     fame for the full board
                   </span>
                 </>
               ) : (
-                <span className='rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
+                  <PointsIcon className='opacity-40 grayscale' />
+                  <FameIcon className='opacity-40 grayscale' />
                   This month is closed — runs still land on the board, but pay{" "}
                   <span className='font-bold text-white'>
                     no points or fame
@@ -413,14 +422,25 @@ export const ChallengeBoard = ({
                   )}>
                   {hasClearedBoard ? "Board cleared" : "Final stop"}
                 </p>
-                <p className='text-xs font-medium text-zinc-500'>
-                  {hasClearedBoard
-                    ? isLive
-                      ? `Every song recorded — the +${FAME_CLEAR_BONUS} fame bonus is yours.`
-                      : "Every song recorded — a clean sweep of the archive."
-                    : `${songs.length - clearedCount} more ${
-                        songs.length - clearedCount === 1 ? "run" : "runs"
-                      } to clear ${isLive ? "the month" : "this board"}`}
+                <p className='flex flex-wrap items-center gap-1 text-xs font-medium text-zinc-500'>
+                  {hasClearedBoard ? (
+                    isLive ? (
+                      <>
+                        Every song recorded — the
+                        <FameIcon className='h-3.5 w-3.5' />
+                        <span className='font-bold text-amber-300'>
+                          +{FAME_CLEAR_BONUS}
+                        </span>
+                        fame bonus is yours.
+                      </>
+                    ) : (
+                      "Every song recorded — a clean sweep of the archive."
+                    )
+                  ) : (
+                    `${songs.length - clearedCount} more ${
+                      songs.length - clearedCount === 1 ? "run" : "runs"
+                    } to clear ${isLive ? "the month" : "this board"}`
+                  )}
                 </p>
               </div>
             </div>

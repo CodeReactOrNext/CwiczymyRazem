@@ -9,6 +9,10 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
+import {
+  FameIcon,
+  PointsIcon,
+} from "feature/challenges/components/RewardIcons";
 import { useChallengeMutations } from "feature/challenges/hooks/useChallenges";
 import type {
   Challenge,
@@ -188,37 +192,48 @@ export const SubmitRecordingDialog = ({
             />
           </div>
 
-          <p className='rounded-lg bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-zinc-500'>
-            Lands in your Recordings too.{" "}
+          <div className='space-y-2 rounded-lg bg-white/[0.03] px-3 py-2.5'>
             {paysReward ? (
               <>
-                Pays{" "}
-                <span className='font-bold text-white'>
-                  +{POINTS_PER_SUBMISSION} points
-                </span>{" "}
-                and{" "}
-                <span className='font-bold text-amber-300'>
-                  +{FAME_PER_SUBMISSION} fame
-                </span>
-                {isFinalSong && (
-                  <>
-                    , plus the{" "}
+                <div className='flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-zinc-400'>
+                  <span className='inline-flex items-center gap-1.5'>
+                    <PointsIcon />
+                    <span className='font-bold text-white'>
+                      +{POINTS_PER_SUBMISSION}
+                    </span>
+                    points
+                  </span>
+                  <span className='inline-flex items-center gap-1.5'>
+                    <FameIcon />
                     <span className='font-bold text-amber-300'>
-                      +{FAME_CLEAR_BONUS} fame
-                    </span>{" "}
-                    bonus — this is your last song on the board
-                  </>
-                )}
-                .
+                      +{FAME_PER_SUBMISSION}
+                    </span>
+                    fame
+                  </span>
+                  {isFinalSong && (
+                    <span className='inline-flex items-center gap-1.5'>
+                      <FameIcon />
+                      <span className='font-bold text-amber-300'>
+                        +{FAME_CLEAR_BONUS}
+                      </span>
+                      clear bonus
+                    </span>
+                  )}
+                </div>
+                <p className='text-xs font-medium text-zinc-500'>
+                  {isFinalSong && "This is your last song on the board. "}Lands
+                  in your Recordings too.
+                </p>
               </>
             ) : (
-              <>
+              <p className='text-xs font-medium text-zinc-500'>
                 This board is closed, so the run earns{" "}
                 <span className='font-bold text-white'>no points or fame</span>{" "}
-                — it just takes its place in the archive.
-              </>
+                — it just takes its place in the archive. Lands in your
+                Recordings too.
+              </p>
             )}
-          </p>
+          </div>
         </div>
 
         <DialogFooter className='pt-2'>

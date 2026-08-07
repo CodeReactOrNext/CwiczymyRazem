@@ -1,11 +1,17 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import Avatar from "components/UI/Avatar";
-import { ShoppingCart, Tag, X } from "lucide-react";
+import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { countScrapParts, getEffectScrapYield, getGuitarScrapYield } from "feature/arsenal/utils/scrap";
+import { ShoppingCart, Tag, Wrench, X } from "lucide-react";
 import Link from "next/link";
 
-import type { EffectInventoryItem, InventoryItem } from "../../types/arsenal.types";
+import type { EffectInventoryItem, InventoryItem, ScrapPart } from "../../types/arsenal.types";
 import type { MarketplaceListing } from "../../types/marketplace.types";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
+import { PartIcon } from "../Parts/PartIcon";
+import { ScrapYieldList } from "../Parts/ScrapYieldList";
 
 interface MarketListingCardProps {
   listing: MarketplaceListing;
@@ -19,6 +25,23 @@ interface MarketListingCardProps {
   isCancelling: boolean;
 }
 
+/**
+ * What the listed instance would pay out if torn down. Same deterministic yield the
+ * collection tab shows on the Scrap button — teardown value is half the reason to buy
+ * a duplicate, so it belongs next to the price rather than behind a purchase.
+ */
+const getListingScrapYield = (listing: MarketplaceListing): ScrapPart[] => {
+  if (listing.itemType === "guitar") {
+    const item = listing.item as InventoryItem;
+    const guitar = GUITARS_BY_ID.get(item.guitarId);
+    return guitar ? getGuitarScrapYield(item, guitar) : [];
+  }
+
+  const item = listing.item as EffectInventoryItem;
+  const effect = EFFECTS_BY_ID.get(item.effectId);
+  return effect ? getEffectScrapYield(item, effect) : [];
+};
+
 export const MarketListingCard = ({
   listing,
   isOwn,
@@ -31,6 +54,9 @@ export const MarketListingCard = ({
 }: MarketListingCardProps) => {
   const canAfford = currentFame >= listing.price;
   const showMissingBadge = notInCollection && !isOwn;
+
+  const scrapParts = getListingScrapYield(listing);
+  const scrapTotal = countScrapParts(scrapParts);
 
   // Seller + price + action, rendered inside the card's own frame so the whole
   // thing reads as one trading card instead of a floating, detached badge.
@@ -56,6 +82,32 @@ export const MarketListingCard = ({
           {listing.price.toLocaleString()}
         </span>
       </div>
+
+      {scrapParts.length > 0 && (
+        <TooltipProvider>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <div className="flex cursor-help items-center gap-2 text-zinc-500 transition-colors hover:text-orange-400">
+                <Wrench size={13} strokeWidth={2.5} className="shrink-0" />
+                <span className="flex items-center gap-1">
+                  {scrapParts.map((part) => (
+                    <PartIcon key={`${part.partId}:${part.tier}`} partId={part.partId} size={24} />
+                  ))}
+                </span>
+                <span className="text-[11px] font-semibold tabular-nums">{scrapTotal} parts</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[260px] border border-zinc-700 bg-zinc-950 text-white">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-400">
+                  Scraps into {scrapTotal} parts
+                </span>
+                <ScrapYieldList parts={scrapParts} compact />
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
 
       {showMissingBadge && (
         <div className="flex items-center gap-1.5 rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-300">

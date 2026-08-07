@@ -38,6 +38,10 @@ export interface ReportDataInterface {
   reportDate: Date;
   totalPoints: number;
   fameEarned?: number;
+  /** Flat daily streak fame included in `fameEarned` (0 when already paid today). */
+  fameStreakBonus?: number;
+  /** Whether the high-accuracy multiplier applied to this session's fame. */
+  fameAccuracyBonus?: boolean;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;

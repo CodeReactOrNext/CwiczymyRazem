@@ -32,6 +32,7 @@ import {
   ClipboardList,
   Clock,
   Download,
+  Dumbbell,
   FilePlus2,
   Flame,
   Home,
@@ -164,7 +165,8 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
   { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
   { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <SiGuitarpro size={16} /> },
-  { id: "practice-skills", name: "Skills", href: "/profile/skills", icon: <Brain size={16} /> },
+  { id: "practice-skills", name: "Skills", href: "/profile/skills?tab=skill-tree", icon: <Brain size={16} /> },
+  { id: "practice-exercises", name: "Exercises", href: "/profile/skills?tab=browse", icon: <Dumbbell size={16} /> },
   { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
   { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
 ];
@@ -186,6 +188,7 @@ const LIBRARY_SUB_NAV: SidebarSubLink[] = [
 /** Views a page falls back to when its query param is absent (bare /songs renders Board). */
 const DEFAULT_QUERY_BY_PATH: Record<string, Record<string, string>> = {
   "/songs": { view: "board" },
+  "/profile/skills": { tab: "skill-tree" },
 };
 
 const SidebarExpandableNavLink = ({

@@ -89,7 +89,10 @@ export function classifyExerciseLanding(
   const idHas = (...fragments: string[]) =>
     fragments.some((fragment) => exerciseId.includes(fragment));
 
-  if (idHas("pentatonic", "scale", "fretboard", "note_hunt", "interval_hunt")) {
+  // string_sweep_* / whole_neck_sweep are the String Hunt / Whole Neck Hunt
+  // fretboard exams — their ids predate the rename and still say "sweep", so they
+  // have to be claimed here before the picking-technique rule below grabs them.
+  if (idHas("pentatonic", "scale", "fretboard", "note_hunt", "interval_hunt", "string_sweep", "whole_neck")) {
     return "scales";
   }
   if (

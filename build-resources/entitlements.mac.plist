@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <!-- The three below are electron-builder's default template, kept verbatim:
+         replacing the default with a custom file replaces it wholesale, so
+         dropping any of these would break the app in ways unrelated to audio.
+         allow-jit / allow-unsigned-executable-memory: V8. And with hardened
+         runtime enabled (electron-builder's default) plus ad-hoc signing,
+         disable-library-validation is what lets the differently-signed native
+         module (audify's .node) load at all — electron-builder explicitly warns
+         about this combination. -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <!-- https://github.com/electron-userland/electron-builder/issues/3940 -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+
+    <!-- Guitar input. Under hardened runtime this entitlement is required for
+         ANY audio capture, including the native CoreAudio path in
+         nativeAudioEngine.js — it is not covered by the Info.plist usage
+         string, which only controls whether macOS is willing to show the
+         consent prompt. Both are needed; either one missing means silence. -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+  </dict>
+</plist>

@@ -87,6 +87,43 @@ describe("noteHitVisualState", () => {
     expect(state.missedNotes).toEqual({});
   });
 
+  it("regression: one wrap freezes hits and misses from the same pass", () => {
+    // Both maps arrive as separate messages carrying the same finished tile.
+    // The miss message used to re-freeze on its own and captured hitNotes
+    // *after* the hit message had already reset it, wiping the green snapshot.
+    const state = createNoteHitVisualState();
+    applyHitNotes(state, { "0-0-0": true }, 1000, 0);
+    applyMissedNotes(state, { "0-1-0": true }, 0);
+
+    // Loop wrap — matching clears both maps in one flush.
+    applyHitNotes(state, {}, 1100, 1);
+    applyMissedNotes(state, {}, 1);
+
+    expect(state.frozenTile).toBe(1);
+    expect(state.frozenHitNotes).toEqual({ "0-0-0": true });
+    expect(state.frozenMissedNotes).toEqual({ "0-1-0": true });
+  });
+
+  it("regression: a pass played with no hits clears the frozen greens", () => {
+    // Misses always pile up on a pass the user sits out, so their shrink used
+    // to re-arm the freeze every loop while frozenHitNotes stayed behind from
+    // the last pass actually played — the same greens repainted forever.
+    const state = createNoteHitVisualState();
+    applyHitNotes(state, { "0-0-0": true }, 1000, 0);
+    applyHitNotes(state, {}, 1100, 1);
+    applyMissedNotes(state, {}, 1);
+    expect(state.frozenHitNotes).toEqual({ "0-0-0": true });
+
+    // Next pass: nothing played, every note misses, then the loop wraps again.
+    applyMissedNotes(state, { "0-0-0": true, "0-1-0": true }, 1);
+    applyHitNotes(state, {}, 2100, 2);
+    applyMissedNotes(state, {}, 2);
+
+    expect(state.frozenTile).toBe(2);
+    expect(state.frozenHitNotes).toEqual({});
+    expect(state.frozenMissedNotes).toEqual({ "0-0-0": true, "0-1-0": true });
+  });
+
   it("DATA reset (resetFrozenNoteState) drops the frozen tail but preserves live progress", () => {
     const state = createNoteHitVisualState();
     applyHitNotes(state, { "0-0-0": true }, 1000, 0);

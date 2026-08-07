@@ -176,15 +176,18 @@ export interface Exercise {
    *   - "click": no mic — the player clicks the target note's position(s) directly
    *     on a fretboard diagram (customGoalRegion + customGoalStrings scope the
    *     valid cells). See useClickHunt / ClickHuntPanel.
-   *   - "sweep": like "octaves", but progress accumulates ACROSS rotations instead
-   *     of resetting per-target — the exam accuracy is (distinct notes completed
-   *     so far) / 12, for "hit every chromatic note before the clock runs out"
-   *     exams. See the fretboard-mastery per-string exam exercises.
+   *   - "accumulate": like "octaves", but progress accumulates ACROSS rotations
+   *     instead of resetting per-target — the exam accuracy is (distinct notes
+   *     completed so far) / 12, for "hit every chromatic note before the clock
+   *     runs out" exams. See the String Hunt / Whole Neck Hunt exercises.
    *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
-  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "sweep" };
-  /** For "click" mode hunts: restricts which strings (1-6, 1 = high e) are in
-   *  play. Omitted = all 6 strings. Combined with customGoalRegion's fret window
-   *  to compute the exact set of valid (string, fret) click targets. */
+  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" };
+  /** Restricts which strings (1-6, 1 = high e) are in play. Omitted = all 6.
+   *  Combined with customGoalRegion's fret window to compute the exact set of
+   *  valid (string, fret) positions — the clickable targets in "click" mode, and
+   *  in the mic-driven modes the octaves that count as a hit (one string + a
+   *  12-fret window = exactly one octave per note, which is how "play it on the
+   *  G string" gets enforced through a pitch detector that can't hear strings). */
   customGoalStrings?: number[];
   /** Rotating hunts: returns a fresh target each call. A plain function (not a
    *  getter) so it survives object spreads/clones — the rotation hook holds the

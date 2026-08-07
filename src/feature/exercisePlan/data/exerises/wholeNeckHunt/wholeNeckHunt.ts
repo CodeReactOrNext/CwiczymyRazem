@@ -14,11 +14,13 @@ const shuffle = (arr: string[]): string[] => {
 let queue: string[] = shuffle(NOTES);
 let currentTarget = queue.shift()!;
 
-export const wholeNeckSweepExercise: Exercise = {
+export const wholeNeckHuntExercise: Exercise = {
+  // Renamed from "String Sweep" (too close to sweep picking) — the id keeps the
+  // old wording on purpose: favorites, quests and records in Firestore key off it.
   id: "whole_neck_sweep",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Whole Neck Sweep",
+  title: "Whole Neck Hunt",
   description: "The final exam: beat the clock and play every one of the 12 notes, anywhere on the neck, within 90 seconds at 60 BPM.",
   difficulty: "hard",
   category: "theory",
@@ -32,7 +34,7 @@ export const wholeNeckSweepExercise: Exercise = {
     "No region, no single string this time — the whole fretboard is fair game, just like real playing.",
     "If a note is taking too long, jump to the string/fret you're most confident about instead of hunting blindly.",
   ],
-  whyItMatters: "This closes the Fretboard Mastery path: no diagram, no single-string focus, just you, the clock, and the whole neck. If you can sweep all 12 notes here, you've genuinely internalized the fretboard.",
+  whyItMatters: "This closes the Fretboard Mastery path: no diagram, no single-string focus, just you, the clock, and the whole neck. If you can track down all 12 notes here, you've genuinely internalized the fretboard.",
   metronomeSpeed: { min: 60, max: 60, recommended: 60 },
   relatedSkills: ["music_theory"],
   disableBackingTrack: true,
@@ -43,5 +45,5 @@ export const wholeNeckSweepExercise: Exercise = {
     currentTarget = queue.shift()!;
     return { goal: currentTarget };
   },
-  noteHuntConfig: { rotateSeconds: 8, mode: "sweep" },
+  noteHuntConfig: { rotateSeconds: 8, mode: "accumulate" },
 };

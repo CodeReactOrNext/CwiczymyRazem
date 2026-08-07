@@ -103,6 +103,12 @@ const RatingPopUpLayout = ({
   } = useRatingPopUp({ ratingData, currentUserStats, previousUserStats, activityData });
 
   const fame = ratingData.fameEarned ?? 0;
+  // Fame scales on a curve over the day's practice total, so spell out the parts
+  // that aren't just "time" — otherwise the number looks arbitrary.
+  const fameBreakdown = [
+    (ratingData.fameStreakBonus ?? 0) > 0 ? `+${ratingData.fameStreakBonus} streak bonus` : null,
+    ratingData.fameAccuracyBonus ? "×1.25 accuracy" : null,
+  ].filter(Boolean);
   const isRest = ratingData.totalPoints <= 0;
 
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
@@ -281,6 +287,10 @@ const RatingPopUpLayout = ({
                   <span className="text-sm font-bold tabular-nums">+{fame}</span>
                   <span className="text-sm font-medium">Fame</span>
                 </div>
+              )}
+
+              {fame > 0 && fameBreakdown.length > 0 && (
+                <p className="mt-2 text-xs text-zinc-500">{fameBreakdown.join(" · ")}</p>
               )}
 
               {skillGains.length > 0 && (

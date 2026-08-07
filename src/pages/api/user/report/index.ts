@@ -10,6 +10,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { auth } from "utils/firebase/api/firebase.config";
+import { calculateSessionFame } from "utils/gameLogic/calculateSessionFame";
 import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 
 interface SkillPointsGained {
@@ -24,6 +25,25 @@ export interface SongListInterface {
   learned: string[];
   learning: string[];
 }
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * The user's local calendar day this report is being filed on — the bucket the
+ * daily fame counter belongs to. Always the client's "today", even for a
+ * back-dated report: that report's own day is long closed, and pointing the
+ * counter at it would hand the user a fresh allowance for today.
+ */
+const getReportDayKey = (clientTodayISO?: string): string => {
+  if (clientTodayISO && ISO_DAY.test(clientTodayISO)) return clientTodayISO;
+
+  // Legacy clients sent a full ISO timestamp; reportUpdateUserStats normalizes
+  // those to UTC midnight, so bucket them by their UTC day the same way.
+  const parsed = clientTodayISO ? new Date(clientTodayISO) : new Date();
+  const date = isNaN(parsed.getTime()) ? new Date() : parsed;
+
+  return date.toISOString().slice(0, 10);
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -85,7 +105,19 @@ export default async function handler(
 
     // Calculate points gained in this session - use the points from current report only
     const pointsGained = report.raitingData.totalPoints || 0;
-    const fameEarned = Math.round(pointsGained);
+
+    // Fame no longer mirrors points: it pays out on a concave curve over the
+    // user's daily practice total, so short daily sessions beat marathons and
+    // the shop economy can't be inflated by one very long (self-reported) day.
+    const fameResult = calculateSessionFame({
+      sessionTimeMs: report.timeSummary.sumTime,
+      dayKey: getReportDayKey(inputData.clientTodayISO),
+      streak: report.currentUserStats.actualDayWithoutBreak,
+      fameDay: currentUserStats.fameDay,
+      accuracy: inputData.micPerformance?.accuracy,
+      isDateBackReport: report.isDateBackReport,
+    });
+    const fameEarned = fameResult.fame;
 
     const season = await getCurrentSeason();
 
@@ -97,7 +129,8 @@ export default async function handler(
       report.timeSummary,
       pointsGained,
       season.seasonId,
-      fameEarned
+      fameEarned,
+      fameResult.fameDay
     ));
 
     writePromises.push(firebaseSetUserExerciseRaprot(
@@ -160,7 +193,12 @@ export default async function handler(
 
     res.status(200).json({
       ...report,
-      raitingData: { ...report.raitingData, fameEarned },
+      raitingData: {
+        ...report.raitingData,
+        fameEarned,
+        fameStreakBonus: fameResult.streakBonus,
+        fameAccuracyBonus: fameResult.accuracyBonusApplied,
+      },
     });
   }
   res.status(400);

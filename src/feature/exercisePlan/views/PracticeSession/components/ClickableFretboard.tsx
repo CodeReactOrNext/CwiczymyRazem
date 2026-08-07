@@ -1,7 +1,7 @@
 import { Checkbox } from "assets/components/ui/checkbox";
 import { Label } from "assets/components/ui/label";
 import { motion } from "framer-motion";
-import { useId, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -13,7 +13,12 @@ interface ClickableFretboardProps {
   /** Total valid positions for this target — lets the header turn green on completion. */
   totalTargets: number;
   lastClick: { string: number; fret: number; correct: boolean; id: number; elapsedSeconds?: number } | null;
-  onCellClick: (string: number, fret: number) => void;
+  /** Omitted → read-only "play it" board: no clickable cells, no hover. */
+  onCellClick?: (string: number, fret: number) => void;
+  /** Read-only mode: "string-fret" key the mic is hearing right now — pulses. */
+  liveKey?: string | null;
+  /** Replaces the default "FRETS x–y" caption. */
+  title?: ReactNode;
 }
 
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
@@ -66,12 +71,16 @@ const STRING_ACTIVE_WIDTHS = [3, 3.6, 4.4, 5.4, 6.6, 8];
 const STRING_INACTIVE_WIDTHS = [1, 1.1, 1.3, 1.5, 1.8, 2.2];
 
 /**
- * Click-to-answer counterpart to NoteHuntFretboard: zooms in on the exercise's
- * fret window (plus a few context frets on each side, so a narrow or single-fret
- * window doesn't float in isolation) so cells are big and easy to hit. All 6
- * strings keep the same row height — a real fretboard's proportions. Strings
- * carry the "in-scope" signal through bold chrome color and thickness; frets
- * are kept deliberately subdued so they never compete with the strings.
+ * The exercise's neck diagram, shared by the click drills and the mic-driven
+ * hunts: zooms in on the fret window (plus a few context frets on each side, so
+ * a narrow or single-fret window doesn't float in isolation) so cells are big and
+ * easy to read or hit. All 6 strings keep the same row height — a real
+ * fretboard's proportions. Strings carry the "in-scope" signal through bold
+ * chrome color and thickness, with everything off-scope dimmed behind a scrim;
+ * frets are kept deliberately subdued so they never compete with the strings.
+ *
+ * Without `onCellClick` it renders read-only — the "play this on your guitar"
+ * board, where progress comes from the mic instead of taps.
  */
 export function ClickableFretboard({
   startFret,
@@ -81,10 +90,16 @@ export function ClickableFretboard({
   totalTargets,
   lastClick,
   onCellClick,
+  liveKey,
+  title,
 }: ClickableFretboardProps) {
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
   const allFound = totalTargets > 0 && found.size >= totalTargets;
+  const interactive = !!onCellClick;
+  // Only worth shouting about which string to use when the exercise actually
+  // narrows it down — with all six in play there's nothing to distinguish.
+  const stringScoped = !!strings && strings.length < 6;
 
   // Persisted across sessions — some players prefer to always see the whole
   // neck for orientation instead of the zoomed search window + context frets.
@@ -136,7 +151,7 @@ export function ClickableFretboard({
     <div className="flex w-full flex-col items-center">
       <div className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
         <p className="text-center text-sm font-bold tracking-widest text-zinc-200">
-          FRETS {startFret}–{endFret}
+          {title ?? `FRETS ${startFret}–${endFret}`}
         </p>
         <div className="flex items-center gap-2">
           <Checkbox id="show-full-neck" checked={showFullNeck} onCheckedChange={(checked) => toggleShowFullNeck(checked === true)} />
@@ -180,6 +195,23 @@ export function ClickableFretboard({
             fill={allFound ? "#34d399" : "#22d3ee"}
             opacity={0.08}
           />
+
+          {/* String-scope band — runs the full length of the neck along every
+              string in play. Crossed with the fret window above, the two bands
+              intersect exactly on the cells that count. */}
+          {stringScoped && STRING_LABELS.map((_, i) =>
+            isInScope(i + 1) ? (
+              <rect
+                key={i}
+                x={neckX}
+                y={rowY(i)}
+                width={neckW}
+                height={ROW_H}
+                fill={allFound ? "#34d399" : "#22d3ee"}
+                opacity={0.1}
+              />
+            ) : null,
+          )}
 
           {/* Inlay markers — sit on the fretboard itself, between strings, like a real neck. */}
           {Array.from({ length: fretCount }, (_, i) => {
@@ -310,6 +342,23 @@ export function ClickableFretboard({
             );
           })}
 
+          {/* Scrim over every string that is out of play — pushes the whole row
+              (frets, inlays and all) behind the one the exercise is asking for. */}
+          {stringScoped && STRING_LABELS.map((_, i) =>
+            isInScope(i + 1) ? null : (
+              <rect
+                key={i}
+                x={neckX}
+                y={rowY(i)}
+                width={neckW}
+                height={ROW_H}
+                fill="#09090b"
+                opacity={0.55}
+                className="pointer-events-none"
+              />
+            ),
+          )}
+
           {/* Fret numbers — plain text above the neck, dimmer for context-only frets. */}
           {Array.from({ length: fretCount }, (_, i) => {
             const fret = displayStart + i;
@@ -331,7 +380,8 @@ export function ClickableFretboard({
             );
           })}
 
-          {/* String labels — chrome for in-scope, muted otherwise. */}
+          {/* String labels — the string(s) actually in play read as the loudest
+              thing on the diagram; everything else recedes. */}
           {STRING_LABELS.map((label, i) => {
             const stringNum = i + 1;
             const active = isInScope(stringNum);
@@ -344,14 +394,16 @@ export function ClickableFretboard({
                 textAnchor="end"
                 fontSize={active ? 32 : 20}
                 fontWeight={active ? "800" : "600"}
-                fill={active ? STRING_ACTIVE_COLOR : STRING_INACTIVE_COLOR}
+                fill={active ? (stringScoped ? "#67e8f9" : STRING_ACTIVE_COLOR) : STRING_INACTIVE_COLOR}
               >
                 {label}
               </text>
             );
           })}
 
-          {/* Clickable cells — only inside in-scope rows, only inside the actual search window. */}
+          {/* Target cells — only inside in-scope rows, only inside the actual
+              search window. Read-only boards keep the found markers but drop the
+              hit areas: nothing here is answerable by clicking. */}
           {STRING_LABELS.map((_, i) => {
             const stringNum = i + 1;
             if (!isInScope(stringNum)) return null;
@@ -366,15 +418,32 @@ export function ClickableFretboard({
               const cy = y + ROW_H / 2;
               cells.push(
                 <g key={key}>
-                  <rect
-                    x={x + 1}
-                    y={y + 1}
-                    width={w - 2}
-                    height={ROW_H - 2}
-                    fill="transparent"
-                    className="cursor-pointer transition-colors hover:fill-zinc-200/10"
-                    onClick={() => onCellClick(stringNum, fret)}
-                  />
+                  {interactive && (
+                    <rect
+                      x={x + 1}
+                      y={y + 1}
+                      width={w - 2}
+                      height={ROW_H - 2}
+                      fill="transparent"
+                      className="cursor-pointer transition-colors hover:fill-zinc-200/10"
+                      onClick={() => onCellClick!(stringNum, fret)}
+                    />
+                  )}
+                  {!isFound && liveKey === key && (
+                    <motion.circle
+                      cx={cx}
+                      cy={cy}
+                      r={30}
+                      fill="none"
+                      stroke="#34d399"
+                      strokeWidth={5}
+                      initial={{ opacity: 0.9, scale: 0.75 }}
+                      animate={{ opacity: [0.9, 0.2, 0.9], scale: [0.75, 1.15, 0.75] }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                      style={{ transformOrigin: `${cx}px ${cy}px` }}
+                      className="pointer-events-none"
+                    />
+                  )}
                   {isFound && (
                     <g className="pointer-events-none">
                       <circle cx={cx} cy={cy} r={42} fill="#10b981" opacity={0.12} />

@@ -2,6 +2,7 @@ import { updateSeasonalStats } from "feature/report/services/updateSeasonalStats
 import { doc, increment, updateDoc } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 import { db } from "utils/firebase/client/firebase.utils";
+import type { FameDayState } from "utils/gameLogic/calculateSessionFame";
 
 
 export const firebaseUpdateUserStats = async (
@@ -16,7 +17,8 @@ export const firebaseUpdateUserStats = async (
   },
   pointsGained: number,
   seasonId: string,
-  fameEarned: number = 0
+  fameEarned: number = 0,
+  fameDay?: FameDayState
 ) => {
   const userDocRef = doc(db, "users", userAuth);
 
@@ -37,6 +39,7 @@ export const firebaseUpdateUserStats = async (
     "statistics.lastReportDate": statistics.lastReportDate,
     "skills": statistics.skills,
     ...(fameEarned > 0 && { "statistics.fame": increment(fameEarned) }),
+    ...(fameDay && { "statistics.fameDay": fameDay }),
   };
 
   await Promise.all([

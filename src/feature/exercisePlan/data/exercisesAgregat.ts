@@ -254,15 +254,15 @@ import {
 } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 import { scalePracticeExercise } from "feature/exercisePlan/data/exerises/scalePractice/scalePractice";
 import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
+import { stringHuntAExercise } from "feature/exercisePlan/data/exerises/stringHuntA/stringHuntA";
+import { stringHuntBExercise } from "feature/exercisePlan/data/exerises/stringHuntB/stringHuntB";
+import { stringHuntDExercise } from "feature/exercisePlan/data/exerises/stringHuntD/stringHuntD";
+import { stringHuntGExercise } from "feature/exercisePlan/data/exerises/stringHuntG/stringHuntG";
+import { stringHuntLowEExercise } from "feature/exercisePlan/data/exerises/stringHuntLowE/stringHuntLowE";
 import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exerises/stringSkippingArpeggios/stringSkippingArpeggios";
 import { stringSkippingBasicExercise } from "feature/exercisePlan/data/exerises/stringSkippingBasic/stringSkippingBasic";
 import { stringSkippingMelodicExercise } from "feature/exercisePlan/data/exerises/stringSkippingMelodic/stringSkippingMelodic";
 import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
-import { stringSweepAExercise } from "feature/exercisePlan/data/exerises/stringSweepA/stringSweepA";
-import { stringSweepBExercise } from "feature/exercisePlan/data/exerises/stringSweepB/stringSweepB";
-import { stringSweepDExercise } from "feature/exercisePlan/data/exerises/stringSweepD/stringSweepD";
-import { stringSweepGExercise } from "feature/exercisePlan/data/exerises/stringSweepG/stringSweepG";
-import { stringSweepLowEExercise } from "feature/exercisePlan/data/exerises/stringSweepLowE/stringSweepLowE";
 import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
 import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
 import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
@@ -282,7 +282,7 @@ import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exeris
 import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
 import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/vibratoLowPosition/vibratoLowPosition";
 import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
-import { wholeNeckSweepExercise } from "feature/exercisePlan/data/exerises/wholeNeckSweep/wholeNeckSweep";
+import { wholeNeckHuntExercise } from "feature/exercisePlan/data/exerises/wholeNeckHunt/wholeNeckHunt";
 
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
 import { spiderPermutation1243Exercise } from "./exerises/spiderPermutation1243/spiderPermutation1243";
@@ -343,12 +343,12 @@ const rawExercises: Exercise[] = [
   fretClickBox812Exercise,
   fretClickWholeNaturalExercise,
   fretClickWholeChromaticExercise,
-  stringSweepLowEExercise,
-  stringSweepAExercise,
-  stringSweepDExercise,
-  stringSweepGExercise,
-  stringSweepBExercise,
-  wholeNeckSweepExercise,
+  stringHuntLowEExercise,
+  stringHuntAExercise,
+  stringHuntDExercise,
+  stringHuntGExercise,
+  stringHuntBExercise,
+  wholeNeckHuntExercise,
   intervalHuntExercise,
   buildTheChordExercise,
   fingerstyleArpeggiosExercise,

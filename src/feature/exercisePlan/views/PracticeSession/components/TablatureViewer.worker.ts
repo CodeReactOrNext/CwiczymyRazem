@@ -181,10 +181,15 @@ let tuningStrings: TuningStringInfo[] = [];
 // many beats ahead of the cursor (or is still ringing under it).
 const TUNING_LOOKAHEAD_BEATS = 2;
 
-// Tile index the frozen snapshot belongs to, captured from the visual cursor at
-// freeze time. Matching resets ~one input-latency before the visual wrap, so we
-// pin the tile at reset time to keep the tail painted through that gap.
-let lastActiveTile = 0;
+// Repetition that most recently FINISHED — the one a matching reset's frozen
+// snapshot describes. Matching grades against a clock shifted back by the input
+// latency (~80-150ms), so its loop reset always reaches us *after* the visual
+// cursor has already crossed into the next repetition. Pinning the snapshot to
+// the tile the cursor sits in (what this used to do) therefore painted the
+// finished pass's greens over the pass being played right now — the board read
+// one full loop behind, and kept repainting the same greens with nothing being
+// played. Which side of the boundary the cursor is on tells us which pass ended.
+let lastFinishedTile = 0;
 
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
 const HIT_ANIM_MS = 320;
@@ -582,7 +587,13 @@ function render() {
   // Repetition the cursor is currently in — the one just before it is the
   // outgoing tail that should keep the previous pass's frozen hit/miss state.
   const activeTile = seamless && totalW > 0 ? Math.floor(dispCursor / totalW) : 0;
-  lastActiveTile = activeTile;
+  // A wrap-triggered freeze always lands near a repetition boundary. Still in
+  // the first half of a tile ⇒ the cursor just crossed in and the pass that
+  // ended is the one behind; past the halfway mark ⇒ matching wrapped first
+  // (zero-latency native input) and the finishing pass is this very tile.
+  lastFinishedTile = seamless && totalW > 0 && dispCursor % totalW < totalW / 2
+    ? activeTile - 1
+    : activeTile;
 
   // ── Clear & translate ────────────────────────────────────────────────────
   ctx.clearRect(0, 0, viewW, viewH);
@@ -616,7 +627,11 @@ function render() {
     const cursorPos = dispCursor - tileOff;
     // Outgoing tail (the repetition just behind the cursor) renders the frozen
     // previous-pass state so it stays painted instead of resetting to raw.
-    const isOutgoing = seamless && visual.hasFrozen && tile === visual.frozenTile;
+    // `tile < activeTile` is a hard guarantee, not an optimisation: a frozen
+    // snapshot describes a pass that is over, so it may never paint the
+    // repetition the cursor is currently in — that alone is what made the
+    // display show the previous loop's feedback instead of the live one.
+    const isOutgoing = seamless && visual.hasFrozen && tile === visual.frozenTile && tile < activeTile;
     const tileHit = isOutgoing ? visual.frozenHitNotes : visual.hitNotes;
     const tileMissed = isOutgoing ? visual.frozenMissedNotes : visual.missedNotes;
     ctx.save();
@@ -843,7 +858,7 @@ function render() {
         }
 
         let fillW = 0;
-        if (isHit && isOutgoing && tile < activeTile) {
+        if (isHit && isOutgoing) {
           // Frozen tail strictly behind the cursor: keep notes fully filled and
           // never touch the live cache (its note key is shared with other tiles).
           fillW = blockW;
@@ -1522,11 +1537,11 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'HIT_NOTES': {
-      applyHitNotes(visual, msg.hitNotes as Record<string, boolean>, Date.now(), lastActiveTile);
+      applyHitNotes(visual, msg.hitNotes as Record<string, boolean>, Date.now(), lastFinishedTile);
       break;
     }
     case 'MISSED_NOTES': {
-      applyMissedNotes(visual, msg.missedNotes as Record<string, boolean>, lastActiveTile);
+      applyMissedNotes(visual, msg.missedNotes as Record<string, boolean>, lastFinishedTile);
       needsRedraw = true;
       break;
     }
