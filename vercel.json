@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/support-ask-update",
-      "schedule": "0 20 */2 * *"
+      "schedule": "0 17 * * *"
     }
   ]
 }

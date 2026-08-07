@@ -104,7 +104,9 @@ export const notificationText = (
     case "reaction":
       return {
         title: "You got motivated!",
-        body: `${sender}motivated you and gave you +10`,
+        // Reactions recorded before the amount was stored can't report one, so they stay silent
+        // about it rather than quoting a number that was never actually awarded.
+        body: `${sender}motivated you${n.fameAwarded ? ` and gave you +${n.fameAwarded}` : ""}`,
       };
     case "season_reward":
       return {

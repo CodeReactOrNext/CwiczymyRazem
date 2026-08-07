@@ -3,6 +3,13 @@ import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/a
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import type { SupportVariantId } from "feature/support/content/supportVariants";
 
+/**
+ * Fame each reactor was actually granted when they motivated this log, keyed by their uid.
+ * Written only by `/api/logs/react` (Admin SDK) so undoing a reaction refunds exactly what was
+ * awarded, even if the row's grouping — and therefore its current payout — changed since.
+ */
+export type LogReactionFame = Record<string, number>;
+
 export type FirebaseLogsSongsStatuses =
   | "learned"
   | "wantToLearn"
@@ -23,6 +30,7 @@ export interface FirebaseLogsSongsInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
   timestamp: string | number | Date;
 }
 
@@ -79,6 +87,7 @@ export interface FirebaseLogsInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
   planId?: string | null;
   songId?: string;
   songTitle?: string;
@@ -125,6 +134,7 @@ export interface FirebaseLogsTopPlayersInterface {
   daysLeftInSeason?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
   timestamp: string | number | Date;
 }
 
@@ -145,6 +155,7 @@ export interface FirebaseLogsRecordingsInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsPlaylistInterface {
@@ -161,6 +172,7 @@ export interface FirebaseLogsPlaylistInterface {
   songCount: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsDailyQuestInterface {
@@ -174,6 +186,7 @@ export interface FirebaseLogsDailyQuestInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsExamPassedInterface {
@@ -192,6 +205,7 @@ export interface FirebaseLogsExamPassedInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsMarketplaceInterface {
@@ -212,6 +226,7 @@ export interface FirebaseLogsMarketplaceInterface {
   rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsMarketplacePurchaseInterface {
@@ -235,6 +250,7 @@ export interface FirebaseLogsMarketplacePurchaseInterface {
   rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }
 
 export interface FirebaseLogsSupportAskInterface {
@@ -247,8 +263,12 @@ export interface FirebaseLogsSupportAskInterface {
   supporters: number;
   nextTierLabel?: string | null;
   nextTierAmountToGo?: number | null;
+  /** Absent on logs written before the roadmap-momentum variant existed. */
+  tiersFunded?: number | null;
+  tiersTotal?: number | null;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
   timestamp: string | number | Date;
 }
 
@@ -260,6 +280,7 @@ export interface FirebaseLogsDonationInterface {
   kind: "one_off" | "recurring";
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
   timestamp: string | number | Date;
 }
 
@@ -282,4 +303,5 @@ export interface FirebaseLogsCaseOpenInterface {
   rolledItem?: InventoryItem | EffectInventoryItem;
   id?: string;
   reactions?: string[];
+  reactionFame?: LogReactionFame;
 }

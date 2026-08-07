@@ -41,7 +41,7 @@ import type {
   FirebaseLogsSupportAskInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
-import { calculateActivityFame, EXERCISE_PLAN_FAME } from "feature/logs/utils/activityFame";
+import { calculateGroupFame } from "feature/logs/utils/activityFame";
 import {
   type AnyFirebaseLog,
   getLogActivityType,
@@ -49,6 +49,11 @@ import {
   type LogActivityType,
   type LogGroup,
 } from "feature/logs/utils/groupConsecutiveLogs";
+import {
+  getGroupAwardedFame,
+  getGroupReactionAnchor,
+  getGroupReactors,
+} from "feature/logs/utils/groupReactions";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
@@ -86,10 +91,6 @@ import {
 import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
-
-/** Fame reward for a group of `count` non-plan activities of the same type. */
-const getGroupFameAmount = (group: LogGroup): number =>
-  group.type === "exercisePlan" ? EXERCISE_PLAN_FAME : calculateActivityFame(group.logs.length);
 
 /** Compact practice duration shown next to the points in a feed row — "1h 20m", "45m",
  * or seconds for sub-minute sessions (so a short drill never reads as "0m"). */
@@ -638,19 +639,29 @@ const FirebaseLogsSupportAskItem = ({
     supporters: log.supporters,
     nextTierLabel: log.nextTierLabel,
     nextTierAmountToGo: log.nextTierAmountToGo,
+    tiersFunded: log.tiersFunded,
+    tiersTotal: log.tiersTotal,
   });
 
   return (
     <div
-      className={`my-4 flex flex-col overflow-hidden bg-main-opposed-bg transition-all duration-300 rounded-xl ${
+      className={`relative my-4 flex flex-col overflow-hidden bg-main-opposed-bg transition-all duration-300 rounded-xl ${
         isNew ? "border border-white/30" : ""
       }`}>
-      <div className='flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10'>
-          <Heart size={16} className='text-amber-400' fill='currentColor' />
+      {/* Same tiled icon pattern and warm glow as the "Help build Riff Quest" banner
+          (feature/dashboard/components/SupportBanner.tsx), so the funding story looks
+          the same wherever it shows up. */}
+      <HeroPattern
+        className='opacity-[0.08]'
+        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
+      />
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
+      <div className='relative z-10 flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/10'>
+          <Heart size={16} className='text-orange-400' fill='currentColor' />
         </div>
         <div className='min-w-0 flex-1'>
-          <p className='text-[10px] font-semibold uppercase tracking-widest text-amber-500/80'>
+          <p className='text-[10px] font-semibold uppercase tracking-widest text-orange-400/80'>
             {copy.eyebrow}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>{copy.headline}</h3>
@@ -661,7 +672,7 @@ const FirebaseLogsSupportAskItem = ({
         </span>
       </div>
 
-      <div className='px-3 pb-4 sm:px-5'>
+      <div className='relative z-10 px-3 pb-4 sm:px-5'>
         <p className='text-sm text-secondText'>{copy.body}</p>
         <a
           href={BMC_URL}
@@ -1168,8 +1179,14 @@ const GroupedLogItem = ({
 }) => {
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
-  const fameAmount = getGroupFameAmount(group);
-  const { uid, userName, avatarUrl, userAvatarFrame, id: logId, reactions } = representative;
+  const fameAmount = calculateGroupFame(group);
+  const { uid, userName, avatarUrl, userAvatarFrame } = representative;
+
+  // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
+  // head keeps changing as the user logs more of the same activity, the tail does not.
+  const reactionLogId = getGroupReactionAnchor(group)?.id;
+  const reactors = getGroupReactors(group);
+  const awardedFame = getGroupAwardedFame(group, fameAmount);
 
   return (
     <LogItem isNew={isNew}>
@@ -1182,14 +1199,15 @@ const GroupedLogItem = ({
             {formatDistanceToNow(date, { addSuffix: true })}
           </span>
 
-          {logId && (
+          {reactionLogId && (
             <div className="ml-auto shrink-0">
               <LogReaction
-                logId={logId}
-                reactions={reactions}
+                logId={reactionLogId}
+                reactions={reactors}
                 currentUserId={currentUserId}
                 disabled={uid === currentUserId}
                 fameAmount={fameAmount}
+                awardedFame={awardedFame}
               />
             </div>
           )}

@@ -51,16 +51,21 @@ const typeConfig = {
       />
     ),
     bg: "bg-amber-500/20",
-    label: (_n: any) => (
-      <span className='inline-flex items-center gap-1'>
-        motivated you and gave you +10
-        <img
-          src='/images/coin.png'
-          alt='coin'
-          className='h-3 w-3 object-contain'
-        />
-      </span>
-    ),
+    // Reactions recorded before the amount was stored have no number to show, so they just say
+    // what happened instead of quoting one that was never actually awarded.
+    label: (n: any) =>
+      n.fameAwarded ? (
+        <span className='inline-flex items-center gap-1'>
+          motivated you and gave you +{n.fameAwarded}
+          <img
+            src='/images/coin.png'
+            alt='coin'
+            className='h-3 w-3 object-contain'
+          />
+        </span>
+      ) : (
+        "motivated you"
+      ),
   },
   season_reward: {
     icon: <Trophy className='h-3 w-3 fill-current text-white' />,

@@ -10,12 +10,16 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 interface LogReactionProps {
+  /** Log the reaction is anchored to — the stable, oldest member of the group. */
   logId: string;
+  /** Everyone who reacted anywhere in the group. */
   reactions?: string[];
   currentUserId: string;
   disabled?: boolean;
-  /** Fame the recipient gets when this row (or grouped row) is motivated. */
+  /** Fame the recipient would get for this row — a preview; the server prices the reaction itself. */
   fameAmount: number;
+  /** Fame the row has already earned from earlier reactions. */
+  awardedFame: number;
 }
 
 interface Ripple {
@@ -33,16 +37,30 @@ const BURST_COINS = [
   { x: 32, y: -32, rotate: -25, delay: 0.08 },
 ];
 
-export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fameAmount }: LogReactionProps) => {
-  const isReacted = reactions.includes(currentUserId);
-  const [localReactions, setLocalReactions] = useState(reactions);
+export const LogReaction = ({
+  logId,
+  reactions = [],
+  currentUserId,
+  disabled,
+  fameAmount,
+  awardedFame,
+}: LogReactionProps) => {
+  const [optimistic, setOptimistic] = useState<{ reacted: boolean; fame: number } | null>(null);
+  const [isPending, setIsPending] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [ripples, setRipples] = useState<Ripple[]>([]);
+
+  // The optimistic guess only stands in until the logs stream reports the same thing; the moment
+  // props agree it stops applying on its own, so there's nothing to clear and no flicker in between.
+  const streamedReacted = reactions.includes(currentUserId);
+  const isGuessing = optimistic !== null && optimistic.reacted !== streamedReacted;
+  const isReacted = isGuessing ? optimistic.reacted : streamedReacted;
+  const totalFame = isGuessing ? optimistic.fame : awardedFame;
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (disabled) return;
+    if (disabled || isPending) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const rippleId = Date.now();
@@ -54,35 +72,57 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
       setRipples((prev) => prev.filter((r) => r.id !== rippleId));
     }, 600);
 
-    const nowReacted = !localReactions.includes(currentUserId);
+    const nowReacted = !isReacted;
+
+    setOptimistic({
+      reacted: nowReacted,
+      fame: Math.max(0, totalFame + (nowReacted ? fameAmount : -fameAmount)),
+    });
+    setIsPending(true);
 
     if (nowReacted) {
-      setLocalReactions([...localReactions, currentUserId]);
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 900);
-      toast.success(
-        <div className="flex items-center gap-1">
-          <span>You motivated the player! You get +1</span>
-          <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
-        </div>,
-        {
-          icon: <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />,
-        }
-      );
-    } else {
-      setLocalReactions(localReactions.filter((id) => id !== currentUserId));
     }
 
-    await toggleLogReaction(logId, currentUserId, !nowReacted, fameAmount);
+    try {
+      const result = await toggleLogReaction(logId);
+
+      // The server prices the reaction, so reconcile against what it actually granted.
+      setOptimistic({
+        reacted: result.reacted,
+        fame: Math.max(0, totalFame + result.fameAwarded),
+      });
+
+      if (result.reacted) {
+        toast.success(
+          <div className="flex items-center gap-1">
+            <span>You motivated the player! You get +1</span>
+            <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
+          </div>,
+          {
+            icon: <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />,
+          }
+        );
+      }
+    } catch {
+      // Drop the guess and fall back to whatever the stream says — nothing was written.
+      setOptimistic(null);
+      setIsAnimating(false);
+      toast.error("Could not update the reaction. Try again.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  if (disabled && localReactions.length === 0) return null;
+  if (disabled && reactions.length === 0) return null;
 
   return (
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <motion.button
           onClick={handleToggle}
+          disabled={isPending}
           whileTap={disabled ? undefined : { scale: 0.85 }}
           animate={isAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
@@ -92,7 +132,8 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
               ? "cursor-default bg-amber-500/15 text-amber-400"
               : isReacted
               ? "cursor-pointer bg-amber-500/15 text-amber-400"
-              : "cursor-pointer bg-zinc-800 text-zinc-400 shadow-sm hover:bg-zinc-700 hover:text-zinc-200"
+              : "cursor-pointer bg-zinc-800 text-zinc-400 shadow-sm hover:bg-zinc-700 hover:text-zinc-200",
+            isPending && "cursor-wait opacity-70"
           )}
           title={undefined}
         >
@@ -143,15 +184,15 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled, fa
               !isReacted && "opacity-50 group-hover:scale-110 group-hover:opacity-100"
             )}
           />
-          {localReactions.length > 0 ? (
+          {totalFame > 0 ? (
             <motion.span
-              key={localReactions.length}
+              key={totalFame}
               initial={{ scale: 1.5 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 22 }}
               className="text-xs font-bold tabular-nums sm:text-[13px]"
             >
-              {localReactions.length * fameAmount}
+              {totalFame}
             </motion.span>
           ) : (
             <span className="text-xs font-semibold tabular-nums sm:text-[13px]">+{fameAmount}</span>

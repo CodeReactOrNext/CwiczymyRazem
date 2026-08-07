@@ -1,74 +1,28 @@
-import {
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  increment,
-  runTransaction,
-  serverTimestamp
-} from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
+import axios from "axios";
+import { auth } from "utils/firebase/client/firebase.utils";
 
-export const toggleLogReaction = async (
-  logId: string,
-  userId: string,
-  isRemoving: boolean = false,
-  fameAmount: number
-) => {
-  if (!logId || !userId) return;
+export interface ToggleLogReactionResult {
+  /** Whether the user now has a reaction on this row. */
+  reacted: boolean;
+  /** Fame the recipient gained (negative when the reaction was withdrawn). */
+  fameAwarded: number;
+  /** Log the reaction actually landed on — the server picks it, not the caller. */
+  logId: string;
+}
 
-  const logRef = doc(db, "logs", logId);
+/**
+ * Motivates (or un-motivates) a feed row. The reward is decided entirely by `/api/logs/react`:
+ * the server rebuilds the row's group, prices it and moves the Fame with the Admin SDK, so no
+ * amount travels from the client and no client write can forge one.
+ */
+export const toggleLogReaction = async (logId: string): Promise<ToggleLogReactionResult> => {
+  const idToken = await auth.currentUser?.getIdToken();
+  if (!idToken) throw new Error("Not signed in");
 
-  try {
-    await runTransaction(db, async (transaction) => {
-      const logSnapshot = await transaction.get(logRef);
-      if (!logSnapshot.exists()) return;
+  const { data } = await axios.post<ToggleLogReactionResult>("/api/logs/react", {
+    idToken,
+    logId,
+  });
 
-      const logData = logSnapshot.data();
-      const recipientId = logData.uid;
-      const recipientRef = doc(db, "users", recipientId);
-
-      const reactorDocRef = doc(db, "users", userId);
-      const reactorSnapshot = await transaction.get(reactorDocRef);
-      const reactorData = reactorSnapshot.data();
-
-      // Update the log reactions
-      transaction.update(logRef, {
-        reactions: isRemoving ? arrayRemove(userId) : arrayUnion(userId)
-      });
-
-      // Fame and Notification logic
-      if (recipientId && recipientId !== userId) {
-        // Update Fame
-        transaction.update(recipientRef, {
-          "statistics.fame": increment(isRemoving ? -fameAmount : fameAmount)
-        });
-
-        transaction.update(reactorDocRef, {
-          "statistics.fame": increment(isRemoving ? -1 : 1)
-        });
-
-        // Add Notification
-        if (!isRemoving && reactorData) {
-          const notificationsRef = collection(db, "notifications");
-          const newNotificationRef = doc(notificationsRef);
-
-          transaction.set(newNotificationRef, {
-            userId: recipientId,
-            senderId: userId,
-            senderName: reactorData.displayName || "Someone",
-            senderAvatarUrl: reactorData.avatar || reactorData.photoURL || null,
-            senderFrame: reactorData.statistics?.lvl ?? 0,
-            type: "reaction",
-            recordingId: logId,
-            recordingTitle: "",
-            isRead: false,
-            timestamp: serverTimestamp()
-          });
-        }
-      }
-    });
-  } catch (error) {
-    console.error("Error toggling reaction with notification/fame:", error);
-  }
+  return data;
 };
