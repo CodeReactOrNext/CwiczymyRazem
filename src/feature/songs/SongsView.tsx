@@ -384,7 +384,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       key={tab.key}
                       onClick={() => handleSwitchView(tab.key)}
                       className={cn(
-                        "relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors active:scale-95",
+                        // flex-1 until sm so the three tabs fill the phone width
+                        // instead of leaving dead space on the right.
+                        "relative flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors active:scale-95 sm:flex-none sm:justify-start",
                         isActive
                           ? "bg-zinc-100 text-zinc-900"
                           : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"

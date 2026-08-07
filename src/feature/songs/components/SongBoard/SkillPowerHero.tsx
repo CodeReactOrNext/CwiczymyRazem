@@ -74,13 +74,13 @@ export const SkillPowerHero = ({
   const isTierLocked = learnedCount < MIN_LEARNED_SONGS_FOR_TIER;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-lg bg-zinc-900/40 p-8 backdrop-blur-xl", className)}>
+    <div className={cn("relative overflow-hidden rounded-lg bg-zinc-900/40 p-5 backdrop-blur-xl sm:p-8", className)}>
       {/* Background Decorative Elements */}
       <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]" />
       <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-emerald-500/5 blur-[80px]" />
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-6">
+        <div className="space-y-5 sm:space-y-6">
           <div className="flex items-center gap-3">
              <div className="h-10 w-10 rounded-[4px] bg-white/5 flex items-center justify-center text-zinc-300 shadow-lg">
                 <TrendingUp size={20} />
@@ -92,17 +92,19 @@ export const SkillPowerHero = ({
           </div>
 
           <div className="flex items-baseline gap-4">
-            <span className="text-7xl font-black text-white tracking-tighter">
+            <span className="text-6xl font-black text-white tracking-tighter sm:text-7xl">
               {skillPower.toFixed(1)}
             </span>
             <div className="flex flex-col">
-               <span className="text-xl font-bold text-white leading-none">Power score</span>
+               <span className="text-lg font-bold text-white leading-none sm:text-xl">Power score</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="grid grid-cols-3 gap-8">
+        {/* Stats and the tier badge only share a row once there is room for both —
+            on a phone they stack, otherwise the badge sits on top of "Time spent". */}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8">
              <div className="space-y-2.5">
                 <p className="text-[10px] font-bold tracking-wider text-zinc-500">Mastered</p>
                 <div className="flex items-center gap-2">
@@ -128,7 +130,7 @@ export const SkillPowerHero = ({
 
           <div className="h-16 w-px bg-white/5 hidden md:block" />
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-start sm:items-center">
              <div
                className="h-24 w-24 rounded-lg flex items-center justify-center text-4xl font-black shadow-2xl mb-3"
                style={{

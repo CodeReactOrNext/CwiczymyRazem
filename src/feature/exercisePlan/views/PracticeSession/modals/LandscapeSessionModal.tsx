@@ -175,6 +175,7 @@ export function LandscapeSessionModal({
                     onEarTrainingGuessed={onEarTrainingGuessed}
                     riddleProgress={riddleProgress}
                     onPlayRiddle={handleToggleTimer}
+                    isExamMode={examMode}
                   />
                 </div>
               </div>

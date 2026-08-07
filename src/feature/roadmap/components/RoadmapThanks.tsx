@@ -16,7 +16,9 @@ export const RoadmapThanks = () => {
       />
       <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-transparent' />
       <div className='relative flex flex-wrap items-center gap-x-12 gap-y-6'>
-        <div className='flex min-w-0 flex-1 items-start gap-3.5'>
+        {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA would
+            otherwise squeeze the copy down to a word per line on a phone. */}
+        <div className='flex w-full min-w-0 items-start gap-3.5 lg:w-auto lg:flex-1'>
           <PartyPopper size={18} className='mt-0.5 shrink-0 text-purple-400' />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>

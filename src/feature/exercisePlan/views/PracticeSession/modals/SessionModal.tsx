@@ -209,6 +209,7 @@ const SessionModal = ({
             onEarTrainingGuessed={onEarTrainingGuessed}
             riddleProgress={riddleProgress}
             onPlayRiddle={handleToggleTimer}
+            isExamMode={examMode}
           />
 
           {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}

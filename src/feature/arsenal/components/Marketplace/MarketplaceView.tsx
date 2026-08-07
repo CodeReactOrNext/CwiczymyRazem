@@ -29,7 +29,7 @@ export const MarketplaceView = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 xsm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {Array.from({ length: 10 }).map((_, i) => (
           <Skeleton key={i} className="h-72 rounded-lg bg-zinc-800/50" />
         ))}
@@ -48,8 +48,10 @@ export const MarketplaceView = () => {
     );
   }
 
+  // One column below 500px: at two columns a phone squeezes the card so hard
+  // that the badges wrap and the perk rows collide.
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 xsm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {listings.map((listing) => (
         <MarketListingCard
           key={listing.id}

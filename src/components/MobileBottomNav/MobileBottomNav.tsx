@@ -1,19 +1,25 @@
 import { cn } from "assets/lib/utils";
 import { useRipple } from "hooks/useRipple";
-import type { LucideIcon } from "lucide-react";
-import { Activity, Home, LayoutGrid, Menu, Timer } from "lucide-react";
+import { Home, Menu, Timer } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { FaArrowTrendUp } from "react-icons/fa6";
+import { PiCassetteTapeLight } from "react-icons/pi";
 
 interface MobileBottomNavProps {
   onMenuClick: () => void;
 }
 
-const navItems = [
+/** Both lucide and react-icons components take these — the nav mixes the two. */
+type NavIcon = React.ComponentType<{ size?: number; className?: string }>;
+
+// Icons must stay in sync with the sidebar entries in RockSidebar, otherwise the
+// same destination shows up with two different glyphs.
+const navItems: { label: string; href: string; icon: NavIcon }[] = [
   { label: "Home", href: "/dashboard", icon: Home },
   { label: "Practice", href: "/timer", icon: Timer },
-  { label: "Songs", href: "/songs?view=board", icon: LayoutGrid },
-  { label: "Progress", href: "/profile/activity", icon: Activity },
+  { label: "Songs", href: "/songs?view=board", icon: PiCassetteTapeLight },
+  { label: "Progress", href: "/profile/activity", icon: FaArrowTrendUp },
 ];
 
 const itemClass =
@@ -43,7 +49,7 @@ const BottomNavItem = ({
 }: {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: NavIcon;
   active: boolean;
 }) => {
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");

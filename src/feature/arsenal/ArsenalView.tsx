@@ -66,7 +66,9 @@ export const ArsenalView = () => {
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         backgroundContent={<HeroPattern />}
         rightContent={
-          <div className="flex flex-col items-end gap-2">
+          // items-end only once the block sits on the right: on mobile it is
+          // left of the screen, where right-aligned chips read as a staircase.
+          <div className="flex flex-col items-stretch gap-2 md:items-end">
             <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
               <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
               <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>

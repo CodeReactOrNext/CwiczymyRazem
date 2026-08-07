@@ -1,7 +1,7 @@
 import { Checkbox } from "assets/components/ui/checkbox";
 import { Label } from "assets/components/ui/label";
 import { motion } from "framer-motion";
-import { type ReactNode, useId, useState } from "react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -42,6 +42,11 @@ const TIME_PILL_H = 60;
 
 const CELL_W = 190;
 const ROW_H = 75;
+// Narrow screens: floor for how small a fret column may render before the board
+// starts scrolling sideways instead of shrinking further. Squeezing ~13 columns
+// into a phone width leaves rows a dozen pixels tall — unreadable and untappable.
+// Lifted at sm: from there the board fits at full width anyway.
+const MIN_COL_PX = 78;
 const TOP_PAD = 55;
 const LEFT_PAD = 55;
 const BOT_PAD = 18;
@@ -160,10 +165,17 @@ export function ClickableFretboard({
           </Label>
         </div>
       </div>
-      <div className="flex w-full justify-center">
+      <div className="w-full overflow-x-auto">
         <svg
           viewBox={`0 0 ${vw} ${vh}`}
-          style={{ width: `min(100%, ${vw}px)`, height: "auto", display: "block" }}
+          className="min-w-[var(--fretboard-min-w)] sm:min-w-0"
+          style={{
+            width: `min(100%, ${vw}px)`,
+            height: "auto",
+            display: "block",
+            margin: "0 auto",
+            "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
+          } as CSSProperties}
           aria-label="Clickable fretboard"
         >
           <defs>

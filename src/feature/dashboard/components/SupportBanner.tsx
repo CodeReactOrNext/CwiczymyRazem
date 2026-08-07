@@ -32,7 +32,9 @@ export const SupportBanner = () => {
         <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
       )}
       <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
-        <div className='flex min-w-0 flex-1 items-start gap-3.5'>
+        {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
+            gap would otherwise leave the copy a couple of characters per line. */}
+        <div className='flex w-full min-w-0 items-start gap-3.5 lg:w-auto lg:flex-1'>
           <Heart
             size={18}
             className={cn(
@@ -56,12 +58,12 @@ export const SupportBanner = () => {
           <FundingStatusBlock
             totalRaised={totalRaised}
             raisedThisMonth={raisedThisMonth}
-            className='order-last w-full lg:order-none lg:w-80'
+            className='w-full lg:w-80'
           />
         )}
 
-        <span className='flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 transition-background group-hover:bg-white sm:text-sm'>
-          <span className='hidden sm:inline'>Support</span>
+        <span className='flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 transition-background group-hover:bg-white sm:w-auto sm:text-sm'>
+          <span>Support</span>
           <ArrowRight
             size={16}
             className='transition-transform duration-300 group-hover:translate-x-0.5'

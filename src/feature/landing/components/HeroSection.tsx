@@ -200,15 +200,19 @@ export const HeroSection = () => {
         <GuitarPatternBackground opacity={0.02} scale={1.3} />
       </div>
 
-      <nav className='relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-12'>
-        <Logo />
-        <div className='flex items-center gap-6 text-sm font-medium text-zinc-400'>
+      {/* Compact logo plus a tighter gap on mobile: at full size the 220px logo
+          and the two links do not fit side by side and end up overlapping. */}
+      <nav className='relative z-30 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-6 lg:px-12'>
+        <Logo compact />
+        <div className='flex shrink-0 items-center gap-4 text-sm font-medium text-zinc-400 sm:gap-6'>
           <Link
             href='/how-it-works'
-            className='transition-colors hover:text-white'>
+            className='whitespace-nowrap transition-colors hover:text-white'>
             How it works
           </Link>
-          <Link href='/login' className='transition-colors hover:text-white'>
+          <Link
+            href='/login'
+            className='whitespace-nowrap transition-colors hover:text-white'>
             Sign in
           </Link>
         </div>

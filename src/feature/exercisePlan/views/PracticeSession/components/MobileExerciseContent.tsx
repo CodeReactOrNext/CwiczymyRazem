@@ -6,6 +6,7 @@ import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { ChordHuntPanel } from "./ChordHuntPanel";
+import { ClickHuntPanel } from "./ClickHuntPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
@@ -40,6 +41,8 @@ interface MobileExerciseContentProps {
   onEarTrainingGuessed?: () => void;
   riddleProgress?: RiddleProgress | null;
   onPlayRiddle: () => void;
+  /** Shows the click hunt's mistake counter under the exam's strike limit. */
+  isExamMode?: boolean;
 }
 
 export function MobileExerciseContent({
@@ -67,6 +70,7 @@ export function MobileExerciseContent({
   onEarTrainingGuessed,
   riddleProgress,
   onPlayRiddle,
+  isExamMode,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
   const { hitNotes, missedNotes } = useNoteMatchingContext();
@@ -81,6 +85,18 @@ export function MobileExerciseContent({
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+            />
+          ) : currentExercise.noteHuntConfig?.mode === "click" ? (
+            // Click drills answer by tapping the diagram, not through the mic —
+            // without this branch they fell through to the mic-driven detector.
+            <ClickHuntPanel
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              startFret={currentExercise.customGoalRegion?.startFret ?? 0}
+              endFret={currentExercise.customGoalRegion?.endFret ?? 12}
+              strings={currentExercise.customGoalStrings}
+              isPlaying={isPlaying}
+              isExamMode={isExamMode}
             />
           ) : (
             <NoteHuntDetector

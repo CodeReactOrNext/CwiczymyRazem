@@ -104,7 +104,10 @@ export const HeroBanner = ({
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""
         }`}
       >
-        <div className="space-y-2 max-w-xl min-w-0 flex-1">
+        {/* w-full matters on mobile: the column is items-start, so without it this
+            block is sized to max-content and wide leftContent (e.g. the dashboard
+            "Last session" pill) escapes the banner instead of truncating. */}
+        <div className="space-y-2 w-full md:w-auto max-w-xl min-w-0 flex-1">
           {eyebrowContent ? (
             <div>{eyebrowContent}</div>
           ) : (

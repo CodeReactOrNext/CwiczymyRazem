@@ -60,16 +60,16 @@ export const TestimonialsSection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mb-12 max-w-3xl'>
-          <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-5xl'>
+          <h2 className='font-landingHeading text-3xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-4xl lg:text-5xl'>
             Loved by guitarists who show up.
           </h2>
         </Reveal>
 
         <Reveal
           delay={0.05}
-          className='mb-6 flex flex-col gap-8 rounded-lg bg-ivory-surface p-10 lg:flex-row lg:items-center'>
+          className='mb-6 flex flex-col gap-6 rounded-lg bg-ivory-surface p-6 sm:gap-8 sm:p-10 lg:flex-row lg:items-center'>
           <Quote className='h-9 w-9 shrink-0 text-ivory-accent' />
-          <p className='flex-1 text-xl leading-relaxed text-ivory-fg'>
+          <p className='flex-1 text-base leading-relaxed text-ivory-fg sm:text-xl'>
             {featured.quote}
           </p>
           <div className='flex shrink-0 items-center gap-3 lg:flex-col lg:items-start lg:text-left'>
