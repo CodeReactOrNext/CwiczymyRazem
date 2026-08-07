@@ -174,7 +174,7 @@ service cloud.firestore {
       allow delete: if request.auth != null
         && resource.data.ownerId == request.auth.uid;
     }
-
+c
     // ─── Global chat ──────────────────────────────────────────────────────────
     match /chats/{messageId} {
       // Any signed-in user can read and post messages

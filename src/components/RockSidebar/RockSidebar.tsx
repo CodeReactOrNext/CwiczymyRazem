@@ -33,6 +33,7 @@ import {
   Clock,
   Download,
   FilePlus2,
+  Flame,
   Home,
   LayoutDashboard,
   Library,
@@ -314,6 +315,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname === "/summary") return "summary";
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/seasons")) return "leaderboard";
+    if (pathname.startsWith("/challenges")) return "challenges";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/tone-studio")) return "tone-studio";
     if (pathname.startsWith("/plans")) return "library";
@@ -394,6 +396,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       href: "/summary",
       icon: <Milestone size={18} />,
       tooltip: "Weekly rewards for hitting practice goals",
+    },
+    {
+      id: "challenges",
+      name: "Challenges",
+      href: "/challenges",
+      icon: <Flame size={18} />,
+      tooltip: "Five community-voted songs to record every month",
     },
     { id: "leaderboard", name: "Rankings", href: "/seasons", icon: <Trophy size={18} /> },
     { id: "arsenal", name: "Arsenal", href: "/arsenal", icon: <Swords size={18} /> },
