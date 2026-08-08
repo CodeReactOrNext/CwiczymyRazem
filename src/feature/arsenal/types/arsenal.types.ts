@@ -51,6 +51,14 @@ export interface EffectInventoryItem {
   stats?: EffectStats;
   /** Rolled named features that produced the stats. Optional for legacy/plain items. */
   features?: ItemFeature[];
+  /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
+  buildLevel?: number;
+  /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */
+  mintCondition?: number;
+  /** Set once the pedal has been through a workshop repair. */
+  restored?: boolean;
+  /** Names of the mods fitted in the workshop, newest last — flavour for the card. */
+  buildLog?: string[];
 }
 
 export type GuitarRarity =
@@ -185,6 +193,14 @@ export interface InventoryItem {
   stats?: ItemStats;
   /** Rolled named features that produced the stats. Optional for legacy/plain items. */
   features?: ItemFeature[];
+  /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
+  buildLevel?: number;
+  /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */
+  mintCondition?: number;
+  /** Set once the guitar has been through a workshop repair. */
+  restored?: boolean;
+  /** Names of the mods fitted in the workshop, newest last — flavour for the card. */
+  buildLog?: string[];
 }
 
 export interface PedalboardPlacement {
@@ -233,6 +249,30 @@ export interface OpenCaseResult {
   effect?: EffectDefinition;
   effectItem?: EffectInventoryItem;
   newFame: number;
+}
+
+/** Which half of the wallet a workshop job draws on. */
+export type WorkshopKind = "guitar" | "effect";
+
+export interface WorkshopBuildResult {
+  buildLevel: number;
+  /** Named mod the job fitted — goes into the item's build log. */
+  modName: string;
+  /** Item Level this level was worth. */
+  levelGain: number;
+  spent: ScrapPart[];
+  newParts: ScrapPart[];
+  newFame: number;
+  rigLevel: number;
+}
+
+export interface WorkshopRepairResult {
+  grade: string;
+  condition: number;
+  levelGain: number;
+  spent: ScrapPart[];
+  newParts: ScrapPart[];
+  rigLevel: number;
 }
 
 export interface OpenEffectPackResult {

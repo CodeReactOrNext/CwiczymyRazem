@@ -9,6 +9,7 @@ import type {
 import {
   COUNTRY_LEVEL_BONUS,
   FEATURE_FILL_CHANCE,
+  getBuildLevelPoints,
   getItemCondition,
   getVintageMultiplier,
   RARITY_LEVEL_BONUS,
@@ -151,10 +152,11 @@ export const rollEffectCountry = (effect: EffectDefinition): string => {
 
 /**
  * Effect level = rolled feature points + rarity + condition (0–10) +
- * vintage age (0–8) + origin prestige. Every effect has a level; features boost it.
+ * vintage age (0–8) + origin prestige + workshop build. Every effect has a level;
+ * features boost it and the workshop keeps boosting it without a ceiling.
  */
 export const getEffectLevel = (
-  item: Pick<EffectInventoryItem, "id" | "condition" | "year" | "country" | "stats">,
+  item: Pick<EffectInventoryItem, "id" | "condition" | "year" | "country" | "stats" | "buildLevel">,
   effect: Pick<EffectDefinition, "rarity" | "yearFrom" | "yearTo">
 ): number => {
   const s = item.stats;
@@ -167,5 +169,6 @@ export const getEffectLevel = (
     (getVintageMultiplier(item.year ?? yearTo, yearFrom, yearTo) - 1) * 8
   );
   const originPoints = item.country ? COUNTRY_LEVEL_BONUS[item.country] ?? 0 : 0;
-  return featurePoints + rarityPoints + conditionPoints + vintagePoints + originPoints;
+  const buildPoints = getBuildLevelPoints(item.buildLevel, effect.rarity);
+  return featurePoints + rarityPoints + conditionPoints + vintagePoints + originPoints + buildPoints;
 };

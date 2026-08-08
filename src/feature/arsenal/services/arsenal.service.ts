@@ -1,7 +1,7 @@
 import axios from "axios";
 import { auth } from "utils/firebase/client/firebase.utils";
 
-import type { ArsenalUserData, CaseType, OpenCaseResult, OpenEffectPackResult, PedalboardPlacement,RigSetup, ScrapResult } from "../types/arsenal.types";
+import type { ArsenalUserData, CaseType, OpenCaseResult, OpenEffectPackResult, PedalboardPlacement,RigSetup, ScrapResult, WorkshopBuildResult, WorkshopKind, WorkshopRepairResult } from "../types/arsenal.types";
 
 async function getIdToken(): Promise<string> {
   const token = await auth.currentUser!.getIdToken();
@@ -100,6 +100,32 @@ export const scrapEffect = async (inventoryItemId: string): Promise<ScrapResult>
   const { data } = await axios.post<ScrapResult>("/api/arsenal/scrap-effect", {
     idToken,
     inventoryItemId,
+  });
+  return data;
+};
+
+export const buildItem = async (
+  itemId: string,
+  kind: WorkshopKind
+): Promise<WorkshopBuildResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<WorkshopBuildResult>("/api/arsenal/workshop/build", {
+    idToken,
+    itemId,
+    kind,
+  });
+  return data;
+};
+
+export const repairItem = async (
+  itemId: string,
+  kind: WorkshopKind
+): Promise<WorkshopRepairResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<WorkshopRepairResult>("/api/arsenal/workshop/repair", {
+    idToken,
+    itemId,
+    kind,
   });
   return data;
 };
