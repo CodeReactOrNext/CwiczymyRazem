@@ -217,11 +217,33 @@ export const COUNTRY_LEVEL_BONUS: Record<string, number> = {
 };
 
 /**
+ * Item Level gained per workshop build level. The build *cost* is identical for
+ * every rarity, so this table is the only thing that makes a Mythic the better
+ * thing to sink parts into — without it the cheapest route to a high Rig Level
+ * would be pumping Commons, and the whole case economy would stop mattering.
+ */
+export const RARITY_BUILD_GAIN: Record<GuitarRarity, number> = {
+  Common: 1,
+  Uncommon: 1,
+  Rare: 2,
+  Epic: 2,
+  Legendary: 3,
+  Mythic: 4,
+};
+
+/** Item Level a build level adds on this item. Uncapped — see `data/workshop.ts`. */
+export const getBuildLevelPoints = (
+  buildLevel: number | undefined,
+  rarity: GuitarRarity
+): number => (buildLevel ?? 0) * (RARITY_BUILD_GAIN[rarity] ?? 1);
+
+/**
  * Item level = rolled feature points + rarity + condition (0–10) +
- * vintage age (0–8) + origin prestige. Every guitar has a level; features boost it.
+ * vintage age (0–8) + origin prestige + workshop build. Every guitar has a level;
+ * features boost it and the workshop keeps boosting it without a ceiling.
  */
 export const getItemLevel = (
-  item: Pick<InventoryItem, "id" | "condition" | "year" | "country" | "stats">,
+  item: Pick<InventoryItem, "id" | "condition" | "year" | "country" | "stats" | "buildLevel">,
   guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">
 ): number => {
   const s = item.stats;
@@ -232,16 +254,24 @@ export const getItemLevel = (
     (getVintageMultiplier(item.year ?? guitar.yearTo, guitar.yearFrom, guitar.yearTo) - 1) * 8
   );
   const originPoints = item.country ? COUNTRY_LEVEL_BONUS[item.country] ?? 0 : 0;
-  return featurePoints + rarityPoints + conditionPoints + vintagePoints + originPoints;
+  const buildPoints = getBuildLevelPoints(item.buildLevel, guitar.rarity);
+  return featurePoints + rarityPoints + conditionPoints + vintagePoints + originPoints + buildPoints;
 };
 
-/** Instance value = base(rarity) × condition × vintage. */
+/**
+ * Instance value = base(rarity) × condition × vintage.
+ *
+ * Condition here is the *mint* condition, not the current one: a workshop
+ * restoration must not raise what the game pays. Otherwise buying a Relic cheap,
+ * restoring it and selling it back would be a Fame printer. Restoring still pays
+ * off — through Item Level, which is what the leaderboard ranks.
+ */
 export const getItemValue = (
-  item: Pick<InventoryItem, "id" | "condition" | "year">,
+  item: Pick<InventoryItem, "id" | "condition" | "year" | "mintCondition">,
   guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">
 ): number => {
   const base = RARITY_BASE_VALUE[guitar.rarity] ?? 0;
-  const condMult = getConditionMultiplier(getItemCondition(item));
+  const condMult = getConditionMultiplier(item.mintCondition ?? getItemCondition(item));
   const vintMult = getVintageMultiplier(item.year ?? guitar.yearTo, guitar.yearFrom, guitar.yearTo);
   return Math.round(base * condMult * vintMult);
 };

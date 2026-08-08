@@ -162,7 +162,7 @@ export const ArsenalView = () => {
             </TabsContent>
 
             <TabsContent value="workshop" className="mt-4">
-              <WorkshopTab parts={data?.parts ?? []} />
+              <WorkshopTab data={data} fame={fame} />
             </TabsContent>
 
             <TabsContent value="dex" className="mt-4">
