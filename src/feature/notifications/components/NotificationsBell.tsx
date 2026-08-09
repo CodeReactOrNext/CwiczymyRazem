@@ -394,12 +394,6 @@ export const NotificationsBell = () => {
                             <ArrowRight className='h-3 w-3' />
                           </p>
                         )}
-                      {n.type === "reaction" && (
-                        <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
-                          Open activity feed
-                          <ArrowRight className='h-3 w-3' />
-                        </p>
-                      )}
                       {n.type === "marketplace_sold" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
                           Open Market
