@@ -74,6 +74,11 @@ export const placeSuffix = (place: number) => {
 
 /** Where (if anywhere) a notification deep-links to when opened. */
 export const notificationHref = (n: AppNotification): string | null => {
+  if ((n.type === "like" || n.type === "comment") && n.recordingId)
+    return `/recordings?recordingId=${n.recordingId}`;
+  // Reactions store the practice-log id in `recordingId`, not a recording — they belong to the
+  // shared logs feed, so they open that instead of a recording that doesn't exist.
+  if (n.type === "reaction") return "/profile";
   if (n.type === "marketplace_sold") return "/arsenal?tab=market";
   if (
     (n.type === "playlist_saved" || n.type === "playlist_liked") &&

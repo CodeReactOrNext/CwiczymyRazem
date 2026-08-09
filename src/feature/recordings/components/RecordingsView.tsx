@@ -8,6 +8,7 @@ import { RecordingViewModal } from "feature/recordings/components/RecordingViewM
 import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { LayoutGrid,Plus, User } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -15,9 +16,20 @@ type ViewType = "all" | "mine";
 
 const RecordingsView = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const [view, setView] = useState<ViewType>("all");
-  
+
+  const router = useRouter();
+  // The open recording lives in the URL so notifications ("X commented on your recording")
+  // can deep-link straight to it, and the modal stays shareable / back-button friendly.
+  const activeRecordingId = (router.query.recordingId as string) || null;
+
+  const openRecording = (recordingId: string | null) => {
+    const query: Record<string, any> = { ...router.query };
+    if (recordingId) query.recordingId = recordingId;
+    else delete query.recordingId;
+    router.push({ query }, undefined, { shallow: true });
+  };
+
   const userId = useAppSelector(selectUserAuth);
   
   // Filter by userId if view is 'mine'
@@ -99,7 +111,7 @@ const RecordingsView = () => {
                 page={page}
                 totalPages={totalPages}
                 setPage={setPage}
-                onViewRecording={setActiveRecordingId}
+                onViewRecording={openRecording}
             />
         </div>
 
@@ -111,7 +123,7 @@ const RecordingsView = () => {
         
         <RecordingViewModal
             isOpen={!!activeRecordingId}
-            onClose={() => setActiveRecordingId(null)}
+            onClose={() => openRecording(null)}
             recordingId={activeRecordingId}
         />
 
