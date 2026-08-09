@@ -1,9 +1,23 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
-import { getEffectFeatures, getEffectLevel } from "feature/arsenal/data/effectStats";
-import { CONDITION_TIERS, getConditionGrade, getConditionTier, getItemCondition } from "feature/arsenal/data/itemStats";
-import { countScrapParts, getEffectScrapYield } from "feature/arsenal/utils/scrap";
-import { Store,Trash2, Wrench } from "lucide-react";
+import {
+  getEffectFeatures,
+  getEffectLevel,
+} from "feature/arsenal/data/effectStats";
+import {
+  getEffectiveRarity,
+  getItemCondition,
+} from "feature/arsenal/data/itemStats";
+import {
+  countScrapParts,
+  getEffectScrapYield,
+} from "feature/arsenal/utils/scrap";
+import { Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
@@ -11,6 +25,9 @@ import { ScrapYieldList } from "../Parts/ScrapYieldList";
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
+import { ConditionMeter } from "../ConditionMeter";
+import { HoloFoil, HoloStripe } from "../HoloFoil";
+import { LevelEmblem } from "../LevelEmblem";
 import { RARITY_STYLES } from "../RarityBadge";
 
 interface EffectCardProps {
@@ -29,15 +46,29 @@ interface EffectCardProps {
   footer?: ReactNode;
 }
 
-export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSelling, onListClick, isListing, onScrapClick, isScrapping, readOnly = false, footer }: EffectCardProps) => {
+export const EffectCard = ({
+  item,
+  isOnPedalboard = false,
+  onSellClick,
+  isSelling,
+  onListClick,
+  isListing,
+  onScrapClick,
+  isScrapping,
+  readOnly = false,
+  footer,
+}: EffectCardProps) => {
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
 
-  const rs = RARITY_STYLES[effect.rarity];
+  // What the pedal *is* now: the workshop can promote it past its mint rarity.
+  const rarity = getEffectiveRarity(effect.rarity, item.buildLevel);
+  const rs = RARITY_STYLES[rarity];
+  // Custom Shop is the only tier that cannot be dropped, so it is the only one
+  // that gets a finish instead of a colour.
+  const holo = rarity === "Custom Shop";
 
   const condition = getItemCondition(item);
-  const grade = getConditionGrade(condition);
-  const conditionTier = getConditionTier(condition);
   const level = getEffectLevel(item, effect);
   const features = getEffectFeatures(item);
 
@@ -47,30 +78,37 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
 
   // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
   const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
-  const signature = sortedFeatures[0] && sortedFeatures[0].points >= 3 ? sortedFeatures[0] : null;
+  const signature =
+    sortedFeatures[0] && sortedFeatures[0].points >= 3
+      ? sortedFeatures[0]
+      : null;
   const affixes = signature ? sortedFeatures.slice(1) : sortedFeatures;
 
   return (
     <div
-      className="group relative flex flex-col h-full overflow-hidden"
+      className='group relative flex h-full flex-col overflow-hidden'
       style={{
         borderRadius: 10,
         backgroundColor: "#111116",
-        backgroundImage: `linear-gradient(160deg, ${rs.baseColor}35 0%, #111116 55%)`,
+        backgroundImage: `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
         boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
         contain: "layout style paint",
-      }}
-    >
+      }}>
       {/* Grain overlay */}
       <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{ backgroundImage: NOISE_BG, backgroundSize: "180px 180px", opacity: 0.035, mixBlendMode: "overlay" }}
+        className='pointer-events-none absolute inset-0 z-0'
+        style={{
+          backgroundImage: NOISE_BG,
+          backgroundSize: "180px 180px",
+          opacity: 0.035,
+          mixBlendMode: "overlay",
+        }}
       />
 
       {/* Subtle structural grid across the whole card */}
       <div
-        className="absolute inset-0 pointer-events-none z-0"
+        className='pointer-events-none absolute inset-0 z-0'
         style={{
           backgroundImage: [
             `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
@@ -81,107 +119,81 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
         }}
       />
 
+      {holo && <HoloFoil />}
+
       {/* Rarity top stripe */}
-      <div
-        className="h-[2px] w-full flex-shrink-0"
-        style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}, transparent)` }}
-      />
+      {holo ? (
+        <HoloStripe />
+      ) : (
+        <div
+          className='h-[2px] w-full flex-shrink-0'
+          style={{
+            background: `linear-gradient(90deg, transparent, ${rs.baseColor}, transparent)`,
+          }}
+        />
+      )}
 
       {/* Brand + Name + Rarity·Type / Serial */}
-      <div className="px-3 pt-3 pb-1.5 flex-shrink-0 flex items-start justify-between gap-2">
-        <div className="min-w-0">
+      <div className='flex flex-shrink-0 items-start justify-between gap-2 px-3 pb-1.5 pt-3'>
+        <div className='min-w-0'>
           <p
-            className="text-[10px] font-semibold tracking-wider uppercase leading-none"
-            style={{ color: rs.baseColor }}
-          >
+            className='text-[10px] font-semibold uppercase leading-none tracking-wider'
+            style={{ color: rs.baseColor }}>
             {effect.brand}
           </p>
-          <p className="text-[16px] font-extrabold text-white leading-tight truncate mt-1">
+          <p className='mt-1 truncate text-[16px] font-extrabold leading-tight text-white'>
             {effect.name}
           </p>
           <p
-            className="text-[9px] font-medium tracking-[0.15em] mt-0.5 capitalize"
-            style={{ color: rs.baseColor, opacity: 0.7 }}
-          >
-            {effect.rarity} · {effect.type}
+            className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
+            style={{ color: rs.baseColor, opacity: 0.7 }}>
+            {rarity} · {effect.type}
           </p>
         </div>
 
         {item.serial != null && (
-          <span className="text-[9px] font-mono text-zinc-500 tracking-tight flex-shrink-0">
+          <span className='font-mono flex-shrink-0 text-[9px] tracking-tight text-zinc-500'>
             #{String(item.serial).padStart(4, "0")}
           </span>
         )}
       </div>
 
       {/* Condition — labelled segmented bar */}
-      <div className="px-3 pb-2.5 flex-shrink-0" title={`Condition: ${grade.label}`}>
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-[8px] font-medium uppercase tracking-widest text-zinc-500">
-            Condition
-          </span>
-          <span
-            className="text-[10px] font-bold uppercase tracking-wider"
-            style={{ color: grade.color, textShadow: `0 0 8px ${grade.color}55` }}
-          >
-            {grade.label}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          {Array.from({ length: CONDITION_TIERS }).map((_, i) => (
-            <span
-              key={i}
-              className="h-1.5 flex-1 rounded-full transition-colors"
-              style={{
-                background: i < conditionTier ? grade.color : "#27272a",
-                boxShadow: i < conditionTier ? `0 0 6px ${grade.color}70` : undefined,
-              }}
-            />
-          ))}
-        </div>
+      <div className='flex-shrink-0 px-3 pb-2.5'>
+        <ConditionMeter condition={condition} restored={item.restored} />
       </div>
 
       {/* Effect image */}
       <div
-        className="relative flex items-center justify-center flex-1 overflow-hidden py-4"
-        style={{ minHeight: 200 }}
-      >
+        className='relative flex flex-1 items-center justify-center overflow-hidden py-4'
+        style={{ minHeight: 200 }}>
         {/* Neutral spotlight so dark effects separate from the background */}
         <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{ background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)` }}
+          className='pointer-events-none absolute inset-0 z-0'
+          style={{
+            background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)`,
+          }}
         />
 
         {/* Rarity glow backdrop */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none translate-y-[60px] opacity-50">
+        <div className='pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center opacity-50'>
           <div
-            className="absolute w-[170px] h-[170px] rounded-full blur-[34px]"
-            style={{ background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)` }}
+            className='absolute h-[170px] w-[170px] rounded-full blur-[34px]'
+            style={{
+              background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 45%, transparent 72%)`,
+            }}
           />
         </div>
 
         {/* Level emblem + New flag */}
-        <div className="absolute top-2 left-2 z-20 flex flex-col items-start gap-1.5">
+        <div className='absolute left-2 top-2 z-20 flex flex-col items-start gap-1.5'>
           {level > 0 && (
-            <div
-              className="flex flex-col items-center justify-center rounded-full"
-              style={{
-                width: 38,
-                height: 38,
-                background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
-                border: `1.5px solid ${rs.baseColor}`,
-                boxShadow: `0 0 10px ${rs.baseColor}55, inset 0 0 6px rgba(0,0,0,0.6)`,
-              }}
-              title="Effect level"
-            >
-              <span className="text-[15px] font-black leading-none text-white">{level}</span>
-            </div>
+            <LevelEmblem level={level} rarity={rarity} title='Effect level' />
           )}
           {item.isNew && (
             <div
-              className="px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
-              style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}
-            >
+              className='px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black'
+              style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}>
               New
             </div>
           )}
@@ -189,25 +201,28 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
 
         {/* Year / country tags on the right */}
         {(item.year || item.country) && (
-          <div className="absolute top-3 right-2 z-20 flex flex-col gap-1.5">
+          <div className='absolute right-2 top-3 z-20 flex flex-col gap-1.5'>
             {[item.year, item.country].filter(Boolean).map((tag, i) => (
-              <div key={i} className="relative flex items-center">
+              <div key={i} className='relative flex items-center'>
                 <div
-                  className="absolute left-[3px] w-[5px] h-[5px] rounded-full z-10"
-                  style={{ background: "#0f0f12", border: "1px solid rgba(255,255,255,0.12)" }}
+                  className='absolute left-[3px] z-10 h-[5px] w-[5px] rounded-full'
+                  style={{
+                    background: "#0f0f12",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                  }}
                 />
                 <div
-                  className="text-[9px] font-semibold text-zinc-300 tracking-wide"
+                  className='text-[9px] font-semibold tracking-wide text-zinc-300'
                   style={{
                     background: "linear-gradient(135deg, #28282e, #1b1b21)",
                     borderRadius: "2px 3px 3px 2px",
-                    clipPath: "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
+                    clipPath:
+                      "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
                     paddingLeft: "14px",
                     paddingRight: "8px",
                     paddingTop: "3px",
                     paddingBottom: "3px",
-                  }}
-                >
+                  }}>
                   {tag}
                 </div>
               </div>
@@ -218,7 +233,7 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
         <img
           src={`/static/images/effects/${effect.imageId}.png`}
           alt={effect.name}
-          className="relative z-10 object-contain"
+          className='relative z-10 object-contain'
           style={{
             height: 160,
             width: 160,
@@ -228,17 +243,29 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
 
         {/* LED */}
         <div
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full z-20"
-          style={{ width: 6, height: 6, backgroundColor: rs.baseColor, boxShadow: `0 0 8px 2px ${rs.baseColor}80` }}
+          className='absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full'
+          style={{
+            width: 6,
+            height: 6,
+            backgroundColor: rs.baseColor,
+            boxShadow: `0 0 8px 2px ${rs.baseColor}80`,
+          }}
         />
 
         {isOnPedalboard && (
-          <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1.5">
+          <div className='absolute bottom-2 left-3 z-20 flex items-center gap-1.5'>
             <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: rs.baseColor, boxShadow: `0 0 8px ${rs.baseColor}` }}
+              className='h-1.5 w-1.5 rounded-full'
+              style={{
+                backgroundColor: rs.baseColor,
+                boxShadow: `0 0 8px ${rs.baseColor}`,
+              }}
             />
-            <span className="text-[8px] font-medium tracking-wide" style={{ color: `${rs.baseColor}B3` }}>on board</span>
+            <span
+              className='text-[8px] font-medium tracking-wide'
+              style={{ color: `${rs.baseColor}B3` }}>
+              on board
+            </span>
           </div>
         )}
       </div>
@@ -246,23 +273,35 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
       {/* RPG-style affixes under the pedal */}
       {features.length > 0 && (
         <div
-          className="relative z-10 flex flex-col gap-1 px-3 py-3 border-t flex-shrink-0"
-          style={{ borderColor: `${rs.baseColor}1a`, background: "rgba(0,0,0,0.28)" }}
-        >
+          className='relative z-10 flex flex-shrink-0 flex-col gap-1 border-t px-3 py-3'
+          style={{
+            borderColor: `${rs.baseColor}1a`,
+            background: "rgba(0,0,0,0.28)",
+          }}>
           {affixes.map((f) => (
-            <div key={f.id} className="flex items-baseline gap-2 leading-snug">
-              <span className="text-[11px] text-zinc-600 flex-shrink-0">◆</span>
-              <span className="text-[12px] text-zinc-300">
-                <span className="font-bold" style={{ color: "#7dd3fc" }}>+{f.points}</span>{" "}
+            <div key={f.id} className='flex items-baseline gap-2 leading-snug'>
+              <span className='flex-shrink-0 text-[11px] text-zinc-600'>◆</span>
+              <span className='text-[12px] text-zinc-300'>
+                <span className='font-bold' style={{ color: "#7dd3fc" }}>
+                  +{f.points}
+                </span>{" "}
                 {f.label}
               </span>
             </div>
           ))}
           {signature && (
-            <div className="flex items-baseline gap-2 leading-snug">
-              <span className="text-[11px] flex-shrink-0" style={{ color: "#f59e0b" }}>★</span>
-              <span className="text-[12px] font-medium" style={{ color: "#f5a524" }}>
-                <span className="font-bold" style={{ color: "#fbbf24" }}>+{signature.points}</span>{" "}
+            <div className='flex items-baseline gap-2 leading-snug'>
+              <span
+                className='flex-shrink-0 text-[11px]'
+                style={{ color: "#f59e0b" }}>
+                ★
+              </span>
+              <span
+                className='text-[12px] font-medium'
+                style={{ color: "#f5a524" }}>
+                <span className='font-bold' style={{ color: "#fbbf24" }}>
+                  +{signature.points}
+                </span>{" "}
                 {signature.label}
               </span>
             </div>
@@ -273,75 +312,86 @@ export const EffectCard = ({ item, isOnPedalboard = false, onSellClick, isSellin
       {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
       {footer ? (
         <div
-          className="relative z-10 border-t flex-shrink-0"
-          style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
-        >
+          className='relative z-10 flex-shrink-0 border-t'
+          style={{
+            borderColor: `${rs.baseColor}20`,
+            background: "rgba(0,0,0,0.35)",
+          }}>
           {footer}
         </div>
       ) : null}
 
       {/* Sell */}
       {!readOnly && !footer && (
-      <div
-        className="flex border-t flex-shrink-0"
-        style={{ borderColor: `${rs.baseColor}20`, background: "rgba(0,0,0,0.35)" }}
-      >
-        {onListClick && (
-          <button
-            onClick={() => onListClick(item.id, item.effectId)}
-            disabled={isListing || isOnPedalboard}
-            className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-amber-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
-            style={{ borderColor: `${rs.baseColor}15` }}
-            title={isOnPedalboard ? "Remove from pedalboard before listing" : "List on the market"}
-          >
-            <Store size={9} strokeWidth={2.5} />
-            Market
-          </button>
-        )}
+        <div
+          className='flex flex-shrink-0 border-t'
+          style={{
+            borderColor: `${rs.baseColor}20`,
+            background: "rgba(0,0,0,0.35)",
+          }}>
+          {onListClick && (
+            <button
+              onClick={() => onListClick(item.id, item.effectId)}
+              disabled={isListing || isOnPedalboard}
+              className='flex flex-1 items-center justify-center gap-1.5 border-r py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
+              style={{ borderColor: `${rs.baseColor}15` }}
+              title={
+                isOnPedalboard
+                  ? "Remove from pedalboard before listing"
+                  : "List on the market"
+              }>
+              <Store size={9} strokeWidth={2.5} />
+              Market
+            </button>
+          )}
 
-        {onScrapClick && (
-          <TooltipProvider>
-            <Tooltip delayDuration={150}>
-              <TooltipTrigger asChild>
-                {/* Wrapper span keeps the tooltip working while the button is disabled. */}
-                <span className="flex flex-1">
-                  <button
-                    onClick={() => onScrapClick(item.id, item.effectId)}
-                    disabled={isScrapping || isOnPedalboard}
-                    className="w-full py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-orange-400 disabled:opacity-20 disabled:cursor-not-allowed border-r"
-                    style={{ borderColor: `${rs.baseColor}15` }}
-                  >
-                    <Wrench size={9} strokeWidth={2.5} />
-                    Scrap
-                  </button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="border border-zinc-700 bg-zinc-950 text-white max-w-[260px]">
-                {isOnPedalboard ? (
-                  <span className="text-xs">Remove from the pedalboard before scrapping</span>
-                ) : (
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-400">
-                      Scraps into {scrapTotal} parts
+          {onScrapClick && (
+            <TooltipProvider>
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger asChild>
+                  {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                  <span className='flex flex-1'>
+                    <button
+                      onClick={() => onScrapClick(item.id, item.effectId)}
+                      disabled={isScrapping || isOnPedalboard}
+                      className='flex w-full items-center justify-center gap-1.5 border-r py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
+                      style={{ borderColor: `${rs.baseColor}15` }}>
+                      <Wrench size={9} strokeWidth={2.5} />
+                      Scrap
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  side='top'
+                  className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
+                  {isOnPedalboard ? (
+                    <span className='text-xs'>
+                      Remove from the pedalboard before scrapping
                     </span>
-                    <ScrapYieldList parts={scrapParts} compact />
-                  </div>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+                  ) : (
+                    <div className='flex flex-col gap-1.5'>
+                      <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
+                        Scraps into {scrapTotal} parts
+                      </span>
+                      <ScrapYieldList parts={scrapParts} compact />
+                    </div>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-        <button
-          onClick={() => onSellClick?.(item.id, item.effectId)}
-          disabled={isSelling || isOnPedalboard}
-          className="flex-1 py-2.5 text-[10px] font-semibold capitalize tracking-wider transition-colors flex items-center justify-center gap-1.5 text-zinc-600 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed"
-          title={isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined}
-        >
-          <Trash2 size={9} strokeWidth={2.5} />
-          Sell
-        </button>
-      </div>
+          <button
+            onClick={() => onSellClick?.(item.id, item.effectId)}
+            disabled={isSelling || isOnPedalboard}
+            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'
+            title={
+              isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined
+            }>
+            <Trash2 size={9} strokeWidth={2.5} />
+            Sell
+          </button>
+        </div>
       )}
     </div>
   );

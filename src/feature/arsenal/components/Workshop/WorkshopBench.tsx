@@ -1,21 +1,33 @@
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
-import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import {
-  getBuildPPCost,
+  getPromotions,
+  getPromotionsAvailable,
+  RARITY_LADDER,
+  RARITY_MAX_FEATURES,
+} from "feature/arsenal/data/itemStats";
+import { getPartLabel } from "feature/arsenal/data/partDefinitions";
+import type { ModQuote } from "feature/arsenal/data/workshop";
+import {
   getBuildQuote,
+  getGradeByRank,
+  getModQuote,
   getRepairQuote,
 } from "feature/arsenal/data/workshop";
-import { useWorkshopBuild } from "feature/arsenal/hooks/useWorkshopBuild";
-import { useWorkshopRepair } from "feature/arsenal/hooks/useWorkshopRepair";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
-import { AnimatePresence, motion } from "framer-motion";
-import { Hammer, Sparkles, Wrench } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Hammer, SlidersHorizontal, Wrench } from "lucide-react";
+import { useMemo, useState } from "react";
 
-import { ScrapYieldList } from "../Parts/ScrapYieldList";
-import { RequirementList } from "./RequirementList";
+import { ConditionMeter } from "../ConditionMeter";
+import { HoloFoil } from "../HoloFoil";
+import { LevelEmblem } from "../LevelEmblem";
+import { ConditionPath } from "./ConditionPath";
+import { JobCard } from "./JobCard";
+import { RarityPath } from "./RarityPath";
+import { SlotPips } from "./SlotPips";
+import type { WorkshopJob } from "./WorkshopJobModal";
+import { WorkshopJobModal } from "./WorkshopJobModal";
 
 interface WorkshopBenchProps {
   entry: WorkshopEntry;
@@ -23,18 +35,47 @@ interface WorkshopBenchProps {
   fame: number;
 }
 
-interface Burst {
-  title: string;
-  subtitle: string;
-  gain: number;
-}
+/**
+ * Why a build cannot run yet, in the fewest words that still point somewhere.
+ * A missing part names itself — that is the whole advantage of a fixed recipe.
+ */
+const getBuildBlocker = (
+  quote: ReturnType<typeof getBuildQuote>,
+): string | undefined => {
+  const failedCheck = quote.checks.find((c) => !c.ok);
+  if (failedCheck?.kind === "condition") {
+    return `restore it to ${getGradeByRank(failedCheck.required).label} first`;
+  }
+
+  const missing = quote.recipe.filter((line) => !line.ok);
+  if (missing.length === 1) {
+    const line = missing[0];
+    return `${line.need - line.have} more ${line.tier} ${getPartLabel(line.partId).toLowerCase()}`;
+  }
+  if (missing.length > 1) return `missing ${missing.length} of the parts`;
+
+  if (failedCheck?.kind === "fame") {
+    return `needs ${failedCheck.required - failedCheck.current} more fame`;
+  }
+  return undefined;
+};
+
+/**
+ * Why the mod bench is closed. Every mod has its own bill, so "not enough parts"
+ * is only true when *none* of them are affordable — otherwise the block is the
+ * slot cap, which a promotion fixes.
+ */
+const getModBlocker = (quote: ModQuote): string | undefined => {
+  if (quote.canFit || quote.canReroll) return undefined;
+  if (quote.slots.free === 0 && quote.fitted.length > 0) {
+    return "no parts for a re-roll";
+  }
+  if (quote.candidates.length === 0) return "nothing else fits this build";
+  return "no parts for any mod yet";
+};
 
 export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
   const rs = RARITY_STYLES[entry.rarity];
-  const grade = getConditionGrade(entry.condition);
-
-  const build = useWorkshopBuild();
-  const repair = useWorkshopRepair();
 
   const buildQuote = useMemo(
     () => getBuildQuote(entry.subject, wallet, fame),
@@ -44,114 +85,65 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
     () => getRepairQuote(entry.subject, wallet),
     [entry.subject, wallet],
   );
-
-  const [burst, setBurst] = useState<Burst | null>(null);
-
-  // The reward moment is the whole point of the tab — but it must not sit there
-  // blocking the next job, so it clears itself.
-  useEffect(() => {
-    const timer = burst ? setTimeout(() => setBurst(null), 2200) : undefined;
-    return () => clearTimeout(timer);
-  }, [burst]);
-
-  const isWorking = build.isPending || repair.isPending;
-
-  const handleBuild = () => {
-    build.mutate(
-      { itemId: entry.id, kind: entry.kind },
-      {
-        onSuccess: (data) =>
-          setBurst({
-            title: data.modName,
-            subtitle: `Build ${data.buildLevel}`,
-            gain: data.levelGain,
-          }),
-      },
-    );
-  };
-
-  const handleRepair = () => {
-    repair.mutate(
-      { itemId: entry.id, kind: entry.kind },
-      {
-        onSuccess: (data) =>
-          setBurst({
-            title: `Restored to ${data.grade}`,
-            subtitle: "Condition",
-            gain: data.levelGain,
-          }),
-      },
-    );
-  };
-
-  // Makes the curve visible: the player can see the wall coming, not just hit it.
-  const upcoming = [1, 2, 3].map((step) =>
-    getBuildPPCost(buildQuote.requirement.level + step),
+  const modQuote = useMemo(
+    () => getModQuote(entry.subject, wallet),
+    [entry.subject, wallet],
   );
 
-  return (
-    <div className='relative flex flex-col gap-6'>
-      <AnimatePresence>
-        {burst && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className='bg-zinc-950/92 absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 rounded-lg backdrop-blur-sm'>
-            <motion.div
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 18 }}
-              className='flex flex-col items-center gap-3'>
-              <Sparkles size={30} style={{ color: rs.baseColor }} />
-              <span className='text-4xl font-black tabular-nums text-white'>
-                +{burst.gain}
-              </span>
-              <span className='text-xs text-zinc-500'>item level</span>
-            </motion.div>
+  const [job, setJob] = useState<WorkshopJob | null>(null);
 
-            <motion.div
-              initial={{ y: 8, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              className='flex flex-col items-center gap-1'>
-              <span className='text-base font-bold text-zinc-100'>
-                {burst.title}
-              </span>
-              <span className='text-xs text-zinc-500'>{burst.subtitle}</span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  const mintRarity = entry.subject.mintRarity;
+  const promotionsDone = getPromotions(mintRarity, entry.buildLevel);
+  const promotionsTotal = getPromotionsAvailable(mintRarity);
+  // Slots the next promotion would unlock — drawn as ghosts past the current cap.
+  const nextRarity =
+    RARITY_LADDER[RARITY_LADDER.indexOf(entry.rarity) + 1] ?? null;
+  const lockedModSlots =
+    nextRarity && promotionsDone < promotionsTotal
+      ? Math.max(0, (RARITY_MAX_FEATURES[nextRarity] ?? 0) - modQuote.slots.max)
+      : 0;
+
+  return (
+    <div className='flex flex-col gap-4'>
+      <WorkshopJobModal
+        job={job}
+        entry={entry}
+        buildQuote={buildQuote}
+        repairQuote={repairQuote}
+        modQuote={modQuote}
+        wallet={wallet}
+        onClose={() => setJob(null)}
+      />
 
       {/* ─── The item on the bench ─── */}
       <div
-        className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-6 sm:flex-row sm:items-center'
+        className='relative flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-900/40 p-7 sm:flex-row sm:items-center'
         style={{
-          backgroundImage: `linear-gradient(135deg, ${rs.baseColor}1f, transparent 55%)`,
+          backgroundImage: `linear-gradient(135deg, ${rs.baseColor}${entry.rarity === "Custom Shop" ? "0f" : "1f"}, transparent 55%)`,
         }}>
-        <div className='flex h-24 w-24 shrink-0 items-center justify-center self-center'>
+        {entry.rarity === "Custom Shop" && <HoloFoil />}
+        <div className='flex h-28 w-28 shrink-0 items-center justify-center self-center'>
           <img
             src={entry.imageSrc}
             alt={entry.name}
             className={cn(
-              "h-24 w-24 object-contain",
+              "h-28 w-28 object-contain",
               entry.rotate && "-rotate-90 scale-[1.7]",
             )}
           />
         </div>
 
-        <div className='flex min-w-0 flex-1 flex-col gap-3'>
-          <div className='flex flex-col gap-0.5'>
+        <div className='flex min-w-0 flex-1 flex-col gap-4'>
+          <div className='flex flex-col gap-1'>
             <span
               className='text-[10px] font-semibold tracking-[0.18em]'
               style={{ color: rs.baseColor }}>
               {entry.brand}
             </span>
-            <span className='truncate text-xl font-black text-white'>
+            <span className='truncate text-2xl font-black text-white'>
               {entry.name}
             </span>
-            <span className='text-[11px]' style={{ color: rs.baseColor }}>
+            <span className='text-xs' style={{ color: rs.baseColor }}>
               {entry.rarity}
               {entry.serial != null && (
                 <span className='font-mono ml-2 text-zinc-500'>
@@ -161,174 +153,110 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
             </span>
           </div>
 
-          <div className='flex flex-wrap items-center gap-2'>
-            <span className='rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-bold tabular-nums text-zinc-200'>
-              Lv {entry.level}
-            </span>
-            <span className='rounded bg-cyan-950/40 px-2.5 py-1 text-[11px] font-bold tabular-nums text-cyan-400'>
-              Build {entry.buildLevel}
-            </span>
-            <span
-              className='rounded px-2.5 py-1 text-[11px] font-bold'
-              style={{
-                backgroundColor: `${grade.color}1a`,
-                color: grade.color,
-              }}>
-              {grade.label}
-            </span>
-            {entry.restored && (
-              <span
-                className='rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-bold text-zinc-400'
-                title='Restored gear keeps its original collector value'>
-                Restored
-              </span>
-            )}
-          </div>
+          <ConditionMeter
+            condition={entry.condition}
+            restored={entry.restored}
+            className='max-w-[280px]'
+          />
+        </div>
+
+        {/*
+          Level only. Build level and promotions used to sit here too, but both
+          are already spelled out on the build card in the words that matter
+          ("Build 1 → 2 · 2 more to the next promotion") — as bare counters they
+          were three numbers competing for the one the player is actually here to
+          move.
+        */}
+        <div className='flex shrink-0 flex-col items-center gap-1.5 self-center'>
+          <LevelEmblem level={entry.level} rarity={entry.rarity} size={52} />
+          <span className='text-xs text-zinc-500'>level</span>
         </div>
       </div>
 
-      {/* ─── Build ─── */}
-      <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-6'>
-        <div className='flex flex-wrap items-end justify-between gap-x-6 gap-y-2'>
-          <div className='flex flex-col gap-1'>
-            <span className='flex items-center gap-2 text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
-              <Hammer size={12} className='text-zinc-500' />
-              Build
-            </span>
-            <span className='text-lg font-black text-white'>
-              {entry.buildLevel} <span className='text-zinc-600'>→</span>{" "}
-              {buildQuote.requirement.level}
-            </span>
-          </div>
+      {/* ─── The two things you can do ─── */}
+      <JobCard
+        icon={Wrench}
+        title='Restore condition'
+        summary={
+          repairQuote.target ? (
+            <ConditionPath
+              condition={entry.condition}
+              target={repairQuote.target}
+            />
+          ) : (
+            "Museum grade — nothing left to restore"
+          )
+        }
+        gain={repairQuote.gain}
+        ready={repairQuote.canRepair}
+        blockedNote={repairQuote.target ? "not enough parts" : undefined}
+        accent='emerald'
+        disabled={!repairQuote.target}
+        onClick={() => setJob("repair")}
+      />
 
-          <div className='flex flex-col items-end gap-0.5'>
-            <span className='text-2xl font-black tabular-nums text-cyan-400'>
-              +{buildQuote.gain}
-            </span>
-            <span className='text-[10px] text-zinc-500'>item level</span>
-          </div>
-        </div>
-
-        <RequirementList checks={buildQuote.checks} />
-
-        {buildQuote.payment && (
-          <div className='flex flex-col gap-3 rounded-lg bg-zinc-950/40 p-4'>
-            <span className='text-[10px] font-bold tracking-[0.15em] text-zinc-500'>
-              This job consumes
-            </span>
-            <ScrapYieldList parts={buildQuote.payment.parts} compact />
-          </div>
-        )}
-
-        <button
-          onClick={handleBuild}
-          disabled={!buildQuote.canBuild || isWorking}
-          className={cn(
-            "rounded-lg px-5 py-3 text-sm font-bold transition-colors",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
-            "disabled:pointer-events-none disabled:opacity-40",
-            buildQuote.canBuild
-              ? "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25"
-              : "bg-zinc-800/60 text-zinc-500",
-          )}>
-          {build.isPending
-            ? "Fitting…"
-            : `Fit next mod — ${buildQuote.requirement.pp.toLocaleString()} pp · ${buildQuote.requirement.fame} fame`}
-        </button>
-
-        <p className='text-[11px] text-zinc-500'>
-          Then {upcoming.map((pp) => pp.toLocaleString()).join(" · ")} pp —
-          every level wants more parts, rarer parts, and more different parts at
-          once.
-        </p>
-      </div>
-
-      {/* ─── Restore ─── */}
-      <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-6'>
-        <div className='flex flex-wrap items-end justify-between gap-x-6 gap-y-2'>
-          <div className='flex flex-col gap-1'>
-            <span className='flex items-center gap-2 text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
-              <Wrench size={12} className='text-zinc-500' />
-              Restore
-            </span>
-            <span className='text-lg font-black text-white'>
-              {repairQuote.target ? (
-                <>
-                  {grade.label} <span className='text-zinc-600'>→</span>{" "}
-                  {repairQuote.target}
-                </>
-              ) : (
-                "Museum grade"
-              )}
-            </span>
-          </div>
-
-          {repairQuote.target && (
-            <div className='flex flex-col items-end gap-0.5'>
-              <span className='text-2xl font-black tabular-nums text-emerald-400'>
-                +{repairQuote.gain}
-              </span>
-              <span className='text-[10px] text-zinc-500'>item level</span>
-            </div>
-          )}
-        </div>
-
-        {repairQuote.target ? (
+      <JobCard
+        icon={Hammer}
+        title={
+          buildQuote.requirement.promotesTo
+            ? `Promote to ${buildQuote.requirement.promotesTo}`
+            : "Next build"
+        }
+        summary={
           <>
-            <RequirementList checks={repairQuote.checks} />
-
-            {repairQuote.payment && (
-              <div className='flex flex-col gap-3 rounded-lg bg-zinc-950/40 p-4'>
-                <span className='text-[10px] font-bold tracking-[0.15em] text-zinc-500'>
-                  This job consumes
-                </span>
-                <ScrapYieldList parts={repairQuote.payment.parts} compact />
-              </div>
-            )}
-
-            <button
-              onClick={handleRepair}
-              disabled={!repairQuote.canRepair || isWorking}
-              className={cn(
-                "rounded-lg px-5 py-3 text-sm font-bold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400",
-                "disabled:pointer-events-none disabled:opacity-40",
-                repairQuote.canRepair
-                  ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
-                  : "bg-zinc-800/60 text-zinc-500",
-              )}>
-              {repair.isPending
-                ? "Restoring…"
-                : `Restore — ${repairQuote.pp.toLocaleString()} pp`}
-            </button>
-
-            <p className='text-[11px] text-zinc-500'>
-              Restoring raises Item Level and unlocks higher build levels. It
-              never raises what the game pays for the item — a restored
-              instrument keeps its original collector value.
-            </p>
+            <span>
+              Build {entry.buildLevel} → {buildQuote.requirement.level}
+            </span>
+            <RarityPath
+              mintRarity={entry.subject.mintRarity}
+              buildLevel={entry.buildLevel}
+            />
           </>
-        ) : (
-          <p className='text-[11px] text-zinc-500'>
-            Nothing left to restore. Condition is maxed, so every build gate is
-            open.
-          </p>
-        )}
-      </div>
+        }
+        gain={buildQuote.gain}
+        ready={buildQuote.canBuild}
+        blockedNote={getBuildBlocker(buildQuote)}
+        accent='cyan'
+        onClick={() => setJob("build")}
+      />
 
-      {/* ─── Build log ─── */}
+      <JobCard
+        icon={SlidersHorizontal}
+        title='Fit a mod'
+        summary={
+          <SlotPips
+            used={modQuote.slots.used}
+            max={modQuote.slots.max}
+            locked={lockedModSlots}
+          />
+        }
+        readyNote={
+          modQuote.canFit
+            ? `${modQuote.slots.free} slot${modQuote.slots.free === 1 ? "" : "s"} free`
+            : "re-roll only"
+        }
+        ready={modQuote.canFit || modQuote.canReroll}
+        blockedNote={getModBlocker(modQuote)}
+        accent='purple'
+        disabled={
+          modQuote.fitted.length === 0 && modQuote.candidates.length === 0
+        }
+        onClick={() => setJob("mod")}
+      />
+
+      {/* ─── Mods fitted ─── */}
       {entry.buildLog.length > 0 && (
         <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-6'>
-          <span className='text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
-            Build log
+          <span className='text-xs font-bold tracking-[0.2em] text-zinc-400'>
+            Mods fitted
           </span>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-2.5'>
             {[...entry.buildLog].reverse().map((mod, i) => (
               <div key={`${mod}-${i}`} className='flex items-baseline gap-3'>
-                <span className='w-6 shrink-0 text-right text-[11px] font-bold tabular-nums text-zinc-600'>
+                <span className='w-6 shrink-0 text-right text-xs font-bold tabular-nums text-zinc-600'>
                   {entry.buildLog.length - i}
                 </span>
-                <span className='text-xs text-zinc-300'>{mod}</span>
+                <span className='text-sm text-zinc-300'>{mod}</span>
               </div>
             ))}
           </div>

@@ -1,14 +1,11 @@
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
-import {
-  CONDITION_TIERS,
-  getConditionGrade,
-  getConditionTier,
-} from "feature/arsenal/data/itemStats";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
-import { Guitar, Search, Zap } from "lucide-react";
+import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+
+import { ConditionMeter } from "../ConditionMeter";
 
 type RackFilter = "all" | "guitar" | "effect";
 
@@ -52,13 +49,10 @@ export const WorkshopRack = ({
   );
 
   return (
-    <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4'>
+    <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>
       <div className='flex flex-col gap-1'>
-        <p className='text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
-          Rack
-        </p>
-        <p className='text-sm font-black tracking-wide text-white'>
-          Pick a piece of gear
+        <p className='text-base font-black tracking-wide text-white'>
+          Your gear
         </p>
       </div>
 
@@ -93,7 +87,7 @@ export const WorkshopRack = ({
         />
       </div>
 
-      <div className='no-scrollbar flex max-h-[560px] flex-col gap-2 overflow-y-auto'>
+      <div className='no-scrollbar flex max-h-[600px] flex-col gap-2 overflow-y-auto py-1'>
         {visible.length === 0 ? (
           <p className='py-10 text-center text-xs text-zinc-500'>
             Nothing matches that.
@@ -101,8 +95,6 @@ export const WorkshopRack = ({
         ) : (
           visible.map((entry) => {
             const rs = RARITY_STYLES[entry.rarity];
-            const grade = getConditionGrade(entry.condition);
-            const tier = getConditionTier(entry.condition);
             const isSelected = entry.id === selectedId;
 
             return (
@@ -110,15 +102,20 @@ export const WorkshopRack = ({
                 key={entry.id}
                 onClick={() => onSelect(entry)}
                 className={cn(
-                  "group relative flex items-center gap-3 overflow-hidden rounded-lg p-3 text-left transition-colors",
+                  "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
                   isSelected
                     ? "bg-zinc-800/70 ring-1 ring-cyan-500/40"
                     : "bg-zinc-800/30 hover:bg-zinc-800/60",
-                )}
-                style={{
-                  backgroundImage: `linear-gradient(90deg, ${rs.baseColor}1f, transparent 45%)`,
-                }}>
+                )}>
+                {/* Rarity as a single mark rather than a wash across the whole row —
+                    the wash sat under the name and made both hard to read. */}
+                <span
+                  className='h-8 w-1 shrink-0 rounded-full'
+                  style={{ backgroundColor: rs.baseColor }}
+                  aria-hidden
+                />
+
                 <span className='flex h-11 w-11 shrink-0 items-center justify-center'>
                   <img
                     src={entry.imageSrc}
@@ -132,37 +129,22 @@ export const WorkshopRack = ({
                   />
                 </span>
 
-                <span className='flex min-w-0 flex-1 flex-col gap-1.5'>
-                  <span className='flex items-baseline gap-2'>
-                    <span className='truncate text-sm font-bold text-zinc-100'>
-                      {entry.name}
-                    </span>
-                    {entry.kind === "guitar" ? (
-                      <Guitar size={11} className='shrink-0 text-zinc-600' />
-                    ) : (
-                      <Zap size={11} className='shrink-0 text-zinc-600' />
-                    )}
+                <span className='flex min-w-0 flex-1 flex-col gap-2'>
+                  <span className='truncate text-sm font-bold leading-tight text-zinc-100'>
+                    {entry.name}
                   </span>
-
-                  <span className='flex items-center gap-1'>
-                    {Array.from({ length: CONDITION_TIERS }).map((_, i) => (
-                      <span
-                        key={i}
-                        className='h-1 w-4 rounded-full'
-                        style={{
-                          background: i < tier ? grade.color : "#27272a",
-                        }}
-                      />
-                    ))}
-                  </span>
+                  <ConditionMeter
+                    condition={entry.condition}
+                    showLabel={false}
+                  />
                 </span>
 
                 <span className='flex shrink-0 flex-col items-end gap-1'>
-                  <span className='text-sm font-black tabular-nums text-white'>
+                  <span className='text-sm font-black tabular-nums leading-none text-white'>
                     {entry.level}
                   </span>
                   {entry.buildLevel > 0 && (
-                    <span className='rounded bg-cyan-950/50 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-cyan-400'>
+                    <span className='rounded bg-cyan-950/50 px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none text-cyan-400'>
                       +{entry.buildLevel}
                     </span>
                   )}

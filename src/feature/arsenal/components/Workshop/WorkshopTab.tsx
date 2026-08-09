@@ -3,7 +3,6 @@ import { getWorkshopEntries } from "feature/arsenal/utils/workshopEntries";
 import { Hammer } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { PartsWallet } from "../Parts/PartsWallet";
 import { WorkshopBench } from "./WorkshopBench";
 import { WorkshopRack } from "./WorkshopRack";
 
@@ -46,9 +45,9 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
 
   return (
     <div className='flex flex-col gap-8'>
-      <PartsWallet parts={data?.parts ?? []} />
-
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]'>
+      {/* The parts wallet lives in Collection — here each job spells out the exact
+          pieces it consumes, so a second full inventory would only add noise. */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-start'>
         <WorkshopRack
           entries={entries}
           selectedId={selected?.id ?? null}

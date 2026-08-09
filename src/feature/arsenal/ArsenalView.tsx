@@ -11,6 +11,12 @@ import { useAppSelector } from "store/hooks";
 const ARSENAL_TABS = ["cases", "collection", "workshop", "dex", "rig", "market"] as const;
 type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
+/** Flip to false to pull the Workshop tab (and its deep link) back out of the UI. */
+const WORKSHOP_ENABLED: boolean = true;
+
+/** Hidden tabs are also unreachable by URL, so `?tab=workshop` falls back to Cases. */
+const isTabVisible = (tab: ArsenalTab): boolean => tab !== "workshop" || WORKSHOP_ENABLED;
+
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { DexView } from "./components/Dex/DexView";
@@ -36,7 +42,9 @@ export const ArsenalView = () => {
   const router = useRouter();
   const tabParam = router.query.tab;
   const activeTab: ArsenalTab =
-    typeof tabParam === "string" && ARSENAL_TABS.includes(tabParam as ArsenalTab)
+    typeof tabParam === "string" &&
+    ARSENAL_TABS.includes(tabParam as ArsenalTab) &&
+    isTabVisible(tabParam as ArsenalTab)
       ? (tabParam as ArsenalTab)
       : "cases";
 
@@ -106,13 +114,15 @@ export const ArsenalView = () => {
                   <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
               </TabsTrigger>
-              <TabsTrigger
-                value="workshop"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <Hammer size={16} />
-                <span className={activeTab === "workshop" ? "inline" : "hidden sm:inline"}>Workshop</span>
-              </TabsTrigger>
+              {WORKSHOP_ENABLED && (
+                <TabsTrigger
+                  value="workshop"
+                  className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
+                >
+                  <Hammer size={16} />
+                  <span className={activeTab === "workshop" ? "inline" : "hidden sm:inline"}>Workshop</span>
+                </TabsTrigger>
+              )}
               <TabsTrigger
                 value="dex"
                 className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
@@ -161,9 +171,11 @@ export const ArsenalView = () => {
               ) : null}
             </TabsContent>
 
-            <TabsContent value="workshop" className="mt-4">
-              <WorkshopTab data={data} fame={fame} />
-            </TabsContent>
+            {WORKSHOP_ENABLED && (
+              <TabsContent value="workshop" className="mt-4">
+                <WorkshopTab data={data} fame={fame} />
+              </TabsContent>
+            )}
 
             <TabsContent value="dex" className="mt-4">
               {isLoading ? (
