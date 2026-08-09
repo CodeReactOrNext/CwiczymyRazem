@@ -43,12 +43,12 @@ describe("notificationHref", () => {
     expect(notificationHref(notification({ type: "like" }))).toBeNull();
   });
 
-  it("sends reactions to the logs feed, not to a recording", () => {
+  it("leaves reactions unlinked despite carrying a recordingId", () => {
     // Reactions reuse `recordingId` for the practice-log id, so it must not be
     // treated as a recording.
     expect(
       notificationHref(notification({ type: "reaction", recordingId: "log1" })),
-    ).toBe("/profile");
+    ).toBeNull();
   });
 
   it("keeps the existing playlist, marketplace and exercise targets", () => {
