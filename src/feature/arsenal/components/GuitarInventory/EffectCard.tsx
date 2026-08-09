@@ -17,7 +17,7 @@ import {
   countScrapParts,
   getEffectScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { Store, Trash2, Wrench } from "lucide-react";
+import { Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
@@ -39,6 +39,9 @@ interface EffectCardProps {
   isListing?: boolean;
   onScrapClick?: (inventoryItemId: string, effectId: number | string) => void;
   isScrapping?: boolean;
+  /** Takes the pedal off the pedalboard straight from the collection tab. */
+  onRemoveFromBoard?: (inventoryItemId: string) => void;
+  isRemovingFromBoard?: boolean;
   /** Hide the Sell footer — for tooltips, reveals and read-only previews. */
   readOnly?: boolean;
   /** Custom footer rendered inside the card frame in place of the Sell row
@@ -55,6 +58,8 @@ export const EffectCard = ({
   isListing,
   onScrapClick,
   isScrapping,
+  onRemoveFromBoard,
+  isRemovingFromBoard,
   readOnly = false,
   footer,
 }: EffectCardProps) => {
@@ -321,8 +326,28 @@ export const EffectCard = ({
         </div>
       ) : null}
 
+      {/* On the board every other action is blocked, so the whole row becomes
+          the one action that is available: taking the pedal off. */}
+      {!readOnly && !footer && isOnPedalboard && onRemoveFromBoard && (
+        <div
+          className='flex flex-shrink-0 border-t'
+          style={{
+            borderColor: `${rs.baseColor}20`,
+            background: "rgba(0,0,0,0.35)",
+          }}>
+          <button
+            onClick={() => onRemoveFromBoard(item.id)}
+            disabled={isRemovingFromBoard}
+            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-500 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-cyan-400'
+            title='Take this pedal off the pedalboard'>
+            <Unplug size={9} strokeWidth={2.5} />
+            Remove from board
+          </button>
+        </div>
+      )}
+
       {/* Sell */}
-      {!readOnly && !footer && (
+      {!readOnly && !footer && !(isOnPedalboard && onRemoveFromBoard) && (
         <div
           className='flex flex-shrink-0 border-t'
           style={{

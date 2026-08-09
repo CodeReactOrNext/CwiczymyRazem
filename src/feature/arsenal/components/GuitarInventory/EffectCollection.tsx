@@ -13,6 +13,7 @@ import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
+import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
@@ -50,6 +51,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: scrap, isPending: isScrapping } = useScrapEffect();
+  const { mutate: savePedalboard, isPending: isRemovingFromBoard } =
+    useUpdatePedalboard();
   const queryClient = useQueryClient();
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
@@ -84,6 +87,13 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   const handleConfirmScrap = () => {
     if (scrapItemId) scrap(scrapItemId, { onSuccess: closeScrapDialog });
+  };
+
+  // Unplug a pedal without leaving the collection tab — otherwise Market/Scrap/
+  // Sell stay locked until the user goes back to the rig.
+  const handleRemoveFromBoard = (inventoryItemId: string) => {
+    const placements = data.rig?.pedalboardItems || [];
+    savePedalboard(placements.filter((p) => p.itemId !== inventoryItemId));
   };
 
   // Sellable duplicates: for every pedal owned more than once, keep the
@@ -266,6 +276,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
               isListing={isListing}
               onScrapClick={handleScrapClick}
               isScrapping={isScrapping}
+              onRemoveFromBoard={handleRemoveFromBoard}
+              isRemovingFromBoard={isRemovingFromBoard}
             />
           ))}
         </div>
