@@ -1,7 +1,7 @@
 import axios from "axios";
 import { auth } from "utils/firebase/client/firebase.utils";
 
-import type { ArsenalUserData, CaseType, OpenCaseResult, OpenEffectPackResult, PedalboardPlacement,RigSetup, ScrapResult, WorkshopBuildResult, WorkshopKind, WorkshopRepairResult } from "../types/arsenal.types";
+import type { ArsenalUserData, CaseType, OpenCaseResult, OpenEffectPackResult, PedalboardPlacement,RigSetup, ScrapResult, WorkshopBuildResult, WorkshopKind, WorkshopModAction, WorkshopModResult, WorkshopRepairResult } from "../types/arsenal.types";
 
 async function getIdToken(): Promise<string> {
   const token = await auth.currentUser!.getIdToken();
@@ -126,6 +126,24 @@ export const repairItem = async (
     idToken,
     itemId,
     kind,
+  });
+  return data;
+};
+
+/** Fits or re-rolls one named mod. Which one is the player's call; the value is rolled server-side. */
+export const modItem = async (
+  itemId: string,
+  kind: WorkshopKind,
+  featureId: string,
+  action: WorkshopModAction
+): Promise<WorkshopModResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<WorkshopModResult>("/api/arsenal/workshop/mod", {
+    idToken,
+    itemId,
+    kind,
+    featureId,
+    action,
   });
   return data;
 };

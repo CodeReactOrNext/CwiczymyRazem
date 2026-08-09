@@ -26,9 +26,11 @@ const WIN_INDEX = 45;
 // Keep in sync with /api/arsenal/sell-guitar.ts and /api/arsenal/sell-effect.ts
 const GUITAR_SELL_VALUES: Record<GuitarRarity, number> = {
   Common: 15, Uncommon: 30, Rare: 75, Epic: 150, Legendary: 300, Mythic: 750,
+  "Custom Shop": 1500,
 };
 const EFFECT_SELL_VALUES: Record<GuitarRarity, number> = {
   Common: 8, Uncommon: 15, Rare: 40, Epic: 75, Legendary: 150, Mythic: 375,
+  "Custom Shop": 750,
 };
 
 type StripItem =

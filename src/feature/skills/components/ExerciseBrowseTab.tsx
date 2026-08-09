@@ -1,4 +1,5 @@
 import { Chip, chipVariants, getChipCustomStyle } from "assets/components/ui/chip";
+import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
@@ -13,8 +14,8 @@ import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Heart, Info, Lock,Search, Trophy } from "lucide-react";
-import { useEffect,useMemo, useState } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Heart, Info, Lock,Search, SlidersHorizontal, Trophy, X } from "lucide-react";
+import { useEffect,useMemo, useRef,useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -55,10 +56,12 @@ const DIFFICULTY_RANK: Record<string, number> = { beginner: 0, easy: 1, medium: 
 const exTitle = (ex: { title: unknown; id: string }): string =>
   typeof ex.title === "string" ? ex.title : ((ex.title as any)?.en ?? ex.id);
 
-const filterPill = (active: boolean) =>
+const filterPill = (active: boolean, big = false) =>
   cn(
     chipVariants({ color: active ? "cyan" : "gray" }),
-    "cursor-pointer whitespace-nowrap px-3 py-1 text-[11px] capitalize focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    "cursor-pointer whitespace-nowrap capitalize focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+    // The sheet's pills are finger-sized; the desktop bar keeps its compact look.
+    big ? "px-3.5 py-2 text-xs" : "px-3 py-1 text-[11px]"
   );
 
 export const ExerciseBrowseTab = ({
@@ -85,6 +88,41 @@ export const ExerciseBrowseTab = ({
   const [isLoadingRanks, setIsLoadingRanks] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("default");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  // Mobile only - filters live in a bottom sheet so the list keeps the screen.
+  // From `sm` up they are laid out inline and this stays unused.
+  const [showFilters, setShowFilters] = useState(false);
+
+  const activeFilterCount =
+    (selectedCategory !== "all" ? 1 : 0) +
+    (selectedDifficulty !== "all" ? 1 : 0) +
+    (selectedSkill !== "all" ? 1 : 0);
+
+  // The sheet is hidden from `sm` up, so a rotation/resize while it is open
+  // would otherwise leave an invisible overlay swallowing clicks.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setShowFilters(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Paging from the bottom of a long phone list would otherwise leave the user
+  // stranded at the end of the new page.
+  const goToPage = (p: number) => {
+    setPage(p);
+    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const clearFilters = () => {
+    setSelectedCategory("all");
+    setSelectedDifficulty("all");
+    setSelectedSkill("all");
+    setPage(1);
+  };
 
   const toggleSort = (key: Exclude<SortKey, "default">) => {
     if (sortKey === key) {
@@ -172,7 +210,11 @@ export const ExerciseBrowseTab = ({
 
   const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageExercises = filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  // Memoized so the rank-fetching effect below doesn't re-run on every render.
+  const pageExercises = useMemo(
+    () => filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [filteredExercises, safePage]
+  );
 
   const userAuth = useAppSelector(selectUserAuth);
 
@@ -246,6 +288,109 @@ export const ExerciseBrowseTab = ({
     onStartExercise(buildChallenge(exercise as typeof exercisesAgregat[0]));
   };
 
+  // Pill sets shared by the desktop filter bar and the mobile filter sheet.
+  const categoryPills = (big = false) =>
+    CATEGORIES.map(cat => (
+      <button key={cat} onClick={() => handleCategoryChange(cat)} className={filterPill(selectedCategory === cat, big)}>
+        {cat === "all" ? "All" : cat}
+      </button>
+    ));
+
+  const difficultyPills = (big = false) =>
+    DIFFICULTIES.map(diff => (
+      <button key={diff} onClick={() => handleDifficultyChange(diff)} className={filterPill(selectedDifficulty === diff, big)}>
+        {diff === "all" ? "All" : diff}
+      </button>
+    ));
+
+  const skillPills = (big = false) => [
+    <button key="all" onClick={() => handleSkillChange("all")} className={filterPill(selectedSkill === "all", big)}>
+      All
+    </button>,
+    ...availableSkills.map(skillId => {
+      const Icon = guitarSkills.find(s => s.id === skillId)?.icon;
+      return (
+        <button
+          key={skillId}
+          onClick={() => handleSkillChange(skillId)}
+          className={cn(filterPill(selectedSkill === skillId, big), "flex items-center gap-1")}
+        >
+          {Icon && <Icon className="h-3 w-3 shrink-0" />}
+          {t(`skills:skills.${skillId}.name` as any)}
+        </button>
+      );
+    }),
+  ];
+
+  const groupLabel = "text-[10px] font-bold capitalize tracking-wider text-zinc-500";
+
+  // Shown under the search box on mobile so applied filters stay visible while
+  // the sheet is closed - each chip removes its own filter.
+  const activeFilterChips = [
+    selectedCategory !== "all" && { key: "cat", label: selectedCategory, clear: () => handleCategoryChange("all") },
+    selectedDifficulty !== "all" && { key: "diff", label: selectedDifficulty, clear: () => handleDifficultyChange("all") },
+    selectedSkill !== "all" && {
+      key: "skill",
+      label: t(`skills:skills.${selectedSkill}.name` as any),
+      clear: () => handleSkillChange("all"),
+    },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
+
+  // Everything both the desktop table row and the mobile card need, derived
+  // once per exercise so the two layouts can't drift apart.
+  const rows = pageExercises.map((exercise) => {
+    const progress = progressMap.get(exercise.id);
+    const bpmStages = exercise.metronomeSpeed ? generateBpmStages(exercise.metronomeSpeed) : [];
+    const completedBpms = progress?.completedBpms || [];
+    const micScore = progress?.micHighScore;
+    const earScore = progress?.earTrainingHighScore;
+    const clickScore = progress?.clickHighScore;
+    const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
+    const micAccuracy = progress?.micHighScoreAccuracy;
+    const clickAccuracy = progress?.clickHighScoreAccuracy;
+    const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
+    const skillId = exercise.relatedSkills[0];
+
+    return {
+      exercise,
+      isLocked: !!exercise.premium && !isPremium,
+      title: typeof exercise.title === "string"
+        ? exercise.title
+        : (exercise.title as any)?.en ?? exercise.id,
+      isNew: isExerciseNew(exercise),
+      skillId,
+      SkillIcon: skillId ? guitarSkills.find(s => s.id === skillId)?.icon : null,
+      isFavorite: favoriteExerciseIds.includes(exercise.id),
+      rank: leaderboardRanks[exercise.id],
+      hasLeaderboard: bpmStages.length > 0 || !!exercise.riddleConfig || exercise.noteHuntConfig?.mode === "click" || (!!exercise.tablature && exercise.tablature.length > 0),
+      hasBpmProgress,
+      bpmStages,
+      completedBpms,
+      bpmPct: hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0,
+      hasBeenAttempted: !!progress && (
+        completedBpms.length > 0 ||
+        (micScore != null && micScore > 0) ||
+        (earScore != null && earScore > 0) ||
+        (clickScore != null && clickScore > 0)
+      ),
+      resultText: hasBpmProgress
+        ? `${maxBpm} BPM`
+        : micScore != null && micScore > 0
+          ? micAccuracy != null ? `${micAccuracy}%` : `${micScore} pts`
+          : earScore != null && earScore > 0
+            ? `${earScore} pts`
+            : clickScore != null && clickScore > 0
+              ? clickAccuracy != null ? `${clickAccuracy}%` : `${clickScore} pts`
+              : null,
+    };
+  });
+
+  const rankClass = (rank: number) =>
+    rank === 1 ? "bg-amber-500/20 text-amber-500" :
+    rank === 2 ? "bg-zinc-300/20 text-zinc-300" :
+    rank === 3 ? "bg-amber-700/20 text-amber-600" :
+    "bg-zinc-800/40 text-zinc-400";
+
   const renderSortHead = (
     col: Exclude<SortKey, "default">,
     label: string,
@@ -278,87 +423,312 @@ export const ExerciseBrowseTab = ({
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-6 pb-24 flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-5 sm:pt-6 pb-24 flex flex-col gap-5 sm:gap-6">
 
       {/* ── Filters bar ── */}
-      <div className="flex flex-col gap-4 bg-zinc-900/60 rounded-lg p-5">
+      <div className="flex flex-col gap-3 sm:gap-4 bg-zinc-900/60 rounded-lg p-3 sm:p-5">
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
-          <input
-            value={searchQuery}
-            onChange={e => handleSearchChange(e.target.value)}
-            placeholder="Search exercises…"
-            className="w-full pl-9 pr-4 h-9 rounded-lg bg-zinc-800/70 border border-zinc-700/60 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-colors"
-          />
-        </div>
-
-        {/* Category */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Category</span>
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => handleCategoryChange(cat)}
-              className={filterPill(selectedCategory === cat)}
-            >
-              {cat === "all" ? "All" : cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Difficulty + Skill row */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Difficulty</span>
-            {DIFFICULTIES.map(diff => (
+        {/* Search + (mobile) filters trigger */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+            <input
+              value={searchQuery}
+              onChange={e => handleSearchChange(e.target.value)}
+              placeholder="Search exercises…"
+              // text-base on mobile stops iOS Safari zooming in on focus.
+              className="w-full pl-9 pr-9 h-11 sm:h-9 rounded-lg bg-zinc-800/70 text-base sm:text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-colors"
+            />
+            {searchQuery && (
               <button
-                key={diff}
-                onClick={() => handleDifficultyChange(diff)}
-                className={filterPill(selectedDifficulty === diff)}
+                onClick={() => handleSearchChange("")}
+                className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+                aria-label="Clear search"
               >
-                {diff === "all" ? "All" : diff}
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setShowFilters(true)}
+            className={cn(
+              "sm:hidden flex shrink-0 items-center gap-1.5 h-11 px-3.5 rounded-lg text-xs font-bold transition-colors",
+              activeFilterCount > 0 ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800/70 text-zinc-400"
+            )}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cyan-500/25 px-1 text-[10px] tabular-nums">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Active filters stay visible on mobile while the sheet is closed */}
+        {activeFilterChips.length > 0 && (
+          <div className="flex sm:hidden flex-wrap gap-1.5">
+            {activeFilterChips.map(chip => (
+              <button
+                key={chip.key}
+                onClick={chip.clear}
+                className={cn(filterPill(true), "flex items-center gap-1 pr-2")}
+              >
+                {chip.label}
+                <X className="h-3 w-3 opacity-60" />
               </button>
             ))}
           </div>
+        )}
 
+        {/* Desktop: filters inline */}
+        <div className="hidden sm:flex flex-col gap-4">
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500 mr-1">Skill</span>
+            <span className={cn(groupLabel, "mr-1")}>Category</span>
+            {categoryPills()}
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className={cn(groupLabel, "mr-1")}>Difficulty</span>
+              {difficultyPills()}
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className={cn(groupLabel, "mr-1")}>Skill</span>
+              {skillPills()}
+            </div>
+          </div>
+
+          {activeFilterCount > 0 && (
             <button
-              onClick={() => handleSkillChange("all")}
-              className={filterPill(selectedSkill === "all")}
+              onClick={clearFilters}
+              className="self-start flex items-center gap-1.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-300 transition-colors"
             >
-              All
+              <X className="h-3 w-3" />
+              Clear filters
             </button>
-            {availableSkills.map(skillId => {
-              const skillData = guitarSkills.find(s => s.id === skillId);
-              const Icon = skillData?.icon;
+          )}
+        </div>
+      </div>
+
+      {/* Mobile: filters live in a bottom sheet so the list keeps the screen */}
+      <Sheet open={showFilters} onOpenChange={setShowFilters}>
+        <SheetContent
+          side="bottom"
+          className="sm:hidden flex max-h-[85vh] flex-col gap-0 rounded-t-2xl bg-zinc-950 p-0"
+        >
+          <SheetTitle className="px-5 pt-5 pb-2 text-lg font-bold text-white">Filters</SheetTitle>
+
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 flex flex-col gap-6">
+            <div className="flex flex-col gap-2.5">
+              <span className={groupLabel}>Category</span>
+              <div className="flex flex-wrap gap-2">{categoryPills(true)}</div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <span className={groupLabel}>Difficulty</span>
+              <div className="flex flex-wrap gap-2">{difficultyPills(true)}</div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <span className={groupLabel}>Skill</span>
+              <div className="flex flex-wrap gap-2">{skillPills(true)}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 px-5 pt-4 pb-6 bg-zinc-950">
+            <button
+              onClick={clearFilters}
+              disabled={activeFilterCount === 0}
+              className="h-11 px-4 rounded-lg bg-zinc-900 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40"
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => setShowFilters(false)}
+              className="flex-1 h-11 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300"
+            >
+              Show {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* ── Table ── */}
+      <div ref={listRef} className="flex flex-col gap-3 scroll-mt-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-zinc-500">
+            {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
+            {totalPages > 1 && <span className="ml-1">— page {safePage} / {totalPages}</span>}
+          </p>
+
+          {/* The card layout has no sortable headers, so mobile gets its own sort pills. */}
+          <div className="flex lg:hidden items-center gap-1.5">
+            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500">Sort</span>
+            {([["name", "Name"], ["difficulty", "Level"], ["time", "Time"]] as const).map(([key, label]) => {
+              const active = sortKey === key;
               return (
                 <button
-                  key={skillId}
-                  onClick={() => handleSkillChange(skillId)}
-                  className={cn(filterPill(selectedSkill === skillId), "flex items-center gap-1")}
+                  key={key}
+                  onClick={() => toggleSort(key)}
+                  className={cn(
+                    "flex items-center gap-1 rounded px-2 py-1 text-[11px] font-bold transition-colors",
+                    active ? "bg-zinc-800 text-zinc-200" : "text-zinc-500"
+                  )}
                 >
-                  {Icon && <Icon className="h-3 w-3 shrink-0" />}
-                  {t(`skills:skills.${skillId}.name` as any)}
+                  {label}
+                  {active && (sortDir === "asc"
+                    ? <ChevronUp className="h-3 w-3 text-cyan-400" />
+                    : <ChevronDown className="h-3 w-3 text-cyan-400" />)}
                 </button>
               );
             })}
           </div>
         </div>
-      </div>
 
-      {/* ── Table ── */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-500">
-            {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
-            {totalPages > 1 && <span className="ml-1">— page {safePage} / {totalPages}</span>}
-          </p>
+        {/* ── Mobile / tablet: cards ── */}
+        <div className="flex flex-col gap-2 lg:hidden">
+          {rows.map(({
+            exercise, isLocked, title, isNew, skillId, SkillIcon, isFavorite, rank,
+            hasLeaderboard, hasBeenAttempted, resultText,
+          }) => (
+            <div
+              key={exercise.id}
+              onClick={() => setPreviewExercise(exercise as Exercise)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg py-3 pl-3.5 pr-3 transition-colors cursor-pointer select-none",
+                hasBeenAttempted ? "bg-zinc-900/70 active:bg-zinc-800/70" : "bg-zinc-900/30 active:bg-zinc-900/60"
+              )}
+            >
+              <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                {/* Title */}
+                <div className="flex items-start gap-2">
+                  {hasBeenAttempted && (
+                    <div className="mt-[3px] flex-shrink-0 flex items-center justify-center bg-emerald-500/10 rounded-full h-4 w-4">
+                      <FaCheck className="h-2 w-2 text-emerald-400" />
+                    </div>
+                  )}
+                  <span className={cn("min-w-0 text-[15px] font-semibold leading-snug line-clamp-2", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
+                    {title}
+                  </span>
+                </div>
+
+                {/* Meta: badges, then plain text so the row stays quiet */}
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  {isNew && (
+                    <Chip color="cyan" className="flex-shrink-0 px-1.5 py-0 text-[9px] tracking-wider">New</Chip>
+                  )}
+                  {isLocked && (
+                    <span className="flex-shrink-0 flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/25">
+                      <Lock className="h-2.5 w-2.5 text-amber-500" />
+                      <span className="text-[9px] font-bold capitalize tracking-wider text-amber-500">Pro</span>
+                    </span>
+                  )}
+                  <Chip
+                    color="custom"
+                    style={getChipCustomStyle(CATEGORY_HEX[exercise.category] ?? CATEGORY_HEX.mixed)}
+                    className="px-1.5 py-0 text-[10px] capitalize tracking-wider"
+                  >
+                    {exercise.category}
+                  </Chip>
+                  <Chip
+                    color="custom"
+                    style={getChipCustomStyle(DIFFICULTY_HEX[exercise.difficulty])}
+                    className="px-1.5 py-0 text-[10px] capitalize tracking-wider"
+                  >
+                    {exercise.difficulty}
+                  </Chip>
+                  {SkillIcon && (
+                    <span className="flex items-center gap-1 text-[11px] text-zinc-500 min-w-0">
+                      <SkillIcon className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{t(`skills:skills.${skillId}.name` as any)}</span>
+                    </span>
+                  )}
+                  <span className="text-[11px] text-zinc-500 tabular-nums whitespace-nowrap">
+                    {exercise.timeInMinutes < 1
+                      ? `${Math.round(exercise.timeInMinutes * 60)} s`
+                      : `${exercise.timeInMinutes} min`}
+                  </span>
+                </div>
+
+                {/* Result + secondary actions share one row to keep cards short */}
+                <div className="flex items-center gap-1">
+                  {hasBeenAttempted && resultText != null && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); if (hasLeaderboard) onShowLeaderboard(exercise.id, title); }}
+                      className="flex items-center gap-1.5 pr-2 rounded"
+                    >
+                      {rank && (
+                        <span className={cn("flex items-center justify-center min-w-[22px] h-5 px-1 rounded font-bold text-[11px]", rankClass(rank))}>
+                          #{rank}
+                        </span>
+                      )}
+                      <span className="text-[11px] font-bold text-zinc-300 tabular-nums whitespace-nowrap">{resultText}</span>
+                    </button>
+                  )}
+                  {userAuth && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleToggleFavorite(exercise.id); }}
+                      className={cn(
+                        "flex items-center justify-center h-8 w-8 -ml-1.5 rounded transition-colors",
+                        isFavorite ? "text-rose-400" : "text-zinc-600 active:text-zinc-400"
+                      )}
+                      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={isFavorite}
+                    >
+                      <Heart size={15} className={cn(isFavorite && "fill-current")} />
+                    </button>
+                  )}
+                  {hasLeaderboard && !hasBeenAttempted && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
+                      className="flex items-center justify-center h-8 w-8 rounded text-zinc-600 active:text-zinc-400 transition-colors"
+                      aria-label="Leaderboard"
+                    >
+                      <Trophy size={15} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Primary action, thumb-height and vertically centred */}
+              {isLocked ? (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onShowUpgrade(); }}
+                  className="flex shrink-0 items-center gap-1 h-10 px-4 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold transition-colors active:bg-amber-500/20"
+                >
+                  <Lock size={12} />
+                  Pro
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onStartExercise(buildChallenge(exercise)); }}
+                  className="flex shrink-0 items-center gap-0.5 h-10 pl-3 pr-4 rounded-lg bg-zinc-100 text-zinc-950 text-xs font-bold transition-colors active:bg-zinc-300"
+                >
+                  <ChevronRight size={14} strokeWidth={2.5} />
+                  Start
+                </button>
+              )}
+            </div>
+          ))}
+
+          {filteredExercises.length === 0 && (
+            <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-4 py-12 text-center">
+              <p className="text-zinc-500 text-sm">No exercises match the current filters.</p>
+              {(activeFilterCount > 0 || searchQuery) && (
+                <button
+                  onClick={() => { clearFilters(); handleSearchChange(""); }}
+                  className="h-9 px-4 rounded-lg bg-zinc-800 text-xs font-bold text-zinc-200 transition-colors active:bg-zinc-700"
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="overflow-x-auto">
+        {/* ── Desktop: table ── */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full min-w-[980px] table-fixed border-separate border-spacing-y-3 text-sm">
             <thead>
               <tr>
@@ -389,45 +759,11 @@ export const ExerciseBrowseTab = ({
               </tr>
             </thead>
             <tbody>
-              {pageExercises.map((exercise) => {
-                const isLocked = !!exercise.premium && !isPremium;
-                const progress = progressMap.get(exercise.id);
-                const bpmStages = exercise.metronomeSpeed ? generateBpmStages(exercise.metronomeSpeed) : [];
-                const completedBpms = progress?.completedBpms || [];
-                const micScore = progress?.micHighScore;
-                const earScore = progress?.earTrainingHighScore;
-                const clickScore = progress?.clickHighScore;
-                const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
-                const hasBeenAttempted = !!progress && (
-                  completedBpms.length > 0 ||
-                  (micScore != null && micScore > 0) ||
-                  (earScore != null && earScore > 0) ||
-                  (clickScore != null && clickScore > 0)
-                );
-                const title = typeof exercise.title === "string"
-                  ? exercise.title
-                  : (exercise.title as any)?.en ?? exercise.id;
-                const isNew = isExerciseNew(exercise);
-                const skillId = exercise.relatedSkills[0];
-                const skillData = skillId ? guitarSkills.find(s => s.id === skillId) : null;
-                const SkillIcon = skillData?.icon;
-                const bpmPct = hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0;
-                const hasLeaderboard = bpmStages.length > 0 || !!exercise.riddleConfig || exercise.noteHuntConfig?.mode === "click" || (!!exercise.tablature && exercise.tablature.length > 0);
-                const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
-                const micAccuracy = progress?.micHighScoreAccuracy;
-                const clickAccuracy = progress?.clickHighScoreAccuracy;
-                const rank = leaderboardRanks[exercise.id];
-                const isFavorite = favoriteExerciseIds.includes(exercise.id);
-                const resultText = hasBpmProgress
-                  ? `${maxBpm} BPM`
-                  : micScore != null && micScore > 0
-                    ? micAccuracy != null ? `${micAccuracy}%` : `${micScore} pts`
-                    : earScore != null && earScore > 0
-                      ? `${earScore} pts`
-                      : clickScore != null && clickScore > 0
-                        ? clickAccuracy != null ? `${clickAccuracy}%` : `${clickScore} pts`
-                        : null;
-
+              {rows.map(({
+                exercise, isLocked, title, isNew, skillId, SkillIcon, isFavorite, rank,
+                hasLeaderboard, hasBeenAttempted, resultText, hasBpmProgress, bpmStages,
+                completedBpms, bpmPct,
+              }) => {
                 const cellBg = cn(
                   "border-y border-zinc-800 transition-colors",
                   hasBeenAttempted
@@ -638,15 +974,20 @@ export const ExerciseBrowseTab = ({
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-1">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => goToPage(Math.max(1, safePage - 1))}
               disabled={safePage === 1}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
+              className="flex items-center gap-1.5 h-9 sm:h-auto px-4 sm:px-3 sm:py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
             >
               <ChevronLeft size={13} />
               Previous
             </button>
 
-            <div className="flex items-center gap-1">
+            {/* Numbered pages need too much room on a phone - show a counter instead. */}
+            <span className="sm:hidden text-xs font-semibold text-zinc-400 tabular-nums">
+              {safePage} / {totalPages}
+            </span>
+
+            <div className="hidden sm:flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
                 const isActive = p === safePage;
                 const isNear = Math.abs(p - safePage) <= 2 || p === 1 || p === totalPages;
@@ -659,7 +1000,7 @@ export const ExerciseBrowseTab = ({
                 return (
                   <button
                     key={p}
-                    onClick={() => setPage(p)}
+                    onClick={() => goToPage(p)}
                     className={cn(
                       "h-7 min-w-[28px] px-2 rounded text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       isActive
@@ -674,9 +1015,9 @@ export const ExerciseBrowseTab = ({
             </div>
 
             <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => goToPage(Math.min(totalPages, safePage + 1))}
               disabled={safePage === totalPages}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
+              className="flex items-center gap-1.5 h-9 sm:h-auto px-4 sm:px-3 sm:py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
             >
               Next
               <ChevronRight size={13} />

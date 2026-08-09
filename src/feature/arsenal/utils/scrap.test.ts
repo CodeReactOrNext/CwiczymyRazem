@@ -21,20 +21,27 @@ describe("getGuitarScrapYield", () => {
   it("pays out the same parts for the same instance every time", () => {
     const item = { features: undefined };
     expect(getGuitarScrapYield(item, guitar(24))).toEqual(
-      getGuitarScrapYield(item, guitar(24))
+      getGuitarScrapYield(item, guitar(24)),
     );
   });
 
   it("tiers the yield off the guitar's rarity", () => {
     // 24 = Fairmont Stratocaster (Common), 44 = Stratocaster Custom (Legendary).
     // Same archetype, so the headline slot is the same part in both.
-    expect(tierOf(getGuitarScrapYield({}, guitar(24)), "pickup")).toBe("Standard");
-    expect(tierOf(getGuitarScrapYield({}, guitar(44)), "pickup")).toBe("Legendary");
+    expect(tierOf(getGuitarScrapYield({}, guitar(24)), "pickup")).toBe(
+      "Standard",
+    );
+    expect(tierOf(getGuitarScrapYield({}, guitar(44)), "pickup")).toBe(
+      "Legendary",
+    );
   });
 
   it("gives a cheap guitar one slot, a Legendary one three", () => {
-    expect(getGuitarScrapYield({}, guitar(24))).toHaveLength(1); // Common
-    expect(getGuitarScrapYield({}, guitar(44))).toHaveLength(3); // Legendary
+    // Screws ride on top of every teardown, so the BOM half is what is counted.
+    const slots = (parts: ScrapPart[]) =>
+      parts.filter((p) => p.partId !== "screws");
+    expect(slots(getGuitarScrapYield({}, guitar(24)))).toHaveLength(1); // Common
+    expect(slots(getGuitarScrapYield({}, guitar(44)))).toHaveLength(3); // Legendary
   });
 
   it("never yields a neck from a set-neck guitar", () => {
@@ -58,7 +65,7 @@ describe("getGuitarScrapYield", () => {
     const plain = getGuitarScrapYield({}, guitar(44));
     const upgraded = getGuitarScrapYield(
       { features: [{ id: "graphite-neck", points: 2 }] },
-      guitar(44)
+      guitar(44),
     );
     expect(tierOf(plain, "neck")).toBe("Legendary");
     // Already at the top of its ladder — the bump cannot push it past Legendary.
@@ -68,7 +75,7 @@ describe("getGuitarScrapYield", () => {
     const cheapPlain = getGuitarScrapYield({}, guitar(47)); // Rare Stratocaster
     const cheapUpgraded = getGuitarScrapYield(
       { features: [{ id: "graphite-neck", points: 2 }] },
-      guitar(47)
+      guitar(47),
     );
     expect(tierOf(cheapPlain, "neck")).toBe("Epic");
     expect(tierOf(cheapUpgraded, "neck")).toBe("Legendary");
@@ -78,14 +85,16 @@ describe("getGuitarScrapYield", () => {
 describe("getEffectScrapYield", () => {
   it("strips a cheap pedal down to its headline part", () => {
     // 2 = TS-808 Overdrive (Common) — one slot, and diodes lead an overdrive.
-    expect(getEffectScrapYield({}, effect(2))).toEqual([
-      { partId: "diode", tier: "Standard", qty: 2 },
-    ]);
+    expect(
+      getEffectScrapYield({}, effect(2)).filter((p) => p.partId !== "screws"),
+    ).toEqual([{ partId: "diode", tier: "Standard", qty: 2 }]);
   });
 
   it("gives up the enclosure at Legendary", () => {
     // 14 = Astral Reverberator (Legendary)
-    expect(tierOf(getEffectScrapYield({}, effect(14)), "enclosure")).toBe("Legendary");
+    expect(tierOf(getEffectScrapYield({}, effect(14)), "enclosure")).toBe(
+      "Legendary",
+    );
   });
 
   it("upgrades the op-amp when the pedal rolled an NOS chip", () => {
@@ -93,7 +102,7 @@ describe("getEffectScrapYield", () => {
     const plain = getEffectScrapYield({}, effect(3));
     const upgraded = getEffectScrapYield(
       { features: [{ id: "nos-opamp", points: 4 }] },
-      effect(3)
+      effect(3),
     );
     expect(tierOf(plain, "opamp")).toBe("Epic");
     expect(tierOf(upgraded, "opamp")).toBe("Legendary");
@@ -113,14 +122,16 @@ describe("countScrapParts", () => {
       countScrapParts([
         { partId: "screws", tier: "Standard", qty: 3 },
         { partId: "body", tier: "Epic", qty: 1 },
-      ])
+      ]),
     ).toBe(4);
   });
 });
 
 describe("addPartsToWallet", () => {
   it("stacks a payout onto what the player already owns", () => {
-    const wallet: ScrapPart[] = [{ partId: "screws", tier: "Standard", qty: 4 }];
+    const wallet: ScrapPart[] = [
+      { partId: "screws", tier: "Standard", qty: 4 },
+    ];
     const gained: ScrapPart[] = [
       { partId: "screws", tier: "Standard", qty: 1 },
       { partId: "pickup", tier: "Epic", qty: 2 },
@@ -132,7 +143,9 @@ describe("addPartsToWallet", () => {
   });
 
   it("leaves the original wallet untouched", () => {
-    const wallet: ScrapPart[] = [{ partId: "screws", tier: "Standard", qty: 4 }];
+    const wallet: ScrapPart[] = [
+      { partId: "screws", tier: "Standard", qty: 4 },
+    ];
     addPartsToWallet(wallet, [{ partId: "screws", tier: "Standard", qty: 6 }]);
     expect(wallet).toEqual([{ partId: "screws", tier: "Standard", qty: 4 }]);
   });
@@ -143,7 +156,9 @@ describe("addPartsToWallet", () => {
       { partId: stale, tier: "Standard", qty: 2 },
       { partId: "screws", tier: "Standard", qty: 1 },
     ];
-    expect(addPartsToWallet(wallet, [{ partId: "body", tier: "Epic", qty: 1 }])).toEqual([
+    expect(
+      addPartsToWallet(wallet, [{ partId: "body", tier: "Epic", qty: 1 }]),
+    ).toEqual([
       { partId: "body", tier: "Epic", qty: 1 },
       { partId: "screws", tier: "Standard", qty: 1 },
     ]);
@@ -172,7 +187,9 @@ describe("groupWalletByPart", () => {
   });
 
   it("drops empty stacks", () => {
-    expect(groupWalletByPart([{ partId: "body", tier: "Epic", qty: 0 }])).toEqual([]);
+    expect(
+      groupWalletByPart([{ partId: "body", tier: "Epic", qty: 0 }]),
+    ).toEqual([]);
   });
 
   it("hides parts left over from a retired part type", () => {
@@ -194,7 +211,7 @@ describe("getWalletTierTotals", () => {
         { partId: "body", tier: "Legendary", qty: 1 },
         { partId: "pickup", tier: "Epic", qty: 2 },
         { partId: "neck", tier: "Standard", qty: 4 },
-      ])
+      ]),
     ).toEqual([
       { tier: "Legendary", qty: 1 },
       { tier: "Epic", qty: 2 },
@@ -208,7 +225,7 @@ describe("getWalletTierTotals", () => {
       getWalletTierTotals([
         { partId: stale, tier: "Standard", qty: 7 },
         { partId: "body", tier: "Epic", qty: 1 },
-      ])
+      ]),
     ).toEqual([{ tier: "Epic", qty: 1 }]);
   });
 });

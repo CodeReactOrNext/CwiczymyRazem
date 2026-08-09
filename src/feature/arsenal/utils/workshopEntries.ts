@@ -1,7 +1,11 @@
 import { EFFECTS_BY_ID } from "../data/effectDefinitions";
 import { getEffectLevel } from "../data/effectStats";
 import { GUITARS_BY_ID } from "../data/guitarDefinitions";
-import { getItemCondition, getItemLevel } from "../data/itemStats";
+import {
+  getEffectiveRarity,
+  getItemCondition,
+  getItemLevel,
+} from "../data/itemStats";
 import type { WorkshopSubject } from "../data/workshop";
 import { getEffectSubject, getGuitarSubject } from "../data/workshop";
 import type {
@@ -53,7 +57,7 @@ export const getWorkshopEntries = (
       kind: "guitar",
       name: def.name,
       brand: def.brand,
-      rarity: def.rarity,
+      rarity: getEffectiveRarity(def.rarity, item.buildLevel),
       imageSrc: getRankBadgeSrc(def.imageId, "small"),
       rotate: true,
       buildLevel: item.buildLevel ?? 0,
@@ -74,7 +78,7 @@ export const getWorkshopEntries = (
       kind: "effect",
       name: def.name,
       brand: def.brand,
-      rarity: def.rarity,
+      rarity: getEffectiveRarity(def.rarity, item.buildLevel),
       imageSrc: `/static/images/effects/${def.imageId}.png`,
       rotate: false,
       buildLevel: item.buildLevel ?? 0,

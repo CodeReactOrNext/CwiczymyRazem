@@ -1,16 +1,20 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { sumEffectStats } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { sumFeatureStats } from "feature/arsenal/data/itemStats";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import {
   getEffectSubject,
   getGuitarSubject,
-  getRepairQuote,
+  getModQuote,
   recipeToParts,
+  rollModPoints,
   subtractParts,
 } from "feature/arsenal/data/workshop";
 import type {
   EffectInventoryItem,
   InventoryItem,
+  ItemFeature,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
@@ -19,13 +23,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Restores an item by one condition grade.
+ * Fits a mod, or re-rolls one already fitted.
  *
- * The first repair pins `mintCondition` to whatever the item rolled at, and
- * `getItemValue` prices from that number forever after — so a restoration raises
- * Item Level (which is what the leaderboard ranks) but never what the game pays
- * for the item. Without that pin, buying a Relic cheap, restoring it and selling
- * it back would be a Fame printer.
+ * The player picks *which* mod — each one has its own bill, so there is nothing
+ * random about the price — but the value is rolled here and never on the client.
+ * `getModQuote` is deterministic, so the bill shown is the bill charged, and the
+ * only thing the request can influence is which named mod it asks for.
  */
 export default async function handler(
   req: NextApiRequest,
@@ -35,14 +38,21 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, itemId, kind } = req.body as {
+  const { idToken, itemId, kind, featureId, action } = req.body as {
     idToken: string;
     itemId: string;
     kind: "guitar" | "effect";
+    /** The named mod to fit or re-roll. */
+    featureId: string;
+    action: "fit" | "reroll";
   };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (!itemId) return res.status(400).json({ error: "Missing itemId" });
+  if (!featureId) return res.status(400).json({ error: "Missing featureId" });
+  if (action !== "fit" && action !== "reroll") {
+    return res.status(400).json({ error: "Invalid action" });
+  }
   if (kind !== "guitar" && kind !== "effect") {
     return res.status(400).json({ error: "Invalid kind" });
   }
@@ -90,21 +100,64 @@ export default async function handler(
               return getEffectSubject(item as EffectInventoryItem, def);
             })();
 
-      const quote = getRepairQuote(subject, wallet);
-      if (!quote.target) throw new Error("ALREADY_MUSEUM");
-      if (!quote.canRepair) throw new Error("REQUIREMENT_PARTS");
-      const spent = recipeToParts(quote.recipe);
+      const quote = getModQuote(subject, wallet);
+      const isReroll = action === "reroll";
 
-      const restored = {
-        ...item,
-        condition: quote.toCondition,
-        // Captured once, from the condition the item rolled at — never overwritten.
-        mintCondition: item.mintCondition ?? quote.fromCondition,
-        restored: true,
-      };
+      // The priced option is the single source of both the bill and the range —
+      // exactly the object the client was looking at when it sent this.
+      const option = isReroll
+        ? quote.fitted.find((f) => f.id === featureId)
+        : quote.candidates.find((c) => c.id === featureId);
+
+      if (!option) {
+        throw new Error(
+          isReroll ? "REQUIREMENT_NOT_FITTED" : "REQUIREMENT_UNAVAILABLE",
+        );
+      }
+      if (!option.affordable) throw new Error("REQUIREMENT_PARTS");
+
+      const features: ItemFeature[] = subject.features.map((f) => ({ ...f }));
+      let pointsBefore: number | undefined;
+      let target: ItemFeature;
+
+      if (isReroll) {
+        // `option` came out of `quote.fitted`, so the feature is certainly there.
+        target = features.find((f) => f.id === featureId)!;
+        pointsBefore = target.points;
+      } else {
+        if (quote.slots.free <= 0) throw new Error("REQUIREMENT_SLOTS");
+        target = { id: option.id, points: 0 };
+        features.push(target);
+      }
+
+      // A re-roll always replaces, including downward — that is the whole risk.
+      target.points = rollModPoints(option);
+
+      const spent = recipeToParts(option.recipe);
+      const buildLog = [
+        ...(item.buildLog ?? []),
+        isReroll ? `${option.label} re-spec` : option.label,
+      ];
+
+      // Built per kind rather than spread once: the two inventories keep their own
+      // stat shapes (`ItemStats` vs `EffectStats`) and must not blur into a union.
+      const upgraded =
+        kind === "guitar"
+          ? {
+              ...(item as InventoryItem),
+              features,
+              stats: sumFeatureStats(features),
+              buildLog,
+            }
+          : {
+              ...(item as EffectInventoryItem),
+              features,
+              stats: sumEffectStats(features),
+              buildLog,
+            };
 
       const newList = [...list];
-      newList[index] = restored;
+      newList[index] = upgraded;
       const newInventory =
         kind === "guitar" ? (newList as InventoryItem[]) : inventory;
       const newEffects =
@@ -128,13 +181,15 @@ export default async function handler(
       });
 
       return {
-        grade: quote.target,
-        condition: quote.toCondition,
-        levelGain: quote.gain,
+        action,
+        featureId: option.id,
+        label: option.label,
+        points: target.points,
+        pointsBefore,
+        // Feature points feed the item level one for one, so the delta is the gain.
+        levelGain: target.points - (pointsBefore ?? 0),
         spent,
-        // Returned so the client can render the finished item immediately,
-        // instead of flashing the old card until the refetch lands.
-        item: restored,
+        item: upgraded,
         newParts,
         rigLevel,
       };
@@ -150,17 +205,19 @@ export default async function handler(
     if (code === "DEFINITION_NOT_FOUND") {
       return res.status(404).json({ error: "Item definition not found" });
     }
-    if (code === "ALREADY_MUSEUM") {
+    if (code.startsWith("REQUIREMENT_")) {
+      const what = code.replace("REQUIREMENT_", "").toLowerCase();
+      const messages: Record<string, string> = {
+        parts: "Not enough parts for this mod",
+        slots: "Every mod slot at this rarity is filled — promote it first",
+        not_fitted: "That mod is not on this item",
+        unavailable: "That mod does not fit this instrument",
+      };
       return res
         .status(400)
-        .json({ error: "This item is already in Museum condition" });
+        .json({ error: messages[what] ?? "Mod requirements not met" });
     }
-    if (code === "REQUIREMENT_PARTS") {
-      return res
-        .status(400)
-        .json({ error: "Not enough parts for this repair" });
-    }
-    console.error("[workshop/repair]", error);
+    console.error("[workshop/mod]", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }

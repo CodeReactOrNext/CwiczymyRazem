@@ -1,6 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
-import { getEffectLevel, getEffectValue } from "feature/arsenal/data/effectStats";
+import {
+  EFFECT_DEFINITIONS,
+  EFFECTS_BY_ID,
+} from "feature/arsenal/data/effectDefinitions";
+import {
+  getEffectLevel,
+  getEffectValue,
+} from "feature/arsenal/data/effectStats";
+import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
@@ -10,10 +17,13 @@ import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
-import { useEffect, useMemo,useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type { ArsenalUserData, EffectInventoryItem } from "../../types/arsenal.types";
+import type {
+  ArsenalUserData,
+  EffectInventoryItem,
+} from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
 import { RARITY_RANK } from "../RarityProgress";
@@ -23,7 +33,12 @@ import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
 
 const EFFECT_FAME_VALUES: Record<string, number> = {
-  Common: 8, Uncommon: 15, Rare: 40, Epic: 75, Legendary: 150, Mythic: 375,
+  Common: 8,
+  Uncommon: 15,
+  Rare: 40,
+  Epic: 75,
+  Legendary: 150,
+  Mythic: 375,
 };
 
 interface EffectCollectionProps {
@@ -40,15 +55,24 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const currentFame = userStats?.fame || 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [selectedEffectId, setSelectedEffectId] = useState<number | string | null>(null);
+  const [selectedEffectId, setSelectedEffectId] = useState<
+    number | string | null
+  >(null);
   const [isListDialogOpen, setIsListDialogOpen] = useState(false);
   const [listItemId, setListItemId] = useState<string | null>(null);
-  const [listEffectId, setListEffectId] = useState<number | string | null>(null);
+  const [listEffectId, setListEffectId] = useState<number | string | null>(
+    null,
+  );
   const [isBulkSellOpen, setIsBulkSellOpen] = useState(false);
   const [scrapItemId, setScrapItemId] = useState<string | null>(null);
-  const [scrapEffectId, setScrapEffectId] = useState<number | string | null>(null);
+  const [scrapEffectId, setScrapEffectId] = useState<number | string | null>(
+    null,
+  );
 
-  const handleScrapClick = (inventoryItemId: string, effectId: number | string) => {
+  const handleScrapClick = (
+    inventoryItemId: string,
+    effectId: number | string,
+  ) => {
     setScrapItemId(inventoryItemId);
     setScrapEffectId(effectId);
   };
@@ -67,7 +91,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   // Pedals placed on the pedalboard are never sold.
   const { duplicateIds, duplicateItems, duplicateFame } = useMemo(() => {
     const pedalboardItemIds = new Set(
-      data.rig?.pedalboardItems?.map((p) => p.itemId) || []
+      data.rig?.pedalboardItems?.map((p) => p.itemId) || [],
     );
     const byEffect = new Map<number | string, EffectInventoryItem[]>();
     for (const item of data.effectInventory || []) {
@@ -86,7 +110,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
       const value = getEffectValue(effect); // rarity-based, same for every copy
       // Best copy first (level desc); keep it, sell the rest.
       const sorted = [...group].sort(
-        (a, b) => getEffectLevel(b, effect) - getEffectLevel(a, effect)
+        (a, b) => getEffectLevel(b, effect) - getEffectLevel(a, effect),
       );
       for (let i = 1; i < sorted.length; i++) {
         const it = sorted[i];
@@ -95,7 +119,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
         items.push({
           id: it.id,
           name: `${effect.brand} ${effect.name}`,
-          rarity: effect.rarity,
+          rarity: getEffectiveRarity(effect.rarity, it.buildLevel),
           level: getEffectLevel(it, effect),
           value,
         });
@@ -126,7 +150,9 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   if (!data.effectInventory || data.effectInventory.length === 0) return null;
 
-  const pedalboardItemIds = new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []);
+  const pedalboardItemIds = new Set(
+    data.rig?.pedalboardItems?.map((p) => p.itemId) || [],
+  );
 
   // Each owned copy is its own card (distinct rolls). "Collected" still counts unique models.
   const ownedEffectIds = new Set(data.effectInventory.map((i) => i.effectId));
@@ -135,13 +161,23 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   // Single flat grid, sorted rarest-first then newest-first — no per-rarity sections.
   const sortedItems = [...data.effectInventory].sort((a, b) => {
-    const rarityA = EFFECTS_BY_ID.get(a.effectId)?.rarity ?? "Common";
-    const rarityB = EFFECTS_BY_ID.get(b.effectId)?.rarity ?? "Common";
+    // Effective, not mint: a promoted pedal belongs with its new tier.
+    const rarityA = getEffectiveRarity(
+      EFFECTS_BY_ID.get(a.effectId)?.rarity ?? "Common",
+      a.buildLevel,
+    );
+    const rarityB = getEffectiveRarity(
+      EFFECTS_BY_ID.get(b.effectId)?.rarity ?? "Common",
+      b.buildLevel,
+    );
     if (rarityA !== rarityB) return RARITY_RANK[rarityB] - RARITY_RANK[rarityA];
     return b.acquiredAt - a.acquiredAt;
   });
 
-  const handleSellClick = (inventoryItemId: string, effectId: number | string) => {
+  const handleSellClick = (
+    inventoryItemId: string,
+    effectId: number | string,
+  ) => {
     setSelectedItemId(inventoryItemId);
     setSelectedEffectId(effectId);
     setIsDialogOpen(true);
@@ -159,7 +195,10 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
     }
   };
 
-  const handleListClick = (inventoryItemId: string, effectId: number | string) => {
+  const handleListClick = (
+    inventoryItemId: string,
+    effectId: number | string,
+  ) => {
     setListItemId(inventoryItemId);
     setListEffectId(effectId);
     setIsListDialogOpen(true);
@@ -175,38 +214,47 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
     if (listItemId) {
       listOnMarket(
         { itemType: "effect", inventoryItemId: listItemId, price },
-        { onSuccess: closeListDialog }
+        { onSuccess: closeListDialog },
       );
     }
   };
 
   return (
     <>
-      <div className="flex flex-col gap-3 mt-8">
-        <div className="flex flex-col gap-0.5">
-          <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
-          <p className="text-base font-black text-white capitalize tracking-wide">Pedals</p>
+      <div className='mt-8 flex flex-col gap-3'>
+        <div className='flex flex-col gap-0.5'>
+          <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
+            Effects
+          </p>
+          <p className='text-base font-black capitalize tracking-wide text-white'>
+            Pedals
+          </p>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
-            <span className="text-sm font-bold text-zinc-500">/ {totalEffectsCount}</span>
-            <span className="ml-1 text-xs font-medium text-zinc-500">pedals collected</span>
+        <div className='flex flex-wrap items-center justify-between gap-3'>
+          <div className='flex items-baseline gap-1.5'>
+            <span className='text-lg font-black text-white'>
+              {uniqueOwnedCount}
+            </span>
+            <span className='text-sm font-bold text-zinc-500'>
+              / {totalEffectsCount}
+            </span>
+            <span className='ml-1 text-xs font-medium text-zinc-500'>
+              pedals collected
+            </span>
           </div>
 
           {duplicateIds.length > 0 && (
             <button
               onClick={() => setIsBulkSellOpen(true)}
               disabled={isSellingBulk}
-              className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
-              title="Sell every lower-level duplicate, keeping the best copy of each pedal"
-            >
+              className='flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
+              title='Sell every lower-level duplicate, keeping the best copy of each pedal'>
               <Layers size={14} />
               Sell duplicates ({duplicateIds.length})
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
           {sortedItems.map((item) => (
             <EffectCard
               key={item.id}
@@ -224,14 +272,15 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
       </div>
 
       {(() => {
-        const effect = scrapEffectId != null ? EFFECTS_BY_ID.get(scrapEffectId) : null;
+        const effect =
+          scrapEffectId != null ? EFFECTS_BY_ID.get(scrapEffectId) : null;
         const item = scrapItemId
           ? data.effectInventory.find((i) => i.id === scrapItemId)
           : null;
         return effect && item ? (
           <ScrapConfirmDialog
             isOpen
-            itemType="Effect"
+            itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
             parts={getEffectScrapYield(item, effect)}
             onConfirm={handleConfirmScrap}
@@ -245,18 +294,19 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
         isOpen={isBulkSellOpen}
         items={duplicateItems}
         fameReward={duplicateFame}
-        protectedNote="Pedals on your pedalboard are never sold."
+        protectedNote='Pedals on your pedalboard are never sold.'
         onConfirm={handleConfirmBulkSell}
         onCancel={() => setIsBulkSellOpen(false)}
         isLoading={isSellingBulk}
       />
 
       {(() => {
-        const effect = selectedEffectId != null ? EFFECTS_BY_ID.get(selectedEffectId) : null;
+        const effect =
+          selectedEffectId != null ? EFFECTS_BY_ID.get(selectedEffectId) : null;
         return effect ? (
           <SellConfirmDialog
             isOpen={isDialogOpen}
-            itemType="Effect"
+            itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
             fameReward={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
             onConfirm={handleConfirmSell}
@@ -271,11 +321,12 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
       })()}
 
       {(() => {
-        const effect = listEffectId != null ? EFFECTS_BY_ID.get(listEffectId) : null;
+        const effect =
+          listEffectId != null ? EFFECTS_BY_ID.get(listEffectId) : null;
         return effect ? (
           <ListItemDialog
             isOpen={isListDialogOpen}
-            itemType="Effect"
+            itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
             minPrice={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
             currentFame={currentFame}

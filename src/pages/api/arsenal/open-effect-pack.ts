@@ -6,7 +6,8 @@ import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
-const EFFECT_PACK_PROBABILITIES: Record<GuitarRarity, number> = {
+// Partial: `Custom Shop` has no drop chance — it is workshop-only.
+const EFFECT_PACK_PROBABILITIES: Partial<Record<GuitarRarity, number>> = {
   Common: 0.50,
   Uncommon: 0.30,
   Rare: 0.13,

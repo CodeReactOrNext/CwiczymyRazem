@@ -1,4 +1,10 @@
-import type { GuitarDefinition, GuitarRarity, InventoryItem, ItemFeature, ItemStats } from "../types/arsenal.types";
+import type {
+  GuitarDefinition,
+  GuitarRarity,
+  InventoryItem,
+  ItemFeature,
+  ItemStats,
+} from "../types/arsenal.types";
 
 /** Base sell value per rarity — the floor before condition/vintage multipliers. */
 export const RARITY_BASE_VALUE: Record<GuitarRarity, number> = {
@@ -8,6 +14,9 @@ export const RARITY_BASE_VALUE: Record<GuitarRarity, number> = {
   Epic: 150,
   Legendary: 300,
   Mythic: 750,
+  // Never minted at this tier — it is only ever reached through the workshop,
+  // and sell value is pinned to the mint rarity anyway. Present for completeness.
+  "Custom Shop": 1500,
 };
 
 export type ConditionKey = "Relic" | "Worn" | "Good" | "Mint" | "Museum";
@@ -51,19 +60,24 @@ const hashStringToUnit = (s: string): number => {
 };
 
 /** The rolled condition, falling back to a deterministic value for legacy items. */
-export const getItemCondition = (item: Pick<InventoryItem, "id" | "condition">): number =>
-  typeof item.condition === "number" ? item.condition : hashStringToUnit(item.id);
+export const getItemCondition = (
+  item: Pick<InventoryItem, "id" | "condition">,
+): number =>
+  typeof item.condition === "number"
+    ? item.condition
+    : hashStringToUnit(item.id);
 
 // ─── Multipliers ─────────────────────────────────────────────────────────────
 
 /** 0.70 (Relic) → 1.30 (Museum). */
-export const getConditionMultiplier = (condition: number): number => 0.7 + condition * 0.6;
+export const getConditionMultiplier = (condition: number): number =>
+  0.7 + condition * 0.6;
 
 /** 1.0 (newest year) → 2.0 (oldest year in the model's range). */
 export const getVintageMultiplier = (
   year: number,
   yearFrom: number,
-  yearTo: number
+  yearTo: number,
 ): number => {
   if (yearTo <= yearFrom) return 1;
   const age = Math.min(1, Math.max(0, (yearTo - year) / (yearTo - yearFrom)));
@@ -94,33 +108,171 @@ export interface GuitarFeatureDef {
 /** Pool of rollable, invisible-on-image guitar features. Each adds points to its category. */
 export const GUITAR_FEATURES: GuitarFeatureDef[] = [
   // Pickups / electronics
-  { id: "coil-split", label: "Coil-split", category: "pickups", min: 1, max: 3 },
-  { id: "hand-wound", label: "Hand-wound pickups", category: "pickups", min: 3, max: 5 },
-  { id: "push-pull", label: "Push-pull pot", category: "pickups", min: 1, max: 3 },
-  { id: "phase-switch", label: "Phase switch", category: "pickups", min: 1, max: 2 },
-  { id: "treble-bleed", label: "Treble bleed", category: "pickups", min: 1, max: 2 },
+  {
+    id: "coil-split",
+    label: "Coil-split",
+    category: "pickups",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "hand-wound",
+    label: "Hand-wound pickups",
+    category: "pickups",
+    min: 3,
+    max: 5,
+  },
+  {
+    id: "push-pull",
+    label: "Push-pull pot",
+    category: "pickups",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "phase-switch",
+    label: "Phase switch",
+    category: "pickups",
+    min: 1,
+    max: 2,
+  },
+  {
+    id: "treble-bleed",
+    label: "Treble bleed",
+    category: "pickups",
+    min: 1,
+    max: 2,
+  },
   { id: "cts-pots", label: "CTS pots", category: "pickups", min: 1, max: 2 },
-  { id: "pio-caps", label: "Paper-in-oil caps", category: "pickups", min: 1, max: 3 },
-  { id: "active-preamp", label: "Active preamp", category: "pickups", min: 2, max: 4 },
-  { id: "copper-shielding", label: "Copper shielding", category: "pickups", min: 1, max: 2 },
+  {
+    id: "pio-caps",
+    label: "Paper-in-oil caps",
+    category: "pickups",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "active-preamp",
+    label: "Active preamp",
+    category: "pickups",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "copper-shielding",
+    label: "Copper shielding",
+    category: "pickups",
+    min: 1,
+    max: 2,
+  },
   // Sustain / hardware / resonance
   { id: "bone-nut", label: "Bone nut", category: "sustain", min: 1, max: 2 },
-  { id: "brass-trem-block", label: "Brass trem block", category: "sustain", min: 2, max: 4 },
-  { id: "steel-saddles", label: "Steel saddles", category: "sustain", min: 1, max: 3 },
-  { id: "locking-tuners", label: "Locking tuners", category: "sustain", min: 1, max: 2 },
-  { id: "torrefied-wood", label: "Torrefied wood", category: "sustain", min: 2, max: 4 },
-  { id: "chambered-body", label: "Chambered body", category: "sustain", min: 1, max: 3 },
+  {
+    id: "brass-trem-block",
+    label: "Brass trem block",
+    category: "sustain",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "steel-saddles",
+    label: "Steel saddles",
+    category: "sustain",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "locking-tuners",
+    label: "Locking tuners",
+    category: "sustain",
+    min: 1,
+    max: 2,
+  },
+  {
+    id: "torrefied-wood",
+    label: "Torrefied wood",
+    category: "sustain",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "chambered-body",
+    label: "Chambered body",
+    category: "sustain",
+    min: 1,
+    max: 3,
+  },
   // Play feeling / setup / neck
-  { id: "plek", label: "Plek'd setup", category: "playFeeling", min: 2, max: 4 },
-  { id: "stainless-frets", label: "Stainless frets", category: "playFeeling", min: 2, max: 4 },
-  { id: "rolled-edges", label: "Rolled edges", category: "playFeeling", min: 1, max: 3 },
-  { id: "scalloped-frets", label: "Scalloped frets", category: "playFeeling", min: 1, max: 3 },
-  { id: "compound-radius", label: "Compound radius", category: "playFeeling", min: 2, max: 4 },
-  { id: "graphite-neck", label: "Graphite-reinforced neck", category: "playFeeling", min: 1, max: 2 },
-  { id: "satin-neck", label: "Satin neck", category: "playFeeling", min: 1, max: 2 },
-  { id: "low-action", label: "Pro low action", category: "playFeeling", min: 1, max: 2 },
-  { id: "truss-wheel", label: "Truss-rod wheel", category: "playFeeling", min: 1, max: 1 },
-  { id: "fret-level", label: "Fret level & crown", category: "playFeeling", min: 1, max: 3 },
+  {
+    id: "plek",
+    label: "Plek'd setup",
+    category: "playFeeling",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "stainless-frets",
+    label: "Stainless frets",
+    category: "playFeeling",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "rolled-edges",
+    label: "Rolled edges",
+    category: "playFeeling",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "scalloped-frets",
+    label: "Scalloped frets",
+    category: "playFeeling",
+    min: 1,
+    max: 3,
+  },
+  {
+    id: "compound-radius",
+    label: "Compound radius",
+    category: "playFeeling",
+    min: 2,
+    max: 4,
+  },
+  {
+    id: "graphite-neck",
+    label: "Graphite-reinforced neck",
+    category: "playFeeling",
+    min: 1,
+    max: 2,
+  },
+  {
+    id: "satin-neck",
+    label: "Satin neck",
+    category: "playFeeling",
+    min: 1,
+    max: 2,
+  },
+  {
+    id: "low-action",
+    label: "Pro low action",
+    category: "playFeeling",
+    min: 1,
+    max: 2,
+  },
+  {
+    id: "truss-wheel",
+    label: "Truss-rod wheel",
+    category: "playFeeling",
+    min: 1,
+    max: 1,
+  },
+  {
+    id: "fret-level",
+    label: "Fret level & crown",
+    category: "playFeeling",
+    min: 1,
+    max: 3,
+  },
 ];
 
 const FEATURES_BY_ID = new Map(GUITAR_FEATURES.map((f) => [f.id, f]));
@@ -133,6 +285,7 @@ export const RARITY_MAX_FEATURES: Record<GuitarRarity, number> = {
   Epic: 7,
   Legendary: 10,
   Mythic: 13,
+  "Custom Shop": 15,
 };
 
 /** Independent chance each available slot actually gets filled with a feature. */
@@ -142,7 +295,8 @@ export interface ResolvedFeature extends GuitarFeatureDef {
   points: number;
 }
 
-const sumFeatureStats = (features: ItemFeature[]): ItemStats => {
+/** Per-category sums for a feature list. Re-run whenever the workshop edits one. */
+export const sumFeatureStats = (features: ItemFeature[]): ItemStats => {
   const stats: ItemStats = { pickups: 0, sustain: 0, playFeeling: 0 };
   for (const f of features) {
     const def = FEATURES_BY_ID.get(f.id);
@@ -157,7 +311,7 @@ const sumFeatureStats = (features: ItemFeature[]): ItemStats => {
  * returns `undefined`). Returns both the feature list and the derived per-category sums.
  */
 export const rollItemFeatures = (
-  rarity: GuitarRarity
+  rarity: GuitarRarity,
 ): { features: ItemFeature[]; stats: ItemStats } | undefined => {
   const max = RARITY_MAX_FEATURES[rarity] ?? 2;
   // Fisher–Yates shuffle so distinct features are picked.
@@ -170,7 +324,8 @@ export const rollItemFeatures = (
   for (let i = 0; i < max && i < pool.length; i++) {
     if (Math.random() < FEATURE_FILL_CHANCE) {
       const def = pool[i];
-      const points = def.min + Math.floor(Math.random() * (def.max - def.min + 1));
+      const points =
+        def.min + Math.floor(Math.random() * (def.max - def.min + 1));
       features.push({ id: def.id, points });
     }
   }
@@ -179,7 +334,9 @@ export const rollItemFeatures = (
 };
 
 /** Resolved feature list (with labels/categories) for display. */
-export const getItemFeatures = (item: Pick<InventoryItem, "features">): ResolvedFeature[] =>
+export const getItemFeatures = (
+  item: Pick<InventoryItem, "features">,
+): ResolvedFeature[] =>
   (item.features ?? [])
     .map((f) => {
       const def = FEATURES_BY_ID.get(f.id);
@@ -188,8 +345,9 @@ export const getItemFeatures = (item: Pick<InventoryItem, "features">): Resolved
     .filter((f): f is ResolvedFeature => f !== null);
 
 /** Per-category stat sums, or `null` when the guitar has no features (plain / legacy). */
-export const getItemStats = (item: Pick<InventoryItem, "stats">): ItemStats | null =>
-  item.stats ?? null;
+export const getItemStats = (
+  item: Pick<InventoryItem, "stats">,
+): ItemStats | null => item.stats ?? null;
 
 /** Flat level contribution from rarity. */
 export const RARITY_LEVEL_BONUS: Record<GuitarRarity, number> = {
@@ -199,6 +357,7 @@ export const RARITY_LEVEL_BONUS: Record<GuitarRarity, number> = {
   Epic: 13,
   Legendary: 22,
   Mythic: 35,
+  "Custom Shop": 50,
 };
 
 /** Level contribution from country of origin (prestige). Unlisted → 0. */
@@ -229,12 +388,76 @@ export const RARITY_BUILD_GAIN: Record<GuitarRarity, number> = {
   Epic: 2,
   Legendary: 3,
   Mythic: 4,
+  "Custom Shop": 5,
 };
 
-/** Item Level a build level adds on this item. Uncapped — see `data/workshop.ts`. */
+// ─── Rarity promotion ────────────────────────────────────────────────────────
+
+/** Low → high. `Custom Shop` sits at the top and is workshop-only. */
+export const RARITY_LADDER: GuitarRarity[] = [
+  "Common",
+  "Uncommon",
+  "Rare",
+  "Epic",
+  "Legendary",
+  "Mythic",
+  "Custom Shop",
+];
+
+/** Build levels that buy one rarity promotion. */
+export const BUILDS_PER_PROMOTION = 3;
+
+/** Most promotions any single item can earn, however far it starts down the ladder. */
+export const MAX_PROMOTIONS = 3;
+
+/**
+ * How many promotions this item could still earn — capped both by the three-per-item
+ * rule and by the top of the ladder, so a Mythic gets one (to Custom Shop) and a
+ * Common gets the full three.
+ */
+export const getPromotionsAvailable = (mintRarity: GuitarRarity): number => {
+  const index = RARITY_LADDER.indexOf(mintRarity);
+  if (index === -1) return 0;
+  return Math.min(MAX_PROMOTIONS, RARITY_LADDER.length - 1 - index);
+};
+
+/** Promotions actually earned so far — one per three build levels, then it stops. */
+export const getPromotions = (
+  mintRarity: GuitarRarity,
+  buildLevel: number | undefined,
+): number =>
+  Math.min(
+    getPromotionsAvailable(mintRarity),
+    Math.floor((buildLevel ?? 0) / BUILDS_PER_PROMOTION),
+  );
+
+/**
+ * The rarity an item currently *is*, as opposed to the one it was minted at.
+ *
+ * Derived from `buildLevel` rather than stored: the promotion count is already
+ * implied by the build level, so there is no second piece of state to keep in
+ * sync and nothing to migrate on existing accounts.
+ *
+ * Note what deliberately keeps using the *mint* rarity: `getItemValue` and the
+ * scrap yield. Promoting must not inflate what the game pays out, and it must not
+ * turn a promoted item into a Unique-part source — that would close a loop where
+ * Unique parts spent on a promotion come straight back out of the teardown.
+ */
+export const getEffectiveRarity = (
+  mintRarity: GuitarRarity,
+  buildLevel: number | undefined,
+): GuitarRarity => {
+  const index = RARITY_LADDER.indexOf(mintRarity);
+  if (index === -1) return mintRarity;
+  return (
+    RARITY_LADDER[index + getPromotions(mintRarity, buildLevel)] ?? mintRarity
+  );
+};
+
+/** Item Level a build level adds. Uses the promoted rarity, so gains compound. */
 export const getBuildLevelPoints = (
   buildLevel: number | undefined,
-  rarity: GuitarRarity
+  rarity: GuitarRarity,
 ): number => (buildLevel ?? 0) * (RARITY_BUILD_GAIN[rarity] ?? 1);
 
 /**
@@ -243,19 +466,40 @@ export const getBuildLevelPoints = (
  * features boost it and the workshop keeps boosting it without a ceiling.
  */
 export const getItemLevel = (
-  item: Pick<InventoryItem, "id" | "condition" | "year" | "country" | "stats" | "buildLevel">,
-  guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">
+  item: Pick<
+    InventoryItem,
+    "id" | "condition" | "year" | "country" | "stats" | "buildLevel"
+  >,
+  guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">,
 ): number => {
   const s = item.stats;
+  // Promotions feed the level twice over — a bigger rarity bonus and a bigger
+  // per-build gain — which is what makes the third promotion worth the grind.
+  const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
   const featurePoints = s ? s.pickups + s.sustain + s.playFeeling : 0;
-  const rarityPoints = RARITY_LEVEL_BONUS[guitar.rarity] ?? 0;
+  const rarityPoints = RARITY_LEVEL_BONUS[rarity] ?? 0;
   const conditionPoints = Math.round(getItemCondition(item) * 10);
   const vintagePoints = Math.round(
-    (getVintageMultiplier(item.year ?? guitar.yearTo, guitar.yearFrom, guitar.yearTo) - 1) * 8
+    (getVintageMultiplier(
+      item.year ?? guitar.yearTo,
+      guitar.yearFrom,
+      guitar.yearTo,
+    ) -
+      1) *
+      8,
   );
-  const originPoints = item.country ? COUNTRY_LEVEL_BONUS[item.country] ?? 0 : 0;
-  const buildPoints = getBuildLevelPoints(item.buildLevel, guitar.rarity);
-  return featurePoints + rarityPoints + conditionPoints + vintagePoints + originPoints + buildPoints;
+  const originPoints = item.country
+    ? (COUNTRY_LEVEL_BONUS[item.country] ?? 0)
+    : 0;
+  const buildPoints = getBuildLevelPoints(item.buildLevel, rarity);
+  return (
+    featurePoints +
+    rarityPoints +
+    conditionPoints +
+    vintagePoints +
+    originPoints +
+    buildPoints
+  );
 };
 
 /**
@@ -268,18 +512,25 @@ export const getItemLevel = (
  */
 export const getItemValue = (
   item: Pick<InventoryItem, "id" | "condition" | "year" | "mintCondition">,
-  guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">
+  guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">,
 ): number => {
   const base = RARITY_BASE_VALUE[guitar.rarity] ?? 0;
-  const condMult = getConditionMultiplier(item.mintCondition ?? getItemCondition(item));
-  const vintMult = getVintageMultiplier(item.year ?? guitar.yearTo, guitar.yearFrom, guitar.yearTo);
+  const condMult = getConditionMultiplier(
+    item.mintCondition ?? getItemCondition(item),
+  );
+  const vintMult = getVintageMultiplier(
+    item.year ?? guitar.yearTo,
+    guitar.yearFrom,
+    guitar.yearTo,
+  );
   return Math.round(base * condMult * vintMult);
 };
 
 // ─── Rollers (used server-side when minting a new item) ───────────────────────
 
 /** Triangular-ish roll (avg of two uniforms) — clusters around the middle grades. */
-export const rollCondition = (): number => Math.round(((Math.random() + Math.random()) / 2) * 1000) / 1000;
+export const rollCondition = (): number =>
+  Math.round(((Math.random() + Math.random()) / 2) * 1000) / 1000;
 
 /** Year skewed toward newer; old years (true vintage) are rare. */
 export const rollVintageYear = (yearFrom: number, yearTo: number): number => {

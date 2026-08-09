@@ -15,6 +15,8 @@ const MS_PER_DAY = 86_400_000;
 
 /** Guaranteed rarity spread of the daily pool — sums to DAILY_POOL_SIZE. */
 export const DAILY_POOL_SLOTS: Record<GuitarRarity, number> = {
+  // Custom Shop is workshop-only, so it never enters a drop pool.
+  "Custom Shop": 0,
   Mythic: 1,
   Legendary: 1,
   Epic: 2,
@@ -87,7 +89,9 @@ export const getDailyPool = (date: Date = new Date()): DailyPoolEntry[] => {
         def,
       })),
     ];
-    pool.push(...seededShuffle(candidates, random).slice(0, DAILY_POOL_SLOTS[rarity]));
+    pool.push(
+      ...seededShuffle(candidates, random).slice(0, DAILY_POOL_SLOTS[rarity]),
+    );
   }
   return pool;
 };

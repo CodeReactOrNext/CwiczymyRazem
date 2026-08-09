@@ -5,6 +5,7 @@ import {
   getBuildQuote,
   getEffectSubject,
   getGuitarSubject,
+  recipeToParts,
   subtractParts,
 } from "feature/arsenal/data/workshop";
 import type {
@@ -90,7 +91,7 @@ export default async function handler(
             })();
 
       const quote = getBuildQuote(subject, wallet, fame);
-      if (!quote.canBuild || !quote.payment) {
+      if (!quote.canBuild) {
         const failed = quote.checks.find((c) => !c.ok);
         throw new Error(
           failed
@@ -98,6 +99,7 @@ export default async function handler(
             : "REQUIREMENT_PARTS",
         );
       }
+      const spent = recipeToParts(quote.recipe);
 
       const buildLevel = subject.buildLevel + 1;
       const upgraded = {
@@ -115,7 +117,7 @@ export default async function handler(
           ? (newList as EffectInventoryItem[])
           : effectInventory;
 
-      const newParts = subtractParts(wallet, quote.payment.parts);
+      const newParts = subtractParts(wallet, spent);
       const newFame = fame - quote.requirement.fame;
 
       const rigLevel = getRigLevel({
@@ -136,7 +138,10 @@ export default async function handler(
         buildLevel,
         modName: quote.modName,
         levelGain: quote.gain,
-        spent: quote.payment.parts,
+        spent,
+        // Returned so the client can render the finished item immediately,
+        // instead of flashing the old card until the refetch lands.
+        item: upgraded,
         newParts,
         newFame,
         rigLevel,

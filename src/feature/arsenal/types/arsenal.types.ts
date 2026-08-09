@@ -61,13 +61,18 @@ export interface EffectInventoryItem {
   buildLog?: string[];
 }
 
+/**
+ * `Custom Shop` is the one tier no case can drop — it exists only at the top of the
+ * workshop's promotion ladder, so a player who owns one built it themselves.
+ */
 export type GuitarRarity =
   | "Common"
   | "Uncommon"
   | "Rare"
   | "Epic"
   | "Legendary"
-  | "Mythic";
+  | "Mythic"
+  | "Custom Shop";
 
 /** Scrap parts run on their own 3-step scale — item rarity decides which tiers roll. */
 export type PartTier = "Standard" | "Epic" | "Legendary" | "Unique";
@@ -261,8 +266,30 @@ export interface WorkshopBuildResult {
   /** Item Level this level was worth. */
   levelGain: number;
   spent: ScrapPart[];
+  /** The finished item, so the result card renders without waiting for a refetch. */
+  item: InventoryItem | EffectInventoryItem;
   newParts: ScrapPart[];
   newFame: number;
+  rigLevel: number;
+}
+
+/** Fitting a new mod, or re-rolling the value of one already on the item. */
+export type WorkshopModAction = "fit" | "reroll";
+
+export interface WorkshopModResult {
+  action: WorkshopModAction;
+  /** The feature that was fitted or re-rolled. */
+  featureId: string;
+  label: string;
+  points: number;
+  /** The value before a re-roll — absent on a fresh fit. */
+  pointsBefore?: number;
+  /** Item Level the job was worth. Negative when a re-roll came out worse. */
+  levelGain: number;
+  spent: ScrapPart[];
+  /** The finished item, so the result card renders without waiting for a refetch. */
+  item: InventoryItem | EffectInventoryItem;
+  newParts: ScrapPart[];
   rigLevel: number;
 }
 
@@ -271,6 +298,8 @@ export interface WorkshopRepairResult {
   condition: number;
   levelGain: number;
   spent: ScrapPart[];
+  /** The finished item, so the result card renders without waiting for a refetch. */
+  item: InventoryItem | EffectInventoryItem;
   newParts: ScrapPart[];
   rigLevel: number;
 }

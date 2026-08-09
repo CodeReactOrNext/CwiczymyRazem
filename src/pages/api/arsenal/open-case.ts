@@ -23,11 +23,12 @@ const GUITAR_CHANCE = 0.6;
 // Flip to false to silence the public activity feed (e.g. while testing).
 const LOG_CASE_OPENS = true;
 
-function drawRarity(probabilities: Record<GuitarRarity, number>): GuitarRarity {
+// Partial: `Custom Shop` has no drop chance to state — it is workshop-only.
+function drawRarity(probabilities: Partial<Record<GuitarRarity, number>>): GuitarRarity {
   const roll = Math.random();
   let cumulative = 0;
   for (const [rarity, prob] of Object.entries(probabilities) as [GuitarRarity, number][]) {
-    cumulative += prob;
+    cumulative += prob ?? 0;
     if (roll < cumulative) return rarity;
   }
   return "Common";

@@ -1,6 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemLevel, getItemValue } from "feature/arsenal/data/itemStats";
+import {
+  GUITAR_DEFINITIONS,
+  GUITARS_BY_ID,
+} from "feature/arsenal/data/guitarDefinitions";
+import {
+  getEffectiveRarity,
+  getItemLevel,
+  getItemValue,
+} from "feature/arsenal/data/itemStats";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
@@ -12,11 +19,15 @@ import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { getGuitarScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { Layers,PackageOpen } from "lucide-react";
-import { useEffect,useMemo,useState } from "react";
+import { Layers, PackageOpen } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type { ArsenalUserData, InventoryItem, RigSetup } from "../../types/arsenal.types";
+import type {
+  ArsenalUserData,
+  InventoryItem,
+  RigSetup,
+} from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
@@ -29,7 +40,12 @@ import { GuitarCard } from "./GuitarCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
 
 const GUITAR_FAME_VALUES: Record<string, number> = {
-  Common: 15, Uncommon: 30, Rare: 75, Epic: 150, Legendary: 300, Mythic: 750,
+  Common: 15,
+  Uncommon: 30,
+  Rare: 75,
+  Epic: 150,
+  Legendary: 300,
+  Mythic: 750,
 };
 
 interface GuitarInventoryProps {
@@ -72,7 +88,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
       const sorted = [...group].sort(
         (a, b) =>
           getItemLevel(b, guitar) - getItemLevel(a, guitar) ||
-          getItemValue(b, guitar) - getItemValue(a, guitar)
+          getItemValue(b, guitar) - getItemValue(a, guitar),
       );
       for (let i = 1; i < sorted.length; i++) {
         const it = sorted[i];
@@ -83,7 +99,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
         items.push({
           id: it.id,
           name: `${guitar.brand} ${guitar.name}`,
-          rarity: guitar.rarity,
+          rarity: getEffectiveRarity(guitar.rarity, it.buildLevel),
           level: getItemLevel(it, guitar),
           value,
         });
@@ -97,12 +113,19 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   const handleEquipTo = (item: InventoryItem, target: EquipTarget) => {
     if (target === "profile") {
-      equip({ guitarId: item.guitarId, itemId: item.id, year: item.year, country: item.country });
+      equip({
+        guitarId: item.guitarId,
+        itemId: item.id,
+        year: item.year,
+        country: item.country,
+      });
       return;
     }
     // Place into a rig slot without touching the avatar/profile guitar.
     // A guitar instance can occupy only one slot — clear it from any other slot first.
-    const newSlots = rig.guitarSlots.map((id) => (id === item.id ? null : id)) as RigSetup["guitarSlots"];
+    const newSlots = rig.guitarSlots.map((id) =>
+      id === item.id ? null : id,
+    ) as RigSetup["guitarSlots"];
     newSlots[target] = item.id;
     saveRig({ rig: { ...rig, guitarSlots: newSlots } });
   };
@@ -120,16 +143,25 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [selectedGuitarId, setSelectedGuitarId] = useState<number | string | null>(null);
+  const [selectedGuitarId, setSelectedGuitarId] = useState<
+    number | string | null
+  >(null);
   const [equipItem, setEquipItem] = useState<InventoryItem | null>(null);
   const [isListDialogOpen, setIsListDialogOpen] = useState(false);
   const [listItemId, setListItemId] = useState<string | null>(null);
-  const [listGuitarId, setListGuitarId] = useState<number | string | null>(null);
+  const [listGuitarId, setListGuitarId] = useState<number | string | null>(
+    null,
+  );
   const [isBulkSellOpen, setIsBulkSellOpen] = useState(false);
   const [scrapItemId, setScrapItemId] = useState<string | null>(null);
-  const [scrapGuitarId, setScrapGuitarId] = useState<number | string | null>(null);
+  const [scrapGuitarId, setScrapGuitarId] = useState<number | string | null>(
+    null,
+  );
 
-  const handleScrapClick = (inventoryItemId: string, guitarId: number | string) => {
+  const handleScrapClick = (
+    inventoryItemId: string,
+    guitarId: number | string,
+  ) => {
     setScrapItemId(inventoryItemId);
     setScrapGuitarId(guitarId);
   };
@@ -162,9 +194,11 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
   if (data.inventory.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-20 text-zinc-500">
-        <PackageOpen size={48} className="opacity-30" />
-        <p className="text-sm font-medium">Your collection is empty. Open a case to start!</p>
+      <div className='flex flex-col items-center justify-center gap-4 py-20 text-zinc-500'>
+        <PackageOpen size={48} className='opacity-30' />
+        <p className='text-sm font-medium'>
+          Your collection is empty. Open a case to start!
+        </p>
       </div>
     );
   }
@@ -176,19 +210,33 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
   // Single flat grid, sorted rarest-first; same-guitar copies stay together
   // (highest level first) instead of being split into per-rarity sections.
   const sortedItems = [...data.inventory].sort((a, b) => {
-    const rarityA = GUITARS_BY_ID.get(a.guitarId)?.rarity ?? "Common";
-    const rarityB = GUITARS_BY_ID.get(b.guitarId)?.rarity ?? "Common";
+    // Effective, not mint: a promoted guitar belongs with its new tier.
+    const rarityA = getEffectiveRarity(
+      GUITARS_BY_ID.get(a.guitarId)?.rarity ?? "Common",
+      a.buildLevel,
+    );
+    const rarityB = getEffectiveRarity(
+      GUITARS_BY_ID.get(b.guitarId)?.rarity ?? "Common",
+      b.buildLevel,
+    );
     if (rarityA !== rarityB) return RARITY_RANK[rarityB] - RARITY_RANK[rarityA];
     if (a.guitarId !== b.guitarId) {
-      return String(a.guitarId).localeCompare(String(b.guitarId), undefined, { numeric: true });
+      return String(a.guitarId).localeCompare(String(b.guitarId), undefined, {
+        numeric: true,
+      });
     }
     const guitar = GUITARS_BY_ID.get(a.guitarId);
-    const levelDiff = guitar ? getItemLevel(b, guitar) - getItemLevel(a, guitar) : 0;
+    const levelDiff = guitar
+      ? getItemLevel(b, guitar) - getItemLevel(a, guitar)
+      : 0;
     if (levelDiff !== 0) return levelDiff;
     return b.acquiredAt - a.acquiredAt;
   });
 
-  const handleSellClick = (inventoryItemId: string, guitarId: number | string) => {
+  const handleSellClick = (
+    inventoryItemId: string,
+    guitarId: number | string,
+  ) => {
     setSelectedItemId(inventoryItemId);
     setSelectedGuitarId(guitarId);
     setIsDialogOpen(true);
@@ -206,7 +254,10 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     }
   };
 
-  const handleListClick = (inventoryItemId: string, guitarId: number | string) => {
+  const handleListClick = (
+    inventoryItemId: string,
+    guitarId: number | string,
+  ) => {
     setListItemId(inventoryItemId);
     setListGuitarId(guitarId);
     setIsListDialogOpen(true);
@@ -222,40 +273,48 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     if (listItemId) {
       listOnMarket(
         { itemType: "guitar", inventoryItemId: listItemId, price },
-        { onSuccess: closeListDialog }
+        { onSuccess: closeListDialog },
       );
     }
   };
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-lg font-black text-white">{uniqueOwnedCount}</span>
-          <span className="text-sm font-bold text-zinc-500">/ {totalGuitarsCount}</span>
-          <span className="ml-1 text-xs font-medium text-zinc-500">guitars collected</span>
+      <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
+        <div className='flex items-baseline gap-1.5'>
+          <span className='text-lg font-black text-white'>
+            {uniqueOwnedCount}
+          </span>
+          <span className='text-sm font-bold text-zinc-500'>
+            / {totalGuitarsCount}
+          </span>
+          <span className='ml-1 text-xs font-medium text-zinc-500'>
+            guitars collected
+          </span>
         </div>
 
         {duplicateIds.length > 0 && (
           <button
             onClick={() => setIsBulkSellOpen(true)}
             disabled={isSellingBulk}
-            className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
-            title="Sell every lower-level duplicate, keeping the best copy of each guitar"
-          >
+            className='flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
+            title='Sell every lower-level duplicate, keeping the best copy of each guitar'>
             <Layers size={14} />
             Sell duplicates ({duplicateIds.length})
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
         {sortedItems.map((item) => (
           <GuitarCard
             key={item.id}
             item={item}
             isEquipped={data.equippedItemId === item.id}
-            rigSlot={(() => { const i = rig.guitarSlots.indexOf(item.id); return i >= 0 ? i : null; })()}
+            rigSlot={(() => {
+              const i = rig.guitarSlots.indexOf(item.id);
+              return i >= 0 ? i : null;
+            })()}
             onEquipClick={() => setEquipItem(item)}
             isEquipping={isEquipping}
             onSellClick={handleSellClick}
@@ -269,16 +328,21 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
       </div>
 
       {(() => {
-        const guitar = selectedGuitarId != null ? GUITARS_BY_ID.get(selectedGuitarId) : null;
+        const guitar =
+          selectedGuitarId != null ? GUITARS_BY_ID.get(selectedGuitarId) : null;
         const selectedItem = selectedItemId
           ? data.inventory.find((i) => i.id === selectedItemId)
           : null;
         return guitar ? (
           <SellConfirmDialog
             isOpen={isDialogOpen}
-            itemType="Guitar"
+            itemType='Guitar'
             itemName={`${guitar.brand} ${guitar.name}`}
-            fameReward={selectedItem ? getItemValue(selectedItem, guitar) : GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
+            fameReward={
+              selectedItem
+                ? getItemValue(selectedItem, guitar)
+                : (GUITAR_FAME_VALUES[guitar.rarity] ?? 0)
+            }
             onConfirm={handleConfirmSell}
             onCancel={() => {
               setIsDialogOpen(false);
@@ -291,14 +355,21 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
       })()}
 
       {(() => {
-        const guitar = listGuitarId != null ? GUITARS_BY_ID.get(listGuitarId) : null;
-        const listItem = listItemId ? data.inventory.find((i) => i.id === listItemId) : null;
+        const guitar =
+          listGuitarId != null ? GUITARS_BY_ID.get(listGuitarId) : null;
+        const listItem = listItemId
+          ? data.inventory.find((i) => i.id === listItemId)
+          : null;
         return guitar ? (
           <ListItemDialog
             isOpen={isListDialogOpen}
-            itemType="Guitar"
+            itemType='Guitar'
             itemName={`${guitar.brand} ${guitar.name}`}
-            minPrice={listItem ? getItemValue(listItem, guitar) : GUITAR_FAME_VALUES[guitar.rarity] ?? 0}
+            minPrice={
+              listItem
+                ? getItemValue(listItem, guitar)
+                : (GUITAR_FAME_VALUES[guitar.rarity] ?? 0)
+            }
             currentFame={currentFame}
             onConfirm={handleConfirmList}
             onCancel={closeListDialog}
@@ -308,12 +379,15 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
       })()}
 
       {(() => {
-        const guitar = scrapGuitarId != null ? GUITARS_BY_ID.get(scrapGuitarId) : null;
-        const item = scrapItemId ? data.inventory.find((i) => i.id === scrapItemId) : null;
+        const guitar =
+          scrapGuitarId != null ? GUITARS_BY_ID.get(scrapGuitarId) : null;
+        const item = scrapItemId
+          ? data.inventory.find((i) => i.id === scrapItemId)
+          : null;
         return guitar && item ? (
           <ScrapConfirmDialog
             isOpen
-            itemType="Guitar"
+            itemType='Guitar'
             itemName={`${guitar.brand} ${guitar.name}`}
             parts={getGuitarScrapYield(item, guitar)}
             onConfirm={handleConfirmScrap}
@@ -334,7 +408,11 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
 
       <EquipTargetDialog
         isOpen={equipItem !== null}
-        itemName={equipItem ? `${GUITARS_BY_ID.get(equipItem.guitarId)?.brand ?? ""} ${GUITARS_BY_ID.get(equipItem.guitarId)?.name ?? ""}` : ""}
+        itemName={
+          equipItem
+            ? `${GUITARS_BY_ID.get(equipItem.guitarId)?.brand ?? ""} ${GUITARS_BY_ID.get(equipItem.guitarId)?.name ?? ""}`
+            : ""
+        }
         itemId={equipItem?.id ?? ""}
         isEquipped={data.equippedItemId === equipItem?.id}
         rigSlots={rig.guitarSlots}

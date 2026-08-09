@@ -33,19 +33,24 @@ export const RARITY_SLOT_COUNT: Record<GuitarRarity, number> = {
   Epic: 3,
   Legendary: 3,
   Mythic: 4,
+  "Custom Shop": 4,
 };
 
 /**
  * The tier the *first* slot comes out at. Six rarities collapse onto three part
  * tiers in pairs; later slots step down from here.
  */
-export const RARITY_PART_TIER: Record<GuitarRarity, Exclude<PartTier, "Unique">> = {
+export const RARITY_PART_TIER: Record<
+  GuitarRarity,
+  Exclude<PartTier, "Unique">
+> = {
   Common: "Standard",
   Uncommon: "Standard",
   Rare: "Epic",
   Epic: "Epic",
   Legendary: "Legendary",
   Mythic: "Legendary",
+  "Custom Shop": "Legendary",
 };
 
 /**
@@ -54,10 +59,25 @@ export const RARITY_PART_TIER: Record<GuitarRarity, Exclude<PartTier, "Unique">>
  * than three flat Legendaries — the headline parts stay special without the rest
  * of the teardown being worthless.
  */
-const slotTierPenalty = (slotIndex: number): number => Math.floor(slotIndex / 2);
+const slotTierPenalty = (slotIndex: number): number =>
+  Math.floor(slotIndex / 2);
 
 /** Only Mythic gear yields Unique parts, and only on the parts that visibly show. */
 export const UNIQUE_PART_RARITY: GuitarRarity = "Mythic";
+
+/**
+ * Screws every teardown gives up, on top of whatever the BOM pays out.
+ *
+ * Scaled by how deep the teardown goes, so stripping a Mythic leaves a bigger pile
+ * of hardware than snapping a Common in half. These are the workshop's cheapest
+ * ingredient and the one a new player has to be able to stockpile, so they stay
+ * the most abundant thing in the game — but only just: at the first rate they
+ * piled up faster than any recipe could spend them.
+ *
+ * Common 5 · Uncommon 7 · Rare–Legendary 9 · Mythic 11.
+ */
+export const getScrewYield = (rarity: GuitarRarity): number =>
+  3 + 2 * (RARITY_SLOT_COUNT[rarity] ?? 1);
 
 /**
  * Maps rolled instance features onto the part they physically are, so a guitar
@@ -102,7 +122,9 @@ export interface ScrapInput {
   features?: ItemFeature[];
 }
 
-const PART_ORDER = new Map<PartId, number>(PART_DEFINITIONS.map((p, i) => [p.id, i]));
+const PART_ORDER = new Map<PartId, number>(
+  PART_DEFINITIONS.map((p, i) => [p.id, i]),
+);
 
 /** Which parts this instance's features push one tier up. */
 export const getUpgradedParts = (features: ItemFeature[] = []): Set<PartId> => {
@@ -114,9 +136,15 @@ export const getUpgradedParts = (features: ItemFeature[] = []): Set<PartId> => {
   return upgraded;
 };
 
-export const getScrapYield = ({ bom, rarity, features }: ScrapInput): ScrapPart[] => {
+export const getScrapYield = ({
+  bom,
+  rarity,
+  features,
+}: ScrapInput): ScrapPart[] => {
   const slotCount = RARITY_SLOT_COUNT[rarity] ?? 1;
-  const baseTierIndex = PART_TIERS.indexOf(RARITY_PART_TIER[rarity] ?? "Standard");
+  const baseTierIndex = PART_TIERS.indexOf(
+    RARITY_PART_TIER[rarity] ?? "Standard",
+  );
   const upgraded = getUpgradedParts(features);
 
   // Kept in BOM order — the headline part reads first in the tooltip.
@@ -140,8 +168,15 @@ export const getScrapYield = ({ bom, rarity, features }: ScrapInput): ScrapPart[
     parts.push({ partId, tier, qty });
   }
 
-  // Defensive: an empty BOM must still pay out something.
-  if (parts.length === 0) parts.push({ partId: "screws", tier: "Standard", qty: 1 });
+  // Screws come off *everything*, so they are handed out on top of the BOM rather
+  // than competing for a slot in it. Only four BOMs in the game list them, which
+  // left screws scarcer than pickups — the exact opposite of what filler should be,
+  // and unusable as the workshop's entry-level ingredient. This also covers the
+  // defensive case of a BOM authored empty: a teardown always pays out something.
+  const bonus = getScrewYield(rarity);
+  const screwRow = parts.find((p) => p.partId === "screws");
+  if (screwRow) screwRow.qty += bonus;
+  else parts.push({ partId: "screws", tier: "Standard", qty: bonus });
 
   return parts;
 };
@@ -168,6 +203,6 @@ export const mergeScrapParts = (yields: ScrapPart[][]): ScrapPart[] => {
   return [...tally.values()].sort(
     (a, b) =>
       (PART_ORDER.get(a.partId) ?? 0) - (PART_ORDER.get(b.partId) ?? 0) ||
-      PART_TIERS.indexOf(b.tier) - PART_TIERS.indexOf(a.tier)
+      PART_TIERS.indexOf(b.tier) - PART_TIERS.indexOf(a.tier),
   );
 };
