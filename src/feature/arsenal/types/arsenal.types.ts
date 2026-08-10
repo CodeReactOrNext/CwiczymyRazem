@@ -254,6 +254,8 @@ export interface OpenCaseResult {
   effect?: EffectDefinition;
   effectItem?: EffectInventoryItem;
   newFame: number;
+  /** True if this is the first copy of this guitarId/effectId the user has ever pulled (dex-new), as opposed to a duplicate. */
+  isNewToDex: boolean;
 }
 
 /** Which half of the wallet a workshop job draws on. */

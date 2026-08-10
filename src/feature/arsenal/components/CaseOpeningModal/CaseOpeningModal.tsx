@@ -303,6 +303,18 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     {revealRarity}
                   </motion.p>
 
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-[0.2em]",
+                      result?.isNewToDex ? "text-amber-300" : "text-zinc-500"
+                    )}
+                  >
+                    {result?.isNewToDex ? "New — First Pull" : "Duplicate — Already in Dex"}
+                  </motion.p>
+
                   <div className="relative flex items-center justify-center">
                     {/* Slow-rotating light rays behind the card */}
                     <motion.div

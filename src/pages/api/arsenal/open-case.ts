@@ -110,6 +110,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const condition = rollCondition();
         const rolled = rollItemFeatures(guitar.rarity);
 
+        // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
+        const isNewToDex = !(data.arsenal?.inventory || []).some(
+          (i: InventoryItem) => i.guitarId === guitar.id
+        );
+
         // Mint a global, sequential serial number for this guitar model.
         // Read happens before any write, so it's transaction-safe.
         const serialRef = firestore
@@ -139,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         t.set(serialRef, { count: serial }, { merge: true });
 
-        return { type: "guitar", guitar, newItem, newInventory, newFame };
+        return { type: "guitar", guitar, newItem, newInventory, newFame, isNewToDex };
       } else {
         // Draw effect
         let effect: EffectDefinition;
@@ -154,6 +159,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const effectYear = rollEffectYear(effect);
         const effectCountry = rollEffectCountry(effect);
         const effectRolled = rollEffectFeatures(effect.rarity, effect.type);
+
+        // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
+        const isNewToDex = !(data.arsenal?.effectInventory || []).some(
+          (i: EffectInventoryItem) => i.effectId === effect.id
+        );
 
         const effectSerialRef = firestore
           .collection("arsenalSerials")
@@ -181,7 +191,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         t.set(effectSerialRef, { count: effectSerial }, { merge: true });
 
-        return { type: "effect", effect, effectItem, newFame };
+        return { type: "effect", effect, effectItem, newFame, isNewToDex };
       }
     });
 
