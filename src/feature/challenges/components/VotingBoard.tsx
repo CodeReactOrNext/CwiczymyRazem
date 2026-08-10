@@ -142,9 +142,9 @@ const NominationRow = ({
           </button>
         </TooltipTrigger>
         {(nomination.voters?.length ?? 0) > 0 && (
-          <TooltipContent side='left' className='max-w-xs'>
+          <TooltipContent side='left' className='max-w-xs bg-zinc-900 text-white border-white/10'>
             <div className='space-y-1'>
-              <p className='text-[11px] font-semibold text-zinc-400 mb-1'>
+              <p className='text-[11px] font-semibold text-zinc-300 mb-1'>
                 Voted by:
               </p>
               {nomination.voters?.map((voter) => (

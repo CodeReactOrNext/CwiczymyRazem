@@ -121,9 +121,9 @@ const Chat = () => {
                                 <span className='leading-none'>{likes.length}</span>
                               </button>
                             </TooltipTrigger>
-                            <TooltipContent side='top' className='max-w-xs'>
+                            <TooltipContent side='top' className='max-w-xs bg-zinc-900 text-white border-white/10'>
                               <div className='space-y-1'>
-                                <p className='text-[11px] font-semibold text-zinc-400 mb-1'>
+                                <p className='text-[11px] font-semibold text-zinc-300 mb-1'>
                                   Liked by:
                                 </p>
                                 {likes.map((liker) => (
