@@ -231,16 +231,17 @@ service cloud.firestore {
 
     // ─── Challenge nominations ────────────────────────────────────────────────
     // Voting ballot for next month's challenge songs. Any signed-in user may
-    // read nominations or vote (modify only voters array). Creating/nominating
-    // a song is handled server-side via /api/challenges/nominate (Admin SDK) to
-    // validate and rate-limit votes per cycle.
+    // read nominations or vote (modify voters array). Creating/nominating
+    // a song or managing carry-over is handled server-side via Admin SDK
+    // (/api/challenges/nominate for votes, /api/challenges/ensure-current
+    // for carry-over and auto-cleanup of stale nominations).
     match /challengeNominations/{nominationId} {
       allow read:  if request.auth != null;
-      allow create: if false; // Admin SDK only (nominateSong validates votes)
-      // Any signed-in user may vote by modifying ONLY the 'voters' array
+      allow create: if false; // Admin SDK only
+      // Any signed-in user may vote by modifying voters array (voteCount changes with it)
       allow update: if request.auth != null
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voters']);
-      allow delete: if false;
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voters', 'voteCount']);
+      allow delete: if false; // Admin SDK only (auto-cleanup via ensure-current)
     }
 
     // ─── Default: deny everything else ────────────────────────────────────────

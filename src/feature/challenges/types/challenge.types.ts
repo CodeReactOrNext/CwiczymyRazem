@@ -74,6 +74,8 @@ export interface ChallengeNomination {
   voteCount: number;
   voters: Array<{ id: string; name: string }>;
   createdAt: Timestamp;
+  /** How many consecutive months this song didn't make the board. Increments each month it's not in top 5. Auto-cleaned at 3. */
+  monthsWithoutBoardEntry?: number;
 }
 
 export const submissionDocId = (

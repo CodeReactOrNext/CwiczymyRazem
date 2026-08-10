@@ -1,6 +1,7 @@
 import {
   CHALLENGE_SONG_COUNT,
   type ChallengeSong,
+  nominationDocId,
 } from "feature/challenges/types/challenge.types";
 import {
   challengeMonthLabel,
@@ -112,6 +113,67 @@ const fillWithPopularSongs = async (
 };
 
 /**
+ * Carries over nominations from the previous month to the current month,
+ * incrementing the monthsWithoutBoardEntry counter for songs that didn't
+ * make the board. Removes songs that have been on the ballot for 3
+ * consecutive months without making the board.
+ */
+const carryOverNominations = async (
+  currentChallengeId: string,
+  boardSongIds: Set<string>,
+  transaction: Transaction,
+  previousNominations: Array<{ ref: any; data: any }>,
+): Promise<void> => {
+  for (const { ref: nominationRef, data: nomination } of previousNominations) {
+    const songId = nomination.songId;
+    const madeBoard = boardSongIds.has(songId);
+
+    // Calculate new counter
+    const currentCounter = nomination.monthsWithoutBoardEntry ?? 0;
+    const newCounter = madeBoard ? 0 : currentCounter + 1;
+
+    // Delete if exceeded 3 months without board entry
+    if (newCounter >= 3) {
+      transaction.delete(nominationRef);
+      continue;
+    }
+
+    // Carry over to current month with reset votes
+    const newNominationRef = firestore
+      .collection("challengeNominations")
+      .doc(nominationDocId(currentChallengeId, songId));
+
+    // Don't overwrite if already nominated this month
+    const existingSnap = await transaction.get(newNominationRef);
+    if (!existingSnap.exists) {
+      transaction.set(newNominationRef, {
+        ...nomination,
+        challengeId: currentChallengeId,
+        voters: [],
+        voteCount: 0,
+        monthsWithoutBoardEntry: newCounter,
+      });
+    } else if (newCounter > 0) {
+      // Just update the counter if already nominated
+      transaction.update(newNominationRef, {
+        monthsWithoutBoardEntry: newCounter,
+      });
+    }
+  }
+};
+
+/**
+ * Gets the previous month's challenge ID (YYYY-MM format).
+ */
+const getPreviousMonthChallengeId = (currentChallengeId: string): string => {
+  const [year, month] = currentChallengeId.split("-").map(Number);
+  if (month === 1) {
+    return `${year - 1}-12`;
+  }
+  return `${year}-${String(month - 1).padStart(2, "0")}`;
+};
+
+/**
  * Draws the current month's challenge board if it doesn't exist yet.
  *
  * Idempotent: the board is a single doc keyed by `YYYY-MM`, created inside a
@@ -147,11 +209,32 @@ export default async function handler(
     }
 
     const { startsAt, endsAt } = challengeWindow(challengeId);
+    const boardSongIds = new Set(songs.map((s) => s.songId));
+
+    // Fetch previous month's nominations (outside transaction, just reads)
+    const previousMonthId = getPreviousMonthChallengeId(challengeId);
+    const previousNominationsSnap = await firestore
+      .collection("challengeNominations")
+      .where("challengeId", "==", previousMonthId)
+      .get();
+
+    const previousNominations = previousNominationsSnap.docs.map((doc) => ({
+      ref: doc.ref,
+      data: doc.data(),
+    }));
 
     const created = await firestore.runTransaction(
       async (transaction: Transaction) => {
         const snapshot = await transaction.get(challengeRef);
         if (snapshot.exists) return false;
+
+        // Carry over nominations from previous month
+        await carryOverNominations(
+          challengeId,
+          boardSongIds,
+          transaction,
+          previousNominations,
+        );
 
         transaction.set(challengeRef, {
           title: `${challengeMonthLabel(challengeId)} Challenge`,
