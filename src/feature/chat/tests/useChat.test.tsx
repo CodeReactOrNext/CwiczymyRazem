@@ -84,6 +84,7 @@ describe("useChat Hook", () => {
     expect(toggleLikeChatMessage).toHaveBeenCalledWith(
       "msg1",
       "user123",
+      "Test User",
       false
     );
   });

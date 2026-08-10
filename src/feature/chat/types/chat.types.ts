@@ -6,5 +6,5 @@ export interface ChatMessageType {
   timestamp: Date;
   userPhotoURL?: string;
   lvl?: number;
-  likes?: string[];
+  likes?: Array<{ id: string; username: string }>;
 }

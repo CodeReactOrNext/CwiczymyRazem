@@ -90,7 +90,10 @@ describe("Chat Component", () => {
           username: "Test User",
           message: "Test Message",
           timestamp: new Date(),
-          likes: ["user1", "user2"],
+          likes: [
+            { id: "user1", username: "User 1" },
+            { id: "user2", username: "User 2" },
+          ],
         },
       ],
       newMessage: "",

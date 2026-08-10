@@ -67,15 +67,15 @@ export const useChat = () => {
       if (!currentUserId) return;
 
       const message = messages.find((msg) => msg.id === messageId);
-      const hasLiked = message?.likes?.includes(currentUserId) ?? false;
+      const hasLiked = message?.likes?.some((l) => l.id === currentUserId) ?? false;
 
       try {
-        await toggleLikeChatMessage(messageId, currentUserId, hasLiked);
+        await toggleLikeChatMessage(messageId, currentUserId, currentUserName, hasLiked);
       } catch {
         toast.error(t("error"));
       }
     },
-    [messages, currentUserId, t]
+    [messages, currentUserId, currentUserName, t]
   );
 
   return {

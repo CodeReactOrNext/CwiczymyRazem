@@ -59,11 +59,14 @@ export const sendChatMessage = async (
 export const toggleLikeChatMessage = async (
   messageId: string,
   userId: string,
+  username: string,
   hasLiked: boolean
 ) => {
   const messageRef = doc(db, "chats", messageId);
 
   return updateDoc(messageRef, {
-    likes: hasLiked ? arrayRemove(userId) : arrayUnion(userId),
+    likes: hasLiked
+      ? arrayRemove({ id: userId, username })
+      : arrayUnion({ id: userId, username }),
   });
 };

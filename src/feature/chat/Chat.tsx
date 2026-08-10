@@ -2,6 +2,11 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { ScrollArea } from "assets/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
@@ -44,7 +49,7 @@ const Chat = () => {
             const isFollowUp = prevMsg && prevMsg.userId === msg.userId;
             const likes = msg.likes ?? [];
             const hasLiked = currentUserId
-              ? likes.includes(currentUserId)
+              ? likes.some((l) => l.id === currentUserId)
               : false;
 
             return (
@@ -99,20 +104,38 @@ const Chat = () => {
                         </Card>
 
                         {likes.length > 0 && (
-                          <button
-                            type='button'
-                            aria-label={t("like")}
-                            onClick={() => msg.id && toggleLike(msg.id)}
-                            className={cn(
-                              "absolute -bottom-3.5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-background active:click-behavior",
-                              hasLiked
-                                ? "bg-red-500/20 text-red-300 hover:bg-red-500/30"
-                                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
-                              isMe ? "left-2" : "right-2"
-                            )}>
-                            <Heart className='h-4 w-4 fill-red-500 text-red-500' />
-                            <span className='leading-none'>{likes.length}</span>
-                          </button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type='button'
+                                aria-label={t("like")}
+                                onClick={() => msg.id && toggleLike(msg.id)}
+                                className={cn(
+                                  "absolute -bottom-3.5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-background active:click-behavior",
+                                  hasLiked
+                                    ? "bg-red-500/20 text-red-300 hover:bg-red-500/30"
+                                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
+                                  isMe ? "left-2" : "right-2"
+                                )}>
+                                <Heart className='h-4 w-4 fill-red-500 text-red-500' />
+                                <span className='leading-none'>{likes.length}</span>
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side='top' className='max-w-xs'>
+                              <div className='space-y-1'>
+                                <p className='text-[11px] font-semibold text-zinc-400 mb-1'>
+                                  Liked by:
+                                </p>
+                                {likes.map((liker) => (
+                                  <UserTooltip key={liker.id} userId={liker.id}>
+                                    <div className='text-[11px] text-zinc-200 hover:text-white cursor-pointer'>
+                                      {liker.username}
+                                    </div>
+                                  </UserTooltip>
+                                ))}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
 
