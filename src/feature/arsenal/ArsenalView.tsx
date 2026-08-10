@@ -22,7 +22,7 @@ import { CaseShop } from "./components/CaseShop/CaseShop";
 import { DexView } from "./components/Dex/DexView";
 import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
-import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
+import { MarketTab } from "./components/Marketplace/MarketTab";
 import { PartsWallet } from "./components/Parts/PartsWallet";
 import { RigView } from "./components/Rig/RigView";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
@@ -194,7 +194,7 @@ export const ArsenalView = () => {
             </TabsContent>
 
             <TabsContent value="market" className="mt-4">
-              <MarketplaceView />
+              <MarketTab />
             </TabsContent>
           </Tabs>
         </div>

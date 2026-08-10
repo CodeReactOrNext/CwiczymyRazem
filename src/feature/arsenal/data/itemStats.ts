@@ -312,20 +312,20 @@ export const sumFeatureStats = (features: ItemFeature[]): ItemStats => {
  */
 export const rollItemFeatures = (
   rarity: GuitarRarity,
+  rng: () => number = Math.random,
 ): { features: ItemFeature[]; stats: ItemStats } | undefined => {
   const max = RARITY_MAX_FEATURES[rarity] ?? 2;
   // Fisher–Yates shuffle so distinct features are picked.
   const pool = [...GUITAR_FEATURES];
   for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   const features: ItemFeature[] = [];
   for (let i = 0; i < max && i < pool.length; i++) {
-    if (Math.random() < FEATURE_FILL_CHANCE) {
+    if (rng() < FEATURE_FILL_CHANCE) {
       const def = pool[i];
-      const points =
-        def.min + Math.floor(Math.random() * (def.max - def.min + 1));
+      const points = def.min + Math.floor(rng() * (def.max - def.min + 1));
       features.push({ id: def.id, points });
     }
   }
@@ -528,14 +528,25 @@ export const getItemValue = (
 
 // ─── Rollers (used server-side when minting a new item) ───────────────────────
 
+/**
+ * Every roller takes an optional PRNG. Left out it is plain `Math.random`, which
+ * is what a case opening wants; the trader passes its seeded generator instead so
+ * the exact instance on the shop card is the one the purchase mints — the same
+ * numbers on every client and again on the server.
+ */
+
 /** Triangular-ish roll (avg of two uniforms) — clusters around the middle grades. */
-export const rollCondition = (): number =>
-  Math.round(((Math.random() + Math.random()) / 2) * 1000) / 1000;
+export const rollCondition = (rng: () => number = Math.random): number =>
+  Math.round(((rng() + rng()) / 2) * 1000) / 1000;
 
 /** Year skewed toward newer; old years (true vintage) are rare. */
-export const rollVintageYear = (yearFrom: number, yearTo: number): number => {
+export const rollVintageYear = (
+  yearFrom: number,
+  yearTo: number,
+  rng: () => number = Math.random,
+): number => {
   const span = yearTo - yearFrom;
   if (span <= 0) return yearFrom;
-  const r = Math.pow(Math.random(), 2.2); // bias toward 0 → toward yearTo (newer)
+  const r = Math.pow(rng(), 2.2); // bias toward 0 → toward yearTo (newer)
   return yearTo - Math.round(r * span);
 };

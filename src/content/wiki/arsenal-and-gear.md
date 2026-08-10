@@ -18,7 +18,7 @@ The Featured Case rotates its pool of items every 3 days on a fixed schedule —
 
 Every item has a rarity tier — Common, Uncommon, Rare, Epic, Legendary, Mythic — which sets its base sell value and a level bonus. On top of that, an item's actual **Item Level** also factors in its condition (Relic through Museum), vintage, and country-of-origin prestige, so two items of the same rarity aren't necessarily equal.
 
-<Checklist items="Collection::Every guitar and effect you own|Workshop::Restore and upgrade gear with salvaged parts|Dex::A completionist gallery of every item that exists in the game, discovered or not|Rig::Where you equip guitars and pedalboard effects|Market::Buy and sell items directly with other players" />
+<Checklist items="Collection::Every guitar and effect you own|Workshop::Restore and upgrade gear with salvaged parts|Dex::A completionist gallery of every item that exists in the game, discovered or not|Rig::Where you equip guitars and pedalboard effects|Market::The Trader's daily stock, and listings from other players" />
 
 ## The Workshop
 
@@ -33,6 +33,16 @@ Scrapping a guitar or pedal tears it down into **parts** — the raw material of
 Requirements widen on four axes at once. The price above, but also *how many different* parts a job needs (from Build 13 you need one of every part the item is physically built from), the *minimum tier* accepted (Epic from Build 8, Legendary from Build 19), and **Unique parts** — from Build 19 you need one, then another every seven levels. Every level also costs a little Fame. On top of that, the item's condition gates the whole thing: Good to start building, Mint from Build 8, Museum from Build 19.
 
 Each build level is worth a flat amount of Item Level depending on rarity — Common and Uncommon +1, Rare and Epic +2, Legendary +3, Mythic +4. The *cost* is identical for every rarity, which is the whole point: parts poured into a Mythic go four times as far as parts poured into a Common, so choosing what goes on the bench matters.
+
+## The Trader
+
+The Market tab has two halves. **Player listings** is the marketplace where you buy and sell with other players; **Trader** is the game's own counter, and the only place parts can be bought at all. It restocks every day at midnight UTC, and everyone sees the same stock.
+
+Parts sell **by the piece**, each offer with a daily limit of its own, so a single day's practice is always enough to buy *something*. One part offer a day is marked down 30%. Which parts turn up is weighted by how little the drop tables actually supply them, so the parts the game starves show up more often — and cost more.
+
+<StatRow stats="2 Fame:Screw|12 Fame:Standard part|35 Fame:Epic part|450 Fame:Legendary part" caption="Standard and Epic sit at roughly triple what the part costs you in given-up sell value when you scrap for it. Legendary is priced far steeper on purpose — it exists to unstick a build the drop tables have walled off, not to supply you. Unique parts are never sold." />
+
+The counter also stocks **two guitars and two pedals a day**, each a specific rolled instance: its condition, vintage and features are on the card before you pay. They are priced at their own sell value times a multiplier that climbs with rarity — ×4 at Common up to ×12 at Mythic — so buying one back-to-back with selling it is always a heavy loss, and a Legendary is a month of saving rather than a purchase. Top rarities only surface every week or two.
 
 ## Rig Level
 

@@ -69,6 +69,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       effectInventory: data.arsenal.effectInventory || [],
       // Accounts created before the scrap system have no wallet yet.
       parts: data.arsenal.parts || [],
+      // Trader purchases. Sent as stored; a counter from an earlier window is
+      // simply ignored by the shop front, which knows today's window.
+      ...(data.arsenal.trader ? { trader: data.arsenal.trader } : {}),
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals

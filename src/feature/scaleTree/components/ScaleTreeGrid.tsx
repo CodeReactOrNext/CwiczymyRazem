@@ -1,3 +1,4 @@
+import { Chip } from 'assets/components/ui/chip';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo,useRef, useState } from 'react';
 
@@ -11,6 +12,8 @@ interface ScaleTreeGridProps {
   onNodeClick: (nodeId: string) => void;
 }
 
+// Frets each box shape is anchored on, in box order — index 0 is Box 1. The
+// fret values build the node IDs; the UI labels rows by their index instead.
 const SCALE_POSITIONS: Record<string, number[]> = {
   minor_pentatonic: [1, 3, 5, 8, 10],
   major_pentatonic: [1, 3, 5, 8, 10],
@@ -27,6 +30,13 @@ const FAMILY_COLORS = {
   pentatonic: '#fbbf24',
   diatonic: '#22d3ee',
   mode: '#a78bfa',
+};
+
+// Same accents as the connection lines, but as palette classes for the chrome.
+const FAMILY_TEXT: Record<string, string> = {
+  pentatonic: 'text-amber-400',
+  diatonic: 'text-cyan-400',
+  mode: 'text-violet-400',
 };
 
 const SCALE_LABEL: Record<string, string> = {
@@ -78,6 +88,12 @@ export function ScaleTreeGrid({
 
   const family = scaleNodes[0]?.data?.scaleFamily || 'diatonic';
   const accentColor = FAMILY_COLORS[family as keyof typeof FAMILY_COLORS] || FAMILY_COLORS.diatonic;
+  const accentText = FAMILY_TEXT[family] || FAMILY_TEXT.diatonic;
+
+  const completedCount = useMemo(
+    () => scaleNodes.filter((n) => n.data?.status === 'completed').length,
+    [scaleNodes]
+  );
 
   const patterns = ['asc', 'desc', 'asc_desc', 'thirds', 'fourths', 'seq3', 'seq4'];
 
@@ -177,25 +193,24 @@ export function ScaleTreeGrid({
 
   return (
     <div
-      className="relative flex-1 flex flex-col h-full bg-[#0d0d10] overflow-hidden p-3 sm:p-6 pt-14 sm:pt-6 select-none"
+      className="relative flex-1 flex flex-col h-full bg-zinc-950 overflow-hidden p-3 sm:p-6 pt-14 sm:pt-6 select-none"
     >
-      <div className="flex flex-col mb-3 sm:mb-5">
-        <span
-          className="text-[10px] sm:text-[11px] font-black capitalize tracking-widest"
-          style={{ color: accentColor }}
-        >
-          {family} Tree
+      <div className="mb-4 flex flex-col sm:mb-6">
+        <span className={`text-xs font-semibold capitalize tracking-wide ${accentText}`}>
+          {family} tree
         </span>
-        <div className="flex items-center gap-3 mt-1 sm:mt-1.5">
-          <h1 className="font-display text-lg sm:text-2xl font-bold text-zinc-100 tracking-wide capitalize">
+        <div className="mt-1.5 flex flex-wrap items-center gap-3">
+          <h1 className="font-display text-xl font-bold capitalize text-zinc-100 sm:text-2xl">
             {SCALE_LABEL[scaleType] || scaleType}
           </h1>
-          <div
-            className="h-[2px] sm:h-[3px] flex-1 max-w-[120px] rounded-full"
-            style={{
-              background: `linear-gradient(to right, ${accentColor}, transparent)`,
-            }}
-          />
+          {scaleNodes.length > 0 && (
+            <Chip color='gray' className='py-1 text-[11px]'>
+              <span className={`font-semibold tabular-nums ${accentText}`}>
+                {completedCount}/{scaleNodes.length}
+              </span>
+              done
+            </Chip>
+          )}
         </div>
       </div>
 
@@ -233,7 +248,7 @@ export function ScaleTreeGrid({
 
         <div className="relative z-10 flex flex-col items-center w-full gap-4 sm:gap-8 min-w-[640px] sm:min-w-0">
           {gateNode && (
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center">
               <div id={`node-slot-${gateNode.id}`} className="flex-shrink-0">
                 <ScaleTreeGridNode
                   node={gateNode}
@@ -244,21 +259,23 @@ export function ScaleTreeGrid({
                   onMouseLeave={() => {}}
                 />
               </div>
-              <span className="text-[10px] font-bold text-zinc-500 tracking-wider">
-                Single String
-              </span>
             </div>
           )}
 
           <div className="w-full max-w-5xl flex flex-col gap-3 sm:gap-6">
-            {positions.map((pos) => {
+            {positions.map((pos, idx) => {
               const posNodes = getPositionNodes(pos);
 
               return (
                 <div key={pos} className="flex items-center w-full gap-2 sm:gap-6">
+                  {/* Rows are named by box order, not by the fret underneath —
+                      "Box 4" is the fourth shape, wherever it sits on the neck. */}
                   <div className="w-10 sm:w-16 flex-shrink-0 text-right">
-                    <span className="text-[10px] sm:text-[11px] font-mono font-bold text-zinc-400 capitalize tracking-widest block">
-                      Pos. {pos}
+                    <span className="block text-xs font-semibold tabular-nums text-zinc-300">
+                      Box {idx + 1}
+                    </span>
+                    <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
+                      fret {pos}
                     </span>
                   </div>
 

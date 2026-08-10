@@ -293,21 +293,21 @@ export const sumEffectStats = (features: ItemFeature[]): EffectStats => {
 export const rollEffectFeatures = (
   rarity: GuitarRarity,
   type: EffectType,
+  rng: () => number = Math.random,
 ): { features: ItemFeature[]; stats: EffectStats } | undefined => {
   const max = RARITY_MAX_FEATURES[rarity] ?? 2;
   const pool = EFFECT_FEATURES.filter(
     (f) => !f.appliesTo || f.appliesTo.includes(type),
   );
   for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   const features: ItemFeature[] = [];
   for (let i = 0; i < max && i < pool.length; i++) {
-    if (Math.random() < FEATURE_FILL_CHANCE) {
+    if (rng() < FEATURE_FILL_CHANCE) {
       const def = pool[i];
-      const points =
-        def.min + Math.floor(Math.random() * (def.max - def.min + 1));
+      const points = def.min + Math.floor(rng() * (def.max - def.min + 1));
       features.push({ id: def.id, points });
     }
   }
@@ -332,15 +332,22 @@ export const getEffectStats = (
 ): EffectStats | null => item.stats ?? null;
 
 /** Roll a vintage year / country for a new effect (uses per-def range if present). */
-export const rollEffectYear = (effect: EffectDefinition): number =>
+export const rollEffectYear = (
+  effect: EffectDefinition,
+  rng: () => number = Math.random,
+): number =>
   rollVintageYear(
     effect.yearFrom ?? EFFECT_YEAR_FROM,
     effect.yearTo ?? EFFECT_YEAR_TO,
+    rng,
   );
 
-export const rollEffectCountry = (effect: EffectDefinition): string => {
+export const rollEffectCountry = (
+  effect: EffectDefinition,
+  rng: () => number = Math.random,
+): string => {
   const pool = effect.countries ?? EFFECT_COUNTRIES;
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pool[Math.floor(rng() * pool.length)];
 };
 
 /**

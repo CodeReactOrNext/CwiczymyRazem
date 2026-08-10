@@ -1,5 +1,6 @@
+import { cn } from 'assets/lib/utils';
 import { motion } from 'framer-motion';
-import { CheckCircle, Flame,Lock } from 'lucide-react';
+import { CheckCircle,Lock } from 'lucide-react';
 
 interface ScaleSidebarItem {
   id: string;
@@ -20,25 +21,12 @@ const SIDEBAR_ITEMS: ScaleSidebarItem[] = [
   { id: 'locrian', label: 'Locrian Mode', scaleType: 'locrian', family: 'mode' },
 ];
 
+// One accent per family, as palette classes rather than raw hex, so the
+// sidebar stays in the app's semantic colour system (amber/cyan/violet).
 const FAMILY_METADATA = {
-  pentatonic: {
-    title: 'Pentatonic',
-    color: '#fbbf24',
-    bgGlow: 'rgba(251, 191, 36, 0.03)',
-    borderGlow: 'rgba(251, 191, 36, 0.15)',
-  },
-  diatonic: {
-    title: 'Diatonic',
-    color: '#22d3ee',
-    bgGlow: 'rgba(34, 211, 238, 0.03)',
-    borderGlow: 'rgba(34, 211, 238, 0.15)',
-  },
-  mode: {
-    title: 'Modal Modes',
-    color: '#a78bfa',
-    bgGlow: 'rgba(167, 139, 250, 0.03)',
-    borderGlow: 'rgba(167, 139, 250, 0.15)',
-  },
+  pentatonic: { title: 'Pentatonic',  text: 'text-amber-400',  bar: 'bg-amber-400',  dot: 'bg-amber-400' },
+  diatonic:   { title: 'Diatonic',    text: 'text-cyan-400',   bar: 'bg-cyan-400',   dot: 'bg-cyan-400' },
+  mode:       { title: 'Modal Modes', text: 'text-violet-400', bar: 'bg-violet-400', dot: 'bg-violet-400' },
 };
 
 interface ScaleTreeSidebarProps {
@@ -65,33 +53,28 @@ export function ScaleTreeSidebar({
   const families = ['pentatonic', 'diatonic', 'mode'] as const;
 
   return (
-    <div className="flex h-full w-[280px] sm:w-[320px] flex-col bg-[#0a0a0c] p-4 select-none">
-      <div className="mb-6 px-2">
-        <h2 className="text-sm font-bold tracking-widest text-zinc-400 capitalize">
-          Scale Selector
+    <div className="flex h-full w-[280px] sm:w-[320px] flex-col bg-zinc-950 p-5 select-none">
+      <div className="mb-7 px-1">
+        <h2 className="font-display text-base font-bold text-zinc-100">
+          Scale selector
         </h2>
-        <p className="text-[10px] text-zinc-500 mt-1">
-          Select a scale to view its skill tree and box positions.
+        <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
+          Pick a scale to see its tree and box positions.
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-6 pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
+      <div className="flex-1 overflow-y-auto space-y-7 pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
         {families.map((family) => {
           const meta = FAMILY_METADATA[family];
           const items = SIDEBAR_ITEMS.filter((item) => item.family === family);
 
           return (
-            <div key={family} className="space-y-2">
-              <div className="flex items-center justify-between px-2">
-                <span
-                  className="text-[10px] font-black capitalize tracking-widest"
-                  style={{ color: meta.color }}
-                >
-                  {meta.title}
-                </span>
-              </div>
+            <div key={family} className="space-y-2.5">
+              <span className={cn("block px-1 text-xs font-semibold tracking-wide", meta.text)}>
+                {meta.title}
+              </span>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {items.map((item) => {
                   const isActive = activeScaleType === item.scaleType;
                   const { total, completed, isLocked, isCompleted } = getScaleStats(item.scaleType);
@@ -101,62 +84,48 @@ export function ScaleTreeSidebar({
                     <motion.button
                       key={item.id}
                       onClick={() => onSelectScale(item.scaleType)}
-                      className={`relative w-full flex flex-col rounded-lg p-3.5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
-                        isActive
-                          ? 'bg-zinc-800/60'
-                          : 'bg-zinc-900/40 hover:bg-zinc-800/40'
-                      }`}
-                    >
-                      {isActive && (
-                        <div
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-3/5 rounded-r"
-                          style={{ backgroundColor: meta.color }}
-                        />
+                      className={cn(
+                        "group flex w-full flex-col rounded-lg p-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        isActive ? "bg-zinc-800/60" : "bg-zinc-900/40 hover:bg-zinc-800/40"
                       )}
-
-                      <div className="flex items-center justify-between w-full">
+                    >
+                      <div className="flex w-full items-center gap-2">
+                        {/* Active scale is marked by a dot, the way the app's nav does it */}
+                        {isActive && <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", meta.dot)} />}
                         <span
-                          className={`text-sm font-semibold tracking-wide transition-colors ${
-                            isActive ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-200'
-                          }`}
+                          className={cn(
+                            "flex-1 truncate text-sm font-semibold transition-colors",
+                            isActive ? "text-zinc-100" : "text-zinc-300 group-hover:text-zinc-100"
+                          )}
                         >
                           {item.label}
                         </span>
 
-                        <div className="flex items-center gap-1.5">
-                          {isLocked ? (
-                            <Lock className="h-3.5 w-3.5 text-zinc-700" />
-                          ) : isCompleted ? (
-                            <CheckCircle
-                              className="h-4 w-4"
-                              style={{ color: meta.color }}
-                            />
-                          ) : completed > 0 ? (
-                            <Flame className="h-4 w-4 text-orange-400 animate-pulse" />
-                          ) : null}
-                        </div>
+                        {isLocked ? (
+                          <Lock className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                        ) : isCompleted ? (
+                          <CheckCircle className={cn("h-4 w-4 shrink-0", meta.text)} />
+                        ) : null}
                       </div>
 
                       {!isLocked && total > 0 && (
-                        <div className="w-full mt-2.5 space-y-1.5">
-                          <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                            <span className="capitalize">Progress</span>
-                            <span className="font-semibold" style={{ color: progressPercent > 0 ? meta.color : '#71717a' }}>
-                              {completed} / {total} ({Math.round(progressPercent)}%)
-                            </span>
-                          </div>
-
-                          <div className="relative h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+                        <div className="mt-3 flex w-full items-center gap-3">
+                          <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-zinc-800/80">
                             <motion.div
-                              className="absolute inset-y-0 left-0 rounded-full"
-                              style={{
-                                backgroundColor: meta.color,
-                              }}
+                              className={cn("absolute inset-y-0 left-0 rounded-full", meta.bar)}
                               initial={{ width: 0 }}
                               animate={{ width: `${progressPercent}%` }}
                               transition={{ duration: 0.4, ease: 'easeOut' }}
                             />
                           </div>
+                          <span
+                            className={cn(
+                              "shrink-0 text-xs font-medium tabular-nums",
+                              progressPercent > 0 ? meta.text : "text-zinc-500"
+                            )}
+                          >
+                            {completed}/{total}
+                          </span>
                         </div>
                       )}
                     </motion.button>

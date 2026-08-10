@@ -3,6 +3,7 @@ import type {
   GuitarDefinition,
   GuitarRarity,
 } from "../types/arsenal.types";
+import { mulberry32, seededShuffle } from "../utils/seededRandom";
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 import { GUITAR_DEFINITIONS } from "./guitarDefinitions";
 
@@ -45,28 +46,6 @@ export type DailyPoolEntry =
  */
 export const getDailyPoolSeed = (date: Date = new Date()): number =>
   Math.floor(date.getTime() / (MS_PER_DAY * POOL_ROTATION_DAYS));
-
-/** Small deterministic PRNG (mulberry32) — same seed, same sequence, everywhere. */
-const mulberry32 = (seed: number) => {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-};
-
-/** Fisher–Yates driven by the seeded PRNG; never mutates the input. */
-const seededShuffle = <T>(items: readonly T[], random: () => number): T[] => {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-};
 
 /**
  * The featured pool for the rotation window containing the given date.

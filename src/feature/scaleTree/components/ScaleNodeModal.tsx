@@ -1,8 +1,10 @@
+import { Chip } from "assets/components/ui/chip";
+import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import { AnimatePresence, motion } from "framer-motion";
-import { Lock, Play, X } from "lucide-react";
-import { useMemo } from "react";
+import { Lock, Play, Target, X } from "lucide-react";
+import { useEffect, useMemo } from "react";
 
 import type { NodeStatus, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
@@ -32,11 +34,30 @@ interface ScaleNodeModalProps {
   node: ScaleTreeNodeDef | null;
   status: NodeStatus | null;
   onClose: () => void;
-  onPractice: () => void;
+  /** Timed exam at the required BPM — passing it unlocks the next node. */
+  onStartExam: () => void;
+  /** Free run of the same exercise, with the usual session controls. */
+  onStartPractice: () => void;
 }
 
-export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeModalProps) {
+export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPractice }: ScaleNodeModalProps) {
   const req = node?.requiredExercises[0];
+  const isLocked = status === "locked";
+
+  // Escape closes, and the page behind stays put while the sheet is open.
+  useEffect(() => {
+    if (!node) return undefined;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [node, onClose]);
 
   const tablature = useMemo(() => {
     if (!req) return null;
@@ -65,81 +86,93 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
   return (
     <AnimatePresence>
       {node && (
-        <>
+        <div
+          key='scale-node-modal'
+          className='fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-4'>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm"
+            className='absolute inset-0 bg-black/70 backdrop-blur-sm'
             onClick={onClose}
           />
 
+          {/* Bottom sheet on phones, centered card from sm up */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 6 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 6 }}
-            transition={{ duration: 0.16 }}
-            className="absolute left-1/2 top-1/2 z-30 w-[90vw] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-zinc-900/95 backdrop-blur-md"
-          >
+            role='dialog'
+            aria-modal='true'
+            aria-label={node.label}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className='relative flex max-h-[88dvh] w-full flex-col gap-5 overflow-y-auto overscroll-contain rounded-lg bg-zinc-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:pb-5'>
             {/* Header */}
-            <div className="flex items-start justify-between p-4 pb-2">
-              <div className="min-w-0">
-                <p className={`text-[10px] font-semibold capitalize tracking-wider ${FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400"}`}>
+            <div className='flex items-start gap-4'>
+              <div className='min-w-0 flex-1'>
+                <p className={cn("text-xs font-semibold capitalize tracking-wide", FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400")}>
                   {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
                 </p>
-                <h2 className="mt-0.5 text-base font-bold leading-tight text-zinc-100">{node.label}</h2>
-                <p className="text-xs text-zinc-500">{node.subtitle}</p>
+                <h2 className='mt-1 font-display text-xl font-bold leading-tight text-zinc-100'>
+                  {node.label}
+                </h2>
+                {node.subtitle && (
+                  <p className='mt-1 text-sm text-zinc-400'>{node.subtitle}</p>
+                )}
               </div>
               <button
                 onClick={onClose}
-                aria-label="Close"
-                className="ml-3 mt-0.5 flex-shrink-0 rounded text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <X size={15} />
+                aria-label='Close'
+                className='-mr-1 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                <X className='h-4 w-4' />
               </button>
             </div>
 
             {/* Exercise tags */}
             {req && (
-              <div className="flex flex-wrap gap-1.5 px-4 pb-3">
-                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300">
-                  {PATTERN_LABELS[req.patternType] ?? req.patternType}
-                </span>
-                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300">
-                  Pos. {req.position}
-                </span>
-                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300">
-                  {req.requiredBpm} BPM
-                </span>
+              <div className='flex flex-wrap gap-2'>
+                <Chip>{PATTERN_LABELS[req.patternType] ?? req.patternType}</Chip>
+                <Chip>
+                  {req.stringNum != null
+                    ? `String ${req.stringNum}`
+                    : `Box ${req.boxNumber ?? req.position}`}
+                </Chip>
+                {req.stringNum == null && (
+                  <Chip>Frets {req.position}–{req.position + 4}</Chip>
+                )}
+                <Chip color='cyan'>{req.requiredBpm} BPM</Chip>
               </div>
             )}
 
-            {/* Tablature preview */}
+            {/* Tablature preview — no inner card, the sheet is the only surface */}
             {tablature && tablature.length > 0 && (
-              <div className="mx-4 mb-3 overflow-hidden rounded-lg bg-zinc-950">
-                <TablaturePreview measures={tablature} />
-              </div>
+              <TablaturePreview measures={tablature} />
             )}
 
-            {/* Action */}
-            <div className="p-4 pt-1">
-              {status === "locked" ? (
-                <div className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2.5 text-xs text-zinc-500">
-                  <Lock size={12} className="flex-shrink-0" />
-                  Complete the required exercises to unlock
-                </div>
-              ) : (
+            {/* Actions */}
+            {isLocked ? (
+              <div className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 px-4 py-3 text-sm text-zinc-400'>
+                <Lock className='h-4 w-4 shrink-0 text-zinc-400' />
+                Complete the required exercises to unlock
+              </div>
+            ) : (
+              <div className='grid grid-cols-2 gap-3'>
                 <button
-                  onClick={onPractice}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-500 active:bg-cyan-700"
-                >
-                  <Play size={14} />
-                  Start Exam
+                  onClick={onStartPractice}
+                  className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+                  <Play className='h-4 w-4' fill='currentColor' />
+                  Practice
                 </button>
-              )}
-            </div>
+                <button
+                  onClick={onStartExam}
+                  className='flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+                  <Target className='h-4 w-4' />
+                  {status === "completed" ? "Retake" : "Exam"}
+                </button>
+              </div>
+            )}
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

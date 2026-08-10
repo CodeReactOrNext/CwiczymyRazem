@@ -11,6 +11,9 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
 
+// Every scale-tree exam runs on the same clock — 90 s to hold the required BPM.
+const EXAM_TIME_IN_MINUTES = 1.5;
+
 export default function PracticeScalePage() {
   const router = useRouter();
   const { type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId } = router.query;
@@ -36,7 +39,7 @@ export default function PracticeScalePage() {
       }
       const exercise = generateSingleStringScaleExercise({ rootNote: "C", scaleType, stringNum });
       if (exam === 'true') {
-        exercise.timeInMinutes = 3;
+        exercise.timeInMinutes = EXAM_TIME_IN_MINUTES;
       }
       setPlan({
         id: `scale-plan-${exercise.id}`,
@@ -65,7 +68,7 @@ export default function PracticeScalePage() {
 
     const exercise = generateScaleExercise({ rootNote: "C", scaleType, patternType, position });
     if (exam === 'true') {
-      exercise.timeInMinutes = 3;
+      exercise.timeInMinutes = EXAM_TIME_IN_MINUTES;
     }
     setPlan({
       id: `scale-plan-${exercise.id}`,

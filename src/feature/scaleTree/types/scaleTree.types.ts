@@ -6,9 +6,21 @@ export type NodeStatus = "locked" | "available" | "in_progress" | "completed";
 export interface RequiredExercise {
   exerciseId: string;
   requiredBpm: number;
+  /**
+   * Target this exercise demanded before the tempo bump. Progress recorded at
+   * the old, slower speed still clears the node — see `isExerciseCleared`.
+   */
+  legacyRequiredBpm?: number;
   scaleType: ScaleType;
   patternType: PatternType;
+  /** Fret the shape is anchored on — what the exercise generator works with. */
   position: number;
+  /**
+   * Shape number a learner sees (Box 1–5 for pentatonic, 1–7 for diatonic).
+   * The frets jump around (1, 3, 5, 8, 10…), so counting boxes reads as a
+   * ladder instead of implying ten separate positions.
+   */
+  boxNumber?: number;
   label: string;
   stringNum?: number; // present for single-string exercises (1=high E … 6=low E)
 }

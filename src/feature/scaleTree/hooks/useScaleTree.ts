@@ -5,7 +5,7 @@ import { useAppSelector } from "store/hooks";
 
 import { SCALE_TREE_NODES, SCALE_TREE_REWARD_NODES } from "../data/scaleTreeNodes";
 import { getClaimedRewards } from "../services/rewardService";
-import { computeNodeStatuses, fetchAllBpmProgress } from "../services/scaleTree.service";
+import { computeNodeStatuses, fetchAllBpmProgress, isExerciseCleared } from "../services/scaleTree.service";
 import type { BpmProgressMap,ScaleTreeNodeData } from "../types/scaleTree.types";
 
 const progressCache: Record<string, BpmProgressMap> = {};
@@ -64,10 +64,9 @@ export function useScaleTree() {
 
   const rfNodes = useMemo(() => {
     const treeNodes = SCALE_TREE_NODES.map((node) => {
-      const doneCount = node.requiredExercises.filter((req) => {
-        const bpms = progressMap.get(req.exerciseId) ?? [];
-        return bpms.some((b) => b >= req.requiredBpm);
-      }).length;
+      const doneCount = node.requiredExercises.filter((req) =>
+        isExerciseCleared(req, progressMap.get(req.exerciseId) ?? [])
+      ).length;
 
       const firstReq = node.requiredExercises[0];
       const bpmsForFirst = firstReq ? (progressMap.get(firstReq.exerciseId) ?? []) : [];

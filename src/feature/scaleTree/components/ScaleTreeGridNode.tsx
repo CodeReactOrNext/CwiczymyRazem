@@ -18,14 +18,16 @@ const FAMILY_COLORS = {
   mode: { accent: '#a78bfa', border: 'border-violet-500/30', glow: 'rgba(167, 139, 250, 0.4)' },
 };
 
+// Keyed by box number (1–7), not by fret — the spine node shows which shape
+// you're on, matching the "Box N" row labels.
 const ROMAN_NUMERALS: Record<number, string> = {
   1: 'I',
   2: 'II',
   3: 'III',
+  4: 'IV',
   5: 'V',
+  6: 'VI',
   7: 'VII',
-  8: 'VIII',
-  10: 'X',
 };
 
 const SCALE_GEOMETRY: Record<string, { sides: number; rotation: number }> = {
@@ -39,6 +41,18 @@ const SCALE_GEOMETRY: Record<string, { sides: number; rotation: number }> = {
   lydian: { sides: 8, rotation: 22.5 },
   locrian: { sides: 3, rotation: 0 },
 };
+
+// Mixes a hex accent toward black (positive ratio) or white (negative) — used
+// for the extruded side of a node and for the highlight on its dots, the same
+// trick the learning path uses: a bright face sitting on a darker lip.
+function shade(hex: string, ratio: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = (channel: number) =>
+    Math.round(
+      ratio >= 0 ? channel * (1 - ratio) : channel + (255 - channel) * -ratio
+    );
+  return `rgb(${mix((n >> 16) & 255)},${mix((n >> 8) & 255)},${mix(n & 255)})`;
+}
 
 function regularPolygon(sides: number, rotationDeg: number, cx = 50, cy = 50, radius = 48): string {
   const rotationRad = (rotationDeg * Math.PI) / 180;
@@ -77,9 +91,17 @@ export function ScaleTreeGridNode({
   const family = node.data?.scaleFamily || 'diatonic';
   const colors = FAMILY_COLORS[family as keyof typeof FAMILY_COLORS] || FAMILY_COLORS.diatonic;
   const isLocked = status === 'locked';
+  const isSubnode = node.id.includes('_pos') && !node.id.endsWith('_asc');
 
   const fillGradId = `fill-grad-${node.id}`;
   const strokeGradId = `stroke-grad-${node.id}`;
+  const glossGradId = `gloss-grad-${node.id}`;
+  const bevelGradId = `bevel-grad-${node.id}`;
+  const dotGradId = `dot-grad-${node.id}`;
+  const shadowFilterId = `soft-shadow-${node.id}`;
+
+  // Thickness of the extruded lip, in viewBox units (~4% of the node).
+  const depth = isSubnode ? 4 : 5;
 
   const getShapePoints = () => {
     if (isSingleString) return '50,2 98,50 50,98 2,50';
@@ -90,8 +112,19 @@ export function ScaleTreeGridNode({
 
   const getShapeSvg = () => {
     const points = getShapePoints();
+    // Locked nodes keep the depth but in near-black, so they stay recessive
+    const lipColor = isLocked ? '#0a0a0d' : shade(colors.accent, 0.74);
+
     return (
-      <>
+      <g filter={`url(#${shadowFilterId})`}>
+        {/* Extruded lip — an offset copy underneath gives the node thickness */}
+        <polygon
+          points={points}
+          transform={`translate(0 ${depth})`}
+          fill={lipColor}
+          stroke="none"
+        />
+        {/* Opaque backing so the lip never shows through the translucent face */}
         <polygon
           points={points}
           fill="#15151a"
@@ -105,13 +138,31 @@ export function ScaleTreeGridNode({
           strokeWidth={isSelected ? 2.4 : 1.4}
           strokeLinejoin="round"
         />
-      </>
+        {/* Top-light + bottom shade across the face — sells the 3D read */}
+        <polygon
+          points={points}
+          fill={`url(#${glossGradId})`}
+          stroke="none"
+          className="pointer-events-none"
+        />
+        {/* Inner bevel — a thin rim light along the upper edges */}
+        {!isLocked && (
+          <polygon
+            points={points}
+            transform="translate(50 50) scale(0.9) translate(-50 -50)"
+            fill="none"
+            stroke={`url(#${bevelGradId})`}
+            strokeWidth={1.2}
+            strokeLinejoin="round"
+            className="pointer-events-none"
+          />
+        )}
+      </g>
     );
   };
 
   const req = node.data?.requiredExercises?.[0];
   const patternType = req?.patternType;
-  const isSubnode = node.id.includes('_pos') && !node.id.endsWith('_asc');
 
   const getConstellationSvg = () => {
     if (isSingleString || isReward || isLocked || !isSubnode) return null;
@@ -189,10 +240,14 @@ export function ScaleTreeGridNode({
   };
 
   const getIconContent = () => {
+    // Every icon carries the same soft cast shadow so it reads as floating a
+    // little above the node face rather than being printed onto it.
+    const iconShadow = 'drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.65)]';
+
     if (isLocked) {
       return (
         <Lock
-          className={`${isSubnode ? 'h-5 w-5' : 'h-6 w-6'} text-zinc-400`}
+          className={`${isSubnode ? 'h-5 w-5' : 'h-6 w-6'} text-zinc-400 ${iconShadow}`}
           strokeWidth={2}
         />
       );
@@ -202,7 +257,7 @@ export function ScaleTreeGridNode({
       const isClaimed = node.data?.claimed;
       return (
         <Trophy
-          className={`h-8 w-8 ${isClaimed ? 'text-emerald-400' : 'text-amber-400'}`}
+          className={`h-8 w-8 ${iconShadow} ${isClaimed ? 'text-emerald-400' : 'text-amber-400'}`}
           strokeWidth={2.2}
         />
       );
@@ -211,7 +266,7 @@ export function ScaleTreeGridNode({
     if (isSingleString) {
       return (
         <Music4
-          className="h-9 w-9"
+          className={`h-9 w-9 ${iconShadow}`}
           style={{ color: colors.accent }}
           strokeWidth={2.2}
         />
@@ -220,21 +275,29 @@ export function ScaleTreeGridNode({
 
     if (isSubnode && patternType) {
       const dotR = 6;
+      // Dots are lit from the top-left so they read as beads, not flat discs.
       const renderDots = (pts: Array<[number, number]>) =>
         pts.map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r={dotR} fill={colors.accent} stroke="none" />
+          <circle key={i} cx={cx} cy={cy} r={dotR} fill={`url(#${dotGradId})`} stroke="none" />
         ));
 
       return (
         <svg
           viewBox="0 0 100 100"
-          className="w-11 h-11 z-10 pointer-events-none"
+          className={`w-11 h-11 z-10 pointer-events-none ${iconShadow}`}
           stroke={colors.accent}
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         >
+          <defs>
+            <radialGradient id={dotGradId} cx="34%" cy="28%" r="78%">
+              <stop offset="0%" stopColor={shade(colors.accent, -0.35)} />
+              <stop offset="45%" stopColor={colors.accent} />
+              <stop offset="100%" stopColor={shade(colors.accent, 0.4)} />
+            </radialGradient>
+          </defs>
           {patternType === 'descending' && (
             <>
               <polyline points="20,30 40,47 60,64 80,81" />
@@ -282,19 +345,24 @@ export function ScaleTreeGridNode({
       );
     }
 
-    const pos = req?.position;
-    const numeral = ROMAN_NUMERALS[pos] || '?';
+    const numeral = ROMAN_NUMERALS[req?.boxNumber] || '?';
     return (
       <div className="flex flex-col items-center justify-center gap-[2px] z-10 pointer-events-none select-none">
         <span
           className="text-[22px] font-black tracking-tighter leading-none"
-          style={{ color: colors.accent }}
+          style={{
+            color: colors.accent,
+            textShadow: '0 1.5px 2px rgba(0,0,0,0.7)',
+          }}
         >
           {numeral}
         </span>
         <div
           className="h-[2px] w-5 rounded-full"
-          style={{ backgroundColor: colors.accent, opacity: 0.7 }}
+          style={{
+            background: `linear-gradient(to bottom, ${shade(colors.accent, -0.25)}, ${shade(colors.accent, 0.3)})`,
+            opacity: 0.8,
+          }}
         />
       </div>
     );
@@ -313,7 +381,8 @@ export function ScaleTreeGridNode({
     >
       <motion.div
         whileHover={isLocked ? {} : { y: -3 }}
-        whileTap={isLocked ? {} : { scale: 0.95 }}
+        // Pressing pushes the face down onto its lip, like the learning path nodes
+        whileTap={isLocked ? {} : { y: 2, scale: 0.97 }}
         className={`relative flex items-center justify-center animate-fade-in ${
           isSingleString
             ? 'w-[72px] h-[72px] sm:w-24 sm:h-24'
@@ -347,6 +416,35 @@ export function ScaleTreeGridNode({
                 </>
               )}
             </linearGradient>
+
+            <linearGradient id={glossGradId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={isLocked ? 0.06 : 0.2} />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity={0} />
+              <stop offset="100%" stopColor="#000000" stopOpacity={isLocked ? 0.16 : 0.26} />
+            </linearGradient>
+
+            <linearGradient id={bevelGradId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.28} />
+              <stop offset="55%" stopColor="#ffffff" stopOpacity={0} />
+              <stop offset="100%" stopColor="#000000" stopOpacity={0.2} />
+            </linearGradient>
+
+            <filter
+              id={shadowFilterId}
+              x="-30%"
+              y="-30%"
+              width="160%"
+              height="160%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feDropShadow
+                dx="0"
+                dy={isSubnode ? 2.5 : 3}
+                stdDeviation={2.5}
+                floodColor="#000000"
+                floodOpacity={isLocked ? 0.35 : 0.5}
+              />
+            </filter>
           </defs>
 
           {getShapeSvg()}
@@ -360,14 +458,14 @@ export function ScaleTreeGridNode({
 
       {node.data?.subtitle && (isReward || isSingleString || isSubnode) && (
         <span
-          className={`mt-1.5 text-[9px] font-semibold tracking-wide capitalize transition-colors text-center max-w-[80px] truncate ${
-            isLocked ? 'text-zinc-700' : 'text-zinc-400 group-hover:text-zinc-200'
+          className={`mt-2.5 text-[10px] font-medium capitalize transition-colors text-center max-w-[84px] truncate ${
+            isLocked ? 'text-zinc-600' : 'text-zinc-400 group-hover:text-zinc-200'
           }`}
         >
           {isReward
             ? 'Reward'
             : isSingleString
-              ? 'Gate'
+              ? 'Single string'
               : req.patternType
                   .replace('intervals_', '')
                   .replace('sequence_', 'seq ')

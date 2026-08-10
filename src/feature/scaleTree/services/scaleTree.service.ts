@@ -3,9 +3,22 @@ import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
 import { SCALE_TREE_NODES } from "../data/scaleTreeNodes";
-import type { BpmProgressMap, NodeStatus } from "../types/scaleTree.types";
+import type { BpmProgressMap, NodeStatus, RequiredExercise } from "../types/scaleTree.types";
 
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
+
+/**
+ * Whether a required exercise counts as passed. The bar is the exercise's
+ * current target BPM, or the lower one it had before the tempo bump — players
+ * who already cleared a node under the old rules keep it cleared.
+ */
+export function isExerciseCleared(req: RequiredExercise, bpms: number[]): boolean {
+  const threshold =
+    req.legacyRequiredBpm != null
+      ? Math.min(req.requiredBpm, req.legacyRequiredBpm)
+      : req.requiredBpm;
+  return bpms.some((b) => b >= threshold);
+}
 
 export async function fetchAllBpmProgress(userId: string): Promise<BpmProgressMap> {
   const progressRef = collection(db, "users", userId, BPM_PROGRESS_SUBCOLLECTION);
@@ -41,10 +54,9 @@ export function computeNodeStatuses(progressMap: BpmProgressMap): Record<string,
         continue;
       }
 
-      const doneCount = node.requiredExercises.filter((req) => {
-        const bpms = progressMap.get(req.exerciseId) ?? [];
-        return bpms.some((b) => b >= req.requiredBpm);
-      }).length;
+      const doneCount = node.requiredExercises.filter((req) =>
+        isExerciseCleared(req, progressMap.get(req.exerciseId) ?? [])
+      ).length;
 
       const newStatus: NodeStatus =
         doneCount === node.requiredExercises.length

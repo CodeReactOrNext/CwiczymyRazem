@@ -20,12 +20,12 @@ Two structured, node-by-node learning paths live outside the free-form practice 
 
 ## Scale Tree
 
-`/scale-tree` is a node graph (nine clusters: minor and major pentatonic, natural minor, major, and the five modes — dorian, phrygian, mixolydian, lydian, locrian) covering every practical fretboard position for each scale.
+`/scale-tree` is a node graph (nine clusters: minor and major pentatonic, natural minor, major, and the five modes — dorian, phrygian, mixolydian, lydian, locrian) covering every practical box shape for each scale.
 
-Inside a cluster, each fretboard position has a chain of **7 pattern nodes** to clear — ascending, descending, ascending+descending, thirds, fourths, and two sequence patterns — each requiring you to hit a target tempo (80 BPM for pentatonic/major/minor scales, 75 BPM for the modes).
+Boxes are numbered the way you learn them — **Box 1 to Box 5** for the pentatonic scales, Box 1 to Box 7 for the diatonic ones — with the fret each shape sits on shown underneath. Each cluster opens with a single-string gate at **80 BPM**, then every box has a chain of **7 pattern nodes** to clear — ascending, descending, ascending+descending, thirds, fourths, and two sequence patterns — each requiring you to hold **95 BPM** for 90 seconds.
 
 <BlogAlert type="tip">
-Clearing all 7 pattern nodes for a position at or above the target BPM unlocks that position's **Reward node** — a one-time claim worth **100 points and 50 Fame**. You have to claim it explicitly; hitting the BPM target alone doesn't auto-grant it.
+Clearing all 7 pattern nodes for a box at or above the target BPM unlocks that box's **Reward node** — a one-time claim worth **100 points and 50 Fame**. You have to claim it explicitly; hitting the BPM target alone doesn't auto-grant it.
 </BlogAlert>
 
 Each node's status — locked, available, in progress, or completed — is driven by your recorded BPM progress on the exercise behind it, so the tree unlocks in order as you actually get faster, not just by time spent.

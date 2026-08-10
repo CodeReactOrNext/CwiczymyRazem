@@ -53,20 +53,34 @@ export function ScaleTreeView() {
     }
   }, [router.query, rfNodes, setSelectedNodeId]);
 
-  const handlePractice = useCallback(() => {
-    if (!selectedNode) return;
-    const req = selectedNode.requiredExercises[0];
-    if (!req) return;
-    if (req.stringNum != null) {
-      router.push(
-        `/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`
-      );
-    } else {
-      router.push(
-        `/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`
-      );
-    }
-  }, [selectedNode, router]);
+  // Both actions run the same exercise; only the exam variant is timed, locked
+  // to the required BPM and reports back a passed stage.
+  const startSession = useCallback(
+    (mode: 'exam' | 'practice') => {
+      if (!selectedNode) return;
+      const req = selectedNode.requiredExercises[0];
+      if (!req) return;
+
+      const params = new URLSearchParams({ type: selectedNode.scaleType });
+      if (req.stringNum != null) {
+        params.set('string', String(req.stringNum));
+      } else {
+        params.set('pos', String(req.position));
+        params.set('pattern', req.patternType);
+      }
+      if (mode === 'exam') {
+        params.set('exam', 'true');
+        params.set('requiredBpm', String(req.requiredBpm));
+      }
+      params.set('nodeId', selectedNode.id);
+
+      router.push(`/practice/scale?${params.toString()}`);
+    },
+    [selectedNode, router]
+  );
+
+  const handleStartExam = useCallback(() => startSession('exam'), [startSession]);
+  const handleStartPractice = useCallback(() => startSession('practice'), [startSession]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedNodeId(null);
@@ -80,7 +94,7 @@ export function ScaleTreeView() {
   return (
     <div
       ref={containerRef}
-      className="relative flex h-full w-full overflow-hidden rounded-lg bg-[#08080a]"
+      className="relative flex h-full w-full overflow-hidden rounded-lg bg-zinc-950"
     >
       <div className="hidden md:flex">
         <ScaleTreeSidebar
@@ -137,31 +151,28 @@ export function ScaleTreeView() {
 
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="absolute left-3 top-3 z-10 flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900/80 px-2.5 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:hidden"
+        className="absolute left-3 top-3 z-10 flex h-9 items-center gap-2 rounded-lg bg-zinc-900/80 px-3 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:hidden"
         aria-label="Open scale selector"
       >
-        <Menu className="h-4 w-4 text-zinc-300" />
-        <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-300">
-          Scales
-        </span>
+        <Menu className="h-4 w-4 text-zinc-400" />
+        <span className="text-xs font-semibold text-zinc-300">Scales</span>
       </button>
 
       <button
         onClick={() => router.push('/timer')}
-        className="absolute right-3 top-3 z-10 flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900/80 px-2.5 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="absolute right-3 top-3 z-10 flex h-9 items-center gap-2 rounded-lg bg-zinc-900/80 px-3 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         aria-label="Back to Practice"
       >
-        <ArrowLeft className="h-4 w-4 text-zinc-300" />
-        <span className="text-[10px] font-bold tracking-wider text-zinc-300">
-          Practice
-        </span>
+        <ArrowLeft className="h-4 w-4 text-zinc-400" />
+        <span className="text-xs font-semibold text-zinc-300">Practice</span>
       </button>
 
       <ScaleNodeModal
         node={selectedNode}
         status={selectedNodeStatus}
         onClose={handleCloseModal}
-        onPractice={handlePractice}
+        onStartExam={handleStartExam}
+        onStartPractice={handleStartPractice}
       />
     </div>
   );

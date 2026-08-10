@@ -1,3 +1,5 @@
+import type { TraderState } from "./trader.types";
+
 export type EffectType =
   | "Overdrive"
   | "Distortion"
@@ -237,6 +239,8 @@ export interface ArsenalUserData {
   effectInventory: EffectInventoryItem[];
   /** Parts recovered from teardowns. A currency: stacked by (partId, tier). */
   parts: ScrapPart[];
+  /** What the player has already taken from the trader in the current window. */
+  trader?: TraderState;
 }
 
 export interface ScrapResult {

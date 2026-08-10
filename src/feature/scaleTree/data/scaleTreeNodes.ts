@@ -3,6 +3,21 @@ import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 
 import type { RewardNodeDef,ScaleTreeNodeDef } from "../types/scaleTree.types";
 
+// Tempo every box-position exam is locked to. Was 70–80 per family, which
+// players found sluggish; one brisk target for the whole tree instead.
+const EXAM_BPM = 95;
+// The single-string gate is the warm-up before a cluster, so it stays a notch
+// below the real exams.
+const GATE_BPM = 80;
+
+// Targets in force before the bump. Nodes stay cleared for anyone who already
+// passed at these speeds, so raising the tempo doesn't wipe existing progress.
+const LEGACY_GATE_BPM = 60;
+const LEGACY_PENT_BPM = 80;
+const LEGACY_DIAT_BPM = 80;
+const LEGACY_MODE_BPM = 75;
+const LEGACY_LOCRIAN_BPM = 70;
+
 const X_STEP = 100;    // horizontal gap between fret positions (spine columns)
 const Y_STEP = 62;     // vertical gap between pattern variants (branch rows)
 const SPINE_RISE = 36; // each rightward spine position rises this many px above the previous
@@ -49,7 +64,8 @@ function makeSingleStringNode(
     prerequisites,
     requiredExercises: [{
       exerciseId: `scale_c_${scaleKey}_string_3`,
-      requiredBpm: 60,
+      requiredBpm: GATE_BPM,
+      legacyRequiredBpm: LEGACY_GATE_BPM,
       scaleType,
       patternType: "ascending",
       position: 0,
@@ -70,7 +86,9 @@ function makeNode(
   prerequisite: string | null,
   exerciseId: string,
   bpm: number,
+  legacyBpm: number,
   fretPos: number,
+  boxNumber: number,
   patternType: PatternType,
 ): ScaleTreeNodeDef {
   return {
@@ -86,11 +104,13 @@ function makeNode(
       {
         exerciseId,
         requiredBpm: bpm,
+        legacyRequiredBpm: legacyBpm,
         scaleType,
         patternType,
         position: fretPos,
+        boxNumber,
         label:
-          `${PATTERNS.find((p) => p.type === patternType)?.label ?? patternType} – Pos. ${fretPos}`,
+          `${PATTERNS.find((p) => p.type === patternType)?.label ?? patternType} – Box ${boxNumber}`,
       },
     ],
   };
@@ -117,12 +137,16 @@ function buildCluster(
   clusterY: number,
   firstPrereq: string | null,
   bpm: number,
+  legacyBpm: number,
 ): ScaleTreeNodeDef[] {
   const nodes: ScaleTreeNodeDef[] = [];
   const halfSpan = (positions.length - 1) / 2;
 
   for (let posIdx = 0; posIdx < positions.length; posIdx++) {
     const pos = positions[posIdx];
+    // Boxes are numbered by their order along the neck, not by the fret they
+    // sit on — "Box 4" is the fourth shape you learn, wherever it lands.
+    const boxNumber = posIdx + 1;
 
     for (let patIdx = 0; patIdx < PATTERNS.length; patIdx++) {
       const pat = PATTERNS[patIdx];
@@ -143,7 +167,7 @@ function buildCluster(
       nodes.push(makeNode(
         id,
         label,
-        `Pos. ${pos} – ${pat.label}`,
+        `Box ${boxNumber} – ${pat.label}`,
         scaleType,
         scaleFamily,
         x,
@@ -151,7 +175,9 @@ function buildCluster(
         prereq,
         `scale_c_${scaleKey}_${pat.type}_pos${pos}`,
         bpm,
+        legacyBpm,
         pos,
+        boxNumber,
         pat.type,
       ));
     }
@@ -211,47 +237,47 @@ const locrianSS = makeSingleStringNode(
 
 const minPentNodes = buildCluster(
   "min_pent", "Minor Pentatonic", "minor_pentatonic", "pentatonic", "minor_pentatonic",
-  PENT_POSITIONS, 0, 0, "min_pent_single_string", 80,
+  PENT_POSITIONS, 0, 0, "min_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
 );
 
 const majPentNodes = buildCluster(
   "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic", "major_pentatonic",
-  PENT_POSITIONS, 1100, -100, "maj_pent_single_string", 80,
+  PENT_POSITIONS, 1100, -100, "maj_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
 );
 
 const natMinorNodes = buildCluster(
   "nat_minor", "Natural Minor", "minor", "diatonic", "minor",
-  DIAT_POSITIONS, -1100, -100, "nat_minor_single_string", 80,
+  DIAT_POSITIONS, -1100, -100, "nat_minor_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
 );
 
 const majorNodes = buildCluster(
   "major", "Major Scale", "major", "diatonic", "major",
-  DIAT_POSITIONS, 2300, -300, "major_single_string", 80,
+  DIAT_POSITIONS, 2300, -300, "major_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
 );
 
 const dorianNodes = buildCluster(
   "dorian", "Dorian", "dorian", "mode", "dorian",
-  DIAT_POSITIONS, -2300, -300, "dorian_single_string", 75,
+  DIAT_POSITIONS, -2300, -300, "dorian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const phrygianNodes = buildCluster(
   "phrygian", "Phrygian", "phrygian", "mode", "phrygian",
-  DIAT_POSITIONS, -1800, 600, "phrygian_single_string", 75,
+  DIAT_POSITIONS, -1800, 600, "phrygian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const mixolydianNodes = buildCluster(
   "mixolydian", "Mixolydian", "mixolydian", "mode", "mixolydian",
-  DIAT_POSITIONS, 2000, 500, "mixolydian_single_string", 75,
+  DIAT_POSITIONS, 2000, 500, "mixolydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const lydianNodes = buildCluster(
   "lydian", "Lydian", "lydian", "mode", "lydian",
-  DIAT_POSITIONS, 3100, -700, "lydian_single_string", 75,
+  DIAT_POSITIONS, 3100, -700, "lydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const locrianNodes = buildCluster(
   "locrian", "Locrian", "locrian", "mode", "locrian",
-  DIAT_POSITIONS, 100, 1300, "locrian_single_string", 70,
+  DIAT_POSITIONS, 100, 1300, "locrian_single_string", EXAM_BPM, LEGACY_LOCRIAN_BPM,
 );
 
 // ─── Reward node generator ────────────────────────────────────────────────────
@@ -274,7 +300,7 @@ function buildRewardNodesForCluster(
 
     rewards.push({
       id: `${scaleId}_pos${pos}_reward`,
-      label: `Reward - Pos. ${pos}`,
+      label: `Reward – Box ${posIdx + 1}`,
       points: 100,
       famePoints: 50,
       position: { x, y },

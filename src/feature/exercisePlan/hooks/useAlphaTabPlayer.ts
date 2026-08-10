@@ -1,7 +1,7 @@
 import * as alphaTabLib from '@coderline/alphatab';
 import { onOutputDeviceChange, readPersistedOutputDeviceId } from 'hooks/useNativeOutputDevice';
 import type { MutableRefObject } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { applyAlphaTabOutputDevice } from 'utils/applyAudioSinkId';
 
 // AlphaTab measures playback position in MIDI ticks; 960 ticks = one quarter note.
@@ -101,6 +101,13 @@ export const useAlphaTabPlayer = ({
   const wasPausedRef     = useRef(false);
   // Tracks the previous isPlaying value to detect actual transitions vs startTime-only changes.
   const prevIsPlayingRef = useRef(false);
+  // isReadyRef mirrored into React state: the settings effects below (metronome click,
+  // master volume) carry values that usually never change after mount, so without a
+  // state dependency they fire exactly once — while apiRef is still null, because the
+  // API is only created once the GP file arrives (async fetch from gpFileUrl). Their
+  // value would then never reach AlphaTab at all, leaving it on its own defaults
+  // (metronomeVolume defaults to 0 → silent click after the count-in).
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   useEffect(() => { isPlayingRef.current             = isPlaying;            }, [isPlaying]);
   useEffect(() => { bpmRef.current                   = bpm;                  }, [bpm]);
@@ -170,6 +177,7 @@ export const useAlphaTabPlayer = ({
 
     api.playerReady.on(() => {
       isReadyRef.current = true;
+      setIsPlayerReady(true);
       // Expose AlphaTab's AudioContext — accessed via the (non-hard-private) output.context field.
       const atCtx = (api.player as any)?.output?.context as AudioContext | undefined;
       if (atCtx) onAudioContextReadyRef.current?.(atCtx);
@@ -206,6 +214,7 @@ export const useAlphaTabPlayer = ({
       if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
       try { api.destroy(); } catch { /* ignore */ }
       isReadyRef.current     = false;
+      setIsPlayerReady(false);
       pendingPlayRef.current = false;
       hasStartedRef.current  = false;
       wasPausedRef.current   = false;
@@ -226,6 +235,10 @@ export const useAlphaTabPlayer = ({
     if (!rawGpFile || !api || rawGpFile === currentFileRef.current) return;
 
     currentFileRef.current = rawGpFile;
+    // Only the play-gating ref resets here — isPlayerReady stays true on purpose.
+    // It gates the settings effects below, and metronome/master volume live on the
+    // API itself (they survive a score swap); clearing it would strand those values
+    // if AlphaTab decided not to re-fire playerReady for the new file.
     isReadyRef.current     = false;
     pendingPlayRef.current = false;
     hasStartedRef.current  = false;
@@ -246,17 +259,23 @@ export const useAlphaTabPlayer = ({
   // AlphaTab built-in metronome volume.
   // countInVolume stays 0 — our metronome handles the count-in clicks.
   // metronomeVolume is driven by the caller (0 when user mutes, 1 otherwise).
+  // isPlayerReady in deps: this is the *only* click the player hears once the
+  // count-in ends (the device metronome mutes itself during GP playback), and its
+  // value normally never changes, so it must be re-applied the moment the API exists.
   useEffect(() => {
     const api = apiRef.current;
-    if (api) api.metronomeVolume = metronomeVolume;
-  }, [metronomeVolume]);
+    if (api && isPlayerReady) api.metronomeVolume = metronomeVolume;
+  }, [metronomeVolume, isPlayerReady]);
 
   // Master volume — a global boost on top of the per-track volumes below (accepts > 1
   // to amplify quiet Guitar Pro soundfonts beyond their normal 100% level).
+  // isPlayerReady in deps for the same reason as the metronome above: a boost restored
+  // from storage is already in place on the first render, so the effect would otherwise
+  // never run again after the API is created and the slider would be purely cosmetic.
   useEffect(() => {
     const api = apiRef.current;
-    if (api) api.masterVolume = masterVolume;
-  }, [masterVolume]);
+    if (api && isPlayerReady) api.masterVolume = masterVolume;
+  }, [masterVolume, isPlayerReady]);
 
   // Playback control — pause/resume without losing position.
   //
