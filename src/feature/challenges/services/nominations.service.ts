@@ -77,10 +77,10 @@ export const nominateSong = async (params: {
     const snap = await transaction.get(ref);
 
     if (snap.exists()) {
-      const voters: string[] = snap.data().voters ?? [];
-      if (voters.includes(userId)) return; // already backed by this player
+      const voters = snap.data().voters ?? [];
+      if (voters.some((v: { id: string }) => v.id === userId)) return; // already backed by this player
       transaction.update(ref, {
-        voters: arrayUnion(userId),
+        voters: arrayUnion({ id: userId, name: userName }),
         voteCount: increment(1),
       });
       return;
@@ -95,7 +95,7 @@ export const nominateSong = async (params: {
       nominatedBy: userId,
       nominatedByName: userName,
       voteCount: 1,
-      voters: [userId],
+      voters: [{ id: userId, name: userName }],
       createdAt: Timestamp.now(),
     };
     if (song.coverUrl) nomination.coverUrl = song.coverUrl;
@@ -113,21 +113,24 @@ export const nominateSong = async (params: {
 export const toggleNominationVote = async (
   nomination: ChallengeNomination,
   userId: string,
+  userName: string,
 ): Promise<{ voted: boolean }> => {
-  const voting = !(nomination.voters ?? []).includes(userId);
+  const voting = !(nomination.voters ?? []).some((v) => v.id === userId);
   const ref = doc(db, NOMINATIONS_COLLECTION, nomination.id);
 
   await runTransaction(db, async (transaction) => {
     const snap = await transaction.get(ref);
     if (!snap.exists()) throw new Error("Nomination no longer exists");
 
-    const voters: string[] = snap.data().voters ?? [];
+    const voters = snap.data().voters ?? [];
     // The doc is the source of truth — a stale optimistic view must not
     // double-count a vote or push the counter below zero.
-    if (voting === voters.includes(userId)) return;
+    if (voting === voters.some((v: { id: string }) => v.id === userId)) return;
 
     transaction.update(ref, {
-      voters: voting ? arrayUnion(userId) : arrayRemove(userId),
+      voters: voting
+        ? arrayUnion({ id: userId, name: userName })
+        : arrayRemove({ id: userId, name: userName }),
       voteCount: increment(voting ? 1 : -1),
     });
   });

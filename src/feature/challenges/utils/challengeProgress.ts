@@ -81,7 +81,7 @@ export const remainingVotes = (
 ): number => {
   if (!userId) return 0;
   const used = nominations.filter((n) =>
-    (n.voters ?? []).includes(userId),
+    (n.voters ?? []).some((v) => v.id === userId),
   ).length;
   return Math.max(0, VOTES_PER_USER - used);
 };

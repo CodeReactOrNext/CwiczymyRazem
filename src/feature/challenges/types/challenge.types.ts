@@ -10,7 +10,7 @@ export const FAME_PER_SUBMISSION = 300;
 export const FAME_CLEAR_BONUS = 500;
 
 /** How many nominations one player may back per voting cycle. */
-export const VOTES_PER_USER = 3;
+export const VOTES_PER_USER = 5;
 
 export type ChallengeStatus = "active" | "archived";
 
@@ -72,7 +72,7 @@ export interface ChallengeNomination {
   nominatedBy: string;
   nominatedByName: string;
   voteCount: number;
-  voters: string[];
+  voters: Array<{ id: string; name: string }>;
   createdAt: Timestamp;
 }
 

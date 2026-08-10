@@ -5,6 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChallengeMutations } from "feature/challenges/hooks/useChallenges";
@@ -117,22 +122,42 @@ const NominationRow = ({
         {tier.tier}
       </span>
 
-      <button
-        type='button'
-        onClick={onToggleVote}
-        disabled={!hasVoted && !canVote}
-        aria-pressed={hasVoted}
-        className={cn(
-          "flex h-11 w-14 shrink-0 flex-col items-center justify-center rounded-lg text-xs font-bold transition-all active:scale-95",
-          hasVoted
-            ? "bg-amber-400/15 text-amber-300 hover:bg-amber-400/25"
-            : canVote
-              ? "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
-              : "bg-white/[0.02] text-zinc-600",
-        )}>
-        <ChevronUp className={cn("h-4 w-4", hasVoted && "fill-current")} />
-        <span className='tabular-nums'>{nomination.voteCount ?? 0}</span>
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type='button'
+            onClick={onToggleVote}
+            disabled={!hasVoted && !canVote}
+            aria-pressed={hasVoted}
+            className={cn(
+              "flex h-11 w-14 shrink-0 flex-col items-center justify-center rounded-lg text-xs font-bold transition-all active:scale-95",
+              hasVoted
+                ? "bg-amber-400/15 text-amber-300 hover:bg-amber-400/25"
+                : canVote
+                  ? "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
+                  : "bg-white/[0.02] text-zinc-600",
+            )}>
+            <ChevronUp className={cn("h-4 w-4", hasVoted && "fill-current")} />
+            <span className='tabular-nums'>{nomination.voteCount ?? 0}</span>
+          </button>
+        </TooltipTrigger>
+        {(nomination.voters?.length ?? 0) > 0 && (
+          <TooltipContent side='left' className='max-w-xs'>
+            <div className='space-y-1'>
+              <p className='text-[11px] font-semibold text-zinc-400 mb-1'>
+                Voted by:
+              </p>
+              {nomination.voters?.map((voter) => (
+                <UserTooltip key={voter.id} userId={voter.id}>
+                  <div className='text-[11px] text-zinc-200 hover:text-white cursor-pointer'>
+                    {voter.name}
+                  </div>
+                </UserTooltip>
+              ))}
+            </div>
+          </TooltipContent>
+        )}
+      </Tooltip>
     </div>
   );
 };
@@ -161,12 +186,12 @@ export const VotingBoard = ({
 
   const handleToggleVote = (nomination: ChallengeNomination) => {
     if (!currentUserId) return;
-    const hasVoted = (nomination.voters ?? []).includes(currentUserId);
+    const hasVoted = (nomination.voters ?? []).some((v) => v.id === currentUserId);
     if (!hasVoted && votesLeft === 0) {
       toast.error(`You've used all ${VOTES_PER_USER} votes this month.`);
       return;
     }
-    toggleVote({ nomination, userId: currentUserId });
+    toggleVote({ nomination, userId: currentUserId, userName });
   };
 
   const handleNominate = async (song: Song) => {
@@ -249,7 +274,7 @@ export const VotingBoard = ({
                 index={index}
                 hasVoted={
                   !!currentUserId &&
-                  (nomination.voters ?? []).includes(currentUserId)
+                  (nomination.voters ?? []).some((v) => v.id === currentUserId)
                 }
                 canVote={!!currentUserId && votesLeft > 0}
                 isQualifying={index < CHALLENGE_SONG_COUNT}

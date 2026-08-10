@@ -45,7 +45,7 @@ const nomination = (
     nominatedBy: "u1",
     nominatedByName: "Player",
     voteCount: 0,
-    voters: [],
+    voters: [] as Array<{ id: string; name: string }>,
     createdAt: ts(0),
     ...overrides,
   }) as ChallengeNomination;
@@ -136,16 +136,16 @@ describe("calculateSubmissionReward", () => {
 describe("remainingVotes", () => {
   it("counts a nomination the player backed as a spent vote", () => {
     const nominations = [
-      nomination({ songId: "a", voters: ["u1"] }),
-      nomination({ songId: "b", voters: ["u2"] }),
+      nomination({ songId: "a", voters: [{ id: "u1", name: "Player1" }] }),
+      nomination({ songId: "b", voters: [{ id: "u2", name: "Player2" }] }),
     ];
-    expect(remainingVotes(nominations, "u1")).toBe(2);
-    expect(remainingVotes(nominations, "u2")).toBe(2);
+    expect(remainingVotes(nominations, "u1")).toBe(4);
+    expect(remainingVotes(nominations, "u2")).toBe(4);
   });
 
   it("never drops below zero and is zero when signed out", () => {
     const nominations = Array.from({ length: 9 }, (_, i) =>
-      nomination({ songId: `s${i}`, voters: ["u1"] }),
+      nomination({ songId: `s${i}`, voters: [{ id: "u1", name: "Player1" }] }),
     );
     expect(remainingVotes(nominations, "u1")).toBe(0);
     expect(remainingVotes(nominations, null)).toBe(0);

@@ -136,8 +136,11 @@ export const useChallengeMutations = () => {
   });
 
   const vote = useMutation({
-    mutationFn: (params: { nomination: ChallengeNomination; userId: string }) =>
-      toggleNominationVote(params.nomination, params.userId),
+    mutationFn: (params: {
+      nomination: ChallengeNomination;
+      userId: string;
+      userName: string;
+    }) => toggleNominationVote(params.nomination, params.userId, params.userName),
     onSuccess: () => refreshBallot(),
     onError: (error) => {
       console.error(error);
