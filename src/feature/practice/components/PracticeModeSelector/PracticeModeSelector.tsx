@@ -301,34 +301,29 @@ export const PracticeModeSelector = () => {
         <div className='container relative z-10 mx-auto max-w-6xl px-4 py-12 font-sans sm:px-6'>
           <div className='flex flex-col gap-6'>
             {lastSessions.length > 0 && (
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
-                {lastSessions.map((session) => (
-                  <button
-                    key={session.at}
-                    type='button'
-                    onClick={() => nav(session.href, `resume-${session.at}`)}
-                    className='group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-zinc-800/60 bg-gradient-to-br from-white/[0.02] to-transparent px-4 py-4 text-left transition-background duration-200 hover:bg-white/[0.06] backdrop-blur-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-                    <Ripple className='bg-white/15' />
-                    <div className='flex items-center gap-3 min-w-0 flex-1'>
-                      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5'>
-                        {loadingMode === `resume-${session.at}` ? (
-                          <div className='h-7 w-7 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
-                        ) : (
-                          <History className='h-7 w-7 text-indigo-400' />
-                        )}
-                      </div>
-                      <div className='min-w-0 flex-1'>
-                        <p className='text-[10px] font-semibold tracking-wide text-zinc-500 mb-1'>
-                          Last Session
-                        </p>
-                        <p className='truncate text-sm font-bold text-white'>
-                          {session.title}
-                        </p>
-                      </div>
-                    </div>
-                    <ArrowRight className='h-5 w-5 shrink-0 text-zinc-400 transition-all group-hover:translate-x-1 group-hover:text-white' />
-                  </button>
-                ))}
+              <div className='flex flex-col gap-2.5'>
+                <p className='flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-500'>
+                  <History className='h-3.5 w-3.5' />
+                  Continue
+                </p>
+                <div className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0'>
+                  {lastSessions.map((session) => (
+                    <button
+                      key={session.at}
+                      type='button'
+                      onClick={() => nav(session.href, `resume-${session.at}`)}
+                      className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background duration-200 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                      <Ripple className='bg-white/15' />
+                      {loadingMode === `resume-${session.at}` && (
+                        <div className='h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
+                      )}
+                      <span className='max-w-[200px] truncate text-[13px] font-medium text-zinc-200 group-hover:text-white'>
+                        {session.title}
+                      </span>
+                      <ArrowRight className='h-3.5 w-3.5 shrink-0 text-zinc-500 transition-all group-hover:translate-x-0.5 group-hover:text-white' />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

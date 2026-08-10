@@ -547,7 +547,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
       <div className="hidden lg:block lg:flex-1" />
 
-      {!isElectron && (
+      {!isElectron && !mobile && (
         <a
           href={DESKTOP_APP_RELEASES_URL}
           target="_blank"
