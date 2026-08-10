@@ -108,10 +108,8 @@ const ChallengeRow = ({
                 ? "bg-zinc-950 text-amber-300 ring-2 ring-amber-400"
                 : "bg-zinc-800 text-zinc-400 ring-1 ring-white/10",
           )}>
-          {isCleared ? (
+          {isCleared && (
             <Check className='h-3.5 w-3.5' strokeWidth={3} />
-          ) : (
-            index + 1
           )}
         </span>
       </div>
@@ -296,10 +294,6 @@ export const ChallengeBoard = ({
               <span className='flex items-center gap-1.5'>
                 <Users className='h-3.5 w-3.5' />
                 {participants} {participants === 1 ? "player" : "players"}
-              </span>
-              <span className='h-1 w-1 rounded-full bg-zinc-600' />
-              <span>
-                {submissions.length} {submissions.length === 1 ? "run" : "runs"}
               </span>
               {(challenge.finisherCount ?? 0) > 0 && (
                 <>
