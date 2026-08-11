@@ -34,6 +34,8 @@ The reward isn't automatic — hitting the tempo unlocks the node, but you have 
 
 Each node shows where you stand — locked, available, in progress or done — based on the tempo you've actually recorded on it. The map opens up as you get faster, not as time passes.
 
+## Questions people ask
+
 <FaqList items="Do I need a microphone?::Not for the Learning Path — Fretboard Mastery is click-based. The Scale Map tracks the tempo you record on each pattern|Can I skip a step?::No, that's rather the point. Steps open in order|What if I fail an exam?::Nothing happens except that it stays unfinished. Retake it whenever|Does this count as practice?::Yes — time spent here logs like any other session" />
 
 <ReadNext links="Skills & achievements::/wiki/skills-and-achievements|AI Coach & weekly Milestones::/wiki/ai-coach-and-weekly-milestones|Points, Fame & streaks::/wiki/how-scoring-works" />

@@ -42,6 +42,8 @@ It's capped at the tier of your single hardest song, so a hundred easy songs can
 
 Public playlists show up in Discover, ranked by how popular they are — someone saving a playlist counts three times as much as a like. Sharing pays: when someone saves your public playlist you get **+20 Fame**, and a like pays **+5 Fame**.
 
+## Questions people ask
+
 <FaqList items="A song I want isn't in the library::Add it from Explore — anything you add becomes searchable for everyone else too|Why is my song stuck in Learning?::Nothing moves out of Learning on its own. Drag it to Learned when you're happy with it|Should I rate honestly?::Yes. Tiers are averages, so a few joke ratings get washed out, but the tiers are what people use to pick songs at the right level|Does practising a song count as practice?::Yes — it logs like any other session and counts towards your points, streak and skills" />
 
 <ReadNext links="Points, Fame & streaks::/wiki/how-scoring-works|Recordings & the community::/wiki/recordings-and-community|Monthly challenges::/wiki/monthly-challenges" />

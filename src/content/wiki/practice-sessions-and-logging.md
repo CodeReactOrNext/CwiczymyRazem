@@ -44,6 +44,8 @@ Everything you've logged is kept, grouped by day, on your Progress screen. Sessi
 
 The summary at the top adds it up for you: total time, number of sessions, points earned, active days, average session length and how your time split across the four categories.
 
+## Questions people ask
+
 <FaqList items="I forgot to log yesterday::Use Manual Log and set the date — anything within the last 7 days is fair game. Note that a backdated session doesn't rebuild a streak you already broke|Can I edit a session?::Yes. Open it in your practice log and change or delete it — points are recalculated to match|The timer was left running::Just correct the minutes on the form before saving. The timer is a suggestion, not a lock|Does practising a song need the timer?::No — practising from a song counts the same and is labelled as a song session automatically" />
 
 <ReadNext links="Points, Fame & streaks::/wiki/how-scoring-works|Ways to practise::/wiki/practice-modes-overview|Exercise plans & Auto Plan::/wiki/exercise-plans-and-auto-plan" />

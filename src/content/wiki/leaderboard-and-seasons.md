@@ -26,6 +26,8 @@ Next to each board you'll see where you stand. It's simply the number of players
 
 The boards and your position are refreshed periodically rather than the instant you save a session, so a big evening of practice can take a while to show up. Your points are already counted — only the display is behind.
 
+## Questions people ask
+
 <FaqList items="I practised a lot and my rank didn't move::Give it a little time. Boards refresh on a schedule; nothing is lost|Can I be top of one board and nowhere on another::Absolutely. The gear board rewards Fame spent in the Arsenal, the season board rewards this month's practice, and the all-time board rewards years of it|Do season rewards arrive automatically::The Fame is paid out when the season closes|Does buying a membership move me up::No. Points come from practice only" />
 
 <ReadNext links="Points, Fame & streaks::/wiki/how-scoring-works|Monthly challenges::/wiki/monthly-challenges|Arsenal & gear::/wiki/arsenal-and-gear" />

@@ -50,6 +50,8 @@ The Trader also stocks **two guitars and two pedals a day**, each a specific ins
 
 Your **Rig Level** is the sum of the Item Level of everything currently equipped in your Rig — guitars plus pedalboard effects. It's the number the [gear board](/wiki/leaderboard-and-seasons) ranks you on. Only equipped gear counts, so swapping in something stronger moves it immediately, and Workshop work only pays off if it went into something you actually use.
 
+## Questions people ask
+
 <FaqList items="Can I buy Fame with real money?::No. Fame is earned — quests, milestones, challenges, seasons and the community|I opened a case and got a duplicate::Scrap it. Duplicates become parts, and parts are what upgrade the copy you kept|Does gear affect my points or level?::Not at all. It's a separate game with its own board|Restore or build first?::Restore. Building past the early levels needs good condition anyway" />
 
 <ReadNext links="Where Fame comes from::/wiki/how-scoring-works|Rankings & seasons::/wiki/leaderboard-and-seasons|Weekly Milestones::/wiki/ai-coach-and-weekly-milestones" />

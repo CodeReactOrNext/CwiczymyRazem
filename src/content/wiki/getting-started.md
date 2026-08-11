@@ -32,12 +32,7 @@ Almost every reward in riff.quest is one of two currencies, and mixing them up i
 
 ## Where everything lives
 
-<ClickPath steps="Home" caption="Your daily quests, your streak, the getting-started checklist and what you did recently." />
-<ClickPath steps="Practice" caption="Every way of practising: routines, the free timer, the manual log, exercises, learning paths." />
-<ClickPath steps="Songs" caption="Your song board, song discovery and playlists." />
-<ClickPath steps="Progress" caption="Your history, your stats and your practice log." />
-<ClickPath steps="Rankings" caption="Seasons, the all-time board and the gear board." />
-<ClickPath steps="Arsenal" caption="The gear game — cases, your collection, the workshop and the market." />
+<Checklist items="Home::Your daily quests, your streak, the getting-started checklist and what you did recently|Practice::Every way of practising — routines, the free timer, the manual log, exercises and learning paths|Songs::Your song board, song discovery and playlists|Progress::Your history, your statistics and your full practice log|Milestones & Challenges::Weekly practice goals, and the five songs the community records each month|Rankings::Seasons, the all-time board and the gear board|Arsenal::The gear game — cases, your collection, the workshop and the market" />
 
 ## Common first-week questions
 

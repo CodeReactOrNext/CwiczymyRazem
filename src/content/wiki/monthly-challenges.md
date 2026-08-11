@@ -30,6 +30,8 @@ Old boards don't disappear. You can still record songs from a closed month and t
 The challenge board is the fastest legitimate Fame in the app. If you're saving for an Elite case, one recorded song is more than double the price of a Standard one.
 </BlogAlert>
 
+## Questions people ask
+
 <FaqList items="Do I have to play it perfectly?::No. This isn't judged or scored — a recording that exists counts|Where does the video live?::You link a video and it shows up in Recordings, where other players can watch, like and comment|Can I submit the same song twice?::No — one recording per song per month, so pick the take you're happiest with|What if I don't like any of the five?::Vote next cycle. Nominations are open the whole time the current board is live" />
 
 <ReadNext links="Recordings & the community::/wiki/recordings-and-community|Rankings & seasons::/wiki/leaderboard-and-seasons|Songs & difficulty::/wiki/songs-playlists-and-difficulty" />

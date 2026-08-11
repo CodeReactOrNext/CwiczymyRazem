@@ -45,7 +45,7 @@ export const PlanComparison = () => (
           <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
             {plan.key === "free"
               ? "Practising, logging, songs, seasons and Arsenal — free forever"
-              : `Cheaper billed yearly, and starts with a ${PLAN_TRIAL_DAYS}-day free trial`}
+              : `Includes a ${PLAN_TRIAL_DAYS}-day free trial`}
           </p>
         </div>
       ))}

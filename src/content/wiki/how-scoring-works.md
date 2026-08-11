@@ -44,6 +44,8 @@ Thirty minutes of practice on the fifth day of a streak:
 
 <Checklist items="Levels::Your total points set your level, and each level takes a little more than the last|Seasons::Every point also lands in the current month's season — a scoreboard that starts fresh on the 1st|Rankings::The all-time board ranks everyone by total points and sessions, and there's a separate board for your gear" />
 
+## Questions people ask
+
 <FaqList items="Do longer sessions pay a bonus?::No, the rate is flat — 1 point per 3 minutes. The multiplier comes from the streak, not from session length|Can I lose points?::Only by undoing something you were paid for, like moving a song back out of Learned. Points are never taken away for inactivity|Why didn't my rank move?::Ranking positions are refreshed periodically rather than instantly, so a big session can take a little while to show up|Is Fame worth chasing?::Only if you enjoy the Arsenal. Fame buys gear, and gear ranks you on the gear board — it does nothing to your level or your points" />
 
 <ReadNext links="Logging a practice session::/wiki/practice-sessions-and-logging|Rankings & seasons::/wiki/leaderboard-and-seasons|Spending Fame in the Arsenal::/wiki/arsenal-and-gear|Home screen & daily quests::/wiki/dashboard-and-daily-quests" />

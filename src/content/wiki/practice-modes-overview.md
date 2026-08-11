@@ -28,6 +28,8 @@ Wherever you practise, your time is filed under one of four categories. They're 
 Guided modes (routines, Auto Plan, roadmaps) tag the categories for you. If you're using the Free Timer or the manual log, tag honestly — this split is the only thing that tells you you've done no ear training in three weeks.
 </BlogAlert>
 
+## Questions people ask
+
 <FaqList items="Does the mode change how many points I get?::No. 30 minutes is 30 minutes wherever it came from. Only healthy habits and the streak change what a session is worth|Can I mix modes in one day?::Yes, and most people do — a routine plus twenty minutes on a song is two sessions and both count|Which mode keeps my streak alive?::Any of them. The streak only asks that a session got logged that day" />
 
 <ReadNext links="Logging a practice session::/wiki/practice-sessions-and-logging|Exercise plans & Auto Plan::/wiki/exercise-plans-and-auto-plan|Skills & achievements::/wiki/skills-and-achievements|Songs & difficulty::/wiki/songs-playlists-and-difficulty" />

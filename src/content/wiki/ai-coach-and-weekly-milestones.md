@@ -34,6 +34,8 @@ Milestones are a ladder of weekly practice goals. Each rung costs a one-off amou
 
 Buy the levels you'll genuinely hit rather than the biggest one you can afford. Groove costs 40 once and pays 30 a week: it's ahead by the second week. Virtuoso pays ten times more, but only in weeks where you practise all four categories every single day.
 
+## Questions people ask
+
 <FaqList items="Do I lose a level if I miss a week?::No. Unlocking is permanent — you simply don't claim that week|Can I claim more than one level a week?::Yes. Every unlocked level whose goal you've met can be claimed, every week|What counts towards the goal?::Logged practice, exactly as it feeds everything else. There's no separate milestone practice|Does a roadmap step need a specific exercise?::No — any logged session counts towards the eight" />
 
 <ReadNext links="Free, Pro & Master::/wiki/membership-plans|Points, Fame & streaks::/wiki/how-scoring-works|Ways to practise::/wiki/practice-modes-overview|Arsenal & gear::/wiki/arsenal-and-gear" />

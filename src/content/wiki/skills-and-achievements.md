@@ -28,6 +28,8 @@ Each one has its own unlock condition (reaching a streak, logging a certain amou
 
 <TierScale items="Common::The ones most players pick up early|Rare::A bit of consistency required|Very rare::Long-term commitment|Epic::Rare enough to be worth showing off" />
 
+## Questions people ask
+
 <FaqList items="How do I gain skill XP?::Play the exercises tagged with that skill and log the session. Free-form practice time raises your points, but only exercises feed specific skills|Can a skill go down?::No. Skill totals never decrease|Do achievements give rewards?::No — they're collectible only. Everything you actually spend comes from Fame|Where do I see my badges?::On your profile, alongside your level and stats" />
 
 <ReadNext links="Ways to practise::/wiki/practice-modes-overview|Practice routines & Auto Plan::/wiki/exercise-plans-and-auto-plan|Learning Path & Scale Map::/wiki/journey-and-scale-tree" />

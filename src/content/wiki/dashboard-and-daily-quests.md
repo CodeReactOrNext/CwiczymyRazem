@@ -30,6 +30,8 @@ Home shows today. **Progress** shows everything else — your practice history d
 
 <ClickPath steps="Progress" caption="Your history, statistics and full practice log — including the ability to edit or delete a session you logged wrong." />
 
+## Questions people ask
+
 <FaqList items="I finished a quest but it still shows as incomplete::Quest progress is counted from logged sessions, so it only moves once you save the session — not while the timer is running|Can I choose my quests?::No, they're drawn for you each day. If a task doesn't suit you, skip it — nothing is lost except that day's claim|Do quests keep a streak?::No. Only practising keeps the streak alive. Quests are a separate, single-day reward" />
 
 <ReadNext links="How points and streaks work::/wiki/how-scoring-works|Logging a practice session::/wiki/practice-sessions-and-logging|Spending your Fame::/wiki/arsenal-and-gear" />

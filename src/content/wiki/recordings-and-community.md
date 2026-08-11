@@ -28,6 +28,8 @@ Tying a recording to a song makes it show up on that song's page too, which is h
 If you want a steady Fame income without grinding, share what you already make: publish the practice exercises you write and the playlists you build. They keep paying long after you've forgotten about them.
 </BlogAlert>
 
+## Questions people ask
+
 <FaqList items="Can I post something private?::Recordings are shared with the community. If you'd rather keep a take to yourself, just don't upload it — you can still tick the Recording habit when you log the session|Can I delete a recording?::Yes, your own recordings can be removed at any time|Do recordings pay points on their own?::Only through challenges. A recording posted outside a challenge is for feedback, not for score|Who can comment?::Any logged-in player. Notifications tell you when somebody does" />
 
 <ReadNext links="Monthly challenges::/wiki/monthly-challenges|Songs & difficulty::/wiki/songs-playlists-and-difficulty|Practice routines & sharing exercises::/wiki/exercise-plans-and-auto-plan" />
