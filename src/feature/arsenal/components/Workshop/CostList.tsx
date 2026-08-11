@@ -2,8 +2,8 @@ import { cn } from "assets/lib/utils";
 import type { RecipeLine } from "feature/arsenal/data/workshop";
 
 import { PartRow } from "../Parts/PartRow";
+import { SectionLabel } from "../SectionLabel";
 import { FameCoin } from "./FameCoin";
-import { SectionLabel } from "./SectionLabel";
 
 interface CostListProps {
   recipe: RecipeLine[];

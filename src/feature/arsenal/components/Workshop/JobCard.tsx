@@ -51,65 +51,73 @@ export const JobCard = ({
   accent,
   disabled = false,
   onClick,
-}: JobCardProps) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    className={cn(
-      "relative flex items-center gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-6 text-left transition-colors click-behavior",
-      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
-      "disabled:pointer-events-none disabled:opacity-50",
-      "hover:bg-zinc-900/70",
-    )}>
-    {ready && !disabled && <ReadyShine />}
-    <span
+}: JobCardProps) => {
+  const showsGain = ready && gain != null;
+  // The note is the whole answer to "why is this button grey?", so on a phone —
+  // where there is no room for a right-hand column — it moves under the summary
+  // rather than disappearing.
+  const note = ready ? (showsGain ? undefined : readyNote) : blockedNote;
+  const noteClass = ready ? ACCENTS[accent].fg : "text-amber-400/80";
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
       className={cn(
-        "relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg",
-        ready ? ACCENTS[accent].bg : "bg-zinc-800/60",
+        "relative flex items-center gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-6 text-left transition-colors click-behavior",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "hover:bg-zinc-900/70",
       )}>
-      <Icon
-        size={24}
-        className={cn(ready ? ACCENTS[accent].fg : "text-zinc-500")}
-      />
-    </span>
-
-    <span className='flex min-w-0 flex-1 flex-col gap-1.5'>
-      <span className='text-lg font-black text-white'>{title}</span>
-      <span className='flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-zinc-400'>
-        {summary}
+      {ready && !disabled && <ReadyShine />}
+      <span
+        className={cn(
+          "relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg",
+          ready ? ACCENTS[accent].bg : "bg-zinc-800/60",
+        )}>
+        <Icon
+          size={24}
+          className={cn(ready ? ACCENTS[accent].fg : "text-zinc-500")}
+        />
       </span>
-    </span>
 
-    <span className='flex shrink-0 items-center gap-4'>
-      {ready && gain != null ? (
-        <span className='flex flex-col items-end gap-0.5'>
-          <CountUp
-            value={gain}
-            prefix='+'
-            className={cn(
-              "text-3xl font-black tabular-nums",
-              ACCENTS[accent].fg,
-            )}
-          />
-          <span className='text-sm text-zinc-500'>level</span>
+      <span className='flex min-w-0 flex-1 flex-col gap-1.5'>
+        <span className='text-lg font-black text-white'>{title}</span>
+        <span className='flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-zinc-400'>
+          {summary}
         </span>
-      ) : ready && readyNote ? (
-        <span
-          className={cn(
-            "hidden max-w-[200px] text-right text-sm sm:block",
-            ACCENTS[accent].fg,
-          )}>
-          {readyNote}
-        </span>
-      ) : (
-        blockedNote && (
-          <span className='hidden max-w-[200px] text-right text-sm text-amber-400/80 sm:block'>
-            {blockedNote}
+        {note && (
+          <span className={cn("text-sm sm:hidden", noteClass)}>{note}</span>
+        )}
+      </span>
+
+      <span className='flex shrink-0 items-center gap-4'>
+        {showsGain ? (
+          <span className='flex flex-col items-end gap-0.5'>
+            <CountUp
+              value={gain}
+              prefix='+'
+              className={cn(
+                "text-3xl font-black tabular-nums",
+                ACCENTS[accent].fg,
+              )}
+            />
+            <span className='text-sm text-zinc-500'>level</span>
           </span>
-        )
-      )}
+        ) : (
+          note && (
+            <span
+              className={cn(
+                "hidden max-w-[200px] text-right text-sm sm:block",
+                noteClass,
+              )}>
+              {note}
+            </span>
+          )
+        )}
 
-      <ChevronRight size={18} className='text-zinc-600' />
-    </span>
-  </button>
-);
+        <ChevronRight size={18} className='text-zinc-600' />
+      </span>
+    </button>
+  );
+};

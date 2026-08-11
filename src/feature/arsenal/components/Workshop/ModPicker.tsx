@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Dices } from "lucide-react";
 
 import { PartRow } from "../Parts/PartRow";
-import { SectionLabel } from "./SectionLabel";
+import { SectionLabel } from "../SectionLabel";
 
 /**
  * The bill for one mod, small enough to sit inside a row.

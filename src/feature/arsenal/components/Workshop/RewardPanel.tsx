@@ -4,6 +4,7 @@ import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import { Check, Lock } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { SectionLabel } from "../SectionLabel";
 import { ConditionPath } from "./ConditionPath";
 
 interface RewardPanelProps {
@@ -26,9 +27,7 @@ const TINT = {
  */
 export const RewardPanel = ({ accent, children }: RewardPanelProps) => (
   <div className={cn("flex flex-col gap-5 rounded-lg p-6", TINT[accent])}>
-    <span className='text-sm font-black tracking-wide text-zinc-200'>
-      You get
-    </span>
+    <SectionLabel>You get</SectionLabel>
     {children}
   </div>
 );
