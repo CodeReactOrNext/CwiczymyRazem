@@ -56,7 +56,7 @@ export const SessionModalHeader = ({
 
         <span
           className={cn(
-            "font-mono shrink-0 text-xl font-black leading-none tabular-nums tracking-tight transition-colors",
+            "font-mono shrink-0 text-xl font-black tabular-nums leading-none tracking-tight transition-colors",
             isPlaying ? "text-white" : "text-zinc-500",
           )}>
           {formattedTimeLeft}

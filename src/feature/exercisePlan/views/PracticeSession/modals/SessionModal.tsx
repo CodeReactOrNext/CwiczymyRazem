@@ -7,12 +7,9 @@ import React, { useState } from "react";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
-import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
-import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
-import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
-import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
+import { MobileToolsIsland } from "../components/MobileToolsIsland";
 import { RotateDeviceHint } from "../components/RotateDeviceHint";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
@@ -179,6 +176,7 @@ const SessionModal = ({
         currentExerciseIndex={currentExerciseIndex}
         totalExercises={totalExercises}
         onClose={onClose}
+        isPlaying={isPlaying}
       />
 
       <div className="flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5">
@@ -222,41 +220,8 @@ const SessionModal = ({
 
           {isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && <MobileMicGameHud />}
 
-          <MobileTimerDisplay isPlaying={isPlaying} />
-
-          {/* Controls */}
-          <MediaControlsToolbar
-            hasMetronome={!!currentExercise.metronomeSpeed}
-            hasAudioTrack={hasAudioTrack}
-            hasMicControls={hasMicControls}
-            speedMultiplier={speedMultiplier ?? 1}
-            onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
-            isAudioMuted={isAudioMuted}
-            isRiddleMode={isRiddleMode}
-            onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
-            isMicEnabled={isMicEnabled}
-            onMicToggle={toggleMic}
-            onRecalibrate={onRecalibrate ?? (() => {})}
-            frequencyRef={frequencyRef}
-            volumeRef={volumeRef}
-            disableTuner={currentExercise.disableTuner}
-            metronome={metronome} isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
-            audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
-            masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
-            onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
-            mobile
-          />
-
-          <ExerciseQuickActionsBar
-            exercise={currentExercise}
-            metronome={metronome}
-            examMode={examMode}
-          />
-
-          <MobileInstructionsCard exercise={currentExercise} />
-
           {currentExercise.links && currentExercise.links.length > 0 && (
-            <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4 mb-20">
+            <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4">
               <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-widest">
                 <span>Support Author</span>
               </div>
@@ -273,6 +238,34 @@ const SessionModal = ({
           )}
         </div>
       </div>
+
+      {/* Every tool that isn't the exercise itself lives here — one icon row
+          docked above the transport, the rest a tap away in its sheet. */}
+      <MobileToolsIsland
+        exercise={currentExercise}
+        metronome={metronome}
+        examMode={examMode}
+        hasMetronome={!!currentExercise.metronomeSpeed}
+        hasAudioTrack={hasAudioTrack}
+        hasMicControls={hasMicControls}
+        isRiddleMode={isRiddleMode}
+        speedMultiplier={speedMultiplier ?? 1}
+        onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
+        isAudioMuted={isAudioMuted}
+        onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
+        isMicEnabled={isMicEnabled}
+        onMicToggle={toggleMic}
+        onRecalibrate={onRecalibrate ?? (() => {})}
+        isMetronomeMuted={isMetronomeMuted}
+        setIsMetronomeMuted={setIsMetronomeMuted}
+        audioTracks={audioTracks}
+        setTrackConfigs={setTrackConfigs}
+        masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
+        onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
+        frequencyRef={frequencyRef}
+        volumeRef={volumeRef}
+        disableTuner={currentExercise.disableTuner}
+      />
 
       <SessionModalControls
         examMode={examMode}

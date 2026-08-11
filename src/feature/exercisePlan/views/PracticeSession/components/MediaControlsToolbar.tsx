@@ -64,6 +64,9 @@ interface MediaControlsToolbarProps {
   compact?: boolean;
   /** Full-width stacked layout for narrow (portrait phone) screens. */
   mobile?: boolean;
+  /** Drop the playback-speed button — used when the tempo controls live
+   *  elsewhere (mobile tools island keeps BPM + speed in one place). */
+  hideSpeed?: boolean;
   disableTuner?: boolean;
   baseBpm?: number;
   trailing?: React.ReactNode;
@@ -273,6 +276,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   volumeRef,
   compact = false,
   mobile = false,
+  hideSpeed = false,
   disableTuner = false,
   baseBpm,
   trailing,
@@ -292,6 +296,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   // track (guitar) toggle is hidden too, unless the exam explicitly keeps it
   // (e.g. scale exams, where hearing the reference scale is allowed).
   const showSpeed = !examMode;
+  // The speed button can be lifted out (mobile island) while the metronome
+  // volume slider below still needs to know the exercise isn't in exam mode.
+  const showSpeedControl = showSpeed && !hideSpeed;
   const showBacking = !examMode || showBackingInExam;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
   const showVolumeButton =
@@ -314,7 +321,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     // ever depend on label width for its layout.
     const gridBtn =
       "flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg transition-all active:scale-95";
-    const showSpeedBtn = showSpeed && hasMetronome;
+    const showSpeedBtn = showSpeedControl && hasMetronome;
     const showBackingBtn = showBacking && hasAudioTrack;
     const showTuningBtn = hasAudioTrack || hasMicControls;
 
