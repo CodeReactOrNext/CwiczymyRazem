@@ -17,6 +17,12 @@ interface ClickableFretboardProps {
   onCellClick?: (string: number, fret: number) => void;
   /** Read-only mode: "string-fret" key the mic is hearing right now — pulses. */
   liveKey?: string | null;
+  /** Cells already solved in an EARLIER step of the same round (the interval
+   *  drill's located roots) — kept on the board in amber under `markedLabel`, so
+   *  the answer to step 2 can be read off the shapes the player just built. */
+  markedKeys?: string[];
+  /** Single character drawn inside every `markedKeys` marker, e.g. "R". */
+  markedLabel?: string;
   /** Replaces the default "FRETS x–y" caption. */
   title?: ReactNode;
 }
@@ -96,10 +102,13 @@ export function ClickableFretboard({
   lastClick,
   onCellClick,
   liveKey,
+  markedKeys,
+  markedLabel,
   title,
 }: ClickableFretboardProps) {
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
+  const marked = new Set(markedKeys);
   const allFound = totalTargets > 0 && found.size >= totalTargets;
   const interactive = !!onCellClick;
   // Only worth shouting about which string to use when the exercise actually
@@ -426,6 +435,7 @@ export function ClickableFretboard({
               const w = colWidth(fret);
               const key = `${stringNum}-${fret}`;
               const isFound = found.has(key);
+              const isMarked = !isFound && marked.has(key);
               const cx = x + w / 2;
               const cy = y + ROW_H / 2;
               cells.push(
@@ -455,6 +465,17 @@ export function ClickableFretboard({
                       style={{ transformOrigin: `${cx}px ${cy}px` }}
                       className="pointer-events-none"
                     />
+                  )}
+                  {isMarked && (
+                    <g className="pointer-events-none">
+                      <circle cx={cx} cy={cy} r={32} fill="#f59e0b" opacity={0.15} />
+                      <circle cx={cx} cy={cy} r={24} fill="#f59e0b" stroke="#432003" strokeWidth={3} />
+                      {markedLabel && (
+                        <text x={cx} y={cy + 9} textAnchor="middle" fontSize={25} fontWeight="bold" fill="#432003">
+                          {markedLabel}
+                        </text>
+                      )}
+                    </g>
                   )}
                   {isFound && (
                     <g className="pointer-events-none">

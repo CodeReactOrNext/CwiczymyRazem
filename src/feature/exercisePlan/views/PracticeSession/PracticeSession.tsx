@@ -15,6 +15,7 @@ import { useAppSelector } from "store/hooks";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
 import type { ExercisePlan } from "../../types/exercise.types";
+import { isClickAnsweredMode } from "../../utils/huntModes";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
@@ -347,11 +348,11 @@ export const PracticeSession = ({
   // (mic_tracking_enabled in localStorage), so once enabled anywhere it would
   // otherwise open a real getUserMedia stream in every exercise, guitar or not.
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong && !currentExercise.disableMic;
-  // Click hunts are scored from mouse clicks, so their snapshot is a real
-  // performance worth reporting even though the mic never opens (useScoreSaving
-  // persists them on its own click branch). Everything else only has a snapshot
-  // worth submitting when the mic was actually listening.
-  const hasTrackedPerformance = isMicEnabled || currentExercise.noteHuntConfig?.mode === "click";
+  // Click-answered hunts are scored from mouse clicks, so their snapshot is a
+  // real performance worth reporting even though the mic never opens
+  // (useScoreSaving persists them on its own click branch). Everything else only
+  // has a snapshot worth submitting when the mic was actually listening.
+  const hasTrackedPerformance = isMicEnabled || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (isExamMode && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke

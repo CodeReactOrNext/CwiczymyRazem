@@ -176,12 +176,16 @@ export interface Exercise {
    *   - "click": no mic — the player clicks the target note's position(s) directly
    *     on a fretboard diagram (customGoalRegion + customGoalStrings scope the
    *     valid cells). See useClickHunt / ClickHuntPanel.
+   *   - "intervalClick": the click drill in two steps — customGoalPrompt holds the
+   *     root + interval, customGoal the (hidden) note the interval lands on. The
+   *     player clicks every root position first, then every target position. See
+   *     useIntervalClickHunt / IntervalClickPanel.
    *   - "accumulate": like "octaves", but progress accumulates ACROSS rotations
    *     instead of resetting per-target — the exam accuracy is (distinct notes
    *     completed so far) / 12, for "hit every chromatic note before the clock
    *     runs out" exams. See the String Hunt / Whole Neck Hunt exercises.
    *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
-  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" };
+  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick" };
   /** Restricts which strings (1-6, 1 = high e) are in play. Omitted = all 6.
    *  Combined with customGoalRegion's fret window to compute the exact set of
    *  valid (string, fret) positions — the clickable targets in "click" mode, and

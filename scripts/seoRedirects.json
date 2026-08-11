@@ -235,6 +235,26 @@
     "permanent": true
   },
   {
+    "source": "/exercises/interval-click-box-0-4",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-box-5-9",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-box-8-12",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-sprint-dg",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
     "source": "/exercises/string-sweep-low-e",
     "destination": "/guitar-scale-practice-routine",
     "permanent": true

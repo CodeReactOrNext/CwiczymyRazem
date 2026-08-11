@@ -29,6 +29,11 @@ export function computeClickTargets(
   }));
 }
 
+/** Multiplier the next find is worth once `n` positions are already found. */
+export function multiplierForFoundCount(n: number): number {
+  return Math.min(8, Math.floor(n / 5) + 1);
+}
+
 /**
  * Escalating score for finding `n` positions — the same curve as the mic-based
  * hunts: every 5 finds bumps the multiplier, capped at 8×.
@@ -37,9 +42,4 @@ export function scoreForFoundCount(n: number): number {
   let total = 0;
   for (let i = 0; i < n; i++) total += 100 * multiplierForFoundCount(i);
   return total;
-}
-
-/** Multiplier the next find is worth once `n` positions are already found. */
-export function multiplierForFoundCount(n: number): number {
-  return Math.min(8, Math.floor(n / 5) + 1);
 }

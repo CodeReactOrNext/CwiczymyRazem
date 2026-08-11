@@ -12,6 +12,7 @@ import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { IntervalClickPanel } from "./IntervalClickPanel";
 import { MetronomeGapTest } from "./MetronomeGapTest";
 import { MicHud } from "./MicHud";
 import { NoteHuntDetector } from "./NoteHuntDetector";
@@ -202,6 +203,19 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+            />
+          ) : currentExercise.noteHuntConfig?.mode === "intervalClick" ? (
+            <IntervalClickPanel
+              rootNote={currentExercise.customGoalPrompt?.title ?? ""}
+              intervalLabel={currentExercise.customGoalPrompt?.subtitle}
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              startFret={currentExercise.customGoalRegion?.startFret ?? 0}
+              endFret={currentExercise.customGoalRegion?.endFret ?? 12}
+              strings={currentExercise.customGoalStrings}
+              isPlaying={isPlaying}
+              isExamMode={isExamMode}
+              onDevPassExam={onDevPassExam}
             />
           ) : currentExercise.noteHuntConfig?.mode === "click" ? (
             <ClickHuntPanel
