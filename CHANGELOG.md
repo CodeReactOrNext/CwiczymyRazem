@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 - Marketplace purchases now show up in the activity feed — the item, its seller and the price paid are visible to everyone, and other players can motivate the buyer for it just like any other activity.
 - You can now heart your favorite plans and exercises — hearted items get pinned to the top of their lists, and a new Favorites page gathers all of them in one place for quick access.
 
+### Changed
+- Sesja ćwiczeń na telefonie (pionowo) oddaje ekran ćwiczeniu: tempo, prędkość odtwarzania, strojenie, głośność, mikrofon i instrukcje schowały się pod jeden rząd ikon nad przyciskami sterowania, a szczegóły otwierają się w wysuwanym panelu dopiero na żądanie. Górny pasek jest niższy, ma pasek postępu planu i wbudowany timer, więc czas widać cały czas bez osobnego wiersza.
+
 ### Fixed
 - Naprawiono problem z Google Translatorem powodujący błędy
 - Błędy z przeglądarki znowu trafiają do Sentry — po przejściu na Next 16 (Turbopack) klient Sentry w ogóle się nie uruchamiał, więc awarie po stronie użytkownika nigdzie nie były zgłaszane. Dodatkowo `console.warn`/`console.error` lądują teraz w logach Sentry, a błędy z preview deploymentów nie mieszają się z produkcyjnymi.

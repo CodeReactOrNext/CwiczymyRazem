@@ -1,9 +1,8 @@
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { motion } from "framer-motion";
 import { X } from "lucide-react";
 
+import { useTimerContext } from "../contexts/TimerContext";
 import { FavoriteExerciseButton } from "./FavoriteExerciseButton";
 
 interface SessionModalHeaderProps {
@@ -12,62 +11,69 @@ interface SessionModalHeaderProps {
   currentExerciseIndex: number;
   totalExercises: number;
   onClose: () => void;
+  isPlaying: boolean;
 }
 
+/**
+ * Phone-portrait session header. It carries the timer too, so the practice area
+ * below doesn't have to give up a whole row to it — everything the player
+ * glances at (time, title, position in the plan) sits in one 48px strip that
+ * never scrolls away.
+ */
 export const SessionModalHeader = ({
   exerciseTitle,
   exerciseId,
   currentExerciseIndex,
   totalExercises,
   onClose,
+  isPlaying,
 }: SessionModalHeaderProps) => {
+  const { formattedTimeLeft } = useTimerContext();
+  const progress = totalExercises
+    ? ((currentExerciseIndex + 1) / totalExercises) * 100
+    : 0;
+
   return (
-    <motion.div
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className={cn(
-        "relative pb-1 shadow-lg backdrop-blur-sm transition-all duration-300"
-      )}>
-      <div
-        className={cn("absolute inset-0")}
-        style={{
-          background:
-            "linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))",
-          clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 4px), 0 100%)",
-          opacity: 0.85,
-        }}
-      />
-
-      <div
-        className='absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/90 via-primary/60 to-transparent'
-        style={{
-          boxShadow: "0 1px 4px rgba(var(--primary-rgb), 0.4)",
-        }}
-      />
-
-      <div className='relative z-10 flex h-14 items-center justify-between'>
+    <div className='relative z-10 shrink-0 bg-zinc-950/70 backdrop-blur-sm'>
+      <div className='flex h-12 items-center gap-2 pr-3'>
         <Button
           variant='ghost'
           size='icon'
           onClick={onClose}
-          className='relative z-10 ml-2 mr-1 shrink-0 transition-all duration-200 hover:bg-background/80 hover:shadow-md'>
+          aria-label='Close session'
+          className='shrink-0 text-zinc-400 hover:text-white'>
           <X className='h-5 w-5' />
         </Button>
 
-        <div className='relative z-10 flex min-w-0 flex-1 items-center justify-center gap-2'>
-          <h1 className='truncate text-[14px] font-bold tracking-tight text-foreground drop-shadow-md'>
+        <div className='flex min-w-0 flex-1 items-center gap-1.5'>
+          <h1 className='truncate text-sm font-semibold text-zinc-100'>
             {exerciseTitle}
           </h1>
-          {exerciseId && <FavoriteExerciseButton exerciseId={exerciseId} compact />}
+          {exerciseId && (
+            <FavoriteExerciseButton exerciseId={exerciseId} compact />
+          )}
         </div>
 
-        <div className='relative z-10 mr-3 flex shrink-0 items-center gap-2'>
-          <Badge variant='outline' className='shadow-sm'>
-            {currentExerciseIndex + 1} of {totalExercises}
-          </Badge>
-        </div>
+        <span
+          className={cn(
+            "font-mono shrink-0 text-xl font-black tabular-nums leading-none tracking-tight transition-colors",
+            isPlaying ? "text-white" : "text-zinc-500",
+          )}>
+          {formattedTimeLeft}
+        </span>
+
+        <span className='font-mono shrink-0 text-[11px] tabular-nums text-zinc-500'>
+          {currentExerciseIndex + 1}/{totalExercises}
+        </span>
       </div>
-    </motion.div>
+
+      {/* Plan progress — a value, not a divider: how far the session has come. */}
+      <div className='h-0.5 w-full bg-zinc-800/60'>
+        <div
+          className='h-full bg-cyan-500/70 transition-all duration-300'
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
   );
 };

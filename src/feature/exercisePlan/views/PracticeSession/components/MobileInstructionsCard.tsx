@@ -7,6 +7,9 @@ import type { Exercise } from "../../../types/exercise.types";
 
 interface MobileInstructionsCardProps {
   exercise: Exercise;
+  /** Render just the content, always expanded and without its own card
+   *  background — for places that already are a card (mobile tools sheet). */
+  plain?: boolean;
 }
 
 /**
@@ -14,7 +17,7 @@ interface MobileInstructionsCardProps {
  * it shows a two-line preview so the guidance is discoverable without eating
  * the small screen; tapping expands the full content.
  */
-export const MobileInstructionsCard = ({ exercise }: MobileInstructionsCardProps) => {
+export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstructionsCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const instructions = exercise.instructions ?? [];
@@ -22,6 +25,56 @@ export const MobileInstructionsCard = ({ exercise }: MobileInstructionsCardProps
   if (!instructions.length && !tips.length && !exercise.whyItMatters) return null;
 
   const preview = instructions[0] ?? exercise.whyItMatters ?? tips[0];
+
+  const content = (
+    <>
+      {exercise.whyItMatters && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-zinc-200">
+            <FaGraduationCap size={12} />
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Why This Matters</h4>
+          </div>
+          <p className="text-xs leading-relaxed text-zinc-400">{exercise.whyItMatters}</p>
+        </div>
+      )}
+
+      {instructions.length > 0 && (
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2 text-zinc-200">
+            <FaInfoCircle size={12} />
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Instructions</h4>
+          </div>
+          <ol className="space-y-2.5">
+            {instructions.map((instruction, idx) => (
+              <li key={idx} className="flex gap-2.5 text-xs leading-relaxed text-zinc-300">
+                <span className="shrink-0 font-mono font-bold text-cyan-500/70">{idx + 1}.</span>
+                <span>{instruction}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {tips.length > 0 && (
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2 text-zinc-200">
+            <FaLightbulb size={12} className="text-amber-400/80" />
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Pro Tips</h4>
+          </div>
+          <div className="space-y-2.5">
+            {tips.map((tip, idx) => (
+              <div key={idx} className="flex gap-2.5 text-xs leading-relaxed text-zinc-400">
+                <span className="shrink-0 font-semibold text-amber-500/60">#{idx + 1}</span>
+                <p>{tip}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  if (plain) return <div className="space-y-6">{content}</div>;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/50">
@@ -48,51 +101,7 @@ export const MobileInstructionsCard = ({ exercise }: MobileInstructionsCardProps
       )}
 
       {isExpanded && (
-        <div className="space-y-5 border-t border-white/5 px-4 py-4">
-          {exercise.whyItMatters && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-zinc-200">
-                <FaGraduationCap size={12} />
-                <h4 className="text-[10px] font-semibold capitalize tracking-wider">Why This Matters</h4>
-              </div>
-              <p className="text-xs leading-relaxed text-zinc-400">{exercise.whyItMatters}</p>
-            </div>
-          )}
-
-          {instructions.length > 0 && (
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-zinc-200">
-                <FaInfoCircle size={12} />
-                <h4 className="text-[10px] font-semibold capitalize tracking-wider">Instructions</h4>
-              </div>
-              <ol className="space-y-2.5">
-                {instructions.map((instruction, idx) => (
-                  <li key={idx} className="flex gap-2.5 text-xs leading-relaxed text-zinc-300">
-                    <span className="shrink-0 font-mono font-bold text-cyan-500/70">{idx + 1}.</span>
-                    <span>{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {tips.length > 0 && (
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-zinc-200">
-                <FaLightbulb size={12} className="text-amber-400/80" />
-                <h4 className="text-[10px] font-semibold capitalize tracking-wider">Pro Tips</h4>
-              </div>
-              <div className="space-y-2.5">
-                {tips.map((tip, idx) => (
-                  <div key={idx} className="flex gap-2.5 text-xs leading-relaxed text-zinc-400">
-                    <span className="shrink-0 font-semibold text-amber-500/60">#{idx + 1}</span>
-                    <p>{tip}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <div className="space-y-5 border-t border-white/5 px-4 py-4">{content}</div>
       )}
     </div>
   );
