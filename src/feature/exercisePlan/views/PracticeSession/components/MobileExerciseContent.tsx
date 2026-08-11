@@ -11,6 +11,7 @@ import { EarQuizPanel } from "./EarQuiz/EarQuizPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
+import { IntervalClickPanel } from "./IntervalClickPanel";
 import { MetronomeGapTest } from "./MetronomeGapTest";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
@@ -98,6 +99,20 @@ export function MobileExerciseContent({
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+            />
+          ) : currentExercise.noteHuntConfig?.mode === "intervalClick" ? (
+            // Two-step interval drill — same tap-the-diagram answer flow as the
+            // click drills, so it must not fall through to the mic detector either.
+            <IntervalClickPanel
+              rootNote={currentExercise.customGoalPrompt?.title ?? ""}
+              intervalLabel={currentExercise.customGoalPrompt?.subtitle}
+              targetNote={currentExercise.customGoal}
+              description={currentExercise.customGoalDescription}
+              startFret={currentExercise.customGoalRegion?.startFret ?? 0}
+              endFret={currentExercise.customGoalRegion?.endFret ?? 12}
+              strings={currentExercise.customGoalStrings}
+              isPlaying={isPlaying}
+              isExamMode={isExamMode}
             />
           ) : currentExercise.noteHuntConfig?.mode === "click" ? (
             // Click drills answer by tapping the diagram, not through the mic —

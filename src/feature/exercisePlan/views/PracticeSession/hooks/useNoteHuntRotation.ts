@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Exercise } from "../../../types/exercise.types";
+import { isClickAnsweredMode } from "../../../utils/huntModes";
 
 export interface HuntTarget {
   goal: string;
@@ -45,7 +46,7 @@ export function useNoteHuntRotation(
   isExamMode = false,
 ): NoteHuntRotation {
   const configuredRotateSeconds = exercise.noteHuntConfig?.rotateSeconds ?? 0;
-  const isExamClickHunt = isExamMode && exercise.noteHuntConfig?.mode === "click";
+  const isExamClickHunt = isExamMode && isClickAnsweredMode(exercise.noteHuntConfig?.mode);
   const rotateSeconds = isExamClickHunt && configuredRotateSeconds > 0 ? EXAM_CLICK_ROTATE_SECONDS : configuredRotateSeconds;
   const enabled = rotateSeconds > 0 && typeof exercise.rollHuntTarget === "function";
 

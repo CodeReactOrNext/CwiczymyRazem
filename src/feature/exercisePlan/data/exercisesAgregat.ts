@@ -229,6 +229,10 @@ import { fretClickOctavesDgHighExercise } from "feature/exercisePlan/data/exeris
 import { fretClickOctavesDgOpenExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesDgOpen/fretClickOctavesDgOpen";
 import { fretClickWholeChromaticExercise } from "feature/exercisePlan/data/exerises/fretClickWholeChromatic/fretClickWholeChromatic";
 import { fretClickWholeNaturalExercise } from "feature/exercisePlan/data/exerises/fretClickWholeNatural/fretClickWholeNatural";
+import { intervalClickBox04Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox04";
+import { intervalClickBox59Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox59";
+import { intervalClickBox812Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox812";
+import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
@@ -349,6 +353,10 @@ const rawExercises: Exercise[] = [
   fretClickBox812Exercise,
   fretClickWholeNaturalExercise,
   fretClickWholeChromaticExercise,
+  intervalClickBox04Exercise,
+  intervalClickBox59Exercise,
+  intervalClickBox812Exercise,
+  intervalClickWholeFretboardExercise,
   stringHuntLowEExercise,
   stringHuntAExercise,
   stringHuntDExercise,

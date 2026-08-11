@@ -10,6 +10,8 @@ import type { ChordHuntState } from "../hooks/useChordHunt";
 import { useChordHunt } from "../hooks/useChordHunt";
 import type { ClickHuntState } from "../hooks/useClickHunt";
 import { useClickHunt } from "../hooks/useClickHunt";
+import type { IntervalClickState } from "../hooks/useIntervalClickHunt";
+import { useIntervalClickHunt } from "../hooks/useIntervalClickHunt";
 import type { NoteHuntState } from "../hooks/useNoteHunt";
 import { useNoteHunt } from "../hooks/useNoteHunt";
 import { useNoteMatching } from "../hooks/useNoteMatching";
@@ -32,6 +34,8 @@ interface NoteMatchingContextValue {
   chordHunt: ChordHuntState | null;
   /** Live click-hunt state — populated only for click-mode exercises. */
   clickHunt: ClickHuntState | null;
+  /** Live interval-drill state — populated only for intervalClick-mode exercises. */
+  intervalClickHunt: IntervalClickState | null;
   /** Cumulative progress for "accumulate" mode hunts (distinct notes completed
    *  across rotations, out of 12) — null in every other mode. */
   chromaticProgress: { found: number; total: number } | null;
@@ -63,6 +67,8 @@ interface NoteMatchingContextValue {
   markChordTone: (pitchClass: number) => void;
   /** Register a click on a fretboard cell for click-mode hunts. */
   registerFretClick: (string: number, fret: number) => void;
+  /** Register a click on a fretboard cell for the interval drill (root, then interval). */
+  registerIntervalClick: (string: number, fret: number) => void;
 }
 
 // ── Imperative handle (what PracticeSession reads in event handlers) ──────────
@@ -101,6 +107,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   noteHunt: null,
   chordHunt: null,
   clickHunt: null,
+  intervalClickHunt: null,
   chromaticProgress: null,
   noteHuntSecondsLeft: null,
   noteHuntRegion: null,
@@ -115,6 +122,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   markNoteHuntOctave: () => { /* no-op default */ },
   markChordTone: () => { /* no-op default */ },
   registerFretClick: () => { /* no-op default */ },
+  registerIntervalClick: () => { /* no-op default */ },
 });
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -151,7 +159,7 @@ interface NoteMatchingProviderProps {
   // strings in play for click- and mic-mode hunts (undefined = all 6)
   customGoalStrings: number[] | undefined;
   // which hunt variant the current exercise is (selects the detection hook)
-  noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | undefined;
+  noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick" | undefined;
   // countdown until the note-hunt target rotates (null when not rotating)
   noteHuntSecondsLeft: number | null;
   // flipped to true once the current hunt goal is fully solved (drives fast-forward)
@@ -245,7 +253,8 @@ export function NoteMatchingProvider({
   const isHunt = !!customGoal;
   const isChordHunt = isHunt && noteHuntMode === "chord";
   const isClickHunt = isHunt && noteHuntMode === "click";
-  const isNoteHunt = isHunt && !isChordHunt && !isClickHunt; // octaves / region / interval / accumulate
+  const isIntervalClickHunt = isHunt && noteHuntMode === "intervalClick";
+  const isNoteHunt = isHunt && !isChordHunt && !isClickHunt && !isIntervalClickHunt; // octaves / region / interval / accumulate
   const isAccumulatingHunt = isNoteHunt && noteHuntMode === "accumulate";
   // Note/chord hunts target a bare note name with no string attached, authored as
   // if standard-tuned — on a uniformly detuned guitar (half/whole step down) the
@@ -297,29 +306,44 @@ export function NoteMatchingProvider({
     huntStrings,
   );
 
-  // Exam mode, click hunts only: too many wrong clicks fails the exam outright
-  // instead of just diluting accuracy — closes the "brute-force every cell"
-  // loophole the untimed, unpenalized click hunt otherwise leaves wide open.
+  // Interval-click mode: the prompt's root lives in customGoalPrompt.title and the
+  // note the interval lands on is the hidden customGoal — step 1 and step 2 of the
+  // same round.
+  const { state: intervalClickHunt, registerClick: registerIntervalClick } = useIntervalClickHunt(
+    customGoalPrompt?.title ?? "",
+    customGoal ?? "",
+    regionStart ?? 0,
+    regionEnd ?? 12,
+    huntStrings,
+  );
+
+  // Exam mode, click-answered hunts only: too many wrong clicks fails the exam
+  // outright instead of just diluting accuracy — closes the "brute-force every
+  // cell" loophole the untimed, unpenalized click drills otherwise leave open.
+  const clickMistakeCount = isIntervalClickHunt ? intervalClickHunt.mistakeCount : clickHunt.mistakeCount;
   const examFailFiredRef = useRef(false);
   useEffect(() => {
-    if (!isExamMode || !isClickHunt || examFailFiredRef.current) return;
-    if (clickHunt.mistakeCount >= CLICK_EXAM_MISTAKE_LIMIT) {
+    if (!isExamMode || !(isClickHunt || isIntervalClickHunt) || examFailFiredRef.current) return;
+    if (clickMistakeCount >= CLICK_EXAM_MISTAKE_LIMIT) {
       examFailFiredRef.current = true;
       onExamFail?.();
     }
-  }, [isExamMode, isClickHunt, clickHunt.mistakeCount, onExamFail]);
+  }, [isExamMode, isClickHunt, isIntervalClickHunt, clickMistakeCount, onExamFail]);
 
-  const huntGameState = isChordHunt ? chordHunt.gameState : isClickHunt ? clickHunt.gameState : noteHunt.gameState;
-  const huntMaxScore = isChordHunt ? chordHunt.maxPossibleScore : isClickHunt ? clickHunt.maxPossibleScore : noteHunt.maxPossibleScore;
-  const huntMaxCombo = isChordHunt ? chordHunt.maxCombo : isClickHunt ? clickHunt.maxCombo : noteHunt.maxCombo;
+  const huntGameState = isChordHunt ? chordHunt.gameState : isClickHunt ? clickHunt.gameState : isIntervalClickHunt ? intervalClickHunt.gameState : noteHunt.gameState;
+  const huntMaxScore = isChordHunt ? chordHunt.maxPossibleScore : isClickHunt ? clickHunt.maxPossibleScore : isIntervalClickHunt ? intervalClickHunt.maxPossibleScore : noteHunt.maxPossibleScore;
+  const huntMaxCombo = isChordHunt ? chordHunt.maxCombo : isClickHunt ? clickHunt.maxCombo : isIntervalClickHunt ? intervalClickHunt.maxCombo : noteHunt.maxCombo;
 
-  // Whole goal solved? Chord: all tones. Click: every valid position. Interval:
-  // found the target once. Octave/region/accumulate: every reachable octave. Reported
-  // to the rotation hook so it can fast-forward to the next target.
+  // Whole goal solved? Chord: all tones. Click: every valid position. Interval
+  // click: both steps of the round. Interval: found the target once.
+  // Octave/region/accumulate: every reachable octave. Reported to the rotation
+  // hook so it can fast-forward to the next target.
   const huntComplete = isChordHunt
     ? chordHunt.tones.length > 0 && chordHunt.foundTones.length === chordHunt.tones.length
     : isClickHunt
       ? clickHunt.targetPositions.length > 0 && clickHunt.foundKeys.length >= clickHunt.targetPositions.length
+      : isIntervalClickHunt
+      ? intervalClickHunt.complete
       : isNoteHunt
         ? noteHuntMode === "interval"
           ? noteHunt.foundOctaves.length >= 1
@@ -346,7 +370,7 @@ export function NoteMatchingProvider({
   }, [isAccumulatingHunt, huntComplete, currentPitchClass]);
   const accumulatedAccuracy = Math.round((accumulatedNotes.size / 12) * 100);
 
-  const huntAccuracy = isChordHunt ? chordHunt.accuracy : isClickHunt ? clickHunt.accuracy : isAccumulatingHunt ? accumulatedAccuracy : noteHunt.accuracy;
+  const huntAccuracy = isChordHunt ? chordHunt.accuracy : isClickHunt ? clickHunt.accuracy : isIntervalClickHunt ? intervalClickHunt.accuracy : isAccumulatingHunt ? accumulatedAccuracy : noteHunt.accuracy;
 
   const isStrummingExercise = !!activeStrumPattern;
   const gameState = isHunt ? huntGameState : isStrummingExercise ? strumGameState : tabGameState;
@@ -381,6 +405,11 @@ export function NoteMatchingProvider({
       const found = clickHunt.maxCombo;
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
+    if (isIntervalClickHunt) {
+      const total = intervalClickHunt.rootPositions.length + intervalClickHunt.intervalPositions.length;
+      const found = intervalClickHunt.maxCombo;
+      return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
+    }
     if (isNoteHunt) {
       const total = noteHunt.octaves.length;
       const found = noteHunt.maxCombo;
@@ -390,6 +419,7 @@ export function NoteMatchingProvider({
   }, [
     isChordHunt, chordHunt.tones.length, chordHunt.maxCombo,
     isClickHunt, clickHunt.targetPositions.length, clickHunt.maxCombo,
+    isIntervalClickHunt, intervalClickHunt.rootPositions.length, intervalClickHunt.intervalPositions.length, intervalClickHunt.maxCombo,
     isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo,
     tabNoteTimeline,
   ]);
@@ -416,6 +446,7 @@ export function NoteMatchingProvider({
       noteHunt: isNoteHunt ? noteHunt : null,
       chordHunt: isChordHunt ? chordHunt : null,
       clickHunt: isClickHunt ? clickHunt : null,
+      intervalClickHunt: isIntervalClickHunt ? intervalClickHunt : null,
       chromaticProgress: isAccumulatingHunt ? { found: accumulatedNotes.size, total: 12 } : null,
       noteHuntSecondsLeft: isHunt ? noteHuntSecondsLeft : null,
       noteHuntRegion: isNoteHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
@@ -430,9 +461,10 @@ export function NoteMatchingProvider({
       markNoteHuntOctave,
       markChordTone,
       registerFretClick,
+      registerIntervalClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (

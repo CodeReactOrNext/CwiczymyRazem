@@ -7,6 +7,7 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
+import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -362,7 +363,7 @@ export const ExerciseBrowseTab = ({
       SkillIcon: skillId ? guitarSkills.find(s => s.id === skillId)?.icon : null,
       isFavorite: favoriteExerciseIds.includes(exercise.id),
       rank: leaderboardRanks[exercise.id],
-      hasLeaderboard: bpmStages.length > 0 || !!exercise.riddleConfig || exercise.noteHuntConfig?.mode === "click" || (!!exercise.tablature && exercise.tablature.length > 0),
+      hasLeaderboard: bpmStages.length > 0 || !!exercise.riddleConfig || isClickAnsweredMode(exercise.noteHuntConfig?.mode) || (!!exercise.tablature && exercise.tablature.length > 0),
       hasBpmProgress,
       bpmStages,
       completedBpms,

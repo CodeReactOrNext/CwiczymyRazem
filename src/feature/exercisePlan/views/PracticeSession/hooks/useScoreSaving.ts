@@ -5,6 +5,7 @@ import { useAppSelector } from "store/hooks";
 
 import { saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise } from "../../../types/exercise.types";
+import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 
 interface UseScoreSavingOptions {
@@ -58,7 +59,7 @@ export function useScoreSaving({
       }
     }
 
-    if (userAuth && currentExercise.noteHuntConfig?.mode === "click" && snap && snap.score > 0) {
+    if (userAuth && isClickAnsweredMode(currentExercise.noteHuntConfig?.mode) && snap && snap.score > 0) {
       const result = await updateClickHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
       saveLeaderboardEntry(userAuth, exId, snap.score, userName || "Anonymous", userAvatar || "");
       if (result.isNewRecord) {
