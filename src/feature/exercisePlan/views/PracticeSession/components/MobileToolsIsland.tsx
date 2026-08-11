@@ -93,7 +93,10 @@ export const MobileToolsIsland = ({
   // toolbar does — the island must not smuggle those controls back in.
   const hasTempo = hasMetronome && !examMode;
   const hasBacking = hasAudioTrack && !examMode;
-  const hasSound = hasMetronome || hasAudioTrack || hasMicControls;
+  // A metronome-only exam exercise has nothing left in the sound panel (no
+  // backing, no tuning, no click volume) — don't offer an empty tab for it.
+  const hasSound =
+    hasAudioTrack || hasMicControls || (hasMetronome && !examMode);
   const hasInfo = !!(
     exercise.instructions?.length ||
     exercise.tips?.length ||

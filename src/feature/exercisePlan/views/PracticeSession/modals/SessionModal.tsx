@@ -169,7 +169,9 @@ const SessionModal = ({
   }
 
   return (
-    <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950", gradientClasses)}>
+    // bg-gradient-to-b + gradientClasses: the category tint now colours the
+    // whole session surface instead of only the header strip it lost.
+    <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950 bg-gradient-to-b", gradientClasses)}>
       <SessionModalHeader
         exerciseTitle={currentExercise.title}
         exerciseId={currentExercise.id}
@@ -271,7 +273,6 @@ const SessionModal = ({
         examMode={examMode}
         isPlaying={isPlaying}
         isLastExercise={isLastExercise}
-        onClose={onClose}
         onFinish={onFinish}
         toggleTimer={handleToggleTimer}
         handleNextExercise={handleNextExerciseClick}
