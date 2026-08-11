@@ -1,3 +1,4 @@
+import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { StaticImageData } from "next/image";
 
@@ -205,6 +206,11 @@ export interface Exercise {
    *  in customGoal for detection. Re-rolled alongside customGoal. */
   customGoalPrompt?: { title: string; subtitle?: string };
   riddleConfig?: ExerciseRiddleConfig;
+  /** Turns the exercise into one of the click-to-answer listening quizzes
+   *  (chord quality, progression, tuning by ear, scale/mode). The panel plays
+   *  the question and grades the answer itself — no mic, no tablature.
+   *  See EarQuizPanel / feature/exercisePlan/logic/earQuiz. */
+  earQuizConfig?: EarQuizConfig;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */

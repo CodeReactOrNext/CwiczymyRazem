@@ -4,6 +4,7 @@ import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/compl
 import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
 import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
 import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
+import { earTrainingLabPlan } from "feature/exercisePlan/data/plans/earTrainingLab/earTrainingLab";
 import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
 import { guitarPlayalongsPlans } from "feature/exercisePlan/data/plans/guitarPlayalongs/guitarPlayalongsPlans";
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
@@ -54,6 +55,7 @@ const FREE_PLAN_IDS = new Set([
   "mega_beginner_first_steps",
   "beginner_daily_exercises",
   "ear_rhythm_fundamentals",
+  "ear_training_lab",
   "daily_dexterity_starter",
   "strumming_foundations",
   "rhythm_timing_foundations",
@@ -114,6 +116,7 @@ export const defaultPlans: ExercisePlan[] = [
   megaBeginnerFirstStepsPlan,
   beginnerDailyExercisesPlan,
   earRhythmFundamentalsPlan,
+  earTrainingLabPlan,
   handHealthStrengthPlan,
   dailyDexterityStarterPlan,
   strummingFoundationsPlan,

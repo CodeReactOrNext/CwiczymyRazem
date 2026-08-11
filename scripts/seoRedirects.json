@@ -565,6 +565,46 @@
     "permanent": true
   },
   {
+    "source": "/exercises/ear-chord-quality-basics",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-chord-quality-advanced",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-progression-basics",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-progression-advanced",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-tuning-trainer",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-tuning-precision",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-mode-basics",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-mode-advanced",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
     "source": "/exercises/first-bend",
     "destination": "/beginner-guitar-exercises#first-bend",
     "permanent": true

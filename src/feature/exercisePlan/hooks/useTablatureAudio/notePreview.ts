@@ -196,7 +196,14 @@ function renderPluck(ctx: AudioContext, periodSamples: number, seconds: number):
   return buffer;
 }
 
-function playPluck(ctx: AudioContext, bus: PreviewBus, freq: number, duration: number, volume: number): void {
+function playPluck(
+  ctx: AudioContext,
+  destination: AudioNode,
+  freq: number,
+  duration: number,
+  volume: number,
+  when?: number,
+): void {
   const periodSamples = Math.max(2, Math.round(ctx.sampleRate / freq + 0.5));
   const renderedFreq = pluckPeriodToFrequency(ctx.sampleRate, periodSamples);
   const buffer = renderPluck(ctx, periodSamples, duration + 0.4);
@@ -224,12 +231,12 @@ function playPluck(ctx: AudioContext, bus: PreviewBus, freq: number, duration: n
   source.connect(body);
   body.connect(tone);
   tone.connect(level);
-  level.connect(bus.input);
+  level.connect(destination);
 
   source.onended = () => {
     source.disconnect(); body.disconnect(); tone.disconnect(); level.disconnect();
   };
-  source.start(ctx.currentTime + 0.02);
+  source.start(when ?? ctx.currentTime + 0.02);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -278,6 +285,108 @@ export function playGuitarNotePreview(midi: number, duration = 1.6, volume = 0.9
   // Not loaded yet — sound the note now (waiting on the network would put a
   // visible delay between the click and the pitch) and warm the samples up for
   // the next one.
-  playPluck(ctx, bus, midiToFrequency(midi), duration, volume);
+  playPluck(ctx, bus.input, midiToFrequency(midi), duration, volume);
   void loadInstrument(ctx);
+}
+
+// ── Chords and sequences ─────────────────────────────────────────────────────
+
+export interface PreviewEvent {
+  /** Notes sounded together, low to high. */
+  midis: number[];
+  /** Seconds after the sequence starts. */
+  at: number;
+  /** Seconds each note rings for. Defaults to 1.6. */
+  duration?: number;
+  /** Seconds between consecutive notes of the same event — 0 is a block chord,
+   *  ~0.03 reads as a strum, a beat's worth turns it into an arpeggio. */
+  spread?: number;
+  /** Relative level of this event (multiplied by the sequence volume). */
+  gain?: number;
+}
+
+/** Small head start so every note of the sequence is scheduled, not fired late. */
+const SEQUENCE_LEAD_SECONDS = 0.06;
+
+/**
+ * Schedule chords and runs on the shared preview bus — the ear-training quizzes
+ * play whole progressions and scales, which `playGuitarNotePreview` can't do:
+ * it fires one note immediately and guards against retriggers, so a chord would
+ * arrive as a single note.
+ *
+ * Returns a stop function that mutes whatever is still to come, so replaying a
+ * question never leaves the previous take ringing underneath.
+ */
+export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => void {
+  const ctx = getPreviewCtx();
+  if (!ctx) return () => {};
+  if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+
+  const bus = getPreviewBus(ctx);
+
+  // Everything routes through one gate, so a single gain ramp silences the whole
+  // sequence — scheduled soundfont voices can't be cancelled individually.
+  const gate = ctx.createGain();
+  gate.gain.value = 1;
+  gate.connect(bus.input);
+
+  const start = ctx.currentTime + SEQUENCE_LEAD_SECONDS;
+  let lastNoteEnd = 0;
+
+  for (const event of events) {
+    const spread = event.spread ?? 0;
+    const duration = event.duration ?? 1.6;
+    const gain = (event.gain ?? 1) * volume;
+    lastNoteEnd = Math.max(lastNoteEnd, event.at + (event.midis.length - 1) * spread + duration);
+
+    event.midis.forEach((midi, index) => {
+      const when = start + event.at + index * spread;
+      if (_instrument) {
+        (_instrument.play as unknown as PlayIntoDestination)(String(midi), when, {
+          duration,
+          gain,
+          destination: gate,
+        });
+      } else {
+        playPluck(ctx, gate, midiToFrequency(midi), duration, gain, when);
+      }
+    });
+  }
+
+  void loadInstrument(ctx); // next sequence gets the sampled instrument
+
+  const releaseGate = () => {
+    try { gate.disconnect(); } catch { /* already gone */ }
+  };
+
+  // Drop the gate once the tail has rung out — a session can play hundreds of
+  // questions, and each one would otherwise leave a node hanging off the bus.
+  let cleanupTimer: ReturnType<typeof setTimeout> | null = setTimeout(
+    releaseGate,
+    (SEQUENCE_LEAD_SECONDS + lastNoteEnd + 1) * 1000,
+  );
+
+  let stopped = false;
+  return () => {
+    if (stopped) return;
+    stopped = true;
+    try {
+      gate.gain.cancelScheduledValues(ctx.currentTime);
+      gate.gain.setTargetAtTime(0, ctx.currentTime, 0.02);
+    } catch {
+      /* context torn down — nothing left to silence */
+    }
+    if (cleanupTimer) clearTimeout(cleanupTimer);
+    cleanupTimer = null;
+    setTimeout(releaseGate, 400);
+  };
+}
+
+/** One chord, strummed by default. Convenience wrapper over playGuitarSequence. */
+export function playGuitarChordPreview(
+  midis: number[],
+  options: { spread?: number; duration?: number; volume?: number } = {},
+): () => void {
+  const { spread = 0.028, duration = 2.4, volume = 0.9 } = options;
+  return playGuitarSequence([{ midis, at: 0, duration, spread }], volume);
 }

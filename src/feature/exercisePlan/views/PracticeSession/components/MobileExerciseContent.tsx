@@ -7,6 +7,7 @@ import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { ChordHuntPanel } from "./ChordHuntPanel";
 import { ClickHuntPanel } from "./ClickHuntPanel";
+import { EarQuizPanel } from "./EarQuiz/EarQuizPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
@@ -74,6 +75,18 @@ export function MobileExerciseContent({
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
   const { hitNotes, missedNotes } = useNoteMatchingContext();
+
+  // Listening quizzes are the whole player slot — they carry no tab, video or
+  // image to fall through to.
+  if (currentExercise.earQuizConfig) {
+    return (
+      <EarQuizPanel
+        config={currentExercise.earQuizConfig}
+        exerciseId={currentExercise.id}
+        isSessionRunning={isPlaying}
+      />
+    );
+  }
 
   return (
     <>

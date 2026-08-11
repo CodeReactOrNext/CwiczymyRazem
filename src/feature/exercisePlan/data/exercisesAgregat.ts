@@ -145,6 +145,11 @@ const FREE_EXERCISE_IDS = new Set([
   "vibrato_low_position",
   "vibrato_sustain_drill",
   "pentatonic_box1_up_down",
+  // Listening quizzes — the entry level of each one is free
+  "ear_chord_quality_basics",
+  "ear_progression_basics",
+  "ear_tuning_trainer",
+  "ear_mode_basics",
   // Playalong exercises — free
   "pentatonic_playalong_best_of",
   "metal_playalong_basic",
@@ -195,6 +200,7 @@ import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/
 import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
 import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
+import { earQuizExercises } from "feature/exercisePlan/data/exerises/earQuiz/earQuizExercises";
 import {
   earTrainingEasy,
   earTrainingHard,
@@ -405,6 +411,7 @@ const rawExercises: Exercise[] = [
   earTrainingEasy,
   earTrainingMedium,
   earTrainingHard,
+  ...earQuizExercises,
   firstBendExercise,
   firstBendHalfStepExercise,
   bendAndReleaseExercise,
