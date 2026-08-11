@@ -3,6 +3,18 @@ import { BlogAlert } from "components/Blog/BlogAlert";
 import { Checklist } from "components/Blog/Checklist";
 import { StatRow } from "components/Blog/StatRow";
 import { StepList } from "components/Blog/StepList";
+import {
+  AppScreen,
+  BoardPreview,
+  ClickPath,
+  FaqList,
+  PlanComparison,
+  ProgressLadder,
+  QuestPreview,
+  ReadNext,
+  SessionLogPreview,
+  TierScale,
+} from "components/Wiki";
 import WikiLayout from "feature/wiki/WikiLayout";
 import AppLayout from "layouts/AppLayout";
 import { getWikiPageBySlug, getWikiSections, type WikiFrontmatter, type WikiSection } from "lib/wiki";
@@ -15,7 +27,22 @@ import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import type { NextPageWithLayout } from "types/page";
 
-const components = { StepList, Checklist, StatRow, BlogAlert };
+const components = {
+  StepList,
+  Checklist,
+  StatRow,
+  BlogAlert,
+  AppScreen,
+  BoardPreview,
+  ClickPath,
+  FaqList,
+  PlanComparison,
+  ProgressLadder,
+  QuestPreview,
+  ReadNext,
+  SessionLogPreview,
+  TierScale,
+};
 
 interface WikiArticleProps {
   frontmatter: WikiFrontmatter;
