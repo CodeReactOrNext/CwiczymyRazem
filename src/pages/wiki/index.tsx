@@ -14,6 +14,9 @@ interface WikiIndexProps {
 }
 
 const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
+  // The very first article in reading order doubles as the "start here" card.
+  const firstPage = sections[0]?.pages[0];
+
   return (
     <>
       <Head>
@@ -23,7 +26,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
       <div className='bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen'>
         <HeroBanner
           title='Wiki'
-          subtitle='How riff.quest works, mechanic by mechanic'
+          subtitle='Everything riff.quest does, explained in plain language'
           eyebrow='Guides'
           backgroundContent={<HeroPattern />}
           compact
@@ -34,9 +37,20 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
             {sections.length === 0 && (
               <p className='text-sm text-zinc-500'>No wiki articles yet.</p>
             )}
+            {firstPage && (
+              <Link
+                href={`/wiki/${firstPage.slug}`}
+                className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-6 transition-background hover:bg-zinc-800/60'>
+                <span className='text-xs font-bold text-cyan-400'>New here?</span>
+                <span className='text-lg font-bold text-white'>{firstPage.title}</span>
+                <span className='text-sm leading-relaxed text-zinc-400'>
+                  {firstPage.description}
+                </span>
+              </Link>
+            )}
             {sections.map((section) => (
               <div key={section.section}>
-                <h2 className='text-base font-bold text-white tracking-wide mb-4'>
+                <h2 className='mb-4 text-base font-bold tracking-wide text-white'>
                   {section.section}
                 </h2>
                 <div className='grid gap-4 md:grid-cols-2'>
@@ -44,7 +58,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                     <Link
                       key={page.slug}
                       href={`/wiki/${page.slug}`}
-                      className='rounded-xl bg-zinc-900/40 p-5 hover:bg-zinc-900/70 transition-background'>
+                      className='rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-800/60'>
                       <div className='font-bold text-white'>{page.title}</div>
                       <p className='mt-2 text-sm leading-relaxed text-zinc-400'>
                         {page.description}
