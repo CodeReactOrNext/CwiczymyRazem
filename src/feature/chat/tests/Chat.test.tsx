@@ -1,8 +1,17 @@
 import { fireEvent,render, screen } from "@testing-library/react";
+import { TooltipProvider } from "assets/components/ui/tooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { beforeEach,describe, expect, it, vi } from "vitest";
 
 import Chat from "../Chat";
+
+// The like tooltip needs the same provider the app mounts in _app.tsx.
+const renderChat = () =>
+  render(
+    <TooltipProvider>
+      <Chat />
+    </TooltipProvider>
+  );
 
 vi.mock("feature/chat/hooks/useChat");
 
@@ -42,12 +51,12 @@ describe("Chat Component", () => {
   });
 
   it("should render messages", () => {
-    render(<Chat />);
+    renderChat();
     expect(screen.getByText("Test Message")).toBeDefined();
   });
 
   it("should send message", async () => {
-    const { container } = render(<Chat />);
+    const { container } = renderChat();
     const button = container.querySelector('button[type="submit"]');
     if (!button) throw new Error("Button not found");
     
@@ -67,12 +76,12 @@ describe("Chat Component", () => {
       error: "Error message",
     });
 
-    render(<Chat />);
+    renderChat();
     expect(screen.getByText("Error message")).toBeDefined();
   });
 
   it("should toggle like when the like button is clicked", () => {
-    const { container } = render(<Chat />);
+    const { container } = renderChat();
     const likeButton = container.querySelector('button[type="button"]');
     if (!likeButton) throw new Error("Like button not found");
 
@@ -104,7 +113,7 @@ describe("Chat Component", () => {
       error: null,
     });
 
-    render(<Chat />);
+    renderChat();
     expect(screen.getByText("2")).toBeDefined();
   });
 });

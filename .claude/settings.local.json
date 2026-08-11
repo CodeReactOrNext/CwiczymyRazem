@@ -56,7 +56,8 @@
       "Bash(npx prettier *)",
       "Bash(ls \"/c/Users/Krokon/Downloads/TheStringTheory-main/TheStringTheory-main/docs/images/\" 2>/dev/null)",
       "Read(//c/Users/Krokon/Downloads/TheStringTheory-main/TheStringTheory-main/docs/**)",
-      "Read(//c/Users/Krokon/Downloads/**)"
+      "Read(//c/Users/Krokon/Downloads/**)",
+      "Bash(npx vitest *)"
     ],
     "additionalDirectories": [
       "\\tmp",
