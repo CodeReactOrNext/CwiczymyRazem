@@ -29,6 +29,21 @@ export interface EffectDefinition {
   countries?: string[];
 }
 
+/**
+ * One line of an item's bench chronicle: what was done, and when.
+ *
+ * Kept short (see `BUILD_LOG_LIMIT`) because the whole array travels with the
+ * user document on every read of the Arsenal.
+ */
+export interface BuildLogEntry {
+  label: string;
+  /** Epoch ms. Absent on entries written before the log carried dates. */
+  at?: number;
+}
+
+/** Legacy items stored the log as bare labels — `readBuildLog` normalises both. */
+export type BuildLogLine = string | BuildLogEntry;
+
 /** Per-category stat sums for an effect (Tone / Headroom / Versatility). */
 export interface EffectStats {
   tone: number;
@@ -59,8 +74,8 @@ export interface EffectInventoryItem {
   mintCondition?: number;
   /** Set once the pedal has been through a workshop repair. */
   restored?: boolean;
-  /** Names of the mods fitted in the workshop, newest last — flavour for the card. */
-  buildLog?: string[];
+  /** Bench work done in the workshop, newest last. Trimmed to the last 10. */
+  buildLog?: BuildLogLine[];
 }
 
 /**
@@ -206,8 +221,8 @@ export interface InventoryItem {
   mintCondition?: number;
   /** Set once the guitar has been through a workshop repair. */
   restored?: boolean;
-  /** Names of the mods fitted in the workshop, newest last — flavour for the card. */
-  buildLog?: string[];
+  /** Bench work done in the workshop, newest last. Trimmed to the last 10. */
+  buildLog?: BuildLogLine[];
 }
 
 export interface PedalboardPlacement {

@@ -513,7 +513,7 @@ describe("getBuildQuote", () => {
     expect(quote.canBuild).toBe(false);
   });
 
-  it("clears a level-1 job on a decent guitar and names the mod", () => {
+  it("clears a level-1 job on a decent guitar and logs it as bench work", () => {
     const quote = getBuildQuote(
       subject({ condition: 0.5 }),
       richWallet(),
@@ -521,7 +521,7 @@ describe("getBuildQuote", () => {
     );
     expect(quote.canBuild).toBe(true);
     expect(quote.recipe.every((line) => line.ok)).toBe(true);
-    expect(quote.modName).not.toBe("");
+    expect(quote.logLabel).toBe("Bench work · build 1");
     expect(quote.requirement.level).toBe(1);
   });
 

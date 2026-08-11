@@ -18,6 +18,7 @@ import type {
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
+import { appendBuildLog } from "feature/arsenal/utils/buildLog";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -134,10 +135,10 @@ export default async function handler(
       target.points = rollModPoints(option);
 
       const spent = recipeToParts(option.recipe);
-      const buildLog = [
-        ...(item.buildLog ?? []),
-        isReroll ? `${option.label} re-spec` : option.label,
-      ];
+      const buildLog = appendBuildLog(
+        item.buildLog,
+        isReroll ? `${option.label} re-spec` : `${option.label} fitted`,
+      );
 
       // Built per kind rather than spread once: the two inventories keep their own
       // stat shapes (`ItemStats` vs `EffectStats`) and must not blur into a union.

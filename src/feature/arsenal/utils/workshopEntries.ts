@@ -10,9 +10,11 @@ import type { WorkshopSubject } from "../data/workshop";
 import { getEffectSubject, getGuitarSubject } from "../data/workshop";
 import type {
   ArsenalUserData,
+  BuildLogEntry,
   GuitarRarity,
   WorkshopKind,
 } from "../types/arsenal.types";
+import { readBuildLog } from "./buildLog";
 import { getRankBadgeSrc } from "./guitarImage";
 
 /** One bench-ready item — guitars and pedals flattened into a single shape. */
@@ -30,7 +32,8 @@ export interface WorkshopEntry {
   /** Current Item Level, build included. */
   level: number;
   serial?: number;
-  buildLog: string[];
+  /** The bench chronicle — jobs run on this item, oldest first. */
+  buildLog: BuildLogEntry[];
   restored: boolean;
   subject: WorkshopSubject;
 }
@@ -64,7 +67,7 @@ export const getWorkshopEntries = (
       condition: getItemCondition(item),
       level: getItemLevel(item, def),
       serial: item.serial,
-      buildLog: item.buildLog ?? [],
+      buildLog: readBuildLog(item.buildLog),
       restored: item.restored ?? false,
       subject: getGuitarSubject(item, def),
     });
@@ -85,7 +88,7 @@ export const getWorkshopEntries = (
       condition: getItemCondition(item),
       level: getEffectLevel(item, def),
       serial: item.serial,
-      buildLog: item.buildLog ?? [],
+      buildLog: readBuildLog(item.buildLog),
       restored: item.restored ?? false,
       subject: getEffectSubject(item, def),
     });
