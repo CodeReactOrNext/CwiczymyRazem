@@ -25,6 +25,7 @@ import { ScrapYieldList } from "../Parts/ScrapYieldList";
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
+import { CardAffixes } from "../CardAffixes";
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil, HoloStripe } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
@@ -80,14 +81,6 @@ export const EffectCard = ({
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getEffectScrapYield(item, effect);
   const scrapTotal = countScrapParts(scrapParts);
-
-  // RPG-style affixes: highlight the strongest mod (≥3 pts) as the "legendary" line.
-  const sortedFeatures = [...features].sort((a, b) => b.points - a.points);
-  const signature =
-    sortedFeatures[0] && sortedFeatures[0].points >= 3
-      ? sortedFeatures[0]
-      : null;
-  const affixes = signature ? sortedFeatures.slice(1) : sortedFeatures;
 
   return (
     <div
@@ -275,44 +268,7 @@ export const EffectCard = ({
         )}
       </div>
 
-      {/* RPG-style affixes under the pedal */}
-      {features.length > 0 && (
-        <div
-          className='relative z-10 flex flex-shrink-0 flex-col gap-1 border-t px-3 py-3'
-          style={{
-            borderColor: `${rs.baseColor}1a`,
-            background: "rgba(0,0,0,0.28)",
-          }}>
-          {affixes.map((f) => (
-            <div key={f.id} className='flex items-baseline gap-2 leading-snug'>
-              <span className='flex-shrink-0 text-[11px] text-zinc-600'>◆</span>
-              <span className='text-[12px] text-zinc-300'>
-                <span className='font-bold' style={{ color: "#7dd3fc" }}>
-                  +{f.points}
-                </span>{" "}
-                {f.label}
-              </span>
-            </div>
-          ))}
-          {signature && (
-            <div className='flex items-baseline gap-2 leading-snug'>
-              <span
-                className='flex-shrink-0 text-[11px]'
-                style={{ color: "#f59e0b" }}>
-                ★
-              </span>
-              <span
-                className='text-[12px] font-medium'
-                style={{ color: "#f5a524" }}>
-                <span className='font-bold' style={{ color: "#fbbf24" }}>
-                  +{signature.points}
-                </span>{" "}
-                {signature.label}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      <CardAffixes features={features} />
 
       {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
       {footer ? (

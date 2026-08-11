@@ -3,12 +3,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { BookMarked,Guitar,Hammer,PackageOpen, Store,Swords } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-const ARSENAL_TABS = ["cases", "collection", "workshop", "dex", "rig", "market"] as const;
+// Ordered like the loop the module is built around: get gear, look at what you
+// own, put it on the rig, improve it, then trade what is left over. Dex is the
+// completionist view and sits at the end rather than between Workshop and Rig.
+const ARSENAL_TABS = ["cases", "collection", "rig", "workshop", "market", "dex"] as const;
 type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
 /** Flip to false to pull the Workshop tab (and its deep link) back out of the UI. */
@@ -17,14 +21,22 @@ const WORKSHOP_ENABLED: boolean = true;
 /** Hidden tabs are also unreachable by URL, so `?tab=workshop` falls back to Cases. */
 const isTabVisible = (tab: ArsenalTab): boolean => tab !== "workshop" || WORKSHOP_ENABLED;
 
+const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
+  cases: { label: "Cases", icon: PackageOpen },
+  collection: { label: "Collection", icon: Swords },
+  rig: { label: "Rig", icon: Guitar },
+  workshop: { label: "Workshop", icon: Hammer },
+  market: { label: "Market", icon: Store },
+  dex: { label: "Dex", icon: BookMarked },
+};
+
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
+import { CollectionTab } from "./components/Collection/CollectionTab";
 import { DexView } from "./components/Dex/DexView";
-import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
-import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
 import { MarketTab } from "./components/Marketplace/MarketTab";
-import { PartsWallet } from "./components/Parts/PartsWallet";
 import { RigView } from "./components/Rig/RigView";
+import { arsenalTabTriggerClass } from "./components/tabTrigger";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
@@ -68,9 +80,11 @@ export const ArsenalView = () => {
 
   return (
     <MainContainer noBorder>
+      {/* The banner sits above every tab, so its subtitle describes the whole
+          module — it used to describe only the case shop. */}
       <HeroBanner
         title="Guitar Arsenal"
-        subtitle="Spend your Fame Points to unlock rare guitars"
+        subtitle="Open cases, build your rig, keep your gear in shape"
         eyebrow="Collect & equip"
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         backgroundContent={<HeroPattern />}
@@ -96,55 +110,28 @@ export const ArsenalView = () => {
         <div className="flex flex-col gap-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
-              <TabsTrigger
-                value="cases"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <PackageOpen size={16} />
-                {/* On mobile only the active tab shows its label, so all tabs
-                    stay visible at once; from sm up every label is shown. */}
-                <span className={activeTab === "cases" ? "inline" : "hidden sm:inline"}>Cases</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="collection"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <Swords size={16} />
-                <span className={activeTab === "collection" ? "inline" : "hidden sm:inline"}>Collection</span>
-                {data && data.inventory.some((i) => i.isNew) && (
-                  <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                )}
-              </TabsTrigger>
-              {WORKSHOP_ENABLED && (
-                <TabsTrigger
-                  value="workshop"
-                  className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-                >
-                  <Hammer size={16} />
-                  <span className={activeTab === "workshop" ? "inline" : "hidden sm:inline"}>Workshop</span>
-                </TabsTrigger>
-              )}
-              <TabsTrigger
-                value="dex"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <BookMarked size={16} />
-                <span className={activeTab === "dex" ? "inline" : "hidden sm:inline"}>Dex</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="rig"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <Guitar size={16} />
-                <span className={activeTab === "rig" ? "inline" : "hidden sm:inline"}>Rig</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="market"
-                className="shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200"
-              >
-                <Store size={16} />
-                <span className={activeTab === "market" ? "inline" : "hidden sm:inline"}>Market</span>
-              </TabsTrigger>
+              {ARSENAL_TABS.filter(isTabVisible).map((tab) => {
+                const { label, icon: Icon } = TAB_META[tab];
+                const hasNewDrop =
+                  tab === "collection" &&
+                  !!data &&
+                  (data.inventory.some((i) => i.isNew) ||
+                    (data.effectInventory ?? []).some((i) => i.isNew));
+
+                return (
+                  <TabsTrigger key={tab} value={tab} className={arsenalTabTriggerClass}>
+                    <Icon size={16} />
+                    {/* On mobile only the active tab shows its label, so all tabs
+                        stay visible at once; from sm up every label is shown. */}
+                    <span className={activeTab === tab ? "inline" : "hidden sm:inline"}>
+                      {label}
+                    </span>
+                    {hasNewDrop && (
+                      <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                    )}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
 
             <TabsContent value="cases" className="mt-6">
@@ -164,11 +151,7 @@ export const ArsenalView = () => {
                   ))}
                 </div>
               ) : data ? (
-                <>
-                  <PartsWallet parts={data.parts ?? []} />
-                  <GuitarInventory data={data} />
-                  <EffectCollection data={data} />
-                </>
+                <CollectionTab data={data} />
               ) : null}
             </TabsContent>
 

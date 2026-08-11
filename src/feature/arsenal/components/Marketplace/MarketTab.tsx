@@ -1,11 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { Store, Users } from "lucide-react";
 
+import { arsenalSubTabTriggerClass } from "../tabTrigger";
 import { TraderView } from "../Trader/TraderView";
 import { MarketplaceView } from "./MarketplaceView";
-
-const TRIGGER_CLASS =
-  "shrink-0 gap-2 px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 transition-all hover:text-zinc-300 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200";
 
 /**
  * Both markets under one tab: the system's counter, which sells parts and one
@@ -15,12 +13,14 @@ const TRIGGER_CLASS =
  */
 export const MarketTab = () => (
   <Tabs defaultValue='trader' className='w-full'>
-    <TabsList className='h-auto max-w-full justify-start rounded-lg bg-zinc-900 p-1'>
-      <TabsTrigger value='trader' className={TRIGGER_CLASS}>
+    {/* Quieter than the module's own tabs — two identical-looking tab rows made
+        it impossible to tell which level you were switching. */}
+    <TabsList className='h-auto max-w-full justify-start rounded-lg bg-zinc-900/40 p-1'>
+      <TabsTrigger value='trader' className={arsenalSubTabTriggerClass}>
         <Store size={16} />
         Trader
       </TabsTrigger>
-      <TabsTrigger value='players' className={TRIGGER_CLASS}>
+      <TabsTrigger value='players' className={arsenalSubTabTriggerClass}>
         <Users size={16} />
         Player listings
       </TabsTrigger>
