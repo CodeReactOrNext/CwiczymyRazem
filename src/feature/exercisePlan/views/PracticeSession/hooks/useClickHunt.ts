@@ -1,13 +1,10 @@
-import { getNotePositionsInRange } from "feature/exercisePlan/scales/fretboardMapper";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NOTES } from "utils/audio/noteUtils";
 
+import type { ClickTarget } from "../helpers/clickTargets";
+import { clickTargetKey, computeClickTargets, multiplierForFoundCount, scoreForFoundCount } from "../helpers/clickTargets";
 import type { GameState } from "./noteMatchingFeedback";
 
-export interface ClickTarget {
-  string: number;
-  fret: number;
-}
+export type { ClickTarget } from "../helpers/clickTargets";
 
 export interface ClickHuntState {
   /** Every valid (string, fret) position for the current target inside the
@@ -29,22 +26,9 @@ export interface ClickHuntState {
   mistakeCount: number;
 }
 
-const keyOf = (p: ClickTarget) => `${p.string}-${p.fret}`;
-
-/** Escalating score for finding `n` positions — same curve as the mic-based hunts. */
-function scoreForCount(n: number): number {
-  let total = 0;
-  for (let i = 0; i < n; i++) total += 100 * Math.min(8, Math.floor(i / 5) + 1);
-  return total;
-}
-
-function computeTargets(note: string, startFret: number, endFret: number, strings?: number[]): ClickTarget[] {
-  const pitchClass = NOTES.indexOf(note);
-  if (pitchClass < 0) return [];
-  const positions = getNotePositionsInRange(pitchClass, startFret, endFret);
-  const scoped = strings ? positions.filter((p) => strings.includes(p.string)) : positions;
-  return scoped.map((p) => ({ string: p.string, fret: p.fret }));
-}
+const keyOf = clickTargetKey;
+const scoreForCount = scoreForFoundCount;
+const computeTargets = computeClickTargets;
 
 function buildState(
   targetPositions: ClickTarget[],
@@ -57,7 +41,7 @@ function buildState(
   mistakeCount = 0,
 ): ClickHuntState {
   const foundCount = targetPositions.filter((p) => found.has(keyOf(p))).length;
-  const multiplier = Math.min(8, Math.floor(foundCount / 5) + 1);
+  const multiplier = multiplierForFoundCount(foundCount);
   // Cumulative across every target rotated through this exam, not just the
   // currently active one — otherwise an exam that ends mid-rotation (the
   // exercise timer, not the per-note countdown) would grade on whatever
