@@ -134,9 +134,15 @@ nie mentalny.
 3. **Wyrównanie kart**: lista modów na karcie skrócona do 3 wierszy + „+N more" (signature zawsze
    widoczny). Siatka przestaje być poszarpana, karta ma przewidywalną wysokość.
 4. **Kolejność zakładek zgodna z pętlą**: Cases → Collection → Rig → Workshop → Market → Dex;
-   klasy triggera wyciągnięte do jednej stałej (koniec z 6 kopiami).
+   klasy triggera wyciągnięte do jednej stałej (koniec z 6 kopiami), a podzakładki Marketu
+   dostały cichszy wariant, żeby dwa poziomy nawigacji dało się od siebie odróżnić.
 5. **Podtytuł hero** przestaje opisywać jedną zakładkę.
-6. `clearNewFlags()` wołane raz, z poziomu zakładki, zamiast z dwóch komponentów.
+6. `clearNewFlags()` wołane raz, z poziomu zakładki, zamiast z dwóch komponentów
+   (kropka „nowe" na zakładce uwzględnia teraz także pedały, nie tylko gitary).
+7. **Kontrast akcji na karcie**: `text-zinc-600` → `text-zinc-400` (Equip: `zinc-300`),
+   etykiety 10 → 11 px — zasada 5 STYLEGUIDE. Sekcja modów rozdzielona tłem zamiast `border-t`.
+8. **Puste stany**: jeden komunikat dla pustej kolekcji (zamiast „Your collection is empty"
+   pokazywanego przy posiadanych pedałach) i osobny dla filtra, który nic nie znalazł.
 
 **Faza 2 — proponowana (wymaga decyzji, większy zasięg):**
 

@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { EffectCollection } from "../GuitarInventory/EffectCollection";
 import { GuitarInventory } from "../GuitarInventory/GuitarInventory";
 import { WalletStrip } from "../Workshop/WalletStrip";
+import { CollectionEmptyResult } from "./CollectionEmptyResult";
+import { CollectionEmptyState } from "./CollectionEmptyState";
 import { CollectionToolbar } from "./CollectionToolbar";
 
 interface CollectionTabProps {
@@ -52,25 +54,37 @@ export const CollectionTab = ({ data }: CollectionTabProps) => {
     <div className='flex flex-col gap-6'>
       <WalletStrip parts={data.parts ?? []} />
 
-      {hasAnything && (
-        <CollectionToolbar
-          scope={scope}
-          onScopeChange={setScope}
-          sort={sort}
-          onSortChange={setSort}
-          query={query}
-          onQueryChange={setQuery}
-          guitarCount={guitarCount}
-          pedalCount={pedalCount}
-        />
-      )}
+      {!hasAnything ? (
+        <CollectionEmptyState />
+      ) : (
+        <>
+          <CollectionToolbar
+            scope={scope}
+            onScopeChange={setScope}
+            sort={sort}
+            onSortChange={setSort}
+            query={query}
+            onQueryChange={setQuery}
+            guitarCount={guitarCount}
+            pedalCount={pedalCount}
+          />
 
-      {isScopeVisible(scope, "guitars") && (
-        <GuitarInventory data={data} query={query} sort={sort} />
-      )}
+          {isScopeVisible(scope, "guitars") &&
+            (guitarCount > 0 ? (
+              <GuitarInventory data={data} query={query} sort={sort} />
+            ) : (
+              // Only worth saying when guitars are all the player asked for —
+              // under "All" the pedals below already fill the screen.
+              scope === "guitars" && <CollectionEmptyResult query={query} />
+            ))}
 
-      {isScopeVisible(scope, "pedals") && (
-        <EffectCollection data={data} query={query} sort={sort} />
+          {isScopeVisible(scope, "pedals") &&
+            (pedalCount > 0 ? (
+              <EffectCollection data={data} query={query} sort={sort} />
+            ) : (
+              scope === "pedals" && <CollectionEmptyResult query={query} />
+            ))}
+        </>
       )}
     </div>
   );

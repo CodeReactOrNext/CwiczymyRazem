@@ -294,7 +294,7 @@ export const EffectCard = ({
           <button
             onClick={() => onRemoveFromBoard(item.id)}
             disabled={isRemovingFromBoard}
-            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-500 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-cyan-400'
+            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-300 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-cyan-400'
             title='Take this pedal off the pedalboard'>
             <Unplug size={9} strokeWidth={2.5} />
             Remove from board
@@ -314,7 +314,7 @@ export const EffectCard = ({
             <button
               onClick={() => onListClick(item.id, item.effectId)}
               disabled={isListing || isOnPedalboard}
-              className='flex flex-1 items-center justify-center gap-1.5 border-r py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
+              className='flex flex-1 items-center justify-center gap-1.5 border-r py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
               style={{ borderColor: `${rs.baseColor}15` }}
               title={
                 isOnPedalboard
@@ -335,7 +335,7 @@ export const EffectCard = ({
                     <button
                       onClick={() => onScrapClick(item.id, item.effectId)}
                       disabled={isScrapping || isOnPedalboard}
-                      className='flex w-full items-center justify-center gap-1.5 border-r py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
+                      className='flex w-full items-center justify-center gap-1.5 border-r py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
                       style={{ borderColor: `${rs.baseColor}15` }}>
                       <Wrench size={9} strokeWidth={2.5} />
                       Scrap
@@ -365,7 +365,7 @@ export const EffectCard = ({
           <button
             onClick={() => onSellClick?.(item.id, item.effectId)}
             disabled={isSelling || isOnPedalboard}
-            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold capitalize tracking-wider text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'
+            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'
             title={
               isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined
             }>

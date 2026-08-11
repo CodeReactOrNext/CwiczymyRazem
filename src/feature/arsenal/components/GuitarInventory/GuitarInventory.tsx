@@ -21,7 +21,7 @@ import type {
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { getGuitarScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { Layers, PackageOpen } from "lucide-react";
+import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -191,16 +191,7 @@ export const GuitarInventory = ({
     });
   };
 
-  if (data.inventory.length === 0) {
-    return (
-      <div className='flex flex-col items-center justify-center gap-4 py-20 text-zinc-500'>
-        <PackageOpen size={48} className='opacity-30' />
-        <p className='text-sm font-medium'>
-          Your collection is empty. Open a case to start!
-        </p>
-      </div>
-    );
-  }
+  if (data.inventory.length === 0) return null;
 
   const uniqueOwnedIds = new Set(data.inventory.map((item) => item.guitarId));
   const uniqueOwnedCount = uniqueOwnedIds.size;

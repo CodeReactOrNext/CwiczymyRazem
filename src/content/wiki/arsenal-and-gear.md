@@ -8,9 +8,9 @@ order: 3
 
 The Arsenal is the part of riff.quest that has nothing to do with your fingers. You spend **Fame** — never points — on cases full of virtual guitars and pedals, keep the ones you like, and equip them to build a rig. None of it makes you a better guitarist. That's rather the point: it's the reward for the work you did elsewhere.
 
-<ClickPath steps="Arsenal" caption="Six tabs: Cases, Collection, Workshop, Dex, Rig and Market." />
+<ClickPath steps="Arsenal" caption="Six tabs, in the order you use them: Cases, Collection, Rig, Workshop, Market and Dex." />
 
-<Checklist items="Cases::Where you spend Fame to open new gear|Collection::Every guitar and pedal you own|Workshop::Restore and upgrade what you've got|Dex::A gallery of every item in the game, found or not — the completionist's tab|Rig::Where you equip the gear you want to be ranked on|Market::The Trader's daily stock, plus listings from other players" />
+<Checklist items="Cases::Where you spend Fame to open new gear|Collection::Every guitar and pedal you own — filter it by kind, search it, sort it|Rig::Where you equip the gear you want to be ranked on|Workshop::Restore and upgrade what you've got|Market::The Trader's daily stock, plus listings from other players|Dex::A gallery of every item in the game, found or not — the completionist's tab" />
 
 ## Opening cases
 

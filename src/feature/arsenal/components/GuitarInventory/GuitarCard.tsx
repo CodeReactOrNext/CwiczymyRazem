@@ -339,10 +339,10 @@ export const GuitarCard = ({
             onClick={() => onEquipClick?.()}
             disabled={isEquipping}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1 border-r px-1 py-3.5 text-[10px] font-semibold capitalize tracking-wide transition-colors",
+              "flex flex-1 items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide transition-colors",
               isEquipped
                 ? "text-amber-400"
-                : "text-zinc-500 disabled:opacity-30 hover:text-white",
+                : "text-zinc-300 disabled:opacity-30 hover:text-white",
             )}
             style={{
               borderColor: `${rs.baseColor}15`,
@@ -361,7 +361,7 @@ export const GuitarCard = ({
                     <button
                       onClick={() => onListClick(item.id, guitar.id)}
                       disabled={isListing || isEquipped || rigSlot != null}
-                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[10px] font-semibold capitalize tracking-wide text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
+                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
                       style={{ borderColor: `${rs.baseColor}15` }}>
                       <Store size={10} strokeWidth={2.5} />
                       Market
@@ -383,7 +383,7 @@ export const GuitarCard = ({
                     <button
                       onClick={() => onScrapClick(item.id, guitar.id)}
                       disabled={isScrapping || isEquipped || rigSlot != null}
-                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[10px] font-semibold capitalize tracking-wide text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
+                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
                       style={{ borderColor: `${rs.baseColor}15` }}>
                       <Wrench size={10} strokeWidth={2.5} />
                       Scrap
@@ -420,7 +420,7 @@ export const GuitarCard = ({
                   <button
                     onClick={() => onSellClick?.(item.id, guitar.id)}
                     disabled={isSelling || isEquipped}
-                    className='flex w-full items-center justify-center gap-1 px-1 py-3.5 text-[10px] font-semibold capitalize tracking-wide text-zinc-600 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'>
+                    className='flex w-full items-center justify-center gap-1 px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'>
                     <Trash2 size={10} strokeWidth={2.5} />
                     Sell
                   </button>
