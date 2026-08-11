@@ -20,7 +20,7 @@ import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { X } from "lucide-react";
 import { useState } from "react";
 
-import { SectionLabel } from "../SectionLabel";
+import { SectionLabel, sectionLabelClass } from "../SectionLabel";
 import { ConditionDelta, LevelDelta, RarityDelta } from "./BeforeAfter";
 import { BuildLadder } from "./BuildLadder";
 import { CostList } from "./CostList";
@@ -196,8 +196,8 @@ export const WorkshopJobModal = ({
         className='flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:max-w-3xl sm:overflow-y-auto sm:p-7'>
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <DialogDescription asChild>
-              <SectionLabel>{caption}</SectionLabel>
+            <DialogDescription className={sectionLabelClass}>
+              {caption}
             </DialogDescription>
             <DialogTitle className='text-2xl font-black text-white'>
               {title}

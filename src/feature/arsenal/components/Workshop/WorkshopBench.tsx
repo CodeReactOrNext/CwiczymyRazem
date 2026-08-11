@@ -167,7 +167,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         title={
           buildQuote.requirement.promotesTo
             ? `Promote to ${buildQuote.requirement.promotesTo}`
-            : "Next build"
+            : `Build ${buildQuote.requirement.level}`
         }
         summary={
           <>

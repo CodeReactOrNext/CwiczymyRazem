@@ -13,12 +13,9 @@ interface SectionLabelProps {
  * different weight and size, which made the same role read as three different
  * levels of importance depending on where you looked.
  */
+export const sectionLabelClass =
+  "text-xs font-bold tracking-[0.2em] text-zinc-400";
+
 export const SectionLabel = ({ children, className }: SectionLabelProps) => (
-  <span
-    className={cn(
-      "text-xs font-bold tracking-[0.2em] text-zinc-400",
-      className,
-    )}>
-    {children}
-  </span>
+  <span className={cn(sectionLabelClass, className)}>{children}</span>
 );
