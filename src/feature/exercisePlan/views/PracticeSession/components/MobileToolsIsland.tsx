@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { RippleButton } from "hooks/useRipple";
 import { Info, SlidersHorizontal, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaMicrophone } from "react-icons/fa";
 import { GiGuitar, GiMetronome } from "react-icons/gi";
 
@@ -88,6 +88,16 @@ export const MobileToolsIsland = ({
   disableTuner,
 }: MobileToolsIslandProps) => {
   const [openTab, setOpenTab] = useState<ToolsTab | null>(null);
+
+  // The sheet lives inside the session layer, so it has no dialog of its own to
+  // close it — Escape is wired here (nothing else in the session claims it).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenTab(null);
+    };
+    if (openTab) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [openTab]);
 
   // Exam mode fixes the tempo and hides the backing track, exactly like the
   // toolbar does — the island must not smuggle those controls back in.
