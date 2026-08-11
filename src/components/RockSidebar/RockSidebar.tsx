@@ -27,6 +27,7 @@ import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
 import {
+  BookOpen,
   Brain,
   ChevronDown,
   ClipboardList,
@@ -328,6 +329,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/recordings")) return "recordings";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";
+    if (pathname.startsWith("/wiki")) return "wiki";
     return null;
   };
 
@@ -427,6 +429,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const utilityNavigation = [
     { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} />, muted: true },
+    { id: "wiki", name: "Wiki", href: "/wiki", icon: <BookOpen size={18} />, muted: true, tooltip: "How everything in riff.quest works" },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} />, muted: true },
   ];
 

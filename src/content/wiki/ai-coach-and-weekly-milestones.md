@@ -1,26 +1,41 @@
 ---
-title: "AI Coach & Weekly Milestones"
-description: "How the AI-generated Mastery Roadmap is built, and how the 9-level weekly Milestones ladder pays out Fame for consistent practice."
+title: "Mastery Roadmaps & Weekly Milestones"
+description: "The personal curriculum the app can generate for you, and the nine-level weekly goal ladder that pays Fame for a consistent week."
 slug: "ai-coach-and-weekly-milestones"
 section: "Skill Development"
 order: 3
 ---
 
 <BlogAlert type="info">
-Both features on this page are Master-tier.
+Both features on this page come with the Practice Master membership — see [Free, Pro & Master](/wiki/membership-plans).
 </BlogAlert>
 
-## AI Coach / Mastery Roadmaps
+## Mastery Roadmaps
 
-`/ai-coach` generates a personalized curriculum: you pick a level (Absolute Beginner, Beginner, Intermediate, or Advanced), and a guitar-teacher-prompted AI model builds a roadmap of **6–8 phases with 6–9 steps each** — roughly 35–55 steps total. Off-topic requests are rejected outright rather than generating something unrelated to guitar.
+A roadmap is a curriculum written for you. You say roughly where you are — absolute beginner, beginner, intermediate or advanced — and the app generates a route of **6 to 8 phases with 6 to 9 steps in each**, so somewhere between 35 and 55 steps from where you are to where you said you'd like to be.
 
-Each generated step defaults to needing **8 completed sessions** before it counts as done, tracked against your actual logged practice sessions — so a roadmap step isn't ticked off just by reading it, you have to put the reps in.
+<ClickPath steps="Practice|Mastery Roadmaps" caption="Generate one, then work through it step by step." />
+
+Each step needs **8 logged practice sessions** before it counts as done, counted from the practice you actually record. Reading a step doesn't tick it off — putting the hours in does.
+
+<BlogAlert type="tip">
+Ask for a roadmap that's about guitar. Requests that wander off the topic are turned down rather than answered with something invented.
+</BlogAlert>
 
 ## Weekly Milestones
 
-`/summary` runs a 9-level ladder of weekly practice challenges. Each level has an unlock cost and a weekly Fame reward, and gets harder to both unlock and to keep clearing:
+Milestones are a ladder of weekly practice goals. Each rung costs a one-off amount of Fame to unlock and then pays Fame **every week you meet its goal** — so a rung you can hit reliably pays for itself and then keeps paying.
 
-<StatRow stats="Spark:free to unlock, 20 Fame/week|Groove:40 Fame to unlock, 30 Fame/week|Hot Streak:80 Fame to unlock, 45 Fame/week|Momentum:130 Fame to unlock, 60 Fame/week|Unstoppable:180 Fame to unlock, 85 Fame/week" />
-<StatRow stats="All-Rounder:230 Fame to unlock, 120 Fame/week|In the Zone:280 Fame to unlock, 160 Fame/week|Shredder:300 Fame to unlock, 220 Fame/week|Virtuoso:300 Fame to unlock, 300 Fame/week" />
+<ClickPath steps="Milestones" caption="Unlock a level once, then claim it every week you meet the goal." />
 
-Each level's weekly goal is its own rule — Spark just needs one 15-minute-plus day that week, while Virtuoso needs a full 7-day streak with all 4 skill categories getting 15+ minutes every single day. A level only pays out once you've unlocked it **and** its goal is met for the current week; claiming resets against the week and you can claim every level you've unlocked and met, every week, as long as you keep up the pace.
+<ProgressLadder items="Spark::Free to unlock · 20 Fame a week · one day of 15+ minutes|Groove::40 to unlock · 30 a week · three days of 20+ minutes|Hot Streak::80 to unlock · 45 a week · a 3-day streak of 15+ minutes|Momentum::130 to unlock · 60 a week · five days of 15+ minutes|Unstoppable::180 to unlock · 85 a week · a full 7-day streak of 15+ minutes|All-Rounder::230 to unlock · 120 a week · three days with all four categories at 15+ minutes|In the Zone::280 to unlock · 160 a week · a 3-day streak with all four categories|Shredder::300 to unlock · 220 a week · a 5-day streak with all four categories|Virtuoso::300 to unlock · 300 a week · a 7-day streak with all four categories at 15+ minutes every day" highlight="Virtuoso" caption="Every level you've unlocked and met can be claimed every week — they stack." />
+
+<StepList steps="Unlock::Pay the one-off Fame cost for a level|Meet the goal::During the current week, by practising as usual|Claim::Collect the weekly Fame — then it resets and you can earn it again next week" />
+
+Buy the levels you'll genuinely hit rather than the biggest one you can afford. Groove costs 40 once and pays 30 a week: it's ahead by the second week. Virtuoso pays ten times more, but only in weeks where you practise all four categories every single day.
+
+## Questions people ask
+
+<FaqList items="Do I lose a level if I miss a week?::No. Unlocking is permanent — you simply don't claim that week|Can I claim more than one level a week?::Yes. Every unlocked level whose goal you've met can be claimed, every week|What counts towards the goal?::Logged practice, exactly as it feeds everything else. There's no separate milestone practice|Does a roadmap step need a specific exercise?::No — any logged session counts towards the eight" />
+
+<ReadNext links="Free, Pro & Master::/wiki/membership-plans|Points, Fame & streaks::/wiki/how-scoring-works|Ways to practise::/wiki/practice-modes-overview|Arsenal & gear::/wiki/arsenal-and-gear" />

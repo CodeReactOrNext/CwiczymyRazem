@@ -37,7 +37,15 @@ export interface WikiSection {
 }
 
 /** Fixed reading order for the sidebar — sections not listed here sort after these, alphabetically. */
-const SECTION_ORDER = ["Scoring & Progress", "Practice", "Songs & Library", "Competition", "Skill Development"];
+const SECTION_ORDER = [
+  "Start Here",
+  "Scoring & Progress",
+  "Practice",
+  "Songs & Library",
+  "Skill Development",
+  "Community",
+  "Competition",
+];
 
 export const getAllWikiPages = (): WikiFrontmatter[] => {
   if (!fs.existsSync(WIKI_DIR)) {
@@ -55,6 +63,9 @@ export const getAllWikiPages = (): WikiFrontmatter[] => {
 
       return data as WikiFrontmatter;
     })
+    // A markdown file without frontmatter isn't an article (a README dropped in
+    // the folder, say) — it would otherwise render as a blank sidebar entry.
+    .filter((page) => Boolean(page.slug && page.title && page.section))
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 };
 

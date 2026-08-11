@@ -1,38 +1,51 @@
 ---
-title: "Practice Sessions & Logging"
-description: "The two ways to log a practice session, what fields it captures, the guardrails on absurd entries, and how the Practice Log history works."
+title: "Logging a Practice Session"
+description: "How to save what you practised — with the timer or by hand — what the form asks for, and how to find and fix sessions later."
 slug: "practice-sessions-and-logging"
 section: "Practice"
-order: 1
+order: 2
 ---
 
-Every session you log feeds your points, your streak, your skills, and the Practice Log history. There are two ways to log one, and they both end up on the same form.
+A session that isn't logged never happened, as far as the app is concerned. Logging is the one habit everything else depends on: points, level, streak, skills and your whole practice history come out of this one form.
 
-## Two ways to log a session
+## Two ways to get there
 
-<StepList steps="Free Timer::Run a stopwatch per skill at /timer/practice while you play, then it hands you off to the log form pre-filled with the time you tracked|Manual Log::Skip the timer and fill in the log form yourself at /report — useful for a session you already finished" />
+<StepList steps="Free Timer::A stopwatch you run while you play, with a separate clock per category. Stop it and the log form opens already filled in with your time|Manual Log::The same form, empty, for a session that happened away from the screen — you can log something that happened up to 7 days ago" />
 
-The log form splits your time across **4 skill categories** — technique, theory, hearing, creativity — each in hours and minutes. You also give the session a title (there's an optional tag picker for Goal/Playing Style/Techniques/Theory/Creative/Performance that just appends labels into the title), and pick when it happened: today, yesterday, or up to 7 days back.
+<ClickPath steps="Practice|Free Timer" caption="Or Practice → Manual Log if you're writing up a session after the fact." />
+
+## What the form asks for
+
+<SessionLogPreview categories="Technique::30 min|Theory::15 min|Hearing::0 min|Creativity::15 min" habits="*Warm-up|*Metronome|Learned something new|*Exercise plan|Recording" total="+25 points" caption="Split your time across the four categories, tick the habits you actually did, give the session a name, and pick the day it happened." />
+
+You also give the session a title. There's a tag picker (goal, playing style, techniques, theory, creative, performance) that simply adds words to that title, so future-you can tell one Tuesday from another.
 
 ## Healthy habits
 
-Check off up to 5 habits per session — each is worth its own point (see [How Scoring Works](/wiki/how-scoring-works)):
+Each ticked habit is worth a point, up to five per session — and the streak bonus multiplies them along with everything else.
 
-<Checklist items="Warm-up::Did a proper warm-up before playing|Metronome::Practiced with a metronome|Learned something new::Picked up a new technique, song section, or concept|Exercise plan::Followed a structured exercise plan|Recording::Recorded yourself playing" />
+<Checklist items="Warm-up::You warmed up properly before playing|Metronome::You practised to a click|Learned something new::A new technique, section or concept|Exercise plan::You followed a structured routine instead of noodling|Recording::You recorded yourself playing" />
 
-## Guardrails on the log form
-
-<BlogAlert type="warning">
-The form actively pushes back on unrealistic entries — it's there to keep your stats meaningful, not to block you.
+<BlogAlert type="tip">
+Tick them honestly. They're worth a couple of points, but their real job is a nudge — five habits that genuinely make practice better.
 </BlogAlert>
 
-- **Zero time logged** — rejected outright.
-- **24 hours or more** in one session — rejected, no confirmation possible.
-- **Over 6 hours** in one session — allowed, but you get a "Long practice?" confirmation popup first.
-- **Logging a day that would exceed its own running total** (e.g. you already logged 3h today and try to add another 4h) — triggers an "Accept Exceeding Time" popup before it's saved.
+## When the form pushes back
 
-## Practice Log history
+The form checks a few things before saving. It isn't trying to stop you, it's trying to keep your statistics worth looking at.
 
-`/practice-log` shows every session you've ever logged, grouped by day. Sessions are automatically classified as **Manual**, **Plan** (started from an [exercise plan](/wiki/exercise-plans-and-auto-plan)), or **Song** (practiced against a specific song), and you can filter by date range (7/30/90 days or all-time), a specific date, session type, or length — short (under 15 min), medium (15–45 min), long (45 min+).
+<Checklist items="No time at all::Won't save — a session needs at least some minutes on it|24 hours or more::Won't save, no way around it|More than 6 hours::Saves, but asks you to confirm first|More than the day can hold::If the day's total would end up impossible, it asks you to confirm before saving" />
 
-The summary widget on top totals your time, session count, points, active days, average session length, and time per skill category. Any logged session can be edited or deleted after the fact.
+## Your practice history
+
+Everything you've logged is kept, grouped by day, on your Progress screen. Sessions are labelled by where they came from — a manual entry, a routine, or a song you were practising.
+
+<ClickPath steps="Progress|Practice Log" caption="Filter by date range, by session type or by length, and edit or delete anything you logged wrong." />
+
+The summary at the top adds it up for you: total time, number of sessions, points earned, active days, average session length and how your time split across the four categories.
+
+## Questions people ask
+
+<FaqList items="I forgot to log yesterday::Use Manual Log and set the date — anything within the last 7 days is fair game. Note that a backdated session doesn't rebuild a streak you already broke|Can I edit a session?::Yes. Open it in your practice log and change or delete it — points are recalculated to match|The timer was left running::Just correct the minutes on the form before saving. The timer is a suggestion, not a lock|Does practising a song need the timer?::No — practising from a song counts the same and is labelled as a song session automatically" />
+
+<ReadNext links="Points, Fame & streaks::/wiki/how-scoring-works|Ways to practise::/wiki/practice-modes-overview|Exercise plans & Auto Plan::/wiki/exercise-plans-and-auto-plan" />

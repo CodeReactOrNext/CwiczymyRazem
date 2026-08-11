@@ -3,6 +3,18 @@ import { BlogAlert } from "components/Blog/BlogAlert";
 import { Checklist } from "components/Blog/Checklist";
 import { StatRow } from "components/Blog/StatRow";
 import { StepList } from "components/Blog/StepList";
+import {
+  AppScreen,
+  BoardPreview,
+  ClickPath,
+  FaqList,
+  PlanComparison,
+  ProgressLadder,
+  QuestPreview,
+  ReadNext,
+  SessionLogPreview,
+  TierScale,
+} from "components/Wiki";
 import WikiLayout from "feature/wiki/WikiLayout";
 import AppLayout from "layouts/AppLayout";
 import { getWikiPageBySlug, getWikiSections, type WikiFrontmatter, type WikiSection } from "lib/wiki";
@@ -15,7 +27,22 @@ import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import type { NextPageWithLayout } from "types/page";
 
-const components = { StepList, Checklist, StatRow, BlogAlert };
+const components = {
+  StepList,
+  Checklist,
+  StatRow,
+  BlogAlert,
+  AppScreen,
+  BoardPreview,
+  ClickPath,
+  FaqList,
+  PlanComparison,
+  ProgressLadder,
+  QuestPreview,
+  ReadNext,
+  SessionLogPreview,
+  TierScale,
+};
 
 interface WikiArticleProps {
   frontmatter: WikiFrontmatter;
@@ -32,6 +59,7 @@ const WikiArticlePage: NextPageWithLayout<WikiArticleProps> = ({ frontmatter, co
       </Head>
       <WikiLayout sections={sections}>
         <div className='p-4 sm:p-6'>
+          <p className='mb-2 text-xs font-bold text-cyan-400'>{frontmatter.section}</p>
           <h1 className='text-2xl font-black tracking-tight text-white'>{frontmatter.title}</h1>
           <p className='mt-2 text-sm text-zinc-400'>{frontmatter.description}</p>
           <div

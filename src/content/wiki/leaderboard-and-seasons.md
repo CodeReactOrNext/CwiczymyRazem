@@ -1,23 +1,33 @@
 ---
-title: "Leaderboard & Seasons"
-description: "The three leaderboards (all-time, seasonal, gear), how monthly seasons reset, top-5 season rewards, and how your rank is calculated."
+title: "Rankings & Seasons"
+description: "The three boards you can appear on, how the monthly season resets, what finishing in the top 5 pays, and why your rank sometimes lags behind."
 slug: "leaderboard-and-seasons"
 section: "Competition"
 order: 1
 ---
 
-There isn't just one leaderboard — there are three, each ranking a different number.
+There isn't one leaderboard, there are three — and they rank completely different things, which is good news if you've only been here a week.
 
-<StepList steps="All-time (/leaderboard)::Ranks every user by their total points or session count, forever|Seasonal (/seasons)::Ranks users by points earned during the current calendar month only|Gear (/leaderboard/gear)::Ranks users by Rig Level — see Arsenal & Gear" />
+<ClickPath steps="Rankings" caption="Three tabs: Seasons, Leaderboard and Gear." />
 
-## Seasons reset monthly
+<StepList steps="Seasons::Only the points you've earned this calendar month. A newcomer can win this|Leaderboard::The all-time board — total points and total sessions, since the day you joined|Gear::Nothing to do with practice. Ranks players by the strength of the gear they've equipped in the Arsenal" />
 
-A season is one calendar month (id format `2026-08`), created automatically the moment anyone first touches the leaderboard that month. Seasonal points live in their own bucket, completely separate from your all-time `statistics.points` — so the seasonal board is a clean slate every month, nothing carries over.
+## Seasons reset every month
+
+A season is one calendar month. Seasonal points are kept in their own pile, separate from your all-time total, so on the 1st everybody starts from zero again — nothing carries over, and nothing you've earned is lost from your all-time score.
 
 <BlogAlert type="tip">
-Finish in the **top 5** of a season and you get a one-time Fame payout when the season ends: **500 / 300 / 200 / 100 / 50** Fame for 1st through 5th place.
+Finish in the **top 5** of a season and you get a one-off Fame payout when it ends: **500 / 300 / 200 / 100 / 50** Fame for 1st through 5th.
 </BlogAlert>
 
-## Your rank
+## Your position
 
-The "you're #N" widget next to each leaderboard counts how many users have a strictly higher score than you and adds 1 — it doesn't have to scan the whole leaderboard to do it, so it stays fast even with a large user base. That count is cached for 5 minutes per board (all-time, seasonal, gear each cache separately), and the leaderboard pages themselves (10 entries per page) are cached for 24 hours — so a big session might take a little while to visibly move your rank.
+Next to each board you'll see where you stand. It's simply the number of players with a higher score than you, plus one.
+
+The boards and your position are refreshed periodically rather than the instant you save a session, so a big evening of practice can take a while to show up. Your points are already counted — only the display is behind.
+
+## Questions people ask
+
+<FaqList items="I practised a lot and my rank didn't move::Give it a little time. Boards refresh on a schedule; nothing is lost|Can I be top of one board and nowhere on another::Absolutely. The gear board rewards Fame spent in the Arsenal, the season board rewards this month's practice, and the all-time board rewards years of it|Do season rewards arrive automatically::The Fame is paid out when the season closes|Does buying a membership move me up::No. Points come from practice only" />
+
+<ReadNext links="Points, Fame & streaks::/wiki/how-scoring-works|Monthly challenges::/wiki/monthly-challenges|Arsenal & gear::/wiki/arsenal-and-gear" />
