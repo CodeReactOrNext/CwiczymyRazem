@@ -1,36 +1,47 @@
 ---
-title: "Exercise Plans & Auto Plan"
-description: "How practice routines are structured, how the Auto Plan generator builds a session for you, and the difference between My Exercises and Community exercises."
+title: "Practice Routines & Auto Plan"
+description: "How routines are put together, how Auto Plan builds a session around the time you have, and how sharing exercises with the community works."
 slug: "exercise-plans-and-auto-plan"
 section: "Practice"
-order: 2
+order: 3
 ---
 
-An **exercise plan** (a "practice routine") is just an ordered list of exercises with a title, description, difficulty (beginner/easy/medium/hard) and category (technique/theory/creativity/hearing/mixed). You can build one by hand at `/plans/create`, or let riff.quest build one for you.
+A **routine** (the app also calls it a practice plan) is nothing more clever than an ordered list of exercises with a name, a difficulty and a category. You follow it top to bottom, and at the end it logs the session for you.
 
-## Auto Plan generator
+<ClickPath steps="Practice|Practice Routines" caption="Ready-made routines, playalongs, your own plans, and plans shared by other players." />
+
+## Three ways to get a routine
+
+<StepList steps="Use a ready-made one::The app ships with plans for common goals — start here if you don't know what you need|Build your own::My Stuff → Create Plan. Pick exercises, put them in the order you want, save it and reuse it forever|Let Auto Plan do it::Tell it how long you've got and it assembles a session for you" />
+
+## Auto Plan
 
 <BlogAlert type="info">
-Auto Plan (`/timer/auto`) is a Master-tier feature.
+Auto Plan is part of the Practice Master membership — see [Free, Pro & Master](/wiki/membership-plans).
 </BlogAlert>
 
-You pick a target duration (15–120 minutes, in 15-minute steps), optionally narrow it down by category and difficulty, and the generator does the rest:
+You choose a length between 15 minutes and 2 hours, optionally narrow it down to certain categories or a difficulty, and it does the rest:
 
-<StepList steps="Filter::Narrows the full exercise library down to your chosen categories and difficulty|Shuffle::Randomizes the filtered list so you don't get the same plan twice|Fill::Greedily adds exercises until the plan reaches at least 90% of your target time, then stops|Fallback::If nothing fits your filters within the time budget, you get a single exercise instead" />
+<StepList steps="It filters::Only exercises matching the categories and difficulty you asked for stay in the pot|It shuffles::So you don't get the same session two days running|It fills your time::Exercises are added until the plan is close to the length you asked for, then it stops|It always gives you something::If nothing fits your filters in the time available, you get a single exercise rather than an empty plan" />
 
-The generated plan's own difficulty label isn't fixed — it's computed from what actually got picked (average of beginner=0 … hard=3 across the chosen exercises, rounded to easy/medium/hard). Before starting, you can reorder, remove, or "replace" (re-roll) any individual exercise in the generated plan.
+The difficulty label on a generated plan is worked out from the exercises that actually got picked, so a "medium" plan really is a medium mix. Before you start you can reorder exercises, drop the ones you don't fancy, or re-roll any single exercise for a different one.
 
-## What's in an exercise
+<ClickPath steps="Practice|Auto Plan" caption="Pick a length, press start, play." />
 
-Each exercise carries a difficulty, category, an estimated time in minutes, step-by-step instructions, tips, optional recommended metronome speed range, related skills, and optionally tablature or a backing track.
+## What's inside an exercise
 
-## My Exercises vs Community
+<Checklist items="Difficulty and category::So it can be filtered and so your time is tagged correctly|An estimated length::Which is what Auto Plan uses to fill your session|Instructions and tips::Step by step, written to be followed while holding a guitar|A suggested tempo::Where a metronome range makes sense|Related skills::What the exercise feeds on your skills screen|Tab or a backing track::When the exercise comes with one" />
 
-Every exercise you create lives in the same pool — the only difference is a public/private toggle:
+## Your exercises and the community
 
-- **My Exercises** (`/my-exercises`) — everything you've authored, public or private.
-- **Community** (`/profile/skills`, Community tab) — only exercises marked public, sorted by average rating.
+Every exercise you create sits in one pool; a single public/private switch decides who sees it.
 
-Community exercises can be rated 1–5 stars, and there's a small Fame reward loop for sharing: a "thanks" from another user pays the author **+5 Fame**, and the first time someone other than the author completes your exercise pays **+1 Fame**. Playing your own exercise doesn't count toward its play count.
+<Checklist items="My Exercises::Everything you've written, public or private — under My Stuff|Community::Only the public ones, browsable by everyone and sorted by rating — under Practice → Exercises" />
 
-Creating or editing an exercise routes you into the tab/tablature editor at `/tab-editor`; publishing has its own public/private toggle (defaults to public) so you decide whether it lands in Community.
+Community exercises can be rated one to five stars. Sharing pays a little too: a "thanks" from another player pays you **+5 Fame**, and the first time somebody other than you completes your exercise pays **+1 Fame**. Playing your own exercise doesn't count towards its play count.
+
+Creating or editing an exercise opens the tab editor, where you can write out the notation. When you publish it, you choose whether it goes public (the default) or stays private to you.
+
+<FaqList items="Do I have to finish a routine for it to count?::No — whatever you actually played gets logged. Finishing simply means everything is ticked off|Can I edit a ready-made plan?::Not in place, but you can build your own version with the exercises you like|Is a routine worth more points than free practice?::No. Time is time. Following a plan does let you tick the Exercise plan habit, which is worth a point|What happens to a shared exercise if I make it private again?::It leaves the community list. Ratings and Fame you already earned stay" />
+
+<ReadNext links="Ways to practise::/wiki/practice-modes-overview|Logging a practice session::/wiki/practice-sessions-and-logging|Skills & achievements::/wiki/skills-and-achievements|Free, Pro & Master::/wiki/membership-plans" />
