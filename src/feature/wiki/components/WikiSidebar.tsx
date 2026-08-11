@@ -12,10 +12,10 @@ export const WikiSidebar = ({ sections }: WikiSidebarProps) => {
 
   return (
     <div className='w-full md:w-72 space-y-6 shrink-0'>
-      <div className='px-4 py-2'>
+      <Link href='/wiki' className='block px-4 py-2'>
         <h2 className='text-2xl font-black tracking-tight text-foreground'>Wiki</h2>
         <p className='text-sm text-muted-foreground font-medium'>How riff.quest works</p>
-      </div>
+      </Link>
       <nav className='flex flex-col gap-5'>
         {sections.map((section) => (
           <div key={section.section} className='flex flex-col gap-1'>

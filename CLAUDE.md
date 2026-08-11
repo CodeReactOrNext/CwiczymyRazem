@@ -62,6 +62,13 @@ Wszystkie style pisz zgodnie z **[docs/STYLEGUIDE.md](docs/STYLEGUIDE.md)** — 
 - **Reużywaj komponenty** zamiast tworzyć nowe. Najpierw sięgnij po bazowe shadcn/ui z `src/assets/components/ui/*`, a potem istniejące komponenty feature'ów. Nowy komponent twórz dopiero, gdy naprawdę nie ma czego użyć.
 - Reszta (dark-only, paleta semantyczna `zinc`+`cyan/amber/orange/emerald/purple`, `cn()`, brak cieni, warianty przez CVA, brak `uppercase`, hover bez `scale`) — patrz STYLEGUIDE.md.
 
+## Wiki (`/wiki`)
+
+Treść w `src/content/wiki/*.md` — instrukcja **dla gracza**, nie dla programisty:
+bez ścieżek URL, nazw pól i wzorów, za to z komponentami z `src/components/Wiki`
+(`ClickPath`, `AppScreen`, `QuestPreview`, `PlanComparison`…). Zasady i lista
+komponentów: **[docs/WIKI.md](docs/WIKI.md)**.
+
 ## Firebase
 
 Reguły dostępu: `firestore.rules` — pola `role`/`stripe*`/`premiumUntil` zapisuje wyłącznie
