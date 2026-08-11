@@ -39,15 +39,9 @@ export function EarQuizPanel({
   const { question, round, isAnswered, isCorrect, stats, answer, next } =
     useEarQuizGame(config, exerciseId);
 
-  // Keyed on the round so every question starts from a clean component — the
-  // quizzes hold no state that should survive into the next one.
-  const shared = {
-    key: round,
-    isAnswered,
-    isCorrect,
-    onAnswer: answer,
-    onNext: next,
-  };
+  // Every quiz body is keyed on the round (below), so a new question remounts it
+  // and its per-round state resets by construction.
+  const shared = { isAnswered, isCorrect, onAnswer: answer, onNext: next };
 
   return (
     <EarQuizCard>
@@ -55,16 +49,16 @@ export function EarQuizPanel({
       {isSessionRunning === false && <StartTimerHint />}
 
       {question.kind === "chordType" && (
-        <ChordTypeQuiz question={question} {...shared} />
+        <ChordTypeQuiz key={round} question={question} {...shared} />
       )}
       {question.kind === "progression" && (
-        <ProgressionQuiz question={question} {...shared} />
+        <ProgressionQuiz key={round} question={question} {...shared} />
       )}
       {question.kind === "detune" && (
-        <DetuneQuiz question={question} {...shared} />
+        <DetuneQuiz key={round} question={question} {...shared} />
       )}
       {question.kind === "scaleMode" && (
-        <ScaleModeQuiz question={question} {...shared} />
+        <ScaleModeQuiz key={round} question={question} {...shared} />
       )}
     </EarQuizCard>
   );

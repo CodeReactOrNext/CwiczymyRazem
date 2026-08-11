@@ -7,6 +7,13 @@ import { EarQuizPanel } from "./EarQuizPanel";
 // jsdom has no Web Audio, so every playback call short-circuits to a no-op —
 // which is exactly what these tests want: the answer flow, not the sound.
 
+// Radix's slider (the tuning quiz) measures its thumb on mount.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;
+
 const CHORD_CONFIG: EarQuizConfig = {
   mode: "chordType",
   qualities: ["major", "minor", "dom7", "sus4"],
@@ -87,5 +94,49 @@ describe("EarQuizPanel — progressions", () => {
 
     expect(screen.getByLabelText("Slot 1: empty")).toBeDefined();
     expect(button("Check").disabled).toBe(true);
+  });
+});
+
+describe("EarQuizPanel — tuning by ear", () => {
+  afterEach(cleanup);
+
+  const config: EarQuizConfig = {
+    mode: "detune",
+    toleranceCents: 8,
+    minOffsetCents: 20,
+    maxOffsetCents: 40,
+  };
+
+  it("keeps the error hidden until the answer is in", () => {
+    render(<EarQuizPanel config={config} exerciseId='test_detune_quiz' />);
+
+    expect(screen.getByText("no numbers — trust your ears")).toBeDefined();
+
+    // Leaving the slider where it started is always outside the window here,
+    // since the question is drawn at least 20 cents out.
+    fireEvent.click(button(/in tune/));
+
+    expect(screen.getByText(/cents$/)).toBeDefined();
+    expect(screen.getByText(/cents (sharp|flat) —/)).toBeDefined();
+    expect(button(/Next/)).toBeDefined();
+  });
+});
+
+describe("EarQuizPanel — scales and modes", () => {
+  afterEach(cleanup);
+
+  const config: EarQuizConfig = {
+    mode: "scaleMode",
+    scales: ["ionian", "aeolian", "dorian"],
+  };
+
+  it("offers each mode and reveals the formula of the one that played", () => {
+    render(<EarQuizPanel config={config} exerciseId='test_mode_quiz' />);
+
+    fireEvent.click(button(/Play scale/));
+    fireEvent.click(button(/Dorian/));
+
+    expect(button(/Next/)).toBeDefined();
+    expect(screen.getByText(/Listen for the .+ — 1 /)).toBeDefined();
   });
 });

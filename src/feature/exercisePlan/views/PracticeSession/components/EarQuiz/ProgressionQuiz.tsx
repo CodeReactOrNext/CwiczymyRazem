@@ -1,7 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { DegreeId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
-import { DEGREES } from "feature/exercisePlan/logic/earQuiz/progressions";
+import {
+  DEGREES,
+  formatDegrees,
+} from "feature/exercisePlan/logic/earQuiz/progressions";
 import type { ProgressionQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { checkProgressionAnswer } from "feature/exercisePlan/logic/earQuiz/questions";
 import { Check, Music2, Undo2 } from "lucide-react";
@@ -208,7 +211,7 @@ export function ProgressionQuiz({
       <QuizReveal show={isAnswered}>
         <QuizVerdict
           isCorrect={isCorrect}
-          answer={question.degrees.join(" – ")}
+          answer={formatDegrees(question.degrees)}
           explanation={question.chords.map((chord) => chord.name).join("  ·  ")}
           footnote={`Heard in: ${question.heardIn}`}
           onNext={onNext}

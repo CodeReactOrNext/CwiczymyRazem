@@ -331,11 +331,13 @@ export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => 
   gate.connect(bus.input);
 
   const start = ctx.currentTime + SEQUENCE_LEAD_SECONDS;
+  let lastNoteEnd = 0;
 
   for (const event of events) {
     const spread = event.spread ?? 0;
     const duration = event.duration ?? 1.6;
     const gain = (event.gain ?? 1) * volume;
+    lastNoteEnd = Math.max(lastNoteEnd, event.at + (event.midis.length - 1) * spread + duration);
 
     event.midis.forEach((midi, index) => {
       const when = start + event.at + index * spread;
@@ -353,6 +355,17 @@ export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => 
 
   void loadInstrument(ctx); // next sequence gets the sampled instrument
 
+  const releaseGate = () => {
+    try { gate.disconnect(); } catch { /* already gone */ }
+  };
+
+  // Drop the gate once the tail has rung out — a session can play hundreds of
+  // questions, and each one would otherwise leave a node hanging off the bus.
+  let cleanupTimer: ReturnType<typeof setTimeout> | null = setTimeout(
+    releaseGate,
+    (SEQUENCE_LEAD_SECONDS + lastNoteEnd + 1) * 1000,
+  );
+
   let stopped = false;
   return () => {
     if (stopped) return;
@@ -363,9 +376,9 @@ export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => 
     } catch {
       /* context torn down — nothing left to silence */
     }
-    setTimeout(() => {
-      try { gate.disconnect(); } catch { /* already gone */ }
-    }, 400);
+    if (cleanupTimer) clearTimeout(cleanupTimer);
+    cleanupTimer = null;
+    setTimeout(releaseGate, 400);
   };
 }
 
