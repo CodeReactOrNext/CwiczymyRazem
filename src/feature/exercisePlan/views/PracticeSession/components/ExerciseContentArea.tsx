@@ -8,6 +8,7 @@ import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
 import { ClickHuntPanel } from "./ClickHuntPanel";
+import { EarQuizPanel } from "./EarQuiz/EarQuizPanel";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ExerciseInstructionsInline } from "./ExerciseInstructionsInline";
@@ -189,8 +190,12 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       )}
 
-      {/* Content: note hunt / chord hunt / tablature / video / strumming / image */}
-      {currentExercise.id === "metronome_gap_test" ? (
+      {/* Content: ear quiz / note hunt / chord hunt / tablature / video / strumming / image */}
+      {currentExercise.earQuizConfig ? (
+        <div className='p-4 sm:p-6'>
+          <EarQuizPanel config={currentExercise.earQuizConfig} exerciseId={currentExercise.id} />
+        </div>
+      ) : currentExercise.id === "metronome_gap_test" ? (
         <div className="p-4">
           <MetronomeGapTest />
         </div>

@@ -20,6 +20,8 @@ export const isOpenExercise = (exercise: Exercise): boolean =>
   exercise.id !== "chord_practice_configurable" &&
   exercise.id !== "scale_practice_configurable" &&
   !exercise.riddleConfig &&
+  // Listening quizzes render EarQuizPanel in the player slot.
+  !exercise.earQuizConfig &&
   !exercise.customGoal &&
   !exercise.rerollCustomGoal &&
   !exercise.rollHuntTarget &&
