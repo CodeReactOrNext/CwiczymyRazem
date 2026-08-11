@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { INTERVALS, intervalBySemitones, intervalsByIds, noteAtInterval, semitonesBetween } from "./intervalDefinitions";
+import { intervalBySemitones, INTERVALS, intervalsByIds, noteAtInterval, semitonesBetween } from "./intervalDefinitions";
 
 describe("intervalDefinitions", () => {
   it("stays inside one octave, unison and octave excluded", () => {

@@ -129,7 +129,7 @@ export function IntervalClickPanel({
     () => intervalClickHunt?.intervalPositions ?? [],
     [intervalClickHunt?.intervalPositions],
   );
-  const foundRootKeys = useMemo(() => intervalClickHunt?.foundRootKeys ?? [], [intervalClickHunt?.foundRootKeys]);
+  const foundRootKeys = intervalClickHunt?.foundRootKeys ?? [];
   const foundIntervalKeys = intervalClickHunt?.foundIntervalKeys ?? [];
   const lastClick = intervalClickHunt?.lastClick ?? null;
   const score = intervalClickHunt?.gameState.score ?? 0;
@@ -180,21 +180,31 @@ export function IntervalClickPanel({
     playRoot();
   }, [noteSound, isPlaying, playRoot]);
 
-  // Round solved → play the interval itself: root, target, then both together.
-  // Sounded from the lowest root the player actually located, so the pitch pair
-  // matches the shape now sitting on the board.
-  useEffect(() => {
-    if (!complete || !noteSound) return undefined;
-    const anchor = foundRootKeys
+  // The lowest root the player actually located — the pitch the closing phrase is
+  // measured from, so what they hear matches the shape sitting on the board.
+  // Keyed by the found cells' contents, not the array's identity: a later click
+  // hands down a fresh array with the same roots in it, and that must not count
+  // as a change or the phrase replays.
+  const foundRootsKey = foundRootKeys.join(",");
+  const anchorMidi = useMemo(() => {
+    const found = foundRootsKey
+      .split(",")
+      .filter(Boolean)
       .map((key) => {
         const [string, fret] = key.split("-").map(Number);
         return midiForPosition(string, fret);
       })
       .filter((midi) => midi >= 0);
-    const base = anchor.length > 0 ? Math.min(...anchor) : rootMidi;
+    return found.length > 0 ? Math.min(...found) : null;
+  }, [foundRootsKey]);
+
+  // Round solved → play the interval itself: root, target, then both together.
+  useEffect(() => {
+    if (!complete || !noteSound) return undefined;
+    const base = anchorMidi ?? rootMidi;
     if (base === null || semitones < 0) return undefined;
     return playIntervalPhrase(base, base + semitones);
-  }, [complete, noteSound, foundRootKeys, rootMidi, semitones]);
+  }, [complete, noteSound, anchorMidi, rootMidi, semitones]);
 
   // A correct click sounds the pitch of the cell that was hit; wrong clicks stay
   // silent — the red flash already says enough.
@@ -213,11 +223,14 @@ export function IntervalClickPanel({
   const [showSemitones, setShowSemitones] = useState(false);
 
   const intervalName = interval?.name ?? intervalLabel.replace(" ↑", "");
+  // Which strings are live is already obvious on the board (the rest sit behind a
+  // scrim), so the prompt only points at it rather than listing string names.
+  const scope = strings && strings.length < 6 ? " on the highlighted strings" : "";
   const stepPrompt = complete
     ? `A ${intervalName} above ${rootNote} is ${targetNote}`
     : onInterval
-      ? `Now click every note a ${intervalName} above ${rootNote}`
-      : `Click every ${rootNote} between frets ${startFret} and ${endFret}`;
+      ? `Now click every note a ${intervalName} above ${rootNote}${scope}`
+      : `Click every ${rootNote} between frets ${startFret} and ${endFret}${scope}`;
 
   return (
     <div className="relative flex w-full max-w-6xl flex-col items-center gap-4 sm:gap-6">
@@ -284,7 +297,9 @@ export function IntervalClickPanel({
             {intervalLabel}
           </span>
           {showSemitones && semitones >= 0 && (
-            <span className="text-xs font-semibold tabular-nums text-zinc-400">+{semitones} frets up</span>
+            <span className="text-xs font-semibold tabular-nums text-zinc-400">
+              +{semitones} frets up one string
+            </span>
           )}
         </div>
 
@@ -322,7 +337,7 @@ export function IntervalClickPanel({
           type="button"
           onClick={() => setShowSemitones((v) => !v)}
           className="rounded-lg bg-zinc-800/60 px-4 py-2 text-sm font-bold tracking-wide text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-          {showSemitones ? "Hide fret count" : "How many frets?"}
+          {showSemitones ? "Hide the distance" : "How far is it?"}
         </button>
         <div className="flex items-center gap-2">
           <Checkbox
