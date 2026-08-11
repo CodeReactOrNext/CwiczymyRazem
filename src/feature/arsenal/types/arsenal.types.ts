@@ -267,10 +267,12 @@ export type WorkshopKind = "guitar" | "effect";
 
 export interface WorkshopBuildResult {
   buildLevel: number;
-  /** Named mod the job fitted — goes into the item's build log. */
+  /** Label this job wrote into the item's build log. */
   modName: string;
   /** Item Level this level was worth. */
   levelGain: number;
+  /** Fame the build actually cost — the client mirrors it into the header counter. */
+  fameSpent: number;
   spent: ScrapPart[];
   /** The finished item, so the result card renders without waiting for a refetch. */
   item: InventoryItem | EffectInventoryItem;

@@ -138,6 +138,8 @@ export default async function handler(
         buildLevel,
         modName: quote.modName,
         levelGain: quote.gain,
+        // Mirrored into the client's Fame counter, which lives outside this query.
+        fameSpent: quote.requirement.fame,
         spent,
         // Returned so the client can render the finished item immediately,
         // instead of flashing the old card until the refetch lands.
