@@ -1,4 +1,5 @@
 import { Chip } from 'assets/components/ui/chip';
+import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scaleTreeNodes';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo,useRef, useState } from 'react';
 
@@ -11,20 +12,6 @@ interface ScaleTreeGridProps {
   selectedNodeId: string | null;
   onNodeClick: (nodeId: string) => void;
 }
-
-// Frets each box shape is anchored on, in box order — index 0 is Box 1. The
-// fret values build the node IDs; the UI labels rows by their index instead.
-const SCALE_POSITIONS: Record<string, number[]> = {
-  minor_pentatonic: [1, 3, 5, 8, 10],
-  major_pentatonic: [1, 3, 5, 8, 10],
-  minor: [1, 2, 3, 5, 7, 8, 10],
-  major: [1, 2, 3, 5, 7, 8, 10],
-  dorian: [1, 2, 3, 5, 7, 8, 10],
-  phrygian: [1, 2, 3, 5, 7, 8, 10],
-  mixolydian: [1, 2, 3, 5, 7, 8, 10],
-  lydian: [1, 2, 3, 5, 7, 8, 10],
-  locrian: [1, 2, 3, 5, 7, 8, 10],
-};
 
 const FAMILY_COLORS = {
   pentatonic: '#fbbf24',
@@ -83,10 +70,11 @@ export function ScaleTreeGrid({
   }, [scaleNodes]);
 
   const positions = useMemo(() => {
-    return SCALE_POSITIONS[scaleType] || [1, 3, 5, 8, 10];
+    return SCALE_TREE_POSITIONS[scaleType] || [1, 2, 3, 5, 7, 8, 10];
   }, [scaleType]);
 
   const family = scaleNodes[0]?.data?.scaleFamily || 'diatonic';
+  const showBoxNames = usesBoxNames(family);
   const accentColor = FAMILY_COLORS[family as keyof typeof FAMILY_COLORS] || FAMILY_COLORS.diatonic;
   const accentText = FAMILY_TEXT[family] || FAMILY_TEXT.diatonic;
 
@@ -268,15 +256,18 @@ export function ScaleTreeGrid({
 
               return (
                 <div key={pos} className="flex items-center w-full gap-2 sm:gap-6">
-                  {/* Rows are named by box order, not by the fret underneath —
-                      "Box 4" is the fourth shape, wherever it sits on the neck. */}
+                  {/* Pentatonic rows carry the box names players already know,
+                      with the fret underneath. Diatonic scales and modes have no
+                      box convention, so the fret is the name. */}
                   <div className="w-10 sm:w-16 flex-shrink-0 text-right">
                     <span className="block text-xs font-semibold tabular-nums text-zinc-300">
-                      Box {idx + 1}
+                      {showBoxNames ? `Box ${idx + 1}` : `Fret ${pos}`}
                     </span>
-                    <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
-                      fret {pos}
-                    </span>
+                    {showBoxNames && (
+                      <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
+                        fret {pos}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex-1 flex justify-between items-center bg-black/15 rounded-lg p-1.5 sm:p-3 gap-1 sm:gap-2">

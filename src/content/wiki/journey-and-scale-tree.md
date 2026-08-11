@@ -24,9 +24,9 @@ Two modules are live today — **Fundamentals** and **Fretboard Mastery** — wi
 
 <ClickPath steps="Practice|Scale Map" caption="Nine scale families, each broken into the shapes you actually play." />
 
-The map covers minor and major pentatonic, natural minor, major, and the five modes. Each scale is split into the boxes you'd learn from a teacher — Box 1 to 5 for the pentatonics, Box 1 to 7 for the rest — with the fret each shape sits at written underneath.
+The map covers minor and major pentatonic, natural minor, major, and the five modes. The pentatonics use the box names you'd get from a teacher — Box 1 to 5, in the order you'd learn them, with the fret each shape sits at written underneath. The other scales have no box names, so their shapes go by the fret they start on.
 
-<StepList steps="A single-string warm-up::Each scale family opens with a gate you clear at 80 BPM|Seven patterns per box::Ascending, descending, both together, thirds, fourths and two sequences|Hold the tempo::Each pattern asks you to hold 95 BPM for 90 seconds|Claim the reward::Clearing all seven patterns in a box unlocks a reward node worth 100 points and 50 Fame" />
+<StepList steps="A single-string warm-up::Each scale family opens with a gate you clear at 80 BPM|Seven patterns per shape::Ascending, descending, both together, thirds, fourths and two sequences|Hold the tempo::Each pattern asks you to hold 95 BPM for 90 seconds|Claim the reward::Clearing all seven patterns in a shape unlocks a reward node worth 100 points and 50 Fame" />
 
 <BlogAlert type="warning">
 The reward isn't automatic — hitting the tempo unlocks the node, but you have to open it and claim it.

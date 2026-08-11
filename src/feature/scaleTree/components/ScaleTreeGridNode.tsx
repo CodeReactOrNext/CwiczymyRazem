@@ -18,16 +18,14 @@ const FAMILY_COLORS = {
   mode: { accent: '#a78bfa', border: 'border-violet-500/30', glow: 'rgba(167, 139, 250, 0.4)' },
 };
 
-// Keyed by box number (1–7), not by fret — the spine node shows which shape
-// you're on, matching the "Box N" row labels.
+// Keyed by pentatonic box number (1–5), not by fret — the spine node shows
+// which shape you're on, matching the "Box N" row labels.
 const ROMAN_NUMERALS: Record<number, string> = {
   1: 'I',
   2: 'II',
   3: 'III',
   4: 'IV',
   5: 'V',
-  6: 'VI',
-  7: 'VII',
 };
 
 const SCALE_GEOMETRY: Record<string, { sides: number; rotation: number }> = {
@@ -345,7 +343,14 @@ export function ScaleTreeGridNode({
       );
     }
 
-    const numeral = ROMAN_NUMERALS[req?.boxNumber] || '?';
+    // Pentatonic spine nodes show their box as a numeral; scales without a box
+    // convention show the fret the shape starts on instead.
+    const numeral =
+      req?.boxNumber != null
+        ? ROMAN_NUMERALS[req.boxNumber] ?? '?'
+        : req?.position != null
+          ? String(req.position)
+          : '?';
     return (
       <div className="flex flex-col items-center justify-center gap-[2px] z-10 pointer-events-none select-none">
         <span

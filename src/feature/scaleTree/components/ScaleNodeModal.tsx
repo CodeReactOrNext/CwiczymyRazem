@@ -132,11 +132,13 @@ export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPrac
             {req && (
               <div className='flex flex-wrap gap-2'>
                 <Chip>{PATTERN_LABELS[req.patternType] ?? req.patternType}</Chip>
-                <Chip>
-                  {req.stringNum != null
-                    ? `String ${req.stringNum}`
-                    : `Box ${req.boxNumber ?? req.position}`}
-                </Chip>
+                {req.stringNum != null ? (
+                  <Chip>String {req.stringNum}</Chip>
+                ) : (
+                  // Box names exist for pentatonics only — elsewhere the fret
+                  // range chip below already says everything there is to say.
+                  req.boxNumber != null && <Chip>Box {req.boxNumber}</Chip>
+                )}
                 {req.stringNum == null && (
                   <Chip>Frets {req.position}–{req.position + 4}</Chip>
                 )}

@@ -34,8 +34,43 @@ const PATTERNS: Array<{ type: PatternType; suffix: string; label: string }> = [
   { type: "sequence_4_notes",     suffix: "seq4",     label: "Sequence 4"      },
 ];
 
-const PENT_POSITIONS = [1, 3, 5, 8, 10];
+// Pentatonic shapes carry the box names players know from teachers and books,
+// so the arrays run in box order (index 0 = Box 1) and the fret is whatever
+// that shape happens to sit on in C.
+//   Minor: Box 1 = fret 8, Box 2 = fret 10, Box 3 = fret 1, Box 4 = 3, Box 5 = 5
+const MIN_PENT_POSITIONS = [8, 10, 1, 3, 5];
+// Major pentatonic technically starts one shape later, but re-using the minor
+// box order keeps one set of names — only the root position moves.
+//   Major: Box 1 = fret 5, Box 2 = fret 8, Box 3 = fret 10, Box 4 = 1, Box 5 = 3
+const MAJ_PENT_POSITIONS = [5, 8, 10, 1, 3];
+// Diatonic scales and modes have no box convention — they are named by fret.
 const DIAT_POSITIONS = [1, 2, 3, 5, 7, 8, 10];
+
+/** Frets each scale's shapes sit on, in the order they are learned. */
+export const SCALE_TREE_POSITIONS: Record<string, number[]> = {
+  minor_pentatonic: MIN_PENT_POSITIONS,
+  major_pentatonic: MAJ_PENT_POSITIONS,
+  minor: DIAT_POSITIONS,
+  major: DIAT_POSITIONS,
+  dorian: DIAT_POSITIONS,
+  phrygian: DIAT_POSITIONS,
+  mixolydian: DIAT_POSITIONS,
+  lydian: DIAT_POSITIONS,
+  locrian: DIAT_POSITIONS,
+};
+
+/** "Box N" is a pentatonic convention; every other family is named by its fret. */
+export const usesBoxNames = (family: ScaleFamily): boolean =>
+  family === "pentatonic";
+
+/** How a shape is named in the UI: "Box 3" for pentatonics, "Fret 5" elsewhere. */
+function shapeName(
+  family: ScaleFamily,
+  fretPos: number,
+  boxNumber: number | undefined,
+): string {
+  return usesBoxNames(family) && boxNumber ? `Box ${boxNumber}` : `Fret ${fretPos}`;
+}
 
 /** Returns the ascending (spine) node ID for a given scale + fret position. */
 function spineId(scaleId: string, pos: number): string {
@@ -88,9 +123,11 @@ function makeNode(
   bpm: number,
   legacyBpm: number,
   fretPos: number,
-  boxNumber: number,
+  boxNumber: number | undefined,
   patternType: PatternType,
 ): ScaleTreeNodeDef {
+  const patternLabel =
+    PATTERNS.find((p) => p.type === patternType)?.label ?? patternType;
   return {
     id,
     label,
@@ -108,9 +145,8 @@ function makeNode(
         scaleType,
         patternType,
         position: fretPos,
-        boxNumber,
-        label:
-          `${PATTERNS.find((p) => p.type === patternType)?.label ?? patternType} – Box ${boxNumber}`,
+        ...(boxNumber ? { boxNumber } : {}),
+        label: `${patternLabel} – ${shapeName(scaleFamily, fretPos, boxNumber)}`,
       },
     ],
   };
@@ -144,9 +180,10 @@ function buildCluster(
 
   for (let posIdx = 0; posIdx < positions.length; posIdx++) {
     const pos = positions[posIdx];
-    // Boxes are numbered by their order along the neck, not by the fret they
-    // sit on — "Box 4" is the fourth shape you learn, wherever it lands.
-    const boxNumber = posIdx + 1;
+    // Pentatonic shapes get their real box name — the positions array is already
+    // in box order, so index 0 is Box 1 wherever it lands on the neck. Diatonic
+    // scales and modes have no box convention and go by fret instead.
+    const boxNumber = usesBoxNames(scaleFamily) ? posIdx + 1 : undefined;
 
     for (let patIdx = 0; patIdx < PATTERNS.length; patIdx++) {
       const pat = PATTERNS[patIdx];
@@ -167,7 +204,7 @@ function buildCluster(
       nodes.push(makeNode(
         id,
         label,
-        `Box ${boxNumber} – ${pat.label}`,
+        `${shapeName(scaleFamily, pos, boxNumber)} – ${pat.label}`,
         scaleType,
         scaleFamily,
         x,
@@ -237,12 +274,12 @@ const locrianSS = makeSingleStringNode(
 
 const minPentNodes = buildCluster(
   "min_pent", "Minor Pentatonic", "minor_pentatonic", "pentatonic", "minor_pentatonic",
-  PENT_POSITIONS, 0, 0, "min_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
+  MIN_PENT_POSITIONS, 0, 0, "min_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
 );
 
 const majPentNodes = buildCluster(
   "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic", "major_pentatonic",
-  PENT_POSITIONS, 1100, -100, "maj_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
+  MAJ_PENT_POSITIONS, 1100, -100, "maj_pent_single_string", EXAM_BPM, LEGACY_PENT_BPM,
 );
 
 const natMinorNodes = buildCluster(
@@ -283,6 +320,7 @@ const locrianNodes = buildCluster(
 // ─── Reward node generator ────────────────────────────────────────────────────
 function buildRewardNodesForCluster(
   scaleId: string,
+  scaleFamily: ScaleFamily,
   positions: number[],
   clusterX: number,
   clusterY: number,
@@ -300,7 +338,7 @@ function buildRewardNodesForCluster(
 
     rewards.push({
       id: `${scaleId}_pos${pos}_reward`,
-      label: `Reward – Box ${posIdx + 1}`,
+      label: `Reward – ${shapeName(scaleFamily, pos, posIdx + 1)}`,
       points: 100,
       famePoints: 50,
       position: { x, y },
@@ -312,15 +350,15 @@ function buildRewardNodesForCluster(
 }
 
 // ─── Generate reward nodes for all clusters ───────────────────────────────────
-const minPentRewards = buildRewardNodesForCluster("min_pent", PENT_POSITIONS, 0, 0);
-const majPentRewards = buildRewardNodesForCluster("maj_pent", PENT_POSITIONS, 1100, -100);
-const natMinorRewards = buildRewardNodesForCluster("nat_minor", DIAT_POSITIONS, -1100, -100);
-const majorRewards = buildRewardNodesForCluster("major", DIAT_POSITIONS, 2300, -300);
-const dorianRewards = buildRewardNodesForCluster("dorian", DIAT_POSITIONS, -2300, -300);
-const phrygianRewards = buildRewardNodesForCluster("phrygian", DIAT_POSITIONS, -1800, 600);
-const mixolydianRewards = buildRewardNodesForCluster("mixolydian", DIAT_POSITIONS, 2000, 500);
-const lydianRewards = buildRewardNodesForCluster("lydian", DIAT_POSITIONS, 3100, -700);
-const locrianRewards = buildRewardNodesForCluster("locrian", DIAT_POSITIONS, 100, 1300);
+const minPentRewards = buildRewardNodesForCluster("min_pent", "pentatonic", MIN_PENT_POSITIONS, 0, 0);
+const majPentRewards = buildRewardNodesForCluster("maj_pent", "pentatonic", MAJ_PENT_POSITIONS, 1100, -100);
+const natMinorRewards = buildRewardNodesForCluster("nat_minor", "diatonic", DIAT_POSITIONS, -1100, -100);
+const majorRewards = buildRewardNodesForCluster("major", "diatonic", DIAT_POSITIONS, 2300, -300);
+const dorianRewards = buildRewardNodesForCluster("dorian", "mode", DIAT_POSITIONS, -2300, -300);
+const phrygianRewards = buildRewardNodesForCluster("phrygian", "mode", DIAT_POSITIONS, -1800, 600);
+const mixolydianRewards = buildRewardNodesForCluster("mixolydian", "mode", DIAT_POSITIONS, 2000, 500);
+const lydianRewards = buildRewardNodesForCluster("lydian", "mode", DIAT_POSITIONS, 3100, -700);
+const locrianRewards = buildRewardNodesForCluster("locrian", "mode", DIAT_POSITIONS, 100, 1300);
 
 // ─── Cluster label positions (for orientation overlay) ───────────────────────
 export type ClusterLabelDef = {

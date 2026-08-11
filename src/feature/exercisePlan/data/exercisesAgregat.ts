@@ -215,12 +215,16 @@ import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMel
 import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
 import { fretClickAHighExercise } from "feature/exercisePlan/data/exerises/fretClickAHigh/fretClickAHigh";
 import { fretClickAOpenExercise } from "feature/exercisePlan/data/exerises/fretClickAOpen/fretClickAOpen";
+import { fretClickBFullExercise } from "feature/exercisePlan/data/exerises/fretClickBFull/fretClickBFull";
 import { fretClickBox04Exercise } from "feature/exercisePlan/data/exerises/fretClickBox04/fretClickBox04";
 import { fretClickBox48Exercise } from "feature/exercisePlan/data/exerises/fretClickBox48/fretClickBox48";
 import { fretClickBox812Exercise } from "feature/exercisePlan/data/exerises/fretClickBox812/fretClickBox812";
+import { fretClickDFullExercise } from "feature/exercisePlan/data/exerises/fretClickDFull/fretClickDFull";
 import { fretClickFret5AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret5All/fretClickFret5All";
 import { fretClickFret7AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret7All/fretClickFret7All";
 import { fretClickFret9AllExercise } from "feature/exercisePlan/data/exerises/fretClickFret9All/fretClickFret9All";
+import { fretClickGFullExercise } from "feature/exercisePlan/data/exerises/fretClickGFull/fretClickGFull";
+import { fretClickHighEFullExercise } from "feature/exercisePlan/data/exerises/fretClickHighEFull/fretClickHighEFull";
 import { fretClickLowEHighExercise } from "feature/exercisePlan/data/exerises/fretClickLowEHigh/fretClickLowEHigh";
 import { fretClickLowEOpenExercise } from "feature/exercisePlan/data/exerises/fretClickLowEOpen/fretClickLowEOpen";
 import { fretClickOctavesBeHighExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesBeHigh/fretClickOctavesBeHigh";
@@ -229,10 +233,6 @@ import { fretClickOctavesDgHighExercise } from "feature/exercisePlan/data/exeris
 import { fretClickOctavesDgOpenExercise } from "feature/exercisePlan/data/exerises/fretClickOctavesDgOpen/fretClickOctavesDgOpen";
 import { fretClickWholeChromaticExercise } from "feature/exercisePlan/data/exerises/fretClickWholeChromatic/fretClickWholeChromatic";
 import { fretClickWholeNaturalExercise } from "feature/exercisePlan/data/exerises/fretClickWholeNatural/fretClickWholeNatural";
-import { intervalClickBox04Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox04";
-import { intervalClickBox59Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox59";
-import { intervalClickBox812Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox812";
-import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
@@ -242,6 +242,10 @@ import {
   improvPromptHard,
   improvPromptMedium,
 } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import { intervalClickBox04Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox04";
+import { intervalClickBox59Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox59";
+import { intervalClickBox812Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox812";
+import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
 import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
@@ -341,6 +345,10 @@ const rawExercises: Exercise[] = [
   fretClickLowEHighExercise,
   fretClickAOpenExercise,
   fretClickAHighExercise,
+  fretClickDFullExercise,
+  fretClickGFullExercise,
+  fretClickBFullExercise,
+  fretClickHighEFullExercise,
   fretClickFret5AllExercise,
   fretClickFret7AllExercise,
   fretClickFret9AllExercise,

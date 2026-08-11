@@ -175,6 +175,26 @@
     "permanent": true
   },
   {
+    "source": "/exercises/fret-click-d-full",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-g-full",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-b-full",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fret-click-high-e-full",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
     "source": "/exercises/fret-click-fret5-all",
     "destination": "/beginner-guitar-exercises",
     "permanent": true

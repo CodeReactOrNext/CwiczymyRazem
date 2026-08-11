@@ -16,9 +16,9 @@ export interface RequiredExercise {
   /** Fret the shape is anchored on — what the exercise generator works with. */
   position: number;
   /**
-   * Shape number a learner sees (Box 1–5 for pentatonic, 1–7 for diatonic).
-   * The frets jump around (1, 3, 5, 8, 10…), so counting boxes reads as a
-   * ladder instead of implying ten separate positions.
+   * Pentatonic box the shape belongs to (1–5), matching the names players get
+   * from teachers and books. Absent for diatonic scales and modes, which have
+   * no box convention and are named by the fret they start on.
    */
   boxNumber?: number;
   label: string;

@@ -219,6 +219,10 @@ export interface Exercise {
   _generatorConfig?: any;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */
   examBacking?: { url: string; sourceBpm: number };
+  /** Overrides the derived "no guitar needed" answer for exercises the shape of
+   *  the config can't reveal — e.g. the metronome gap test, which is answered
+   *  with the spacebar. See feature/exercisePlan/utils/isNoGuitarExercise. */
+  noGuitarNeeded?: boolean;
   disableMic?: boolean;
   disableBackingTrack?: boolean;
   disableTuner?: boolean;

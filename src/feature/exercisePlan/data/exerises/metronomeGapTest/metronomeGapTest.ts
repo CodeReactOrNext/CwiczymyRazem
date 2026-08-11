@@ -23,6 +23,9 @@ export const metronomeGapTestExercise: Exercise = {
   // click track (audible bars → silence → target). A non-null metronomeSpeed
   // would make the session auto-start its continuous metronome on top of ours.
   disableMic: true,
+  // Answered with the spacebar / a click, so it belongs in the "no guitar" list
+  // even though its config looks like an ordinary exercise.
+  noGuitarNeeded: true,
   metronomeSpeed: null,
   relatedSkills: ["rhythm"],
 };

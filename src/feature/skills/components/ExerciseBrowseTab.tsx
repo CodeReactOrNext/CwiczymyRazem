@@ -9,13 +9,14 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
+import { isNoGuitarExercise } from "feature/exercisePlan/utils/isNoGuitarExercise";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Heart, Info, Lock,Search, SlidersHorizontal, Trophy, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Hand,Heart, Info, Lock,Search, SlidersHorizontal, Trophy, X } from "lucide-react";
 import { useEffect,useMemo, useRef,useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -83,6 +84,9 @@ export const ExerciseBrowseTab = ({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedSkill, setSelectedSkill] = useState("all");
+  // Screen-answered exercises only (ear quizzes, fretboard click hunts) - for
+  // practising on the bus with no instrument at hand.
+  const [noGuitarOnly, setNoGuitarOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
@@ -96,7 +100,8 @@ export const ExerciseBrowseTab = ({
   const activeFilterCount =
     (selectedCategory !== "all" ? 1 : 0) +
     (selectedDifficulty !== "all" ? 1 : 0) +
-    (selectedSkill !== "all" ? 1 : 0);
+    (selectedSkill !== "all" ? 1 : 0) +
+    (noGuitarOnly ? 1 : 0);
 
   // The sheet is hidden from `sm` up, so a rotation/resize while it is open
   // would otherwise leave an invisible overlay swallowing clicks.
@@ -122,6 +127,7 @@ export const ExerciseBrowseTab = ({
     setSelectedCategory("all");
     setSelectedDifficulty("all");
     setSelectedSkill("all");
+    setNoGuitarOnly(false);
     setPage(1);
   };
 
@@ -155,6 +161,11 @@ export const ExerciseBrowseTab = ({
     setPage(1);
   };
 
+  const handleNoGuitarChange = (value: boolean) => {
+    setNoGuitarOnly(value);
+    setPage(1);
+  };
+
   const availableSkills = useMemo(() => {
     const skillSet = new Set<GuitarSkillId>();
     exercisesAgregat.forEach(ex => {
@@ -177,6 +188,7 @@ export const ExerciseBrowseTab = ({
         if (selectedCategory !== "all" && ex.category !== selectedCategory) return false;
         if (selectedDifficulty !== "all" && ex.difficulty !== selectedDifficulty) return false;
         if (selectedSkill !== "all" && !ex.relatedSkills.includes(selectedSkill as GuitarSkillId)) return false;
+        if (noGuitarOnly && !isNoGuitarExercise(ex)) return false;
         if (q) {
           const title = (typeof ex.title === "string" ? ex.title : (ex.title as any)?.en ?? "").toLowerCase();
           const desc = (typeof ex.description === "string" ? ex.description : "").toLowerCase();
@@ -207,7 +219,7 @@ export const ExerciseBrowseTab = ({
         if (aAttempted !== bAttempted) return aAttempted ? -1 : 1;
         return exTitle(a).localeCompare(exTitle(b));
       });
-  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, progressMap, sortKey, sortDir, favoriteExerciseIds]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, noGuitarOnly, progressMap, sortKey, sortDir, favoriteExerciseIds]);
 
   const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -323,6 +335,18 @@ export const ExerciseBrowseTab = ({
     }),
   ];
 
+  const noGuitarPill = (big = false) => (
+    <button
+      onClick={() => handleNoGuitarChange(!noGuitarOnly)}
+      aria-pressed={noGuitarOnly}
+      // normal-case: `capitalize` would turn the multi-word label into Title Case.
+      className={cn(filterPill(noGuitarOnly, big), "flex items-center gap-1.5 normal-case")}
+    >
+      <Hand className="h-3 w-3 shrink-0" />
+      No guitar needed
+    </button>
+  );
+
   const groupLabel = "text-[10px] font-bold capitalize tracking-wider text-zinc-500";
 
   // Shown under the search box on mobile so applied filters stay visible while
@@ -335,7 +359,13 @@ export const ExerciseBrowseTab = ({
       label: t(`skills:skills.${selectedSkill}.name` as any),
       clear: () => handleSkillChange("all"),
     },
-  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
+    noGuitarOnly && {
+      key: "noGuitar",
+      label: "No guitar needed",
+      clear: () => handleNoGuitarChange(false),
+      className: "normal-case",
+    },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void; className?: string }[];
 
   // Everything both the desktop table row and the mobile card need, derived
   // once per exercise so the two layouts can't drift apart.
@@ -474,7 +504,7 @@ export const ExerciseBrowseTab = ({
               <button
                 key={chip.key}
                 onClick={chip.clear}
-                className={cn(filterPill(true), "flex items-center gap-1 pr-2")}
+                className={cn(filterPill(true), "flex items-center gap-1 pr-2", chip.className)}
               >
                 {chip.label}
                 <X className="h-3 w-3 opacity-60" />
@@ -499,6 +529,11 @@ export const ExerciseBrowseTab = ({
             <div className="flex flex-wrap gap-2 items-center">
               <span className={cn(groupLabel, "mr-1")}>Skill</span>
               {skillPills()}
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className={cn(groupLabel, "mr-1")}>Gear</span>
+              {noGuitarPill()}
             </div>
           </div>
 
@@ -534,6 +569,10 @@ export const ExerciseBrowseTab = ({
             <div className="flex flex-col gap-2.5">
               <span className={groupLabel}>Skill</span>
               <div className="flex flex-wrap gap-2">{skillPills(true)}</div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <span className={groupLabel}>Gear</span>
+              <div className="flex flex-wrap gap-2">{noGuitarPill(true)}</div>
             </div>
           </div>
 

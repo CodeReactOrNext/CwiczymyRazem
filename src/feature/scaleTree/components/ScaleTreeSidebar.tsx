@@ -59,7 +59,7 @@ export function ScaleTreeSidebar({
           Scale selector
         </h2>
         <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
-          Pick a scale to see its tree and box positions.
+          Pick a scale to see its tree and shapes.
         </p>
       </div>
 

@@ -226,7 +226,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
   },
   {
     id: "scalloped-frets",
-    label: "Scalloped frets",
+    label: "Scalloped fretboard",
     category: "playFeeling",
     min: 1,
     max: 3,
