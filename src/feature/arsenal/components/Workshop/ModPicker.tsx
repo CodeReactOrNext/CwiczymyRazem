@@ -3,12 +3,13 @@ import type { FittedMod, ModOption } from "feature/arsenal/data/workshop";
 import { motion } from "framer-motion";
 import { Dices } from "lucide-react";
 
-import { PartTally } from "./PartTally";
+import { PartRow } from "../Parts/PartRow";
+import { SectionLabel } from "../SectionLabel";
 
 /**
  * The bill for one mod, small enough to sit inside a row.
  *
- * `RecipeList` is the full-width version for a job the player has already
+ * `CostList` is the full-width version for a job the player has already
  * committed to; here a dozen mods are being compared at once, so each bill is
  * reduced to its parts and quantities — still the real numbers, still tier
  * coloured, just quiet enough to scan down the column.
@@ -16,9 +17,12 @@ import { PartTally } from "./PartTally";
 const MiniBill = ({ mod }: { mod: ModOption }) => (
   <div className='flex flex-wrap items-center gap-2'>
     {mod.recipe.map((line, i) => (
-      <PartTally
+      <PartRow
         key={`${line.partId}:${line.tier}`}
-        line={line}
+        partId={line.partId}
+        tier={line.tier}
+        need={line.need}
+        have={line.have}
         variant='compact'
         index={i}
       />
@@ -123,9 +127,7 @@ export const ModPicker = ({
   <div className='flex flex-col gap-7'>
     {fitted.length > 0 && (
       <div className='flex flex-col gap-3'>
-        <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-          Fitted
-        </span>
+        <SectionLabel>Fitted</SectionLabel>
         <div className='flex flex-col gap-2'>
           {fitted.map((mod, i) => (
             <ModRow
@@ -144,11 +146,11 @@ export const ModPicker = ({
     )}
 
     <div className='flex flex-col gap-3'>
-      <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+      <SectionLabel>
         {slotsFull
           ? "Fits this build — but every slot is taken"
           : "Fits this build"}
-      </span>
+      </SectionLabel>
 
       {candidates.length === 0 ? (
         <div className='rounded-lg bg-zinc-800/20 p-6 text-base text-zinc-400'>

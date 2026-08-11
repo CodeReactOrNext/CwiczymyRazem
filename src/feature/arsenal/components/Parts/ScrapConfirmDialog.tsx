@@ -1,3 +1,13 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "assets/components/ui/alert-dialog";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { countScrapParts } from "feature/arsenal/utils/scrap";
 
@@ -13,6 +23,11 @@ interface ScrapConfirmDialogProps {
   isLoading: boolean;
 }
 
+/**
+ * A teardown is permanent, so it asks on an `alert-dialog`: Escape and the
+ * backdrop cancel, the focus trap keeps the two buttons reachable, and neither
+ * closes the dialog while the request is still in flight.
+ */
 export const ScrapConfirmDialog = ({
   isOpen,
   itemType,
@@ -22,43 +37,51 @@ export const ScrapConfirmDialog = ({
   onCancel,
   isLoading,
 }: ScrapConfirmDialogProps) => {
-  if (!isOpen) return null;
-
   const total = countScrapParts(parts);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-sm rounded-xl bg-zinc-900 p-6">
-        <h2 className="mb-2 text-lg font-bold text-white">Scrap {itemType}?</h2>
-        <p className="mb-1 text-sm text-zinc-400">{itemName}</p>
-        <p className="mb-5 text-xs text-zinc-500">
-          This is permanent — the {itemType.toLowerCase()} is gone for good.
-        </p>
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open && !isLoading) onCancel();
+      }}>
+      <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
+        <AlertDialogHeader className='space-y-2'>
+          <AlertDialogTitle className='text-lg font-bold text-white'>
+            Scrap {itemType}?
+          </AlertDialogTitle>
+          <AlertDialogDescription className='text-sm text-zinc-400'>
+            {itemName} — this is permanent, the {itemType.toLowerCase()} is gone
+            for good.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-        <div className="mb-6 rounded-lg bg-zinc-800/50 p-4">
-          <p className="mb-3 text-xs text-zinc-400">
+        <div className='flex flex-col gap-4 rounded-lg bg-zinc-800/50 p-4'>
+          <p className='text-xs text-zinc-400'>
             You will salvage {total} {total === 1 ? "part" : "parts"}
           </p>
           <ScrapYieldList parts={parts} />
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={onCancel}
+        <AlertDialogFooter className='gap-2 sm:space-x-0'>
+          <AlertDialogCancel
             disabled={isLoading}
-            className="flex-1 rounded bg-zinc-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-600 disabled:opacity-50"
-          >
+            className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              // The dialog closes on the confirmed action; the caller unmounts it
+              // itself once the teardown lands, so it must not close early.
+              e.preventDefault();
+              onConfirm();
+            }}
             disabled={isLoading}
-            className="flex-1 rounded bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
-          >
+            className='bg-orange-600 text-white hover:bg-orange-700 sm:flex-1'>
             {isLoading ? "Scrapping..." : "Confirm"}
-          </button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

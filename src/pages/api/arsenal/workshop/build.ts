@@ -14,6 +14,7 @@ import type {
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
+import { appendBuildLog } from "feature/arsenal/utils/buildLog";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -105,7 +106,7 @@ export default async function handler(
       const upgraded = {
         ...item,
         buildLevel,
-        buildLog: [...(item.buildLog ?? []), quote.modName],
+        buildLog: appendBuildLog(item.buildLog, quote.logLabel),
       };
 
       const newList = [...list];
@@ -136,8 +137,9 @@ export default async function handler(
 
       return {
         buildLevel,
-        modName: quote.modName,
         levelGain: quote.gain,
+        // Mirrored into the client's Fame counter, which lives outside this query.
+        fameSpent: quote.requirement.fame,
         spent,
         // Returned so the client can render the finished item immediately,
         // instead of flashing the old card until the refetch lands.

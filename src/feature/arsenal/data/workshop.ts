@@ -494,56 +494,16 @@ export interface WorkshopCheck {
 // ─── Build log flavour ───────────────────────────────────────────────────────
 
 /**
- * `FEATURE_PART_UPGRADES` already says which part each named feature physically is.
- * Read backwards it says what a part can be fitted as, which is exactly the label a
- * build job needs — so a job paid with a bridge reads "Brass trem block", not "+1".
+ * What a build job writes into the item's chronicle.
+ *
+ * Deliberately *not* a feature name. The label used to be borrowed from the real
+ * feature pool ("Hand-wound pickups"), which read as if the build had fitted that
+ * mod — it had not: a build buys a level, mods are their own job with their own
+ * bill and their own entry in `features`. The log is a record of bench work, so
+ * it says exactly that and nothing the item does not have.
  */
-const FEATURES_BY_PART = ((): Map<PartId, string[]> => {
-  const map = new Map<PartId, string[]>();
-  for (const [featureId, partId] of Object.entries(FEATURE_PART_UPGRADES)) {
-    map.set(partId, [...(map.get(partId) ?? []), featureId]);
-  }
-  return map;
-})();
-
-const GUITAR_FEATURE_LABELS = new Map(
-  GUITAR_FEATURES.map((f) => [f.id, f.label]),
-);
-const EFFECT_FEATURE_LABELS = new Map(
-  EFFECT_FEATURES.map((f) => [f.id, f.label]),
-);
-
-const TIER_WEIGHT: Record<PartTier, number> = {
-  Standard: 0,
-  Epic: 1,
-  Legendary: 2,
-  Unique: 3,
-};
-
-const getBuildModName = (
-  recipe: ScrapPart[],
-  kind: WorkshopKind,
-  level: number,
-): string => {
-  const labels =
-    kind === "guitar" ? GUITAR_FEATURE_LABELS : EFFECT_FEATURE_LABELS;
-
-  // The best part in the recipe is the one worth naming the job after.
-  const headline = [...recipe].sort(
-    (a, b) => TIER_WEIGHT[b.tier] - TIER_WEIGHT[a.tier],
-  );
-
-  for (const part of headline) {
-    const candidates = (FEATURES_BY_PART.get(part.partId) ?? []).filter((id) =>
-      labels.has(id),
-    );
-    if (candidates.length > 0) {
-      return labels.get(candidates[level % candidates.length])!;
-    }
-  }
-
-  return "Bench work";
-};
+export const getBuildLogLabel = (level: number): string =>
+  `Bench work · build ${level}`;
 
 // ─── Build ───────────────────────────────────────────────────────────────────
 
@@ -564,8 +524,8 @@ export interface BuildQuote {
   recipe: RecipeLine[];
   checks: WorkshopCheck[];
   canBuild: boolean;
-  /** Name of the mod this job fits, for the build log. */
-  modName: string;
+  /** What this job writes into the build log — bench work, not a feature. */
+  logLabel: string;
 }
 
 /**
@@ -651,7 +611,7 @@ export const getBuildQuote = (
     recipe,
     checks,
     canBuild: checks.every((c) => c.ok) && recipe.every((line) => line.ok),
-    modName: getBuildModName(parts, subject.kind, level),
+    logLabel: getBuildLogLabel(level),
   };
 };
 

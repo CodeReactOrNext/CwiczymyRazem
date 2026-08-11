@@ -10,8 +10,8 @@ import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
+import { PartRow } from "../Parts/PartRow";
 import { RARITY_STYLES } from "../RarityBadge";
-import { PartTally } from "./PartTally";
 
 interface BuildLadderProps {
   subject: WorkshopSubject;
@@ -128,9 +128,12 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
 
               <div className='flex flex-wrap items-center gap-2'>
                 {recipe.map((line, i) => (
-                  <PartTally
+                  <PartRow
                     key={`${line.partId}:${line.tier}`}
-                    line={line}
+                    partId={line.partId}
+                    tier={line.tier}
+                    need={line.need}
+                    have={line.have}
                     variant='compact'
                     index={i}
                   />

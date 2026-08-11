@@ -6,15 +6,16 @@ import {
   RARITY_LADDER,
   RARITY_MAX_FEATURES,
 } from "feature/arsenal/data/itemStats";
-import { getPartLabel } from "feature/arsenal/data/partDefinitions";
-import type { ModQuote } from "feature/arsenal/data/workshop";
 import {
   getBuildQuote,
-  getGradeByRank,
   getModQuote,
   getRepairQuote,
 } from "feature/arsenal/data/workshop";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import {
+  describeBlocker,
+  describeModBlocker,
+} from "feature/arsenal/utils/workshopBlockers";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { Hammer, SlidersHorizontal, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -22,7 +23,9 @@ import { useMemo, useState } from "react";
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
+import { BuildLog } from "./BuildLog";
 import { ConditionPath } from "./ConditionPath";
+import { FittedMods } from "./FittedMods";
 import { JobCard } from "./JobCard";
 import { RarityPath } from "./RarityPath";
 import { SlotPips } from "./SlotPips";
@@ -34,45 +37,6 @@ interface WorkshopBenchProps {
   wallet: ScrapPart[];
   fame: number;
 }
-
-/**
- * Why a build cannot run yet, in the fewest words that still point somewhere.
- * A missing part names itself — that is the whole advantage of a fixed recipe.
- */
-const getBuildBlocker = (
-  quote: ReturnType<typeof getBuildQuote>,
-): string | undefined => {
-  const failedCheck = quote.checks.find((c) => !c.ok);
-  if (failedCheck?.kind === "condition") {
-    return `restore it to ${getGradeByRank(failedCheck.required).label} first`;
-  }
-
-  const missing = quote.recipe.filter((line) => !line.ok);
-  if (missing.length === 1) {
-    const line = missing[0];
-    return `${line.need - line.have} more ${line.tier} ${getPartLabel(line.partId).toLowerCase()}`;
-  }
-  if (missing.length > 1) return `missing ${missing.length} of the parts`;
-
-  if (failedCheck?.kind === "fame") {
-    return `needs ${failedCheck.required - failedCheck.current} more fame`;
-  }
-  return undefined;
-};
-
-/**
- * Why the mod bench is closed. Every mod has its own bill, so "not enough parts"
- * is only true when *none* of them are affordable — otherwise the block is the
- * slot cap, which a promotion fixes.
- */
-const getModBlocker = (quote: ModQuote): string | undefined => {
-  if (quote.canFit || quote.canReroll) return undefined;
-  if (quote.slots.free === 0 && quote.fitted.length > 0) {
-    return "no parts for a re-roll";
-  }
-  if (quote.candidates.length === 0) return "nothing else fits this build";
-  return "no parts for any mod yet";
-};
 
 export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
   const rs = RARITY_STYLES[entry.rarity];
@@ -113,6 +77,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         modQuote={modQuote}
         wallet={wallet}
         onClose={() => setJob(null)}
+        onChangeJob={setJob}
       />
 
       {/* ─── The item on the bench ─── */}
@@ -189,7 +154,9 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         }
         gain={repairQuote.gain}
         ready={repairQuote.canRepair}
-        blockedNote={repairQuote.target ? "not enough parts" : undefined}
+        blockedNote={
+          repairQuote.target ? describeBlocker(repairQuote.recipe) : undefined
+        }
         accent='emerald'
         disabled={!repairQuote.target}
         onClick={() => setJob("repair")}
@@ -200,7 +167,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         title={
           buildQuote.requirement.promotesTo
             ? `Promote to ${buildQuote.requirement.promotesTo}`
-            : "Next build"
+            : `Build ${buildQuote.requirement.level}`
         }
         summary={
           <>
@@ -215,7 +182,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         }
         gain={buildQuote.gain}
         ready={buildQuote.canBuild}
-        blockedNote={getBuildBlocker(buildQuote)}
+        blockedNote={describeBlocker(buildQuote.recipe, buildQuote.checks)}
         accent='cyan'
         onClick={() => setJob("build")}
       />
@@ -236,7 +203,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
             : "re-roll only"
         }
         ready={modQuote.canFit || modQuote.canReroll}
-        blockedNote={getModBlocker(modQuote)}
+        blockedNote={describeModBlocker(modQuote)}
         accent='purple'
         disabled={
           modQuote.fitted.length === 0 && modQuote.candidates.length === 0
@@ -244,24 +211,11 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         onClick={() => setJob("mod")}
       />
 
-      {/* ─── Mods fitted ─── */}
-      {entry.buildLog.length > 0 && (
-        <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-6'>
-          <span className='text-xs font-bold tracking-[0.2em] text-zinc-400'>
-            Mods fitted
-          </span>
-          <div className='flex flex-col gap-2.5'>
-            {[...entry.buildLog].reverse().map((mod, i) => (
-              <div key={`${mod}-${i}`} className='flex items-baseline gap-3'>
-                <span className='w-6 shrink-0 text-right text-xs font-bold tabular-nums text-zinc-600'>
-                  {entry.buildLog.length - i}
-                </span>
-                <span className='text-sm text-zinc-300'>{mod}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ─── What is actually on the instrument ─── */}
+      <FittedMods mods={modQuote.fitted} onReroll={() => setJob("mod")} />
+
+      {/* ─── The chronicle of bench work, folded away ─── */}
+      <BuildLog entries={entry.buildLog} />
     </div>
   );
 };

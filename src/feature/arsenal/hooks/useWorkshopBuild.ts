@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deductFame } from "feature/user/store/userSlice";
 import { toast } from "sonner";
+import { useAppDispatch } from "store/hooks";
 
 import { buildItem } from "../services/arsenal.service";
 import type { WorkshopKind } from "../types/arsenal.types";
@@ -8,14 +10,17 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 /** Buys one build level. The bill is recomputed server-side from the stored item. */
 export const useWorkshopBuild = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: ({ itemId, kind }: { itemId: string; kind: WorkshopKind }) =>
       buildItem(itemId, kind),
     onSuccess: (data) => {
-      toast.success(
-        `${data.modName} fitted — Build ${data.buildLevel}, +${data.levelGain} level`,
-      );
+      // Fame lives in the Redux user slice, not in this query — without the
+      // mirror both the header counter and the build's own Fame gate keep
+      // quoting the pre-build balance until the page is reloaded.
+      dispatch(deductFame(data.fameSpent ?? 0));
+      toast.success(`Build ${data.buildLevel} — +${data.levelGain} level`);
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
     onError: (error: unknown) => {

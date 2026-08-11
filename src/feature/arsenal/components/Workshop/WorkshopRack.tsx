@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ConditionMeter } from "../ConditionMeter";
+import { SectionLabel } from "../SectionLabel";
 
 type RackFilter = "all" | "guitar" | "effect";
 
@@ -13,6 +14,11 @@ interface WorkshopRackProps {
   entries: WorkshopEntry[];
   selectedId: string | null;
   onSelect: (entry: WorkshopEntry) => void;
+  /**
+   * Drops the panel's own surface and its inner scroll — for the mobile sheet,
+   * where the sheet is already the surface and already scrolls.
+   */
+  bare?: boolean;
 }
 
 const FILTERS: { id: RackFilter; label: string }[] = [
@@ -26,6 +32,7 @@ export const WorkshopRack = ({
   entries,
   selectedId,
   onSelect,
+  bare = false,
 }: WorkshopRackProps) => {
   const [filter, setFilter] = useState<RackFilter>("all");
   const [search, setSearch] = useState("");
@@ -49,12 +56,12 @@ export const WorkshopRack = ({
   );
 
   return (
-    <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>
-      <div className='flex flex-col gap-1'>
-        <p className='text-base font-black tracking-wide text-white'>
-          Your gear
-        </p>
-      </div>
+    <div
+      className={cn(
+        "flex flex-col gap-5",
+        !bare && "rounded-lg bg-zinc-900/40 p-5",
+      )}>
+      <SectionLabel>Your gear</SectionLabel>
 
       <div className='flex gap-1 rounded-lg bg-zinc-950/50 p-1'>
         {FILTERS.map((f) => (
@@ -87,7 +94,11 @@ export const WorkshopRack = ({
         />
       </div>
 
-      <div className='no-scrollbar flex max-h-[600px] flex-col gap-2 overflow-y-auto py-1'>
+      <div
+        className={cn(
+          "no-scrollbar flex flex-col gap-2 py-1",
+          !bare && "max-h-[600px] overflow-y-auto",
+        )}>
         {visible.length === 0 ? (
           <p className='py-10 text-center text-xs text-zinc-500'>
             Nothing matches that.

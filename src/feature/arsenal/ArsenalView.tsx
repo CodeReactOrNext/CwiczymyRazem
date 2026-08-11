@@ -25,6 +25,7 @@ import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
 import { MarketTab } from "./components/Marketplace/MarketTab";
 import { PartsWallet } from "./components/Parts/PartsWallet";
 import { RigView } from "./components/Rig/RigView";
+import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
 import { getRigLevel } from "./data/rigLevel";
@@ -173,7 +174,9 @@ export const ArsenalView = () => {
 
             {WORKSHOP_ENABLED && (
               <TabsContent value="workshop" className="mt-4">
-                <WorkshopTab data={data} fame={fame} />
+                {/* Without the guard `getWorkshopEntries(undefined)` is empty and a
+                    player with a full rack is told to "open a case first". */}
+                {isLoading ? <WorkshopSkeleton /> : <WorkshopTab data={data} fame={fame} />}
               </TabsContent>
             )}
 
