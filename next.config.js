@@ -382,6 +382,9 @@ module.exports = withSentryConfig(module.exports, {
   // tunnelRoute disabled to reduce Vercel edge requests
   // tunnelRoute: "/monitoring",
 
+  // ⚠️ Buildy idą Turbopackiem (patrz `turbopack: {}` wyżej), więc opcje pod kluczem
+  // `webpack` nie mają efektu. Zostają na wypadek powrotu na webpack (`next build --webpack`).
+  // Szczegóły i sposób weryfikacji Sentry: docs/SENTRY.md
   webpack: {
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
     // See the following for more information:

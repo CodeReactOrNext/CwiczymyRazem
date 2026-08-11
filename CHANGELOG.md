@@ -11,4 +11,5 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Naprawiono problem z Google Translatorem powodujący błędy
+- Błędy z przeglądarki znowu trafiają do Sentry — po przejściu na Next 16 (Turbopack) klient Sentry w ogóle się nie uruchamiał, więc awarie po stronie użytkownika nigdzie nie były zgłaszane. Dodatkowo `console.warn`/`console.error` lądują teraz w logach Sentry, a błędy z preview deploymentów nie mieszają się z produkcyjnymi.
 
