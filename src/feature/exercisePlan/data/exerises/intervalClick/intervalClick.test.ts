@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 import { intervalClickBox04Exercise } from "./intervalClickBox04";
 import { intervalClickBox59Exercise } from "./intervalClickBox59";
 import { intervalClickBox812Exercise } from "./intervalClickBox812";
-import { intervalClickSprintExercise } from "./intervalClickSprint";
+import { intervalClickWholeFretboardExercise } from "./intervalClickWholeFretboard";
 
 const exercises = [
   intervalClickBox04Exercise,
   intervalClickBox59Exercise,
   intervalClickBox812Exercise,
-  intervalClickSprintExercise,
+  intervalClickWholeFretboardExercise,
 ];
 
 describe("interval click drills", () => {

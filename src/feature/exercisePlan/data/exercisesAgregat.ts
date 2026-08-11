@@ -226,7 +226,7 @@ import { fretClickWholeNaturalExercise } from "feature/exercisePlan/data/exerise
 import { intervalClickBox04Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox04";
 import { intervalClickBox59Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox59";
 import { intervalClickBox812Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox812";
-import { intervalClickSprintExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickSprint";
+import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
@@ -350,7 +350,7 @@ const rawExercises: Exercise[] = [
   intervalClickBox04Exercise,
   intervalClickBox59Exercise,
   intervalClickBox812Exercise,
-  intervalClickSprintExercise,
+  intervalClickWholeFretboardExercise,
   stringHuntLowEExercise,
   stringHuntAExercise,
   stringHuntDExercise,
