@@ -137,7 +137,6 @@ export default async function handler(
 
       return {
         buildLevel,
-        modName: quote.logLabel,
         levelGain: quote.gain,
         // Mirrored into the client's Fame counter, which lives outside this query.
         fameSpent: quote.requirement.fame,

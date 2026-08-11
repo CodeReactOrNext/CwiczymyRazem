@@ -282,8 +282,6 @@ export type WorkshopKind = "guitar" | "effect";
 
 export interface WorkshopBuildResult {
   buildLevel: number;
-  /** Label this job wrote into the item's build log. */
-  modName: string;
   /** Item Level this level was worth. */
   levelGain: number;
   /** Fame the build actually cost — the client mirrors it into the header counter. */
