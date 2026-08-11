@@ -24,7 +24,11 @@ interface Voice {
   gain: GainNode;
 }
 
-function createVoice(ctx: AudioContext, frequency: number, destination: AudioNode): Voice {
+function createVoice(
+  ctx: AudioContext,
+  frequency: number,
+  destination: AudioNode,
+): Voice {
   const gain = ctx.createGain();
   gain.gain.value = 0;
   gain.connect(destination);
@@ -48,7 +52,11 @@ function createVoice(ctx: AudioContext, frequency: number, destination: AudioNod
 
 function retune(ctx: AudioContext, voice: Voice, frequency: number): void {
   voice.oscillators.forEach((osc, index) => {
-    osc.frequency.setTargetAtTime(frequency * HARMONICS[index].multiple, ctx.currentTime, GLIDE_SECONDS);
+    osc.frequency.setTargetAtTime(
+      frequency * HARMONICS[index].multiple,
+      ctx.currentTime,
+      GLIDE_SECONDS,
+    );
   });
 }
 
@@ -81,7 +89,8 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
     try {
       const AudioContextClass =
         window.AudioContext ??
-        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
       if (!AudioContextClass) return;
 
       if (!ctxRef.current || ctxRef.current.state === "closed") {
@@ -93,15 +102,33 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
       if (ctx.state === "suspended") void ctx.resume().catch(() => {});
 
       const referenceFrequency = midiToFrequency(referenceMidi);
-      if (!referenceVoiceRef.current) referenceVoiceRef.current = createVoice(ctx, referenceFrequency, ctx.destination);
-      if (!tunedVoiceRef.current) tunedVoiceRef.current = createVoice(ctx, referenceFrequency, ctx.destination);
+      if (!referenceVoiceRef.current)
+        referenceVoiceRef.current = createVoice(
+          ctx,
+          referenceFrequency,
+          ctx.destination,
+        );
+      if (!tunedVoiceRef.current)
+        tunedVoiceRef.current = createVoice(
+          ctx,
+          referenceFrequency,
+          ctx.destination,
+        );
 
       retune(ctx, referenceVoiceRef.current, referenceFrequency);
-      retune(ctx, tunedVoiceRef.current, referenceFrequency * centsToRatio(offsetCents));
+      retune(
+        ctx,
+        tunedVoiceRef.current,
+        referenceFrequency * centsToRatio(offsetCents),
+      );
 
       [referenceVoiceRef.current, tunedVoiceRef.current].forEach((voice) => {
         voice.gain.gain.cancelScheduledValues(ctx.currentTime);
-        voice.gain.gain.setTargetAtTime(VOICE_LEVEL, ctx.currentTime, FADE_SECONDS / 3);
+        voice.gain.gain.setTargetAtTime(
+          VOICE_LEVEL,
+          ctx.currentTime,
+          FADE_SECONDS / 3,
+        );
       });
 
       setIsPlaying(true);
@@ -121,7 +148,11 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
     if (!ctx || !referenceVoiceRef.current || !tunedVoiceRef.current) return;
     const referenceFrequency = midiToFrequency(referenceMidi);
     retune(ctx, referenceVoiceRef.current, referenceFrequency);
-    retune(ctx, tunedVoiceRef.current, referenceFrequency * centsToRatio(offsetCents));
+    retune(
+      ctx,
+      tunedVoiceRef.current,
+      referenceFrequency * centsToRatio(offsetCents),
+    );
   }, [referenceMidi, offsetCents]);
 
   useEffect(
@@ -130,7 +161,11 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
       if (!ctx) return;
       [referenceVoiceRef.current, tunedVoiceRef.current].forEach((voice) => {
         voice?.oscillators.forEach((osc) => {
-          try { osc.stop(); } catch { /* already stopped */ }
+          try {
+            osc.stop();
+          } catch {
+            /* already stopped */
+          }
         });
       });
       void ctx.close().catch(() => {});

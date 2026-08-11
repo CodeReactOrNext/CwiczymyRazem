@@ -1,14 +1,32 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Flame, Play, RotateCcw, Square, Trophy, X } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Flame,
+  Play,
+  RotateCcw,
+  Square,
+  Trophy,
+  X,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { EarQuizStats } from "../../hooks/useEarQuizGame";
 
 /** Header: what the quiz is, and how the session is going. */
-export function EarQuizHeader({ label, stats }: { label: string; stats: EarQuizStats }) {
-  const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : null;
+export function EarQuizHeader({
+  label,
+  stats,
+}: {
+  label: string;
+  stats: EarQuizStats;
+}) {
+  const accuracy =
+    stats.answered > 0
+      ? Math.round((stats.correct / stats.answered) * 100)
+      : null;
 
   return (
     <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-2'>
@@ -22,7 +40,11 @@ export function EarQuizHeader({ label, stats }: { label: string; stats: EarQuizS
             <span className='ml-1.5 text-zinc-500'>{accuracy}%</span>
           </span>
         )}
-        <span className={cn("flex items-center gap-1.5", stats.streak > 0 ? "text-orange-400" : "text-zinc-500")}>
+        <span
+          className={cn(
+            "flex items-center gap-1.5",
+            stats.streak > 0 ? "text-orange-400" : "text-zinc-500",
+          )}>
           <Flame className='h-3.5 w-3.5' aria-hidden />
           <span className='font-semibold'>{stats.streak}</span>
         </span>
@@ -47,7 +69,13 @@ interface ListenButtonProps {
 }
 
 /** The primary action of every quiz: hear the thing you're being asked about. */
-export function ListenButton({ onClick, isPlaying, label = "Play", hasPlayed, className }: ListenButtonProps) {
+export function ListenButton({
+  onClick,
+  isPlaying,
+  label = "Play",
+  hasPlayed,
+  className,
+}: ListenButtonProps) {
   return (
     <Button
       size='lg'
@@ -56,7 +84,13 @@ export function ListenButton({ onClick, isPlaying, label = "Play", hasPlayed, cl
         "h-12 min-w-[168px] gap-2 bg-cyan-500/15 text-base font-semibold text-cyan-300 hover:bg-cyan-500/25",
         className,
       )}>
-      {isPlaying ? <Square className='h-4 w-4' /> : hasPlayed ? <RotateCcw className='h-4 w-4' /> : <Play className='h-4 w-4' />}
+      {isPlaying ? (
+        <Square className='h-4 w-4' />
+      ) : hasPlayed ? (
+        <RotateCcw className='h-4 w-4' />
+      ) : (
+        <Play className='h-4 w-4' />
+      )}
       {isPlaying ? "Stop" : hasPlayed ? "Play again" : label}
     </Button>
   );
@@ -98,7 +132,13 @@ interface AnswerTileProps {
 }
 
 /** One option in an answer grid — big tap target, verdict shown by background. */
-export function AnswerTile({ onClick, state, disabled, title, subtitle }: AnswerTileProps) {
+export function AnswerTile({
+  onClick,
+  state,
+  disabled,
+  title,
+  subtitle,
+}: AnswerTileProps) {
   return (
     <button
       type='button'
@@ -113,7 +153,9 @@ export function AnswerTile({ onClick, state, disabled, title, subtitle }: Answer
         state === "muted" && "bg-zinc-800/20 text-zinc-500",
       )}>
       <span className='text-sm font-semibold leading-tight'>{title}</span>
-      {subtitle && <span className='text-xs leading-tight opacity-70'>{subtitle}</span>}
+      {subtitle && (
+        <span className='text-xs leading-tight opacity-70'>{subtitle}</span>
+      )}
     </button>
   );
 }
@@ -132,31 +174,57 @@ interface QuizVerdictProps {
 }
 
 /** Verdict + the teaching moment + the way on to the next round. */
-export function QuizVerdict({ isCorrect, answer, explanation, footnote, onNext, extraAction }: QuizVerdictProps) {
+export function QuizVerdict({
+  isCorrect,
+  answer,
+  explanation,
+  footnote,
+  onNext,
+  extraAction,
+}: QuizVerdictProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
-      className={cn("flex flex-col gap-4 rounded-lg p-4 sm:p-5", isCorrect ? "bg-emerald-500/10" : "bg-red-500/10")}>
+      className={cn(
+        "flex flex-col gap-4 rounded-lg p-4 sm:p-5",
+        isCorrect ? "bg-emerald-500/10" : "bg-red-500/10",
+      )}>
       <div className='flex items-start gap-3'>
         <span
           className={cn(
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            isCorrect ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400",
+            isCorrect
+              ? "bg-emerald-500/20 text-emerald-400"
+              : "bg-red-500/20 text-red-400",
           )}>
-          {isCorrect ? <Check className='h-4 w-4' aria-label='Correct' /> : <X className='h-4 w-4' aria-label='Wrong' />}
+          {isCorrect ? (
+            <Check className='h-4 w-4' aria-label='Correct' />
+          ) : (
+            <X className='h-4 w-4' aria-label='Wrong' />
+          )}
         </span>
 
         <div className='min-w-0 space-y-1.5'>
-          <p className={cn("text-base font-semibold", isCorrect ? "text-emerald-400" : "text-red-400")}>{answer}</p>
-          {explanation && <p className='text-sm text-zinc-300'>{explanation}</p>}
+          <p
+            className={cn(
+              "text-base font-semibold",
+              isCorrect ? "text-emerald-400" : "text-red-400",
+            )}>
+            {answer}
+          </p>
+          {explanation && (
+            <p className='text-sm text-zinc-300'>{explanation}</p>
+          )}
           {footnote && <p className='text-xs text-zinc-400'>{footnote}</p>}
         </div>
       </div>
 
       <div className='flex flex-wrap items-center gap-3'>
-        <Button onClick={onNext} className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
+        <Button
+          onClick={onNext}
+          className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
           Next
           <ArrowRight className='h-4 w-4' />
         </Button>
@@ -170,7 +238,9 @@ export function QuizVerdict({ isCorrect, answer, explanation, footnote, onNext, 
 export function EarQuizCard({ children }: { children: ReactNode }) {
   return (
     <div className='mx-auto w-full max-w-3xl'>
-      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6'>{children}</div>
+      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6'>
+        {children}
+      </div>
     </div>
   );
 }
@@ -186,6 +256,14 @@ export function StartTimerHint() {
 }
 
 /** Fades a block in when it appears (verdicts, revealed hints). */
-export function QuizReveal({ show, children }: { show: boolean; children: ReactNode }) {
-  return <AnimatePresence initial={false}>{show ? children : null}</AnimatePresence>;
+export function QuizReveal({
+  show,
+  children,
+}: {
+  show: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <AnimatePresence initial={false}>{show ? children : null}</AnimatePresence>
+  );
 }

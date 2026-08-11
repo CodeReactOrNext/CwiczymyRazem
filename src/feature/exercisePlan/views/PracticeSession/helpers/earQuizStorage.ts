@@ -15,7 +15,10 @@ export function loadEarQuizBestStreak(exerciseId: string): number {
   }
 }
 
-export function saveEarQuizBestStreak(exerciseId: string, streak: number): void {
+export function saveEarQuizBestStreak(
+  exerciseId: string,
+  streak: number,
+): void {
   try {
     localStorage.setItem(`${BEST_STREAK_KEY}.${exerciseId}`, String(streak));
   } catch {

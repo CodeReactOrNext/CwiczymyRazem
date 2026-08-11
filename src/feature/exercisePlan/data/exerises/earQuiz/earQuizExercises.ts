@@ -18,7 +18,8 @@ export const earChordQualityBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_chord_quality_basics",
   title: "Chord Quality: The Big Four",
-  description: "Hear a chord and name it: major, minor, dominant 7 or sus4. Four colours, no fretboard needed.",
+  description:
+    "Hear a chord and name it: major, minor, dominant 7 or sus4. Four colours, no fretboard needed.",
   whyItMatters:
     "Almost every song you will ever learn is built from these four sounds. Once you can name a chord the moment it rings, you stop guessing chord charts and start hearing them.",
   difficulty: "easy",
@@ -34,7 +35,10 @@ export const earChordQualityBasicsExercise: Exercise = {
     "Sus4 has no 3rd at all, so it sounds neither happy nor sad, just suspended.",
   ],
   relatedSkills: ["ear_training", "harmony-ear", "chords"],
-  earQuizConfig: { mode: "chordType", qualities: ["major", "minor", "dom7", "sus4"] },
+  earQuizConfig: {
+    mode: "chordType",
+    qualities: ["major", "minor", "dom7", "sus4"],
+  },
 };
 
 export const earChordQualityAdvancedExercise: Exercise = {
@@ -69,7 +73,8 @@ export const earProgressionBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_progression_basics",
   title: "Progression Builder: Three Chords",
-  description: "Hear a three-chord progression and build it back from Roman-numeral tiles.",
+  description:
+    "Hear a three-chord progression and build it back from Roman-numeral tiles.",
   whyItMatters:
     "Hearing chords as degrees rather than letters is what makes a song transposable. Once you catch I–IV–V by ear, you can play along in any key without knowing the chart.",
   difficulty: "medium",
@@ -96,7 +101,8 @@ export const earProgressionAdvancedExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_progression_advanced",
   title: "Progression Builder: Four Chords",
-  description: "Four-chord pop and jazz turnarounds — I–V–vi–IV and the rest — rebuilt degree by degree.",
+  description:
+    "Four-chord pop and jazz turnarounds — I–V–vi–IV and the rest — rebuilt degree by degree.",
   whyItMatters:
     "Four-bar loops are the backbone of most songs written in the last sixty years. Recognising them instantly turns 'learning a song' into 'confirming what you already heard'.",
   difficulty: "hard",
@@ -136,7 +142,8 @@ export const earTuningTrainerExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_tuning_trainer",
   title: "Tune It By Ear",
-  description: "Two notes, one of them out. Slide it into tune by listening for the beating — the drill behind tuning without a tuner.",
+  description:
+    "Two notes, one of them out. Slide it into tune by listening for the beating — the drill behind tuning without a tuner.",
   difficulty: "medium",
   timeInMinutes: 5,
   whyItMatters:
@@ -153,14 +160,20 @@ export const earTuningTrainerExercise: Exercise = {
   ],
   relatedSkills: ["ear_training"],
   disableTuner: true,
-  earQuizConfig: { mode: "detune", toleranceCents: 8, minOffsetCents: 14, maxOffsetCents: 45 },
+  earQuizConfig: {
+    mode: "detune",
+    toleranceCents: 8,
+    minOffsetCents: 14,
+    maxOffsetCents: 45,
+  },
 };
 
 export const earTuningPrecisionExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_tuning_precision",
   title: "Tune It By Ear: Fine",
-  description: "The same drill with a much tighter window — small errors, slow beats, four cents of tolerance.",
+  description:
+    "The same drill with a much tighter window — small errors, slow beats, four cents of tolerance.",
   difficulty: "hard",
   timeInMinutes: 5,
   whyItMatters:
@@ -177,7 +190,12 @@ export const earTuningPrecisionExercise: Exercise = {
   ],
   relatedSkills: ["ear_training"],
   disableTuner: true,
-  earQuizConfig: { mode: "detune", toleranceCents: 4, minOffsetCents: 6, maxOffsetCents: 25 },
+  earQuizConfig: {
+    mode: "detune",
+    toleranceCents: 4,
+    minOffsetCents: 6,
+    maxOffsetCents: 25,
+  },
 };
 
 // ── 4. Scales & modes ────────────────────────────────────────────────────────
@@ -186,7 +204,8 @@ export const earModeBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_mode_basics",
   title: "Major, Minor or Dorian?",
-  description: "A scale plays over its own tonic drone. Tell natural minor from Dorian — the single most useful ear test a guitarist can pass.",
+  description:
+    "A scale plays over its own tonic drone. Tell natural minor from Dorian — the single most useful ear test a guitarist can pass.",
   difficulty: "medium",
   timeInMinutes: 6,
   whyItMatters:
@@ -209,7 +228,8 @@ export const earModeAdvancedExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_mode_advanced",
   title: "Name That Mode",
-  description: "All six common modes over a drone: Ionian, Lydian, Mixolydian, Dorian, Aeolian and Phrygian.",
+  description:
+    "All six common modes over a drone: Ionian, Lydian, Mixolydian, Dorian, Aeolian and Phrygian.",
   difficulty: "hard",
   timeInMinutes: 8,
   whyItMatters:

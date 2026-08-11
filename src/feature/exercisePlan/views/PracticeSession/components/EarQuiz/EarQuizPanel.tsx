@@ -1,4 +1,7 @@
-import type { EarQuizConfig, EarQuizMode } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
+import type {
+  EarQuizConfig,
+  EarQuizMode,
+} from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 
 import { useEarQuizGame } from "../../hooks/useEarQuizGame";
 import { ChordTypeQuiz } from "./ChordTypeQuiz";
@@ -28,22 +31,41 @@ const MODE_LABEL: Record<EarQuizMode, string> = {
  * panel holds the round loop and the scoreboard they all share, so a session can
  * drop in any of them by setting `earQuizConfig` on the exercise.
  */
-export function EarQuizPanel({ config, exerciseId, isSessionRunning }: EarQuizPanelProps) {
-  const { question, round, isAnswered, isCorrect, stats, answer, next } = useEarQuizGame(config, exerciseId);
+export function EarQuizPanel({
+  config,
+  exerciseId,
+  isSessionRunning,
+}: EarQuizPanelProps) {
+  const { question, round, isAnswered, isCorrect, stats, answer, next } =
+    useEarQuizGame(config, exerciseId);
 
   // Keyed on the round so every question starts from a clean component — the
   // quizzes hold no state that should survive into the next one.
-  const shared = { key: round, isAnswered, isCorrect, onAnswer: answer, onNext: next };
+  const shared = {
+    key: round,
+    isAnswered,
+    isCorrect,
+    onAnswer: answer,
+    onNext: next,
+  };
 
   return (
     <EarQuizCard>
       <EarQuizHeader label={MODE_LABEL[config.mode]} stats={stats} />
       {isSessionRunning === false && <StartTimerHint />}
 
-      {question.kind === "chordType" && <ChordTypeQuiz question={question} {...shared} />}
-      {question.kind === "progression" && <ProgressionQuiz question={question} {...shared} />}
-      {question.kind === "detune" && <DetuneQuiz question={question} {...shared} />}
-      {question.kind === "scaleMode" && <ScaleModeQuiz question={question} {...shared} />}
+      {question.kind === "chordType" && (
+        <ChordTypeQuiz question={question} {...shared} />
+      )}
+      {question.kind === "progression" && (
+        <ProgressionQuiz question={question} {...shared} />
+      )}
+      {question.kind === "detune" && (
+        <DetuneQuiz question={question} {...shared} />
+      )}
+      {question.kind === "scaleMode" && (
+        <ScaleModeQuiz question={question} {...shared} />
+      )}
     </EarQuizCard>
   );
 }

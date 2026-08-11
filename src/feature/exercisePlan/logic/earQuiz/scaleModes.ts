@@ -105,7 +105,10 @@ export const sortScaleModes = (ids: ScaleModeId[]): ScaleModeId[] =>
   [...ids].sort((a, b) => MODE_ORDER.indexOf(a) - MODE_ORDER.indexOf(b));
 
 /** One octave ascending, root repeated on top so the run resolves. */
-export const buildScaleMidi = (rootMidi: number, scale: ScaleModeId): number[] => [
+export const buildScaleMidi = (
+  rootMidi: number,
+  scale: ScaleModeId,
+): number[] => [
   ...SCALE_MODES[scale].intervals.map((semitones) => rootMidi + semitones),
   rootMidi + 12,
 ];
@@ -115,4 +118,7 @@ export const buildScaleMidi = (rootMidi: number, scale: ScaleModeId): number[] =
  * and Aeolian are the same seven notes from a different starting point, so the
  * tonic has to be held for the ear to have anything to measure against.
  */
-export const buildDroneMidi = (rootMidi: number): number[] => [rootMidi - 12, rootMidi - 5];
+export const buildDroneMidi = (rootMidi: number): number[] => [
+  rootMidi - 12,
+  rootMidi - 5,
+];

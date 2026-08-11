@@ -3,7 +3,10 @@ import type { EarQuizQuestion } from "feature/exercisePlan/logic/earQuiz/questio
 import { generateEarQuizQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { loadEarQuizBestStreak, saveEarQuizBestStreak } from "../helpers/earQuizStorage";
+import {
+  loadEarQuizBestStreak,
+  saveEarQuizBestStreak,
+} from "../helpers/earQuizStorage";
 
 export interface EarQuizStats {
   /** Correct answers this session. */
@@ -20,7 +23,9 @@ export interface EarQuizStats {
  * a streak plus a hit rate — so none of them has to reimplement it.
  */
 export function useEarQuizGame(config: EarQuizConfig, exerciseId: string) {
-  const [question, setQuestion] = useState<EarQuizQuestion>(() => generateEarQuizQuestion(config));
+  const [question, setQuestion] = useState<EarQuizQuestion>(() =>
+    generateEarQuizQuestion(config),
+  );
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   // Bumped every round. The quiz bodies are keyed on it, so a new question
@@ -40,11 +45,14 @@ export function useEarQuizGame(config: EarQuizConfig, exerciseId: string) {
   const answeredRef = useRef(false);
 
   useEffect(() => {
-    if (stats.bestStreak > 0) saveEarQuizBestStreak(exerciseId, stats.bestStreak);
+    if (stats.bestStreak > 0)
+      saveEarQuizBestStreak(exerciseId, stats.bestStreak);
   }, [stats.bestStreak, exerciseId]);
 
   const configRef = useRef(config);
-  useEffect(() => { configRef.current = config; }, [config]);
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
 
   const answer = useCallback((correct: boolean) => {
     if (answeredRef.current) return; // one verdict per round

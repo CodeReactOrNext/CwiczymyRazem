@@ -8,7 +8,12 @@ import { Check, Music2, Undo2 } from "lucide-react";
 import { useState } from "react";
 
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
-import { ListenButton, QuizReveal, QuizSecondaryButton, QuizVerdict } from "./EarQuizChrome";
+import {
+  ListenButton,
+  QuizReveal,
+  QuizSecondaryButton,
+  QuizVerdict,
+} from "./EarQuizChrome";
 
 interface ProgressionQuizProps {
   question: ProgressionQuestion;
@@ -26,11 +31,18 @@ const STRUM_SPREAD = 0.028;
  *  under the tile so nobody has to remember the convention mid-round. */
 const QUALITY_LABEL = { major: "major", minor: "minor", dim: "dim" } as const;
 
-export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onNext }: ProgressionQuizProps) {
+export function ProgressionQuiz({
+  question,
+  isAnswered,
+  isCorrect,
+  onAnswer,
+  onNext,
+}: ProgressionQuizProps) {
   const { isPlaying, play, stop } = useEarQuizPlayback();
-  const [slots, setSlots] = useState<(DegreeId | null)[]>(() => question.degrees.map(() => null));
+  const [slots, setSlots] = useState<(DegreeId | null)[]>(() =>
+    question.degrees.map(() => null),
+  );
   const [hasPlayed, setHasPlayed] = useState(false);
-
 
   const playProgression = () => {
     play(
@@ -49,7 +61,17 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
   const toggleProgression = () => (isPlaying ? stop() : playProgression());
 
   const playTonic = () => {
-    play([{ midis: question.tonicMidis, at: 0, duration: 2.2, spread: STRUM_SPREAD }], 2.2);
+    play(
+      [
+        {
+          midis: question.tonicMidis,
+          at: 0,
+          duration: 2.2,
+          spread: STRUM_SPREAD,
+        },
+      ],
+      2.2,
+    );
   };
 
   const placeDegree = (degree: DegreeId) => {
@@ -84,14 +106,25 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
   return (
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>Which progression is this?</p>
+        <p className='text-center text-lg font-semibold text-zinc-100'>
+          Which progression is this?
+        </p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton onClick={toggleProgression} isPlaying={isPlaying} label='Play progression' hasPlayed={hasPlayed} />
-          <QuizSecondaryButton onClick={playTonic} icon={<Music2 className='h-4 w-4' />}>
+          <ListenButton
+            onClick={toggleProgression}
+            isPlaying={isPlaying}
+            label='Play progression'
+            hasPlayed={hasPlayed}
+          />
+          <QuizSecondaryButton
+            onClick={playTonic}
+            icon={<Music2 className='h-4 w-4' />}>
             Hear the I chord
           </QuizSecondaryButton>
         </div>
-        <p className='text-center text-xs text-zinc-500'>Key of {question.keyName} — build the degrees you hear, in order</p>
+        <p className='text-center text-xs text-zinc-500'>
+          Key of {question.keyName} — build the degrees you hear, in order
+        </p>
       </div>
 
       {/* Slots the tiles drop into */}
@@ -104,17 +137,27 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
               type='button'
               onClick={() => clearSlot(index)}
               disabled={isAnswered || slot === null}
-              aria-label={slot ? `Slot ${index + 1}: ${slot}, tap to clear` : `Slot ${index + 1}: empty`}
+              aria-label={
+                slot
+                  ? `Slot ${index + 1}: ${slot}, tap to clear`
+                  : `Slot ${index + 1}: empty`
+              }
               className={cn(
                 "flex h-16 w-20 flex-col items-center justify-center gap-0.5 rounded-lg text-lg font-semibold transition-colors",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none",
                 slot === null && "bg-zinc-800/20 text-zinc-600",
-                slot !== null && verdict === undefined && "bg-zinc-800/60 text-zinc-100 hover:bg-zinc-800",
+                slot !== null &&
+                  verdict === undefined &&
+                  "bg-zinc-800/60 text-zinc-100 hover:bg-zinc-800",
                 verdict === true && "bg-emerald-500/10 text-emerald-400",
                 verdict === false && "bg-red-500/10 text-red-400",
               )}>
               <span>{slot ?? index + 1}</span>
-              {isAnswered && <span className='text-[11px] font-normal opacity-70'>{question.chords[index]?.name}</span>}
+              {isAnswered && (
+                <span className='text-[11px] font-normal opacity-70'>
+                  {question.chords[index]?.name}
+                </span>
+              )}
             </button>
           );
         })}
@@ -135,7 +178,9 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
               "disabled:pointer-events-none disabled:opacity-40",
             )}>
             {degree}
-            <span className='text-[10px] font-normal text-zinc-500'>{QUALITY_LABEL[DEGREES[degree].quality]}</span>
+            <span className='text-[10px] font-normal text-zinc-500'>
+              {QUALITY_LABEL[DEGREES[degree].quality]}
+            </span>
           </button>
         ))}
       </div>
@@ -168,7 +213,9 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
           footnote={`Heard in: ${question.heardIn}`}
           onNext={onNext}
           extraAction={
-            <QuizSecondaryButton onClick={playProgression} icon={<Music2 className='h-4 w-4' />}>
+            <QuizSecondaryButton
+              onClick={playProgression}
+              icon={<Music2 className='h-4 w-4' />}>
               Play it again
             </QuizSecondaryButton>
           }

@@ -1,5 +1,8 @@
 import type { PreviewEvent } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
-import { playGuitarSequence, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
+import {
+  playGuitarSequence,
+  preloadGuitarNotePreview,
+} from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
@@ -13,7 +16,9 @@ export function useEarQuizPlayback() {
   const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Warm the sampled guitar while the player is still reading the question.
-  useEffect(() => { preloadGuitarNotePreview(); }, []);
+  useEffect(() => {
+    preloadGuitarNotePreview();
+  }, []);
 
   const stop = useCallback(() => {
     stopRef.current?.();
@@ -24,12 +29,18 @@ export function useEarQuizPlayback() {
   }, []);
 
   /** `durationSeconds` is how long the whole sequence rings for, including tails. */
-  const play = useCallback((events: PreviewEvent[], durationSeconds: number, volume?: number) => {
-    stop();
-    stopRef.current = playGuitarSequence(events, volume);
-    setIsPlaying(true);
-    endTimerRef.current = setTimeout(() => setIsPlaying(false), durationSeconds * 1000);
-  }, [stop]);
+  const play = useCallback(
+    (events: PreviewEvent[], durationSeconds: number, volume?: number) => {
+      stop();
+      stopRef.current = playGuitarSequence(events, volume);
+      setIsPlaying(true);
+      endTimerRef.current = setTimeout(
+        () => setIsPlaying(false),
+        durationSeconds * 1000,
+      );
+    },
+    [stop],
+  );
 
   useEffect(() => stop, [stop]);
 

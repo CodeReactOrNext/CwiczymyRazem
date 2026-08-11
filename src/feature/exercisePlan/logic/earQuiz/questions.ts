@@ -10,20 +10,32 @@ import type {
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
 import type { ProgressionChord } from "./progressions";
-import { buildProgressionChords, findProgression, midiToNoteName, PROGRESSIONS, sortDegrees } from "./progressions";
+import {
+  buildProgressionChords,
+  findProgression,
+  midiToNoteName,
+  PROGRESSIONS,
+  sortDegrees,
+} from "./progressions";
 import { buildDroneMidi, buildScaleMidi, sortScaleModes } from "./scaleModes";
 
 export type Rng = () => number;
 
-const pick = <T>(items: readonly T[], rng: Rng): T => items[Math.floor(rng() * items.length) % items.length];
+const pick = <T>(items: readonly T[], rng: Rng): T =>
+  items[Math.floor(rng() * items.length) % items.length];
 
 /** Draws from `items`, never returning `exclude` — unless it is the only option. */
-const pickFresh = <T>(items: readonly T[], exclude: T | undefined, rng: Rng): T => {
+const pickFresh = <T>(
+  items: readonly T[],
+  exclude: T | undefined,
+  rng: Rng,
+): T => {
   const fresh = items.filter((item) => item !== exclude);
   return fresh.length > 0 ? pick(fresh, rng) : items[0];
 };
 
-const randomInt = (min: number, max: number, rng: Rng): number => min + Math.floor(rng() * (max - min + 1));
+const randomInt = (min: number, max: number, rng: Rng): number =>
+  min + Math.floor(rng() * (max - min + 1));
 
 // Roots are drawn from a middle register: high enough that a stacked chord stays
 // clear on laptop speakers, low enough that the top voice never gets shrill.
@@ -108,7 +120,11 @@ export const generateProgressionQuestion = (
     .map(findProgression)
     .filter((p): p is NonNullable<typeof p> => !!p);
   const available = pool.length > 0 ? pool : PROGRESSIONS;
-  const progression = pickFresh(available, available.find((p) => p.id === previous?.progressionId), rng);
+  const progression = pickFresh(
+    available,
+    available.find((p) => p.id === previous?.progressionId),
+    rng,
+  );
 
   const keyRootMidi = randomInt(KEY_ROOT_RANGE.min, KEY_ROOT_RANGE.max, rng);
   const chords = buildProgressionChords(keyRootMidi, progression.degrees);
@@ -135,8 +151,16 @@ export const generateDetuneQuestion = (
   previous?: DetuneQuestion | null,
   rng: Rng = Math.random,
 ): DetuneQuestion => {
-  const referenceMidi = pickFresh(DETUNE_REFERENCE_MIDI, previous?.referenceMidi, rng);
-  const magnitude = randomInt(config.minOffsetCents, config.maxOffsetCents, rng);
+  const referenceMidi = pickFresh(
+    DETUNE_REFERENCE_MIDI,
+    previous?.referenceMidi,
+    rng,
+  );
+  const magnitude = randomInt(
+    config.minOffsetCents,
+    config.maxOffsetCents,
+    rng,
+  );
   const sign = rng() < 0.5 ? -1 : 1;
   return {
     kind: "detune",
@@ -172,30 +196,58 @@ export const generateEarQuizQuestion = (
   rng: Rng = Math.random,
 ): EarQuizQuestion => {
   const sameKind = previous && previous.kind === config.mode ? previous : null;
-  if (config.mode === "chordType") return generateChordTypeQuestion(config, sameKind as ChordTypeQuestion | null, rng);
-  if (config.mode === "progression") return generateProgressionQuestion(config, sameKind as ProgressionQuestion | null, rng);
-  if (config.mode === "detune") return generateDetuneQuestion(config, sameKind as DetuneQuestion | null, rng);
-  return generateScaleModeQuestion(config, sameKind as ScaleModeQuestion | null, rng);
+  if (config.mode === "chordType")
+    return generateChordTypeQuestion(
+      config,
+      sameKind as ChordTypeQuestion | null,
+      rng,
+    );
+  if (config.mode === "progression")
+    return generateProgressionQuestion(
+      config,
+      sameKind as ProgressionQuestion | null,
+      rng,
+    );
+  if (config.mode === "detune")
+    return generateDetuneQuestion(
+      config,
+      sameKind as DetuneQuestion | null,
+      rng,
+    );
+  return generateScaleModeQuestion(
+    config,
+    sameKind as ScaleModeQuestion | null,
+    rng,
+  );
 };
 
 // ── Answer checking ──────────────────────────────────────────────────────────
 
 /** Cents the player is still out by after moving the slider. */
-export const remainingDetuneCents = (question: DetuneQuestion, sliderCents: number): number =>
-  question.offsetCents + sliderCents;
+export const remainingDetuneCents = (
+  question: DetuneQuestion,
+  sliderCents: number,
+): number => question.offsetCents + sliderCents;
 
-export const isDetuneSolved = (question: DetuneQuestion, sliderCents: number): boolean =>
-  Math.abs(remainingDetuneCents(question, sliderCents)) <= question.toleranceCents;
+export const isDetuneSolved = (
+  question: DetuneQuestion,
+  sliderCents: number,
+): boolean =>
+  Math.abs(remainingDetuneCents(question, sliderCents)) <=
+  question.toleranceCents;
 
 /**
  * How fast the two notes beat against each other at a given error — the thing
  * the player is actually listening for, shown as feedback after an answer.
  * Two pitches `cents` apart beat at the difference of their frequencies.
  */
-export const beatsPerSecond = (referenceFrequency: number, cents: number): number =>
-  Math.abs(referenceFrequency * (Math.pow(2, cents / 1200) - 1));
+export const beatsPerSecond = (
+  referenceFrequency: number,
+  cents: number,
+): number => Math.abs(referenceFrequency * (Math.pow(2, cents / 1200) - 1));
 
-export const centsToRatio = (cents: number): number => Math.pow(2, cents / 1200);
+export const centsToRatio = (cents: number): number =>
+  Math.pow(2, cents / 1200);
 
 /** Per-slot verdicts for a built progression answer. */
 export const checkProgressionAnswer = (

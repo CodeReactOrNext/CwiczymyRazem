@@ -1,13 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { buildChordMidi, CHORD_QUALITIES, sortChordQualities } from "./chordQualities";
+import {
+  buildChordMidi,
+  CHORD_QUALITIES,
+  sortChordQualities,
+} from "./chordQualities";
 import type {
   ChordTypeQuizConfig,
   DetuneQuizConfig,
   ProgressionQuizConfig,
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
-import { buildProgressionChords, DEGREES, findProgression, PROGRESSIONS, sortDegrees } from "./progressions";
+import {
+  buildProgressionChords,
+  DEGREES,
+  findProgression,
+  PROGRESSIONS,
+  sortDegrees,
+} from "./progressions";
 import type { Rng } from "./questions";
 import {
   beatsPerSecond,
@@ -20,7 +30,12 @@ import {
   isDetuneSolved,
   remainingDetuneCents,
 } from "./questions";
-import { buildDroneMidi, buildScaleMidi, SCALE_MODES, sortScaleModes } from "./scaleModes";
+import {
+  buildDroneMidi,
+  buildScaleMidi,
+  SCALE_MODES,
+  sortScaleModes,
+} from "./scaleModes";
 
 /** Deterministic rng: cycles through the given values. */
 const seeded = (values: number[]): Rng => {
@@ -36,7 +51,12 @@ describe("chord qualities", () => {
   });
 
   it("keeps a fixed answer order whatever the config lists", () => {
-    expect(sortChordQualities(["dim", "major", "min7", "minor"])).toEqual(["major", "minor", "min7", "dim"]);
+    expect(sortChordQualities(["dim", "major", "min7", "minor"])).toEqual([
+      "major",
+      "minor",
+      "min7",
+      "dim",
+    ]);
   });
 
   it("has every quality's formula match its intervals", () => {
@@ -52,8 +72,16 @@ describe("chord qualities", () => {
 describe("progressions", () => {
   it("voices each degree as a bass note under a close triad", () => {
     const [tonic, dominant] = buildProgressionChords(60, ["I", "V"]);
-    expect(tonic).toMatchObject({ degree: "I", name: "C", midis: [48, 60, 64, 67] });
-    expect(dominant).toMatchObject({ degree: "V", name: "G", midis: [55, 67, 71, 74] });
+    expect(tonic).toMatchObject({
+      degree: "I",
+      name: "C",
+      midis: [48, 60, 64, 67],
+    });
+    expect(dominant).toMatchObject({
+      degree: "V",
+      name: "G",
+      midis: [55, 67, 71, 74],
+    });
   });
 
   it("names minor and diminished degrees", () => {
@@ -75,20 +103,43 @@ describe("progressions", () => {
 
   it("checks the built answer slot by slot", () => {
     const question = generateProgressionQuestion(
-      { mode: "progression", progressions: ["I-V-vi-IV"], degreePool: ["I", "IV", "V", "vi"] },
+      {
+        mode: "progression",
+        progressions: ["I-V-vi-IV"],
+        degreePool: ["I", "IV", "V", "vi"],
+      },
       null,
       seeded([0, 0]),
     );
-    expect(checkProgressionAnswer(question, ["I", "V", "vi", "IV"])).toEqual([true, true, true, true]);
-    expect(checkProgressionAnswer(question, ["I", "V", "IV", "vi"])).toEqual([true, true, false, false]);
-    expect(checkProgressionAnswer(question, [null, null, null, null])).toEqual([false, false, false, false]);
+    expect(checkProgressionAnswer(question, ["I", "V", "vi", "IV"])).toEqual([
+      true,
+      true,
+      true,
+      true,
+    ]);
+    expect(checkProgressionAnswer(question, ["I", "V", "IV", "vi"])).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ]);
+    expect(checkProgressionAnswer(question, [null, null, null, null])).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 });
 
 describe("scale modes", () => {
   it("builds one ascending octave with the root on top", () => {
-    expect(buildScaleMidi(60, "ionian")).toEqual([60, 62, 64, 65, 67, 69, 71, 72]);
-    expect(buildScaleMidi(60, "dorian")).toEqual([60, 62, 63, 65, 67, 69, 70, 72]);
+    expect(buildScaleMidi(60, "ionian")).toEqual([
+      60, 62, 64, 65, 67, 69, 71, 72,
+    ]);
+    expect(buildScaleMidi(60, "dorian")).toEqual([
+      60, 62, 63, 65, 67, 69, 70, 72,
+    ]);
   });
 
   it("separates dorian from aeolian only by the 6th", () => {
@@ -103,29 +154,50 @@ describe("scale modes", () => {
   });
 
   it("keeps a fixed answer order", () => {
-    expect(sortScaleModes(["aeolian", "ionian", "dorian"])).toEqual(["ionian", "dorian", "aeolian"]);
+    expect(sortScaleModes(["aeolian", "ionian", "dorian"])).toEqual([
+      "ionian",
+      "dorian",
+      "aeolian",
+    ]);
   });
 });
 
 describe("question generation", () => {
-  const chordConfig: ChordTypeQuizConfig = { mode: "chordType", qualities: ["major", "minor", "dom7"] };
+  const chordConfig: ChordTypeQuizConfig = {
+    mode: "chordType",
+    qualities: ["major", "minor", "dom7"],
+  };
 
   it("never repeats the previous chord quality", () => {
     const first = generateChordTypeQuestion(chordConfig, null, seeded([0, 0]));
     for (let i = 0; i < 20; i++) {
-      const next = generateChordTypeQuestion(chordConfig, first, seeded([i / 20, i / 20]));
+      const next = generateChordTypeQuestion(
+        chordConfig,
+        first,
+        seeded([i / 20, i / 20]),
+      );
       expect(next.quality).not.toBe(first.quality);
     }
   });
 
   it("plays the chord it is asking about", () => {
-    const question = generateChordTypeQuestion(chordConfig, null, seeded([0.5, 0]));
-    expect(question.midis).toEqual(buildChordMidi(question.rootMidi, question.quality));
+    const question = generateChordTypeQuestion(
+      chordConfig,
+      null,
+      seeded([0.5, 0]),
+    );
+    expect(question.midis).toEqual(
+      buildChordMidi(question.rootMidi, question.quality),
+    );
     expect(question.options).toContain(question.quality);
   });
 
   it("falls back to the full list when the configured progressions are unknown", () => {
-    const config: ProgressionQuizConfig = { mode: "progression", progressions: ["nope"], degreePool: ["I", "V"] };
+    const config: ProgressionQuizConfig = {
+      mode: "progression",
+      progressions: ["nope"],
+      degreePool: ["I", "V"],
+    };
     const question = generateProgressionQuestion(config, null, seeded([0, 0]));
     expect(findProgression(question.progressionId)).toBeDefined();
     expect(question.chords).toHaveLength(question.degrees.length);
@@ -137,12 +209,22 @@ describe("question generation", () => {
       progressions: ["I-V-vi-IV"],
       degreePool: ["I", "IV", "V", "vi"],
     };
-    const question = generateProgressionQuestion(config, null, seeded([0, 0.3]));
-    for (const degree of question.degrees) expect(question.tiles).toContain(degree);
+    const question = generateProgressionQuestion(
+      config,
+      null,
+      seeded([0, 0.3]),
+    );
+    for (const degree of question.degrees)
+      expect(question.tiles).toContain(degree);
   });
 
   it("draws the detune error from the configured window, either direction", () => {
-    const config: DetuneQuizConfig = { mode: "detune", toleranceCents: 8, minOffsetCents: 10, maxOffsetCents: 30 };
+    const config: DetuneQuizConfig = {
+      mode: "detune",
+      toleranceCents: 8,
+      minOffsetCents: 10,
+      maxOffsetCents: 30,
+    };
     const flat = generateDetuneQuestion(config, null, seeded([0, 0, 0.9]));
     const sharp = generateDetuneQuestion(config, null, seeded([0, 0, 0.1]));
     expect(Math.abs(flat.offsetCents)).toBeGreaterThanOrEqual(10);
@@ -152,13 +234,24 @@ describe("question generation", () => {
   });
 
   it("dispatches on the config's mode", () => {
-    const scaleConfig: ScaleModeQuizConfig = { mode: "scaleMode", scales: ["dorian", "aeolian"] };
-    expect(generateEarQuizQuestion(scaleConfig, null, seeded([0, 0])).kind).toBe("scaleMode");
-    expect(generateEarQuizQuestion(chordConfig, null, seeded([0, 0])).kind).toBe("chordType");
+    const scaleConfig: ScaleModeQuizConfig = {
+      mode: "scaleMode",
+      scales: ["dorian", "aeolian"],
+    };
+    expect(
+      generateEarQuizQuestion(scaleConfig, null, seeded([0, 0])).kind,
+    ).toBe("scaleMode");
+    expect(
+      generateEarQuizQuestion(chordConfig, null, seeded([0, 0])).kind,
+    ).toBe("chordType");
   });
 
   it("sounds the drone under the scale it asks about", () => {
-    const question = generateScaleModeQuestion({ mode: "scaleMode", scales: ["lydian"] }, null, seeded([0, 0.5]));
+    const question = generateScaleModeQuestion(
+      { mode: "scaleMode", scales: ["lydian"] },
+      null,
+      seeded([0, 0.5]),
+    );
     expect(question.midis).toEqual(buildScaleMidi(question.rootMidi, "lydian"));
     expect(question.droneMidis).toEqual(buildDroneMidi(question.rootMidi));
   });

@@ -101,5 +101,8 @@ export const sortChordQualities = (ids: ChordQualityId[]): ChordQualityId[] =>
  * Deliberately a plain close voicing rather than a guitar grip — the point is to
  * hear the quality, not to recognise a shape.
  */
-export const buildChordMidi = (rootMidi: number, quality: ChordQualityId): number[] =>
+export const buildChordMidi = (
+  rootMidi: number,
+  quality: ChordQualityId,
+): number[] =>
   CHORD_QUALITIES[quality].intervals.map((semitones) => rootMidi + semitones);

@@ -6,7 +6,13 @@ import { Snail } from "lucide-react";
 import { useState } from "react";
 
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
-import { AnswerTile, ListenButton, QuizReveal, QuizSecondaryButton, QuizVerdict } from "./EarQuizChrome";
+import {
+  AnswerTile,
+  ListenButton,
+  QuizReveal,
+  QuizSecondaryButton,
+  QuizVerdict,
+} from "./EarQuizChrome";
 
 interface ScaleModeQuizProps {
   question: ScaleModeQuestion;
@@ -23,11 +29,16 @@ const NOTE_DURATION = 0.85;
  *  the run stays in front of it. */
 const DRONE_GAIN = 0.45;
 
-export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNext }: ScaleModeQuizProps) {
+export function ScaleModeQuiz({
+  question,
+  isAnswered,
+  isCorrect,
+  onAnswer,
+  onNext,
+}: ScaleModeQuizProps) {
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ScaleModeId | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
-
 
   const playScale = (noteSeconds: number) => {
     const runSeconds = question.midis.length * noteSeconds;
@@ -35,7 +46,13 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
       [
         // Tonic drone underneath — without it Dorian and Aeolian are the same
         // seven notes and the question has no answer.
-        { midis: question.droneMidis, at: 0, duration: runSeconds + 1.2, spread: 0.04, gain: DRONE_GAIN },
+        {
+          midis: question.droneMidis,
+          at: 0,
+          duration: runSeconds + 1.2,
+          spread: 0.04,
+          gain: DRONE_GAIN,
+        },
         ...question.midis.map((midi, index) => ({
           midis: [midi],
           at: 0.35 + index * noteSeconds,
@@ -62,10 +79,19 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
   return (
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>Which scale is this?</p>
+        <p className='text-center text-lg font-semibold text-zinc-100'>
+          Which scale is this?
+        </p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton onClick={toggleScale} isPlaying={isPlaying} label='Play scale' hasPlayed={hasPlayed} />
-          <QuizSecondaryButton onClick={() => playScale(SLOW_NOTE_SECONDS)} icon={<Snail className='h-4 w-4' />}>
+          <ListenButton
+            onClick={toggleScale}
+            isPlaying={isPlaying}
+            label='Play scale'
+            hasPlayed={hasPlayed}
+          />
+          <QuizSecondaryButton
+            onClick={() => playScale(SLOW_NOTE_SECONDS)}
+            icon={<Snail className='h-4 w-4' />}>
             Play it slowly
           </QuizSecondaryButton>
         </div>
@@ -76,7 +102,13 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
         </p>
       </div>
 
-      <div className={cn("grid gap-3", question.options.length > 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-3")}>
+      <div
+        className={cn(
+          "grid gap-3",
+          question.options.length > 3
+            ? "grid-cols-2 sm:grid-cols-3"
+            : "grid-cols-1 sm:grid-cols-3",
+        )}>
         {question.options.map((id) => {
           const scale = SCALE_MODES[id];
           const state = !isAnswered
@@ -107,7 +139,9 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
           footnote={`Listen for the ${answerScale.tell} — ${answerScale.formula}`}
           onNext={onNext}
           extraAction={
-            <QuizSecondaryButton onClick={() => playScale(SLOW_NOTE_SECONDS)} icon={<Snail className='h-4 w-4' />}>
+            <QuizSecondaryButton
+              onClick={() => playScale(SLOW_NOTE_SECONDS)}
+              icon={<Snail className='h-4 w-4' />}>
               Hear it again, slowly
             </QuizSecondaryButton>
           }

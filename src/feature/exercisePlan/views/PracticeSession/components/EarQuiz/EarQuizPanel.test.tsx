@@ -7,9 +7,13 @@ import { EarQuizPanel } from "./EarQuizPanel";
 // jsdom has no Web Audio, so every playback call short-circuits to a no-op —
 // which is exactly what these tests want: the answer flow, not the sound.
 
-const CHORD_CONFIG: EarQuizConfig = { mode: "chordType", qualities: ["major", "minor", "dom7", "sus4"] };
+const CHORD_CONFIG: EarQuizConfig = {
+  mode: "chordType",
+  qualities: ["major", "minor", "dom7", "sus4"],
+};
 
-const button = (name: string | RegExp) => screen.getByRole("button", { name }) as HTMLButtonElement;
+const button = (name: string | RegExp) =>
+  screen.getByRole("button", { name }) as HTMLButtonElement;
 
 describe("EarQuizPanel — chord quality", () => {
   afterEach(cleanup);
