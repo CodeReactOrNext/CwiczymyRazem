@@ -193,7 +193,11 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       {/* Content: ear quiz / note hunt / chord hunt / tablature / video / strumming / image */}
       {currentExercise.earQuizConfig ? (
         <div className='p-4 sm:p-6'>
-          <EarQuizPanel config={currentExercise.earQuizConfig} exerciseId={currentExercise.id} />
+          <EarQuizPanel
+            config={currentExercise.earQuizConfig}
+            exerciseId={currentExercise.id}
+            isSessionRunning={isPlaying}
+          />
         </div>
       ) : currentExercise.id === "metronome_gap_test" ? (
         <div className="p-4">

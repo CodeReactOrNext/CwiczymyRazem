@@ -79,7 +79,13 @@ export function MobileExerciseContent({
   // Listening quizzes are the whole player slot — they carry no tab, video or
   // image to fall through to.
   if (currentExercise.earQuizConfig) {
-    return <EarQuizPanel config={currentExercise.earQuizConfig} exerciseId={currentExercise.id} />;
+    return (
+      <EarQuizPanel
+        config={currentExercise.earQuizConfig}
+        exerciseId={currentExercise.id}
+        isSessionRunning={isPlaying}
+      />
+    );
   }
 
   return (

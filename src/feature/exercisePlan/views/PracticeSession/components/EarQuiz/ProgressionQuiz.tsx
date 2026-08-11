@@ -33,10 +33,6 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
 
 
   const playProgression = () => {
-    if (isPlaying) {
-      stop();
-      return;
-    }
     play(
       question.chords.map((chord, index) => ({
         midis: chord.midis,
@@ -48,6 +44,9 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
     );
     setHasPlayed(true);
   };
+
+  // Play/stop on the main button; every other control just starts its own sound.
+  const toggleProgression = () => (isPlaying ? stop() : playProgression());
 
   const playTonic = () => {
     play([{ midis: question.tonicMidis, at: 0, duration: 2.2, spread: STRUM_SPREAD }], 2.2);
@@ -87,7 +86,7 @@ export function ProgressionQuiz({ question, isAnswered, isCorrect, onAnswer, onN
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>Which progression is this?</p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton onClick={playProgression} isPlaying={isPlaying} label='Play progression' hasPlayed={hasPlayed} />
+          <ListenButton onClick={toggleProgression} isPlaying={isPlaying} label='Play progression' hasPlayed={hasPlayed} />
           <QuizSecondaryButton onClick={playTonic} icon={<Music2 className='h-4 w-4' />}>
             Hear the I chord
           </QuizSecondaryButton>

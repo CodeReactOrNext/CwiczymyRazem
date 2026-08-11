@@ -30,10 +30,6 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
 
 
   const playScale = (noteSeconds: number) => {
-    if (isPlaying) {
-      stop();
-      return;
-    }
     const runSeconds = question.midis.length * noteSeconds;
     play(
       [
@@ -51,6 +47,10 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
     setHasPlayed(true);
   };
 
+  // The primary button doubles as a stop; the slow button always restarts, so it
+  // never reads as "cut the scale off".
+  const toggleScale = () => (isPlaying ? stop() : playScale(NOTE_SECONDS));
+
   const handlePick = (scale: ScaleModeId) => {
     if (isAnswered) return;
     setPicked(scale);
@@ -64,7 +64,7 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>Which scale is this?</p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton onClick={() => playScale(NOTE_SECONDS)} isPlaying={isPlaying} label='Play scale' hasPlayed={hasPlayed} />
+          <ListenButton onClick={toggleScale} isPlaying={isPlaying} label='Play scale' hasPlayed={hasPlayed} />
           <QuizSecondaryButton onClick={() => playScale(SLOW_NOTE_SECONDS)} icon={<Snail className='h-4 w-4' />}>
             Play it slowly
           </QuizSecondaryButton>
@@ -76,7 +76,7 @@ export function ScaleModeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
         </p>
       </div>
 
-      <div className={cn("grid gap-3", question.options.length > 3 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-3")}>
+      <div className={cn("grid gap-3", question.options.length > 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-3")}>
         {question.options.map((id) => {
           const scale = SCALE_MODES[id];
           const state = !isAnswered

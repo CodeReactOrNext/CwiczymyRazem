@@ -28,13 +28,13 @@ export function ChordTypeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
 
 
   const playChord = (spread: number) => {
-    if (isPlaying) {
-      stop();
-      return;
-    }
     play([{ midis: question.midis, at: 0, duration: CHORD_DURATION, spread }], CHORD_DURATION + spread * question.midis.length);
     setHasPlayed(true);
   };
+
+  // The primary button doubles as a stop; the arpeggio button always restarts,
+  // otherwise pressing it mid-chord would just cut the sound off.
+  const toggleChord = () => (isPlaying ? stop() : playChord(STRUM_SPREAD));
 
   const handlePick = (quality: ChordQualityId) => {
     if (isAnswered) return;
@@ -49,7 +49,7 @@ export function ChordTypeQuiz({ question, isAnswered, isCorrect, onAnswer, onNex
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>What kind of chord is this?</p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton onClick={() => playChord(STRUM_SPREAD)} isPlaying={isPlaying} label='Play chord' hasPlayed={hasPlayed} />
+          <ListenButton onClick={toggleChord} isPlaying={isPlaying} label='Play chord' hasPlayed={hasPlayed} />
           <QuizSecondaryButton onClick={() => playChord(ARPEGGIO_SPREAD)} icon={<AudioWaveform className='h-4 w-4' />}>
             One note at a time
           </QuizSecondaryButton>

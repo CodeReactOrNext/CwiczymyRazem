@@ -170,8 +170,18 @@ export function QuizVerdict({ isCorrect, answer, explanation, footnote, onNext, 
 export function EarQuizCard({ children }: { children: ReactNode }) {
   return (
     <div className='mx-auto w-full max-w-3xl'>
-      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>{children}</div>
+      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6'>{children}</div>
     </div>
+  );
+}
+
+/** Nudge to start the session timer — the quiz itself stays fully usable. */
+export function StartTimerHint() {
+  return (
+    <p className='flex items-center justify-center gap-2 text-xs text-amber-400'>
+      <Play className='h-3 w-3' aria-hidden />
+      Press Play below to start the timer — the quiz already works
+    </p>
   );
 }
 
