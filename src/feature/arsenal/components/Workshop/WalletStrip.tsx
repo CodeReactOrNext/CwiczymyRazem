@@ -16,15 +16,20 @@ interface WalletStripProps {
  *
  * Each job already spells out the parts it consumes, but planning — "can I make
  * anything at all today?" — needs the stock itself, and it used to live one tab
- * away in Collection. The strip stays with the player as they scroll the rack,
- * and unfolds into the same full wallet the Collection tab shows.
+ * away in Collection. It unfolds into the same full wallet the Collection tab
+ * shows.
+ *
+ * It used to be sticky, riding along at the top of the rack. Unfolded, that meant
+ * a panel of sockets pinned over whatever the player was scrolling to — the strip
+ * is something you consult before a job, not while reading one, so it now stays
+ * where it was put.
  */
 export const WalletStrip = ({ parts }: WalletStripProps) => {
   const [open, setOpen] = useState(false);
   const tierTotals = useMemo(() => getWalletTierTotals(parts), [parts]);
 
   return (
-    <div className='sticky top-0 z-20 flex flex-col gap-4 rounded-lg bg-zinc-900/80 p-4 backdrop-blur'>
+    <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4'>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}

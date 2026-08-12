@@ -13,6 +13,7 @@ import {
   getEffectiveRarity,
   getItemCondition,
 } from "feature/arsenal/data/itemStats";
+import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import {
   countScrapParts,
   getEffectScrapYield,
@@ -81,6 +82,7 @@ export const EffectCard = ({
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getEffectScrapYield(item, effect);
   const scrapTotal = countScrapParts(scrapParts);
+  const salvagedMod = getSalvageableMod(item, "effect");
 
   return (
     <div
@@ -355,6 +357,12 @@ export const EffectCard = ({
                         Scraps into {scrapTotal} parts
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
+                      {salvagedMod && (
+                        <span className='text-[11px] text-purple-300'>
+                          {salvagedMod.label} +{salvagedMod.points} comes off
+                          whole
+                        </span>
+                      )}
                     </div>
                   )}
                 </TooltipContent>

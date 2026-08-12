@@ -890,6 +890,16 @@ export interface ModQuote {
   canReroll: boolean;
 }
 
+/**
+ * Every mod in one kind's pool, ignoring any particular instrument.
+ *
+ * `getFittableMods` answers "what can go on *this*"; this answers "what exists",
+ * which is what anything drawing a mod out of thin air — the trader's daily
+ * shelf — has to draw from.
+ */
+export const getModPool = (kind: WorkshopKind): ModFeatureDef[] =>
+  (kind === "guitar" ? GUITAR_FEATURES : EFFECT_FEATURES).map(toModDef);
+
 /** Looks a feature up in the pool for `kind`, whether or not it fits the subject. */
 export const getModDef = (
   kind: WorkshopKind,

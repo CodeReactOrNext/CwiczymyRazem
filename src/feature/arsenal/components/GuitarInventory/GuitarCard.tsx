@@ -12,6 +12,7 @@ import {
   getItemFeatures,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
   countScrapParts,
@@ -97,6 +98,7 @@ export const GuitarCard = ({
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getGuitarScrapYield(item, guitar);
   const scrapTotal = countScrapParts(scrapParts);
+  const salvagedMod = getSalvageableMod(item, "guitar");
 
   return (
     <div
@@ -407,6 +409,12 @@ export const GuitarCard = ({
                         Scraps into {scrapTotal} parts
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
+                      {salvagedMod && (
+                        <span className='text-[11px] text-purple-300'>
+                          {salvagedMod.label} +{salvagedMod.points} comes off
+                          whole
+                        </span>
+                      )}
                     </div>
                   )}
                 </TooltipContent>

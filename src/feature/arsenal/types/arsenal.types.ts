@@ -245,6 +245,25 @@ export const DEFAULT_RIG: RigSetup = {
   ampId: null,
 };
 
+/**
+ * A mod pulled off an instrument during a teardown and kept.
+ *
+ * It is a thing, not a currency: one entry per rescued mod, hanging in the stash
+ * until it is fitted onto something else. The value it carries is the value it
+ * had on the old instrument, minus the teardown's toll — see `data/salvage.ts`.
+ */
+export interface SalvagedMod {
+  /** Stash id. Derived from the item it came off, so it cannot collide. */
+  id: string;
+  featureId: string;
+  /** Which pool the feature belongs to — a pedal mod never fits a guitar. */
+  kind: WorkshopKind;
+  points: number;
+  /** The instrument it was pulled out of. Flavour on the tile. */
+  sourceName: string;
+  salvagedAt: number;
+}
+
 export interface ArsenalUserData {
   inventory: InventoryItem[];
   equippedGuitarId: number | string | null;
@@ -256,6 +275,14 @@ export interface ArsenalUserData {
   parts: ScrapPart[];
   /** What the player has already taken from the trader in the current window. */
   trader?: TraderState;
+  /**
+   * Where each item hangs on the stash board — item id → cell index. Purely
+   * cosmetic, and always re-resolved on load, so a stale or broken entry costs
+   * nothing but the position it asked for. See `utils/stashLayout`.
+   */
+  stashLayout?: Record<string, number>;
+  /** Mods rescued from teardowns, waiting to be fitted onto something else. */
+  salvagedMods?: SalvagedMod[];
 }
 
 export interface ScrapResult {
@@ -263,6 +290,8 @@ export interface ScrapResult {
   parts: ScrapPart[];
   /** The full wallet after the teardown. */
   newParts: ScrapPart[];
+  /** The one mod that survived the teardown, if the item carried any. */
+  salvaged?: SalvagedMod | null;
 }
 
 export interface OpenCaseResult {
@@ -294,8 +323,12 @@ export interface WorkshopBuildResult {
   rigLevel: number;
 }
 
-/** Fitting a new mod, or re-rolling the value of one already on the item. */
-export type WorkshopModAction = "fit" | "reroll";
+/**
+ * Fitting a new mod, re-rolling one already on the item, or bolting on a mod
+ * rescued from a teardown — the third keeps the value it came with instead of
+ * rolling a new one.
+ */
+export type WorkshopModAction = "fit" | "reroll" | "fit-salvaged";
 
 export interface WorkshopModResult {
   action: WorkshopModAction;

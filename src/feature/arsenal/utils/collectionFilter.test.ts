@@ -17,6 +17,7 @@ const entry = (
   level: number,
   acquiredAt: number,
   groupKey = id,
+  inUse = false,
 ): CollectionEntry<string> => ({
   item: id,
   name,
@@ -24,6 +25,7 @@ const entry = (
   level,
   acquiredAt,
   groupKey,
+  inUse,
 });
 
 describe("matchesQuery", () => {
@@ -92,6 +94,37 @@ describe("sortEntries", () => {
       (e) => e.item,
     );
     expect(order).toEqual(["rare-new", "epic", "rare-old"]);
+  });
+
+  it("puts what the player is using first, whatever its rarity", () => {
+    const spareEpic = entry("spare-epic", "Spare epic", "Epic", 30, 10);
+    const playedCommon = entry(
+      "played",
+      "Played common",
+      "Common",
+      2,
+      1,
+      "played",
+      true,
+    );
+    const order = sortEntries([spareEpic, playedCommon], "equipped").map(
+      (e) => e.item,
+    );
+    expect(order).toEqual(["played", "spare-epic"]);
+  });
+
+  it("falls back to the default order under equipped when nothing is in use", () => {
+    const order = sortEntries([common, epic, rareOld], "equipped").map(
+      (e) => e.item,
+    );
+    expect(order).toEqual(["epic", "rare-old", "common"]);
+  });
+
+  it("orders one kind by rarity under type — the split by kind is the board's", () => {
+    const order = sortEntries([common, rareOld, epic], "type").map(
+      (e) => e.item,
+    );
+    expect(order).toEqual(["epic", "rare-old", "common"]);
   });
 
   it("does not mutate the input array", () => {

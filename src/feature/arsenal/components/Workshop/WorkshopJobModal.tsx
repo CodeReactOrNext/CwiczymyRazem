@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type {
   BuildQuote,
   ModQuote,
@@ -37,6 +38,8 @@ interface WorkshopJobModalProps {
   buildQuote: BuildQuote;
   repairQuote: RepairQuote;
   modQuote: ModQuote;
+  /** Rescued mods this instrument could take, priced against the wallet. */
+  salvagedOptions: SalvagedModOption[];
   /** Passed through to the ladder map so every rung shows stock, not just the next. */
   wallet: ScrapPart[];
   onClose: () => void;
@@ -67,6 +70,7 @@ export const WorkshopJobModal = ({
   buildQuote,
   repairQuote,
   modQuote,
+  salvagedOptions,
   wallet,
   onClose,
   onChangeJob,
@@ -129,9 +133,13 @@ export const WorkshopJobModal = ({
       },
     );
 
-  const runMod = (featureId: string, action: WorkshopModAction) =>
+  const runMod = (
+    featureId: string | null,
+    action: WorkshopModAction,
+    salvagedId?: string,
+  ) =>
     mod.mutate(
-      { itemId: entry.id, kind: entry.kind, featureId, action },
+      { itemId: entry.id, kind: entry.kind, featureId, action, salvagedId },
       {
         onSuccess: (data) =>
           setResult({
@@ -144,9 +152,9 @@ export const WorkshopJobModal = ({
             spent: data.spent,
             item: data.item,
             headline:
-              data.action === "fit"
-                ? `${data.label} +${data.points}`
-                : `${data.label} +${data.pointsBefore} → +${data.points}`,
+              data.action === "reroll"
+                ? `${data.label} +${data.pointsBefore} → +${data.points}`
+                : `${data.label} +${data.points}`,
           }),
       },
     );
@@ -159,7 +167,7 @@ export const WorkshopJobModal = ({
     : job === "repair"
       ? `Restore to ${repairQuote.target}`
       : job === "mod"
-        ? "Fit a mod"
+        ? "Install mod"
         : buildLabel(buildQuote);
 
   const caption = result
@@ -177,8 +185,10 @@ export const WorkshopJobModal = ({
     ...(buildQuote.canBuild
       ? [{ job: "build" as const, label: buildLabel(buildQuote) }]
       : []),
-    ...(modQuote.canFit || modQuote.canReroll
-      ? [{ job: "mod" as const, label: "Fit another mod" }]
+    ...(modQuote.canFit ||
+    modQuote.canReroll ||
+    (modQuote.slots.free > 0 && salvagedOptions.length > 0)
+      ? [{ job: "mod" as const, label: "Install another mod" }]
       : []),
   ];
 
@@ -284,10 +294,14 @@ export const WorkshopJobModal = ({
             <ModPicker
               candidates={modQuote.candidates}
               fitted={modQuote.fitted}
+              salvaged={salvagedOptions}
               slotsFull={modQuote.slots.free === 0}
               busy={isPending}
               onFit={(featureId) => runMod(featureId, "fit")}
               onReroll={(featureId) => runMod(featureId, "reroll")}
+              onFitSalvaged={(salvagedId) =>
+                runMod(null, "fit-salvaged", salvagedId)
+              }
             />
           </>
         ) : (

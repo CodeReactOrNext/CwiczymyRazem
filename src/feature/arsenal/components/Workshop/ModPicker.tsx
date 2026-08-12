@@ -1,10 +1,18 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type { FittedMod, ModOption } from "feature/arsenal/data/workshop";
 import { motion } from "framer-motion";
 import { Dices } from "lucide-react";
 
 import { PartRow } from "../Parts/PartRow";
 import { SectionLabel } from "../SectionLabel";
+import { ModArt } from "./ModArt";
 
 /**
  * The bill for one mod, small enough to sit inside a row.
@@ -14,9 +22,9 @@ import { SectionLabel } from "../SectionLabel";
  * reduced to its parts and quantities — still the real numbers, still tier
  * coloured, just quiet enough to scan down the column.
  */
-const MiniBill = ({ mod }: { mod: ModOption }) => (
+const MiniBill = ({ recipe }: { recipe: ModOption["recipe"] }) => (
   <div className='flex flex-wrap items-center gap-2'>
-    {mod.recipe.map((line, i) => (
+    {recipe.map((line, i) => (
       <PartRow
         key={`${line.partId}:${line.tier}`}
         partId={line.partId}
@@ -30,12 +38,66 @@ const MiniBill = ({ mod }: { mod: ModOption }) => (
   </div>
 );
 
+/**
+ * A row's one button, with what it will do to the instrument behind it.
+ *
+ * The consequence lives in a tooltip rather than in the row: with a dozen mods
+ * listed, a paragraph under every bill turned the list into an essay, and the
+ * player only needs the fine print for the row they are about to commit to. The
+ * hint is written with that mod's own numbers in it, so it is never generic.
+ */
+const ActionButton = ({
+  label,
+  hint,
+  rolls,
+  disabled,
+  onAction,
+}: {
+  label: string;
+  hint?: string;
+  /** A re-roll — dice on the label and the quieter zinc treatment. */
+  rolls: boolean;
+  disabled: boolean;
+  onAction: () => void;
+}) => {
+  const button = (
+    <button
+      onClick={onAction}
+      disabled={disabled}
+      className={cn(
+        "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors click-behavior",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400",
+        "disabled:pointer-events-none disabled:opacity-40",
+        rolls
+          ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+          : "bg-purple-500/15 text-purple-300 hover:bg-purple-500/25",
+      )}>
+      {rolls && <Dices size={16} />}
+      {label}
+    </button>
+  );
+
+  if (!hint) return button;
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        {/* `asChild` keeps the row's own button — the trigger adds no box of its own. */}
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent className='max-w-[280px] leading-relaxed'>
+          {hint}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 interface ModRowProps {
   mod: ModOption;
   /** Present on a fitted mod — its current value. */
   points?: number;
   actionLabel: string;
-  /** Explains a button whose consequence is not obvious from its label. */
+  /** Tooltip on the button, for a consequence its label cannot carry. */
   actionHint?: string;
   disabled: boolean;
   onAction: () => void;
@@ -59,6 +121,13 @@ const ModRow = ({
       "flex flex-col gap-4 rounded-lg p-5 transition-colors sm:flex-row sm:items-center sm:gap-6",
       mod.affordable ? "bg-zinc-800/40 hover:bg-zinc-800/60" : "bg-zinc-800/20",
     )}>
+    <ModArt
+      modId={mod.id}
+      size={96}
+      dimmed={!mod.affordable}
+      className='self-start sm:self-center'
+    />
+
     <div className='flex min-w-0 flex-1 flex-col gap-3'>
       <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
         {points != null && (
@@ -74,27 +143,80 @@ const ModRow = ({
           {mod.label}
         </span>
         <span className='shrink-0 text-sm tabular-nums text-zinc-500'>
-          rolls +{mod.min} to +{mod.max}
+          {points != null ? "re-rolls" : "rolls"} +{mod.min} to +{mod.max}
         </span>
       </div>
 
-      <MiniBill mod={mod} />
+      <MiniBill recipe={mod.recipe} />
+    </div>
+
+    <ActionButton
+      label={actionLabel}
+      hint={actionHint}
+      rolls={points != null}
+      disabled={disabled}
+      onAction={onAction}
+    />
+  </motion.div>
+);
+
+/**
+ * A mod pulled off something the player scrapped, offered back to this
+ * instrument.
+ *
+ * Deliberately not a `ModRow`: this one has no range to roll and no bill to pay,
+ * because it is not being made — it already exists, it was paid for with the
+ * instrument it came off, and it arrives at the exact value it survived with.
+ * Where the bill would be, the row says where it came from instead.
+ */
+const SalvagedRow = ({
+  mod,
+  slotsFull,
+  busy,
+  onFit,
+  index,
+}: {
+  mod: SalvagedModOption;
+  slotsFull: boolean;
+  busy: boolean;
+  onFit: () => void;
+  index: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: Math.min(index * 0.05, 0.4), duration: 0.3 }}
+    className='flex flex-col gap-4 rounded-lg bg-purple-500/10 p-5 transition-colors hover:bg-purple-500/15 sm:flex-row sm:items-center sm:gap-6'>
+    <ModArt
+      modId={mod.featureId}
+      size={96}
+      className='self-start sm:self-center'
+    />
+
+    <div className='flex min-w-0 flex-1 flex-col gap-2'>
+      <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
+        <span className='shrink-0 text-2xl font-black tabular-nums text-purple-300'>
+          +{mod.points}
+        </span>
+        <span className='min-w-0 truncate text-base font-bold text-zinc-100'>
+          {mod.label}
+        </span>
+      </div>
+      <span className='text-sm text-zinc-500'>
+        Salvaged from {mod.sourceName} — free to fit, nothing re-rolled
+      </span>
     </div>
 
     <button
-      onClick={onAction}
-      disabled={disabled}
-      title={actionHint}
+      onClick={onFit}
+      disabled={slotsFull || busy}
       className={cn(
         "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors click-behavior",
+        "bg-purple-500/20 text-purple-200 hover:bg-purple-500/30",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400",
         "disabled:pointer-events-none disabled:opacity-40",
-        points != null
-          ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
-          : "bg-purple-500/15 text-purple-300 hover:bg-purple-500/25",
       )}>
-      {points != null && <Dices size={16} />}
-      {actionLabel}
+      Install
     </button>
   </motion.div>
 );
@@ -102,11 +224,14 @@ const ModRow = ({
 interface ModPickerProps {
   candidates: ModOption[];
   fitted: FittedMod[];
+  /** Mods rescued from teardowns that this instrument could take. */
+  salvaged: SalvagedModOption[];
   /** No free slot — the fit menu is shown, but nothing in it can be bought. */
   slotsFull: boolean;
   busy: boolean;
   onFit: (featureId: string) => void;
   onReroll: (featureId: string) => void;
+  onFitSalvaged: (salvagedId: string) => void;
 }
 
 /**
@@ -119,15 +244,29 @@ interface ModPickerProps {
 export const ModPicker = ({
   candidates,
   fitted,
+  salvaged,
   slotsFull,
   busy,
   onFit,
   onReroll,
+  onFitSalvaged,
 }: ModPickerProps) => (
   <div className='flex flex-col gap-7'>
     {fitted.length > 0 && (
       <div className='flex flex-col gap-3'>
-        <SectionLabel>Fitted</SectionLabel>
+        <div className='flex flex-col gap-1.5'>
+          <SectionLabel>Installed</SectionLabel>
+          {/*
+            The tooltips carry each row's own numbers, but a tooltip is nothing on
+            a phone — so the rule that costs a player levels is written once here,
+            where it cannot be missed.
+          */}
+          <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+            A re-roll buys the mod again for a brand-new value from its range.
+            Whatever comes up replaces what the mod is worth now — there is no
+            keeping the better of the two.
+          </p>
+        </div>
         <div className='flex flex-col gap-2'>
           {fitted.map((mod, i) => (
             <ModRow
@@ -136,9 +275,31 @@ export const ModPicker = ({
               index={i}
               points={mod.points}
               actionLabel='Re-roll'
-              actionHint='Pays the same bill again and always replaces the current roll'
+              actionHint={`Pays this bill again for one fresh roll between +${mod.min} and +${mod.max}. It replaces +${mod.points} either way — ${
+                mod.points > mod.min
+                  ? `${mod.points - mod.min} of the ${mod.max - mod.min + 1} results are worse than what it carries now`
+                  : "the only way from here is up or sideways"
+              }.`}
               disabled={!mod.affordable || busy}
               onAction={() => onReroll(mod.id)}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {salvaged.length > 0 && (
+      <div className='flex flex-col gap-3'>
+        <SectionLabel>From the stash</SectionLabel>
+        <div className='flex flex-col gap-2'>
+          {salvaged.map((mod, i) => (
+            <SalvagedRow
+              key={mod.salvagedId}
+              mod={mod}
+              index={i}
+              slotsFull={slotsFull}
+              busy={busy}
+              onFit={() => onFitSalvaged(mod.salvagedId)}
             />
           ))}
         </div>
@@ -164,7 +325,7 @@ export const ModPicker = ({
               key={mod.id}
               mod={mod}
               index={i}
-              actionLabel='Fit'
+              actionLabel='Install'
               disabled={!mod.affordable || slotsFull || busy}
               onAction={() => onFit(mod.id)}
             />

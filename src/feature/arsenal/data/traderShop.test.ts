@@ -4,6 +4,7 @@ import type { GuitarRarity, PartTier } from "../types/arsenal.types";
 import type {
   TraderEffectOffer,
   TraderGuitarOffer,
+  TraderModOffer,
   TraderPartOffer,
 } from "../types/trader.types";
 import { getEffectBom } from "./effectBom";
@@ -12,15 +13,20 @@ import { getEffectValue } from "./effectStats";
 import { getGuitarBom } from "./guitarBom";
 import { GUITAR_DEFINITIONS } from "./guitarDefinitions";
 import { getItemValue, RARITY_BASE_VALUE } from "./itemStats";
+import { getModResaleValue } from "./resale";
 import { getScrapYield } from "./scrapYield";
 import {
+  getModBillValue,
   getTraderOffers,
   getTraderRestockAt,
   getTraderShop,
   getTraderWindow,
   ITEM_PRICE_MULTIPLIER,
+  MOD_PRICE_MULTIPLIER,
+  MOD_ROLL_PREMIUM,
   TRADER_WINDOW_MS,
 } from "./traderShop";
+import { getModDef, MOD_ROLL_BONUS } from "./workshop";
 
 const dayAt = (index: number) => new Date(index * TRADER_WINDOW_MS + 3_600_000);
 
@@ -271,6 +277,83 @@ describe("trader pricing", () => {
       const cheapest = Math.min(...offers.map((o) => o.unitPrice));
       expect(cheapest).toBeLessThanOrEqual(30);
     }
+  });
+});
+
+describe("the day's mod", () => {
+  const modOf = (offers: ReturnType<typeof getTraderOffers>) =>
+    offers.find((o): o is TraderModOffer => o.kind === "mod");
+
+  it("stocks exactly one, one to a player", () => {
+    for (const offers of windows(120)) {
+      const mods = offers.filter((o) => o.kind === "mod");
+      expect(mods).toHaveLength(1);
+      expect(mods[0].stock).toBe(1);
+    }
+  });
+
+  it("only ever offers a mod that exists in its own pool", () => {
+    for (const offers of windows(365)) {
+      const mod = modOf(offers)!;
+      const def = getModDef(mod.modKind, mod.featureId);
+      expect(def).not.toBeNull();
+      expect(mod.label).toBe(def!.label);
+    }
+  });
+
+  it("rolls inside the case range, never the bench's widened one", () => {
+    // The workshop has to keep rolling the best numbers in the game, or paying
+    // Fame for a component beats doing the work.
+    for (const offers of windows(365)) {
+      const mod = modOf(offers)!;
+      const def = getModDef(mod.modKind, mod.featureId)!;
+      expect(mod.points).toBeGreaterThanOrEqual(def.min);
+      expect(mod.points).toBeLessThanOrEqual(def.max - MOD_ROLL_BONUS);
+      expect(mod.maxPoints).toBe(Math.max(def.min, def.max - MOD_ROLL_BONUS));
+    }
+  });
+
+  it("draws from both pools over a season", () => {
+    const kinds = windows(365).map((offers) => modOf(offers)!.modKind);
+    const guitarShare =
+      kinds.filter((k) => k === "guitar").length / kinds.length;
+    expect(guitarShare).toBeGreaterThan(0.35);
+    expect(guitarShare).toBeLessThan(0.65);
+  });
+
+  it("never sells a mod for less than its parts cost at the same counter", () => {
+    for (const offers of windows(365)) {
+      const mod = modOf(offers)!;
+      const def = getModDef(mod.modKind, mod.featureId)!;
+      const bill = getModBillValue(def);
+      // The invariant that matters: buying the mod is never cheaper than buying
+      // the parts for it and running the job yourself.
+      expect(mod.unitPrice).toBeGreaterThan(bill);
+      // Prices are rounded to 5 / 25, so allow the rounding step itself.
+      expect(mod.unitPrice).toBeGreaterThanOrEqual(
+        bill * MOD_PRICE_MULTIPLIER - 25,
+      );
+      // And the roll never runs away with the price: the bill dominates.
+      expect(mod.unitPrice).toBeLessThanOrEqual(
+        bill * MOD_PRICE_MULTIPLIER * (1 + MOD_ROLL_PREMIUM) + 25,
+      );
+    }
+  });
+
+  it("is worth far more fitted than sold straight back", () => {
+    for (const offers of windows(120)) {
+      const mod = modOf(offers)!;
+      const resale = getModResaleValue(mod.modKind, mod.featureId, mod.points);
+      expect(resale / mod.unitPrice).toBeLessThan(0.1);
+    }
+  });
+
+  it("turns over every day", () => {
+    const seen = windows(30).map((offers) => {
+      const mod = modOf(offers)!;
+      return `${mod.modKind}:${mod.featureId}:${mod.points}`;
+    });
+    expect(new Set(seen).size).toBeGreaterThan(20);
   });
 });
 

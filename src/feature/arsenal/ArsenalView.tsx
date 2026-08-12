@@ -4,7 +4,7 @@ import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { LucideIcon } from "lucide-react";
-import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords } from "lucide-react";
+import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -12,7 +12,20 @@ import { useAppSelector } from "store/hooks";
 // Ordered like the loop the module is built around: get gear, look at what you
 // own, put it on the rig, improve it, then trade what is left over. Dex is the
 // completionist view and sits at the end rather than between Workshop and Rig.
-const ARSENAL_TABS = ["cases", "collection", "rig", "workshop", "market", "dex"] as const;
+//
+// The two markets are separate tabs rather than halves of one. They are shopped
+// for different reasons — the counter is where you go to *fix* a shortage, with
+// a stock that turns over daily, the listings are a browse — and burying either
+// one behind a second row of tabs cost it a click and its own deep link.
+const ARSENAL_TABS = [
+  "cases",
+  "collection",
+  "rig",
+  "workshop",
+  "trader",
+  "market",
+  "dex",
+] as const;
 type ArsenalTab = (typeof ARSENAL_TABS)[number];
 
 /** Flip to false to pull the Workshop tab (and its deep link) back out of the UI. */
@@ -26,7 +39,8 @@ const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
   collection: { label: "Collection", icon: Swords },
   rig: { label: "Rig", icon: Guitar },
   workshop: { label: "Workshop", icon: Hammer },
-  market: { label: "Market", icon: Store },
+  trader: { label: "Trader", icon: Store },
+  market: { label: "Market", icon: Users },
   dex: { label: "Dex", icon: BookMarked },
 };
 
@@ -34,9 +48,10 @@ import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { CollectionTab } from "./components/Collection/CollectionTab";
 import { DexView } from "./components/Dex/DexView";
-import { MarketTab } from "./components/Marketplace/MarketTab";
+import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
 import { RigView } from "./components/Rig/RigView";
 import { arsenalTabTriggerClass } from "./components/tabTrigger";
+import { TraderView } from "./components/Trader/TraderView";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
@@ -179,8 +194,12 @@ export const ArsenalView = () => {
               {data ? <RigView data={data} /> : null}
             </TabsContent>
 
+            <TabsContent value="trader" className="mt-4">
+              <TraderView />
+            </TabsContent>
+
             <TabsContent value="market" className="mt-4">
-              <MarketTab />
+              <MarketplaceView />
             </TabsContent>
           </Tabs>
         </div>

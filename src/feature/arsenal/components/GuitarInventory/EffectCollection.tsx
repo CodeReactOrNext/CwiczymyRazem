@@ -2,36 +2,27 @@ import {
   EFFECT_DEFINITIONS,
   EFFECTS_BY_ID,
 } from "feature/arsenal/data/effectDefinitions";
-import {
-  getEffectLevel,
-  getEffectValue,
-} from "feature/arsenal/data/effectStats";
-import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
 import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
-import type {
-  CollectionEntry,
-  CollectionSort,
-} from "feature/arsenal/utils/collectionFilter";
+import { getEffectEntries } from "feature/arsenal/utils/collectionEntries";
+import type { CollectionSort } from "feature/arsenal/utils/collectionFilter";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
+import { getEffectDuplicates } from "feature/arsenal/utils/duplicates";
 import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type {
-  ArsenalUserData,
-  EffectInventoryItem,
-} from "../../types/arsenal.types";
+import type { ArsenalUserData } from "../../types/arsenal.types";
 import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
 import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
-import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
@@ -108,51 +99,18 @@ export const EffectCollection = ({
   // Sellable duplicates: for every pedal owned more than once, keep the
   // highest-level copy and mark the lower-level ones for bulk selling.
   // Pedals placed on the pedalboard are never sold.
-  const { duplicateIds, duplicateItems, duplicateFame } = useMemo(() => {
-    const pedalboardItemIds = new Set(
-      data.rig?.pedalboardItems?.map((p) => p.itemId) || [],
-    );
-    const byEffect = new Map<number | string, EffectInventoryItem[]>();
-    for (const item of data.effectInventory || []) {
-      const arr = byEffect.get(item.effectId);
-      if (arr) arr.push(item);
-      else byEffect.set(item.effectId, [item]);
-    }
-
-    const ids: string[] = [];
-    const items: BulkSellItem[] = [];
-    let fame = 0;
-    for (const [effectId, group] of byEffect) {
-      if (group.length < 2) continue;
-      const effect = EFFECTS_BY_ID.get(effectId);
-      if (!effect) continue;
-      const value = getEffectValue(effect); // rarity-based, same for every copy
-      // Best copy first (level desc); keep it, sell the rest.
-      const sorted = [...group].sort(
-        (a, b) => getEffectLevel(b, effect) - getEffectLevel(a, effect),
-      );
-      for (let i = 1; i < sorted.length; i++) {
-        const it = sorted[i];
-        if (pedalboardItemIds.has(it.id)) continue;
-        ids.push(it.id);
-        items.push({
-          id: it.id,
-          name: `${effect.brand} ${effect.name}`,
-          rarity: getEffectiveRarity(effect.rarity, it.buildLevel),
-          level: getEffectLevel(it, effect),
-          value,
-        });
-        fame += value;
-      }
-    }
-    // Highest-level (most valuable) first.
-    items.sort((a, b) => b.level - a.level || b.value - a.value);
-    return { duplicateIds: ids, duplicateItems: items, duplicateFame: fame };
-  }, [data.effectInventory, data.rig?.pedalboardItems]);
+  const duplicates = useMemo(
+    () =>
+      getEffectDuplicates(
+        data.effectInventory || [],
+        new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []),
+      ),
+    [data.effectInventory, data.rig?.pedalboardItems],
+  );
 
   const handleConfirmBulkSell = () => {
-    if (duplicateIds.length === 0) return;
-    sellBulk(duplicateIds, {
+    if (duplicates.ids.length === 0) return;
+    sellBulk(duplicates.ids, {
       onSuccess: () => setIsBulkSellOpen(false),
     });
   };
@@ -170,20 +128,11 @@ export const EffectCollection = ({
 
   // Single flat grid: the toolbar decides the order, the entries only describe
   // what each card can be searched and sorted by.
-  const entries: CollectionEntry<EffectInventoryItem>[] =
-    data.effectInventory.map((item) => {
-      const effect = EFFECTS_BY_ID.get(item.effectId);
-      return {
-        item,
-        name: effect ? `${effect.brand} ${effect.name}` : "",
-        // Effective, not mint: a promoted pedal belongs with its new tier.
-        rarity: getEffectiveRarity(effect?.rarity ?? "Common", item.buildLevel),
-        level: effect ? getEffectLevel(item, effect) : 0,
-        acquiredAt: item.acquiredAt,
-        groupKey: String(item.effectId),
-      };
-    });
-  const sortedItems = filterAndSortEntries(entries, query, sort);
+  const sortedItems = filterAndSortEntries(
+    getEffectEntries(data.effectInventory, pedalboardItemIds),
+    query,
+    sort,
+  );
 
   const handleSellClick = (
     inventoryItemId: string,
@@ -240,14 +189,14 @@ export const EffectCollection = ({
           total={totalEffectsCount}
           unit='pedals collected'
           action={
-            duplicateIds.length > 0 ? (
+            duplicates.ids.length > 0 ? (
               <button
                 onClick={() => setIsBulkSellOpen(true)}
                 disabled={isSellingBulk}
                 className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
                 title='Sell every lower-level duplicate, keeping the best copy of each pedal'>
                 <Layers size={14} />
-                Sell duplicates ({duplicateIds.length})
+                Sell duplicates ({duplicates.ids.length})
               </button>
             ) : null
           }
@@ -287,6 +236,7 @@ export const EffectCollection = ({
             itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
             parts={getEffectScrapYield(item, effect)}
+            salvaged={getSalvageableMod(item, "effect")}
             onConfirm={handleConfirmScrap}
             onCancel={closeScrapDialog}
             isLoading={isScrapping}
@@ -296,8 +246,8 @@ export const EffectCollection = ({
 
       <BulkSellConfirmDialog
         isOpen={isBulkSellOpen}
-        items={duplicateItems}
-        fameReward={duplicateFame}
+        items={duplicates.items}
+        fameReward={duplicates.fame}
         protectedNote='Pedals on your pedalboard are never sold.'
         onConfirm={handleConfirmBulkSell}
         onCancel={() => setIsBulkSellOpen(false)}

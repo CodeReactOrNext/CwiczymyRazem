@@ -18,6 +18,14 @@ export const useBuyTraderOffer = () => {
       // price depends on the window's stock, which the client must not assume.
       dispatch(deductFame(result.spent));
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+
+      // Parts and instruments land where the player can see them; a mod lands in
+      // the stash, a tab away, so it is the one purchase that has to say so.
+      if (result.kind === "mod") {
+        toast.success(
+          "Mod added to your stash — fit it from Collection or the bench",
+        );
+      }
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.error || "Purchase failed");

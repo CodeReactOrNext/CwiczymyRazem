@@ -13,6 +13,8 @@ const renderToolbar = (overrides = {}) => {
     onSortChange: vi.fn(),
     query: "",
     onQueryChange: vi.fn(),
+    view: "stash" as const,
+    onViewChange: vi.fn(),
     guitarCount: 13,
     pedalCount: 19,
     ...overrides,
@@ -40,6 +42,24 @@ describe("CollectionToolbar", () => {
     expect(screen.getByText("Newest").closest("button")?.ariaPressed).toBe(
       "true",
     );
+  });
+
+  it("marks the active view as pressed and reports the switch", () => {
+    const props = renderToolbar();
+    expect(screen.getByLabelText("Stash view").ariaPressed).toBe("true");
+    expect(screen.getByLabelText("Cards view").ariaPressed).toBe("false");
+
+    fireEvent.click(screen.getByLabelText("Cards view"));
+    expect(props.onViewChange).toHaveBeenCalledWith("cards");
+  });
+
+  it("drops the view switch where there is only one view to have", () => {
+    renderToolbar({ view: "cards", showViewSwitch: false });
+    expect(screen.queryByLabelText("Stash view")).toBeNull();
+    expect(screen.queryByLabelText("Cards view")).toBeNull();
+    // The rest of the bar is untouched: a phone still filters and searches.
+    expect(screen.getByText("Rarity")).toBeTruthy();
+    expect(screen.getByLabelText("Search your collection")).toBeTruthy();
   });
 
   it("reports scope, sort and query changes", () => {

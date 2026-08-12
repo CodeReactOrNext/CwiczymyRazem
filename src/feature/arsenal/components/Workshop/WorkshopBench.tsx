@@ -6,12 +6,16 @@ import {
   RARITY_LADDER,
   RARITY_MAX_FEATURES,
 } from "feature/arsenal/data/itemStats";
+import { getSalvagedModOptions } from "feature/arsenal/data/salvage";
 import {
   getBuildQuote,
   getModQuote,
   getRepairQuote,
 } from "feature/arsenal/data/workshop";
-import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import type {
+  SalvagedMod,
+  ScrapPart,
+} from "feature/arsenal/types/arsenal.types";
 import {
   describeBlocker,
   describeModBlocker,
@@ -22,10 +26,10 @@ import { useMemo, useState } from "react";
 
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil } from "../HoloFoil";
+import { InServiceTags } from "../InServiceTags";
 import { LevelEmblem } from "../LevelEmblem";
 import { BuildLog } from "./BuildLog";
 import { ConditionPath } from "./ConditionPath";
-import { FittedMods } from "./FittedMods";
 import { JobCard } from "./JobCard";
 import { RarityPath } from "./RarityPath";
 import { SlotPips } from "./SlotPips";
@@ -35,10 +39,17 @@ import { WorkshopJobModal } from "./WorkshopJobModal";
 interface WorkshopBenchProps {
   entry: WorkshopEntry;
   wallet: ScrapPart[];
+  /** The whole stash of rescued mods — filtered here to what this item can take. */
+  salvagedMods: SalvagedMod[];
   fame: number;
 }
 
-export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
+export const WorkshopBench = ({
+  entry,
+  wallet,
+  salvagedMods,
+  fame,
+}: WorkshopBenchProps) => {
   const rs = RARITY_STYLES[entry.rarity];
 
   const buildQuote = useMemo(
@@ -53,8 +64,15 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
     () => getModQuote(entry.subject, wallet),
     [entry.subject, wallet],
   );
+  const salvagedOptions = useMemo(
+    () => getSalvagedModOptions(entry.subject, salvagedMods),
+    [entry.subject, salvagedMods],
+  );
 
   const [job, setJob] = useState<WorkshopJob | null>(null);
+
+  /** A rescued mod that fits this instrument, with a slot free for it. */
+  const canRefit = modQuote.slots.free > 0 && salvagedOptions.length > 0;
 
   const mintRarity = entry.subject.mintRarity;
   const promotionsDone = getPromotions(mintRarity, entry.buildLevel);
@@ -75,6 +93,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         buildQuote={buildQuote}
         repairQuote={repairQuote}
         modQuote={modQuote}
+        salvagedOptions={salvagedOptions}
         wallet={wallet}
         onClose={() => setJob(null)}
         onChangeJob={setJob}
@@ -116,6 +135,10 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
                 </span>
               )}
             </span>
+            {/* Whether the thing on the bench is gear you are actually playing.
+                Every job below is priced in parts you cannot get back, and on a
+                spare copy none of it touches your Rig Level. */}
+            <InServiceTags uses={entry.uses} className='mt-1.5' />
           </div>
 
           <ConditionMeter
@@ -138,7 +161,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
         </div>
       </div>
 
-      {/* ─── The two things you can do ─── */}
+      {/* ─── The three things you can do ─── */}
       <JobCard
         icon={Wrench}
         title='Restore condition'
@@ -189,7 +212,7 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
 
       <JobCard
         icon={SlidersHorizontal}
-        title='Fit a mod'
+        title='Install mod'
         summary={
           <SlotPips
             used={modQuote.slots.used}
@@ -198,21 +221,20 @@ export const WorkshopBench = ({ entry, wallet, fame }: WorkshopBenchProps) => {
           />
         }
         readyNote={
-          modQuote.canFit
+          modQuote.canFit || canRefit
             ? `${modQuote.slots.free} slot${modQuote.slots.free === 1 ? "" : "s"} free`
             : "re-roll only"
         }
-        ready={modQuote.canFit || modQuote.canReroll}
-        blockedNote={describeModBlocker(modQuote)}
+        ready={modQuote.canFit || modQuote.canReroll || canRefit}
+        blockedNote={canRefit ? undefined : describeModBlocker(modQuote)}
         accent='purple'
         disabled={
-          modQuote.fitted.length === 0 && modQuote.candidates.length === 0
+          modQuote.fitted.length === 0 &&
+          modQuote.candidates.length === 0 &&
+          salvagedOptions.length === 0
         }
         onClick={() => setJob("mod")}
       />
-
-      {/* ─── What is actually on the instrument ─── */}
-      <FittedMods mods={modQuote.fitted} onReroll={() => setJob("mod")} />
 
       {/* ─── The chronicle of bench work, folded away ─── */}
       <BuildLog entries={entry.buildLog} />
