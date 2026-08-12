@@ -23,6 +23,9 @@ interface ClickableFretboardProps {
   markedKeys?: string[];
   /** Single character drawn inside every `markedKeys` marker, e.g. "R". */
   markedLabel?: string;
+  /** Cells the current step still accepts, tinted as a zone — the interval drill's
+   *  hand span around the placed root. A whole area, never the answers alone. */
+  zoneKeys?: string[];
   /** Replaces the default "FRETS x–y" caption. */
   title?: ReactNode;
 }
@@ -104,11 +107,13 @@ export function ClickableFretboard({
   liveKey,
   markedKeys,
   markedLabel,
+  zoneKeys,
   title,
 }: ClickableFretboardProps) {
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
   const marked = new Set(markedKeys);
+  const zone = new Set(zoneKeys);
   const allFound = totalTargets > 0 && found.size >= totalTargets;
   const interactive = !!onCellClick;
   // Only worth shouting about which string to use when the exercise actually
@@ -440,6 +445,17 @@ export function ClickableFretboard({
               const cy = y + ROW_H / 2;
               cells.push(
                 <g key={key}>
+                  {zone.has(key) && (
+                    <rect
+                      x={x}
+                      y={y}
+                      width={w}
+                      height={ROW_H}
+                      fill="#f59e0b"
+                      opacity={0.09}
+                      className="pointer-events-none"
+                    />
+                  )}
                   {interactive && (
                     <rect
                       x={x + 1}

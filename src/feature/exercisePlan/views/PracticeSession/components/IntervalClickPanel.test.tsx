@@ -12,7 +12,7 @@ const renderPanel = () =>
       rootNote="A"
       intervalLabel="Perfect 5th ↑"
       targetNote="E"
-      description="Click the root first, then the note the interval lands on"
+      description="Click one root, then the interval measured from that spot"
       startFret={0}
       endFret={4}
       isPlaying={false}
@@ -40,7 +40,7 @@ describe("IntervalClickPanel", () => {
 
   it("tells the player which step they are on", () => {
     renderPanel();
-    expect(screen.getByText("Click every A between frets 0 and 4")).toBeDefined();
+    expect(screen.getByText("Click any A between frets 0 and 4")).toBeDefined();
     expect(screen.getByText("1. Root")).toBeDefined();
     expect(screen.getByText("2. Target")).toBeDefined();
   });

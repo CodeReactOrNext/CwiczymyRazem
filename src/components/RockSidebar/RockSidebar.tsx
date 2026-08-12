@@ -21,7 +21,7 @@ import {
 } from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDesktopAppVersion } from "hooks/useDesktopAppVersion";
+import { useAppVersion } from "hooks/useAppVersion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
@@ -294,7 +294,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   // Surfacing it next to the logo makes a stale desktop install (see
   // useUpdateRequiredGate) obvious at a glance instead of hidden.
-  const appVersion = useDesktopAppVersion();
+  const appVersion = useAppVersion();
 
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
@@ -593,12 +593,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               <div className="flex h-9 w-9 items-center justify-center">
                 <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
               </div>
-              <h2 className="flex items-baseline gap-1.5 text-sm font-semibold text-white">
-                Riff Quest
-                {appVersion && (
-                  <span className="text-[10px] font-medium text-zinc-600">v{appVersion}</span>
-                )}
-              </h2>
+              <div className="flex flex-col">
+                <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
+                <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-600">
+                  <span className="text-amber-500/80">beta</span>
+                  {appVersion && <span>v{appVersion}</span>}
+                </span>
+              </div>
             </Link>
             <div className="ml-auto">
               <NotificationsBell />
@@ -638,12 +639,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
                   <div className="flex h-9 w-9 items-center justify-center">
                     <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
                   </div>
-                  <h2 className="flex items-baseline gap-1.5 text-sm font-semibold text-white">
-                    Riff Quest
-                    {appVersion && (
-                      <span className="text-[10px] font-medium text-zinc-600">v{appVersion}</span>
-                    )}
-                  </h2>
+                  <div className="flex flex-col">
+                    <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
+                    <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-600">
+                      <span className="text-amber-500/80">beta</span>
+                      {appVersion && <span>v{appVersion}</span>}
+                    </span>
+                  </div>
                 </Link>
                 <div className="flex items-center gap-2">
                   <NotificationsBell />

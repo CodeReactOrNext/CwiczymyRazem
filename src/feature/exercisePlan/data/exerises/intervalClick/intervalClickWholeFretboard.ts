@@ -14,12 +14,12 @@ export const intervalClickWholeFretboardExercise = createIntervalClickExercise({
   roots: ALL_ROOTS,
   rotateSeconds: 90,
   instructions: [
-    "No fret window this time — root and interval can land anywhere across the whole neck, frets 0 to 12.",
-    "Click every spot of the root first, all 6 strings, then every spot of the note the interval lands on.",
+    "No fret window this time — the root can be anywhere across the whole neck, frets 0 to 12.",
+    "Click one spot of the root, anywhere you like, then the interval measured from that spot — within reach of it, not somewhere else on the neck.",
     "This is the boxes you already trained, combined — lean on the landmarks (open strings, fret 5, fret 7, fret 12) instead of scanning fret by fret.",
   ],
   tips: [
-    "Work out the target note name once, then hunt for it — don't count frets separately on every string.",
+    "Place the root where you'd actually play it, then read the interval off the shape — that's the skill this rewards.",
     "Fret 12 repeats each string's open note an octave up, so the second half of the neck mirrors the first.",
     "If the root has a sharp, find the natural first and step one fret up.",
   ],

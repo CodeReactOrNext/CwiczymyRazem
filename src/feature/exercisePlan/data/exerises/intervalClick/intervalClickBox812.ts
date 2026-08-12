@@ -13,7 +13,7 @@ export const intervalClickBox812Exercise = createIntervalClickExercise({
   rotateSeconds: 75,
   instructions: [
     "Roots can now be sharps (C#, F#, A#…) and every interval is in play, tritone and major 7th included.",
-    "Click every root in frets 8–12 first, then every spot of the note the interval lands on.",
+    "Click one root in frets 8–12 first, then the interval measured from that spot — it has to sit within reach of the root you placed.",
     "At fret 12 each string repeats its own open note an octave up — use that to check yourself.",
   ],
   tips: [

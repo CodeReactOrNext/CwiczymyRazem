@@ -47,9 +47,10 @@ function rollPrompt(roots: string[], intervals: IntervalDefinition[], exclude?: 
 }
 
 /**
- * Builds one "click the root, then click the interval" drill. Every variant is
- * the same game — only the fret window, the string scope and the interval pool
- * change — so they all share this factory instead of copying the config around.
+ * Builds one "place the root, then click the interval from it" drill — two clicks
+ * a round. Every variant is the same game — only the fret window, the string scope
+ * and the interval pool change — so they all share this factory instead of copying
+ * the config around.
  *
  * The prompt (root + interval name) lives in `customGoalPrompt`; the note the
  * interval actually lands on is the hidden `customGoal`, which is what the click
@@ -86,7 +87,7 @@ export function createIntervalClickExercise(config: IntervalClickConfig): Exerci
     disableMic: true,
     customGoal: current.target,
     customGoalPrompt: promptFor(current),
-    customGoalDescription: "Click the root first, then the note the interval lands on",
+    customGoalDescription: "Click one root, then the interval measured from that spot",
     customGoalRegion: config.region,
     customGoalStrings: config.strings,
     rollHuntTarget: () => {

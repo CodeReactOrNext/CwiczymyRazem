@@ -1,23 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ClickTarget } from "../helpers/clickTargets";
-import { clickTargetKey, computeClickTargets, multiplierForFoundCount, scoreForFoundCount } from "../helpers/clickTargets";
+import {
+  clickTargetKey,
+  computeClickTargets,
+  multiplierForFoundCount,
+  scoreForFoundCount,
+  targetsWithinReach,
+} from "../helpers/clickTargets";
 import type { GameState } from "./noteMatchingFeedback";
 
-/** Which half of the round the player is on: locate the root, then the interval. */
+/** Which half of the round the player is on: place the root, then the interval. */
 export type IntervalClickPhase = "root" | "interval";
 
 export interface IntervalClickState {
   phase: IntervalClickPhase;
-  /** Every position of the ROOT note inside the window — step 1's answers. */
+  /** Every position of the ROOT inside the window — step 1 takes any ONE of them. */
   rootPositions: ClickTarget[];
-  /** Every position of the INTERVAL note (root + interval) — step 2's answers. */
+  /** Cells that count as the interval from the placed root — empty until it is placed. */
   intervalPositions: ClickTarget[];
+  /** The root position the player picked; the interval is measured from here. */
+  anchor: ClickTarget | null;
+  /** The placed root, as a one-element list — the board marks cells by key. */
   foundRootKeys: string[];
   foundIntervalKeys: string[];
   /** Most recent click outcome, for transient flash feedback — `id` increments on
    *  every scored click so the same cell can flash twice. `elapsedSeconds` is set
-   *  only the first time a position is found, counted from when the step started. */
+   *  only on a correct click, counted from when the step started. */
   lastClick: { string: number; fret: number; correct: boolean; id: number; elapsedSeconds?: number } | null;
   gameState: GameState;
   accuracy: number;
@@ -25,7 +34,9 @@ export interface IntervalClickState {
   maxCombo: number;
   /** Wrong clicks across the whole exercise (every rotation), never reset. */
   mistakeCount: number;
-  /** Both steps solved for the current prompt. */
+  /** Correct clicks across the whole exercise — two per solved round. */
+  correctClicks: number;
+  /** Both clicks of the current prompt landed. */
   complete: boolean;
 }
 
@@ -34,11 +45,10 @@ const keyOf = clickTargetKey;
 interface BuildArgs {
   rootPositions: ClickTarget[];
   intervalPositions: ClickTarget[];
-  foundRoot: Set<string>;
-  foundInterval: Set<string>;
+  anchor: ClickTarget | null;
+  foundIntervalKey: string | null;
   lastClick: IntervalClickState["lastClick"];
-  scoreOffset: number;
-  bankedFound: number;
+  correctClicks: number;
   bankedTotal: number;
   mistakeCount: number;
 }
@@ -46,44 +56,48 @@ interface BuildArgs {
 function buildState({
   rootPositions,
   intervalPositions,
-  foundRoot,
-  foundInterval,
+  anchor,
+  foundIntervalKey,
   lastClick,
-  scoreOffset,
-  bankedFound,
+  correctClicks,
   bankedTotal,
   mistakeCount,
 }: BuildArgs): IntervalClickState {
-  const rootFound = rootPositions.filter((p) => foundRoot.has(keyOf(p))).length;
-  const intervalFound = intervalPositions.filter((p) => foundInterval.has(keyOf(p))).length;
-  const foundCount = rootFound + intervalFound;
-  const total = rootPositions.length + intervalPositions.length;
-  const rootDone = rootFound >= rootPositions.length;
+  // A window with no root at all (unknown note name) has nothing to place, so
+  // the round opens on step 2 rather than deadlocking on step 1.
+  const hasRoots = rootPositions.length > 0;
+  const rootDone = !hasRoots || anchor !== null;
+  const roundTotal = (hasRoots ? 1 : 0) + 1;
+  const roundFound = (anchor ? 1 : 0) + (foundIntervalKey ? 1 : 0);
 
-  // Cumulative across every prompt rotated through this session, not just the
-  // current one — an exercise that ends mid-round would otherwise grade on the
-  // fraction of the CURRENT prompt that happens to be found, ignoring every
-  // round already solved in full. Same banking as useClickHunt.
-  const cumulativeFound = bankedFound + foundCount;
-  const cumulativeTotal = bankedTotal + total;
+  // Graded across every prompt rotated through this session, not just the current
+  // one: correct clicks over the clicks the session asked for (two per prompt
+  // presented) plus every wrong click. Both halves matter — skipping rounds
+  // leaves asked-for clicks unanswered, and brute-forcing the board inflates the
+  // denominator, so neither route reaches a good grade.
+  const cumulativeTotal = bankedTotal + roundTotal + mistakeCount;
 
   return {
     phase: rootDone ? "interval" : "root",
     rootPositions,
     intervalPositions,
-    foundRootKeys: Array.from(foundRoot),
-    foundIntervalKeys: Array.from(foundInterval),
+    anchor,
+    foundRootKeys: anchor ? [keyOf(anchor)] : [],
+    foundIntervalKeys: foundIntervalKey ? [foundIntervalKey] : [],
     lastClick,
     gameState: {
-      score: scoreOffset + scoreForFoundCount(foundCount),
-      combo: foundCount,
-      multiplier: multiplierForFoundCount(foundCount),
+      // The streak runs across rounds, not inside one: at two clicks a round the
+      // multiplier would never leave 1× if it reset on every prompt.
+      score: scoreForFoundCount(correctClicks),
+      combo: correctClicks,
+      multiplier: multiplierForFoundCount(correctClicks),
     },
-    accuracy: cumulativeTotal > 0 ? Math.round((cumulativeFound / cumulativeTotal) * 100) : 0,
-    maxPossibleScore: scoreForFoundCount(total),
-    maxCombo: foundCount,
+    accuracy: cumulativeTotal > 0 ? Math.round((correctClicks / cumulativeTotal) * 100) : 0,
+    maxPossibleScore: scoreForFoundCount(correctClicks + (roundTotal - roundFound)),
+    maxCombo: correctClicks,
     mistakeCount,
-    complete: total > 0 && rootDone && intervalFound >= intervalPositions.length,
+    correctClicks,
+    complete: rootDone && foundIntervalKey !== null,
   };
 }
 
@@ -94,15 +108,15 @@ export interface IntervalClickControls {
 }
 
 /**
- * The interval drill's answer tracking: a two-step click round. Step 1 asks for
- * every position of the ROOT note inside the window; step 2 — which opens by
- * itself once the root is fully mapped — asks for every position of the note the
- * prompted interval lands on, whose name is never shown (working it out IS the
- * exercise).
+ * The interval drill's answer tracking: two clicks per round. Step 1 asks for the
+ * ROOT — any one of its positions in the window, the player's pick — and step 2,
+ * which opens on that click, asks for the note the prompted interval lands on,
+ * within a hand's reach of the root just placed. The answer's name is never shown;
+ * working it out IS the exercise.
  *
- * Scoring, accuracy banking and the mistake counter mirror useClickHunt, so an
- * interval round grades on the same scale as a plain click drill; the two steps
- * share one running multiplier, so a full round is worth more than two halves.
+ * Placing the root instead of mapping all of them is what makes step 2 a real
+ * interval: the shape is measured from one spot on the neck, the way it is when
+ * playing, rather than from a note name spread over six strings.
  */
 export function useIntervalClickHunt(
   rootNote: string,
@@ -114,15 +128,22 @@ export function useIntervalClickHunt(
   const stringsKey = strings ? strings.join(",") : "all";
   const promptKey = `${rootNote}>${intervalNote}|${startFret}-${endFret}|${stringsKey}`;
 
-  const rootsRef = useRef<ClickTarget[]>(computeClickTargets(rootNote, startFret, endFret, strings));
-  const intervalsRef = useRef<ClickTarget[]>(computeClickTargets(intervalNote, startFret, endFret, strings));
-  const foundRootRef = useRef<Set<string>>(new Set());
-  const foundIntervalRef = useRef<Set<string>>(new Set());
+  const initialRoots = computeClickTargets(rootNote, startFret, endFret, strings);
+  const initialTargets = computeClickTargets(intervalNote, startFret, endFret, strings);
+  // Step 2 has no answers until a root is placed — unless there is no root to
+  // place at all, in which case the round opens on every position of the answer.
+  const initialAccepted = initialRoots.length > 0 ? [] : initialTargets;
+
+  const rootsRef = useRef<ClickTarget[]>(initialRoots);
+  /** Every position of the answer note in the window — narrowed to the ones in
+   *  reach as soon as the root is placed. */
+  const allTargetsRef = useRef<ClickTarget[]>(initialTargets);
+  const anchorRef = useRef<ClickTarget | null>(null);
+  const acceptedRef = useRef<ClickTarget[]>(initialAccepted);
+  const foundIntervalRef = useRef<string | null>(null);
   const hitIdRef = useRef(0);
-  const sessionScoreRef = useRef(0);
-  const prevFoundCountRef = useRef(0);
+  const correctClicksRef = useRef(0);
   const firstPromptRef = useRef(true);
-  const bankedFoundRef = useRef(0);
   const bankedTotalRef = useRef(0);
   // Never cleared on rotation — an exam's mistake limit has to see every wrong
   // click since the exam started, not just the current prompt's.
@@ -134,43 +155,39 @@ export function useIntervalClickHunt(
 
   const [state, setState] = useState<IntervalClickState>(() =>
     buildState({
-      rootPositions: computeClickTargets(rootNote, startFret, endFret, strings),
-      intervalPositions: computeClickTargets(intervalNote, startFret, endFret, strings),
-      foundRoot: new Set(),
-      foundInterval: new Set(),
+      rootPositions: initialRoots,
+      intervalPositions: initialAccepted,
+      anchor: null,
+      foundIntervalKey: null,
       lastClick: null,
-      scoreOffset: 0,
-      bankedFound: 0,
+      correctClicks: 0,
       bankedTotal: 0,
       mistakeCount: 0,
     }),
   );
 
-  // Fresh prompt: bank the finishing round's score and progress first (skipping
-  // the initial mount), then start over on the new root/interval pair.
+  // Fresh prompt: bank the finishing round's asked-for clicks first (skipping the
+  // initial mount), then start over on the new root/interval pair.
   useEffect(() => {
     if (!firstPromptRef.current) {
-      sessionScoreRef.current += scoreForFoundCount(prevFoundCountRef.current);
-      bankedFoundRef.current += prevFoundCountRef.current;
-      bankedTotalRef.current += rootsRef.current.length + intervalsRef.current.length;
+      bankedTotalRef.current += (rootsRef.current.length > 0 ? 1 : 0) + 1;
     }
     firstPromptRef.current = false;
     rootsRef.current = computeClickTargets(rootNote, startFret, endFret, strings);
-    intervalsRef.current = computeClickTargets(intervalNote, startFret, endFret, strings);
-    foundRootRef.current = new Set();
-    foundIntervalRef.current = new Set();
+    allTargetsRef.current = computeClickTargets(intervalNote, startFret, endFret, strings);
+    anchorRef.current = null;
+    acceptedRef.current = rootsRef.current.length > 0 ? [] : allTargetsRef.current;
+    foundIntervalRef.current = null;
     hitIdRef.current = 0;
-    prevFoundCountRef.current = 0;
     stepStartRef.current = Date.now();
     setState(
       buildState({
         rootPositions: rootsRef.current,
-        intervalPositions: intervalsRef.current,
-        foundRoot: foundRootRef.current,
-        foundInterval: foundIntervalRef.current,
+        intervalPositions: acceptedRef.current,
+        anchor: null,
+        foundIntervalKey: null,
         lastClick: null,
-        scoreOffset: sessionScoreRef.current,
-        bankedFound: bankedFoundRef.current,
+        correctClicks: correctClicksRef.current,
         bankedTotal: bankedTotalRef.current,
         mistakeCount: mistakeCountRef.current,
       }),
@@ -179,48 +196,56 @@ export function useIntervalClickHunt(
   }, [promptKey]);
 
   const registerClick = useCallback((string: number, fret: number) => {
-    const roots = rootsRef.current;
-    const intervals = intervalsRef.current;
+    // Round already solved — the panel is on its way to the next prompt, and
+    // stray taps in the meantime must not be graded either way.
+    if (foundIntervalRef.current !== null) return;
+
+    const anchor = anchorRef.current;
+    const rootDone = anchor !== null || rootsRef.current.length === 0;
     const key = `${string}-${fret}`;
-    const rootDone = roots.every((p) => foundRootRef.current.has(keyOf(p)));
 
-    // Tapping a root cell again after the root step is over is obviously not an
-    // attempt at the interval — those cells stay marked on the board — so it
-    // costs nothing rather than burning a strike.
-    if (rootDone && foundRootRef.current.has(key)) return;
+    // Tapping the placed root again during step 2 is obviously not an attempt at
+    // the interval — it stays marked on the board — so it costs nothing.
+    if (anchor && key === keyOf(anchor)) return;
 
-    const active = rootDone ? intervals : roots;
-    const found = rootDone ? foundIntervalRef.current : foundRootRef.current;
-    const isTarget = active.some((p) => p.string === string && p.fret === fret);
-    const alreadyFound = found.has(key);
     hitIdRef.current++;
-
     let elapsedSeconds: number | undefined;
-    if (isTarget && !alreadyFound) {
-      found.add(key);
-      elapsedSeconds = (Date.now() - stepStartRef.current) / 1000;
-      // Finishing the root step opens the interval step — restart the clock so
-      // its own find times are measured from when it actually became answerable.
-      if (!rootDone && roots.every((p) => foundRootRef.current.has(keyOf(p)))) {
+    let correct = false;
+
+    if (!rootDone) {
+      const placed = rootsRef.current.find((p) => p.string === string && p.fret === fret);
+      if (placed) {
+        correct = true;
+        elapsedSeconds = (Date.now() - stepStartRef.current) / 1000;
+        anchorRef.current = placed;
+        // The interval is measured from the spot just picked, so step 2's answers
+        // only exist once there is a root to measure from.
+        acceptedRef.current = targetsWithinReach(allTargetsRef.current, placed);
+        // Step 2 opens here — restart the clock so its find time is measured from
+        // when it actually became answerable.
         stepStartRef.current = Date.now();
       }
-    } else if (!isTarget) {
-      mistakeCountRef.current += 1;
+    } else if (acceptedRef.current.some((p) => p.string === string && p.fret === fret)) {
+      correct = true;
+      elapsedSeconds = (Date.now() - stepStartRef.current) / 1000;
+      foundIntervalRef.current = key;
     }
 
-    const next = buildState({
-      rootPositions: roots,
-      intervalPositions: intervals,
-      foundRoot: foundRootRef.current,
-      foundInterval: foundIntervalRef.current,
-      lastClick: { string, fret, correct: isTarget, id: hitIdRef.current, elapsedSeconds },
-      scoreOffset: sessionScoreRef.current,
-      bankedFound: bankedFoundRef.current,
-      bankedTotal: bankedTotalRef.current,
-      mistakeCount: mistakeCountRef.current,
-    });
-    prevFoundCountRef.current = next.gameState.combo;
-    setState(next);
+    if (correct) correctClicksRef.current += 1;
+    else mistakeCountRef.current += 1;
+
+    setState(
+      buildState({
+        rootPositions: rootsRef.current,
+        intervalPositions: acceptedRef.current,
+        anchor: anchorRef.current,
+        foundIntervalKey: foundIntervalRef.current,
+        lastClick: { string, fret, correct, id: hitIdRef.current, elapsedSeconds },
+        correctClicks: correctClicksRef.current,
+        bankedTotal: bankedTotalRef.current,
+        mistakeCount: mistakeCountRef.current,
+      }),
+    );
   }, []);
 
   return { state, registerClick };
