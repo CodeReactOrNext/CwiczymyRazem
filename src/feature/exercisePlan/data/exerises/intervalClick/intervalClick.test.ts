@@ -24,9 +24,9 @@ describe("interval click drills", () => {
     expect(exercise.customGoalRegion).toBeDefined();
   });
 
-  // Every round asks for two full sets of cells. If a window held no position of
-  // some note, that round would be unwinnable — and since the roll is random, it
-  // would only show up for players, never in review.
+  // Every round asks for a root and the note its interval lands on. If a window
+  // held no position of some note, that round would be unwinnable — and since the
+  // roll is random, it would only show up for players, never in review.
   it.each(exercises.map((e) => [e.title, e] as const))("%s can answer every note in its window", (_title, exercise) => {
     const { startFret, endFret } = exercise.customGoalRegion!;
     for (const note of NOTES) {

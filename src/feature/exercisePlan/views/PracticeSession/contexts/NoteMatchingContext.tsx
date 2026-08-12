@@ -406,8 +406,11 @@ export function NoteMatchingProvider({
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
     if (isIntervalClickHunt) {
-      const total = intervalClickHunt.rootPositions.length + intervalClickHunt.intervalPositions.length;
-      const found = intervalClickHunt.maxCombo;
+      // Two clicks a round, many rounds — so the timeline is the session's clicks
+      // themselves (every correct one, then every wrong one) rather than a single
+      // prompt's cells, which would say nothing about how the exercise went.
+      const found = intervalClickHunt.correctClicks;
+      const total = found + intervalClickHunt.mistakeCount;
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
     if (isNoteHunt) {
@@ -419,7 +422,7 @@ export function NoteMatchingProvider({
   }, [
     isChordHunt, chordHunt.tones.length, chordHunt.maxCombo,
     isClickHunt, clickHunt.targetPositions.length, clickHunt.maxCombo,
-    isIntervalClickHunt, intervalClickHunt.rootPositions.length, intervalClickHunt.intervalPositions.length, intervalClickHunt.maxCombo,
+    isIntervalClickHunt, intervalClickHunt.correctClicks, intervalClickHunt.mistakeCount,
     isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo,
     tabNoteTimeline,
   ]);

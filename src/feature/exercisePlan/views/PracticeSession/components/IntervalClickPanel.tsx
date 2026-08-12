@@ -14,6 +14,7 @@ import {
   pickReferenceMidi,
   saveClickHuntNoteSoundPreference,
 } from "../helpers/clickHuntNoteSound";
+import { isWithinReach, reachZoneKeys } from "../helpers/clickTargets";
 import { playIntervalPhrase } from "../helpers/intervalPreview";
 import { ClickableFretboard } from "./ClickableFretboard";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
@@ -131,6 +132,7 @@ export function IntervalClickPanel({
   );
   const foundRootKeys = intervalClickHunt?.foundRootKeys ?? [];
   const foundIntervalKeys = intervalClickHunt?.foundIntervalKeys ?? [];
+  const anchor = intervalClickHunt?.anchor ?? null;
   const lastClick = intervalClickHunt?.lastClick ?? null;
   const score = intervalClickHunt?.gameState.score ?? 0;
   const mistakeCount = intervalClickHunt?.mistakeCount ?? 0;
@@ -141,6 +143,16 @@ export function IntervalClickPanel({
   const rootFound = foundRootKeys.length;
   const intervalFound = foundIntervalKeys.length;
   const isRotating = noteHuntSecondsLeft !== null;
+
+  // Step 2 only accepts the interval within a hand's reach of the root the player
+  // placed, so the board shades that span — the whole rectangle, answers and all,
+  // which shows where to look without pointing at the note. Skipped when the span
+  // was too tight to hold an answer and the hunt fell back to the whole window.
+  const zoneKeys = useMemo(() => {
+    if (!anchor || !onInterval || complete) return undefined;
+    if (!intervalPositions.every((p) => isWithinReach(p, anchor))) return undefined;
+    return reachZoneKeys(anchor, startFret, endFret, strings);
+  }, [anchor, onInterval, complete, intervalPositions, startFret, endFret, strings]);
 
   // Once both steps are solved, move on by ourselves after a beat — long enough
   // for the reveal and the interval phrase to land.
@@ -229,8 +241,8 @@ export function IntervalClickPanel({
   const stepPrompt = complete
     ? `A ${intervalName} above ${rootNote} is ${targetNote}`
     : onInterval
-      ? `Now click every note a ${intervalName} above ${rootNote}${scope}`
-      : `Click every ${rootNote} between frets ${startFret} and ${endFret}${scope}`;
+      ? `Now click the ${intervalName} above that ${rootNote} — within reach of it`
+      : `Click any ${rootNote} between frets ${startFret} and ${endFret}${scope}`;
 
   return (
     <div className="relative flex w-full max-w-6xl flex-col items-center gap-4 sm:gap-6">
@@ -282,7 +294,7 @@ export function IntervalClickPanel({
           caption="Root"
           value={rootNote}
           state={onInterval ? "done" : "active"}
-          progress={rootPositions.length > 0 ? `${rootFound} / ${rootPositions.length}` : undefined}
+          progress={onInterval ? "placed" : "pick one spot"}
           burst={onInterval ? undefined : { foundCount: rootFound, complete: false }}
         />
 
@@ -308,7 +320,7 @@ export function IntervalClickPanel({
           caption="Target"
           value={complete ? targetNote : "?"}
           state={complete ? "done" : onInterval ? "active" : "waiting"}
-          progress={onInterval && intervalPositions.length > 0 ? `${intervalFound} / ${intervalPositions.length}` : undefined}
+          progress={complete ? "found" : onInterval ? "from that root" : undefined}
           burst={onInterval ? { foundCount: intervalFound, complete } : undefined}
         />
       </div>
@@ -358,9 +370,11 @@ export function IntervalClickPanel({
         endFret={endFret}
         strings={strings}
         foundKeys={onInterval ? foundIntervalKeys : foundRootKeys}
-        totalTargets={onInterval ? intervalPositions.length : rootPositions.length}
+        // One click settles either step, so the board's "solved" state is a single find.
+        totalTargets={1}
         markedKeys={onInterval ? foundRootKeys : undefined}
         markedLabel="R"
+        zoneKeys={zoneKeys}
         lastClick={lastClick}
         onCellClick={handleCellClick}
       />
@@ -377,9 +391,12 @@ export function IntervalClickPanel({
         {process.env.NODE_ENV !== "production" && !complete && (
           <button
             type="button"
-            onClick={() =>
-              (onInterval ? intervalPositions : rootPositions).forEach((p) => registerIntervalClick(p.string, p.fret))
-            }
+            onClick={() => {
+              // One cell settles the step — clicking the rest would only rack up
+              // mistakes on cells the step no longer accepts.
+              const [first] = onInterval ? intervalPositions : rootPositions;
+              if (first) registerIntervalClick(first.string, first.fret);
+            }}
             className="inline-flex items-center gap-2 rounded-lg bg-amber-500/10 px-4 py-2 text-xs font-bold tracking-wide text-amber-400 transition-colors hover:bg-amber-500/20"
             title="Dev-only: instantly solves the current step">
             🧪 Solve this step (dev)

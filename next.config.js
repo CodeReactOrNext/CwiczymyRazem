@@ -29,6 +29,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    // Ta sama wersja co w electron/preload.js — jedno źródło prawdy w package.json.
+    NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
+  },
   reactCompiler: true,
   images: {
     unoptimized: true,
