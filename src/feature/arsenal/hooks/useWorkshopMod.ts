@@ -9,7 +9,8 @@ import type {
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 /**
- * Fits a mod, or re-rolls one that is already on the item.
+ * Fits a mod, re-rolls one that is already on the item, or refits one rescued
+ * from a teardown.
  *
  * A re-roll can come out worse — the toast says so plainly rather than dressing a
  * loss up as a success, because the player chose that risk and should see it land.
@@ -23,14 +24,17 @@ export const useWorkshopMod = () => {
       kind,
       featureId,
       action,
+      salvagedId,
     }: {
       itemId: string;
       kind: WorkshopKind;
-      featureId: string;
+      /** Null on a salvaged fit — the stash entry names the feature. */
+      featureId: string | null;
       action: WorkshopModAction;
-    }) => modItem(itemId, kind, featureId, action),
+      salvagedId?: string;
+    }) => modItem(itemId, kind, featureId, action, salvagedId),
     onSuccess: (data) => {
-      if (data.action === "fit") {
+      if (data.action === "fit" || data.action === "fit-salvaged") {
         toast.success(`${data.label} fitted — +${data.points} level`);
       } else if (data.levelGain > 0) {
         toast.success(

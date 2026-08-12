@@ -1,34 +1,28 @@
-import { useQueryClient } from "@tanstack/react-query";
 import {
   EFFECT_DEFINITIONS,
   EFFECTS_BY_ID,
 } from "feature/arsenal/data/effectDefinitions";
-import {
-  getEffectLevel,
-  getEffectValue,
-} from "feature/arsenal/data/effectStats";
-import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
-import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
+import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
 import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
-import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
+import { getEffectEntries } from "feature/arsenal/utils/collectionEntries";
+import type { CollectionSort } from "feature/arsenal/utils/collectionFilter";
+import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
+import { getEffectDuplicates } from "feature/arsenal/utils/duplicates";
 import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import type {
-  ArsenalUserData,
-  EffectInventoryItem,
-} from "../../types/arsenal.types";
+import type { ArsenalUserData } from "../../types/arsenal.types";
+import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
+import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
-import { RARITY_RANK } from "../RarityProgress";
-import type { BulkSellItem } from "./BulkSellConfirmDialog";
 import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
@@ -44,16 +38,22 @@ const EFFECT_FAME_VALUES: Record<string, number> = {
 
 interface EffectCollectionProps {
   data: ArsenalUserData;
+  /** Free-text filter driven by the collection toolbar. */
+  query?: string;
+  sort?: CollectionSort;
 }
 
-export const EffectCollection = ({ data }: EffectCollectionProps) => {
+export const EffectCollection = ({
+  data,
+  query = "",
+  sort = "rarity",
+}: EffectCollectionProps) => {
   const { mutate: sellEffect, isPending: isSelling } = useSellEffect();
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: scrap, isPending: isScrapping } = useScrapEffect();
   const { mutate: savePedalboard, isPending: isRemovingFromBoard } =
     useUpdatePedalboard();
-  const queryClient = useQueryClient();
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -99,64 +99,21 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   // Sellable duplicates: for every pedal owned more than once, keep the
   // highest-level copy and mark the lower-level ones for bulk selling.
   // Pedals placed on the pedalboard are never sold.
-  const { duplicateIds, duplicateItems, duplicateFame } = useMemo(() => {
-    const pedalboardItemIds = new Set(
-      data.rig?.pedalboardItems?.map((p) => p.itemId) || [],
-    );
-    const byEffect = new Map<number | string, EffectInventoryItem[]>();
-    for (const item of data.effectInventory || []) {
-      const arr = byEffect.get(item.effectId);
-      if (arr) arr.push(item);
-      else byEffect.set(item.effectId, [item]);
-    }
-
-    const ids: string[] = [];
-    const items: BulkSellItem[] = [];
-    let fame = 0;
-    for (const [effectId, group] of byEffect) {
-      if (group.length < 2) continue;
-      const effect = EFFECTS_BY_ID.get(effectId);
-      if (!effect) continue;
-      const value = getEffectValue(effect); // rarity-based, same for every copy
-      // Best copy first (level desc); keep it, sell the rest.
-      const sorted = [...group].sort(
-        (a, b) => getEffectLevel(b, effect) - getEffectLevel(a, effect),
-      );
-      for (let i = 1; i < sorted.length; i++) {
-        const it = sorted[i];
-        if (pedalboardItemIds.has(it.id)) continue;
-        ids.push(it.id);
-        items.push({
-          id: it.id,
-          name: `${effect.brand} ${effect.name}`,
-          rarity: getEffectiveRarity(effect.rarity, it.buildLevel),
-          level: getEffectLevel(it, effect),
-          value,
-        });
-        fame += value;
-      }
-    }
-    // Highest-level (most valuable) first.
-    items.sort((a, b) => b.level - a.level || b.value - a.value);
-    return { duplicateIds: ids, duplicateItems: items, duplicateFame: fame };
-  }, [data.effectInventory, data.rig?.pedalboardItems]);
+  const duplicates = useMemo(
+    () =>
+      getEffectDuplicates(
+        data.effectInventory || [],
+        new Set(data.rig?.pedalboardItems?.map((p) => p.itemId) || []),
+      ),
+    [data.effectInventory, data.rig?.pedalboardItems],
+  );
 
   const handleConfirmBulkSell = () => {
-    if (duplicateIds.length === 0) return;
-    sellBulk(duplicateIds, {
+    if (duplicates.ids.length === 0) return;
+    sellBulk(duplicates.ids, {
       onSuccess: () => setIsBulkSellOpen(false),
     });
   };
-
-  // Clear "new" flags when user opens collection tab
-  useEffect(() => {
-    const hasNew = data.effectInventory.some((item) => item.isNew);
-    if (hasNew) {
-      clearNewFlags().then(() => {
-        queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
-      });
-    }
-  }, []);
 
   if (!data.effectInventory || data.effectInventory.length === 0) return null;
 
@@ -169,20 +126,13 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
   const uniqueOwnedCount = ownedEffectIds.size;
   const totalEffectsCount = EFFECT_DEFINITIONS.length;
 
-  // Single flat grid, sorted rarest-first then newest-first — no per-rarity sections.
-  const sortedItems = [...data.effectInventory].sort((a, b) => {
-    // Effective, not mint: a promoted pedal belongs with its new tier.
-    const rarityA = getEffectiveRarity(
-      EFFECTS_BY_ID.get(a.effectId)?.rarity ?? "Common",
-      a.buildLevel,
-    );
-    const rarityB = getEffectiveRarity(
-      EFFECTS_BY_ID.get(b.effectId)?.rarity ?? "Common",
-      b.buildLevel,
-    );
-    if (rarityA !== rarityB) return RARITY_RANK[rarityB] - RARITY_RANK[rarityA];
-    return b.acquiredAt - a.acquiredAt;
-  });
+  // Single flat grid: the toolbar decides the order, the entries only describe
+  // what each card can be searched and sorted by.
+  const sortedItems = filterAndSortEntries(
+    getEffectEntries(data.effectInventory, pedalboardItemIds),
+    query,
+    sort,
+  );
 
   const handleSellClick = (
     inventoryItemId: string,
@@ -231,56 +181,47 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
   return (
     <>
-      <div className='mt-8 flex flex-col gap-3'>
-        <div className='flex flex-col gap-0.5'>
-          <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
-            Effects
-          </p>
-          <p className='text-base font-black capitalize tracking-wide text-white'>
-            Pedals
-          </p>
-        </div>
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <div className='flex items-baseline gap-1.5'>
-            <span className='text-lg font-black text-white'>
-              {uniqueOwnedCount}
-            </span>
-            <span className='text-sm font-bold text-zinc-500'>
-              / {totalEffectsCount}
-            </span>
-            <span className='ml-1 text-xs font-medium text-zinc-500'>
-              pedals collected
-            </span>
+      <div className='flex flex-col gap-3'>
+        <CollectionSectionHeader
+          eyebrow='Effects'
+          title='Pedals'
+          owned={uniqueOwnedCount}
+          total={totalEffectsCount}
+          unit='pedals collected'
+          action={
+            duplicates.ids.length > 0 ? (
+              <button
+                onClick={() => setIsBulkSellOpen(true)}
+                disabled={isSellingBulk}
+                className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
+                title='Sell every lower-level duplicate, keeping the best copy of each pedal'>
+                <Layers size={14} />
+                Sell duplicates ({duplicates.ids.length})
+              </button>
+            ) : null
+          }
+        />
+        {sortedItems.length === 0 ? (
+          <CollectionEmptyResult query={query} />
+        ) : (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
+            {sortedItems.map((item) => (
+              <EffectCard
+                key={item.id}
+                item={item}
+                isOnPedalboard={pedalboardItemIds.has(item.id)}
+                onSellClick={handleSellClick}
+                isSelling={isSelling}
+                onListClick={handleListClick}
+                isListing={isListing}
+                onScrapClick={handleScrapClick}
+                isScrapping={isScrapping}
+                onRemoveFromBoard={handleRemoveFromBoard}
+                isRemovingFromBoard={isRemovingFromBoard}
+              />
+            ))}
           </div>
-
-          {duplicateIds.length > 0 && (
-            <button
-              onClick={() => setIsBulkSellOpen(true)}
-              disabled={isSellingBulk}
-              className='flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
-              title='Sell every lower-level duplicate, keeping the best copy of each pedal'>
-              <Layers size={14} />
-              Sell duplicates ({duplicateIds.length})
-            </button>
-          )}
-        </div>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
-          {sortedItems.map((item) => (
-            <EffectCard
-              key={item.id}
-              item={item}
-              isOnPedalboard={pedalboardItemIds.has(item.id)}
-              onSellClick={handleSellClick}
-              isSelling={isSelling}
-              onListClick={handleListClick}
-              isListing={isListing}
-              onScrapClick={handleScrapClick}
-              isScrapping={isScrapping}
-              onRemoveFromBoard={handleRemoveFromBoard}
-              isRemovingFromBoard={isRemovingFromBoard}
-            />
-          ))}
-        </div>
+        )}
       </div>
 
       {(() => {
@@ -295,6 +236,7 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
             itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
             parts={getEffectScrapYield(item, effect)}
+            salvaged={getSalvageableMod(item, "effect")}
             onConfirm={handleConfirmScrap}
             onCancel={closeScrapDialog}
             isLoading={isScrapping}
@@ -304,8 +246,8 @@ export const EffectCollection = ({ data }: EffectCollectionProps) => {
 
       <BulkSellConfirmDialog
         isOpen={isBulkSellOpen}
-        items={duplicateItems}
-        fameReward={duplicateFame}
+        items={duplicates.items}
+        fameReward={duplicates.fame}
         protectedNote='Pedals on your pedalboard are never sold.'
         onConfirm={handleConfirmBulkSell}
         onCancel={() => setIsBulkSellOpen(false)}

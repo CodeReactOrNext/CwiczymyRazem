@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { TierPlate } from "../TierPlate";
 import { PartIcon } from "./PartIcon";
 
 const partRow = cva("flex items-center rounded-lg", {
@@ -32,10 +33,18 @@ const partRow = cva("flex items-center rounded-lg", {
   defaultVariants: { variant: "full", ok: true },
 });
 
-const ICON_SIZE: Record<PartRowVariant, { box: string; icon: number }> = {
-  full: { box: "h-11 w-11", icon: 40 },
-  compact: { box: "h-8 w-8", icon: 30 },
-  yield: { box: "h-10 w-10", icon: 38 },
+/**
+ * `box` frames a cost with no socket of its own (Fame); `plate` is the socket a
+ * part gets, and `icon` the part inside it — smaller than the plate, because a
+ * hollow only reads as one if the thing in it has room to sit.
+ */
+const ICON_SIZE: Record<
+  PartRowVariant,
+  { box: string; plate: number; icon: number }
+> = {
+  full: { box: "h-11 w-11", plate: 46, icon: 36 },
+  compact: { box: "h-8 w-8", plate: 32, icon: 26 },
+  yield: { box: "h-10 w-10", plate: 42, icon: 34 },
 };
 
 type PartRowVariant = NonNullable<VariantProps<typeof partRow>["variant"]>;
@@ -102,16 +111,26 @@ export const PartRow = ({
           : undefined
       }
       className={partRow({ variant, ok })}>
-      <span
-        className={cn(
-          "flex shrink-0 items-center justify-center",
-          dense ? "h-8 w-8" : size.box,
-          !ok && "opacity-40 grayscale",
-        )}>
-        {icon ?? (
-          <PartIcon partId={partId!} size={dense ? 30 : size.icon} />
-        )}
-      </span>
+      {/* A part sits in the same lit hollow the stash hangs it in, so the tier
+          is legible before the word under the name is read. A cost that is not
+          a part — Fame — brings its own emblem and needs no socket. */}
+      {tierColor && !icon ? (
+        <TierPlate
+          color={tierColor}
+          size={dense ? 32 : size.plate}
+          muted={!ok}>
+          <PartIcon partId={partId!} size={dense ? 26 : size.icon} />
+        </TierPlate>
+      ) : (
+        <span
+          className={cn(
+            "flex shrink-0 items-center justify-center",
+            dense ? "h-8 w-8" : size.box,
+            !ok && "opacity-40 grayscale",
+          )}>
+          {icon ?? <PartIcon partId={partId!} size={dense ? 30 : size.icon} />}
+        </span>
+      )}
 
       {variant === "compact" ? (
         // No room for the name: the icon carries it and the tooltip spells it out.

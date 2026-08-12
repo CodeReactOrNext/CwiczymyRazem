@@ -1,9 +1,10 @@
+import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemLevel } from "feature/arsenal/data/itemStats";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
+import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
 import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarPickerModalProps {
@@ -34,74 +35,91 @@ export const GuitarPickerModal = ({
   const items = Array.from(uniqueMap.values());
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'
+      onClick={onClose}>
       <div
-        className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded bg-zinc-950 border border-zinc-800 p-5 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">Guitar Slot {slotIndex + 1}</p>
-            <p className="text-base font-black text-white capitalize tracking-wide">Choose a guitar</p>
+        className='relative max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-zinc-900 p-6 shadow-2xl'
+        onClick={(e) => e.stopPropagation()}>
+        <div className='mb-6 flex items-start justify-between gap-4'>
+          <div className='flex flex-col gap-0.5'>
+            <p className='text-[10px] font-bold capitalize tracking-widest text-zinc-500'>
+              Guitar Slot {slotIndex + 1}
+            </p>
+            <p className='text-base font-black capitalize tracking-wide text-white'>
+              Choose a guitar
+            </p>
           </div>
-          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
-            <X size={20} />
+          <button
+            onClick={onClose}
+            aria-label='Close'
+            className='rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white'>
+            <X size={18} />
           </button>
         </div>
 
         {currentItemId && (
           <button
-            onClick={() => { onSelect(null); onClose(); }}
-            className="mb-4 w-full py-2 text-[10px] font-black capitalize tracking-widest border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-zinc-500 rounded transition-colors"
-          >
+            onClick={() => {
+              onSelect(null);
+              onClose();
+            }}
+            className='mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white'>
             Remove from slot
           </button>
         )}
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+        {/*
+          The same sockets the stash is built from, so a guitar is the same object
+          wherever the player meets it — lit by its rarity, standing upright, with
+          its level in the corner and its full card behind a hover.
+        */}
+        <div className='grid grid-cols-3 gap-x-3 gap-y-4 xsm:grid-cols-4 sm:grid-cols-5'>
           {items.map((item) => {
             const guitar = GUITARS_BY_ID.get(item.guitarId);
             if (!guitar) return null;
-            const rs = RARITY_STYLES[guitar.rarity];
+
+            const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
             const isSelected = item.id === currentItemId;
             const isOccupied = occupiedItemIds.includes(item.id) && !isSelected;
 
             return (
-              <button
-                key={item.id}
-                disabled={isOccupied}
-                onClick={() => { onSelect(item.id); onClose(); }}
-                className="relative flex flex-col items-center rounded overflow-hidden text-left transition-all duration-200 disabled:opacity-30"
-                style={{
-                  background: `linear-gradient(160deg, ${rs.baseColor}20 0%, #0f0f12 50%)`,
-                  borderBottom: `2px solid ${rs.baseColor}`,
-                  outline: isSelected ? `2px solid ${rs.baseColor}` : undefined,
-                }}
-              >
-                <div className="relative flex items-center justify-center w-full" style={{ height: 90 }}>
-                  <span
-                    className="absolute top-1 left-1 z-10 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black text-white"
-                    style={{
-                      background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
-                      border: `1.5px solid ${rs.baseColor}`,
-                      boxShadow: `0 0 8px ${rs.baseColor}55`,
+              <div key={item.id} className='flex flex-col gap-2'>
+                {/* A guitar socket is one column by two rows on the board; here
+                    there is no board, so the cell carries that shape itself. */}
+                <div className='aspect-[1/2]'>
+                  <GuitarStashTile
+                    item={item}
+                    isEquipped={isSelected}
+                    dimmed={isOccupied}
+                    disabled={isOccupied}
+                    onClick={() => {
+                      onSelect(item.id);
+                      onClose();
                     }}
-                    title="Item level"
-                  >
-                    {getItemLevel(item, guitar)}
-                  </span>
-                  <img
-                    src={getRankBadgeSrc(guitar.imageId, "small")}
-                    alt={guitar.name}
-                    className="-rotate-90 object-contain"
-                    style={{ height: 80, width: 80 }}
                   />
                 </div>
-                <div className="px-2 pb-2 w-full">
-                  <p className="text-[8px] font-bold capitalize truncate" style={{ color: rs.baseColor }}>{guitar.brand}</p>
-                  <p className="text-[10px] font-black text-white capitalize truncate leading-snug">{guitar.name}</p>
+
+                <div
+                  className={cn(
+                    "flex min-w-0 flex-col",
+                    isOccupied && "opacity-40",
+                  )}>
+                  <span
+                    className='truncate text-[10px] font-bold capitalize'
+                    style={{ color: RARITY_STYLES[rarity].baseColor }}>
+                    {guitar.brand}
+                  </span>
+                  <span className='truncate text-xs font-black capitalize leading-snug text-white'>
+                    {guitar.name}
+                  </span>
+                  {isOccupied && (
+                    <span className='text-[10px] font-semibold text-zinc-500'>
+                      In another slot
+                    </span>
+                  )}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

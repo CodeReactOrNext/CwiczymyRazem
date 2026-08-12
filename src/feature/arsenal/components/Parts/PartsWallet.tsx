@@ -12,6 +12,7 @@ import { Wrench } from "lucide-react";
 import { useMemo } from "react";
 
 import { SectionLabel } from "../SectionLabel";
+import { TierPlate } from "../TierPlate";
 import { PartIcon } from "./PartIcon";
 
 interface PartsWalletProps {
@@ -64,28 +65,38 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
           {rows.map((row) => (
             <div
               key={row.partId}
-              className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4'>
-              <div className='flex items-start justify-between gap-3'>
-                <PartIcon partId={row.partId} size={60} />
-                {/* Per-tier counts, rarest at the top. */}
-                <div className='flex flex-col items-end gap-1'>
-                  {row.tiers.map((t) => (
-                    <span key={t.tier} className='flex items-baseline gap-1.5'>
-                      <span
-                        className='text-[10px] font-semibold'
-                        style={{ color: PART_TIER_COLORS[t.tier] }}>
-                        {t.tier}
-                      </span>
-                      <span className='text-base font-black tabular-nums text-white'>
-                        {t.qty}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </div>
+              className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-4'>
               <span className='truncate text-xs font-semibold text-zinc-300'>
                 {getPartLabel(row.partId)}
               </span>
+
+              {/*
+                One socket per tier held, rarest first — the stash's own plates,
+                lit by the tier and counted in the corner. A single flat glyph
+                with a column of numbers beside it made four separate stacks read
+                as one blurry heap, and hid the thing that actually decides
+                whether a job can be paid for: which *tier* the pile is in.
+              */}
+              <div className='flex flex-wrap items-start gap-2'>
+                {row.tiers.map((t) => (
+                  <span
+                    key={t.tier}
+                    className='flex flex-col items-center gap-1'
+                    title={`${t.qty}× ${t.tier} ${getPartLabel(row.partId)}`}>
+                    <TierPlate
+                      color={PART_TIER_COLORS[t.tier]}
+                      size={52}
+                      count={t.qty}>
+                      <PartIcon partId={row.partId} size={30} />
+                    </TierPlate>
+                    <span
+                      className='text-[9px] font-bold'
+                      style={{ color: PART_TIER_COLORS[t.tier] }}>
+                      {t.tier}
+                    </span>
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
         </div>

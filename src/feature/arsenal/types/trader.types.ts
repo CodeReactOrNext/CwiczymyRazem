@@ -3,10 +3,12 @@ import type {
   InventoryItem,
   PartId,
   PartTier,
+  SalvagedMod,
   ScrapPart,
+  WorkshopKind,
 } from "./arsenal.types";
 
-export type TraderOfferKind = "part" | "guitar" | "effect";
+export type TraderOfferKind = "part" | "guitar" | "effect" | "mod";
 
 interface TraderOfferBase {
   /** Stable within a window: `${window}-${slot}`. Also the key in `TraderState.bought`. */
@@ -53,8 +55,29 @@ export interface TraderEffectOffer extends TraderOfferBase {
   roll: TraderEffectRoll;
 }
 
+/**
+ * The day's mod: a loose component, sold the way a teardown hands one over.
+ *
+ * It is not fitted to anything at the counter — it lands in the stash as a
+ * `SalvagedMod` and goes onto whatever instrument the player later drags it
+ * onto, which is the one route to a mod that does not require owning the parts
+ * for it first.
+ */
+export interface TraderModOffer extends TraderOfferBase {
+  kind: "mod";
+  /** Which pool the feature belongs to — a pedal mod never fits a guitar. */
+  modKind: WorkshopKind;
+  featureId: string;
+  label: string;
+  /** The rolled value, fixed from the window seed like every other offer. */
+  points: number;
+  /** The pool's range, so the card can say how good the roll is. */
+  minPoints: number;
+  maxPoints: number;
+}
+
 export type TraderItemOffer = TraderGuitarOffer | TraderEffectOffer;
-export type TraderOffer = TraderPartOffer | TraderItemOffer;
+export type TraderOffer = TraderPartOffer | TraderItemOffer | TraderModOffer;
 
 export interface TraderShop {
   /** The window the offers belong to — sent with every purchase. */
@@ -86,4 +109,6 @@ export interface TraderBuyResult {
   item?: InventoryItem | EffectInventoryItem;
   /** Item purchases only — first copy of this model the player has ever owned. */
   isNewToDex?: boolean;
+  /** Mod purchases only — the stash entry the counter handed over. */
+  mod?: SalvagedMod;
 }

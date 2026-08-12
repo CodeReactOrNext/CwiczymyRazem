@@ -5,8 +5,13 @@ import { useAppSelector } from "store/hooks";
 import { useArsenalData } from "../../hooks/useArsenalData";
 import { useBuyTraderOffer } from "../../hooks/useBuyTraderOffer";
 import { getRemainingStock, useTraderShop } from "../../hooks/useTraderShop";
-import type { TraderItemOffer, TraderPartOffer } from "../../types/trader.types";
+import type {
+  TraderItemOffer,
+  TraderModOffer,
+  TraderPartOffer,
+} from "../../types/trader.types";
 import { ItemOfferCard } from "./ItemOfferCard";
+import { ModOfferCard } from "./ModOfferCard";
 import { PartOfferCard } from "./PartOfferCard";
 import { RestockTimer } from "./RestockTimer";
 
@@ -44,8 +49,9 @@ export const TraderView = () => {
     (o): o is TraderPartOffer => o.kind === "part",
   );
   const items = shop.offers.filter(
-    (o): o is TraderItemOffer => o.kind !== "part",
+    (o): o is TraderItemOffer => o.kind === "guitar" || o.kind === "effect",
   );
+  const mod = shop.offers.find((o): o is TraderModOffer => o.kind === "mod");
 
   const remainingOf = (offerId: string) => {
     const offer = shop.offers.find((o) => o.id === offerId)!;
@@ -61,13 +67,27 @@ export const TraderView = () => {
               Today at the counter
             </p>
             <p className='text-base font-black capitalize tracking-wide text-white'>
-              Parts
+              Parts &amp; mods
             </p>
           </div>
           <RestockTimer restockAt={shop.restockAt} />
         </div>
 
         <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
+          {/* The day's mod is another loose component sold by the piece, so it
+              sits on the same shelf as the parts rather than in a feature panel
+              of its own. First, because there is one a day and it is gone once
+              taken. */}
+          {mod && (
+            <ModOfferCard
+              offer={mod}
+              available={remainingOf(mod.id) > 0}
+              currentFame={fame}
+              onBuy={() => handleBuy(mod.id, 1)}
+              isBuying={isPending && pendingOfferId === mod.id}
+            />
+          )}
+
           {parts.map((offer) => (
             <PartOfferCard
               key={offer.id}

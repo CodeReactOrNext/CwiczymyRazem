@@ -3,6 +3,7 @@ import { sumEffectStats } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { sumFeatureStats } from "feature/arsenal/data/itemStats";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { getSalvagedModOptions } from "feature/arsenal/data/salvage";
 import {
   getEffectSubject,
   getGuitarSubject,
@@ -15,6 +16,7 @@ import type {
   EffectInventoryItem,
   InventoryItem,
   ItemFeature,
+  SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
@@ -24,12 +26,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Fits a mod, or re-rolls one already fitted.
+ * Fits a mod, re-rolls one already fitted, or bolts on one rescued from a
+ * teardown.
  *
  * The player picks *which* mod — each one has its own bill, so there is nothing
  * random about the price — but the value is rolled here and never on the client.
  * `getModQuote` is deterministic, so the bill shown is the bill charged, and the
  * only thing the request can influence is which named mod it asks for.
+ *
+ * A salvaged fit is the one case where nothing is rolled and nothing is charged:
+ * the mod already has a value, earned on the instrument it was pulled off, and
+ * the player already paid that instrument for it — see `data/salvage.ts`.
  */
 export default async function handler(
   req: NextApiRequest,
@@ -39,19 +46,28 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, itemId, kind, featureId, action } = req.body as {
+  const { idToken, itemId, kind, featureId, action, salvagedId } = req.body as {
     idToken: string;
     itemId: string;
     kind: "guitar" | "effect";
-    /** The named mod to fit or re-roll. */
-    featureId: string;
-    action: "fit" | "reroll";
+    /** The named mod to fit or re-roll. Unused by a salvaged fit. */
+    featureId?: string;
+    action: "fit" | "reroll" | "fit-salvaged";
+    /** The stash entry a salvaged fit consumes. */
+    salvagedId?: string;
   };
+
+  const isSalvaged = action === "fit-salvaged";
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (!itemId) return res.status(400).json({ error: "Missing itemId" });
-  if (!featureId) return res.status(400).json({ error: "Missing featureId" });
-  if (action !== "fit" && action !== "reroll") {
+  if (isSalvaged) {
+    if (!salvagedId)
+      return res.status(400).json({ error: "Missing salvagedId" });
+  } else if (!featureId) {
+    return res.status(400).json({ error: "Missing featureId" });
+  }
+  if (action !== "fit" && action !== "reroll" && !isSalvaged) {
     return res.status(400).json({ error: "Invalid action" });
   }
   if (kind !== "guitar" && kind !== "effect") {
@@ -103,42 +119,69 @@ export default async function handler(
 
       const quote = getModQuote(subject, wallet);
       const isReroll = action === "reroll";
-
-      // The priced option is the single source of both the bill and the range —
-      // exactly the object the client was looking at when it sent this.
-      const option = isReroll
-        ? quote.fitted.find((f) => f.id === featureId)
-        : quote.candidates.find((c) => c.id === featureId);
-
-      if (!option) {
-        throw new Error(
-          isReroll ? "REQUIREMENT_NOT_FITTED" : "REQUIREMENT_UNAVAILABLE",
-        );
-      }
-      if (!option.affordable) throw new Error("REQUIREMENT_PARTS");
+      const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
 
       const features: ItemFeature[] = subject.features.map((f) => ({ ...f }));
       let pointsBefore: number | undefined;
       let target: ItemFeature;
+      let label: string;
+      let spent: ScrapPart[];
+      let logLine: string;
+      let newSalvagedMods = salvagedMods;
 
-      if (isReroll) {
-        // `option` came out of `quote.fitted`, so the feature is certainly there.
-        target = features.find((f) => f.id === featureId)!;
-        pointsBefore = target.points;
-      } else {
+      if (isSalvaged) {
+        // Resolved from the stash the same way the bench resolved it, so a
+        // request cannot name a mod the player does not own or one that does
+        // not fit this instrument.
+        const offer = getSalvagedModOptions(subject, salvagedMods).find(
+          (o) => o.salvagedId === salvagedId,
+        );
+        if (!offer) throw new Error("REQUIREMENT_UNAVAILABLE");
         if (quote.slots.free <= 0) throw new Error("REQUIREMENT_SLOTS");
-        target = { id: option.id, points: 0 };
+
+        // Nothing is rolled and nothing is charged: the mod arrives with the
+        // value it was salvaged at, already paid for with the instrument it was
+        // torn off.
+        target = { id: offer.featureId, points: offer.points };
         features.push(target);
+        label = offer.label;
+        spent = [];
+        logLine = `${offer.label} refitted from ${offer.sourceName}`;
+        newSalvagedMods = salvagedMods.filter((m) => m.id !== offer.salvagedId);
+      } else {
+        // The priced option is the single source of both the bill and the range —
+        // exactly the object the client was looking at when it sent this.
+        const option = isReroll
+          ? quote.fitted.find((f) => f.id === featureId)
+          : quote.candidates.find((c) => c.id === featureId);
+
+        if (!option) {
+          throw new Error(
+            isReroll ? "REQUIREMENT_NOT_FITTED" : "REQUIREMENT_UNAVAILABLE",
+          );
+        }
+        if (!option.affordable) throw new Error("REQUIREMENT_PARTS");
+
+        if (isReroll) {
+          // `option` came out of `quote.fitted`, so the feature is certainly there.
+          target = features.find((f) => f.id === featureId)!;
+          pointsBefore = target.points;
+        } else {
+          if (quote.slots.free <= 0) throw new Error("REQUIREMENT_SLOTS");
+          target = { id: option.id, points: 0 };
+          features.push(target);
+        }
+
+        // A re-roll always replaces, including downward — that is the whole risk.
+        target.points = rollModPoints(option);
+        label = option.label;
+        spent = recipeToParts(option.recipe);
+        logLine = isReroll
+          ? `${option.label} re-spec`
+          : `${option.label} fitted`;
       }
 
-      // A re-roll always replaces, including downward — that is the whole risk.
-      target.points = rollModPoints(option);
-
-      const spent = recipeToParts(option.recipe);
-      const buildLog = appendBuildLog(
-        item.buildLog,
-        isReroll ? `${option.label} re-spec` : `${option.label} fitted`,
-      );
+      const buildLog = appendBuildLog(item.buildLog, logLine);
 
       // Built per kind rather than spread once: the two inventories keep their own
       // stat shapes (`ItemStats` vs `EffectStats`) and must not blur into a union.
@@ -178,13 +221,14 @@ export default async function handler(
         [kind === "guitar" ? "arsenal.inventory" : "arsenal.effectInventory"]:
           newList,
         "arsenal.parts": newParts,
+        ...(isSalvaged ? { "arsenal.salvagedMods": newSalvagedMods } : {}),
         rigLevel,
       });
 
       return {
         action,
-        featureId: option.id,
-        label: option.label,
+        featureId: target.id,
+        label,
         points: target.points,
         pointsBefore,
         // Feature points feed the item level one for one, so the delta is the gain.

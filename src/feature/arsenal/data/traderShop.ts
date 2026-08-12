@@ -7,6 +7,7 @@ import type {
 import type {
   TraderEffectOffer,
   TraderGuitarOffer,
+  TraderModOffer,
   TraderOffer,
   TraderPartOffer,
   TraderShop,
@@ -33,14 +34,17 @@ import {
 } from "./itemStats";
 import { PART_DEFINITIONS, PART_TIERS } from "./partDefinitions";
 import { getPartSupply } from "./partSupply";
+import type { ModFeatureDef } from "./workshop";
+import { getModPool, MOD_ROLL_BONUS } from "./workshop";
 
 /**
  * The trader: a system-run shop that restocks every day.
  *
- * Two things separate it from the marketplace next door. It sells *parts*, which
- * players cannot list, and everything it sells is priced by the system rather
- * than by whoever listed it — so it is the only place where a player who needs
- * one specific Legendary pickup can simply go and buy one.
+ * Two things separate it from the marketplace next door. It sells what players
+ * cannot list — *parts*, and one loose *mod* a day — and everything it sells is
+ * priced by the system rather than by whoever listed it, so it is the only place
+ * where a player who needs one specific Legendary pickup can simply go and buy
+ * one.
  *
  * **The whole stock is derived from the window number and nothing else.** Same
  * trick as `dailyCase.ts`: every client renders the shop front with zero reads,
@@ -127,6 +131,23 @@ export const ITEM_PRICE_MULTIPLIER: Record<GuitarRarity, number> = {
 /** The cut on the one part offer flagged as the day's deal. */
 export const DEAL_DISCOUNT_PCT = 30;
 
+/**
+ * What the day's mod costs, as a multiple of buying its own bill at this same
+ * counter and doing the job at the bench.
+ *
+ * Above 1 by a wide margin, for the same reason parts cost more than scrapping:
+ * the counter is the precise route, never the cheap one. What the premium buys
+ * here is bigger than usual, though — a bench mod needs an instrument that
+ * physically takes it, a free slot on that instrument, and the parts in hand,
+ * and it rolls its value only after the bill is paid. This one is a component in
+ * the stash with its number already on it, and it can wait there until the
+ * instrument worth putting it on turns up.
+ */
+export const MOD_PRICE_MULTIPLIER = 2;
+
+/** Extra on top at a perfect roll, tapering to nothing at the pool's floor. */
+export const MOD_ROLL_PREMIUM = 0.6;
+
 // ─── Stock ───────────────────────────────────────────────────────────────────
 
 /**
@@ -153,6 +174,15 @@ const POT_EPIC_CHANCE = 0.4;
 
 /** How often the counter has a Legendary part at all. Roughly one day in three. */
 const LEGENDARY_SLOT_CHANCE = 0.35;
+
+/**
+ * One mod a day, one to a player. It is a component, not a stack: a second copy
+ * of the same feature cannot go on the same instrument anyway.
+ */
+const MOD_STOCK = 1;
+
+/** How often the day's mod is a guitar mod rather than a pedal one. */
+const MOD_GUITAR_CHANCE = 0.5;
 
 /** Rarity of each featured slot. Legendary lands every week or two, Mythic ~monthly. */
 export const TRADER_ITEM_RARITY_WEIGHTS: Record<string, number> = {
@@ -354,6 +384,74 @@ const drawEffectOffer = (
   };
 };
 
+/**
+ * What the parts for one mod cost at this counter today.
+ *
+ * The bill is the mod, so the bill is the price — scarcity, tier steps and all.
+ * A `hand-wound` asking for two Legendary pickups is dear because Legendary
+ * pickups are dear, and it stays in step with the parts on the shelf next to it
+ * without a second table to keep in sync.
+ */
+export const getModBillValue = (def: ModFeatureDef): number =>
+  def.parts.reduce(
+    (sum, line) => sum + getPartUnitPrice(line.partId, line.tier) * line.qty,
+    0,
+  );
+
+/**
+ * Fame for a mod of this value. The roll is worth paying for — a `+1` and a `+6`
+ * of the same feature are not the same object — but the bill dominates, so a
+ * cheap mod on a perfect roll never overtakes a dear one on a poor one.
+ */
+export const getModOfferPrice = (
+  def: ModFeatureDef,
+  points: number,
+): number => {
+  const span = def.max - def.min;
+  const quality = span > 0 ? (points - def.min) / span : 0;
+  return roundItemPrice(
+    getModBillValue(def) *
+      MOD_PRICE_MULTIPLIER *
+      (1 + MOD_ROLL_PREMIUM * Math.min(1, Math.max(0, quality))),
+  );
+};
+
+/**
+ * The day's mod.
+ *
+ * The value is rolled over the *case* range rather than the widened bench one:
+ * the workshop has to keep rolling the best numbers in the game, or paying Fame
+ * for a component beats doing the work. `MOD_ROLL_BONUS` is the bench's edge and
+ * the counter does not get it.
+ */
+const drawModOffer = (
+  id: string,
+  random: () => number,
+): TraderModOffer | null => {
+  const modKind = random() < MOD_GUITAR_CHANCE ? "guitar" : "effect";
+  const def = seededPick(getModPool(modKind), random);
+  if (!def) return null;
+
+  const max = Math.max(def.min, def.max - MOD_ROLL_BONUS);
+  const points = def.min + Math.floor(random() * (max - def.min + 1));
+  const price = getModOfferPrice(def, points);
+
+  return {
+    id,
+    kind: "mod",
+    modKind,
+    featureId: def.id,
+    label: def.label,
+    points,
+    minPoints: def.min,
+    maxPoints: max,
+    stock: MOD_STOCK,
+    unitPrice: price,
+    basePrice: price,
+    discountPct: 0,
+  };
+};
+
 const discounted = (offer: TraderPartOffer): TraderPartOffer => ({
   ...offer,
   unitPrice: Math.max(
@@ -418,7 +516,11 @@ export const getTraderOffers = (date: Date = new Date()): TraderOffer[] => {
     Boolean(offer),
   );
 
-  return [...priced, ...items];
+  // Drawn last so adding it left every offer above it — and therefore every
+  // price and every rolled instance — exactly as it was.
+  const mod = drawModOffer(id("mod"), random);
+
+  return [...priced, ...items, ...(mod ? [mod] : [])];
 };
 
 export const getTraderShop = (date: Date = new Date()): TraderShop => ({

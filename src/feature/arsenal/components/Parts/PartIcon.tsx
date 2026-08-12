@@ -24,7 +24,7 @@ export const PartIcon = ({ partId, size = 20, className }: PartIconProps) => {
         className={cn("flex shrink-0 items-center justify-center", className)}
         style={box}
         aria-hidden>
-        <Bolt size={Math.round(size * 0.62)} className="text-zinc-600" />
+        <Bolt size={Math.round(size * 0.62)} className='text-zinc-600' />
       </span>
     );
   }
@@ -32,12 +32,14 @@ export const PartIcon = ({ partId, size = 20, className }: PartIconProps) => {
   return (
     <img
       src={def.icon}
-      alt=""
+      alt=''
       aria-hidden
       width={size}
       height={size}
-      loading="lazy"
-      decoding="async"
+      loading='lazy'
+      decoding='async'
+      // Never a native drag source: sockets in the stash are dragged themselves.
+      draggable={false}
       className={cn("shrink-0 object-contain", className)}
       style={box}
     />

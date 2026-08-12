@@ -8,9 +8,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
+import type { SalvageableMod } from "feature/arsenal/data/salvage";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { countScrapParts } from "feature/arsenal/utils/scrap";
 
+import { ModArt } from "../Workshop/ModArt";
 import { ScrapYieldList } from "./ScrapYieldList";
 
 interface ScrapConfirmDialogProps {
@@ -18,6 +20,8 @@ interface ScrapConfirmDialogProps {
   itemType: "Guitar" | "Effect";
   itemName: string;
   parts: ScrapPart[];
+  /** The one mod this teardown pulls out whole. Absent on an unmodded item. */
+  salvaged?: SalvageableMod | null;
   onConfirm: () => void;
   onCancel: () => void;
   isLoading: boolean;
@@ -33,6 +37,7 @@ export const ScrapConfirmDialog = ({
   itemType,
   itemName,
   parts,
+  salvaged,
   onConfirm,
   onCancel,
   isLoading,
@@ -62,6 +67,26 @@ export const ScrapConfirmDialog = ({
           </p>
           <ScrapYieldList parts={parts} />
         </div>
+
+        {/* The mod that comes out whole. Not a choice — the instrument decides
+            which one survives — so it is named, and nothing else: the bill above
+            is what the player is reading, and a paragraph here competes with it. */}
+        {salvaged && (
+          <div className='flex items-center gap-4 rounded-lg bg-purple-500/10 p-4'>
+            <ModArt modId={salvaged.featureId} size={52} />
+            <div className='flex min-w-0 flex-col gap-1'>
+              <span className='text-xs font-semibold text-purple-300/80'>
+                Blueprint
+              </span>
+              <span className='truncate text-sm font-bold text-zinc-100'>
+                {salvaged.label}{" "}
+                <span className='tabular-nums text-purple-300'>
+                  +{salvaged.points}
+                </span>
+              </span>
+            </div>
+          </div>
+        )}
 
         <AlertDialogFooter className='gap-2 sm:space-x-0'>
           <AlertDialogCancel

@@ -72,6 +72,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Trader purchases. Sent as stored; a counter from an earlier window is
       // simply ignored by the shop front, which knows today's window.
       ...(data.arsenal.trader ? { trader: data.arsenal.trader } : {}),
+      // How the player arranged their stash. Cosmetic, and validated by the
+      // board itself, so it travels exactly as stored.
+      ...(data.arsenal.stashLayout
+        ? { stashLayout: data.arsenal.stashLayout }
+        : {}),
+      // Mods rescued from teardowns. Absent on every account that has not
+      // scrapped a modded instrument yet.
+      ...(Array.isArray(data.arsenal.salvagedMods)
+        ? { salvagedMods: data.arsenal.salvagedMods }
+        : {}),
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals

@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ConditionMeter } from "../ConditionMeter";
+import { InServiceTags } from "../InServiceTags";
 import { SectionLabel } from "../SectionLabel";
 
 type RackFilter = "all" | "guitar" | "effect";
@@ -144,6 +145,10 @@ export const WorkshopRack = ({
                   <span className='truncate text-sm font-bold leading-tight text-zinc-100'>
                     {entry.name}
                   </span>
+                  {/* Sits above the condition meter rather than off to the side:
+                      the rack is scanned down the names, and this is part of
+                      what the name means here. */}
+                  <InServiceTags uses={entry.uses} />
                   <ConditionMeter
                     condition={entry.condition}
                     showLabel={false}

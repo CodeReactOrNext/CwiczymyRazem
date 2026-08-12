@@ -1,16 +1,26 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import { getSalvageableMod, toSalvagedMod } from "feature/arsenal/data/salvage";
+import type {
+  SalvagedMod,
+  ScrapPart,
+} from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
-import { addPartsToWallet, getEffectScrapYield } from "feature/arsenal/utils/scrap";
+import {
+  addPartsToWallet,
+  getEffectScrapYield,
+} from "feature/arsenal/utils/scrap";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
  * Tears a pedal down into parts. Like the guitar route, the yield is recomputed
- * server-side from the stored item.
+ * server-side from the stored item, and one fitted mod survives into the stash.
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -21,7 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
-  if (!inventoryItemId) return res.status(400).json({ error: "Missing inventoryItemId" });
+  if (!inventoryItemId)
+    return res.status(400).json({ error: "Missing inventoryItemId" });
 
   let userId: string;
   try {
@@ -35,13 +46,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userRef = firestore.collection("users").doc(userId);
     const userDoc = await userRef.get();
 
-    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+    if (!userDoc.exists)
+      return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
     const effectInventory = data.arsenal?.effectInventory || [];
 
     const itemIndex = effectInventory.findIndex(
-      (item: { id: string }) => item.id === inventoryItemId
+      (item: { id: string }) => item.id === inventoryItemId,
     );
     if (itemIndex === -1) {
       return res.status(404).json({ error: "Item not found in inventory" });
@@ -55,16 +67,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // A pedal wired into the board has to come off it first.
     const pedalboardItems = data.arsenal?.rig?.pedalboardItems || [];
-    if (pedalboardItems.some((pb: { itemId: string }) => pb.itemId === inventoryItemId)) {
-      return res.status(400).json({ error: "Cannot scrap an effect that is on the pedalboard" });
+    if (
+      pedalboardItems.some(
+        (pb: { itemId: string }) => pb.itemId === inventoryItemId,
+      )
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Cannot scrap an effect that is on the pedalboard" });
     }
 
     const gained = getEffectScrapYield(item, effectDef);
     const wallet: ScrapPart[] = data.arsenal?.parts ?? [];
     const newParts = addPartsToWallet(wallet, gained);
 
+    const salvageable = getSalvageableMod(item, "effect");
+    const salvaged = salvageable
+      ? toSalvagedMod(
+          salvageable,
+          item.id,
+          `${effectDef.brand} ${effectDef.name}`,
+        )
+      : null;
+    const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
+    const newSalvagedMods = salvaged
+      ? [...salvagedMods, salvaged]
+      : salvagedMods;
+
     const newEffectInventory = effectInventory.filter(
-      (_: unknown, i: number) => i !== itemIndex
+      (_: unknown, i: number) => i !== itemIndex,
     );
 
     const rig = data.arsenal?.rig ?? DEFAULT_RIG;
@@ -77,10 +108,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await userRef.update({
       "arsenal.effectInventory": newEffectInventory,
       "arsenal.parts": newParts,
+      "arsenal.salvagedMods": newSalvagedMods,
       rigLevel,
     });
 
-    return res.status(200).json({ success: true, parts: gained, newParts });
+    return res
+      .status(200)
+      .json({ success: true, parts: gained, newParts, salvaged });
   } catch (error) {
     console.error("[scrap-effect]", error);
     return res.status(500).json({ error: "Internal server error" });

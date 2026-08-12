@@ -7,6 +7,7 @@ import {
 import type {
   EffectInventoryItem,
   InventoryItem,
+  SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import type {
@@ -126,8 +127,34 @@ export default async function handler(
           return { ...base, newParts };
         }
 
-        // Items are one-offs: a rolled instance, sold once per player per window.
+        // Everything else on the counter is a one-off: a rolled instance or a
+        // rolled component, sold once per player per window.
         if (quantity !== 1) throw new Error("INVALID_QUANTITY");
+
+        // The day's mod lands in the stash exactly as a teardown's would — the
+        // counter is another way to *come by* one, not another way to fit one.
+        if (offer.kind === "mod") {
+          const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
+
+          // Scoped to the window and to one per player, so it can never collide
+          // with a second purchase or with a `salvage:` id off a teardown.
+          const mod: SalvagedMod = {
+            id: `trader:${offer.id}`,
+            featureId: offer.featureId,
+            kind: offer.modKind,
+            points: offer.points,
+            sourceName: "Trader",
+            salvagedAt: Date.now(),
+          };
+
+          t.update(userRef, {
+            "statistics.fame": newFame,
+            "arsenal.salvagedMods": [...salvagedMods, mod],
+            "arsenal.trader": trader,
+          });
+
+          return { ...base, mod };
+        }
 
         if (offer.kind === "guitar") {
           const def = GUITARS_BY_ID.get(offer.roll.guitarId);

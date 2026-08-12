@@ -1,16 +1,30 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import { getSalvageableMod, toSalvagedMod } from "feature/arsenal/data/salvage";
+import type {
+  SalvagedMod,
+  ScrapPart,
+} from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
-import { addPartsToWallet, getGuitarScrapYield } from "feature/arsenal/utils/scrap";
+import {
+  addPartsToWallet,
+  getGuitarScrapYield,
+} from "feature/arsenal/utils/scrap";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
  * Tears a guitar down into parts. The yield is recomputed here from the stored
  * item — the client only says *which* item, never what it should get.
+ *
+ * One fitted mod survives as an object in the stash. Which one is a function of
+ * the item's own id, so this route reaches the same answer the confirm dialog
+ * showed without the request being able to name a favourite.
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -21,7 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
-  if (!inventoryItemId) return res.status(400).json({ error: "Missing inventoryItemId" });
+  if (!inventoryItemId)
+    return res.status(400).json({ error: "Missing inventoryItemId" });
 
   let userId: string;
   try {
@@ -35,13 +50,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userRef = firestore.collection("users").doc(userId);
     const userDoc = await userRef.get();
 
-    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+    if (!userDoc.exists)
+      return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
     const inventory = data.arsenal?.inventory || [];
 
     const itemIndex = inventory.findIndex(
-      (item: { id: string }) => item.id === inventoryItemId
+      (item: { id: string }) => item.id === inventoryItemId,
     );
     if (itemIndex === -1) {
       return res.status(404).json({ error: "Item not found in inventory" });
@@ -57,7 +73,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const wallet: ScrapPart[] = data.arsenal?.parts ?? [];
     const newParts = addPartsToWallet(wallet, gained);
 
-    const newInventory = inventory.filter((_: unknown, i: number) => i !== itemIndex);
+    // The one mod that comes off whole, if the guitar carried any.
+    const salvageable = getSalvageableMod(item, "guitar");
+    const salvaged = salvageable
+      ? toSalvagedMod(
+          salvageable,
+          item.id,
+          `${guitarDef.brand} ${guitarDef.name}`,
+        )
+      : null;
+    const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
+    const newSalvagedMods = salvaged
+      ? [...salvagedMods, salvaged]
+      : salvagedMods;
+
+    const newInventory = inventory.filter(
+      (_: unknown, i: number) => i !== itemIndex,
+    );
 
     // Scrapping the equipped guitar clears the profile slot.
     let equippedGuitarId = data.arsenal?.equippedGuitarId;
@@ -73,7 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Same for a rig slot, then refresh the denormalized rig level.
     const rig = data.arsenal?.rig ?? DEFAULT_RIG;
     const guitarSlots = (rig.guitarSlots ?? DEFAULT_RIG.guitarSlots).map(
-      (slotId: string | null) => (slotId === item.id ? null : slotId)
+      (slotId: string | null) => (slotId === item.id ? null : slotId),
     );
     const rigLevel = getRigLevel({
       inventory: newInventory,
@@ -84,13 +116,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await userRef.update({
       "arsenal.inventory": newInventory,
       "arsenal.parts": newParts,
+      "arsenal.salvagedMods": newSalvagedMods,
       "arsenal.equippedGuitarId": equippedGuitarId,
       "arsenal.equippedItemId": equippedItemId,
       "arsenal.rig.guitarSlots": guitarSlots,
       rigLevel,
     });
 
-    return res.status(200).json({ success: true, parts: gained, newParts });
+    return res
+      .status(200)
+      .json({ success: true, parts: gained, newParts, salvaged });
   } catch (error) {
     console.error("[scrap-guitar]", error);
     return res.status(500).json({ error: "Internal server error" });
