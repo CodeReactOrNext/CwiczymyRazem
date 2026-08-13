@@ -15,7 +15,7 @@ import {
   saveClickHuntNoteSoundPreference,
 } from "../helpers/clickHuntNoteSound";
 import { isWithinReach, reachZoneKeys } from "../helpers/clickTargets";
-import { playIntervalPhrase } from "../helpers/intervalPreview";
+import { INTERVAL_PHRASE_HOLD_MS, playIntervalPhrase } from "../helpers/intervalPreview";
 import { ClickableFretboard, FullNeckToggle, useShowFullNeck } from "./ClickableFretboard";
 import { HuntStage, HuntStats } from "./HuntStage";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
@@ -38,6 +38,13 @@ interface IntervalClickPanelProps {
 }
 
 type StepState = "waiting" | "active" | "done";
+
+/** How long a solved round stays up when the notes are muted — just the reveal to
+ *  read. With sound on it is the interval phrase that sets the pace instead. */
+const SILENT_ADVANCE_MS = 1400;
+/** A beat of silence between the previous round's phrase and the new prompt's root,
+ *  so the two never blur into one another. */
+const PROMPT_ROOT_DELAY_MS = 280;
 
 const STEP_TILE_STYLES: Record<StepState, string> = {
   waiting: "bg-zinc-800/40 text-zinc-500",
@@ -153,17 +160,13 @@ export function IntervalClickPanel({
     return reachZoneKeys(anchor, startFret, endFret, strings);
   }, [anchor, onInterval, complete, intervalPositions, startFret, endFret, strings]);
 
-  // Once both steps are solved, move on by ourselves after a beat — long enough
-  // for the reveal and the interval phrase to land.
+  // Once both steps are solved, move on by ourselves — but not until the interval
+  // phrase has said its piece (see the audio section below). Rotating in the middle
+  // of it is what left one round's notes running into the next.
   const advanceHuntRef = useRef(advanceHunt);
   useEffect(() => {
     advanceHuntRef.current = advanceHunt;
   });
-  useEffect(() => {
-    if (!complete) return undefined;
-    const t = setTimeout(() => advanceHuntRef.current(), 1800);
-    return () => clearTimeout(t);
-  }, [complete]);
 
   // ── Audio ──────────────────────────────────────────────────────────────────
   // Shares the click drills' single "play notes for me" preference, so the choice
@@ -185,11 +188,16 @@ export function IntervalClickPanel({
 
   // Sound the root as a new prompt appears — the interval is measured FROM it, so
   // hearing it first is the ear-training half of the drill. Gated on the session
-  // actually running: the panel is live well before Play is pressed.
+  // actually running: the panel is live well before Play is pressed. Keyed on the
+  // prompt as well, so a round whose root repeats the last one's still opens with
+  // it, and delayed a beat so it lands in silence rather than on the tail of the
+  // phrase that closed the previous round.
+  const promptKey = `${rootNote}>${targetNote}`;
   useEffect(() => {
-    if (!noteSound || !isPlaying) return;
-    playRoot();
-  }, [noteSound, isPlaying, playRoot]);
+    if (!noteSound || !isPlaying) return undefined;
+    const t = setTimeout(playRoot, PROMPT_ROOT_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [noteSound, isPlaying, playRoot, promptKey]);
 
   // The lowest root the player actually located — the pitch the closing phrase is
   // measured from, so what they hear matches the shape sitting on the board.
@@ -209,7 +217,19 @@ export function IntervalClickPanel({
     return found.length > 0 ? Math.min(...found) : null;
   }, [foundRootsKey]);
 
-  // Round solved → play the interval itself: root, target, then both together.
+  // The "hear the root" button follows the board: before a root is placed there is
+  // only the window's reference pitch, afterwards the very note the interval is
+  // being measured from — the one the closing phrase starts on, so the button and
+  // the drill never disagree about which octave the root sits in.
+  const heardRootMidi = anchorMidi ?? rootMidi;
+  const hearRoot = useCallback(() => {
+    if (heardRootMidi !== null) playGuitarNotePreview(heardRootMidi);
+  }, [heardRootMidi]);
+
+  // Round solved → play the interval itself: root, target, then both together,
+  // measured from the root sitting on the board. The cleanup silences it, so
+  // rotating early (Next, or leaving the exercise) cuts the phrase off instead of
+  // letting it ring over whatever comes next.
   useEffect(() => {
     if (!complete || !noteSound) return undefined;
     const base = anchorMidi ?? rootMidi;
@@ -217,18 +237,28 @@ export function IntervalClickPanel({
     return playIntervalPhrase(base, base + semitones);
   }, [complete, noteSound, anchorMidi, rootMidi, semitones]);
 
-  // A correct click sounds the pitch of the cell that was hit; wrong clicks stay
-  // silent — the red flash already says enough.
+  // Hold the solved round open until that phrase has finished; muted, there is only
+  // the reveal to read.
+  useEffect(() => {
+    if (!complete) return undefined;
+    const t = setTimeout(() => advanceHuntRef.current(), noteSound ? INTERVAL_PHRASE_HOLD_MS : SILENT_ADVANCE_MS);
+    return () => clearTimeout(t);
+  }, [complete, noteSound]);
+
+  // A correct click in step 1 sounds the pitch of the cell that was hit; wrong
+  // clicks stay silent — the red flash already says enough. Step 2's click is silent
+  // too: it is the click that solves the round, and the phrase above follows it
+  // immediately. A loose note in front of that turned the ending into four notes in
+  // a row with no shape to them.
   const handleCellClick = useCallback(
     (string: number, fret: number) => {
-      const active = onInterval ? intervalPositions : rootPositions;
-      if (noteSound && active.some((p) => p.string === string && p.fret === fret)) {
+      if (noteSound && !onInterval && rootPositions.some((p) => p.string === string && p.fret === fret)) {
         const midi = midiForPosition(string, fret);
         if (midi >= 0) playGuitarNotePreview(midi);
       }
       registerIntervalClick(string, fret);
     },
-    [noteSound, onInterval, intervalPositions, rootPositions, registerIntervalClick],
+    [noteSound, onInterval, rootPositions, registerIntervalClick],
   );
 
   const [showSemitones, setShowSemitones] = useState(false);
@@ -331,8 +361,8 @@ export function IntervalClickPanel({
           <div className="flex flex-wrap items-center justify-center gap-2 sm:ml-2">
             <button
               type="button"
-              onClick={playRoot}
-              disabled={rootMidi === null}
+              onClick={hearRoot}
+              disabled={heardRootMidi === null}
               className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               title="Play the root note the interval is measured from">
               <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear the root
