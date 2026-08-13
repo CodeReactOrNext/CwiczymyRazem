@@ -78,10 +78,18 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Hammer,
     label: "Luthier: Guitar Parts & Upgrading",
     kind: "feature",
+    done: true,
     description:
       "Gear drops parts by rarity as you play, and the parts you scrap from guitars you don't want feed right back in. Spend matching parts at the Luthier to level up a guitar or effect and push its rarity higher.",
   },
-  { id: "t33", goal: 33, icon: Target, label: "+4 New Exercises", kind: "content" },
+  {
+    id: "t33",
+    goal: 33,
+    icon: Target,
+    label: "+4 New Exercises",
+    kind: "content",
+    done: true,
+  },
   { id: "t41", goal: 41, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
   {
     id: "t51",

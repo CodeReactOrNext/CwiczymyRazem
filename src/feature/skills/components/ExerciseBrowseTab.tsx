@@ -173,11 +173,11 @@ export const ExerciseBrowseTab = ({
       ex.relatedSkills.forEach(s => skillSet.add(s as GuitarSkillId));
     });
     return Array.from(skillSet).sort((a, b) => {
-      const na = guitarSkills.find(s => s.id === a)?.id ?? a;
-      const nb = guitarSkills.find(s => s.id === b)?.id ?? b;
+      const na = t(`skills:skills.${a}.name` as any) as string;
+      const nb = t(`skills:skills.${b}.name` as any) as string;
       return na.localeCompare(nb);
     });
-  }, []);
+  }, [t]);
 
   const filteredExercises = useMemo(() => {
     const q = searchQuery.toLowerCase();
