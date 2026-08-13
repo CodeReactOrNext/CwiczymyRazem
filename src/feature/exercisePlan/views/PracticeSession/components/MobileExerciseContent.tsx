@@ -2,7 +2,6 @@ import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalo
 import React from "react";
 
 import { isOpenExercise } from "../../../utils/isOpenExercise";
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { ChordHuntPanel } from "./ChordHuntPanel";
@@ -13,10 +12,10 @@ import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { IntervalClickPanel } from "./IntervalClickPanel";
 import { MetronomeGapTest } from "./MetronomeGapTest";
+import { MobileTablaturePanel } from "./MobileTablaturePanel";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
 import { StrummingSection } from "./StrummingSection";
-import { TablatureViewer } from "./TablatureViewer";
 
 interface MobileExerciseContentProps {
   currentExercise: any;
@@ -75,7 +74,6 @@ export function MobileExerciseContent({
   isExamMode,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
-  const { hitNotes, missedNotes } = useNoteMatchingContext();
 
   // Listening quizzes are the whole player slot — they carry no tab, video or
   // image to fall through to.
@@ -159,27 +157,16 @@ export function MobileExerciseContent({
       {currentExercise.id === "metronome_gap_test" ? (
         <MetronomeGapTest compact />
       ) : activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
-        <div className="w-full overflow-hidden rounded-2xl border border-white/5 bg-[#09090b] shadow-lg">
-          <TablatureViewer
-            measures={activeTablature}
-            bpm={effectiveBpm || metronome.bpm}
-            isPlaying={metronome.isPlaying}
-            startTime={metronome.startTime || null}
-            countInRemaining={(metronome as any).countInRemaining}
-            className="w-full"
-            frequencyRef={frequencyRef}
-            isListening={isListening}
-            hitNotes={hitNotes}
-            missedNotes={missedNotes}
-            currentBeatsElapsed={0}
-            resetKey={tabResetKey}
-            // Phones hit the 120px/beat floor of the beat-width formula, which
-            // shows barely ~1 measure. 0.75 fits ~a third more tab while 16th
-            // notes (0.25 beat) still get their 22px minimum pill without
-            // overlapping.
-            zoom={0.75}
-          />
-        </div>
+        <MobileTablaturePanel
+          measures={activeTablature}
+          bpm={effectiveBpm || metronome.bpm}
+          isPlaying={metronome.isPlaying}
+          startTime={metronome.startTime || null}
+          countInRemaining={(metronome as any).countInRemaining}
+          frequencyRef={frequencyRef}
+          isListening={isListening}
+          resetKey={tabResetKey}
+        />
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
           <YouTubePlayalong

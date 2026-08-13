@@ -206,7 +206,9 @@ export const PracticeLogView = () => {
                         key={group.dateKey}
                         className="rounded-xl bg-white/[0.03] p-2 backdrop-blur-sm sm:p-2.5"
                       >
-                        <div className="flex items-baseline justify-between gap-3 px-3 pb-1 pt-1.5">
+                        {/* Stacked below sm so the date keeps a full line to
+                            itself instead of wrapping around the day totals. */}
+                        <div className="flex flex-col gap-0.5 px-3 pb-1 pt-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
                           <h3 className="font-display text-[15px] font-semibold text-zinc-100">
                             {group.date.toLocaleDateString("en", {
                               weekday: "long",

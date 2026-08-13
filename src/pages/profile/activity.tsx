@@ -24,7 +24,6 @@ import {
 } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import { Download } from "lucide-react";
-import Link from "next/link";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -115,16 +114,13 @@ const ProfileActivityPage = () => {
             activeHref='/profile/activity'
             ariaLabel='Progress sections'
           />
-          <div className='ml-auto flex items-center gap-1'>
+          {/* Exports are desktop-only — three CSV buttons wrap onto their own
+              row on a phone and push the actual content down for little gain. */}
+          <div className='ml-auto hidden items-center gap-1 md:flex'>
             <ExportButton label='Export sessions' onClick={handleExportSessions} />
             <ExportButton label='Export songs' onClick={handleExportSongs} />
             <ExportButton label='Export summary' onClick={handleExportSummary} />
           </div>
-          <Link
-            href='/scoring'
-            className='rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-            How points work
-          </Link>
         </div>
         <div className='font-openSans flex flex-col gap-6'>
 

@@ -402,7 +402,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
             )}
 
             {detailsTarget ? (
-              <div className="h-full flex flex-col">
+              <div className="flex flex-col">
                 <SongDetailView
                   song={detailsTarget}
                   progress={progressMap[detailsTarget.id] ?? null}

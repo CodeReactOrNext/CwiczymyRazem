@@ -12,6 +12,47 @@ import { convertMsToHM } from "utils/converter";
 import { CATEGORY_META, SESSION_TYPE_CONFIG } from "../config/sessionType";
 import type { PracticeLogSession } from "../types/practiceLog.types";
 
+const DurationStat = ({
+  timeMs,
+  label,
+  className,
+}: {
+  timeMs: number;
+  label: string;
+  className?: string;
+}) => (
+  <span
+    title={label}
+    className={cn("flex items-center gap-1.5 tabular-nums", className)}
+  >
+    <Clock size={13} className="shrink-0 text-zinc-500" aria-hidden />
+    <span className="font-bold text-zinc-100">{convertMsToHM(timeMs)}</span>
+  </span>
+);
+
+const PointsStat = ({
+  points,
+  label,
+  className,
+}: {
+  points: number;
+  label: string;
+  className?: string;
+}) => (
+  <span
+    title={label}
+    className={cn("flex items-center gap-1.5 tabular-nums", className)}
+  >
+    <img
+      src="/images/points.png"
+      alt=""
+      aria-hidden
+      className="h-4 w-4 shrink-0 object-contain"
+    />
+    <span className="font-bold text-amber-300">{points}</span>
+  </span>
+);
+
 interface SessionCardProps {
   session: PracticeLogSession;
   onEdit: (session: PracticeLogSession) => void;
@@ -93,7 +134,7 @@ export const SessionCard = ({
         )}
 
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-zinc-500">
-          <span className="tabular-nums">
+          <span className="whitespace-nowrap tabular-nums">
             {session.date.toLocaleTimeString("en", {
               hour: "2-digit",
               minute: "2-digit",
@@ -112,45 +153,32 @@ export const SessionCard = ({
             </span>
           ))}
         </div>
+
+        {/* Below sm the stats sit under the title instead of in a right rail —
+            three fixed-width columns left the title about one character wide. */}
+        <div className="mt-1 flex items-center gap-4 text-[13px] sm:hidden">
+          <DurationStat timeMs={session.timeMs} label={t("card.duration")} />
+          <PointsStat points={session.points} label={t("card.points")} />
+        </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2.5 sm:gap-3.5">
-        <span
-          title={t("card.duration")}
+      <div className="hidden shrink-0 items-center gap-2.5 sm:flex sm:gap-3.5">
+        <DurationStat
+          timeMs={session.timeMs}
+          label={t("card.duration")}
           className={cn(
-            "flex items-center justify-end gap-1.5 tabular-nums",
-            compact ? "min-w-[54px]" : "min-w-[62px]"
+            "justify-end",
+            compact ? "min-w-[54px] text-sm" : "min-w-[62px] text-[15px]"
           )}
-        >
-          <Clock size={13} className="shrink-0 text-zinc-500" aria-hidden />
-          <span
-            className={cn(
-              "font-bold text-zinc-100",
-              compact ? "text-sm" : "text-[15px]"
-            )}
-          >
-            {convertMsToHM(session.timeMs)}
-          </span>
-        </span>
-        <span
-          title={t("card.points")}
-          className="flex min-w-[52px] items-center justify-end gap-1.5 tabular-nums"
-        >
-          <img
-            src="/images/points.png"
-            alt=""
-            aria-hidden
-            className="h-4 w-4 shrink-0 object-contain"
-          />
-          <span
-            className={cn(
-              "font-bold text-amber-300",
-              compact ? "text-sm" : "text-[15px]"
-            )}
-          >
-            {session.points}
-          </span>
-        </span>
+        />
+        <PointsStat
+          points={session.points}
+          label={t("card.points")}
+          className={cn(
+            "min-w-[52px] justify-end",
+            compact ? "text-sm" : "text-[15px]"
+          )}
+        />
       </div>
 
       {isManual ? (
@@ -173,7 +201,8 @@ export const SessionCard = ({
           </button>
         </div>
       ) : (
-        <div className="flex w-[60px] shrink-0 items-center justify-center">
+        // Hover-only tooltip — nothing a touch device can reveal, so it stays off mobile.
+        <div className="hidden w-[60px] shrink-0 items-center justify-center sm:flex">
           <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>

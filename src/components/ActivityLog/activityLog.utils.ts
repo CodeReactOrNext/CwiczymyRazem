@@ -12,6 +12,7 @@ export const getEmptySlots = (dayOfWeek: number): DateWithReport[] => {
     .map(() => ({
       date: new Date(),
       report: undefined,
+      isPlaceholder: true,
     }));
 };
 

@@ -1,3 +1,4 @@
+import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { formatDistanceToNowStrict } from "date-fns";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
@@ -24,14 +25,15 @@ const StatCell = ({
   value: string;
   muted?: boolean;
 }) => (
-  <div className="min-w-0">
-    <p className="text-[10px] font-bold tracking-wider text-zinc-500">{label}</p>
+  <div className='min-w-0'>
+    <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
+      {label}
+    </p>
     <p
       className={cn(
         "mt-0.5 truncate text-sm font-semibold tabular-nums",
-        muted ? "text-zinc-600" : "text-zinc-200"
-      )}
-    >
+        muted ? "text-zinc-600" : "text-zinc-200",
+      )}>
       {value}
     </p>
   </div>
@@ -77,66 +79,72 @@ export const SongBoardRow = ({
   return (
     <div
       onClick={onOpenDetails}
-      className="group flex cursor-pointer items-center gap-3 rounded-lg bg-zinc-900/40 p-3 transition-background hover:bg-zinc-800/40 md:gap-4 md:px-4"
-    >
+      className='group flex cursor-pointer items-center gap-3 rounded-lg bg-zinc-900/40 p-3 transition-background hover:bg-zinc-800/40 md:gap-4 md:px-4'>
       {/* Cover */}
-      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg md:h-14 md:w-14">
+      <div className='h-12 w-12 shrink-0 overflow-hidden rounded-lg md:h-14 md:w-14'>
         {song.coverUrl ? (
           <img
             src={song.coverUrl}
             alt={`${song.title} cover`}
-            className="h-full w-full object-cover"
+            className='h-full w-full object-cover'
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-zinc-800">
-            <Music className="h-5 w-5 text-zinc-600" />
+          <div className='flex h-full w-full items-center justify-center bg-zinc-800'>
+            <Music className='h-5 w-5 text-zinc-600' />
           </div>
         )}
       </div>
 
       {/* Title / artist (+ compact stats below lg) */}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <p translate="no" className="truncate text-[15px] font-bold text-white">
-            {song.title}
-          </p>
-          {hasSectionMap && (
-            <span
-              title="Community section map available"
-              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400"
-            >
-              <ListMusic className="h-2.5 w-2.5" />
-              Map
-            </span>
-          )}
-        </div>
-        <p translate="no" className="truncate text-sm text-zinc-400">
+      <div className='min-w-0 flex-1'>
+        <p translate='no' className='truncate text-[15px] font-bold text-white'>
+          {song.title}
+        </p>
+        <p translate='no' className='truncate text-sm text-zinc-400'>
           {song.artist}
         </p>
-        <p className="mt-1 truncate text-xs text-zinc-500 lg:hidden">
-          {hasPracticed ? (
-            <>
-              {sessionCount} session{sessionCount === 1 ? "" : "s"} ·{" "}
-              {formatPracticeTime(totalPracticeMs)}
-              {lastPracticedAt && <> · {lastPracticeLabel}</>}
-              {bestAccuracy !== null && (
-                <>
-                  {" "}
-                  ·{" "}
-                  <span className="font-semibold text-amber-400">
-                    {Math.round(bestAccuracy)}%
-                  </span>
-                </>
-              )}
-            </>
-          ) : (
-            "Not practiced yet"
+        {/* The map badge leads this line instead of sharing the title row, so it
+            stays fully visible while long titles keep the whole width to truncate in. */}
+        <div className='mt-1 flex min-w-0 items-center gap-2'>
+          {hasSectionMap && (
+            <Badge
+              variant='secondary'
+              title='Community section map available'
+              className='shrink-0 gap-1 px-1.5 py-0 text-[10px]'>
+              <ListMusic className='h-3 w-3' />
+              Map
+            </Badge>
           )}
-        </p>
+          <p className='min-w-0 truncate text-xs text-zinc-500 lg:hidden'>
+            {hasPracticed ? (
+              <>
+                {sessionCount} session{sessionCount === 1 ? "" : "s"} ·{" "}
+                {formatPracticeTime(totalPracticeMs)}
+                {lastPracticedAt && <> · {lastPracticeLabel}</>}
+                {bestAccuracy !== null && (
+                  <>
+                    {" "}
+                    ·{" "}
+                    <span className='font-semibold text-amber-400'>
+                      {Math.round(bestAccuracy)}%
+                    </span>
+                  </>
+                )}
+              </>
+            ) : (
+              "Not practiced yet"
+            )}
+          </p>
+        </div>
         {/* Part marks below lg — the row is too tight for a separate column */}
         {onPartsChange && (
-          <div className="mt-1.5 lg:hidden" onClick={(e) => e.stopPropagation()}>
-            <SongPartMarks parts={progress?.parts ?? []} onChange={onPartsChange} />
+          <div
+            className='mt-1.5 lg:hidden'
+            onClick={(e) => e.stopPropagation()}>
+            <SongPartMarks
+              parts={progress?.parts ?? []}
+              onChange={onPartsChange}
+            />
           </div>
         )}
       </div>
@@ -144,81 +152,83 @@ export const SongBoardRow = ({
       {/* Part marks column (lg+) */}
       {onPartsChange && (
         <div
-          className="hidden shrink-0 lg:block"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <SongPartMarks parts={progress?.parts ?? []} onChange={onPartsChange} />
+          className='hidden shrink-0 lg:block'
+          onClick={(e) => e.stopPropagation()}>
+          <SongPartMarks
+            parts={progress?.parts ?? []}
+            onChange={onPartsChange}
+          />
         </div>
       )}
 
       {/* Stats columns (lg+) */}
-      <div className="hidden w-[300px] shrink-0 grid-cols-3 gap-4 lg:grid xl:w-[340px]">
+      <div className='hidden w-[300px] shrink-0 grid-cols-3 gap-4 lg:grid xl:w-[340px]'>
         <StatCell
-          label="Sessions"
+          label='Sessions'
           value={hasPracticed ? String(sessionCount) : "—"}
           muted={!hasPracticed}
         />
         <StatCell
-          label="Play time"
+          label='Play time'
           value={hasPracticed ? formatPracticeTime(totalPracticeMs) : "—"}
           muted={!hasPracticed}
         />
         <StatCell
-          label="Last practice"
+          label='Last practice'
           value={lastPracticeLabel}
           muted={!lastPracticedAt}
         />
       </div>
 
       {/* Best GP accuracy (sm+) */}
-      <div className="hidden w-16 shrink-0 flex-col items-end sm:flex">
+      <div className='hidden w-16 shrink-0 flex-col items-end sm:flex'>
         {bestAccuracy !== null ? (
           <>
-            <span className="text-[10px] font-bold tracking-wider text-zinc-500">
+            <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
               Best
             </span>
-            <span className="text-xl font-black tabular-nums leading-tight text-amber-400">
+            <span className='text-xl font-black tabular-nums leading-tight text-amber-400'>
               {Math.round(bestAccuracy)}%
             </span>
           </>
         ) : (
-          <span aria-label="No GP accuracy yet" className="text-sm text-zinc-600">
+          <span
+            aria-label='No GP accuracy yet'
+            className='text-sm text-zinc-600'>
             —
           </span>
         )}
       </div>
 
-      <TierBadge song={song} className="h-9 w-9 shrink-0 text-sm" />
+      <TierBadge song={song} className='h-9 w-9 shrink-0 text-sm' />
 
       {onToggleFavorite && (
         <button
-          type="button"
+          type='button'
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite();
           }}
           className={cn(
-            "click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg click-behavior transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             isFavorite
               ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
-              : "bg-white/5 text-zinc-200 hover:bg-white/15 hover:text-white"
-          )}
-        >
+              : "bg-white/5 text-zinc-200 hover:bg-white/15 hover:text-white",
+          )}>
           <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
         </button>
       )}
 
       <button
-        type="button"
+        type='button'
         aria-label={`Practice ${song.title}`}
         onClick={(e) => {
           e.stopPropagation();
           onPractice();
         }}
-        className="click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 transition-background hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      >
-        <Play className="h-4 w-4 fill-current" />
+        className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 click-behavior transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/15 hover:text-white'>
+        <Play className='h-4 w-4 fill-current' />
       </button>
     </div>
   );

@@ -38,4 +38,6 @@ export interface FormattedActivityReport {
 export interface DateWithReport {
   date: Date;
   report: ReportListInterfaceWithTimeSumary | undefined;
-} 
+  /** Filler cell padding the first column so Jan 1 lands on its weekday row. */
+  isPlaceholder?: boolean;
+}

@@ -1,10 +1,6 @@
-import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
-import {
-  MONTHLY_RUNNING_COST,
-  ROADMAP_RAISED_OFFSET,
-} from "feature/roadmap/data/roadmap.data";
+import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
 import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +14,6 @@ export const SupportBanner = () => {
   // Same tier ladder as /roadmap — must apply the same reset offset,
   // otherwise "next unlock" here disagrees with the roadmap page.
   const totalRaised = Math.max(0, rawTotalRaised - ROADMAP_RAISED_OFFSET);
-  const isCovered = raisedThisMonth >= MONTHLY_RUNNING_COST;
 
   return (
     <Link
@@ -28,20 +23,15 @@ export const SupportBanner = () => {
         className='opacity-[0.08]'
         maskImage='linear-gradient(to right, black 0%, transparent 55%)'
       />
-      {!isCovered && (
-        <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
-      )}
+      {/* The warm wash and the heart stay on regardless of funding state — tying
+          them to `isCovered` made the banner flip tint the moment the funding
+          request resolved. The actual status still lives in FundingStatusBlock. */}
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
         {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
             gap would otherwise leave the copy a couple of characters per line. */}
         <div className='flex w-full min-w-0 items-start gap-3.5 lg:w-auto lg:flex-1'>
-          <Heart
-            size={18}
-            className={cn(
-              "mt-0.5 shrink-0",
-              isCovered ? "text-zinc-500" : "text-orange-400",
-            )}
-          />
+          <Heart size={18} className='mt-0.5 shrink-0 text-orange-400' />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
               Help build Riff Quest

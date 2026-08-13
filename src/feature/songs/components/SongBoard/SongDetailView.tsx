@@ -278,7 +278,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const totalMinutes = progress ? Math.floor((progress.totalPracticeMs % 3600000) / 60000) : 0;
 
   return (
-    <div className="relative h-full w-full flex flex-col xl:overflow-hidden overflow-y-auto no-scrollbar bg-second-600">
+    <div className="relative w-full flex flex-col bg-second-600">
       {/* Header Section */}
       <div className="relative shrink-0 overflow-hidden bg-zinc-900/50">
          <div className="absolute inset-0 overflow-hidden">
@@ -461,7 +461,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
       </div>
 
       {/* Content Section */}
-      <div className="flex-1 xl:overflow-y-auto p-4 md:p-6 lg:p-8 no-scrollbar">
+      <div className="p-4 md:p-6 lg:p-8">
          
          {/* Spotify Preview */}
          {song.spotifyId && (
@@ -631,6 +631,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             </div>
          </div>
 
+         {/* Recordings for this song */}
+         <SongRecordingsSection songId={song.id} songTitle={song.title} songArtist={song.artist} />
+
          {/* Full Width Bottom: Integrated Mastery Timeline Box */}
          <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
            <div className="flex flex-col items-center gap-8">
@@ -768,9 +771,6 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               />
            </div>
          </div>
-
-         {/* Recordings for this song */}
-         <SongRecordingsSection songId={song.id} songTitle={song.title} songArtist={song.artist} />
       </div>
     </div>
   );

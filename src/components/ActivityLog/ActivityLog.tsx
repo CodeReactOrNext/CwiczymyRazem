@@ -77,18 +77,22 @@ export const ActivityLogView = ({
   // activity is visible without manual scrolling.
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container || isLoading) return;
+    if (!container || isLoading || datasWithReports.length === 0) return;
     if (typeof window === "undefined" || window.innerWidth >= 1024) return;
     if (year !== new Date().getFullYear()) return;
 
     const todayStr = new Date().toDateString();
+    // Leading placeholders carry today's date as filler — skip them, otherwise
+    // the match lands on column 0 and the calendar never moves.
     const todayIndex = datasWithReports.findIndex(
-      (d) => d.date.toDateString() === todayStr
+      (d) => !d.isPlaceholder && d.date.toDateString() === todayStr
     );
     if (todayIndex === -1) return;
 
     const todayCol = Math.floor(todayIndex / 7);
     const todayX = todayCol * CALENDAR_CELL_SIZE;
+    // Park today two cells from the right edge so the last few days still read
+    // as "recent" instead of being flush against the border.
     const target = todayX - container.clientWidth + CALENDAR_CELL_SIZE * 2;
     container.scrollLeft = Math.max(0, target);
   }, [datasWithReports, isLoading, year]);

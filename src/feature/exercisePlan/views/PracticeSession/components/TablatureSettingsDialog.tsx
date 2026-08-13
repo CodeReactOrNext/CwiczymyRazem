@@ -24,13 +24,14 @@ export function TablatureSettingsDialog({
 }: TablatureSettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* The practice session is itself a full-screen layer at z-[999999], so the
-          default z-50 dialog renders behind it — visible to hit-testing (that layer
-          is pointer-events:none while a modal is open) but painted over. Both the
-          panel and its backdrop have to clear it. */}
+      {/* The practice session is itself a full-screen layer — z-[999999] on desktop,
+          z-[9999999] on mobile — so the default z-50 dialog renders behind it: visible
+          to hit-testing (that layer is pointer-events:none while a modal is open) but
+          painted over. Both the panel and its backdrop have to clear the mobile layer
+          too, hence the same tier every other in-session dialog uses. */}
       <DialogContent
-        className='z-[9999999] bg-zinc-950 text-white sm:max-w-2xl'
-        overlayClassName='z-[9999999]'>
+        className='z-[99999999] bg-zinc-950 text-white sm:max-w-2xl'
+        overlayClassName='z-[99999998]'>
         <DialogHeader>
           <DialogTitle>Tablature settings</DialogTitle>
           <DialogDescription className='text-zinc-400'>
