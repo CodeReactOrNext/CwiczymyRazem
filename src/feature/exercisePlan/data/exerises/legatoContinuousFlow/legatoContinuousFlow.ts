@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const legatoContinuousFlowExercise: Exercise = {
   id: "legato_continuous_flow",
-  title: "Continuous Legato Flow",
+  title: "Legato — Continuous Flow",
   description: "Maintain a continuous, unbroken stream of notes using pure legato technique.",
   whyItMatters: "Legato playing minimizes picking hand involvement to create a smooth, flowing sound. Developing continuous flow trains your fretting hand to generate consistent note volume and tone purely through finger strength and coordination.",
   difficulty: "hard",

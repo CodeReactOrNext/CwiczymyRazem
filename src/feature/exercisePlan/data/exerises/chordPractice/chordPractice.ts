@@ -3,7 +3,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chordPracticeExercise: Exercise = {
   id: "chord_practice_configurable",
-  title: "Chord Practice (Configurable)",
+  title: "Chord Practice — Pick Your Chords",
   description: "Practice clean transitions and finger placement across a customizable selection of chords.",
   whyItMatters: "Mastering transitions between diverse chord families is essential for smooth rhythm playing. This exercise builds muscle memory and hand independence, ensuring all strings ring clearly without unintended muting.",
   difficulty: "easy",

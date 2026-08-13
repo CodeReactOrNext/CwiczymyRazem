@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const strummingRockExercise: Exercise = {
   id: "strumming_rock",
-  title: "Rock Strumming Patterns",
+  title: "Strumming — Rock Accents",
   description: "Practice dynamic rock strumming patterns featuring heavy accents and steady timing.",
   whyItMatters: "Rock rhythm requires a solid pocket and dynamic contrast between loud and soft strums. Developing a robust library of strumming patterns allows you to back up any song with confidence.",
   difficulty: "easy",

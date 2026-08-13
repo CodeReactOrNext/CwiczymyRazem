@@ -4,7 +4,7 @@ import spiderPermutation1234Image from "./image.png";
 
 export const spiderPermutation1234Exercise: Exercise = {
   id: "spider_permutation_1234",
-  title: "Spider Exercise - 1-2-3-4 Permutation",
+  title: "Finger Permutations — 1-2-3-4",
   description: "Fret notes on a single string using finger permutation 1-2-3-4 to isolate specific finger movements and develop deep coordination control.",
   whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 1-2-3-4 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
   difficulty: "medium",

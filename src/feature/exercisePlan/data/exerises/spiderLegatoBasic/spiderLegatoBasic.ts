@@ -5,7 +5,7 @@ import spiderBasicImage from "./image.png";
 
 export const spiderLegatoBasicExercise: Exercise = {
   id: "spider_legato_basic",
-  title: "Spider Legato - Basic",
+  title: "Spider — Legato, No Picking",
   description: "Execute the spider walk pattern purely with hammer-ons and pull-offs.",
   whyItMatters: "Removing the pick forces your fretting hand to do all the work. This builds massive strength, finger independence, and timing control, leading to incredibly fluid legato runs.",
   difficulty: "medium",

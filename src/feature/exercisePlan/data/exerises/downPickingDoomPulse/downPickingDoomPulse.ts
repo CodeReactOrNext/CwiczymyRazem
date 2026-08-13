@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const downPickingDoomPulseExercise: Exercise = {
   id: "down_picking_doom_pulse",
-  title: "Doom Pulse — Slow Down Picking Control",
+  title: "Down Picking — Slow & Heavy",
   description:
     "Build wrist stamina and heavy, percussive down-picking control.",
   whyItMatters: "Consistent, heavy down-picking is crucial for genres like metal, rock, and punk. This exercise trains the wrist and forearm muscles to maintain a constant dynamic attack and timing precision at solid tempos, preventing fatigue during long rhythm parts.",

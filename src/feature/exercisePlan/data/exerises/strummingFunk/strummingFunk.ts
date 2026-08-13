@@ -2,7 +2,7 @@
 
 export const strummingFunkExercise: Exercise = {
   id: "strumming_funk",
-  title: "Funk Rhythm Guitar",
+  title: "Strumming — Funk 16ths",
   description: "Master 16th-note scratching, clean accents, and tight left-hand muting.",
   whyItMatters: "Funk rhythm relies heavily on percussive 'scratching' and precise accents. This exercise trains your fretting hand to squeeze the neck only on accented notes and relax to mute the strings on others, building elite hand sync.",
   difficulty: "easy",

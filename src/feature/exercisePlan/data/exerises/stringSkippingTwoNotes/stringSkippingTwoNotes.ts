@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const stringSkippingTwoNotesExercise: Exercise = {
   id: "string_skipping_two_notes",
-  title: "String Skipping — 2 Notes Per String",
+  title: "String Skipping — 2 Per String",
   description: "Fret two notes per string and skip adjacent strings to develop precise picking hand spatial awareness.",
   whyItMatters: "This exercise programs accurate spatial awareness into your picking hand. By jumping over intermediate strings, you train your hand to find strings instantly by feel, vastly improving your control, speed, and accuracy.",
   difficulty: "easy",

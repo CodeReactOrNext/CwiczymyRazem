@@ -2,7 +2,7 @@
 
 export const tappingMelodicLinesExercise: Exercise = {
   id: "tapping_melodic_lines",
-  title: "Melodic Tapping Compositions",
+  title: "Tapping — Melodic Lines",
   description: "Incorporate two-handed tapping to play expressive, melodic phrases.",
   whyItMatters: "Two-handed tapping turns the guitar into a piano-like instrument. Learning to tap melodic lines rather than just fast arpeggios adds a highly lyrical, unique texture to your solos.",
   difficulty: "hard",

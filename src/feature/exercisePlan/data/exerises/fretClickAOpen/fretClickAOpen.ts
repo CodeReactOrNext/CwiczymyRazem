@@ -24,7 +24,7 @@ export const fretClickAOpenExercise: Exercise = {
   id: "fret_click_a_open",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "A String: Open Position — Click Drill",
+  title: "Click Hunt — A String, Frets 0–6",
   description: "A note name appears — click its spot on the A string, frets 0 to 6.",
   difficulty: "beginner",
   category: "theory",

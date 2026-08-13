@@ -6,7 +6,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const firstBendExercise: Exercise = {
   id: "first_bend",
-  title: "First Bend – Whole Step",
+  title: "Bending — First Whole Step",
   description: "Learn accurate whole-step string bending. Compare your bent pitch against reference notes to train both muscle memory and your ear.",
   whyItMatters: "This exercise teaches you to target bent pitches by ear rather than guessing. It trains your muscle memory to hit the exact whole-step pitch perfectly every time, preventing flat or out-of-tune bends.",
   difficulty: "easy",

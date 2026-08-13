@@ -3,7 +3,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const spiderPermutation4123Exercise: Exercise = {
   id: "spider_permutation_4123",
-  title: "Spider Exercise - 4-1-2-3 Permutation",
+  title: "Finger Permutations — 4-1-2-3",
   description: "Fret notes on a single string using finger permutation 4-1-2-3 to isolate specific finger movements and develop deep coordination control.",
   whyItMatters: "This permutation isolates the muscle movements of fingers in the specific 4-1-2-3 sequence. It trains your brain to control finger movements in unconventional sequences, breaking down common mechanical bottlenecks and building finger coordination.",
   difficulty: "medium",

@@ -23,7 +23,7 @@ const tablature: TablatureMeasure[] = [[1, 2], [3, 4]].map((bases) => ({
 
 export const spiderXExtendedExercise: Exercise = {
   id: "spider_x_extended",
-  title: "Extended Spider X Exercise",
+  title: "Spider — Diagonal X, Extended",
   description: "Challenge coordination with a wider, multi-position version of the diagonal Spider X.",
   whyItMatters: "The extended version introduces shifting positions along with diagonal string changes. This builds outstanding spatial awareness, finger dexterity, and high-level picking synchronization.",
   difficulty: "medium",

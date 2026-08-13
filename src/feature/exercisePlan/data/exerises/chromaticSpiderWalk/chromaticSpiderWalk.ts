@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chromaticSpiderWalkExercise: Exercise = {
   id: "chromatic_spider_walk",
-  title: "Chromatic Spider Drill",
+  title: "Spider — 1-2-3-4, Frets 5–8",
   description: "Improve finger synchronization, independent muscle control, and clean cross-string coordination.",
   whyItMatters: "The spider walk is a fundamental warm-up that isolates each finger of the fretting hand. By coordinating finger movement with alternate picking, you build rhythmic accuracy, reduce excess tension, and lay a solid foundation for advanced speed and endurance.",
   difficulty: "medium",

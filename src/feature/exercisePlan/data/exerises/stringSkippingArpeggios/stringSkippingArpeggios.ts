@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const stringSkippingArpeggiosExercise: Exercise = {
   id: "string_skipping_arpeggios",
-  title: "Spread Triad Arpeggios",
+  title: "String Skipping — Spread Triads",
   description: "Play wide-interval arpeggios using clean string-skipping mechanics.",
   whyItMatters: "Spread triads sound open, majestic, and less predictable than standard block chords. Practicing them with string skipping builds great picking hand control and introduces highly modern melodic textures.",
   difficulty: "hard",

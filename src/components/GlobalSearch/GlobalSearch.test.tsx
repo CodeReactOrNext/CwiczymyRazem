@@ -45,10 +45,10 @@ describe("GlobalSearch", () => {
       "Search plans, exercises, songs...",
     );
 
-    fireEvent.change(input, { target: { value: "horizontal spider" } });
+    fireEvent.change(input, { target: { value: "shifting up the neck" } });
 
     expect(await screen.findByText("Exercises")).toBeTruthy();
-    expect(await findByTitle("Horizontal Spider Exercise")).toBeTruthy();
+    expect(await findByTitle("Spider — Shifting Up the Neck")).toBeTruthy();
   });
 
   it("shows nothing for a query shorter than 2 characters", async () => {
@@ -72,8 +72,8 @@ describe("GlobalSearch", () => {
       "Search plans, exercises, songs...",
     );
 
-    fireEvent.change(input, { target: { value: "horizontal spider" } });
-    await findByTitle("Horizontal Spider Exercise");
+    fireEvent.change(input, { target: { value: "shifting up the neck" } });
+    await findByTitle("Spider — Shifting Up the Neck");
 
     fireEvent.keyDown(input, { key: "Enter" });
 

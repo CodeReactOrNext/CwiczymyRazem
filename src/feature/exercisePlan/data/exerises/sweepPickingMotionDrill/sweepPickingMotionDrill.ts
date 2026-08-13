@@ -6,7 +6,7 @@ const T = 1 / 3;
 
 export const sweepPickingMotionDrillExercise: Exercise = {
   id: "sweep_picking_motion_drill",
-  title: "Sweep Picking Motion Drill – 3 Strings",
+  title: "Sweep — 3 Strings, First Steps",
   description:
     "Develop basic sweeping mechanics using simple three-string triad shapes.",
   whyItMatters: "Three-string sweeps are the perfect entry point to mastering the sweeping motion. Focusing on a continuous, fluid pick stroke across a small number of strings builds excellent muscle memory for larger sweeps.",

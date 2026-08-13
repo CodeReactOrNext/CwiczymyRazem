@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const fretStretchDrillExercise: Exercise = {
   id: "fret_stretch_drill",
-  title: "Wide Fret Span Sequences",
+  title: "Stretch — Wide Fret Spans",
   description: "Develop finger flexibility and fretboard reach by practicing controlled, wide-interval fretting sequences.",
   whyItMatters: "Flexibility in the fretting hand enables you to play complex chord shapes, sweeping arpeggios, and legato lines that span multiple frets. Building proper reach mechanics—rather than just applying force—prevents hand fatigue, minimizes muscle tension, and lowers the risk of tendon strain.",
   difficulty: "hard",

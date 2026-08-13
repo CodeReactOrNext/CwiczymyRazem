@@ -2,7 +2,7 @@
 
 export const hybridPickingIndependenceExercise: Exercise = {
   id: "hybrid_picking_independence",
-  title: "Hybrid Picking Independence",
+  title: "Hybrid Picking — Wide Intervals",
   description: "Combine your pick and fingers to play wide-interval string-skipping lines.",
   whyItMatters: "Hybrid picking bridges the gap between pick control and fingerstyle agility. Using the pick for low strings and fingers for high strings allows you to cross wide string gaps effortlessly, which is essential for modern rock, country, and jazz fusion styles.",
   difficulty: "hard",

@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const rhythmicPocketMasteryExercise: Exercise = {
   id: "rhythmic_pocket_mastery",
-  title: "Subdivision Control",
+  title: "Timing — Switch Subdivisions",
   description: "Transition smoothly between different rhythmic subdivisions at a constant tempo.",
   whyItMatters: "Rhythmic flexibility allows you to vary the speed of your solos and rhythm parts without changing the song's BPM. Mastering subdivision control keeps you locked in 'the pocket' during complex rhythm shifts.",
   difficulty: "medium",

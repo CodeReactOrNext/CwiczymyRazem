@@ -44,7 +44,7 @@ export const intervalHuntExercise: Exercise = {
   id: "interval_hunt",
   addedAt: "2026-06-25",
   isHiddenFromLanding: true,
-  title: "Interval Hunt",
+  title: "Note Hunt — Intervals",
   description: "Read a root note and an interval, then find and play the target note anywhere on the neck.",
   difficulty: "medium",
   category: "theory",

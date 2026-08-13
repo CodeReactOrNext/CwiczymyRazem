@@ -3,7 +3,7 @@ import { ALL_ROOTS, createIntervalClickExercise } from "./createIntervalClickExe
 export const intervalClickBox812Exercise = createIntervalClickExercise({
   id: "interval_click_box_8_12",
   addedAt: "2026-08-11",
-  title: "Intervals: Upper Box — Click Drill",
+  title: "Interval Clicks — Box 8–12",
   description: "Every interval, sharp roots included, in the box that runs up to the 12th-fret octave.",
   difficulty: "hard",
   timeInMinutes: 3,

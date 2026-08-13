@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chordSpotlightDrillExercise: Exercise = {
   id: "chord_spotlight_drill",
-  title: "Chord Spotlight — D Major Muting Drill",
+  title: "Muting — Inside a D Chord",
   description: "Strike a three-string D major triad while selectively muting specific strings with your fretting hand.",
   whyItMatters: "This exercise develops independent fretting hand tension control. By holding a full chord shape and selectively releasing pressure on specific fingers, you learn to mute unwanted strings without breaking your structural hand position—an essential skill for clean rhythm playing and funky percussive strumming.",
   difficulty: "easy",

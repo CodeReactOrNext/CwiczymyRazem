@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const twoNotesPerBarPhrasingExercise: Exercise = {
   id: "two_notes_per_bar_phrasing",
-  title: "Two-Notes-Per-Bar Phrasing",
+  title: "Phrasing — Two Notes Per Bar",
   description:
     "Create expressive phrases restricted to exactly two notes per measure.",
   whyItMatters: "When notes are extremely limited, you must focus entirely on timing, tone, vibrato, and silence. This drill builds incredible phrasing discipline, making every note you choose count.",

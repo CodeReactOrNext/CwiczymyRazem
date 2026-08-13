@@ -55,7 +55,7 @@ const accentBar = (): TablatureMeasure => ({
 
 export const tripletsDrillExercise: Exercise = {
   id: "rhythm_triole",
-  title: "Triplets Drill",
+  title: "Timing — Triplets",
   description: "Play three even notes per beat on a single string to master the feel and timing of triplet subdivisions.",
   whyItMatters: "This exercise programs the feel of three-note subdivisions (triplets) directly into your internal rhythm. It develops an even picking pulse, prevents rushing the third note, and establishes the essential hand coordination needed for odd-numbered divisions.",
   difficulty: "easy",

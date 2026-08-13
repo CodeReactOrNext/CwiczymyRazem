@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const mutingSpotlightDrillExercise: Exercise = {
   id: "muting_spotlight_drill",
-  title: "Muting Spotlight — Pick One, Kill the Rest",
+  title: "Muting — One Note at a Time",
   description:
     "Isolate single notes while aggressively muting all adjacent strings under gain.",
   whyItMatters: "High gain amplifies every minor vibration on the guitar. Isolating a single note while resting your picking hand palm on lower strings and fretting index finger on higher strings creates a dead-silent background for your leads.",

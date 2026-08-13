@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const spiderChromaticsExercise: Exercise = {
   id: "spider_chromatics",
-  title: "Spider Chromatics - 1-2-3-4",
+  title: "Spider — 1-2-3-4, Frets 1–4",
   description: "Classic chromatic spider exercise involving fingers 1-2-3-4 moving across all strings.",
   difficulty: "medium",
   category: "technique",

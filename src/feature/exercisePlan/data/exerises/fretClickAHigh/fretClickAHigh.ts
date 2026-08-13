@@ -24,7 +24,7 @@ export const fretClickAHighExercise: Exercise = {
   id: "fret_click_a_high",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "A String: Frets 6–12 — Click Drill",
+  title: "Click Hunt — A String, Frets 6–12",
   description: "A note name appears — click its spot on the A string, frets 6 to 12.",
   difficulty: "beginner",
   category: "theory",

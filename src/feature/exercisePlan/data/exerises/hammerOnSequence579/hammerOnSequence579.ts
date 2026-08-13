@@ -4,7 +4,7 @@ import hammerOnSequenceImage from "./image.png";
 
 export const hammerOnSequence579Exercise: Exercise = {
   id: "hammer_on_sequence_5_7_9",
-  title: "Hammer-ons – 5-7-9 Sequence",
+  title: "Legato — Hammer-ons 5-7-9",
   description:
     "Build finger strength and legato fluidity using wide-span hammer-ons.",
   whyItMatters: "Hammer-ons allow you to play fluid, rapid lines with a soft, vocal-like attack. The 5-7-9 sequence requires stretching the fingers, which helps build both reach and independent hammer strength in the ring and pinky fingers.",

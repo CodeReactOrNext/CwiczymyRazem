@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const mutingDisciplineDrillExercise: Exercise = {
   id: "muting_discipline_drill",
-  title: "Muting Discipline Drill",
+  title: "Muting — Both Hands",
   description: "Eliminate unwanted string noise using systematic dual-hand muting.",
   whyItMatters: "Clean guitar playing, especially under high gain, requires constant control over idle strings. Mastering muting discipline ensures that only the target note is heard, resulting in clear, professional-grade performances.",
   difficulty: "medium",

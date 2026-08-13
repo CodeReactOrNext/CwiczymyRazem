@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const metronomeGapTestExercise: Exercise = {
   id: "metronome_gap_test",
-  title: "Metronome Gap Test",
+  title: "Timing — Metronome Gap Test",
   description: "Lock onto the click for two bars, then keep the pulse through the silence and tap the very next downbeat — the app measures how far off you land.",
   whyItMatters: "It reveals whether you've truly internalised the tempo or are just riding an external click. Holding the grid through silence builds the deep internal timing you need to lock in with a drummer, lead a band, and stop rushing or dragging.",
   difficulty: "medium",

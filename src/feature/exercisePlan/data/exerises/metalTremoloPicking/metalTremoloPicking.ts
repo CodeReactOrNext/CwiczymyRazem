@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const metalTremoloPickingExercise: Exercise = {
   id: "metal_tremolo_picking",
-  title: "Phrygian Assault Thrash Tremolo Picking",
+  title: "Tremolo Picking — Phrygian Riff",
   description: "Develop high-speed tremolo picking endurance and precise low-end palm muting using the aggressive, minor-second Phrygian scale structure.",
   whyItMatters: "This exercise builds speed and endurance for your picking hand. It tightens your alternate picking accuracy, locks in palm-mute consistency, and trains your hand to stay completely relaxed during high-intensity metal riffing.",
   difficulty: "hard",

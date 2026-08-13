@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const speedBurstChromaticBlitzExercise: Exercise = {
   id: "speed_burst_chromatic_blitz",
-  title: "Speed Burst Chromatic Blitz",
+  title: "Chromatic — Speed Bursts",
   description: "Execute brief, rapid chromatic note groups interspersed with quick rests to build fast twitch muscle response and control hand tension.",
   whyItMatters: "This exercise develops fast-twitch muscle response in both hands. It trains your fingers to fire quickly in sync, and teaches you how to release tension instantly during rests, preventing hand fatigue.",
   difficulty: "hard",

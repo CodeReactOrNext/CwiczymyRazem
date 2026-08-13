@@ -2,7 +2,7 @@
 
 export const legatoTrillSprintExercise: Exercise = {
   id: "legato_trill_sprint",
-  title: "Legato Trill Sprints",
+  title: "Legato — Trills",
   description: "Develop muscular endurance and rapid finger coordination with trill bursts.",
   whyItMatters: "Trills require rapid, continuous hammer-ons and pull-offs between two notes. Sprints build fast-twitch muscle response in individual finger pairs, which dramatically improves overall legato speed and control.",
   difficulty: "hard",

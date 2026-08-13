@@ -6,7 +6,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const tappingSingleStringExercise: Exercise = {
   id: "tapping_single_string",
-  title: "Tapping – Simple Melody",
+  title: "Tapping — Simple Melody",
   description:
     "Learn basic tapping mechanics by playing a simple melody along a single string.",
   whyItMatters: "Starting with a simple melody lets you focus entirely on the physical mechanics of tapping: landing exactly in the middle of the fret and executing a clean pull-off without string noise.",

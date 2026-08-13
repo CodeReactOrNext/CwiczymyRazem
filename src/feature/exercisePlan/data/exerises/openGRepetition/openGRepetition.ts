@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const openGRepetitionExercise: Exercise = {
   id: "open_g_repetition",
-  title: "Open G String Repetition",
+  title: "Timing — Open G Repeats",
   description: "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
   difficulty: "beginner",
   category: "technique",

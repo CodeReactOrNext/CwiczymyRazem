@@ -17,7 +17,7 @@ const EAR_QUIZ_DEFAULTS = {
 export const earChordQualityBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_chord_quality_basics",
-  title: "Chord Quality: The Big Four",
+  title: "Chord Quality — The Big Four",
   description:
     "Hear a chord and name it: major, minor, dominant 7 or sus4. Four colours, no fretboard needed.",
   whyItMatters:
@@ -44,7 +44,7 @@ export const earChordQualityBasicsExercise: Exercise = {
 export const earChordQualityAdvancedExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_chord_quality_advanced",
-  title: "Chord Quality: All Seven",
+  title: "Chord Quality — All Seven",
   description: "The full set by ear: major, minor, 7, maj7, m7, dim and sus4.",
   whyItMatters:
     "Telling maj7 from m7 from a plain dominant is what lets you transcribe jazz, soul and anything past three-chord rock without reaching for a chart.",
@@ -72,7 +72,7 @@ export const earChordQualityAdvancedExercise: Exercise = {
 export const earProgressionBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_progression_basics",
-  title: "Progression Builder: Three Chords",
+  title: "Progression Builder — 3 Chords",
   description:
     "Hear a three-chord progression and build it back from Roman-numeral tiles.",
   whyItMatters:
@@ -100,7 +100,7 @@ export const earProgressionBasicsExercise: Exercise = {
 export const earProgressionAdvancedExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_progression_advanced",
-  title: "Progression Builder: Four Chords",
+  title: "Progression Builder — 4 Chords",
   description:
     "Four-chord pop and jazz turnarounds — I–V–vi–IV and the rest — rebuilt degree by degree.",
   whyItMatters:
@@ -141,7 +141,7 @@ export const earProgressionAdvancedExercise: Exercise = {
 export const earTuningTrainerExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_tuning_trainer",
-  title: "Tune It By Ear",
+  title: "Tune By Ear — Basics",
   description:
     "Two notes, one of them out. Slide it into tune by listening for the beating — the drill behind tuning without a tuner.",
   difficulty: "medium",
@@ -171,7 +171,7 @@ export const earTuningTrainerExercise: Exercise = {
 export const earTuningPrecisionExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_tuning_precision",
-  title: "Tune It By Ear: Fine",
+  title: "Tune By Ear — Fine",
   description:
     "The same drill with a much tighter window — small errors, slow beats, four cents of tolerance.",
   difficulty: "hard",
@@ -203,7 +203,7 @@ export const earTuningPrecisionExercise: Exercise = {
 export const earModeBasicsExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_mode_basics",
-  title: "Major, Minor or Dorian?",
+  title: "Name That Mode — Three Modes",
   description:
     "A scale plays over its own tonic drone. Tell natural minor from Dorian — the single most useful ear test a guitarist can pass.",
   difficulty: "medium",
@@ -227,7 +227,7 @@ export const earModeBasicsExercise: Exercise = {
 export const earModeAdvancedExercise: Exercise = {
   ...EAR_QUIZ_DEFAULTS,
   id: "ear_mode_advanced",
-  title: "Name That Mode",
+  title: "Name That Mode — All Six",
   description:
     "All six common modes over a drone: Ionian, Lydian, Mixolydian, Dorian, Aeolian and Phrygian.",
   difficulty: "hard",

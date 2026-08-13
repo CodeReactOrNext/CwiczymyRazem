@@ -12,7 +12,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const miniArpeggioExercise: Exercise = {
   id: "mini_arpeggio",
-  title: "Mini Arpeggio – Em7",
+  title: "Sweep — Em7 Mini Arpeggio",
   description:
     "Practice clean sweeping and rolling mechanics across three-string shapes.",
   whyItMatters: "Mini arpeggios are the building blocks of sweep picking. Learning to roll your fretting fingers across the same fret on adjacent strings prevents notes from bleeding together, ensuring a clean, articulated arpeggio line.",

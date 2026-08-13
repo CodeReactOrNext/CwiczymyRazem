@@ -19,7 +19,7 @@ export const stringHuntGExercise: Exercise = {
   id: "string_sweep_g",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "String Hunt — G",
+  title: "Timed Hunt — G String",
   description: "Beat the clock: play every one of the 12 notes on the G string within 90 seconds, at 60 BPM.",
   difficulty: "hard",
   category: "theory",

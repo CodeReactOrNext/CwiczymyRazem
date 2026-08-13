@@ -38,7 +38,7 @@ export const fretboardRegionHuntExercise: Exercise = {
   id: "fretboard_region_hunt",
   addedAt: "2026-06-25",
   isHiddenFromLanding: true,
-  title: "Fretboard Region Hunt",
+  title: "Note Hunt — In a Region",
   description: "Locate a note inside a specific region of the neck shown on a fretboard diagram — under the clock.",
   difficulty: "hard",
   category: "theory",

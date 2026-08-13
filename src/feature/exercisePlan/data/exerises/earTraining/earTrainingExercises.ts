@@ -3,7 +3,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const earTrainingEasy: Exercise = {
   id: "earTrainingEasy",
   isHiddenFromLanding: true,
-  title: "Ear Training Level 1",
+  title: "Play by Ear — Easy",
   description: "Recognize intervals and simple melodic movements to bridge ear-to-fretboard connection.",
   whyItMatters: "A well-trained ear allows you to translate the melodies in your head directly onto the guitar, transcribe songs quickly, and react dynamically to other musicians during a performance.",
   difficulty: "easy",
@@ -34,7 +34,7 @@ export const earTrainingEasy: Exercise = {
 export const earTrainingMedium: Exercise = {
   id: "earTrainingMedium",
   isHiddenFromLanding: true,
-  title: "Ear Training Level 2",
+  title: "Play by Ear — Medium",
   description: "Listen to a short melody and repeat it.",
   difficulty: "medium",
   category: "hearing",
@@ -61,7 +61,7 @@ export const earTrainingMedium: Exercise = {
 export const earTrainingHard: Exercise = {
   id: "earTrainingHard",
   isHiddenFromLanding: true,
-  title: "Ear Training Level 3",
+  title: "Play by Ear — Hard",
   description: "Complex intervals and wider range.",
   difficulty: "hard",
   category: "hearing",

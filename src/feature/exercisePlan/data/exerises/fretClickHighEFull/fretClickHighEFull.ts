@@ -20,7 +20,7 @@ export const fretClickHighEFullExercise: Exercise = {
   id: "fret_click_high_e_full",
   addedAt: "2026-08-11",
   isHiddenFromLanding: true,
-  title: "High e String: Frets 0–12 — Click Drill",
+  title: "Click Hunt — High e, Frets 0–12",
   description: "A note name appears — click every spot on the high e string, frets 0 to 12, where it lands.",
   difficulty: "easy",
   category: "theory",

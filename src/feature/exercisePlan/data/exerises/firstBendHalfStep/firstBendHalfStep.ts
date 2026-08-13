@@ -6,7 +6,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const firstBendHalfStepExercise: Exercise = {
   id: "first_bend_half_step",
-  title: "First Bend – Half Step",
+  title: "Bending — First Half Step",
   description:
     "Master the mechanics of half-step string bending with a focus on pitch accuracy.",
   whyItMatters: "Developing accurate bending mechanics early prevents the development of weak finger-only bending habits. Precise half-step bends are critical for smooth blues and rock phrasing, helping you hit the target pitch perfectly every time.",

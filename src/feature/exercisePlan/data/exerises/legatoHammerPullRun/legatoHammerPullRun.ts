@@ -2,7 +2,7 @@
 
 export const legatoHammerPullRunExercise: Exercise = {
   id: "legato_hammer_pull_run",
-  title: "Legato Hammer-Pull Scale Run",
+  title: "Legato — Scale Run",
   description: "Incorporate legato runs across multiple strings with precise rhythmic timing.",
   whyItMatters: "Legato scale runs can sound uneven if the transition between strings is not perfectly timed. This exercise ensures that the first note on each new string is struck cleanly while the subsequent notes flow seamlessly, building high-speed coordination.",
   difficulty: "hard",

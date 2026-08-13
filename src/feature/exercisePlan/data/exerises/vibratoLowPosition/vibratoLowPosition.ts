@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const vibratoLowPositionExercise: Exercise = {
   id: "vibrato_low_position",
-  title: "Vibrato — Low Position (Frets 1–5)",
+  title: "Vibrato — Frets 1–5",
   description:
     "Develop controlled, wide vibrato in the lower frets with high string tension.",
   whyItMatters: "Fretting near the nut requires more physical force to modulate the string's pitch. This drill builds the foundational hand strength and wrist mechanics needed to execute clean, wide vibrato on low frets.",

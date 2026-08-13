@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const triadImprovisationExercise: Exercise = {
   id: "triad_improvisation",
-  title: "Triad Improvisation",
+  title: "Improv — Triads Only",
   description: "Improvise solos purely using three-note triad shapes over a backing track.",
   whyItMatters: "Limiting yourself to triads forces you to learn chord shapes inside out and connect them melodically across the neck. It prevents you from playing mindless scale runs and makes your solos sound highly structured.",
   requiresBackingTrack: true,

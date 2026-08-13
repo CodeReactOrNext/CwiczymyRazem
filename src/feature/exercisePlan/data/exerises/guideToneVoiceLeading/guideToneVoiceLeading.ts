@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const guideToneVoiceLeadingExercise: Exercise = {
   id: "guide_tone_voice_leading",
-  title: "Guide Tone Voice-Leading Drill",
+  title: "Chords — Guide Tones",
   description:
     "Connect chord progressions smoothly by resolving third and seventh intervals.",
   whyItMatters: "Guide tones are the most harmonically defining notes of any chord. Resolving thirds to sevenths (and vice versa) during chord transitions creates incredibly smooth voice leading, which is a staple of jazz, fusion, and professional chord arranging.",

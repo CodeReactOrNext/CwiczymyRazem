@@ -27,7 +27,7 @@ export const fretClickLowEOpenExercise: Exercise = {
   id: "fret_click_low_e_open",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Low E String: Open Position — Click Drill",
+  title: "Click Hunt — Low E, Frets 0–6",
   description: "A note name appears — click its spot on the low E string, frets 0 to 6.",
   difficulty: "beginner",
   category: "theory",

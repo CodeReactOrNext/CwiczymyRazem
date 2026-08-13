@@ -20,7 +20,7 @@ export const fretClickDFullExercise: Exercise = {
   id: "fret_click_d_full",
   addedAt: "2026-08-11",
   isHiddenFromLanding: true,
-  title: "D String: Frets 0–12 — Click Drill",
+  title: "Click Hunt — D String, Frets 0–12",
   description: "A note name appears — click every spot on the D string, frets 0 to 12, where it lands.",
   difficulty: "easy",
   category: "theory",

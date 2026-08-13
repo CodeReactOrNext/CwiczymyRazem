@@ -25,7 +25,7 @@ const upSweep = [
 
 export const sweepPickingMotionDrill6StringExercise: Exercise = {
   id: "sweep_picking_motion_drill_6_string",
-  title: "Sweep Picking Motion Drill – 6 Strings",
+  title: "Sweep — 6 Strings, Full Span",
   description:
     "Master full-span, six-string sweep arpeggios with intense focus on fretting rolls.",
   whyItMatters: "Six-string sweeps require exceptional coordination and palm muting. This drill teaches you to roll across multiple strings to prevent note bleeding while using your palm to keep the low strings completely quiet.",

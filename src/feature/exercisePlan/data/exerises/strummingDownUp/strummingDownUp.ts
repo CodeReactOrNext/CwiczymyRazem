@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const strummingDownUpExercise: Exercise = {
   id: "strumming_down_up",
-  title: "Down-Up Strumming",
+  title: "Strumming — Down-Up",
   description: "Develop a fluid, continuous down-up strumming motion with strict rhythm control.",
   whyItMatters: "Continuous down-up motion is the engine of all rhythm playing. Keeping your strumming hand moving like a pendulum ensures perfect timing and lets you accent beats effortlessly.",
   difficulty: "easy",

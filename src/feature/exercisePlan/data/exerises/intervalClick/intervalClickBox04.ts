@@ -3,7 +3,7 @@ import { createIntervalClickExercise } from "./createIntervalClickExercise";
 export const intervalClickBox04Exercise = createIntervalClickExercise({
   id: "interval_click_box_0_4",
   addedAt: "2026-08-11",
-  title: "Intervals: Open Box — Click Drill",
+  title: "Interval Clicks — Box 0–4",
   description: "Two clicks a round: pick a root in frets 0–4, then the interval measured from it.",
   difficulty: "medium",
   timeInMinutes: 3,
