@@ -1,10 +1,18 @@
 import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
 
-export const DEFAULT_SUPPORT_TITLE = "Support";
+/**
+ * "Support" alone read like a helpdesk role — these are people who put money
+ * into the project, so the badge says what they actually are.
+ */
+export const DEFAULT_SUPPORT_TITLE = "Supporter";
 
 /** Badge label for a member — their custom title, or the generic one. */
 export const getSupportLabel = (member?: SupportTeamMember | null): string =>
   member?.title?.trim() || DEFAULT_SUPPORT_TITLE;
+
+/** Hover text spelling out the donation, so the badge can't be misread. */
+export const getSupportTooltip = (member?: SupportTeamMember | null): string =>
+  `${getSupportLabel(member)} — supports Riff Quest with a donation`;
 
 /** uid → member lookup used by the feed / presence list, which only carry uids. */
 export const buildSupportMemberIndex = (
@@ -13,9 +21,9 @@ export const buildSupportMemberIndex = (
   new Map(members.map((member) => [member.uid, member]));
 
 /**
- * Support members come first in the "Live Now" stack — the whole point of the
- * mark is that people can spot someone who can help them without hovering
- * through the whole row. Everything else keeps its original order.
+ * Supporters come first in the "Live Now" stack — the mark is a thank-you, and
+ * it only works if it is visible without hovering through the whole row.
+ * Everything else keeps its original order.
  */
 export const sortSupportFirst = <T extends { uid: string }>(
   users: T[],

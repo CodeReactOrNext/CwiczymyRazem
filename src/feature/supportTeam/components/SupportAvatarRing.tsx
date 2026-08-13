@@ -1,9 +1,9 @@
 import { cn } from "assets/lib/utils";
 import type { ReactNode } from "react";
 
-/** Purple→cyan sweep that only the support team gets — nothing else in the app uses it. */
+/** Gold sweep that only supporters get — nothing else in the app uses it. */
 export const SUPPORT_CONIC_GRADIENT =
-  "conic-gradient(from 0deg, #7c3aed, #c084fc, #22d3ee, #c084fc, #7c3aed)";
+  "conic-gradient(from 0deg, #b45309, #fbbf24, #fef3c7, #fbbf24, #b45309)";
 
 interface SupportAvatarRingProps {
   children: ReactNode;
@@ -15,7 +15,7 @@ interface SupportAvatarRingProps {
 }
 
 /**
- * Wraps an (opaque, circular) avatar in a slowly rotating gradient rim + glow.
+ * Wraps an (opaque, circular) avatar in a slowly rotating gold rim + glow.
  * The avatar itself masks the middle of the gradient disc, which is what turns
  * it into a ring — so whatever is passed in has to stay round and opaque.
  */
