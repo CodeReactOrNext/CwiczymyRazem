@@ -20,6 +20,7 @@ import {
   BUILDS_PER_PROMOTION,
   CONDITION_GRADES,
   getConditionGrade,
+  getConditionPoints,
   getEffectiveRarity,
   getItemCondition,
   getPromotionsAvailable,
@@ -622,7 +623,10 @@ export interface RepairQuote {
   target: ConditionKey | null;
   fromCondition: number;
   toCondition: number;
-  /** Item Level the step is worth (condition contributes 0–10). */
+  /**
+   * Item Level the step is worth — the gap between two grades in
+   * `CONDITION_LEVEL_POINTS`, so a restoration always pays something.
+   */
   gain: number;
   recipe: RecipeLine[];
   canRepair: boolean;
@@ -675,7 +679,9 @@ export const getRepairQuote = (
     target: step.key,
     fromCondition: subject.condition,
     toCondition: step.to,
-    gain: Math.round(step.to * 10) - Math.round(subject.condition * 10),
+    // Grade in, grade out — the step moves the item exactly one grade up, so it
+    // is always worth exactly what that grade step is worth. Never zero.
+    gain: getConditionPoints(step.to) - getConditionPoints(subject.condition),
     recipe,
     canRepair: recipe.every((line) => line.ok),
   };

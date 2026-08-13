@@ -10,6 +10,7 @@ import {
   COUNTRY_LEVEL_BONUS,
   FEATURE_FILL_CHANCE,
   getBuildLevelPoints,
+  getConditionPoints,
   getEffectiveRarity,
   getItemCondition,
   getVintageMultiplier,
@@ -367,7 +368,7 @@ export const getEffectLevel = (
   const rarity = getEffectiveRarity(effect.rarity, item.buildLevel);
   const featurePoints = s ? s.tone + s.headroom + s.versatility : 0;
   const rarityPoints = RARITY_LEVEL_BONUS[rarity] ?? 0;
-  const conditionPoints = Math.round(getItemCondition(item) * 10);
+  const conditionPoints = getConditionPoints(getItemCondition(item));
   const yearFrom = effect.yearFrom ?? EFFECT_YEAR_FROM;
   const yearTo = effect.yearTo ?? EFFECT_YEAR_TO;
   const vintagePoints = Math.round(

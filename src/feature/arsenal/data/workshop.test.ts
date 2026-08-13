@@ -634,7 +634,18 @@ describe("getRepairQuote", () => {
 
   it("reports the Item Level the step is worth", () => {
     const quote = getRepairQuote(subject({ condition: 0.43 }), richWallet());
-    expect(quote.gain).toBe(3); // 0.43 → 0.73 is +3 condition points
+    expect(quote.gain).toBe(3); // Good (4) → Mint (7)
+  });
+
+  it("always pays something, wherever inside the grade the item sits", () => {
+    // The whole point of grading the payout: 0.69 is a hair below Mint and used
+    // to round to the same Item Level as the 0.73 it restores to — +0 for a full
+    // bill of parts.
+    for (const condition of [0.02, 0.14, 0.16, 0.39, 0.41, 0.69, 0.71, 0.91]) {
+      const quote = getRepairQuote(subject({ condition }), richWallet());
+      expect(quote.target).not.toBeNull();
+      expect(quote.gain).toBeGreaterThan(0);
+    }
   });
 
   it("asks only for screws at the bottom of the ladder", () => {

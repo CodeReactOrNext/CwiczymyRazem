@@ -42,6 +42,32 @@ export const getConditionGrade = (condition: number): ConditionGrade =>
   CONDITION_GRADES.find((g) => condition >= g.min) ??
   CONDITION_GRADES[CONDITION_GRADES.length - 1];
 
+/**
+ * Item Level a condition grade is worth.
+ *
+ * Anchored to the *grade*, not to the raw 0–1 float, and deliberately so: the
+ * workshop sells restorations by grade ("Good → Mint"), so what a restoration
+ * pays has to be a property of the grade too. Scoring `condition * 10` instead
+ * made the payout depend on where inside the grade the item happened to roll —
+ * a Good at 0.69 and the Mint it restores to at 0.73 both round to 7, so the
+ * player spent a full bill of parts for +0 and the job read as broken. Here
+ * every step up the ladder is worth a fixed amount, so no restoration is ever
+ * worthless and the number in the modal is the number every item gets.
+ *
+ * Still 0–10 end to end, so no existing level is inflated by the change.
+ */
+export const CONDITION_LEVEL_POINTS: Record<ConditionKey, number> = {
+  Relic: 0,
+  Worn: 2,
+  Good: 4,
+  Mint: 7,
+  Museum: 10,
+};
+
+/** Item Level contributed by an item's condition — see `CONDITION_LEVEL_POINTS`. */
+export const getConditionPoints = (condition: number): number =>
+  CONDITION_LEVEL_POINTS[getConditionGrade(condition).key];
+
 /** Discrete condition tier for segmented indicators: Relic=1 … Museum=5. */
 export const CONDITION_TIERS = CONDITION_GRADES.length;
 export const getConditionTier = (condition: number): number => {
@@ -478,7 +504,7 @@ export const getItemLevel = (
   const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
   const featurePoints = s ? s.pickups + s.sustain + s.playFeeling : 0;
   const rarityPoints = RARITY_LEVEL_BONUS[rarity] ?? 0;
-  const conditionPoints = Math.round(getItemCondition(item) * 10);
+  const conditionPoints = getConditionPoints(getItemCondition(item));
   const vintagePoints = Math.round(
     (getVintageMultiplier(
       item.year ?? guitar.yearTo,
