@@ -1,5 +1,5 @@
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
@@ -44,68 +44,77 @@ export const ActivityStartModal = ({ plan, exercise, onClose }: ActivityStartMod
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-[480px] bg-zinc-950/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden !rounded-[12px] flex flex-col">
-        <div className="relative p-6 pt-7 pb-5 border-b border-white/5 bg-gradient-to-b from-cyan-500/10 to-transparent">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_70%)] pointer-events-none" />
-          <DialogHeader className="relative z-10">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400/80">
-              {plan ? "Plan" : "Exercise"}
-            </span>
-            <DialogTitle className="text-xl font-black text-white leading-tight mt-1">
-              {title}
-            </DialogTitle>
-            {description && (
-              <p className="mt-2 text-[13px] text-zinc-400 font-medium leading-relaxed">
-                {description}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-              <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-zinc-900/80 border-white/10 text-white flex items-center gap-1.5">
-                <Clock className="w-3 h-3 text-cyan-400" />
-                {formatDuration(totalDuration)}
-              </Badge>
-              <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
-                {difficulty}
-              </Badge>
-              <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-white/5 border-white/10 text-zinc-300">
-                {category}
-              </Badge>
-              {plan && (
-                <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[8px] bg-white/5 border-white/10 text-zinc-300 flex items-center gap-1.5">
-                  <ListChecks className="w-3 h-3 text-zinc-400" />
-                  {plan.exercises.length}
-                </Badge>
-              )}
-            </div>
-          </DialogHeader>
+      {/* One padded card: header, meta and actions are separated by spacing
+          rather than the rules the modal used to draw across itself. */}
+      {/* No `relative` here — DialogContent is `fixed` (which already anchors the
+          absolute decorations below), and tailwind-merge would drop the `fixed`. */}
+      <DialogContent className="flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-950/95 p-6 backdrop-blur-3xl sm:max-w-[480px]">
+        {/* Cyan wash over the top of the card — same treatment the header block
+            used to carry, now spanning the whole (borderless) panel. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-cyan-500/10 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_70%)]" />
+
+        <DialogHeader className="relative space-y-2 text-left">
+          <span className="text-xs font-semibold text-cyan-400">
+            {plan ? "Plan" : "Exercise"}
+          </span>
+          <DialogTitle className="pr-10 text-xl font-bold leading-tight text-zinc-100">
+            {title}
+          </DialogTitle>
+          {description && (
+            <p className="text-sm leading-relaxed text-zinc-400">
+              {description}
+            </p>
+          )}
+        </DialogHeader>
+
+        {/* Uppercase kept on request — it is the look the owner signed off on,
+            styleguide rule #11 notwithstanding. */}
+        <div className="relative flex flex-wrap items-center gap-2 uppercase tracking-wider">
+          <Chip color="cyan">
+            <Clock className="h-3.5 w-3.5" />
+            {formatDuration(totalDuration)}
+          </Chip>
+          <Chip color="emerald">{difficulty}</Chip>
+          <Chip>{category}</Chip>
+          {plan && (
+            <Chip>
+              <ListChecks className="h-3.5 w-3.5 text-zinc-400" />
+              {plan.exercises.length}
+            </Chip>
+          )}
         </div>
 
         {plan && plan.exercises.length > 0 && (
-          <div className="px-6 py-5 max-h-[40vh] overflow-y-auto scrollbar-premium">
-            <h4 className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-3">
+          <div className="relative max-h-[40vh] overflow-y-auto scrollbar-premium">
+            <h4 className="mb-3 text-xs font-semibold text-zinc-500">
               Exercises
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {plan.exercises.map((ex, i) => (
-                <li key={`${ex.id}-${i}`} className="flex items-center gap-3 text-[13px] text-zinc-300">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-zinc-800/50 text-[10px] font-bold text-zinc-500 shrink-0 border border-white/5">
+                <li key={`${ex.id}-${i}`} className="flex items-center gap-3 text-sm text-zinc-300">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-semibold text-zinc-400">
                     {i + 1}
                   </span>
                   <span className="flex-1 leading-snug">{ex.title}</span>
-                  <span className="text-[11px] text-zinc-500 shrink-0">{formatDuration(ex.timeInMinutes)}</span>
+                  <span className="shrink-0 text-xs text-zinc-500">{formatDuration(ex.timeInMinutes)}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        <div className="flex items-center justify-end p-5 border-t border-white/5 bg-zinc-950/40 gap-3">
+        {/* Kept as they were on request — the uppercase pair is the look the
+            owner signed off on, styleguide rule #11 notwithstanding. */}
+        <div className="relative flex items-center justify-end gap-3">
           <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[11px] rounded-[8px]">
             Close
           </Button>
-          <Button onClick={handleStart} className="font-bold uppercase tracking-widest text-[11px] rounded-[8px] gap-2">
+          {/* Button wraps its children in its own flex span, so the variant's
+              `gap-2` never reaches the icon — the margin has to live here. */}
+          <Button onClick={handleStart} className="font-bold uppercase tracking-widest text-[11px] rounded-[8px]">
             Start
-            <Play className="w-3 h-3" />
+            <Play className="ml-2 w-3 h-3" />
           </Button>
         </div>
       </DialogContent>

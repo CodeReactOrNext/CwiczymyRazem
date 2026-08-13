@@ -9,6 +9,8 @@ import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
+import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import Link from "next/link";
@@ -61,6 +63,8 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
   const { t } = useTranslation("common");
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
+  const { getSupportMember } = useSupportTeam();
+  const supportMember = getSupportMember(userId);
 
   useEffect(() => {
     if (!userId) {
@@ -146,10 +150,13 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     {userData.displayName?.[0] ?? "?"}
                   </div>
                 )}
-                <div>
+                <div className='flex flex-col items-start gap-1.5'>
                   <h3 className='text-base font-bold text-gray-900'>
                     {userData.displayName}
                   </h3>
+                  {supportMember && (
+                    <SupportBadge member={supportMember} tone='light' />
+                  )}
                 </div>
               </div>
               <div className='relative z-10 grid grid-cols-2 gap-2'>

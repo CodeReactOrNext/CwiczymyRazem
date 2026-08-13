@@ -11,6 +11,9 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
+import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
+import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useTranslation } from "hooks/useTranslation";
 import { Heart, SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -27,6 +30,7 @@ const Chat = () => {
   } = useChat();
 
   const { t } = useTranslation("chat");
+  const { getSupportMember } = useSupportTeam();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +55,7 @@ const Chat = () => {
             const hasLiked = currentUserId
               ? likes.some((l) => l.id === currentUserId)
               : false;
+            const supportMember = getSupportMember(msg.userId);
 
             return (
               <div
@@ -66,12 +71,23 @@ const Chat = () => {
                     {!isFollowUp && (
                       <UserTooltip userId={msg.userId}>
                         <div className='mt-0.5'>
-                          <Avatar
-                            size='sm'
-                            name={msg.username}
-                            avatarURL={msg.userPhotoURL}
-                            lvl={msg.lvl}
-                          />
+                          {supportMember ? (
+                            <SupportAvatarRing>
+                              <Avatar
+                                size='sm'
+                                name={msg.username}
+                                avatarURL={msg.userPhotoURL}
+                                lvl={msg.lvl}
+                              />
+                            </SupportAvatarRing>
+                          ) : (
+                            <Avatar
+                              size='sm'
+                              name={msg.username}
+                              avatarURL={msg.userPhotoURL}
+                              lvl={msg.lvl}
+                            />
+                          )}
                         </div>
                       </UserTooltip>
                     )}
@@ -80,11 +96,18 @@ const Chat = () => {
                   {/* Message Section */}
                   <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                     {!isFollowUp && (
-                      <UserTooltip userId={msg.userId}>
-                        <span className='mb-1 px-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500/80'>
-                          {msg.username}
-                        </span>
-                      </UserTooltip>
+                      <div
+                        className={cn(
+                          "mb-1 flex items-center gap-1.5",
+                          isMe && "flex-row-reverse"
+                        )}>
+                        <UserTooltip userId={msg.userId}>
+                          <span className='px-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500/80'>
+                            {msg.username}
+                          </span>
+                        </UserTooltip>
+                        {supportMember && <SupportBadge member={supportMember} />}
+                      </div>
                     )}
 
                     <div

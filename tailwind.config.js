@@ -369,6 +369,10 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)", opacity: "0.2" },
           "50%": { transform: "scale(1.03)", opacity: "0.4" },
         },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -382,6 +386,7 @@ module.exports = {
         shine: "shine 4.5s ease-in-out infinite",
         "timer-particle": "timer-particle 2s ease-in-out infinite",
         "timer-pulse-glow": "timer-pulse-glow 2s ease-in-out infinite",
+        "spin-slow": "spin-slow 6s linear infinite",
       },
     },
     fontFamily: {

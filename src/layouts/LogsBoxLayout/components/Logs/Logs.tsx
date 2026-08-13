@@ -60,6 +60,9 @@ import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { type SongTierInfo, useSongTiers } from "feature/songs/hooks/useSongTiers";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getSupportVariantCopy } from "feature/support/content/supportVariants";
+import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
+import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useTranslation } from "hooks/useTranslation";
 import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
@@ -395,7 +398,20 @@ const UserLink = ({
   avatarUrl?: string | null;
   lvl?: number;
 }) => {
+  const { getSupportMember } = useSupportTeam();
+
   if (!uid) return <span>{userName}</span>;
+
+  const supportMember = getSupportMember(uid);
+
+  const avatar = (
+    <Avatar
+      size="sm"
+      name={userName}
+      avatarURL={avatarUrl || undefined}
+      lvl={lvl}
+    />
+  );
 
   return (
     <UserTooltip userId={uid}>
@@ -403,14 +419,14 @@ const UserLink = ({
         className='flex items-center gap-2 text-white hover:underline'
         href={`/user/${uid}`}>
         <div className="scale-75 sm:scale-100 origin-left sm:mr-2">
-          <Avatar
-            size="sm"
-            name={userName}
-            avatarURL={avatarUrl || undefined}
-            lvl={lvl}
-          />
+          {supportMember ? (
+            <SupportAvatarRing>{avatar}</SupportAvatarRing>
+          ) : (
+            avatar
+          )}
         </div>
         <span>{userName}</span>
+        {supportMember && <SupportBadge member={supportMember} />}
       </Link>
     </UserTooltip>
   );

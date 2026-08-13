@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent,render, screen } from "@testing-library/react";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { useChat } from "feature/chat/hooks/useChat";
@@ -5,12 +6,15 @@ import { beforeEach,describe, expect, it, vi } from "vitest";
 
 import Chat from "../Chat";
 
-// The like tooltip needs the same provider the app mounts in _app.tsx.
+// The like tooltip and the support-team lookup behind the author avatars need
+// the same providers the app mounts in _app.tsx.
 const renderChat = () =>
   render(
-    <TooltipProvider>
-      <Chat />
-    </TooltipProvider>
+    <QueryClientProvider client={new QueryClient()}>
+      <TooltipProvider>
+        <Chat />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 
 vi.mock("feature/chat/hooks/useChat");

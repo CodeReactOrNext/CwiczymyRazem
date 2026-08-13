@@ -1,4 +1,8 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
+import { SupportMark } from "feature/supportTeam/components/SupportBadge";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
+import { sortSupportFirst } from "feature/supportTeam/utils/supportTeam.utils";
 import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { Monitor } from "lucide-react";
@@ -6,13 +10,16 @@ import Link from "next/link";
 
 export const OnlineUsers = () => {
     const { onlineUsers, isDbEnabled } = useOnlineUsers();
+    const { isSupport, getSupportMember } = useSupportTeam();
 
     if (!isDbEnabled || onlineUsers.length === 0) return null;
 
     // Filter unique users by UID to prevent duplicates
     const uniqueUsers = onlineUsers.filter((v,i,a)=>a.findIndex(t=>(t.uid===v.uid))===i);
 
-    const displayUsers = uniqueUsers.slice(0, 8);
+    // Support members lead the stack: they sit on top of the overlap, so their
+    // ring stays whole, and they are the first face someone looking for help sees.
+    const displayUsers = sortSupportFirst(uniqueUsers, isSupport).slice(0, 8);
     const remainingCount = uniqueUsers.length - 8;
 
     return (
@@ -26,52 +33,69 @@ export const OnlineUsers = () => {
             <div className="flex items-center pl-2">
                 {displayUsers.map((user, i) => {
                     const isPracticing = !!user.currentActivity;
-                    
+                    const supportMember = getSupportMember(user.uid);
+
+                    const avatar = (
+                        <div className={`
+                            relative h-10 w-10 rounded-full bg-zinc-800 overflow-hidden shadow-xl transition-all duration-300
+                            ${supportMember ? "" : `ring-2 ${isPracticing ? "ring-cyan-500" : "ring-zinc-900"}`}
+                        `}>
+                             {user.avatar ? (
+                                <img src={user.avatar} alt={user.displayName} className="h-full w-full object-cover" />
+                             ) : (
+                                <div className="h-full w-full flex items-center justify-center bg-zinc-700 text-xs font-bold text-zinc-300">
+                                    {user.displayName?.[0] || "?"}
+                                </div>
+                             )}
+                        </div>
+                    );
+
                     return (
-                        <div 
-                            key={user.uid} 
-                            className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-300" 
+                        <div
+                            key={user.uid}
+                            className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-300"
                             style={{ zIndex: displayUsers.length - i }}
                         >
                             <UserTooltip userId={user.uid} currentActivity={user.currentActivity}>
                                 <Link href={`/user/${user.uid}`}>
-                                    <div className="cursor-pointer relative group">
+                                    <div className="cursor-pointer relative transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                                         {/* Practicing Animation */}
                                         {isPracticing && (
-                                            <motion.div 
+                                            <motion.div
                                                 initial={{ scale: 0.8, opacity: 0 }}
-                                                animate={{ 
+                                                animate={{
                                                     scale: [1, 1.2, 1],
                                                     opacity: [0.5, 0.2, 0.5]
                                                 }}
-                                                transition={{ 
-                                                    duration: 2, 
+                                                transition={{
+                                                    duration: 2,
                                                     repeat: Infinity,
-                                                    ease: "easeInOut" 
+                                                    ease: "easeInOut"
                                                 }}
-                                                className="absolute -inset-1 rounded-full bg-cyan-500 z-0"
+                                                className={`absolute -inset-1 rounded-full z-0 ${supportMember ? "bg-purple-500" : "bg-cyan-500"}`}
                                             />
                                         )}
-                                        
-                                        <div className={`
-                                            relative h-10 w-10 rounded-full ring-2 bg-zinc-800 overflow-hidden shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1
-                                            ${isPracticing ? 'ring-cyan-500' : 'ring-zinc-900'}
-                                        `}>
-                                             {user.avatar ? (
-                                                <img src={user.avatar} alt={user.displayName} className="h-full w-full object-cover" />
-                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center bg-zinc-700 text-xs font-bold text-zinc-300">
-                                                    {user.displayName?.[0] || "?"}
-                                                </div>
-                                             )}
-                                        </div>
 
-                                        {/* Status Dot */}
-                                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-950 ${isPracticing ? 'bg-cyan-500' : 'bg-emerald-500'}`}>
-                                            {isPracticing && (
-                                                <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
-                                            )}
-                                        </div>
+                                        {supportMember ? (
+                                            <SupportAvatarRing>{avatar}</SupportAvatarRing>
+                                        ) : (
+                                            avatar
+                                        )}
+
+                                        {/* Bottom-right: support mark for the team, plain state dot for
+                                        everyone else — the rotating ring already says "online" for them. */}
+                                        {supportMember ? (
+                                            <SupportMark
+                                                member={supportMember}
+                                                className="absolute -bottom-0.5 -right-0.5"
+                                            />
+                                        ) : (
+                                            <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-950 ${isPracticing ? 'bg-cyan-500' : 'bg-emerald-500'}`}>
+                                                {isPracticing && (
+                                                    <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Desktop app badge — top-right: the left edge of every
                                         avatar but the first sits under its higher z-indexed
