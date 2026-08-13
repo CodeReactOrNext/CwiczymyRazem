@@ -9,7 +9,7 @@ import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
 import { DEFAULT_SUPPORT_TITLE } from "feature/supportTeam/utils/supportTeam.utils";
 import { doc, getDoc } from "firebase/firestore";
-import { LifeBuoy, Search, ShieldCheck, Trash2, User, Users } from "lucide-react";
+import { Heart, Search, Trash2, User, Users } from "lucide-react";
 import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
@@ -74,15 +74,15 @@ const SearchResultRow = ({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder={DEFAULT_SUPPORT_TITLE}
-        className='w-32 rounded-xl border border-white/5 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-700 focus:border-purple-500/40 focus:outline-none'
+        className='w-32 rounded-xl border border-white/5 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-700 focus:border-amber-500/40 focus:outline-none'
       />
 
       <button
         onClick={() => run(() => onMark(title))}
         disabled={busy}
-        className='flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-purple-500 disabled:opacity-40'>
-        <ShieldCheck size={12} />
-        {user.isSupport ? "Update" : "Make support"}
+        className='flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 transition hover:bg-amber-400 disabled:opacity-40'>
+        <Heart size={12} fill='currentColor' />
+        {user.isSupport ? "Update" : "Mark as supporter"}
       </button>
 
       {user.isSupport && (
@@ -106,7 +106,7 @@ const TeamMemberRow = ({
   member: SupportTeamMember;
   onRemove: () => void;
 }) => (
-  <div className='flex items-center gap-4 rounded-2xl border border-white/5 bg-zinc-950/60 p-4 transition-colors hover:border-purple-500/20'>
+  <div className='flex items-center gap-4 rounded-2xl border border-white/5 bg-zinc-950/60 p-4 transition-colors hover:border-amber-500/20'>
     <SupportAvatarRing>
       <UserAvatar avatar={member.avatar} />
     </SupportAvatarRing>
@@ -201,16 +201,16 @@ const AdminUsersPage = () => {
             </div>
           </div>
 
-          <div className='flex items-center gap-6 rounded-3xl border border-purple-500/20 bg-zinc-950/50 p-8 backdrop-blur-xl'>
-            <div className='flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10'>
-              <LifeBuoy className='h-7 w-7 text-purple-400' />
+          <div className='flex items-center gap-6 rounded-3xl border border-amber-500/20 bg-zinc-950/50 p-8 backdrop-blur-xl'>
+            <div className='flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10'>
+              <Heart className='h-7 w-7 text-amber-400' fill='currentColor' />
             </div>
             <div>
               <div className='text-4xl font-black tabular-nums text-white'>
                 {members.length}
               </div>
               <p className='mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600'>
-                Support team
+                Supporters
               </p>
             </div>
           </div>
@@ -220,7 +220,7 @@ const AdminUsersPage = () => {
         <section className='space-y-4'>
           <div className='flex flex-col gap-1'>
             <h3 className='text-xs font-black uppercase tracking-[0.2em] text-zinc-500'>
-              Mark a user as support
+              Mark a user as a supporter
             </h3>
             <p className='text-xs text-zinc-600'>
               Search by display name or paste a user ID. The optional label
@@ -238,7 +238,7 @@ const AdminUsersPage = () => {
               value={term}
               onChange={(e) => setTerm(e.target.value)}
               placeholder='e.g. jenny or a user ID…'
-              className='w-full rounded-2xl border border-white/5 bg-zinc-900 py-3 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-700 focus:border-purple-500/40 focus:outline-none'
+              className='w-full rounded-2xl border border-white/5 bg-zinc-900 py-3 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-700 focus:border-amber-500/40 focus:outline-none'
             />
           </div>
 
@@ -272,14 +272,14 @@ const AdminUsersPage = () => {
         {/* Current team */}
         <section className='space-y-4'>
           <h3 className='flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-500'>
-            <ShieldCheck size={13} />
-            Support team
+            <Heart size={13} fill='currentColor' />
+            Supporters
           </h3>
 
           {members.length === 0 ? (
             <div className='flex flex-col items-center gap-3 rounded-3xl border border-dashed border-white/5 py-16 text-zinc-700'>
-              <LifeBuoy className='h-10 w-10 opacity-20' />
-              <p className='text-sm font-bold'>No support members yet</p>
+              <Heart className='h-10 w-10 opacity-20' />
+              <p className='text-sm font-bold'>No supporters marked yet</p>
               <p className='text-xs text-zinc-600'>
                 Search for a user above to give them the badge
               </p>

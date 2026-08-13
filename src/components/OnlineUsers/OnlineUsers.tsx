@@ -17,8 +17,8 @@ export const OnlineUsers = () => {
     // Filter unique users by UID to prevent duplicates
     const uniqueUsers = onlineUsers.filter((v,i,a)=>a.findIndex(t=>(t.uid===v.uid))===i);
 
-    // Support members lead the stack: they sit on top of the overlap, so their
-    // ring stays whole, and they are the first face someone looking for help sees.
+    // Supporters lead the stack: they sit on top of the overlap, so their gold
+    // ring stays whole instead of being clipped by the next avatar.
     const displayUsers = sortSupportFirst(uniqueUsers, isSupport).slice(0, 8);
     const remainingCount = uniqueUsers.length - 8;
 
@@ -72,7 +72,7 @@ export const OnlineUsers = () => {
                                                     repeat: Infinity,
                                                     ease: "easeInOut"
                                                 }}
-                                                className={`absolute -inset-1 rounded-full z-0 ${supportMember ? "bg-purple-500" : "bg-cyan-500"}`}
+                                                className={`absolute -inset-1 rounded-full z-0 ${supportMember ? "bg-amber-400" : "bg-cyan-500"}`}
                                             />
                                         )}
 
@@ -82,7 +82,7 @@ export const OnlineUsers = () => {
                                             avatar
                                         )}
 
-                                        {/* Bottom-right: support mark for the team, plain state dot for
+                                        {/* Bottom-right: heart mark for supporters, plain state dot for
                                         everyone else — the rotating ring already says "online" for them. */}
                                         {supportMember ? (
                                             <SupportMark

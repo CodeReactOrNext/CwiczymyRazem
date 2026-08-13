@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Public roster of support-team members, used to mark their avatars in the
+ * Public roster of supporters, used to mark their avatars in the
  * activity feed and the "Live Now" list. Served from a single denormalised
  * document (written by /api/admin/support) so the client pays one request
  * instead of a per-user lookup it is not even allowed to make.

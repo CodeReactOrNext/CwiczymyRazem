@@ -5,6 +5,7 @@ import {
   buildSupportMemberIndex,
   DEFAULT_SUPPORT_TITLE,
   getSupportLabel,
+  getSupportTooltip,
   sortSupportFirst,
 } from "./supportTeam.utils";
 
@@ -26,7 +27,22 @@ describe("getSupportLabel", () => {
   });
 
   it("uses the custom title when set", () => {
-    expect(getSupportLabel(member("a", "Moderator"))).toBe("Moderator");
+    expect(getSupportLabel(member("a", "Patron"))).toBe("Patron");
+  });
+
+  it("names the donor, not a helpdesk role", () => {
+    expect(DEFAULT_SUPPORT_TITLE).toBe("Supporter");
+  });
+});
+
+describe("getSupportTooltip", () => {
+  it("spells out that the badge is about donating", () => {
+    expect(getSupportTooltip(member("a"))).toBe(
+      "Supporter — supports Riff Quest with a donation",
+    );
+    expect(getSupportTooltip(member("a", "Patron"))).toBe(
+      "Patron — supports Riff Quest with a donation",
+    );
   });
 });
 

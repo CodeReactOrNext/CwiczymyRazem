@@ -24,7 +24,7 @@ export const useAdminSupport = (password: string) => {
         });
         setMembers(res.data.members ?? []);
       } catch {
-        toast.error("Failed to load the support team");
+        toast.error("Failed to load the supporters");
       } finally {
         setIsLoading(false);
       }
@@ -55,7 +55,7 @@ export const useAdminSupport = (password: string) => {
     [password],
   );
 
-  /** Marks the user as support, or updates the label shown on their badge. */
+  /** Marks the user as a supporter, or updates the label shown on their badge. */
   const markAsSupport = async (uid: string, title?: string) => {
     try {
       const res = await axios.post(
@@ -72,9 +72,9 @@ export const useAdminSupport = (password: string) => {
               : user,
           ) ?? null,
       );
-      toast.success("Marked as support");
+      toast.success("Marked as a supporter");
     } catch {
-      toast.error("Failed to mark as support");
+      toast.error("Failed to mark as a supporter");
     }
   };
 
@@ -93,9 +93,9 @@ export const useAdminSupport = (password: string) => {
               : user,
           ) ?? null,
       );
-      toast.success("Removed from the support team");
+      toast.success("Removed from the supporters");
     } catch {
-      toast.error("Failed to remove from the support team");
+      toast.error("Failed to remove from the supporters");
     }
   };
 

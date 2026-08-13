@@ -1,7 +1,10 @@
 import { cn } from "assets/lib/utils";
 import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
-import { getSupportLabel } from "feature/supportTeam/utils/supportTeam.utils";
-import { ShieldCheck } from "lucide-react";
+import {
+  getSupportLabel,
+  getSupportTooltip,
+} from "feature/supportTeam/utils/supportTeam.utils";
+import { Heart } from "lucide-react";
 
 interface SupportBadgeProps {
   member?: SupportTeamMember | null;
@@ -10,22 +13,26 @@ interface SupportBadgeProps {
   className?: string;
 }
 
-/** Text pill shown next to a support member's name wherever there is room. */
+/**
+ * Text pill shown next to a supporter's name wherever there is room. Gold + a
+ * filled heart, the same language the donation surfaces use — a shield would
+ * read as a moderator instead of someone funding the project.
+ */
 export const SupportBadge = ({
   member,
   tone = "dark",
   className,
 }: SupportBadgeProps) => (
   <span
-    title={`${getSupportLabel(member)} — riff.quest team`}
+    title={getSupportTooltip(member)}
     className={cn(
       "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold leading-none",
       tone === "light"
-        ? "bg-purple-100 text-purple-700"
-        : "bg-purple-500/15 text-purple-300",
+        ? "bg-amber-100 text-amber-700"
+        : "bg-amber-500/15 text-amber-300",
       className,
     )}>
-    <ShieldCheck size={10} strokeWidth={2.5} />
+    <Heart size={10} strokeWidth={2.5} fill='currentColor' />
     {getSupportLabel(member)}
   </span>
 );
@@ -41,11 +48,11 @@ interface SupportMarkProps {
  */
 export const SupportMark = ({ member, className }: SupportMarkProps) => (
   <div
-    title={`${getSupportLabel(member)} — riff.quest team`}
+    title={getSupportTooltip(member)}
     className={cn(
-      "flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-white ring-2 ring-zinc-950",
+      "flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-zinc-950 ring-2 ring-zinc-950",
       className,
     )}>
-    <ShieldCheck className='h-2.5 w-2.5' strokeWidth={3} />
+    <Heart className='h-2.5 w-2.5' strokeWidth={3} fill='currentColor' />
   </div>
 );
