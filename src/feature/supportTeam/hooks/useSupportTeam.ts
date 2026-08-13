@@ -13,7 +13,7 @@ const fetchSupportTeam = async (): Promise<SupportTeamMember[]> => {
 };
 
 /**
- * The support roster, served from a single backend-maintained document — the
+ * The supporter roster, served from a single backend-maintained document — the
  * feed and the presence list only carry uids, and clients can't read other
  * users' documents, so the mark can't be resolved per user on the client.
  * Cached for a long while: the list changes maybe a few times a year.
