@@ -20,7 +20,7 @@ const measure = (tapFret: number) => ({
 
 export const tappingDescendingTargetExercise: Exercise = {
   id: "tapping_descending_target",
-  title: "Tapping – Descending Target Drill",
+  title: "Tapping — Descending Targets",
   description:
     "Practice precise, descending tapped arpeggios with clean pull-offs.",
   whyItMatters: "Descending tapping sequences can easily become muddy if the tapped finger doesn't pull off cleanly. This drill trains your tapping finger to pull slightly downward, ensuring a crisp, high-volume note trigger.",

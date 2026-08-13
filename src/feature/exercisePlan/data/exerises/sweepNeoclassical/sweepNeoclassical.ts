@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const sweepNeoclassicalExercise: Exercise = {
   id: "sweep_neoclassical",
-  title: "Neoclassical Sweep Master",
+  title: "Sweep — Neoclassical Runs",
   description: "Execute multi-octave sweep arpeggios with perfect synchronization.",
   whyItMatters: "Sweeping is the ultimate high-speed arpeggio technique. This neoclassical drill focuses on the sync between the picking hand 'sweep' and fretting hand 'rolls', ensuring every note is perfectly separated and articulate.",
   difficulty: "hard",

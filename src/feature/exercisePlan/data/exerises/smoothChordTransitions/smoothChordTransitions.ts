@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const smoothChordTransitionsExercise: Exercise = {
   id: "smooth_chord_transitions",
-  title: "Smooth Chord Transitions",
+  title: "Chords — Smooth Changes",
   description:
     "Minimize finger movement and eliminate pauses during common chord changes.",
   whyItMatters: "Choppy chord changes ruin the groove of a song. Training your fingers to move as a single, coordinated unit and using anchor fingers where possible ensures a continuous, professional rhythm sound.",

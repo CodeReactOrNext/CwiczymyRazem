@@ -17,7 +17,7 @@ const BASE_TIPS = [
 
 export const strummingPattern2: Exercise = {
   id: "strumming_pattern_2",
-  title: "Strumming Pattern 2 — Quarter Downs + Final Up",
+  title: "Strumming 2 — Downs + Final Up",
   description: "Execute four steady downstrokes with a single upstroke on the final subdivision.",
   whyItMatters: "This pattern introduces basic subdivision control, allowing you to insert an upstroke without disrupting the primary downbeat pulse.",
   difficulty: "easy",
@@ -36,7 +36,7 @@ export const strummingPattern2: Exercise = {
 
 export const strummingPattern3: Exercise = {
   id: "strumming_pattern_3",
-  title: "Strumming Pattern 3 — All Eighth Notes",
+  title: "Strumming 3 — All Eighths",
   description: "Execute continuous alternate strumming on every 8th-note subdivision.",
   whyItMatters: "This pattern establishes the core mechanics of alternate strumming, ensuring equal weight and timing between downstrokes and upstrokes.",
   difficulty: "easy",
@@ -54,7 +54,7 @@ export const strummingPattern3: Exercise = {
 
 export const strummingPattern4: Exercise = {
   id: "strumming_pattern_4",
-  title: "Strumming Pattern 4 — Down-Skip-Down-Up",
+  title: "Strumming 4 — Down-Skip-Down-Up",
   description: "Perform an alternating pattern with a missed upstroke on the first subdivision.",
   whyItMatters: "This introduces syncopation by omitting a subdivision, training your arm to maintain the pendulum motion even when skipping the strings.",
   difficulty: "easy",
@@ -72,7 +72,7 @@ export const strummingPattern4: Exercise = {
 
 export const strummingPattern5: Exercise = {
   id: "strumming_pattern_5",
-  title: "Strumming Pattern 5 — Down-Up Skip",
+  title: "Strumming 5 — Down-Up Skip",
   description: "Perform a pattern that omits the upstrokes before beats 2 and 4.",
   whyItMatters: "Omitting specific upstrokes develops selective targeting, allowing you to create breathing room within a rhythm without losing momentum.",
   difficulty: "easy",
@@ -90,7 +90,7 @@ export const strummingPattern5: Exercise = {
 
 export const strummingPattern6: Exercise = {
   id: "strumming_pattern_6",
-  title: "Strumming Pattern 6 — Syncopated Upstroke",
+  title: "Strumming 6 — Syncopated Ups",
   description: "Execute a syncopated pattern featuring two consecutive sounding upstrokes.",
   whyItMatters: "Consecutive upstrokes force you to rely entirely on the internal pendulum pulse, developing advanced syncopation and timing independence.",
   difficulty: "easy",
@@ -108,7 +108,7 @@ export const strummingPattern6: Exercise = {
 
 export const strummingPattern7: Exercise = {
   id: "strumming_pattern_7",
-  title: "Strumming Pattern 7 — Inside Upstrokes",
+  title: "Strumming 7 — Inside Upstrokes",
   description: "Perform a pattern centered around upstrokes on the subdivisions.",
   whyItMatters: "By isolating the upstrokes, this exercise balances your strumming attack and ensures your upward motions are as authoritative as your downward motions.",
   difficulty: "easy",
@@ -126,7 +126,7 @@ export const strummingPattern7: Exercise = {
 
 export const strummingPattern8: Exercise = {
   id: "strumming_pattern_8",
-  title: "Strumming Pattern 8 — Two Downs then Down-Up",
+  title: "Strumming 8 — Downs, Down-Up",
   description: "Combine quarter-note and eighth-note feels within a single measure.",
   whyItMatters: "Mixing rhythmic densities trains your hand to transition smoothly between sparse and busy strumming without altering your core tempo.",
   difficulty: "easy",
@@ -144,7 +144,7 @@ export const strummingPattern8: Exercise = {
 
 export const strummingPattern9: Exercise = {
   id: "strumming_pattern_9",
-  title: "Strumming Pattern 9 — Skip First &",
+  title: "Strumming 9 — Skip First &",
   description: "Execute an eighth-note run that omits only the first upstroke.",
   whyItMatters: "This pattern builds stamina and consistency in continuous eighth-note strumming, using a single rest to reset the phrasing loop.",
   difficulty: "easy",
@@ -162,7 +162,7 @@ export const strummingPattern9: Exercise = {
 
 export const strummingPattern10: Exercise = {
   id: "strumming_pattern_10",
-  title: "Strumming Pattern 10 — Syncopated Upstroke Run",
+  title: "Strumming 10 — Upstroke Run",
   description: "Execute a highly syncopated pattern dominated by consecutive upstrokes.",
   whyItMatters: "Extended runs of upstrokes test your timing accuracy and arm control, ensuring your silent downswings remain perfectly anchored to the beat.",
   difficulty: "easy",
@@ -180,7 +180,7 @@ export const strummingPattern10: Exercise = {
 
 export const strummingPattern11: Exercise = {
   id: "strumming_pattern_11",
-  title: "Strumming Pattern 11 — Syncopated Mid-Bar Down",
+  title: "Strumming 11 — Mid-Bar Down",
   description: "Perform a syncopated pattern that interrupts an upstroke run with a mid-measure downstroke.",
   whyItMatters: "Inserting a surprise downstroke into a syncopated run trains rapid motor switching and breaks predictability in your rhythm playing.",
   difficulty: "easy",
@@ -198,7 +198,7 @@ export const strummingPattern11: Exercise = {
 
 export const strummingPattern12: Exercise = {
   id: "strumming_pattern_12",
-  title: "Strumming Pattern 12 — Starts on Upstroke",
+  title: "Strumming 12 — Starts on Up",
   description: "Begin a strumming sequence on the first subdivision upstroke rather than the downbeat.",
   whyItMatters: "Starting on an upbeat forces you to internalize the downbeat silently, dramatically improving your internal pulse and metronome alignment.",
   difficulty: "easy",
@@ -216,7 +216,7 @@ export const strummingPattern12: Exercise = {
 
 export const strummingPattern13: Exercise = {
   id: "strumming_pattern_13",
-  title: "Strumming Pattern 13 — Soft Landing",
+  title: "Strumming 13 — Soft Landing",
   description: "Perform a steady downstroke sequence featuring a single isolated upstroke.",
   whyItMatters: "This exercise isolates the upstroke motion within a downstroke-heavy context, refining your dynamic control and subtle accenting.",
   difficulty: "easy",
@@ -234,7 +234,7 @@ export const strummingPattern13: Exercise = {
 
 export const strummingPattern14: Exercise = {
   id: "strumming_pattern_14",
-  title: "Strumming Pattern 14 — All Upstrokes",
+  title: "Strumming 14 — All Upstrokes",
   description: "Execute a pattern composed entirely of upstrokes on the subdivisions.",
   whyItMatters: "Isolating upstrokes builds tone consistency and precise pick depth control, as upward strums are naturally weaker and require focused mechanics.",
   difficulty: "easy",
@@ -252,7 +252,7 @@ export const strummingPattern14: Exercise = {
 
 export const strummingPattern15: Exercise = {
   id: "strumming_pattern_15",
-  title: "Strumming Pattern 15 — Upstrokes + One Down",
+  title: "Strumming 15 — Ups + One Down",
   description: "Perform an upstroke-heavy pattern punctuated by a single downstroke.",
   whyItMatters: "This inversion of standard strumming conventions sharpens your coordination and forces you to treat upstrokes as the primary rhythmic driver.",
   difficulty: "easy",
@@ -270,7 +270,7 @@ export const strummingPattern15: Exercise = {
 
 export const strummingPattern16: Exercise = {
   id: "strumming_pattern_16",
-  title: "Strumming Pattern 16 — Double Down-Up",
+  title: "Strumming 16 — Double Down-Up",
   description: "Execute two alternating pairs embedded within syncopated upstrokes.",
   whyItMatters: "Navigating dense alternating pairs surrounded by silence and syncopation challenges your rhythmic stability and strict pendulum mechanics.",
   difficulty: "easy",
@@ -288,7 +288,7 @@ export const strummingPattern16: Exercise = {
 
 export const strummingPattern18: Exercise = {
   id: "strumming_pattern_18",
-  title: "Strumming Pattern 18 — Half-Time Feel",
+  title: "Strumming 18 — Half-Time Feel",
   description: "Perform a sparse pattern with downstrokes on beats 1 and 3.",
   whyItMatters: "Sparse patterns require intense internal counting to prevent rushing. This exercise builds patience and sustained tempo control.",
   difficulty: "easy",
@@ -306,7 +306,7 @@ export const strummingPattern18: Exercise = {
 
 export const strummingPattern19: Exercise = {
   id: "strumming_pattern_19",
-  title: "Strumming Pattern 19 — Down-Up on Beat 1",
+  title: "Strumming 19 — Down-Up on Beat 1",
   description: "Begin with an alternating pair followed by strict downstrokes.",
   whyItMatters: "Transitioning immediately from subdivisions to quarter notes stabilizes your tempo and prevents rushing after busy rhythmic figures.",
   difficulty: "easy",
@@ -324,7 +324,7 @@ export const strummingPattern19: Exercise = {
 
 export const strummingPattern20: Exercise = {
   id: "strumming_pattern_20",
-  title: "Strumming Pattern 20 — Mixed Syncopation",
+  title: "Strumming 20 — Mixed Syncopation",
   description: "Perform a flowing pattern that mixes alternating pairs with isolated downstrokes.",
   whyItMatters: "This develops rhythmic vocabulary by combining common structural building blocks into a cohesive, musical phrase.",
   difficulty: "easy",
@@ -342,7 +342,7 @@ export const strummingPattern20: Exercise = {
 
 export const strummingPattern21: Exercise = {
   id: "strumming_pattern_21",
-  title: "Strumming Pattern 21 — Upstroke Ending",
+  title: "Strumming 21 — Upstroke Ending",
   description: "Execute a sparse opening leading into a dense, syncopated ending.",
   whyItMatters: "Managing long silences followed by rapid subdivisions builds dynamic pacing and prevents tempo drag during rests.",
   difficulty: "easy",
@@ -360,7 +360,7 @@ export const strummingPattern21: Exercise = {
 
 export const strummingPattern22: Exercise = {
   id: "strumming_pattern_22",
-  title: "Strumming Pattern 22 — Mid-Bar Upstroke",
+  title: "Strumming 22 — Mid-Bar Upstroke",
   description: "Perform a pattern featuring an alternating pair displaced to the middle of the measure.",
   whyItMatters: "Displacing standard rhythmic figures to unexpected beats trains your concentration and disrupts automatic muscle memory patterns.",
   difficulty: "easy",
@@ -378,7 +378,7 @@ export const strummingPattern22: Exercise = {
 
 export const strummingPattern23: Exercise = {
   id: "strumming_pattern_23",
-  title: "Strumming Pattern 23 — Full 1-2, Quarter 3-4",
+  title: "Strumming 23 — Dense to Sparse",
   description: "Contrast dense eighth notes in the first half with sparse quarter notes in the second.",
   whyItMatters: "This structural contrast requires you to rapidly shift rhythmic gears without losing the underlying quarter-note pulse.",
   difficulty: "easy",
@@ -396,7 +396,7 @@ export const strummingPattern23: Exercise = {
 
 export const strummingPattern24: Exercise = {
   id: "strumming_pattern_24",
-  title: "Strumming Pattern 24 — Opens on Upstroke",
+  title: "Strumming 24 — Opens on Up",
   description: "Begin on the first subdivision upstroke followed by steady quarter-note downstrokes.",
   whyItMatters: "Starting off-beat before settling into a strong downbeat groove trains recovery mechanics and subdivision awareness.",
   difficulty: "easy",
@@ -414,7 +414,7 @@ export const strummingPattern24: Exercise = {
 
 export const strummingPattern25: Exercise = {
   id: "strumming_pattern_25",
-  title: "Strumming Pattern 25 — Late Upstroke",
+  title: "Strumming 25 — Late Upstroke",
   description: "Execute alternating pairs with a syncopated, delayed final upstroke.",
   whyItMatters: "Delayed accents build tension and release in your rhythm playing, requiring strict adherence to the silent pendulum swings.",
   difficulty: "easy",
@@ -432,7 +432,7 @@ export const strummingPattern25: Exercise = {
 
 export const strummingPattern26: Exercise = {
   id: "strumming_pattern_26",
-  title: "Strumming Pattern 26 — Two Down-Up Groups",
+  title: "Strumming 26 — Down-Up Pairs",
   description: "Perform two isolated alternating pairs separated by rests.",
   whyItMatters: "Isolating short rhythmic bursts trains explosive control and immediate muting awareness between active strumming phrases.",
   difficulty: "easy",
@@ -450,7 +450,7 @@ export const strummingPattern26: Exercise = {
 
 export const strummingPattern27: Exercise = {
   id: "strumming_pattern_27",
-  title: "Strumming Pattern 27 — Upstroke Lead-In",
+  title: "Strumming 27 — Upstroke Lead-In",
   description: "Begin with an upstroke leading directly into a continuous eighth-note run.",
   whyItMatters: "Entering a busy pattern on an upstroke requires excellent pick depth control to prevent the pick from digging in and disrupting the flow.",
   difficulty: "easy",
@@ -468,7 +468,7 @@ export const strummingPattern27: Exercise = {
 
 export const strummingPattern28: Exercise = {
   id: "strumming_pattern_28",
-  title: "Strumming Pattern 28 — Upstroke into Downs",
+  title: "Strumming 28 — Up, Then Downs",
   description: "Perform an upstroke entry followed by quarter notes and an alternating finish.",
   whyItMatters: "This pattern demands precise switching between off-beats, on-beats, and continuous subdivisions, challenging overall rhythmic agility.",
   difficulty: "easy",
@@ -486,7 +486,7 @@ export const strummingPattern28: Exercise = {
 
 export const strummingPattern29: Exercise = {
   id: "strumming_pattern_29",
-  title: "Strumming Pattern 29 — Skip the & of 3",
+  title: "Strumming 29 — Skip the & of 3",
   description: "Execute continuous subdivisions with a single omission on the upstroke of beat 3.",
   whyItMatters: "Omitting a single subdivision within a continuous flow develops selective string avoidance and subtle syncopation mechanics.",
   difficulty: "easy",
@@ -504,7 +504,7 @@ export const strummingPattern29: Exercise = {
 
 export const strummingPattern30: Exercise = {
   id: "strumming_pattern_30",
-  title: "Strumming Pattern 30 — Opens Slow, Ends Fast",
+  title: "Strumming 30 — Slow to Fast",
   description: "Transition from sparse quarter notes to a dense, syncopated ending phrase.",
   whyItMatters: "Accelerating the rhythmic density builds momentum and phrasing awareness, essential for creating dynamic rhythm guitar parts.",
   difficulty: "easy",
@@ -522,7 +522,7 @@ export const strummingPattern30: Exercise = {
 
 export const strummingPattern31: Exercise = {
   id: "strumming_pattern_31",
-  title: "Strumming Pattern 31 — All Eighths, Skip Last",
+  title: "Strumming 31 — Skip the Last Up",
   description: "Perform continuous eighth notes, omitting only the final upstroke.",
   whyItMatters: "Dropping the final subdivision creates a brief resting window, useful for executing complex chord transitions on the subsequent downbeat.",
   difficulty: "easy",
@@ -540,7 +540,7 @@ export const strummingPattern31: Exercise = {
 
 export const strummingPattern32: Exercise = {
   id: "strumming_pattern_32",
-  title: "Strumming Pattern 32 — Double Upstroke Gaps",
+  title: "Strumming 32 — Off-Beat Pairs",
   description: "Execute isolated up-down pairs positioned exclusively on subdivisions.",
   whyItMatters: "This highly syncopated pattern entirely avoids the strong downbeats, forcing complete reliance on internal timing and subdivision accuracy.",
   difficulty: "easy",

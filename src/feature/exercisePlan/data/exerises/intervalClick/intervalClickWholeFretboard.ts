@@ -5,7 +5,7 @@ import { ALL_ROOTS, createIntervalClickExercise } from "./createIntervalClickExe
 export const intervalClickWholeFretboardExercise = createIntervalClickExercise({
   id: "interval_click_whole_fretboard",
   addedAt: "2026-08-11",
-  title: "Intervals: Whole Fretboard — Click Drill",
+  title: "Interval Clicks — Whole Neck",
   description: "Every interval, every root, the full neck from open to fret 12 — no box to hide in.",
   difficulty: "hard",
   timeInMinutes: 4,

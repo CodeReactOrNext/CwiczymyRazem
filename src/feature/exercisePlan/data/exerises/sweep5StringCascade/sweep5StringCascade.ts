@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const sweep5StringCascadeExercise: Exercise = {
   id: "sweep_5_string_cascade",
-  title: "5-String Sweep Cascades",
+  title: "Sweep — 5-String Cascades",
   description: "Execute extended 5-string sweep arpeggios to build deep fretting hand muting control and fluid sweep motion.",
   whyItMatters: "This exercise develops muting discipline and fluid motion across almost the entire fretboard width. It trains your picking hand to execute a broad, uniform sweep stroke, and builds the string-to-string muting control required to play clean, note-separated arpeggios at any speed.",
   difficulty: "hard",

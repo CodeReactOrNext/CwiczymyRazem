@@ -2,7 +2,7 @@
 
 export const jazzChordMelodyExercise: Exercise = {
   id: "jazz_chord_melody",
-  title: "Bass and Chords",
+  title: "Hybrid Picking — Bass + Chords",
   description: "Coordinate hybrid picking to execute clean bass lines while plucking simultaneous chord harmony.",
   whyItMatters: "This exercise develops highly independent control between your pick and fingers. By separating low-frequency bass lines from high-frequency harmony voicings, you build the essential hand coordination needed to play solo arrangements, manage polyrhythms, and achieve precise chord comping.",
   difficulty: "hard",

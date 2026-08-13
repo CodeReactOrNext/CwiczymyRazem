@@ -27,7 +27,7 @@ const tablature: TablatureMeasure[] = [0, 1, 2].map((shift) => {
 
 export const jpStretching: Exercise = {
   id: "jp_stretching",
-  title: "Petrucci Stretching Exercise",
+  title: "Stretch — Petrucci Pattern",
   description: "Expand your finger reach and hand flexibility with a wide-interval linear stretch.",
   whyItMatters: "Developing wide fretboard reach requires careful conditioning of the hand muscles. This exercise helps build structural reach, making complex jazz chords and wide-span metal/shred runs feel effortless and comfortable.",
   difficulty: "easy",

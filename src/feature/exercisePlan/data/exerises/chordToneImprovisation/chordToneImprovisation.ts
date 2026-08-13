@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const chordToneImprovisationExercise: Exercise = {
   id: "chord_tone_improvisation",
-  title: "Chord Tone Improvisation",
+  title: "Improv — Chord Tones",
   description:
     "Target chord tones systematically over shifting backing tracks to build melodic intent.",
   whyItMatters: "Improvising by targeting chord tones (root, third, fifth, seventh) anchors your solos directly to the underlying harmony. This technique prevents random note selection, producing structured, harmonically rich solos that sound musical and professional.",

@@ -2,7 +2,7 @@
 
 export const expressiveBendPhrasingExercise: Exercise = {
   id: "expressive_bend_phrasing",
-  title: "Expressive Bend Phrasing",
+  title: "Bending — Inside a Phrase",
   description: "Integrate whole-step and half-step bends into melodic phrases with precise pitch control.",
   whyItMatters: "Bending is one of the most expressive techniques on the guitar, mimicking the human voice. Proper bending technique involves using the strength of multiple fingers and rotating the wrist to achieve perfect intonation and prevent string slippage.",
   difficulty: "medium",

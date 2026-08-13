@@ -2,7 +2,7 @@
 
 export const chickenPickinExercise: Exercise = {
   id: "chicken_pickin",
-  title: "Snap and Pop",
+  title: "Hybrid Picking — Chicken Pickin'",
   description: "Develop hybrid picking coordination and percussive snapping dynamics.",
   whyItMatters: "Chicken picking is a cornerstone of country and blues lead styles. Snapping the string with your fingers while muting it with your picking hand creates a percussive, high-attack note definition that adds rhythmic energy and dynamic contrast to your playing.",
   difficulty: "hard",

@@ -2,7 +2,7 @@
 
 export const stringSkippingMelodicExercise: Exercise = {
   id: "string_skipping_melodic",
-  title: "Melodic Skip Sequences",
+  title: "String Skipping — Melodic Lines",
   description: "Navigate melodic lines that utilize constant, wide-interval string skips.",
   whyItMatters: "Melodic string skips add dramatic pitch changes to your solos. This exercise trains your picking hand to find strings instantly without looking, building excellent spatial accuracy.",
   difficulty: "hard",

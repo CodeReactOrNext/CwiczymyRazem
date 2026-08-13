@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const alternatePickingCrossStringExercise: Exercise = {
   id: "alternate_picking_cross_string",
-  title: "Alternate Picking Cross-String",
+  title: "Alternate Picking — Cross-String",
   description: "A minor scale-based alternate picking exercise across all 6 strings. Progresses from 2-note-per-string pentatonic patterns to 3-note-per-string natural minor, training inside and outside picking.",
   whyItMatters: "This exercise develops clean alternate picking across string changes. It improves picking consistency, string transition control, and synchronization between both hands.",
   difficulty: "medium",

@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const pullOffPentatonicRunExercise: Exercise = {
   id: "pull_off_pentatonic_run",
-  title: "Dark Pull-off Pentatonic Run",
+  title: "Legato — Pull-off Pentatonic",
   description: "Develop seamless legato technique using A minor pentatonic pull-offs across the middle strings. Focus on dynamic equality between picked and pulled notes for a smooth, heavy flow.",
   whyItMatters: "This exercise builds fretting hand finger independence and strength. Legato runs are fundamental to fluid phrasing, speed, and clean transitions between strings.",
   difficulty: "easy",

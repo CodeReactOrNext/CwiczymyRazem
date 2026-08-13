@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const strummingBasicExercise: Exercise = {
   id: "strumming_basic",
-  title: "Basic Down Strumming",
+  title: "Strumming 1 — All Downs",
   description: "Strum steady downward strokes on every beat over an Em chord to build basic rhythm and timing.",
   whyItMatters: "This is the basic up-and-down arm movement used in all rhythm playing. Strumming steady downbeats locks your timing to the metronome, keeps your wrist relaxed, and helps you hit all the strings of the chord evenly.",
   difficulty: "beginner",

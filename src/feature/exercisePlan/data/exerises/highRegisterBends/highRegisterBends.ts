@@ -6,7 +6,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const highRegisterBendsExercise: Exercise = {
   id: "high_register_bends",
-  title: "High Register Bends – 15th Fret",
+  title: "Bending — High Frets, 15th",
   description:
     "Control string tension and achieve precise intonation when bending in the higher register.",
   whyItMatters: "String tension feels significantly different in the high register compared to the middle of the neck. Practicing bends at the 15th fret and above builds the mechanical strength and fine motor skills necessary for soaring, pitch-perfect solos.",

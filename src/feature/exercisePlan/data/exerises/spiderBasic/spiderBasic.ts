@@ -5,7 +5,7 @@ import spiderBasicImage from "./image.png";
 
 export const spiderBasicExercise: Exercise = {
   id: "spider_basic",
-  title: "Horizontal Spider Exercise",
+  title: "Spider — Shifting Up the Neck",
   description: "Master left-hand finger independence and sync it perfectly with your picking hand using this foundational horizontal shifting pattern.",
   whyItMatters: "This exercise develops solid finger autonomy. It prevents fingers from 'flying away' from the fretboard, vastly improves economy of motion, and synchronizes both hands for clean, fast lead playing.",
   difficulty: "medium",

@@ -5,7 +5,7 @@ import chromaticAccentsImage from "./image.png";
 
 export const chromaticAccentsExercise: Exercise = {
   id: "chromatic_accents",
-  title: "Chromatic Accent Dynamics",
+  title: "Chromatic — Moving Accents",
   description: "Master your dynamic control by playing a chromatic sequence with shifting accents. You will learn to control your pick attack to make accented notes significantly louder and non-accented notes noticeably quieter.",
   whyItMatters: "This exercise develops precise dynamic control over your pick attack. It teaches you to differentiate accented and normal notes, which is essential for groove, phrasing, and expressive playing.",
   difficulty: "medium",

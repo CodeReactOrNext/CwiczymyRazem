@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const stringRepetitionExercise: Exercise = {
   id: "all_strings_open_repetition",
-  title: "All Strings Open Repetition",
+  title: "Timing — All Open Strings",
   description: "Rhythm exercise moving across all strings using open notes.",
   difficulty: "beginner",
   category: "technique",

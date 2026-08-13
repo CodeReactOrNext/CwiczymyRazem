@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const toneColorExplorationExercise: Exercise = {
   id: "tone_color_exploration",
-  title: "Tonal Palette Discovery",
+  title: "Tone — Pick Position & Angle",
   description: "Explore the different sounds you can produce by varying pick location and angle.",
   whyItMatters: "Your hands are the ultimate tone control. Picking near the bridge produces a bright, biting tone, while picking near the neck creates a warm, round sound. Developing control over these tone 'colors' adds massive expression to your playing.",
   difficulty: "easy",

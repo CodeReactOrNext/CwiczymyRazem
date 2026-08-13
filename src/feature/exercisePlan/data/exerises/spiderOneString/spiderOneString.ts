@@ -5,7 +5,7 @@ import spiderOneStringImage from "./image.png";
 
 export const spiderOneStringExercise: Exercise = {
   id: "spider_one_string",
-  title: "Single String Spider Exercise",
+  title: "Spider — One String",
   description: "Fret notes chromatic sequence on a single string to develop basic finger coordination and clean fretting hand accuracy.",
   whyItMatters: "This exercise establishes precise finger coordination on a single string. It helps build initial finger strength, ensures clear note separation, and trains your fingers to find frets without looking.",
   difficulty: "easy",

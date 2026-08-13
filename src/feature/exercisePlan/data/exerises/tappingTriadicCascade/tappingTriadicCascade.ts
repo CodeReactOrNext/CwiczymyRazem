@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const tappingTriadicCascadeExercise: Exercise = {
   id: "tapping_triadic_cascade",
-  title: "Tapping Triadic Cascades",
+  title: "Tapping — Triad Cascades",
   description: "Execute fast, flowing tapped arpeggios that cascade diagonally.",
   whyItMatters: "Tapped arpeggios that cascade diagonally across the fretboard sound modern and complex. Combining tapping with slides and string changes creates a fluid, harp-like effect that elevates your lead guitar vocabulary.",
   difficulty: "hard",

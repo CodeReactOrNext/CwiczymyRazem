@@ -2,7 +2,7 @@
 
 export const dynamicCrescendoExercise: Exercise = {
   id: "dynamic_crescendo",
-  title: "Dynamic Range Control",
+  title: "Dynamics — Soft to Loud",
   description: "Master the full dynamic spectrum of the guitar, from whisper-quiet to an aggressive attack. Control your picking depth and attack speed to match the required volume curves.",
   whyItMatters: "This exercise trains exact physical control over pick depth and attack velocity. Differentiating volume levels smoothly (crescendo and decrescendo) separates expressive, professional guitarists from mechanical ones.",
   difficulty: "medium",

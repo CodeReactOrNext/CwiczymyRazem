@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const callAndResponsePhrasingExercise: Exercise = {
   id: "call_and_response_phrasing",
-  title: "Call and Response Phrasing",
+  title: "Phrasing — Call & Response",
   description: "Improvise contrasting pairs of musical phrases to structure guitar solos into clear questions and answers.",
   whyItMatters: "This exercise develops structural phrasing and melodic storytelling during improvisation. By forcing you to separate solos into distinct pairs of 'questions' (tense/unresolved) and 'responses' (resolved), you learn to use pauses effectively, build and release tension logically, and keep your listeners engaged.",
   difficulty: "medium",

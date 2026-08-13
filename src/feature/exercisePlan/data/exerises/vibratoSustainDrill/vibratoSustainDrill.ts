@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const vibratoSustainDrillExercise: Exercise = {
   id: "vibrato_sustain_drill",
-  title: "Vibrato Sustain — Hold It for the Whole Bar",
+  title: "Vibrato — Hold a Whole Bar",
   description: "Sustain notes with continuous, even vibrato while executing precise rests to test control over pitch modulation.",
   whyItMatters: "Developing clean vibrato requires complete physical control over finger and wrist movement. By introducing intentional rests, this exercise trains you to immediately activate and deactivate the vibrato technique at precise times without resetting your hand placement or drifting in pitch and tempo.",
   difficulty: "easy",

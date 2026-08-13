@@ -4,7 +4,7 @@ import legatoSextupletsImage from "./image.png";
 
 export const legatoSextuplets457Exercise: Exercise = {
   id: "legato_sextuplets_4_5_7",
-  title: "Legato Sextuplets – 4-5-7",
+  title: "Legato — Sextuplets 4-5-7",
   description:
     "Execute fast, even six-note patterns using legato phrasing.",
   whyItMatters: "Sextuplets are a standard rhythmic subdivision for high-speed runs. Practicing them with legato techniques on frets 4, 5, and 7 improves pinky strength and teaches you to divide beats evenly without relying on the metronome click for every note.",

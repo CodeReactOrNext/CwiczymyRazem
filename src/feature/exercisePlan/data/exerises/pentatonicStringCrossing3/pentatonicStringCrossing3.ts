@@ -12,7 +12,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const pentatonicStringCrossing3Exercise: Exercise = {
   id: "pentatonic_string_crossing_3",
-  title: "Pentatonic String Crossing — 3 Strings",
+  title: "Pentatonic — String Crossing",
   description: "Master the transitions between strings inside the pentatonic box. Focus on minimal pick travel to eliminate speed bottlenecks.",
   whyItMatters: "This exercise develops clean alternate picking across string changes. It improves your picking consistency, string transition control, and synchronization between both hands.",
   difficulty: "easy",

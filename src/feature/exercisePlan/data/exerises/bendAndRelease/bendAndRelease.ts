@@ -6,7 +6,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const bendAndReleaseExercise: Exercise = {
   id: "bend_and_release",
-  title: "Bend & Release",
+  title: "Bending — Slow Release",
   description: "Perform clean whole-step string bends followed by slow, controlled releases to develop precise pitch control and finger strength.",
   whyItMatters: "This exercise develops accurate pitch control and micro-intonation. The slow, controlled release trains your fingers to guide the string back to its starting position without losing fret pressure, eliminating pitch wobbles and ensuring a smooth, expressive vocal-like quality to your bends.",
   difficulty: "easy",

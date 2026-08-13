@@ -12,7 +12,7 @@ export const fretClickWholeChromaticExercise: Exercise = {
   id: "fret_click_whole_chromatic",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Whole Neck: Every Note — Click Drill",
+  title: "Click Hunt — Whole Neck, All Notes",
   description: "Any note — natural or sharp/flat — appears. Click every spot it occupies across the entire fretboard, frets 0 to 12.",
   difficulty: "hard",
   category: "theory",

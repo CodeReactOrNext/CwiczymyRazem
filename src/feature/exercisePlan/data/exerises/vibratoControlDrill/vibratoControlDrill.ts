@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const vibratoControlDrillExercise: Exercise = {
   id: "vibrato_control_drill",
-  title: "Vibrato Control",
+  title: "Vibrato — Speed & Width",
   description: "Control the speed, width, and depth of your pitch modulation by sustaining notes and bent pitches across multiple strings.",
   whyItMatters: "Sustaining clean vibrato requires maintaining uniform oscillation width and speed across different fretboard locations. Practicing vibrato on regular notes, during string changes, and on bent pitches develops the finger strength and forearm rotational control needed for high-level expression and pitch consistency.",
   difficulty: "medium",

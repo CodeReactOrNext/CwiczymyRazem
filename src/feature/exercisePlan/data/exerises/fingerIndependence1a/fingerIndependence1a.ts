@@ -9,7 +9,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const fingerIndependence1aExercise: Exercise = {
   id: "finger_independence_1a",
-  title: "Finger Independence Exercise 1a",
+  title: "Spider — Anchor the Other Fingers",
   description: "Isolate individual fingers of the fretting hand while keeping the others anchored.",
   whyItMatters: "Finger independence prevents secondary muscle tension and sympathetic finger movement. Developing isolated control over each finger ensures clean note execution, smoother transitions, and superior economy of motion during complex playing.",
   difficulty: "easy",

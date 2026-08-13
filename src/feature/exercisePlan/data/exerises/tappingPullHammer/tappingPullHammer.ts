@@ -7,7 +7,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const tappingPullHammerExercise: Exercise = {
   id: "tapping_pull_hammer",
-  title: "Tapping – Two-Voice Phrase",
+  title: "Tapping — Two Voices",
   description:
     "Develop counterpoint and independent phrasing by playing a two-voice tapped melody.",
   whyItMatters: "Playing independent voices with both hands builds incredible brain-to-finger coordination. This advanced technique lets you play both basslines/chords and melodies simultaneously on a single guitar.",

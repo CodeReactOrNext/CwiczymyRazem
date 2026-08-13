@@ -12,7 +12,7 @@ export const fretClickBox48Exercise: Exercise = {
   id: "fret_click_box_4_8",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Box: Frets 4–8 — Click Drill",
+  title: "Click Hunt — Box 4–8",
   description: "A note name appears — click every spot inside this 5-fret box, across all 6 strings.",
   difficulty: "medium",
   category: "theory",

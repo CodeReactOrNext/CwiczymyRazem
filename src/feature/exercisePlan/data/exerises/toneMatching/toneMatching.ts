@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const toneMatchingExercise: Exercise = {
   id: "tone_matching_challenge",
-  title: "Tone Matching Challenge",
+  title: "Tone — Match the Reference",
   description: "Listen to reference tones and adjust your attack and pickup selection to match them.",
   whyItMatters: "Matching reference tones trains your ear to recognize subtle changes in dynamics, timbre, and equalization, helping you dial in the perfect sound on any gear.",
   difficulty: "medium",

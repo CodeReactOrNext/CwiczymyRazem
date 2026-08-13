@@ -419,7 +419,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder='e.g. Spider Exercise — 1-2-3-4 Permutation'
+                  placeholder='e.g. Finger Permutations — 1-2-3-4'
                   maxLength={100}
                   className={fieldClass(!!errors.title)}
                 />

@@ -2,7 +2,7 @@
 
 export const stringSkippingBasicExercise: Exercise = {
   id: "string_skipping_basic",
-  title: "Pentatonic String Skips",
+  title: "String Skipping — Pentatonic",
   description: "Practice jumping over strings while playing pentatonic scale shapes.",
   whyItMatters: "Pentatonic scales can sound repetitive if played sequentially. Adding string skips opens up the scale, creating larger interval jumps that sound highly expressive and modern.",
   difficulty: "hard",

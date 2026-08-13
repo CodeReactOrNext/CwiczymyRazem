@@ -19,7 +19,7 @@ export const stringHuntDExercise: Exercise = {
   id: "string_sweep_d",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "String Hunt — D",
+  title: "Timed Hunt — D String",
   description: "Beat the clock: play every one of the 12 notes on the D string within 90 seconds, at 60 BPM.",
   difficulty: "hard",
   category: "theory",

@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const sweepPicking3StringExercise: Exercise = {
   id: "sweep_picking_3_string",
-  title: "3-String Sweep Synchronization",
+  title: "Sweep — 3 Strings, Hand Sync",
   description: "Practice clean 3-string sweep picking arpeggios to coordinate your pick stroke with sequential finger lifts.",
   whyItMatters: "This exercise coordinates the exact micro-timing between your hands required for clean sweep picking. It eliminates note bleeding by training your fretting hand to lift fingers sequentially, and teaches your picking hand to execute a single, continuous fluid sweep stroke rather than individual picking motions.",
   difficulty: "hard",

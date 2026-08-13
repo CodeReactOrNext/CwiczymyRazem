@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const hammerOnPentatonicRunExercise: Exercise = {
   id: "hammer_on_pentatonic_run",
-  title: "Hammer-on Pentatonic Run – 3 Strings",
+  title: "Legato — Hammer-on Pentatonic",
   description: "Develop strong legato hammer-on technique and smooth cross-string transition fluidity across three strings.",
   whyItMatters: "This exercise builds finger independence and hammer-on power. It gives you the strength and speed needed for fluid legato lines without relying constantly on the pick.",
   difficulty: "easy",

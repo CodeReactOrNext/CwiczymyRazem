@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const vibratoHighPositionExercise: Exercise = {
   id: "vibrato_high_position",
-  title: "Vibrato — High Position (Frets 12–17)",
+  title: "Vibrato — Frets 12–17",
   description:
     "Adapt your vibrato technique to the narrow frets of the upper register.",
   whyItMatters: "The mechanical leverage of the fingers is lower in the high register. Practicing vibrato above the 12th fret trains you to use precise wrist rotation and forearm push/pull to achieve even, expressive pitch modulation.",

@@ -10,7 +10,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 export const quarterNotesDrillExercise: Exercise = {
   id: "quarter_notes_drill",
   isHiddenFromLibrary: false,
-  title: "Quarter Notes Drill",
+  title: "Timing — Quarter Notes",
   description:
     "Develop strict timing and pick attack consistency using quarter-note pulses.",
   whyItMatters: "Perfect rhythmic timing is the separation between amateur and professional guitarists. This drill builds a solid internal clock, ensuring you land exactly on the beat without rushing or lagging behind.",

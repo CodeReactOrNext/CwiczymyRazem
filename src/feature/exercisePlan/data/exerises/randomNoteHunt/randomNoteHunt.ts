@@ -17,7 +17,7 @@ let currentTarget = pickNote();
 export const randomNoteHuntExercise: Exercise = {
   id: "random_note_hunt",
   isHiddenFromLanding: true,
-  title: "Random Note Hunt",
+  title: "Note Hunt — Naturals",
   description: "Improve your fretboard knowledge by finding all occurrences of a chosen note across the neck.",
   difficulty: "beginner",
   category: "theory",

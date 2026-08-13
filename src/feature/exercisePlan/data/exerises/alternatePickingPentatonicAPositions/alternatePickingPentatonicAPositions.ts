@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const alternatePickingPentatonicAPositionsExercise: Exercise = {
   id: "alternate_picking_pentatonic_a_positions",
-  title: "A Pentatonic Alternate Picking — Position Drill",
+  title: "Alternate Picking — A Pentatonic",
   description: "Practice pentatonic alternate picking using repeated notes per string to lock in hand synchronization and metronome timing.",
   whyItMatters: "This exercise anchors your picking hand synchronization by isolating the moment of string crossing. Playing each note four times allows your brain to settle into the alternate picking pulse before navigating the physical change of string plane, resulting in extremely clean and stable picking runs.",
   difficulty: "easy",

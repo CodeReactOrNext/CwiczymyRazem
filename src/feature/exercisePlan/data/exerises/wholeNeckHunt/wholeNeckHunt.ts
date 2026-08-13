@@ -20,7 +20,7 @@ export const wholeNeckHuntExercise: Exercise = {
   id: "whole_neck_sweep",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "Whole Neck Hunt",
+  title: "Timed Hunt — Whole Neck",
   description: "The final exam: beat the clock and play every one of the 12 notes, anywhere on the neck, within 90 seconds at 60 BPM.",
   difficulty: "hard",
   category: "theory",

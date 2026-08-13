@@ -12,7 +12,7 @@ export const fretClickOctavesDgOpenExercise: Exercise = {
   id: "fret_click_octaves_dg_open",
   addedAt: "2026-08-03",
   isHiddenFromLanding: true,
-  title: "D & G Strings: Open Position — Click Drill",
+  title: "Click Hunt — D & G, Frets 0–6",
   description: "A note name appears — click every spot on the D and G strings, frets 0 to 6, where it lands.",
   difficulty: "easy",
   category: "theory",

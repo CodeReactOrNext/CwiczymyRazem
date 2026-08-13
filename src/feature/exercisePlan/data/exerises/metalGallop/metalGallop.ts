@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const metalGallopExercise: Exercise = {
   id: "metal_gallop",
-  title: "Iron Gallop — Thrash Rhythm Drill",
+  title: "Gallop Picking — Thrash Rhythm",
   description:
     "Master precise, high-speed rhythmic galloping patterns.",
   whyItMatters: "The gallop (one eighth note followed by two sixteenth notes) is the rhythmic heartbeat of heavy metal and hard rock. Achieving a tight, aggressive gallop requires strict pick stroke direction and palm-muting discipline.",

@@ -22,7 +22,7 @@ const tablature: TablatureMeasure[] = [[1, 2], [3, 4]].map((bases) => ({
 
 export const spiderXExercise: Exercise = {
   id: "spider_x",
-  title: "Spider X Pattern Exercise",
+  title: "Spider — Diagonal X",
   description: "Play a diagonal, cross-string spider pattern that forms an 'X' shape.",
   whyItMatters: "Diagonal fretboard movement is highly common in real solos but rarely practiced. The Spider X drill breaks up linear muscle memory, training your brain and fingers to navigate the fretboard dynamically.",
   difficulty: "medium",

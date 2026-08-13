@@ -4,7 +4,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const spiderStairsHardExercise: Exercise = {
   id: "spider_stairs_hard",
-  title: "Advanced Spider Stairs Exercise",
+  title: "Spider — Stairs & Wide Stretch",
   description: "Fret non-adjacent string skipping patterns with wide interval leaps to build absolute finger independence and fingerboard stretch control.",
   whyItMatters: "This exercise develops extreme finger independence and wide stretching capacity. By crossing multiple strings non-sequentially while maintaining a wide fret stretch, it trains your hand to stay relaxed under technical strain and prevents your fingers from tensing up during large interval leaps.",
   difficulty: "hard",

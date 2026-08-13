@@ -23,6 +23,7 @@ import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { LEGACY_EXERCISE_TITLES } from "feature/exercisePlan/data/legacyExerciseTitles";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { LogReaction } from "feature/logs/components/LogReaction";
@@ -1028,7 +1029,13 @@ const GroupedLogLine = ({
   const genericLog = log as FirebaseLogsInterface;
   const plan: any = genericLog.planId ? defaultPlans.find((p) => p.id === genericLog.planId) : null;
   const matchedExercise: Exercise | null = genericLog.exerciseTitle
-    ? exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ?? null
+    ? exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ??
+      // Old logs store the title text as it was at log time. Names get renamed (#786) —
+      // fall back to the legacy-title → id map so historical logs keep linking correctly.
+      exercisesAgregat.find(
+        (ex) => ex.id === LEGACY_EXERCISE_TITLES[genericLog.exerciseTitle as string],
+      ) ??
+      null
     : null;
   const planTitle = plan ? plan.title : null;
   const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;

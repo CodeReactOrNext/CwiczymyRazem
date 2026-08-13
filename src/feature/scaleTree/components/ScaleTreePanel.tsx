@@ -192,7 +192,7 @@ export function ScaleTreePanel({
               </Link>
 
               <p className="text-[10px] text-zinc-600 leading-relaxed">
-                Go to the Timer section → select "Scale Practice (Configurable)" → set{" "}
+                Go to the Timer section → select "Scale Practice — Pick Your Scale" → set{" "}
                 <span className="text-zinc-400">{node.label}</span> in the key of C.
                 After practicing, mark the achieved BPM in the grid above.
               </p>

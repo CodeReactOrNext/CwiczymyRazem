@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const unisonBendDrillExercise: Exercise = {
   id: "unison_bend_drill",
-  title: "Unison Bending",
+  title: "Bending — Unison Bends",
   description: "Master pitch matching and microtonal adjustments in unison bends.",
   whyItMatters: "Unison bends (holding one note while bending an adjacent string to match its pitch) sound powerful and aggressive. Achieving perfect pitch unison eliminates beat frequencies, creating a massive, focused rock sound.",
   difficulty: "hard",

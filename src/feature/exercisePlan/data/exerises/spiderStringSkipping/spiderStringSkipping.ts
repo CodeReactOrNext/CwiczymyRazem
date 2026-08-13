@@ -23,7 +23,7 @@ const tablature: TablatureMeasure[] = STRING_ORDER.map((strings) => ({
 
 export const SpiderStringSkippingExercise: Exercise = {
   id: "spider_string_skipping",
-  title: "String Skipping Spider Exercise",
+  title: "Spider — String Skipping",
   description: "Integrate wide string jumps into the spider walk pattern.",
   whyItMatters: "String skipping can easily cause missed notes or accidental string noise. Combining it with the spider walk forces both hands to sync perfectly, building elite-level coordinate agility.",
   difficulty: "medium",

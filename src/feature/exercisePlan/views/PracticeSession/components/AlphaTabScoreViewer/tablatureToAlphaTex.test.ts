@@ -78,7 +78,7 @@ describe("tablatureToAlphaTex", () => {
     // next same-string note. So each flagged arrival note must move its `h` back onto the
     // previous note on the same string. Emitting `h` on the destination instead made
     // AlphaTab slur it to the next picked note, drawing a stray arc across the whole bar
-    // (the "Dark Pull-off Pentatonic Run" legato bug).
+    // (the "Legato — Pull-off Pentatonic" bug).
     const measures: TablatureMeasure[] = [
       {
         timeSignature: [4, 4],

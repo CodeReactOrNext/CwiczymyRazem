@@ -3,7 +3,14 @@
 **Data:** 2026-08-13
 **Issue:** #786
 **Zakres:** 225 ćwiczeń z `exercisesAgregat` (`src/feature/exercisePlan/data/exerises/**`)
-**Status:** **propozycja do decyzji właściciela — w kodzie nic nie zostało zmienione** (zgodnie z prośbą w tickecie).
+**Status:** propozycja z tego dokumentu **wdrożona w kodzie** (PR #787) — z jednym wyjątkiem:
+**playalongi (§5.21–5.22) świadomie pominięte**, na wyraźną prośbę właściciela. Zmieniono
+**186 tytułów** ćwiczeń z §5.1–5.19 (`id` bez zmian, zgodnie z §8.5). Nie wdrożono decyzji
+strukturalnych z §10 (scalanie duplikatów, dziura na Strumming 17, rejestracja serii
+`musician_fitness_lvl2_*`) — to wymaga osobnej decyzji właściciela i osobnego PR-a.
+Naprawiono też blokadę z §8.1: `Logs.tsx` dopasowuje teraz ćwiczenie po tytule, a jeśli nie
+znajdzie (stary log sprzed zmiany nazwy), spada do mapy `LEGACY_EXERCISE_TITLES`
+(`feature/exercisePlan/data/legacyExerciseTitles.ts`) — stare logi dalej linkują się poprawnie.
 
 ---
 

@@ -2,7 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const minimalMotionVoiceLeadingExercise: Exercise = {
   id: "minimal_motion_voice_leading",
-  title: "Minimal-Motion Voice Leading",
+  title: "Chords — Least Finger Motion",
   description:
     "Arrange chord voicings to minimize finger movement between transitions.",
   whyItMatters: "Minimal-motion voice leading makes chord progressions sound cohesive, elegant, and highly polished. It reduces large jumps across the fretboard, making your rhythm parts easier to play and much more satisfying to listen to.",
