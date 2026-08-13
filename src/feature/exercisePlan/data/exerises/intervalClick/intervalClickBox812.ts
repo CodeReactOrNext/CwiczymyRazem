@@ -6,7 +6,7 @@ export const intervalClickBox812Exercise = createIntervalClickExercise({
   title: "Intervals: Upper Box — Click Drill",
   description: "Every interval, sharp roots included, in the box that runs up to the 12th-fret octave.",
   difficulty: "hard",
-  timeInMinutes: 4,
+  timeInMinutes: 3,
   region: { startFret: 8, endFret: 12 },
   intervalIds: ["m2", "M2", "m3", "M3", "P4", "TT", "P5", "m6", "M6", "m7", "M7"],
   roots: ALL_ROOTS,

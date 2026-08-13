@@ -23,7 +23,7 @@ export const earChordQualityBasicsExercise: Exercise = {
   whyItMatters:
     "Almost every song you will ever learn is built from these four sounds. Once you can name a chord the moment it rings, you stop guessing chord charts and start hearing them.",
   difficulty: "easy",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Press Play — a chord rings out on a random root.",
     "Pick the quality you hear. The root changes every round, so the colour is the only thing worth listening to.",
@@ -49,7 +49,7 @@ export const earChordQualityAdvancedExercise: Exercise = {
   whyItMatters:
     "Telling maj7 from m7 from a plain dominant is what lets you transcribe jazz, soul and anything past three-chord rock without reaching for a chart.",
   difficulty: "hard",
-  timeInMinutes: 6,
+  timeInMinutes: 2,
   instructions: [
     "Press Play and name the exact quality — seven are in play.",
     "Work top-down: first the 3rd (major or minor), then the 7th (none, ♭7 or natural 7).",
@@ -78,7 +78,7 @@ export const earProgressionBasicsExercise: Exercise = {
   whyItMatters:
     "Hearing chords as degrees rather than letters is what makes a song transposable. Once you catch I–IV–V by ear, you can play along in any key without knowing the chart.",
   difficulty: "medium",
-  timeInMinutes: 6,
+  timeInMinutes: 2,
   instructions: [
     "Press Play — three chords go past in the key shown above the tiles.",
     "Tap the degree tiles in order to fill the slots, then press Check. Tap a filled slot to clear it.",
@@ -106,7 +106,7 @@ export const earProgressionAdvancedExercise: Exercise = {
   whyItMatters:
     "Four-bar loops are the backbone of most songs written in the last sixty years. Recognising them instantly turns 'learning a song' into 'confirming what you already heard'.",
   difficulty: "hard",
-  timeInMinutes: 8,
+  timeInMinutes: 2,
   instructions: [
     "Press Play — four chords go past in the key shown above the tiles.",
     "Build the progression from the tiles, then press Check.",
@@ -145,7 +145,7 @@ export const earTuningTrainerExercise: Exercise = {
   description:
     "Two notes, one of them out. Slide it into tune by listening for the beating — the drill behind tuning without a tuner.",
   difficulty: "medium",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   whyItMatters:
     "A tuner tells you a string is flat; your ears tell you the band is out. Hearing beats between two notes is the skill behind tuning to a piano, checking intonation and bending in tune.",
   instructions: [
@@ -175,7 +175,7 @@ export const earTuningPrecisionExercise: Exercise = {
   description:
     "The same drill with a much tighter window — small errors, slow beats, four cents of tolerance.",
   difficulty: "hard",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   whyItMatters:
     "The last few cents are where a guitar goes from 'tuned' to 'in tune with itself'. Training that resolution is what makes chords ring instead of shimmer.",
   instructions: [
@@ -207,7 +207,7 @@ export const earModeBasicsExercise: Exercise = {
   description:
     "A scale plays over its own tonic drone. Tell natural minor from Dorian — the single most useful ear test a guitarist can pass.",
   difficulty: "medium",
-  timeInMinutes: 6,
+  timeInMinutes: 2,
   whyItMatters:
     "Dorian and Aeolian are the same seven notes seen from a different tonic, so the only way to tell them apart is by ear. Getting it right is what stops you playing sad minor licks over a funk groove.",
   instructions: [
@@ -231,7 +231,7 @@ export const earModeAdvancedExercise: Exercise = {
   description:
     "All six common modes over a drone: Ionian, Lydian, Mixolydian, Dorian, Aeolian and Phrygian.",
   difficulty: "hard",
-  timeInMinutes: 8,
+  timeInMinutes: 2,
   whyItMatters:
     "Modes are how experienced players describe the colour of a riff in one word. Hearing them lets you pick the right scale over a vamp on the first pass instead of the third.",
   instructions: [

@@ -1,7 +1,6 @@
-import { Checkbox } from "assets/components/ui/checkbox";
-import { Label } from "assets/components/ui/label";
+import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { type CSSProperties, useCallback, useId, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -26,8 +25,10 @@ interface ClickableFretboardProps {
   /** Cells the current step still accepts, tinted as a zone — the interval drill's
    *  hand span around the placed root. A whole area, never the answers alone. */
   zoneKeys?: string[];
-  /** Replaces the default "FRETS x–y" caption. */
-  title?: ReactNode;
+  /** Zooms out to the whole neck. Owned by the panel (see `useShowFullNeck`), so
+   *  the toggle can sit in its control row instead of in a caption above the
+   *  board — the neck itself draws exactly the same either way. */
+  showFullNeck?: boolean;
 }
 
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
@@ -42,9 +43,50 @@ const CONTEXT_FRETS = 3;
 
 // Furthest fret any exercise's search window reaches — the ceiling for the
 // "show whole neck" toggle so it always covers every exercise, not just this one.
-const FULL_NECK_END_FRET = 12;
+export const FULL_NECK_END_FRET = 12;
 
 const SHOW_FULL_NECK_LS_KEY = "riffquest.clickableFretboard.showFullNeck";
+
+/**
+ * Whole-neck preference, persisted across sessions — some players prefer to
+ * always see the whole neck for orientation instead of the zoomed search window
+ * + context frets. Lives outside the board so the panel can put the toggle in
+ * its own control row.
+ */
+export function useShowFullNeck() {
+  const [showFullNeck, setShowFullNeck] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(SHOW_FULL_NECK_LS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const toggle = useCallback((next: boolean) => {
+    setShowFullNeck(next);
+    try {
+      localStorage.setItem(SHOW_FULL_NECK_LS_KEY, next ? "1" : "0");
+    } catch {}
+  }, []);
+  return [showFullNeck, toggle] as const;
+}
+
+/** Zoom-out switch for the neck — same preference as before, as a compact chip. */
+export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: (next: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={value}
+      onClick={() => onChange(!value)}
+      className={cn(
+        "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        value ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
+      )}
+      title="Show the whole neck instead of just the search window">
+      Whole neck
+    </button>
+  );
+}
 
 const TIME_PILL_W = 165;
 const TIME_PILL_H = 60;
@@ -108,7 +150,7 @@ export function ClickableFretboard({
   markedKeys,
   markedLabel,
   zoneKeys,
-  title,
+  showFullNeck = false,
 }: ClickableFretboardProps) {
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
@@ -119,23 +161,6 @@ export function ClickableFretboard({
   // Only worth shouting about which string to use when the exercise actually
   // narrows it down — with all six in play there's nothing to distinguish.
   const stringScoped = !!strings && strings.length < 6;
-
-  // Persisted across sessions — some players prefer to always see the whole
-  // neck for orientation instead of the zoomed search window + context frets.
-  const [showFullNeck, setShowFullNeck] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem(SHOW_FULL_NECK_LS_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
-  const toggleShowFullNeck = (checked: boolean) => {
-    setShowFullNeck(checked);
-    try {
-      localStorage.setItem(SHOW_FULL_NECK_LS_KEY, checked ? "1" : "0");
-    } catch {}
-  };
 
   const displayStart = showFullNeck ? 0 : Math.max(0, startFret - CONTEXT_FRETS);
   const displayEnd = showFullNeck ? Math.max(endFret, FULL_NECK_END_FRET) : endFret + CONTEXT_FRETS;
@@ -167,19 +192,7 @@ export function ClickableFretboard({
   const clipId = `ckfb-clip-${reactId}`;
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <div className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
-        <p className="text-center text-sm font-bold tracking-widest text-zinc-200">
-          {title ?? `FRETS ${startFret}–${endFret}`}
-        </p>
-        <div className="flex items-center gap-2">
-          <Checkbox id="show-full-neck" checked={showFullNeck} onCheckedChange={(checked) => toggleShowFullNeck(checked === true)} />
-          <Label htmlFor="show-full-neck" className="cursor-pointer text-xs font-semibold tracking-wide text-zinc-400">
-            Show whole neck
-          </Label>
-        </div>
-      </div>
-      <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto">
         <svg
           viewBox={`0 0 ${vw} ${vh}`}
           className="min-w-[var(--fretboard-min-w)] sm:min-w-0"
@@ -555,8 +568,7 @@ export function ClickableFretboard({
               </motion.g>
             );
           })()}
-        </svg>
-      </div>
+      </svg>
     </div>
   );
 }

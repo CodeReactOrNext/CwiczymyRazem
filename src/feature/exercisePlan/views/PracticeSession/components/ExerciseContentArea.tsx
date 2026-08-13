@@ -205,7 +205,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           <MetronomeGapTest />
         </div>
       ) : currentExercise.customGoal ? (
-        <div className="flex w-full justify-center py-10">
+        <div className="flex w-full justify-center px-3 py-6 sm:px-5 sm:py-8">
           {currentExercise.noteHuntConfig?.mode === "chord" ? (
             <ChordHuntPanel
               chordName={currentExercise.customGoal}
@@ -218,7 +218,6 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               rootNote={currentExercise.customGoalPrompt?.title ?? ""}
               intervalLabel={currentExercise.customGoalPrompt?.subtitle}
               targetNote={currentExercise.customGoal}
-              description={currentExercise.customGoalDescription}
               startFret={currentExercise.customGoalRegion?.startFret ?? 0}
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}

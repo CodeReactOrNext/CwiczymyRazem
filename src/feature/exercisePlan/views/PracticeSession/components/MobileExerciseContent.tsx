@@ -107,7 +107,6 @@ export function MobileExerciseContent({
               rootNote={currentExercise.customGoalPrompt?.title ?? ""}
               intervalLabel={currentExercise.customGoalPrompt?.subtitle}
               targetNote={currentExercise.customGoal}
-              description={currentExercise.customGoalDescription}
               startFret={currentExercise.customGoalRegion?.startFret ?? 0}
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}

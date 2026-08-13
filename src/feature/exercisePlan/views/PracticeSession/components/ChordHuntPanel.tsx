@@ -5,6 +5,7 @@ import { NOTES } from "utils/audio/noteUtils";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { DetectionWave } from "./DetectionWave";
+import { HuntStats } from "./HuntStage";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
 
 interface ChordHuntPanelProps {
@@ -40,34 +41,18 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
   return (
     <div className="flex w-full max-w-sm flex-col items-center gap-4">
       {/* Score (mic only) + countdown */}
-      <div className="flex items-center justify-center gap-3">
-        {isMicEnabled && (
-          <span className="rounded bg-amber-500/15 px-3.5 py-1.5 text-base font-extrabold tracking-wide text-amber-300">
-            ★ {score} pts
-          </span>
-        )}
-        {isRotating && (
-          <span
-            className={cn(
-              "rounded px-3.5 py-1.5 text-base font-extrabold tabular-nums transition-colors",
-              allFound
-                ? "bg-emerald-500/20 text-emerald-300"
-                : noteHuntSecondsLeft! <= 5
-                ? "animate-pulse bg-red-500/25 text-red-300"
-                : "bg-white/10 text-zinc-200",
-            )}
-          >
-            {noteHuntSecondsLeft}s
-          </span>
-        )}
-      </div>
+      <HuntStats
+        score={isMicEnabled ? score : undefined}
+        secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+        complete={allFound}
+      />
 
       {/* Chord name card */}
       <div className="relative group">
         <div
           className={cn(
             "absolute -inset-2 blur-[16px] rounded-lg transition-opacity duration-500",
-            allFound ? "bg-emerald-500/50 opacity-100" : "bg-cyan-500/15 opacity-50",
+            allFound ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
           )}
         />
         <HuntSuccessBurst foundCount={foundCount} complete={allFound} />
@@ -75,12 +60,12 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
           animate={allFound ? { scale: [1, 1.18, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "relative h-32 min-w-[8rem] px-6 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors duration-500",
+            "relative flex h-28 min-w-[8rem] items-center justify-center overflow-hidden rounded-lg px-6 transition-colors duration-500",
             allFound ? "bg-emerald-900/80" : "bg-zinc-900/90",
           )}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-          <span className="text-7xl font-black text-white tracking-tighter drop-shadow-[0_0_18px_rgba(255,255,255,0.5)]">
+          <span className="font-display text-6xl font-black tracking-tighter text-white">
             {chordName}
           </span>
         </motion.div>
@@ -118,10 +103,10 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
               const chipClass = cn(
                 "flex h-12 min-w-[3.25rem] flex-col items-center justify-center rounded px-2 font-extrabold leading-none transition-all",
                 isCurrent
-                  ? "bg-emerald-500/30 text-emerald-100 scale-110"
+                  ? "bg-emerald-500/30 text-emerald-100"
                   : found
-                  ? "bg-emerald-500/15 text-emerald-300"
-                  : "bg-zinc-800/80 text-zinc-300",
+                  ? "bg-emerald-500/10 text-emerald-400"
+                  : "bg-zinc-800/60 text-zinc-300",
               );
               const inner = (
                 <>
@@ -143,8 +128,8 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
 
       {/* Progress */}
       {tones.length > 0 && (
-        <p className={cn("text-sm font-extrabold tracking-widest transition-colors", allFound ? "text-emerald-300" : "text-zinc-300")}>
-          {allFound ? "★ CHORD COMPLETE" : `${foundCount} / ${tones.length} TONES FOUND`}
+        <p className={cn("text-sm font-extrabold tabular-nums transition-colors", allFound ? "text-emerald-400" : "text-zinc-300")}>
+          {allFound ? "★ chord complete" : `${foundCount} / ${tones.length} tones found`}
         </p>
       )}
 
@@ -153,9 +138,9 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
         <button
           type="button"
           onClick={advanceHunt}
-          className="mt-1 inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
+          className="mt-1 inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
-          Next <FaArrowRight className="h-3.5 w-3.5" />
+          Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
         </button>
       )}
     </div>

@@ -8,7 +8,7 @@ export const intervalClickWholeFretboardExercise = createIntervalClickExercise({
   title: "Intervals: Whole Fretboard — Click Drill",
   description: "Every interval, every root, the full neck from open to fret 12 — no box to hide in.",
   difficulty: "hard",
-  timeInMinutes: 5,
+  timeInMinutes: 4,
   region: { startFret: 0, endFret: 12 },
   intervalIds: INTERVALS.map((interval) => interval.id),
   roots: ALL_ROOTS,

@@ -1,9 +1,12 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import Backdrop from "components/UI/Backdrop";
 import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
+import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
+import { recordPracticeSession } from "feature/songs/services/userSongProgress.service";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -28,7 +31,7 @@ import {
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { ArrowDown, Check, Flame } from "lucide-react";
+import { ArrowDown, Check, Flame, Music, Tags } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useState } from "react";
@@ -51,6 +54,7 @@ import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
 import type { ReportFormikInterface } from "./ReportView.types";
 import SavedTimeBanner from "./SavedTimeBanner";
+import SessionSongPicker, { type SessionSong } from "./SessionSongPicker";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
@@ -66,10 +70,25 @@ const ReportView = () => {
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // A session is described either by free text + tags, or by one song from the
+  // user's library — the two share `reportTitle`, so they live in separate tabs.
+  const [selectedSong, setSelectedSong] = useState<SessionSong | null>(
+    songId && songTitle
+      ? {
+          id: songId as string,
+          title: songTitle as string,
+          artist: (songArtist as string) ?? "",
+        }
+      : null
+  );
+  const [focusMode, setFocusMode] = useState<"tags" | "song">(
+    selectedSong ? "song" : "tags"
+  );
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
 
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
   const raitingData = useAppSelector(selectRaitingData);
@@ -203,6 +222,26 @@ const ReportView = () => {
     return sumTime;
   };
 
+  type SetFieldValue = (field: string, value: any) => void;
+
+  const selectSong = (song: SessionSong | null, setFieldValue: SetFieldValue) => {
+    setSelectedSong(song);
+    setFieldValue("songId", song?.id);
+    setFieldValue("songTitle", song?.title);
+    setFieldValue("songArtist", song?.artist);
+    setFieldValue("reportTitle", song ? `${song.artist} - ${song.title}` : "");
+  };
+
+  const switchFocusMode = (mode: "tags" | "song", setFieldValue: SetFieldValue) => {
+    setFocusMode(mode);
+    if (mode === "song") {
+      // Tags and a song both write `reportTitle`; keep only one of them alive.
+      setSelectedTags([]);
+    } else if (selectedSong) {
+      selectSong(null, setFieldValue);
+    }
+  };
+
   const reportOnSubmit = async (inputData: ReportFormikInterface) => {
     const sumTime = getSumTime(inputData);
     const lastReportTimeExceded = isLastReportTimeExceeded(
@@ -255,7 +294,28 @@ const ReportView = () => {
     };
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));
-    
+
+    // A manual log attributed to a song also feeds that song's own progress
+    // (total practice time, session count) and pulls it into "learning" — the
+    // same bookkeeping the song timer does, so both routes stay consistent.
+    if (inputData.songId && inputData.songTitle) {
+      dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+      try {
+        await recordPracticeSession(userAuth, inputData.songId, sumTime, null, null);
+        await ensureSongIsLearning(
+          userAuth,
+          inputData.songId,
+          inputData.songTitle,
+          inputData.songArtist ?? "",
+          avatar ?? undefined
+        );
+        queryClient.invalidateQueries({ queryKey: ["user-song-progress", userAuth] });
+        queryClient.invalidateQueries({ queryKey: ["user-songs", userAuth] });
+      } catch (error) {
+        console.error("Failed to update song progress from manual log:", error);
+      }
+    }
+
     // Quest Trigger
     if (inputData.habbits && inputData.habbits.length >= 2) {
         dispatch(updateQuestProgress({ type: 'healthy_habits', amount: 2 }));
@@ -550,6 +610,34 @@ const ReportView = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                        <div className="lg:col-span-12 xl:col-span-7 space-y-6">
+                        <div className='flex gap-1 rounded-lg bg-zinc-900/60 p-1'>
+                          {([
+                            { mode: "tags" as const, label: "Free session", Icon: Tags },
+                            { mode: "song" as const, label: "Song from my library", Icon: Music },
+                          ]).map(({ mode, label, Icon }) => (
+                            <button
+                              key={mode}
+                              type='button'
+                              onClick={() => switchFocusMode(mode, setFieldValue)}
+                              className={cn(
+                                "flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-xs font-bold transition-colors",
+                                focusMode === mode
+                                  ? "bg-cyan-500/10 text-cyan-400"
+                                  : "text-zinc-500 hover:text-zinc-300"
+                              )}>
+                              <Icon className='h-3.5 w-3.5' />
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {focusMode === "song" ? (
+                          <SessionSongPicker
+                            userId={userAuth as string | null}
+                            selected={selectedSong}
+                            onSelect={(song) => selectSong(song, setFieldValue)}
+                          />
+                        ) : (
                         <div className='space-y-4'>
                           <div className="flex items-center justify-between">
                             <label className='font-sans text-sm font-bold text-zinc-400'>
@@ -657,6 +745,7 @@ const ReportView = () => {
                             ))}
                           </div>
                           </div>
+                        )}
                        </div>
 
                        <div className="lg:col-span-12 xl:col-span-5 space-y-4">

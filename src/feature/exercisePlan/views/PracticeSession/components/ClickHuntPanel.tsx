@@ -2,7 +2,6 @@ import { Checkbox } from "assets/components/ui/checkbox";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
-import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
@@ -13,8 +12,8 @@ import {
   pickReferenceMidi,
   saveClickHuntNoteSoundPreference,
 } from "../helpers/clickHuntNoteSound";
-import { ClickableFretboard } from "./ClickableFretboard";
-import { HuntSuccessBurst } from "./HuntSuccessBurst";
+import { ClickableFretboard, FullNeckToggle, useShowFullNeck } from "./ClickableFretboard";
+import { HuntStage, HuntStats, HuntTargetCard } from "./HuntStage";
 
 interface ClickHuntPanelProps {
   targetNote: string;
@@ -32,6 +31,12 @@ interface ClickHuntPanelProps {
    *  button below, which only solves the current rotating target. */
   onDevPassExam?: () => void;
 }
+
+// Exercise descriptions end with the fret window — "…on the B string (frets
+// 0-12)". The neck numbers its own frets and shades the answerable ones, so the
+// sentence doesn't need to carry it as well.
+const stripFretRange = (description?: string) =>
+  description?.replace(/\s*\(\s*frets?\b[^)]*\)\s*$/i, "").trim() || undefined;
 
 /**
  * Click-to-answer counterpart to NoteHuntDetector: shows the target note name
@@ -52,6 +57,8 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   const totalTargets = targetPositions.length;
   const complete = totalTargets > 0 && foundCount >= totalTargets;
   const isRotating = noteHuntSecondsLeft !== null;
+
+  const [showFullNeck, setShowFullNeck] = useShowFullNeck();
 
   // Once every position is found, move on to the next note by ourselves after
   // a short beat — instead of waiting on the shared rotation timer's slower
@@ -109,154 +116,97 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
     [noteSound, targetPositions, registerFretClick],
   );
 
+  const instruction = stripFretRange(description);
+
   return (
-    <div className="relative flex w-full max-w-6xl flex-col items-center gap-2.5 sm:gap-4">
-      <AnimatePresence>
-        {!isPlaying && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-zinc-950/40 backdrop-blur-[1px]"
-          >
-            <span className="rounded-lg bg-zinc-900/90 px-5 py-3 text-center text-sm font-bold tracking-wide text-amber-200 shadow-xl ring-1 ring-white/10">
-              ▶ Press Play below to start the timer
-              <br />
-              <span className="text-xs font-semibold text-zinc-400">you can click right away</span>
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex items-center justify-center gap-3">
-        <span className="rounded bg-amber-500/15 px-3.5 py-1.5 text-base font-extrabold tracking-wide text-amber-300">
-          ★ {score} pts
-        </span>
-        {isExamMode && (
-          <span className="rounded border border-dashed border-white/10 bg-zinc-800/40 px-3.5 py-1.5 text-base font-extrabold tabular-nums text-zinc-400">
-            ✕ {mistakeCount}/{CLICK_EXAM_MISTAKE_LIMIT}
-          </span>
-        )}
-        {isRotating && (
-          <span
-            className={cn(
-              "rounded px-3.5 py-1.5 text-base font-extrabold tabular-nums transition-colors",
-              complete
-                ? "bg-emerald-500/20 text-emerald-300"
-                : noteHuntSecondsLeft! <= 5
-                ? "animate-pulse bg-red-500/25 text-red-300"
-                : "bg-white/10 text-zinc-200",
-            )}
-          >
-            {noteHuntSecondsLeft}s
-          </span>
-        )}
-      </div>
-
-      <div className="relative group">
-        <div
-          className={cn(
-            "absolute -inset-2 blur-[16px] rounded-lg transition-opacity duration-500",
-            complete ? "bg-emerald-500/50 opacity-100" : "bg-cyan-500/15 opacity-50",
-          )}
+    <HuntStage
+      awaitingStart={!isPlaying}
+      stats={
+        <HuntStats
+          score={score}
+          mistakes={isExamMode ? { count: mistakeCount, limit: CLICK_EXAM_MISTAKE_LIMIT } : undefined}
+          secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+          complete={complete}
         />
-        <HuntSuccessBurst foundCount={foundCount} complete={complete} />
-        <motion.div
-          animate={complete ? { scale: [1, 1.18, 1] } : { scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className={cn(
-            "relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-lg flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden transition-colors duration-500",
-            complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
-          )}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              key={targetNote}
-              initial={{ opacity: 0, y: 10, scale: 0.85 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.85 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_0_18px_rgba(255,255,255,0.5)]"
-            >
-              {targetNote}
-            </motion.span>
-          </AnimatePresence>
-        </motion.div>
-      </div>
-
-      {description && (
-        <p className="text-center text-sm font-semibold tracking-wide text-zinc-200">{description}</p>
-      )}
-
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <button
-          type="button"
-          onClick={playReference}
-          disabled={referenceMidi === null}
-          className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95 disabled:opacity-40"
-          title="Play the note you are looking for">
-          <FaVolumeUp className="h-3.5 w-3.5" /> Hear the note
-        </button>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="click-hunt-note-sound"
-            checked={noteSound}
-            onCheckedChange={(checked) => toggleNoteSound(checked === true)}
-          />
-          <Label htmlFor="click-hunt-note-sound" className="cursor-pointer text-xs font-semibold tracking-wide text-zinc-400">
-            Play it automatically
-          </Label>
+      }
+      prompt={
+        <div className="flex flex-col items-center gap-3">
+          <HuntTargetCard value={targetNote} complete={complete} foundCount={foundCount} animationKey={targetNote} />
+          {instruction && <p className="text-center text-sm font-bold text-zinc-200">{instruction}</p>}
         </div>
-      </div>
+      }
+      board={
+        <ClickableFretboard
+          startFret={startFret}
+          endFret={endFret}
+          strings={strings}
+          foundKeys={foundKeys}
+          totalTargets={totalTargets}
+          lastClick={lastClick}
+          onCellClick={handleCellClick}
+          showFullNeck={showFullNeck}
+        />
+      }
+      footer={
+        <div className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          {totalTargets > 1 && (
+            <p className={cn("text-sm font-extrabold tabular-nums transition-colors", complete ? "text-emerald-400" : "text-zinc-300")}>
+              {complete ? "★ all positions found" : `${foundCount} / ${totalTargets} found`}
+            </p>
+          )}
+          {isRotating && (
+            <button
+              type="button"
+              onClick={advanceHunt}
+              className="inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+              Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
+            </button>
+          )}
 
-      <ClickableFretboard
-        startFret={startFret}
-        endFret={endFret}
-        strings={strings}
-        foundKeys={foundKeys}
-        totalTargets={totalTargets}
-        lastClick={lastClick}
-        onCellClick={handleCellClick}
-      />
+          {/* Settings — quieter than Next and parked next to it, so they stay
+              reachable without sitting in the reading path above the neck. */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:ml-2">
+            <button
+              type="button"
+              onClick={playReference}
+              disabled={referenceMidi === null}
+              className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              title="Play the note you are looking for">
+              <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear it
+            </button>
+            <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="click-hunt-note-sound"
+                checked={noteSound}
+                onCheckedChange={(checked) => toggleNoteSound(checked === true)}
+              />
+              <Label htmlFor="click-hunt-note-sound" className="cursor-pointer text-xs font-semibold text-zinc-400">
+                Autoplay
+              </Label>
+            </div>
+          </div>
 
-      <div className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        {totalTargets > 0 && (
-          <p className={cn("text-sm font-extrabold tracking-wide transition-colors", complete ? "text-emerald-300" : "text-zinc-300")}>
-            {complete ? "★ all positions found" : `${foundCount} / ${totalTargets} found`}
-          </p>
-        )}
-        {isRotating && (
-          <button
-            type="button"
-            onClick={advanceHunt}
-            className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-bold tracking-wide text-white transition-colors hover:bg-white/20 active:scale-95"
-          >
-            Next <FaArrowRight className="h-3.5 w-3.5" />
-          </button>
-        )}
-        {process.env.NODE_ENV !== "production" && !complete && totalTargets > 0 && (
-          <button
-            type="button"
-            onClick={() => targetPositions.forEach((p) => registerFretClick(p.string, p.fret))}
-            className="inline-flex items-center gap-2 rounded-lg border border-dashed border-amber-400/40 bg-transparent px-4 py-2 text-xs font-bold tracking-wide text-amber-300/80 transition-colors hover:bg-amber-400/10"
-            title="Dev-only: instantly clicks every valid position for this note"
-          >
-            🧪 Complete instantly (dev)
-          </button>
-        )}
-        {onDevPassExam && (
-          <button
-            type="button"
-            onClick={onDevPassExam}
-            className="inline-flex items-center gap-2 rounded-lg border border-dashed border-emerald-400/50 bg-transparent px-4 py-2 text-xs font-bold tracking-wide text-emerald-300/90 transition-colors hover:bg-emerald-400/10"
-            title="Dev-only: ends the WHOLE EXAM right now and runs the normal finish flow"
-          >
-            🏁 Pass whole exam (dev)
-          </button>
-        )}
-      </div>
-    </div>
+          {process.env.NODE_ENV !== "production" && !complete && totalTargets > 0 && (
+            <button
+              type="button"
+              onClick={() => targetPositions.forEach((p) => registerFretClick(p.string, p.fret))}
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-400 transition-colors hover:bg-amber-500/20"
+              title="Dev-only: instantly clicks every valid position for this note">
+              🧪 Complete instantly (dev)
+            </button>
+          )}
+          {onDevPassExam && (
+            <button
+              type="button"
+              onClick={onDevPassExam}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+              title="Dev-only: ends the WHOLE EXAM right now and runs the normal finish flow">
+              🏁 Pass whole exam (dev)
+            </button>
+          )}
+        </div>
+      }
+    />
   );
 }

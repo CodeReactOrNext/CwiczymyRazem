@@ -45,7 +45,11 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
 
     beat.notes.forEach((note) => {
       const cy     = strY(note.string);
-      const txt    = String(note.fret);
+      // Dead/muted notes carry a meaningless fret (usually 0) — they must render as an
+      // X, exactly like the full viewer does, otherwise a fully muted exercise (sweep
+      // motion drills) looks like a row of open strings in the preview.
+      const isDead = !!note.isDead;
+      const txt    = isDead ? "×" : String(note.fret);
       const color  = STRING_COLORS[note.string - 1];
       const bgW    = Math.min(slotW - 2, txt.length > 1 ? 13 : 10);
       const key    = `${bi}-${note.string}`;
