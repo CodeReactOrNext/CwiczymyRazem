@@ -21,24 +21,19 @@ describe("SupportAvatarRing", () => {
     expect(screen.getByTestId("avatar")).toBeTruthy();
   });
 
-  it("blurs the halo from a flat colour, so it stays an even circle", () => {
+  it("renders no blurred glow behind the avatar", () => {
     const { layers } = renderRing();
-    const halo = layers[0];
 
-    // The conic sweep is near-dark where it starts and near-white on the
-    // opposite side; blurred, that read as a squashed oval under the avatar.
-    expect(halo.style.background).not.toContain("conic-gradient");
-    expect(halo.className).not.toContain("animate-spin-slow");
-    expect(halo.className).toContain("rounded-full");
+    expect(layers.some((layer) => layer.className.includes("blur"))).toBe(false);
   });
 
-  it("only spins the rim, and reaches less far out than the halo", () => {
+  it("spins the gold rim", () => {
     const { layers } = renderRing();
-    const [halo, rim] = layers;
+    const rim = layers[0];
 
     expect(rim.style.background).toContain("conic-gradient");
     expect(rim.className).toContain("animate-spin-slow");
-    expect(parseInt(halo.style.inset)).toBeLessThan(parseInt(rim.style.inset));
+    expect(rim.className).toContain("rounded-full");
   });
 
   it("stays square in a cramped flex row, so the rings cannot go elliptical", () => {
