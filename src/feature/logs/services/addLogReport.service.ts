@@ -2,6 +2,7 @@ import type { AchievementList } from "feature/achievements/types";
 import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import { logger } from "feature/logger/Logger";
+import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
 import {
   collection,
   doc,
@@ -28,6 +29,8 @@ export const firebaseAddLogReport = async (
     songId?: string;
     songTitle?: string;
     songArtist?: string;
+    /** Every song of a multi-song session with its own slice of the time. */
+    songs?: ReportSongEntry[];
   },
   streak?: number,
   skillPointsGained?: Record<string, number>,

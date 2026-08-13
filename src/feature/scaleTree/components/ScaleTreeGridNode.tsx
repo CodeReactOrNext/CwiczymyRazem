@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
 import { Lock, Music4,Trophy } from 'lucide-react';
 
+import { BASE_ROOT_NOTE, transposeFret } from '../data/scaleTreeKeys';
 import type { NodeStatus } from '../types/scaleTree.types';
 
 interface ScaleTreeGridNodeProps {
   node: any;
+  /** Key the tree is played in — moves the fret a shape is named after. */
+  rootNote?: string;
   status: NodeStatus;
   isSelected: boolean;
   onClick: () => void;
@@ -78,6 +81,7 @@ const CONSTELLATIONS: Record<string, Array<{ x: number; y: number }>> = {
 
 export function ScaleTreeGridNode({
   node,
+  rootNote = BASE_ROOT_NOTE,
   status,
   isSelected,
   onClick,
@@ -349,7 +353,7 @@ export function ScaleTreeGridNode({
       req?.boxNumber != null
         ? ROMAN_NUMERALS[req.boxNumber] ?? '?'
         : req?.position != null
-          ? String(req.position)
+          ? String(transposeFret(req.position, rootNote))
           : '?';
     return (
       <div className="flex flex-col items-center justify-center gap-[2px] z-10 pointer-events-none select-none">
@@ -376,6 +380,9 @@ export function ScaleTreeGridNode({
   const selectedGlowFilter = isSelected
     ? `drop-shadow(0 0 6px ${colors.glow})`
     : undefined;
+
+  // Personal best above the exam tempo, kept per shape (shared across keys).
+  const recordBpm = node.data?.record?.bpm as number | undefined;
 
   return (
     <div
@@ -459,6 +466,16 @@ export function ScaleTreeGridNode({
         <div className="relative z-10 flex items-center justify-center">
           {getIconContent()}
         </div>
+
+        {/* Record tempo rides on the node itself, so the map reads as a scoreboard */}
+        {recordBpm && !isLocked && !isReward && (
+          <span
+            title={`Record: ${recordBpm} BPM`}
+            className="pointer-events-none absolute -right-1.5 -top-1.5 z-20 rounded-full bg-orange-500 px-1.5 py-[1px] text-[9px] font-bold leading-tight tabular-nums text-zinc-950"
+          >
+            {recordBpm}
+          </span>
+        )}
       </motion.div>
 
       {node.data?.subtitle && (isReward || isSingleString || isSubnode) && (

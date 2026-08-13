@@ -6,9 +6,10 @@ import { useAppSelector } from "store/hooks";
 import { SCALE_TREE_NODES, SCALE_TREE_REWARD_NODES } from "../data/scaleTreeNodes";
 import { getClaimedRewards } from "../services/rewardService";
 import { computeNodeStatuses, fetchAllBpmProgress, isExerciseCleared } from "../services/scaleTree.service";
-import type { BpmProgressMap,ScaleTreeNodeData } from "../types/scaleTree.types";
+import type { BpmProgressMap,ScaleRecordMap,ScaleTreeNodeData } from "../types/scaleTree.types";
 
 const progressCache: Record<string, BpmProgressMap> = {};
+const recordsCache: Record<string, ScaleRecordMap> = {};
 const rewardsCache: Record<string, string[]> = {};
 
 export function useScaleTree() {
@@ -16,6 +17,12 @@ export function useScaleTree() {
   const [progressMap, setProgressMap] = useState<BpmProgressMap>(() => {
     if (userId && progressCache[userId]) {
       return progressCache[userId];
+    }
+    return new Map();
+  });
+  const [recordMap, setRecordMap] = useState<ScaleRecordMap>(() => {
+    if (userId && recordsCache[userId]) {
+      return recordsCache[userId];
     }
     return new Map();
   });
@@ -33,6 +40,9 @@ export function useScaleTree() {
       if (progressCache[userId]) {
         setProgressMap(progressCache[userId]);
       }
+      if (recordsCache[userId]) {
+        setRecordMap(recordsCache[userId]);
+      }
       if (rewardsCache[userId]) {
         setClaimedRewards(rewardsCache[userId]);
       }
@@ -43,13 +53,15 @@ export function useScaleTree() {
     if (!userId) return;
     setIsLoading(true);
     try {
-      const [map, rewards] = await Promise.all([
+      const [progress, rewards] = await Promise.all([
         fetchAllBpmProgress(userId),
         getClaimedRewards(userId),
       ]);
-      progressCache[userId] = map;
+      progressCache[userId] = progress.bpms;
+      recordsCache[userId] = progress.records;
       rewardsCache[userId] = rewards;
-      setProgressMap(map);
+      setProgressMap(progress.bpms);
+      setRecordMap(progress.records);
       setClaimedRewards(rewards);
     } finally {
       setIsLoading(false);
@@ -77,6 +89,7 @@ export function useScaleTree() {
         status: nodeStatuses[node.id] ?? "locked",
         progress: { done: doneCount, total: node.requiredExercises.length },
         currentBpm,
+        record: firstReq ? recordMap.get(firstReq.exerciseId) ?? null : null,
       };
 
       return {
@@ -99,7 +112,7 @@ export function useScaleTree() {
     }));
 
     return [...treeNodes, ...rewardNodes];
-  }, [nodeStatuses, progressMap, claimedRewards]);
+  }, [nodeStatuses, progressMap, recordMap, claimedRewards, userId]);
 
   const selectedNode = useMemo(
     () => (selectedNodeId ? SCALE_TREE_NODES.find((n) => n.id === selectedNodeId) ?? null : null),
@@ -107,6 +120,11 @@ export function useScaleTree() {
   );
 
   const selectedNodeStatus = selectedNodeId ? (nodeStatuses[selectedNodeId] ?? "locked") : null;
+
+  const selectedNodeRecord = useMemo(() => {
+    const exerciseId = selectedNode?.requiredExercises[0]?.exerciseId;
+    return exerciseId ? recordMap.get(exerciseId) ?? null : null;
+  }, [selectedNode, recordMap]);
 
   const rfEdges = useMemo<Edge[]>(
     () => {
@@ -148,9 +166,11 @@ export function useScaleTree() {
     selectedNode,
     selectedNodeId,
     selectedNodeStatus,
+    selectedNodeRecord,
     setSelectedNodeId,
     progressMap,
     setProgressMap,
+    recordMap,
     isLoading,
     refreshProgress: loadProgress,
     refreshClaimedRewards,

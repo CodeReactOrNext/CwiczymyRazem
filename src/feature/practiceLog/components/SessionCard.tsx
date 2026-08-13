@@ -5,12 +5,16 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { formatPracticed } from "feature/user/view/ReportView/helpers/sessionSongs";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Lock, Pencil, Trash2 } from "lucide-react";
 import { convertMsToHM } from "utils/converter";
 
 import { CATEGORY_META, SESSION_TYPE_CONFIG } from "../config/sessionType";
 import type { PracticeLogSession } from "../types/practiceLog.types";
+
+/** How many songs of a long run get named before the rest are counted off. */
+const SONG_SPLIT_LIMIT = 4;
 
 const DurationStat = ({
   timeMs,
@@ -81,6 +85,12 @@ export const SessionCard = ({
       ? CATEGORY_META.filter(({ key }) => session.timeSumary![key] > 0)
       : [];
 
+  // The title of a multi-song session lists the songs but not their times —
+  // that split is the whole point of logging a repeat run, so show it here.
+  const songSplit =
+    !compact && (session.songs?.length ?? 0) > 1 ? session.songs! : [];
+  const shownSongs = songSplit.slice(0, SONG_SPLIT_LIMIT);
+
   return (
     <div
       className={cn(
@@ -130,6 +140,16 @@ export const SessionCard = ({
         {!compact && session.description && (
           <p className="mt-0.5 truncate text-xs text-zinc-500">
             {session.description}
+          </p>
+        )}
+
+        {shownSongs.length > 0 && (
+          <p className="mt-0.5 truncate text-xs text-zinc-500" translate="no">
+            {shownSongs
+              .map((song) => `${song.songTitle} ${formatPracticed(song.practiceMs)}`)
+              .join(" · ")}
+            {songSplit.length > shownSongs.length &&
+              ` · +${songSplit.length - shownSongs.length}`}
           </p>
         )}
 

@@ -3,10 +3,12 @@ import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import { AnimatePresence, motion } from "framer-motion";
-import { Lock, Play, Target, X } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { Flame, Lock, Minus, Play, Plus, Target, Trophy, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
-import type { NodeStatus, ScaleTreeNodeDef } from "../types/scaleTree.types";
+import { BASE_ROOT_NOTE, transposeFret } from "../data/scaleTreeKeys";
+import { nextRecordTarget, RECORD_MAX_BPM, RECORD_MIN_BPM, stepRecordBpm } from "../data/scaleTreeRecords";
+import type { NodeStatus, ScaleRecord, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
 const PATTERN_LABELS: Record<string, string> = {
   ascending:            "Ascending",
@@ -33,16 +35,45 @@ const FAMILY_COLOR: Record<string, string> = {
 interface ScaleNodeModalProps {
   node: ScaleTreeNodeDef | null;
   status: NodeStatus | null;
+  /** Key the tree is currently played in — moves every shape along the neck. */
+  rootNote: string;
+  /** Fastest clean run above the exam tempo, shared across keys. */
+  record: ScaleRecord | null;
   onClose: () => void;
   /** Timed exam at the required BPM — passing it unlocks the next node. */
   onStartExam: () => void;
   /** Free run of the same exercise, with the usual session controls. */
   onStartPractice: () => void;
+  /** The same exam, run faster than the tree asks for, chasing a personal best. */
+  onStartRecord: (bpm: number) => void;
 }
 
-export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPractice }: ScaleNodeModalProps) {
+export function ScaleNodeModal({
+  node,
+  status,
+  rootNote,
+  record,
+  onClose,
+  onStartExam,
+  onStartPractice,
+  onStartRecord,
+}: ScaleNodeModalProps) {
   const req = node?.requiredExercises[0];
   const isLocked = status === "locked";
+  const isCompleted = status === "completed";
+  const fret = req ? transposeFret(req.position, rootNote) : 0;
+
+  // Stepper for the record run. It resets whenever the sheet moves to another
+  // node (or that node's record changes) so it always opens one step past the
+  // best that node has seen — adjusted during render rather than in an effect.
+  const [lastRecordBaseline, setLastRecordBaseline] = useState("");
+  const [recordTarget, setRecordTarget] = useState(() => nextRecordTarget(record?.bpm));
+  // Held steady while the sheet animates out (node is already null by then).
+  const recordBaseline = node ? `${node.id}:${record?.bpm ?? 0}` : lastRecordBaseline;
+  if (recordBaseline !== lastRecordBaseline) {
+    setLastRecordBaseline(recordBaseline);
+    setRecordTarget(nextRecordTarget(record?.bpm));
+  }
 
   // Escape closes, and the page behind stays put while the sheet is open.
   useEffect(() => {
@@ -64,24 +95,24 @@ export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPrac
     try {
       if (req.stringNum != null) {
         const exercise = generateSingleStringScaleExercise({
-          rootNote: "C",
+          rootNote,
           scaleType: req.scaleType,
           stringNum: req.stringNum,
         });
         return exercise.tablature ?? null;
       } else {
         const exercise = generateScaleExercise({
-          rootNote: "C",
+          rootNote,
           scaleType: req.scaleType,
           patternType: req.patternType,
-          position: req.position,
+          position: fret,
         });
         return exercise.tablature ?? null;
       }
     } catch {
       return null;
     }
-  }, [req]);
+  }, [req, rootNote, fret]);
 
   return (
     <AnimatePresence>
@@ -140,9 +171,10 @@ export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPrac
                   req.boxNumber != null && <Chip>Box {req.boxNumber}</Chip>
                 )}
                 {req.stringNum == null && (
-                  <Chip>Frets {req.position}–{req.position + 4}</Chip>
+                  <Chip>Frets {fret}–{fret + 4}</Chip>
                 )}
                 <Chip color='cyan'>{req.requiredBpm} BPM</Chip>
+                {rootNote !== BASE_ROOT_NOTE && <Chip color='purple'>Key of {rootNote}</Chip>}
               </div>
             )}
 
@@ -169,9 +201,69 @@ export function ScaleNodeModal({ node, status, onClose, onStartExam, onStartPrac
                   onClick={onStartExam}
                   className='flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
                   <Target className='h-4 w-4' />
-                  {status === "completed" ? "Retake" : "Exam"}
+                  {isCompleted ? "Retake" : "Exam"}
                 </button>
               </div>
+            )}
+
+            {/* Record run — the same exam above the tree's tempo. Opens up once the
+                node itself is cleared, so the exam stays the way in. */}
+            {!isLocked && (
+              isCompleted ? (
+                <div className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-4'>
+                  <div className='flex items-center gap-3'>
+                    <Flame className='h-4 w-4 shrink-0 text-orange-400' />
+                    <span className='flex-1 text-sm font-bold text-zinc-100'>Record run</span>
+                    {record ? (
+                      <span className='flex items-center gap-1.5 text-sm font-bold tabular-nums text-orange-400'>
+                        <Trophy className='h-3.5 w-3.5' />
+                        {record.bpm} BPM
+                        {record.rootNote && (
+                          <span className='font-medium text-zinc-500'>· {record.rootNote}</span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className='text-xs text-zinc-500'>No record yet</span>
+                    )}
+                  </div>
+
+                  <div className='flex items-center gap-3'>
+                    <div className='flex flex-1 items-center justify-between gap-2 rounded-lg bg-zinc-900/60 px-2 py-2'>
+                      <button
+                        onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, -1))}
+                        disabled={recordTarget <= RECORD_MIN_BPM}
+                        aria-label='Lower target tempo'
+                        className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
+                        <Minus className='h-4 w-4' />
+                      </button>
+                      <span className='text-sm font-bold tabular-nums text-zinc-100'>
+                        {recordTarget} BPM
+                      </span>
+                      <button
+                        onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, 1))}
+                        disabled={recordTarget >= RECORD_MAX_BPM}
+                        aria-label='Raise target tempo'
+                        className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
+                        <Plus className='h-4 w-4' />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => onStartRecord(recordTarget)}
+                      className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-orange-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+                      <Flame className='h-4 w-4' />
+                      {record ? "Beat it" : "Set record"}
+                    </button>
+                  </div>
+
+                  <p className='text-xs leading-relaxed text-zinc-500'>
+                    Only a clean run counts — hold the tempo to the end and the fastest one is kept.
+                  </p>
+                </div>
+              ) : (
+                <p className='text-xs leading-relaxed text-zinc-500'>
+                  Pass the exam to open record runs above {req?.requiredBpm ?? RECORD_MIN_BPM} BPM.
+                </p>
+              )
             )}
           </motion.div>
         </div>

@@ -29,7 +29,9 @@ const resolveTitle = (log: FirebaseUserExceriseLog, type: SessionType) => {
     const plan = defaultPlans.find((p) => p.id === log.planId);
     if (plan) return plan.title;
   }
-  if (type === "song" && log.songTitle) {
+  // A multi-song session already carries every title in `exceriseTitle`
+  // ("4 songs: …"); naming only the primary one would hide the rest.
+  if (type === "song" && log.songTitle && (log.songs?.length ?? 0) <= 1) {
     return log.songArtist
       ? `${log.songTitle} — ${log.songArtist}`
       : log.songTitle;
@@ -55,6 +57,7 @@ export const mapLogToSession = (
     description: log.description,
     songTitle: log.songTitle,
     songArtist: log.songArtist,
+    songs: log.songs,
     isDateBackReport: log.isDateBackReport,
   };
 };

@@ -3,10 +3,13 @@ import { ArrowLeft, Menu, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { BASE_ROOT_NOTE, isScaleTreeKey, transposeFret } from '../data/scaleTreeKeys';
 import { useScaleTree } from '../hooks/useScaleTree';
 import { ScaleNodeModal } from './ScaleNodeModal';
 import { ScaleTreeGrid } from './ScaleTreeGrid';
 import { ScaleTreeSidebar } from './ScaleTreeSidebar';
+
+const ROOT_NOTE_STORAGE_KEY = 'scaleTree.rootNote';
 
 const PREFIX_TO_SCALE: Record<string, string> = {
   min_pent: 'minor_pentatonic',
@@ -28,12 +31,27 @@ export function ScaleTreeView() {
     selectedNode,
     selectedNodeId,
     selectedNodeStatus,
+    selectedNodeRecord,
     setSelectedNodeId,
   } = useScaleTree();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeScaleType, setActiveScaleType] = useState('minor_pentatonic');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // The key the whole tree is played in. Node data is authored in C; every other
+  // key is the same shapes moved along the neck (see transposeFret). The view is
+  // client-only (dynamic import, ssr: false), so the stored key can be read
+  // straight into the first render.
+  const [rootNote, setRootNote] = useState(() => {
+    if (typeof window === 'undefined') return BASE_ROOT_NOTE;
+    const stored = window.localStorage.getItem(ROOT_NOTE_STORAGE_KEY);
+    return isScaleTreeKey(stored) ? stored : BASE_ROOT_NOTE;
+  });
+
+  const handleSelectRootNote = useCallback((note: string) => {
+    setRootNote(note);
+    window.localStorage.setItem(ROOT_NOTE_STORAGE_KEY, note);
+  }, []);
 
   useEffect(() => {
     if (router.query.fromExam === 'true' && router.query.nodeId && rfNodes.length > 0) {
@@ -53,34 +71,46 @@ export function ScaleTreeView() {
     }
   }, [router.query, rfNodes, setSelectedNodeId]);
 
-  // Both actions run the same exercise; only the exam variant is timed, locked
-  // to the required BPM and reports back a passed stage.
+  // All three actions run the same exercise. Exam and record runs are timed and
+  // locked to a tempo; only the exam clears the node, only a record run is scored
+  // against the node's personal best.
   const startSession = useCallback(
-    (mode: 'exam' | 'practice') => {
+    (mode: 'exam' | 'practice' | 'record', bpm?: number) => {
       if (!selectedNode) return;
       const req = selectedNode.requiredExercises[0];
       if (!req) return;
 
-      const params = new URLSearchParams({ type: selectedNode.scaleType });
+      const params = new URLSearchParams({ type: selectedNode.scaleType, root: rootNote });
       if (req.stringNum != null) {
         params.set('string', String(req.stringNum));
       } else {
-        params.set('pos', String(req.position));
+        // The fret follows the key; the shape (and therefore the node) does not.
+        params.set('pos', String(transposeFret(req.position, rootNote)));
         params.set('pattern', req.patternType);
       }
-      if (mode === 'exam') {
+      if (mode !== 'practice') {
         params.set('exam', 'true');
-        params.set('requiredBpm', String(req.requiredBpm));
+        params.set('requiredBpm', String(mode === 'record' ? bpm ?? req.requiredBpm : req.requiredBpm));
       }
+      if (mode === 'record') {
+        params.set('mode', 'record');
+      }
+      // Progress is filed under the C exercise whatever key it was played in —
+      // the same shape in another key is the same achievement.
+      params.set('exerciseId', req.exerciseId);
       params.set('nodeId', selectedNode.id);
 
       router.push(`/practice/scale?${params.toString()}`);
     },
-    [selectedNode, router]
+    [selectedNode, rootNote, router]
   );
 
   const handleStartExam = useCallback(() => startSession('exam'), [startSession]);
   const handleStartPractice = useCallback(() => startSession('practice'), [startSession]);
+  const handleStartRecord = useCallback(
+    (bpm: number) => startSession('record', bpm),
+    [startSession]
+  );
 
   const handleCloseModal = useCallback(() => {
     setSelectedNodeId(null);
@@ -143,6 +173,8 @@ export function ScaleTreeView() {
 
       <ScaleTreeGrid
         scaleType={activeScaleType}
+        rootNote={rootNote}
+        onSelectRootNote={handleSelectRootNote}
         rfNodes={rfNodes}
         rfEdges={rfEdges}
         selectedNodeId={selectedNodeId}
@@ -170,9 +202,12 @@ export function ScaleTreeView() {
       <ScaleNodeModal
         node={selectedNode}
         status={selectedNodeStatus}
+        rootNote={rootNote}
+        record={selectedNodeRecord}
         onClose={handleCloseModal}
         onStartExam={handleStartExam}
         onStartPractice={handleStartPractice}
+        onStartRecord={handleStartRecord}
       />
     </div>
   );

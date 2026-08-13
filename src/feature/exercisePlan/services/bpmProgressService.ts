@@ -17,6 +17,11 @@ export interface BpmProgressData {
   earTrainingHighScore?: number;
   clickHighScore?: number;
   clickHighScoreAccuracy?: number;
+  /** Fastest clean scale-tree record run — see `updateScaleRecordBpm`. */
+  recordBpm?: number;
+  recordBpmAccuracy?: number;
+  /** Key the record was set in; the shape is the same in every key. */
+  recordBpmRoot?: string;
 }
 
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
@@ -82,6 +87,50 @@ export const toggleBpmStage = async (
     return completedBpms;
   } catch (error) {
     logger.error(error, { context: "toggleBpmStage" });
+    throw error;
+  }
+};
+
+/**
+ * Records a tempo as cleared, and only that — unlike `toggleBpmStage`, replaying
+ * a stage that was already passed leaves it passed (a retaken exam must never
+ * take progress away).
+ */
+export const addBpmStage = async (
+  userId: string,
+  exerciseId: string,
+  bpm: number,
+  exerciseTitle: string,
+  exerciseCategory: string
+): Promise<number[]> => {
+  try {
+    const docRef = doc(
+      db,
+      "users",
+      userId,
+      BPM_PROGRESS_SUBCOLLECTION,
+      exerciseId
+    );
+    const snapshot = await trackedGetDoc(docRef);
+
+    const existing = snapshot.exists() ? snapshot.data() : {};
+    const completedBpms: number[] = [...(existing.completedBpms || [])];
+    if (completedBpms.includes(bpm)) return completedBpms;
+
+    completedBpms.push(bpm);
+    completedBpms.sort((a, b) => a - b);
+
+    await trackedSetDoc(docRef, {
+      ...existing,
+      completedBpms,
+      exerciseTitle,
+      exerciseCategory,
+      lastUpdated: Timestamp.now(),
+    });
+
+    return completedBpms;
+  } catch (error) {
+    logger.error(error, { context: "addBpmStage" });
     throw error;
   }
 };
@@ -198,6 +247,52 @@ export const updateClickHighScore = async (
   } catch (error) {
     logger.error(error, { context: "updateClickHighScore" });
     return { isNewRecord: false, previousScore: 0 };
+  }
+};
+
+/**
+ * Scale-tree record run: keeps the fastest tempo the exercise has been played
+ * cleanly at, above the tempo the tree itself asks for. Slower runs are ignored,
+ * so a bad attempt can never cost a player their record.
+ */
+export const updateScaleRecordBpm = async (
+  userId: string,
+  exerciseId: string,
+  bpm: number,
+  accuracy: number,
+  rootNote: string,
+  exerciseTitle: string,
+  exerciseCategory: string
+): Promise<{ isNewRecord: boolean; previousBpm: number }> => {
+  try {
+    const docRef = doc(
+      db,
+      "users",
+      userId,
+      BPM_PROGRESS_SUBCOLLECTION,
+      exerciseId
+    );
+    const snapshot = await trackedGetDoc(docRef);
+
+    const existing = snapshot.exists() ? snapshot.data() : {};
+    const previousBpm = existing.recordBpm || 0;
+
+    if (bpm <= previousBpm) return { isNewRecord: false, previousBpm };
+
+    await trackedSetDoc(docRef, {
+      ...existing,
+      completedBpms: existing.completedBpms || [],
+      exerciseTitle,
+      exerciseCategory,
+      recordBpm: bpm,
+      recordBpmAccuracy: accuracy,
+      recordBpmRoot: rootNote,
+      lastUpdated: Timestamp.now(),
+    });
+    return { isNewRecord: true, previousBpm };
+  } catch (error) {
+    logger.error(error, { context: "updateScaleRecordBpm" });
+    return { isNewRecord: false, previousBpm: 0 };
   }
 };
 

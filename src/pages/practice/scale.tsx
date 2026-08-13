@@ -1,13 +1,16 @@
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
-import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
+import { addBpmStage, updateScaleRecordBpm } from "feature/exercisePlan/services/bpmProgressService";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { BASE_ROOT_NOTE, isScaleTreeKey } from "feature/scaleTree/data/scaleTreeKeys";
+import { isRecordRunClean, RECORD_PASS_ACCURACY } from "feature/scaleTree/data/scaleTreeRecords";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
 
@@ -16,10 +19,19 @@ const EXAM_TIME_IN_MINUTES = 1.5;
 
 export default function PracticeScalePage() {
   const router = useRouter();
-  const { type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId } = router.query;
+  const {
+    type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId,
+    root, mode, exerciseId: exerciseIdParam,
+  } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
+
+  // Key the tree sent us into. The fret (`pos`) already arrives transposed —
+  // this only decides which notes the generator writes into the tab.
+  const rootNote = isScaleTreeKey(root) ? root : BASE_ROOT_NOTE;
+  // A record run is the same timed exam, just above the tree's own tempo.
+  const isRecordRun = mode === 'record';
 
   const examMode = exam === 'true' && requiredBpm && nodeId
     ? { requiredBpm: Number(requiredBpm), nodeId: String(nodeId) }
@@ -37,7 +49,7 @@ export default function PracticeScalePage() {
         router.replace("/scale-tree");
         return;
       }
-      const exercise = generateSingleStringScaleExercise({ rootNote: "C", scaleType, stringNum });
+      const exercise = generateSingleStringScaleExercise({ rootNote, scaleType, stringNum });
       if (exam === 'true') {
         exercise.timeInMinutes = EXAM_TIME_IN_MINUTES;
       }
@@ -66,7 +78,7 @@ export default function PracticeScalePage() {
       return;
     }
 
-    const exercise = generateScaleExercise({ rootNote: "C", scaleType, patternType, position });
+    const exercise = generateScaleExercise({ rootNote, scaleType, patternType, position });
     if (exam === 'true') {
       exercise.timeInMinutes = EXAM_TIME_IN_MINUTES;
     }
@@ -82,25 +94,49 @@ export default function PracticeScalePage() {
       userId: userAuth ?? "anonymous",
       image: null,
     });
-  }, [router.isReady, type, pos, pattern, stringParam, userAuth, router]);
+  }, [router.isReady, type, pos, pattern, stringParam, rootNote, exam, userAuth, router]);
 
   const isDataReady = router.isReady && !!plan;
 
   const handleExamComplete = async (accuracy: number) => {
-    if (!userAuth || !requiredBpm || !plan?.exercises[0]) {
+    const exercise = plan?.exercises[0];
+    if (!userAuth || !requiredBpm || !exercise) {
       setIsFinishing(true);
       router.push(backUrl);
       return;
     }
-    const exercise = plan.exercises[0];
+    // Progress is filed under the tree's own (C) exercise id whatever key the run
+    // was played in — the same shape in another key is the same achievement.
+    const progressExerciseId = typeof exerciseIdParam === 'string' ? exerciseIdParam : exercise.id;
     try {
-      await toggleBpmStage(
-        userAuth,
-        exercise.id,
-        Number(requiredBpm),
-        exercise.title,
-        'theory'
-      );
+      if (isRecordRun) {
+        if (isRecordRunClean(accuracy)) {
+          const { isNewRecord, previousBpm } = await updateScaleRecordBpm(
+            userAuth,
+            progressExerciseId,
+            Number(requiredBpm),
+            accuracy,
+            rootNote,
+            exercise.title,
+            'theory'
+          );
+          toast[isNewRecord ? 'success' : 'message'](
+            isNewRecord
+              ? `New record: ${requiredBpm} BPM${previousBpm ? ` (was ${previousBpm})` : ''}`
+              : `Clean run, but your record still stands at ${previousBpm} BPM`
+          );
+        } else {
+          toast.message(`No record — a run needs ${RECORD_PASS_ACCURACY}% accuracy to count`);
+        }
+      } else {
+        await addBpmStage(
+          userAuth,
+          progressExerciseId,
+          Number(requiredBpm),
+          exercise.title,
+          'theory'
+        );
+      }
     } catch (e) {
       console.error(e);
     } finally {

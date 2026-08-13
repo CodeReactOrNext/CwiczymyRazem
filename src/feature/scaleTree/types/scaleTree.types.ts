@@ -47,11 +47,27 @@ export interface ScaleTreeNodeDef {
   requiredExercises: RequiredExercise[];
 }
 
+/** Fastest clean run above the exam tempo — the node's personal best. */
+export interface ScaleRecord {
+  bpm: number;
+  /** Key it was set in. The shape is identical in every key, so records are shared. */
+  rootNote?: string;
+  accuracy?: number;
+}
+
 export interface ScaleTreeNodeData extends ScaleTreeNodeDef {
   [key: string]: unknown;
   status: NodeStatus;
   progress: { done: number; total: number };
   currentBpm: number | null;
+  record: ScaleRecord | null;
 }
 
 export type BpmProgressMap = Map<string, number[]>;
+export type ScaleRecordMap = Map<string, ScaleRecord>;
+
+/** Everything the tree reads out of `exerciseBpmProgress` in one pass. */
+export interface ScaleTreeProgress {
+  bpms: BpmProgressMap;
+  records: ScaleRecordMap;
+}

@@ -750,6 +750,21 @@ export const PracticeSession = ({
         isLastExercise={isLastExercise}
       />
 
+      {/* Dev-only shortcut for exams with no hunt panel to host the button —
+          scale-tree exams and record runs, where the only way to finish is to
+          play the thing out. Passes at 100% and at whatever tempo the run is
+          locked to, so record runs save a record from here too. */}
+      {process.env.NODE_ENV !== "production" && isExamMode && !currentExercise.customGoal && isMounted && createPortal(
+        <button
+          type="button"
+          onClick={handleDevCompleteExam}
+          title="Dev-only: ends the exam right now and runs the normal finish flow"
+          className="fixed bottom-4 left-4 z-[999999999] inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-400 backdrop-blur-md transition-colors hover:bg-emerald-500/20">
+          🏁 Pass exam{lockedExamBpm ? ` @ ${lockedExamBpm} BPM` : ""} (dev)
+        </button>,
+        document.body,
+      )}
+
       <TuningSettingsModal />
     </>
     </SessionUIProvider>

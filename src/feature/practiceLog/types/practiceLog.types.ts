@@ -1,3 +1,5 @@
+import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
+
 export type SessionType = "manual" | "plan" | "song";
 
 export type DateRangeKey = "7d" | "30d" | "90d" | "all";
@@ -27,6 +29,8 @@ export interface PracticeLogSession {
   description?: string;
   songTitle?: string;
   songArtist?: string;
+  /** Per-song breakdown of a multi-song session; absent for single-song ones. */
+  songs?: ReportSongEntry[];
   isDateBackReport?: string;
 }
 

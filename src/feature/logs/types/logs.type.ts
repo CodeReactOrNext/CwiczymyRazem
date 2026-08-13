@@ -2,6 +2,7 @@ import type { AchievementList } from "feature/achievements/types";
 import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import type { SupportVariantId } from "feature/support/content/supportVariants";
+import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
 
 /**
  * Fame each reactor was actually granted when they motivated this log, keyed by their uid.
@@ -62,6 +63,11 @@ export interface FirebaseUserExceriseLog {
   songId?: string;
   songTitle?: string;
   songArtist?: string;
+  /**
+   * Full breakdown of a multi-song session. Absent on single-song and older
+   * reports, where `songId`/`songTitle`/`songArtist` alone describe the session.
+   */
+  songs?: ReportSongEntry[];
 }
 
 export interface FirebaseLogsInterface {

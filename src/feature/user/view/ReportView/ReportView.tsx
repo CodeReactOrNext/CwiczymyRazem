@@ -52,11 +52,24 @@ import { i18n } from "utils/translation";
 
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
+import {
+  buildSongsSessionTitle,
+  createPickedSong,
+  MAX_SESSION_SONGS,
+  MAX_SONG_CATEGORY_MINUTES,
+  type PickedSong,
+  pickPrimarySong,
+  type SessionSong,
+  sumSongMinutes,
+  toReportSongEntries,
+} from "./helpers/sessionSongs";
 import type { ReportFormikInterface } from "./ReportView.types";
 import SavedTimeBanner from "./SavedTimeBanner";
-import SessionSongPicker, { type SessionSong } from "./SessionSongPicker";
+import SessionSongPicker, { type SongCategory } from "./SessionSongPicker";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
+
+type SessionMode = "free" | "songs";
 
 const ReportView = () => {
   const router = useRouter();
@@ -70,19 +83,22 @@ const ReportView = () => {
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  // A session is described either by free text + tags, or by one song from the
-  // user's library — the two share `reportTitle`, so they live in separate tabs.
-  const [selectedSong, setSelectedSong] = useState<SessionSong | null>(
+  // The session is either free practice — own time boxes, own title and tags —
+  // or a run over songs, where each song brings its own time. Picking the mode
+  // is the first thing step 1 asks, because it decides what the rest looks like.
+  const [pickedSongs, setPickedSongs] = useState<PickedSong[]>(
     songId && songTitle
-      ? {
-          id: songId as string,
-          title: songTitle as string,
-          artist: (songArtist as string) ?? "",
-        }
-      : null
+      ? [
+          createPickedSong({
+            id: songId as string,
+            title: songTitle as string,
+            artist: (songArtist as string) ?? "",
+          }),
+        ]
+      : []
   );
-  const [focusMode, setFocusMode] = useState<"tags" | "song">(
-    selectedSong ? "song" : "tags"
+  const [sessionMode, setSessionMode] = useState<SessionMode>(
+    pickedSongs.length > 0 ? "songs" : "free"
   );
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
@@ -224,21 +240,80 @@ const ReportView = () => {
 
   type SetFieldValue = (field: string, value: any) => void;
 
-  const selectSong = (song: SessionSong | null, setFieldValue: SetFieldValue) => {
-    setSelectedSong(song);
-    setFieldValue("songId", song?.id);
-    setFieldValue("songTitle", song?.title);
-    setFieldValue("songArtist", song?.artist);
-    setFieldValue("reportTitle", song ? `${song.artist} - ${song.title}` : "");
+  const setMinutesField = (
+    hoursField: string,
+    minutesField: string,
+    minutes: number,
+    setFieldValue: SetFieldValue
+  ) => {
+    setFieldValue(hoursField, String(Math.floor(minutes / 60)));
+    setFieldValue(minutesField, String(minutes % 60));
   };
 
-  const switchFocusMode = (mode: "tags" | "song", setFieldValue: SetFieldValue) => {
-    setFocusMode(mode);
-    if (mode === "song") {
-      // Tags and a song both write `reportTitle`; keep only one of them alive.
+  /**
+   * In song mode the songs own the report's time: its technique and hearing
+   * totals are the sum over them, and its title lists them. Writing it back
+   * into the same Formik fields keeps scoring, validation and the total-time
+   * readout working exactly as they do for a free session.
+   */
+  const applySongTimes = (songs: PickedSong[], setFieldValue: SetFieldValue) => {
+    const { technique, hearing } = sumSongMinutes(songs);
+
+    setMinutesField("techniqueHours", "techniqueMinutes", technique, setFieldValue);
+    setMinutesField("hearingHours", "hearingMinutes", hearing, setFieldValue);
+    setMinutesField("theoryHours", "theoryMinutes", 0, setFieldValue);
+    setMinutesField("creativityHours", "creativityMinutes", 0, setFieldValue);
+    setFieldValue("reportTitle", buildSongsSessionTitle(songs));
+  };
+
+  const toggleSong = (song: SessionSong, setFieldValue: SetFieldValue) => {
+    const isPicked = pickedSongs.some((picked) => picked.id === song.id);
+    if (!isPicked && pickedSongs.length >= MAX_SESSION_SONGS) return;
+
+    const nextSongs = isPicked
+      ? pickedSongs.filter((picked) => picked.id !== song.id)
+      : [...pickedSongs, createPickedSong(song)];
+
+    setPickedSongs(nextSongs);
+    applySongTimes(nextSongs, setFieldValue);
+  };
+
+  const setSongMinutes = (
+    pickedId: string,
+    category: SongCategory,
+    minutes: number,
+    setFieldValue: SetFieldValue
+  ) => {
+    const safeMinutes = Math.max(0, Math.min(minutes, MAX_SONG_CATEGORY_MINUTES));
+    const nextSongs = pickedSongs.map((song) =>
+      song.id === pickedId
+        ? {
+            ...song,
+            techniqueMinutes:
+              category === "technique" ? safeMinutes : song.techniqueMinutes,
+            hearingMinutes: category === "hearing" ? safeMinutes : song.hearingMinutes,
+          }
+        : song
+    );
+
+    setPickedSongs(nextSongs);
+    applySongTimes(nextSongs, setFieldValue);
+  };
+
+  const switchSessionMode = (mode: SessionMode, setFieldValue: SetFieldValue) => {
+    setSessionMode(mode);
+
+    if (mode === "songs") {
+      // Tags and songs both write `reportTitle`; keep only one of them alive.
       setSelectedTags([]);
-    } else if (selectedSong) {
-      selectSong(null, setFieldValue);
+      applySongTimes(pickedSongs, setFieldValue);
+      return;
+    }
+
+    if (pickedSongs.length > 0) {
+      // The time on the boxes was the songs' — dropping them empties it too.
+      setPickedSongs([]);
+      applySongTimes([], setFieldValue);
     }
   };
 
@@ -270,6 +345,9 @@ const ReportView = () => {
       return;
     }
 
+    const loggedSongs = sessionMode === "songs" ? toReportSongEntries(pickedSongs) : [];
+    const primarySong = pickPrimarySong(loggedSongs);
+
     if (sumTime > 6 * 60 * 60 * 1000 && !acceptLongTime) {
       setLongTimePopUpVisible(true);
       return;
@@ -285,6 +363,12 @@ const ReportView = () => {
 
     const enrichedInputData = {
       ...inputData,
+      songs: loggedSongs,
+      // Everything that still reads a single song (activity feed, practice log,
+      // rating popup) gets the one this session leaned on the most.
+      songId: primarySong?.songId,
+      songTitle: primarySong?.songTitle,
+      songArtist: primarySong?.songArtist,
       clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
       clientNowISO: new Date().toISOString(),
       clientDisplayStreak: getStreakFromActivityLog(
@@ -295,19 +379,31 @@ const ReportView = () => {
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));
 
-    // A manual log attributed to a song also feeds that song's own progress
-    // (total practice time, session count) and pulls it into "learning" — the
-    // same bookkeeping the song timer does, so both routes stay consistent.
-    if (inputData.songId && inputData.songTitle) {
-      dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+    // A manual log attributed to songs also feeds each song's own progress (its
+    // share of the practice time, session count) and pulls it into "learning" —
+    // the same bookkeeping the song timer does, so both routes stay consistent.
+    if (loggedSongs.length > 0) {
+      dispatch(
+        updateQuestProgress({ type: 'practice_any_song', amount: loggedSongs.length })
+      );
       try {
-        await recordPracticeSession(userAuth, inputData.songId, sumTime, null, null);
-        await ensureSongIsLearning(
-          userAuth,
-          inputData.songId,
-          inputData.songTitle,
-          inputData.songArtist ?? "",
-          avatar ?? undefined
+        await Promise.all(
+          loggedSongs.map(async (song) => {
+            await recordPracticeSession(
+              userAuth,
+              song.songId,
+              song.practiceMs,
+              null,
+              null
+            );
+            await ensureSongIsLearning(
+              userAuth,
+              song.songId,
+              song.songTitle,
+              song.songArtist ?? "",
+              avatar ?? undefined
+            );
+          })
         );
         queryClient.invalidateQueries({ queryKey: ["user-song-progress", userAuth] });
         queryClient.invalidateQueries({ queryKey: ["user-songs", userAuth] });
@@ -398,12 +494,13 @@ const ReportView = () => {
       Number(inputData.creativityHours || 0) * 60 + Number(inputData.creativityMinutes || 0);
     posthog.capture("practice_session_completed", {
       total_minutes: totalMinutesForCapture,
-      has_song: !!inputData.songTitle,
+      has_song: loggedSongs.length > 0,
+      song_count: loggedSongs.length,
       has_plan: !!inputData.planId,
       habit_count: inputData.habbits?.length ?? 0,
     });
 
-    setSubmittedValues(inputData);
+    setSubmittedValues(enrichedInputData);
     setAcceptPopUpVisible(false);
     setView('success');
   };
@@ -478,8 +575,18 @@ const ReportView = () => {
           previousUserStats={previousUserStats}
           activityData={activityDataToUse}
           sessionTitle={submittedValues?.reportTitle}
-          songTitle={submittedValues?.songTitle}
-          songArtist={submittedValues?.songArtist}
+          // With several songs the title already lists them — repeating just the
+          // primary one underneath would read as if it were the only one.
+          songTitle={
+            (submittedValues?.songs?.length ?? 0) > 1
+              ? undefined
+              : submittedValues?.songTitle
+          }
+          songArtist={
+            (submittedValues?.songs?.length ?? 0) > 1
+              ? undefined
+              : submittedValues?.songArtist
+          }
         />
       ) : (
         <Formik
@@ -490,7 +597,12 @@ const ReportView = () => {
           onSubmit={reportOnSubmit}>
           {({ errors, values, setFieldValue }) => {
             const isStep1Done = getSumTime(values) > 0;
-            const isStep2Completed = values.reportTitle.trim().length > 0 || (values.habbits && values.habbits.length > 0);
+            const isSongMode = sessionMode === "songs";
+            // Song mode fills the title from the songs, so only ticked habits
+            // can mark this step as done there.
+            const isStep2Completed = isSongMode
+              ? (values.habbits?.length ?? 0) > 0
+              : values.reportTitle.trim().length > 0 || (values.habbits && values.habbits.length > 0);
 
             return (
               <>
@@ -515,40 +627,76 @@ const ReportView = () => {
                           "ml-12 text-sm font-medium transition-colors duration-500",
                           isStep1Done ? "text-emerald-400" : "text-zinc-400"
                         )}>
-                          {isStep1Done 
-                            ? "Great! Practice time added. You can save now or fill optional details below." 
-                            : "What did you practice today? Add time below."}
+                          {isStep1Done
+                            ? "Great! Practice time added. You can save now or fill optional details below."
+                            : isSongMode
+                              ? "Pick the songs you played and set the time on each one."
+                              : "What did you practice today? Add time below."}
                         </p>
                     </div>
-                    
-                    {hasSavedTime && (
-                      <SavedTimeBanner
-                        timerData={timerData}
-                        onApply={() => applySavedTime(setFieldValue)}
-                        onDismiss={() => setSavedTimeApplied(true)}
-                      />
-                    )}
 
-                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                      {timeInputList.map(
-                        (
-                          { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
-                          index
-                        ) => (
-                          <div key={index}>
-                            <TimeInputBox
-                              errors={errors}
-                              title={title}
-                              questionMarkProps={questionMarkProps}
-                              Icon={Icon}
-                              hoursName={hoursName}
-                              minutesName={minutesName}
-                              skillId={skillId}
-                            />
-                          </div>
-                        )
-                      )}
+                    <div className='mb-6 flex gap-1 rounded-lg bg-zinc-900/60 p-1'>
+                      {([
+                        { mode: "free" as const, label: "Free session", Icon: Tags },
+                        { mode: "songs" as const, label: "Songs", Icon: Music },
+                      ]).map(({ mode, label, Icon }) => (
+                        <button
+                          key={mode}
+                          type='button'
+                          onClick={() => switchSessionMode(mode, setFieldValue)}
+                          className={cn(
+                            "flex flex-1 items-center justify-center gap-2 rounded py-2.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
+                            sessionMode === mode
+                              ? "bg-cyan-500/10 text-cyan-400"
+                              : "text-zinc-500 hover:text-zinc-300"
+                          )}>
+                          <Icon className='h-3.5 w-3.5' />
+                          {label}
+                        </button>
+                      ))}
                     </div>
+
+                    {isSongMode ? (
+                      <SessionSongPicker
+                        userId={userAuth as string | null}
+                        selected={pickedSongs}
+                        onToggle={(song) => toggleSong(song, setFieldValue)}
+                        onSetMinutes={(pickedId, category, minutes) =>
+                          setSongMinutes(pickedId, category, minutes, setFieldValue)
+                        }
+                      />
+                    ) : (
+                      <>
+                        {hasSavedTime && (
+                          <SavedTimeBanner
+                            timerData={timerData}
+                            onApply={() => applySavedTime(setFieldValue)}
+                            onDismiss={() => setSavedTimeApplied(true)}
+                          />
+                        )}
+
+                        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                          {timeInputList.map(
+                            (
+                              { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
+                              index
+                            ) => (
+                              <div key={index}>
+                                <TimeInputBox
+                                  errors={errors}
+                                  title={title}
+                                  questionMarkProps={questionMarkProps}
+                                  Icon={Icon}
+                                  hoursName={hoursName}
+                                  minutesName={minutesName}
+                                  skillId={skillId}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </>
+                    )}
                     <div className='mt-10'>
                       <div className="flex flex-col items-center gap-4 md:items-end">
                         <div className='flex items-center rounded-lg bg-zinc-900/60 px-6 py-4 backdrop-blur-md'>
@@ -602,42 +750,15 @@ const ReportView = () => {
                       </div>
                       <div className="flex items-baseline gap-3">
                         <h3 className='font-display text-xl font-bold tracking-tight text-zinc-100'>
-                           Session focus & habits
+                           {isSongMode ? "Healthy habits" : "Session focus & habits"}
                         </h3>
                         <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">Optional</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                       {!isSongMode && (
                        <div className="lg:col-span-12 xl:col-span-7 space-y-6">
-                        <div className='flex gap-1 rounded-lg bg-zinc-900/60 p-1'>
-                          {([
-                            { mode: "tags" as const, label: "Free session", Icon: Tags },
-                            { mode: "song" as const, label: "Song from my library", Icon: Music },
-                          ]).map(({ mode, label, Icon }) => (
-                            <button
-                              key={mode}
-                              type='button'
-                              onClick={() => switchFocusMode(mode, setFieldValue)}
-                              className={cn(
-                                "flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-xs font-bold transition-colors",
-                                focusMode === mode
-                                  ? "bg-cyan-500/10 text-cyan-400"
-                                  : "text-zinc-500 hover:text-zinc-300"
-                              )}>
-                              <Icon className='h-3.5 w-3.5' />
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-
-                        {focusMode === "song" ? (
-                          <SessionSongPicker
-                            userId={userAuth as string | null}
-                            selected={selectedSong}
-                            onSelect={(song) => selectSong(song, setFieldValue)}
-                          />
-                        ) : (
                         <div className='space-y-4'>
                           <div className="flex items-center justify-between">
                             <label className='font-sans text-sm font-bold text-zinc-400'>
@@ -745,10 +866,13 @@ const ReportView = () => {
                             ))}
                           </div>
                           </div>
-                        )}
                        </div>
+                       )}
 
-                       <div className="lg:col-span-12 xl:col-span-5 space-y-4">
+                       <div className={cn(
+                         "lg:col-span-12 space-y-4",
+                         isSongMode ? "xl:col-span-12" : "xl:col-span-5"
+                       )}>
                           <div className="flex items-center justify-between gap-2 px-1">
                             <p className="text-lg font-bold text-zinc-200">Habits checklist</p>
                             <span

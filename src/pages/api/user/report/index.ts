@@ -28,6 +28,44 @@ export interface SongListInterface {
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Matches `MAX_SESSION_SONGS` in the form — keeps one report doc a sane size. */
+const MAX_REPORT_SONGS = 20;
+const MAX_SONG_TEXT_LENGTH = 200;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The per-song breakdown of a multi-song session comes straight from the
+ * client, so it is rebuilt field by field before it can reach Firestore.
+ */
+const sanitizeReportSongs = (value: unknown) => {
+  if (!Array.isArray(value)) return undefined;
+
+  const songs = value
+    .filter(
+      (entry): entry is Record<string, unknown> =>
+        !!entry && typeof entry === "object"
+    )
+    .map((entry) => ({
+      songId: typeof entry.songId === "string" ? entry.songId : "",
+      songTitle:
+        typeof entry.songTitle === "string"
+          ? entry.songTitle.slice(0, MAX_SONG_TEXT_LENGTH)
+          : "",
+      songArtist:
+        typeof entry.songArtist === "string"
+          ? entry.songArtist.slice(0, MAX_SONG_TEXT_LENGTH)
+          : "",
+      practiceMs:
+        typeof entry.practiceMs === "number" && Number.isFinite(entry.practiceMs)
+          ? Math.min(Math.max(Math.round(entry.practiceMs), 0), DAY_MS)
+          : 0,
+    }))
+    .filter((song) => song.songId && song.practiceMs > 0)
+    .slice(0, MAX_REPORT_SONGS);
+
+  return songs.length > 0 ? songs : undefined;
+};
+
 /**
  * The user's local calendar day this report is being filed on — the bucket the
  * daily fame counter belongs to. Always the client's "today", even for a
@@ -121,6 +159,19 @@ export default async function handler(
 
     const season = await getCurrentSeason();
 
+    // `songId`/`songTitle`/`songArtist` stay the session's primary song so every
+    // older consumer keeps working; `songs` carries the full per-song breakdown.
+    const reportSongs = sanitizeReportSongs(inputData.songs);
+    const songDetails =
+      inputData.songId || inputData.songTitle || inputData.songArtist || reportSongs
+        ? {
+            ...(inputData.songId && { songId: inputData.songId }),
+            ...(inputData.songTitle && { songTitle: inputData.songTitle }),
+            ...(inputData.songArtist && { songArtist: inputData.songArtist }),
+            ...(reportSongs && { songs: reportSongs }),
+          }
+        : undefined;
+
     const writePromises = [];
 
     writePromises.push(firebaseUpdateUserStats(
@@ -141,11 +192,7 @@ export default async function handler(
       report.timeSummary,
       season.seasonId,
       inputData.planId ?? null,
-      inputData.songId || inputData.songTitle || inputData.songArtist ? {
-        ...(inputData.songId && { songId: inputData.songId }),
-        ...(inputData.songTitle && { songTitle: inputData.songTitle }),
-        ...(inputData.songArtist && { songArtist: inputData.songArtist })
-      } : undefined
+      songDetails
     ));
 
     if (!report.isDateBackReport) {
@@ -172,11 +219,7 @@ export default async function handler(
         report.timeSummary,
         inputData.avatarUrl ?? null,
         inputData.planId ?? null,
-        inputData.songId || inputData.songTitle || inputData.songArtist ? {
-          ...(inputData.songId && { songId: inputData.songId }),
-          ...(inputData.songTitle && { songTitle: inputData.songTitle }),
-          ...(inputData.songArtist && { songArtist: inputData.songArtist })
-        } : undefined,
+        songDetails,
         discordStreak,
         inputData.skillPointsGained,
         report.newRecords,

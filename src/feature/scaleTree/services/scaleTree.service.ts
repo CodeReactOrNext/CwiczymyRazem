@@ -3,7 +3,13 @@ import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
 import { SCALE_TREE_NODES } from "../data/scaleTreeNodes";
-import type { BpmProgressMap, NodeStatus, RequiredExercise } from "../types/scaleTree.types";
+import type {
+  BpmProgressMap,
+  NodeStatus,
+  RequiredExercise,
+  ScaleRecordMap,
+  ScaleTreeProgress,
+} from "../types/scaleTree.types";
 
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
 
@@ -20,17 +26,35 @@ export function isExerciseCleared(req: RequiredExercise, bpms: number[]): boolea
   return bpms.some((b) => b >= threshold);
 }
 
-export async function fetchAllBpmProgress(userId: string): Promise<BpmProgressMap> {
+/**
+ * Reads the whole `exerciseBpmProgress` subcollection once: cleared tempos (what
+ * unlocks nodes) and record runs (the personal best shown on the node) live in
+ * the same documents, so they travel together.
+ */
+export async function fetchAllBpmProgress(userId: string): Promise<ScaleTreeProgress> {
   const progressRef = collection(db, "users", userId, BPM_PROGRESS_SUBCOLLECTION);
   const snapshot = await trackedGetDocs(progressRef);
 
-  const map: BpmProgressMap = new Map();
+  const bpms: BpmProgressMap = new Map();
+  const records: ScaleRecordMap = new Map();
   snapshot.forEach((doc) => {
-    const data = doc.data() as { completedBpms?: number[] };
-    map.set(doc.id, data.completedBpms ?? []);
+    const data = doc.data() as {
+      completedBpms?: number[];
+      recordBpm?: number;
+      recordBpmRoot?: string;
+      recordBpmAccuracy?: number;
+    };
+    bpms.set(doc.id, data.completedBpms ?? []);
+    if (data.recordBpm) {
+      records.set(doc.id, {
+        bpm: data.recordBpm,
+        rootNote: data.recordBpmRoot,
+        accuracy: data.recordBpmAccuracy,
+      });
+    }
   });
 
-  return map;
+  return { bpms, records };
 }
 
 export function computeNodeStatuses(progressMap: BpmProgressMap): Record<string, NodeStatus> {

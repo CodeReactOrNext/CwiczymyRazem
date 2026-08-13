@@ -1,4 +1,6 @@
 import { Chip } from 'assets/components/ui/chip';
+import { cn } from 'assets/lib/utils';
+import { SCALE_TREE_KEYS, transposeFret } from 'feature/scaleTree/data/scaleTreeKeys';
 import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scaleTreeNodes';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo,useRef, useState } from 'react';
@@ -7,6 +9,9 @@ import { ScaleTreeGridNode } from './ScaleTreeGridNode';
 
 interface ScaleTreeGridProps {
   scaleType: string;
+  /** Key the tree is played in — the shapes are the same, the frets move. */
+  rootNote: string;
+  onSelectRootNote: (rootNote: string) => void;
   rfNodes: any[];
   rfEdges: any[];
   selectedNodeId: string | null;
@@ -52,6 +57,8 @@ const SCALE_TO_PREFIX: Record<string, string> = {
 
 export function ScaleTreeGrid({
   scaleType,
+  rootNote,
+  onSelectRootNote,
   rfNodes,
   rfEdges,
   selectedNodeId,
@@ -189,7 +196,7 @@ export function ScaleTreeGrid({
         </span>
         <div className="mt-1.5 flex flex-wrap items-center gap-3">
           <h1 className="font-display text-xl font-bold capitalize text-zinc-100 sm:text-2xl">
-            {SCALE_LABEL[scaleType] || scaleType}
+            {rootNote} {SCALE_LABEL[scaleType] || scaleType}
           </h1>
           {scaleNodes.length > 0 && (
             <Chip color='gray' className='py-1 text-[11px]'>
@@ -199,6 +206,29 @@ export function ScaleTreeGrid({
               done
             </Chip>
           )}
+        </div>
+
+        {/* Key picker — the tree itself never changes, only the fret its shapes
+            sit on and the notes under your fingers. */}
+        <div className="mt-4 flex items-center gap-3">
+          <span className="hidden shrink-0 text-xs font-semibold text-zinc-500 sm:block">Key</span>
+          <div className="flex gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
+            {SCALE_TREE_KEYS.map((key) => (
+              <button
+                key={key}
+                onClick={() => onSelectRootNote(key)}
+                aria-pressed={key === rootNote}
+                className={cn(
+                  'shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold tabular-nums transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                  key === rootNote
+                    ? 'bg-zinc-800/70 text-zinc-100'
+                    : 'bg-zinc-900/40 text-zinc-500 hover:bg-zinc-800/40 hover:text-zinc-300'
+                )}
+              >
+                {key}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -240,6 +270,7 @@ export function ScaleTreeGrid({
               <div id={`node-slot-${gateNode.id}`} className="flex-shrink-0">
                 <ScaleTreeGridNode
                   node={gateNode}
+                  rootNote={rootNote}
                   status={gateNode.data?.status || 'locked'}
                   isSelected={gateNode.id === selectedNodeId}
                   onClick={() => onNodeClick(gateNode.id)}
@@ -253,6 +284,8 @@ export function ScaleTreeGrid({
           <div className="w-full max-w-5xl flex flex-col gap-3 sm:gap-6">
             {positions.map((pos, idx) => {
               const posNodes = getPositionNodes(pos);
+              // Node IDs stay keyed to the C fret; only the label follows the key.
+              const fret = transposeFret(pos, rootNote);
 
               return (
                 <div key={pos} className="flex items-center w-full gap-2 sm:gap-6">
@@ -261,11 +294,11 @@ export function ScaleTreeGrid({
                       box convention, so the fret is the name. */}
                   <div className="w-10 sm:w-16 flex-shrink-0 text-right">
                     <span className="block text-xs font-semibold tabular-nums text-zinc-300">
-                      {showBoxNames ? `Box ${idx + 1}` : `Fret ${pos}`}
+                      {showBoxNames ? `Box ${idx + 1}` : `Fret ${fret}`}
                     </span>
                     {showBoxNames && (
                       <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
-                        fret {pos}
+                        fret {fret}
                       </span>
                     )}
                   </div>
@@ -275,6 +308,7 @@ export function ScaleTreeGrid({
                       <div key={node.id} id={`node-slot-${node.id}`} className="flex-shrink-0">
                         <ScaleTreeGridNode
                           node={node}
+                          rootNote={rootNote}
                           status={node.data?.status || 'locked'}
                           isSelected={node.id === selectedNodeId}
                           onClick={() => onNodeClick(node.id)}

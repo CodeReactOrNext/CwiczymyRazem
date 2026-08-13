@@ -1,4 +1,7 @@
-import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
+import type {
+  ReportDataInterface,
+  ReportSongEntry,
+} from "feature/user/view/ReportView/ReportView.types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 import { db } from "../../../utils/firebase/client/firebase.utils";
@@ -28,6 +31,8 @@ export const firebaseSetUserExerciseRaprot = async (
     songId?: string;
     songTitle?: string;
     songArtist?: string;
+    /** Every song of a multi-song session with its own slice of the time. */
+    songs?: ReportSongEntry[];
   }
 ) => {
   const dataRaport = {

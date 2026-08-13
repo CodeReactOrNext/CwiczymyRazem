@@ -2,6 +2,8 @@ import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import { convertMsToHM } from "utils/converter";
 
+import { SKILL_COLORS } from "./helpers/skillColors";
+
 interface TimerData {
   technique: number;
   theory: number;
@@ -14,13 +16,6 @@ interface SavedTimeBannerProps {
   onApply: () => void;
   onDismiss: () => void;
 }
-
-const SKILL_COLORS = {
-  technique: "#e04c3b",
-  theory: "#a44aed",
-  hearing: "#4a7edd",
-  creativity: "#37b874",
-} as const;
 
 const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps) => {
   const { t } = useTranslation("report");

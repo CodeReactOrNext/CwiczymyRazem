@@ -5,6 +5,22 @@ export type HabbitsType =
   | "metronome"
   | "recording";
 
+/**
+ * One song a session's time was attributed to. A session can hold several of
+ * them (a repeat run over the setlist); the singular `songId`/`songTitle`/
+ * `songArtist` fields below stay filled with the primary one so every consumer
+ * that predates multi-song reports keeps working.
+ */
+export interface ReportSongEntry {
+  songId: string;
+  songTitle: string;
+  songArtist: string;
+  /** Total time spent on this song, in ms — `techniqueMs` + `hearingMs`. */
+  practiceMs: number;
+  techniqueMs: number;
+  hearingMs: number;
+}
+
 export interface ReportFormikInterface {
   techniqueHours: string;
   techniqueMinutes: string;
@@ -22,6 +38,8 @@ export interface ReportFormikInterface {
   songId?: string;
   songTitle?: string;
   songArtist?: string;
+  /** Every song of this session with its own time; empty/absent for non-song sessions. */
+  songs?: ReportSongEntry[];
   skillPointsGained?: Record<string, number>;
   exerciseRecords?: {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
