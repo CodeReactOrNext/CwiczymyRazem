@@ -38,6 +38,11 @@ export const masterOfPuppets: SongGuide = {
     { label: "Tempo", value: "≈212 BPM, downpicked" },
     { label: "Length", value: "8:35" },
   ],
+  lookup: {
+    bpm: 212,
+    tuning: "E standard",
+    musicalKey: "E minor",
+  },
   editorial: {
     difficulty: 8.5,
     timeToLearn: "3–6 months to full tempo",

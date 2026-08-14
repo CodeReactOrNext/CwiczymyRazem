@@ -36,6 +36,11 @@ export const hotelCalifornia: SongGuide = {
     { label: "Tempo", value: "≈74 BPM" },
     { label: "Length", value: "6:30" },
   ],
+  lookup: {
+    bpm: 74,
+    tuning: "E standard",
+    musicalKey: "B minor",
+  },
   editorial: {
     difficulty: 6.5,
     timeToLearn: "1–2 weeks rhythm; 1–3 months with solo",

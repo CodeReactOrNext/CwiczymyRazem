@@ -38,6 +38,10 @@ export const crazyTrain: SongGuide = {
     { label: "Tempo", value: "≈136 BPM" },
     { label: "Length", value: "4:52" },
   ],
+  lookup: {
+    bpm: 136,
+    tuning: "E standard",
+  },
   editorial: {
     difficulty: 7,
     timeToLearn: "2–4 weeks for the riff; 3–6 months for the full solo",

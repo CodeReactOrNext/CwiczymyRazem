@@ -38,6 +38,11 @@ export const sevenNationArmy: SongGuide = {
     { label: "Tempo", value: "≈120 BPM" },
     { label: "Length", value: "3:51" },
   ],
+  lookup: {
+    bpm: 120,
+    tuning: "E standard",
+    musicalKey: "E minor",
+  },
   editorial: {
     difficulty: 4.5,
     timeToLearn: "A day for the riff; 2–4 weeks for the full song",

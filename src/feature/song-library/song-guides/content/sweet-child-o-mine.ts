@@ -41,6 +41,10 @@ export const sweetChildOMine: SongGuide = {
     { label: "Tempo", value: "≈125 BPM" },
     { label: "Length", value: "5:56" },
   ],
+  lookup: {
+    bpm: 125,
+    tuning: "E♭ standard",
+  },
   editorial: {
     difficulty: 7.5,
     timeToLearn: "1–2 weeks intro; 2–4 months full song",

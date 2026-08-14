@@ -2,6 +2,24 @@ import { getAuthorProfile } from "lib/authors";
 import Head from "next/head";
 
 import type { GuideFaqEntry, GuideLiveData, SongGuide } from "../types";
+import {
+  composeGuideDescription,
+  composeGuideTitle,
+} from "../utils/composeGuideSeo";
+
+/**
+ * Guides whose title/description are generated from `lookup` data instead of
+ * the hand-written `seo` block, retargeting them at "{song} bpm / key / tuning"
+ * lookups. Staged rather than switched on everywhere at once so the change can
+ * be attributed and rolled back; clearing the set moves every guide over.
+ */
+const LOOKUP_SEO_SLUGS = new Set([
+  "master-of-puppets",
+  "stairway-to-heaven",
+  "hotel-california",
+  "sweet-child-o-mine",
+  "nothing-else-matters",
+]);
 
 interface SongGuideSEOProps {
   guide: SongGuide;
@@ -19,13 +37,21 @@ export const SongGuideSEO = ({
   const ogImageUrl = liveData.song?.coverUrl ?? `${siteUrl}/promo.png`;
   const authorProfile = getAuthorProfile(guide.author);
 
+  const useLookupSeo = LOOKUP_SEO_SLUGS.has(guide.slug);
+  const metaTitle = useLookupSeo
+    ? composeGuideTitle(guide, liveData)
+    : guide.seo.metaTitle;
+  const metaDescription = useLookupSeo
+    ? composeGuideDescription(guide, liveData)
+    : guide.seo.metaDescription;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Article",
         headline: guide.h1,
-        description: guide.seo.metaDescription,
+        description: metaDescription,
         image: ogImageUrl,
         author: authorProfile
           ? {
@@ -114,23 +140,23 @@ export const SongGuideSEO = ({
 
   return (
     <Head>
-      <title>{guide.seo.metaTitle}</title>
-      <meta name='description' content={guide.seo.metaDescription} />
+      <title>{metaTitle}</title>
+      <meta name='description' content={metaDescription} />
       <meta name='keywords' content={guide.seo.keywords.join(", ")} />
       <meta name='robots' content='index, follow' />
 
       <meta property='og:type' content='article' />
       <meta property='og:url' content={pageUrl} />
-      <meta property='og:title' content={guide.seo.metaTitle} />
-      <meta property='og:description' content={guide.seo.metaDescription} />
+      <meta property='og:title' content={metaTitle} />
+      <meta property='og:description' content={metaDescription} />
       <meta property='og:image' content={ogImageUrl} />
       <meta property='article:published_time' content={guide.publishedAt} />
       <meta property='article:modified_time' content={guide.updatedAt} />
       <meta property='article:author' content={guide.author || "Riff Quest"} />
 
       <meta name='twitter:card' content='summary_large_image' />
-      <meta name='twitter:title' content={guide.seo.metaTitle} />
-      <meta name='twitter:description' content={guide.seo.metaDescription} />
+      <meta name='twitter:title' content={metaTitle} />
+      <meta name='twitter:description' content={metaDescription} />
       <meta name='twitter:image' content={ogImageUrl} />
 
       <link rel='canonical' href={pageUrl} />

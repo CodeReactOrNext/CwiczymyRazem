@@ -36,6 +36,11 @@ export const stairwayToHeaven: SongGuide = {
     { label: "Feel", value: "Slow build, ≈72 BPM rising toward the finale" },
     { label: "Length", value: "8:02" },
   ],
+  lookup: {
+    bpm: 72,
+    tuning: "E standard",
+    musicalKey: "A minor",
+  },
   editorial: {
     difficulty: 7,
     timeToLearn: "4–8 weeks for the full song",

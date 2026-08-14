@@ -36,6 +36,10 @@ export const nothingElseMatters: SongGuide = {
     { label: "Feel", value: "Slow 6/8 ballad" },
     { label: "Length", value: "6:28" },
   ],
+  lookup: {
+    tuning: "E standard",
+    musicalKey: "E minor",
+  },
   editorial: {
     difficulty: 4.6,
     timeToLearn: "2–4 weeks for the core song",

@@ -146,6 +146,26 @@ export interface SongGuide {
   quickAnswer: string;
   intro: string[];
   facts: GuideFact[];
+  /**
+   * Machine-readable duplicates of the lookup values that also appear, prose
+   * and all, in `facts`. `facts` stays the presentation layer — it can say
+   * "≈212 BPM, downpicked" or bury the tempo under a "Feel" label — while
+   * these are the only fields anything programmatic (SEO titles, schema,
+   * filtering) is allowed to read.
+   *
+   * Every one is optional and every consumer must handle `undefined`: several
+   * guides genuinely have no single answer. Leave a field out rather than
+   * flattening a compound value — a song whose riff is in A and whose solo is
+   * in F# minor has no `musicalKey`, and inventing one is worse than omitting it.
+   */
+  lookup?: {
+    /** Main-riff tempo, the plain number. Drop the "≈" and any qualifier. */
+    bpm?: number;
+    /** Base tuning only, e.g. "E standard" — no capo or 12-string notes. */
+    tuning?: string;
+    /** Only when the song has one unambiguous key. */
+    musicalKey?: string;
+  };
   /** Editorial fallbacks — overridden by live community data when available. */
   editorial: {
     difficulty: number;

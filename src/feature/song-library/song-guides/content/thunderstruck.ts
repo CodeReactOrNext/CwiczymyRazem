@@ -38,6 +38,10 @@ export const thunderstruck: SongGuide = {
     { label: "Tempo", value: "≈136 BPM, alternate-picked" },
     { label: "Length", value: "4:52" },
   ],
+  lookup: {
+    bpm: 136,
+    tuning: "E standard",
+  },
   editorial: {
     difficulty: 6,
     timeToLearn:
