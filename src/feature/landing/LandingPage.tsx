@@ -82,6 +82,16 @@ const LandingPage = ({
 }: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
     {
+      title: "Is Riff Quest a free guitar practice app?",
+      message:
+        "Yes. Riff Quest is a free guitar practice app — session tracking, the exercise library, community song difficulty ratings and your progress stats are free forever, with no trial and no credit card. Premium only adds extras on top; everything you need to practice and track progress stays free.",
+    },
+    {
+      title: "Do I need to download anything?",
+      message:
+        "No. Riff Quest is a web app that runs in your browser on desktop, tablet and phone — you sign up free and start practicing in seconds, with nothing to install and no app store involved. There is an optional desktop app for players who want low-latency audio input, but it is never required.",
+    },
+    {
       title: "Who is this app for?",
       message:
         "Riff Quest is for guitarists who want to turn their practice into visible progress. If you feel inconsistent, stuck, or just want a better way to track your repertoire, this is for you.",
