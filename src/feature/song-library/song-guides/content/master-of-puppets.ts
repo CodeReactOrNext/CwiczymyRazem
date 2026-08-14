@@ -11,9 +11,9 @@ export const masterOfPuppets: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-07-20",
   seo: {
-    metaTitle: "Master of Puppets Guitar Difficulty: Real Data | Riff Quest",
+    metaTitle: "Master of Puppets: The Riffs Are Easy. 8 Minutes Isn't.",
     metaDescription:
-      "How hard is Master of Puppets on guitar? Riff-by-riff difficulty map, the 212 BPM downpicking ladder, and a realistic timeline of 3–6 months to full tempo.",
+      "212 BPM downpicked for eight and a half minutes — 14 players rate it 7.3/10 and took 3–6 months. Riff-by-riff map and the BPM ladder that gets you there.",
     keywords: [
       "master of puppets guitar difficulty",
       "how hard is master of puppets",
