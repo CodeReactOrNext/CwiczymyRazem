@@ -1,12 +1,16 @@
 import type { SongGuide } from "../types";
 import { crazyTrain } from "./crazy-train";
+import { eruption } from "./eruption";
 import { hotelCalifornia } from "./hotel-california";
 import { masterOfPuppets } from "./master-of-puppets";
 import { nothingElseMatters } from "./nothing-else-matters";
 import { sevenNationArmy } from "./seven-nation-army";
+import { snowHeyOh } from "./snow-hey-oh";
 import { stairwayToHeaven } from "./stairway-to-heaven";
 import { sweetChildOMine } from "./sweet-child-o-mine";
+import { theTrooper } from "./the-trooper";
 import { thunderstruck } from "./thunderstruck";
+import { tornadoOfSouls } from "./tornado-of-souls";
 
 export const songGuides: SongGuide[] = [
   nothingElseMatters,
@@ -17,6 +21,10 @@ export const songGuides: SongGuide[] = [
   sevenNationArmy,
   thunderstruck,
   crazyTrain,
+  theTrooper,
+  snowHeyOh,
+  tornadoOfSouls,
+  eruption,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>

@@ -256,6 +256,8 @@ export const crazyTrain: SongGuide = {
         artist: "Van Halen",
         difficulty: 9.5,
         why: "The tapping and legato vocabulary Crazy Train's solo introduces, taken to its purest and most extreme form.",
+        guideSlug: "eruption",
+        songId: "Wss26QoLTUtCCQnvnVwu",
       },
     ],
   },
