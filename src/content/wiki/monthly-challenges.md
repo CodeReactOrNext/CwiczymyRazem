@@ -6,7 +6,7 @@ section: "Community"
 order: 1
 ---
 
-Every month the community picks **five songs**, and everyone tries to record themselves playing them. It's the one part of riff.quest where other people hear you play — and it pays better than anything else in the app.
+Every month the community picks **five songs**, and everyone tries to record themselves playing them. It's the one part of riff.quest where other people hear you play, and it pays better than anything else in the app.
 
 <ClickPath steps="Challenges" caption="Three tabs: this month's board, the vote for next month, and the archive." />
 
@@ -14,7 +14,7 @@ Every month the community picks **five songs**, and everyone tries to record the
 
 <StepList steps="Look at the board::Five songs, chosen by last month's vote. Difficulty tiers are shown, so you can tell what you're in for|Learn one::Any one of them. Nobody has to do all five|Record it::A phone camera is fine. Upload it as a video link and submit it against the song|Get paid::Each accepted recording pays 100 points and 300 Fame" />
 
-<StatRow stats="+100 points:per song you record|+300 Fame:per song you record|+500 Fame:bonus for clearing all five|5 songs:on every monthly board" caption="One recording per song per player — so a full board is 500 points and 2000 Fame." />
+<StatRow stats="+100 points:per song you record|+300 Fame:per song you record|+500 Fame:bonus for clearing all five|5 songs:on every monthly board" caption="One recording per song per player, so a full board is 500 points and 2000 Fame." />
 
 ## Voting for next month
 
@@ -24,7 +24,7 @@ While one board is live, the next one is being decided. You nominate songs you'd
 
 ## The archive
 
-Old boards don't disappear. You can still record songs from a closed month and the recording lands on that board — it just doesn't pay points or Fame. Back-filling a year of challenges was never meant to be a shortcut up the rankings, but catching up on a song you missed is fair game.
+Old boards don't disappear. You can still record songs from a closed month and the recording lands on that board; it just doesn't pay points or Fame. Back-filling a year of challenges was never meant to be a shortcut up the rankings, but catching up on a song you missed is fair game.
 
 <BlogAlert type="tip">
 The challenge board is the fastest legitimate Fame in the app. If you're saving for an Elite case, one recorded song is more than double the price of a Standard one.
@@ -32,6 +32,6 @@ The challenge board is the fastest legitimate Fame in the app. If you're saving 
 
 ## Questions people ask
 
-<FaqList items="Do I have to play it perfectly?::No. This isn't judged or scored — a recording that exists counts|Where does the video live?::You link a video and it shows up in Recordings, where other players can watch, like and comment|Can I submit the same song twice?::No — one recording per song per month, so pick the take you're happiest with|What if I don't like any of the five?::Vote next cycle. Nominations are open the whole time the current board is live" />
+<FaqList items="Do I have to play it perfectly?::No. This isn't judged or scored; a recording that exists counts|Where does the video live?::You link a video and it shows up in Recordings, where other players can watch, like and comment|Can I submit the same song twice?::No, one recording per song per month, so pick the take you're happiest with|What if I don't like any of the five?::Vote next cycle. Nominations are open the whole time the current board is live" />
 
-<ReadNext links="Recordings & the community::/wiki/recordings-and-community|Rankings & seasons::/wiki/leaderboard-and-seasons|Songs & difficulty::/wiki/songs-playlists-and-difficulty" />
+<ReadNext links="Where Fame comes from::/wiki/fame|Recordings & the community::/wiki/recordings-and-community|Rankings & seasons::/wiki/leaderboard-and-seasons|Songs & difficulty::/wiki/songs-playlists-and-difficulty" />

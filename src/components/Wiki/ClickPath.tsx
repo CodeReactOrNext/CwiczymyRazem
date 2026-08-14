@@ -1,3 +1,4 @@
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
 import { ChevronRight } from "lucide-react";
 
 import { parseList } from "./parseProps";
@@ -21,7 +22,10 @@ export const ClickPath = ({ steps, caption }: ClickPathProps) => {
         {items.map((item, index) => (
           <span key={item} className='flex items-center gap-2'>
             {index > 0 && (
-              <ChevronRight className='h-4 w-4 text-zinc-600' aria-hidden='true' />
+              <ChevronRight
+                className='h-4 w-4 text-zinc-600'
+                aria-hidden='true'
+              />
             )}
             <span
               className={
@@ -34,7 +38,11 @@ export const ClickPath = ({ steps, caption }: ClickPathProps) => {
           </span>
         ))}
       </div>
-      {caption && <p className='mt-3 text-xs text-zinc-500'>{caption}</p>}
+      {caption && (
+        <p className='mt-3 text-xs text-zinc-500'>
+          {withCurrencyIcons(caption)}
+        </p>
+      )}
     </div>
   );
 };

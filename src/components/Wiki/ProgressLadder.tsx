@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
 
 import { parsePairs } from "./parseProps";
 
@@ -15,7 +16,11 @@ interface ProgressLadderProps {
  * grades. The bar next to each rung grows so the shape of the progression is
  * readable at a glance, without doing the maths.
  */
-export const ProgressLadder = ({ items, highlight, caption }: ProgressLadderProps) => {
+export const ProgressLadder = ({
+  items,
+  highlight,
+  caption,
+}: ProgressLadderProps) => {
   const rungs = parsePairs(items);
 
   return (
@@ -32,7 +37,7 @@ export const ProgressLadder = ({ items, highlight, caption }: ProgressLadderProp
               <span
                 className={cn(
                   "w-32 shrink-0 text-sm font-bold",
-                  isHighlighted ? "text-cyan-400" : "text-zinc-200"
+                  isHighlighted ? "text-cyan-400" : "text-zinc-200",
                 )}>
                 {rung.title}
               </span>
@@ -42,21 +47,25 @@ export const ProgressLadder = ({ items, highlight, caption }: ProgressLadderProp
                 <span
                   className={cn(
                     "block h-2 rounded-full",
-                    isHighlighted ? "bg-cyan-500/70" : "bg-zinc-700"
+                    isHighlighted ? "bg-cyan-500/70" : "bg-zinc-700",
                   )}
                   style={{ width: `${width}%` }}
                 />
               </span>
               {rung.description && (
                 <span className='text-sm leading-relaxed text-zinc-400'>
-                  {rung.description}
+                  {withCurrencyIcons(rung.description)}
                 </span>
               )}
             </div>
           );
         })}
       </div>
-      {caption && <p className='mt-3 text-xs text-zinc-500'>{caption}</p>}
+      {caption && (
+        <p className='mt-3 text-xs text-zinc-500'>
+          {withCurrencyIcons(caption)}
+        </p>
+      )}
     </div>
   );
 };

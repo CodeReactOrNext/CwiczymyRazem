@@ -1,28 +1,50 @@
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { Footer } from "feature/landing/components/Footer";
+import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
 import WikiLayout from "feature/wiki/WikiLayout";
 import AppLayout from "layouts/AppLayout";
 import { getWikiSections, type WikiSection } from "lib/wiki";
-import type { GetServerSideProps } from "next";
+import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+
+const SITE_URL = "https://riff.quest";
+const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
+const DESCRIPTION =
+  "The Riff Quest Knowledge Base: how practice logging, points, Fame, streaks, songs, skills and the rest of the app actually work, explained in plain language.";
 
 interface WikiIndexProps {
   sections: WikiSection[];
 }
 
 const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
+  const { status } = useSession();
+  const isLogged = status === "authenticated";
+
   // The very first article in reading order doubles as the "start here" card.
   const firstPage = sections[0]?.pages[0];
 
   return (
     <>
       <Head>
-        <title>Wiki | Riff Quest</title>
-        <meta name='robots' content='noindex' />
+        <title>Riff Quest Knowledge Base</title>
+        <meta name='description' content={DESCRIPTION} />
+        <link rel='canonical' href={`${SITE_URL}/wiki`} />
+        <meta property='og:title' content='Riff Quest Knowledge Base' />
+        <meta property='og:description' content={DESCRIPTION} />
+        <meta property='og:url' content={`${SITE_URL}/wiki`} />
+        <meta property='og:type' content='website' />
+        <meta property='og:site_name' content='Riff Quest' />
+        <meta property='og:image' content={OG_IMAGE} />
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:title' content='Riff Quest Knowledge Base' />
+        <meta name='twitter:description' content={DESCRIPTION} />
+        <meta name='twitter:image' content={OG_IMAGE} />
       </Head>
+      {!isLogged && <WikiPublicNav />}
       <div className='bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen'>
         <HeroBanner
           title='Wiki'
@@ -71,13 +93,14 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
           </div>
         </WikiLayout>
       </div>
+      {!isLogged && <Footer />}
     </>
   );
 };
 
 WikiIndexPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId={"wiki"} subtitle='Wiki' variant='primary'>
+    <AppLayout pageId={"wiki"} subtitle='Wiki' variant='primary' isPublic>
       {page}
     </AppLayout>
   );
@@ -85,18 +108,7 @@ WikiIndexPage.getLayout = function getLayout(page: ReactElement) {
 
 export default WikiIndexPage;
 
-export const getServerSideProps: GetServerSideProps<WikiIndexProps> = async (context) => {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
+export const getStaticProps: GetStaticProps<WikiIndexProps> = async () => {
   return {
     props: {
       sections: getWikiSections(),

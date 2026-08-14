@@ -1,3 +1,4 @@
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
 import { Check, Square } from "lucide-react";
 
 import { AppScreen } from "./AppScreen";
@@ -34,7 +35,9 @@ export const SessionLogPreview = ({
             key={row.title}
             className='flex items-center justify-between gap-4 rounded bg-zinc-800/40 px-4 py-3'>
             <span className='text-sm text-zinc-400'>{row.title}</span>
-            <span className='text-sm font-bold text-zinc-100'>{row.description}</span>
+            <span className='text-sm font-bold text-zinc-100'>
+              {row.description}
+            </span>
           </div>
         ))}
       </div>
@@ -71,7 +74,9 @@ export const SessionLogPreview = ({
       {total && (
         <div className='mt-5 flex items-center justify-between gap-4 rounded bg-zinc-800/40 px-4 py-3'>
           <span className='text-sm text-zinc-400'>Session is worth</span>
-          <span className='text-sm font-bold text-cyan-400'>{total}</span>
+          <span className='text-sm font-bold text-cyan-400'>
+            {withCurrencyIcons(total)}
+          </span>
         </div>
       )}
     </AppScreen>

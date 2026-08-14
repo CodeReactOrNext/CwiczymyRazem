@@ -1,3 +1,5 @@
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
+
 import { parsePairs } from "./parseProps";
 
 /** Low → high ramp, reused for every "worse to better" scale in the wiki. */
@@ -34,17 +36,21 @@ export const TierScale = ({ items, caption }: TierScaleProps) => {
               className={`inline-block rounded px-2.5 py-1 text-xs font-bold ${
                 RAMP[Math.min(index, RAMP.length - 1)]
               }`}>
-              {tier.title}
+              {withCurrencyIcons(tier.title)}
             </span>
             {tier.description && (
               <p className='mt-2.5 text-xs leading-relaxed text-zinc-400'>
-                {tier.description}
+                {withCurrencyIcons(tier.description)}
               </p>
             )}
           </div>
         ))}
       </div>
-      {caption && <p className='mt-3 text-xs text-zinc-500'>{caption}</p>}
+      {caption && (
+        <p className='mt-3 text-xs text-zinc-500'>
+          {withCurrencyIcons(caption)}
+        </p>
+      )}
     </div>
   );
 };

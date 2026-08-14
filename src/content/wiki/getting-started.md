@@ -1,41 +1,65 @@
 ---
 title: "Getting Started"
-description: "What riff.quest is, what happens on your first day, and the five-step checklist that gets you a free guitar for your Arsenal."
+description: "What riff.quest actually does, the ten minutes that get you started, and the difference between points and Fame that trips up everyone in week one."
 slug: "getting-started"
 section: "Start Here"
 order: 1
 ---
 
-riff.quest is a practice tracker for guitarists that behaves a bit like a game. You practise, you write down what you did, and the app turns it into points, a level, a streak and a place on the rankings. Nothing here replaces your guitar teacher or your metronome — it replaces the notebook you were supposed to keep and never did.
+riff.quest is a practice tracker that behaves like a game. You practise, you tell the app what you did, and it turns that into points, a level, a streak and a place on the rankings. It replaces the practice notebook you were supposed to keep and never did.
 
-If you only remember one sentence: **practise, then log it.** Everything else in this wiki hangs off that one habit.
+And there is plenty to practise. The library holds over 200 exercises and more than 50 ready-made routines, the Learning Path runs 36 steps across two modules, and the Scale Map covers 9 scale families. On top of that, a Mastery Roadmap is written for you when you ask for one, usually somewhere between 35 and 55 steps long.
 
-## Your first day, step by step
+<StatRow stats="200+:exercises in the library|50+:ready-made routines|36:steps in the Learning Path|9:scale families on the Scale Map" caption="The first two are rounded down and the real numbers keep climbing, so treat them as the floor rather than the count." />
 
-<StepList steps="Pick a starting point::Right after signing up you choose how you like to practise — a guided journey, the exercise library, your own practice journal, or working through songs. It only sets your starting screen, you can use everything later|Play something::Ten minutes is plenty. A warm-up, a scale, the chorus you keep getting wrong|Log it::Tell the app what you played and for how long. That's the moment points, streak and skills all move|Add a song you want to learn::Your song list is what makes the app feel personal — it's also where a lot of the points live|Come back tomorrow::Day two is where the streak bonus starts, and the streak is the single biggest multiplier in the app" />
+The whole app is one loop, repeated:
 
-## The getting-started checklist
+<StepList steps="Play::Ten minutes counts. A warm-up, one scale, the chorus you keep fumbling|Log it::Say what you played and for how long. This is the moment everything moves: points, streak, skills, quests|Come back tomorrow::Day two starts the streak bonus, and the streak is the biggest multiplier in the app" />
 
-On your Home screen there's a short checklist that walks you through the app. Finish all five steps and you get enough Fame to open your first Arsenal case — which is how most people end up with their first virtual guitar.
+## Your first ten minutes
 
-<Checklist items="What is Riff Quest?::A 30-second intro to what the app does|Do your first exercise::With or without note detection — either counts|Add your first song::Something you actually want to learn|Explore exercise plans::See what a ready-made practice routine looks like|Build your own plan::Pick your own exercises, in your own order" />
+You don't need to set anything up. Pick up the guitar, start the stopwatch, play whatever you were going to play anyway.
+
+<ClickPath steps="Practice|Free Timer" caption="Run it while you play, stop it when you're done. Already practised today? Practice → Manual Log does the same thing without the stopwatch." />
+
+When you stop the timer, you get this form with the time already filled in. Check the split, tick anything true, save.
+
+<Screenshot src="/images/wiki/log-session-time.webp" alt="The 'Enter exercise time' step: three minutes on Technique, five on Hearing, eight minutes in total, with a Save Now button" caption="Eight minutes across two categories. Small on purpose: the point is that it got saved, not that it's impressive." />
+
+Practice pays 20 points an hour, so those eight minutes are worth 2 points. Unimpressive, and entirely beside the point: you are now a player with a streak of one, a level, and a row on the rankings.
 
 <BlogAlert type="tip">
-The reward for finishing the checklist is Fame, not points — enough for one Standard case in the [Arsenal](/wiki/arsenal-and-gear). Claim it, open the case, and the checklist disappears from your Home screen for good.
+No microphone, no interface, no setup is required for any of this. [Note detection](/wiki/note-detection) exists and is fun, but everything in the app works if you just type in your minutes.
 </BlogAlert>
 
-## The two things you'll collect
+## Pick a starting point
 
-Almost every reward in riff.quest is one of two currencies, and mixing them up is the most common source of confusion.
+Right after signing up you're asked where you'd like to begin. It only decides which screen you land on first, and nothing is locked, and you can use all four from day one. Pick the one that matches your problem:
 
-<TierScale items="Points::Earned by practising. They decide your level and your position on every ranking. You can't spend them|Fame::The spendable one. It buys cases and gear in the Arsenal, and comes from quests, milestones, challenges and the community" caption="Some things pay both. Points are your record; Fame is your pocket money." />
+<Checklist items="Guided Journey::You don't know what to practise. The app picks the next step for you, one at a time|Exercise Library::You know your weak spot and want a drill for it|Practice Journal::You already have a routine and just want it tracked|Song Library::You're here to learn songs, and want your repertoire in one place" />
 
-## Where everything lives
+## Day two is the important one
 
-<Checklist items="Home::Your daily quests, your streak, the getting-started checklist and what you did recently|Practice::Every way of practising — routines, the free timer, the manual log, exercises and learning paths|Songs::Your song board, song discovery and playlists|Progress::Your history, your statistics and your full practice log|Milestones & Challenges::Weekly practice goals, and the five songs the community records each month|Rankings::Seasons, the all-time board and the gear board|Arsenal::The gear game — cases, your collection, the workshop and the market" />
+One session is a data point. Two days in a row is a streak, and the streak multiplies everything you log, practice time and habit points alike.
 
-## Common first-week questions
+<Screenshot src="/images/wiki/streak-multiplier.webp" alt="The streak breakdown: a 1-day streak at ×1.0, earning 20 points per hour of practice and 1 point per habit ticked, above a ladder reading Day 1 ×1.0, Day 2 ×1.2, Day 3 ×1.3, Day 4 ×1.4, Day 5+ ×1.5" caption="The flame at the top of the screen opens this. Day one pays the plain rate; from day two the multiplier climbs, and it stops at ×1.5." maxWidth="420px" />
 
-<FaqList items="Do I have to use the timer?::No. If you practised away from the computer, use Practice → Manual Log and type in the time. You can log a session up to 7 days after it happened|Does it matter what I practise?::For points, no — 15 minutes is 15 minutes whatever the category. For your skills and your daily quests, yes: what you tag your time as decides which skills grow|What if I miss a day?::You lose the streak bonus and start it again. Nothing else is taken away — your points, level and gear all stay|Do I need to pay?::No. Practising, logging, songs, seasons, rankings and the whole Arsenal are free. Paid plans add tools like the plan creator, Guitar Pro files and the automatic session generator" />
+Ten minutes keeps it alive. Miss a day and it resets to zero, but your points, level and gear are never taken away.
 
-<ReadNext links="Your Home screen & daily quests::/wiki/dashboard-and-daily-quests|How points and streaks work::/wiki/how-scoring-works|Ways to practise::/wiki/practice-modes-overview|Free, Pro and Master::/wiki/membership-plans" />
+<BlogAlert type="takeaway">
+Ten minutes on a busy Tuesday is worth more to you than a three-hour Sunday. Play the streak, not the session.
+</BlogAlert>
+
+## Points and Fame are not the same thing
+
+This trips up almost everyone in week one. **Points** are your record: they set your level and your rankings, and you can't spend them. **Fame** is your pocket money: it buys cases and gear in the Arsenal and does nothing to your level. A logged session pays both, and after that they part ways — points come almost entirely from practice, while Fame also arrives from quests, milestones, challenges and other players. Both have their own article: [Points, levels & streaks](/wiki/how-scoring-works) and [Fame & where it comes from](/wiki/fame).
+
+## Where the rest of it lives
+
+<Checklist items="Home::Today: your daily quests, your streak, and what everyone's been logging|Practice::Every way of practising: routines, the free timer, the manual log, exercises, learning paths|Songs::Your song board, discovery and playlists|Progress::Your history, your category split and every session you've saved|Rankings & Arsenal::Where your points put you, and where your Fame gets spent" />
+
+## Questions people ask
+
+<FaqList items="Does it matter what I practise?::For points, no. 15 minutes is 15 minutes in any category. For your skills and your daily quests, yes: the category you tag decides which skills grow|I practise away from the computer::Use Practice → Manual Log and type the time in. You can log a session up to 7 days after it happened|What if I miss a day?::You lose the streak bonus and start counting again. Nothing else is touched: points, level, songs and gear all stay|Do I have to do the quests and the gear stuff?::No. The tracker works on its own. The quests, Arsenal and rankings are there for the days when motivation needs help|How much of this is free?::Practising, logging, songs, streaks, quests and the rankings all work without paying for anything" />
+
+<ReadNext links="Your Home screen & daily quests::/wiki/dashboard-and-daily-quests|How points and streaks work::/wiki/how-scoring-works|Where Fame comes from::/wiki/fame|Logging a practice session::/wiki/practice-sessions-and-logging|Ways to practise::/wiki/practice-modes-overview" />

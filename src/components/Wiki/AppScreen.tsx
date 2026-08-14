@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
 import type { ReactNode } from "react";
 
 interface AppScreenProps {
@@ -14,7 +15,12 @@ interface AppScreenProps {
  * and colours as the real screen, so wiki articles can show what something looks
  * like without shipping (and re-shooting) image files.
  */
-export const AppScreen = ({ title, caption, className, children }: AppScreenProps) => (
+export const AppScreen = ({
+  title,
+  caption,
+  className,
+  children,
+}: AppScreenProps) => (
   <figure className='not-prose my-10'>
     <div className={cn("rounded-lg bg-zinc-900/40 p-5 sm:p-6", className)}>
       <div className='mb-5 flex items-center gap-2.5'>
@@ -26,7 +32,9 @@ export const AppScreen = ({ title, caption, className, children }: AppScreenProp
       {children}
     </div>
     {caption && (
-      <figcaption className='mt-3 text-xs text-zinc-500'>{caption}</figcaption>
+      <figcaption className='mt-3 text-xs text-zinc-500'>
+        {withCurrencyIcons(caption)}
+      </figcaption>
     )}
   </figure>
 );

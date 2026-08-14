@@ -12,13 +12,9 @@ A **routine** (the app also calls it a practice plan) is nothing more clever tha
 
 ## Three ways to get a routine
 
-<StepList steps="Use a ready-made one::The app ships with plans for common goals — start here if you don't know what you need|Build your own::My Stuff → Create Plan. Pick exercises, put them in the order you want, save it and reuse it forever|Let Auto Plan do it::Tell it how long you've got and it assembles a session for you" />
+<StepList steps="Use a ready-made one::The app ships with plans for common goals, so start here if you don't know what you need|Build your own::My Stuff → Create Plan. Pick exercises, put them in the order you want, save it and reuse it forever|Let Auto Plan do it::Tell it how long you've got and it assembles a session for you" />
 
 ## Auto Plan
-
-<BlogAlert type="info">
-Auto Plan is part of the Practice Master membership — see [Free, Pro & Master](/wiki/membership-plans).
-</BlogAlert>
 
 You choose a length between 15 minutes and 2 hours, optionally narrow it down to certain categories or a difficulty, and it does the rest:
 
@@ -36,7 +32,7 @@ The difficulty label on a generated plan is worked out from the exercises that a
 
 Every exercise you create sits in one pool; a single public/private switch decides who sees it.
 
-<Checklist items="My Exercises::Everything you've written, public or private — under My Stuff|Community::Only the public ones, browsable by everyone and sorted by rating — under Practice → Exercises" />
+<Checklist items="My Exercises::Everything you've written, public or private, under My Stuff|Community::Only the public ones, browsable by everyone and sorted by rating, under Practice → Exercises" />
 
 Community exercises can be rated one to five stars. Sharing pays a little too: a "thanks" from another player pays you **+5 Fame**, and the first time somebody other than you completes your exercise pays **+1 Fame**. Playing your own exercise doesn't count towards its play count.
 
@@ -44,6 +40,6 @@ Creating or editing an exercise opens the tab editor, where you can write out th
 
 ## Questions people ask
 
-<FaqList items="Do I have to finish a routine for it to count?::No — whatever you actually played gets logged. Finishing simply means everything is ticked off|Can I edit a ready-made plan?::Not in place, but you can build your own version with the exercises you like|Is a routine worth more points than free practice?::No. Time is time. Following a plan does let you tick the Exercise plan habit, which is worth a point|What happens to a shared exercise if I make it private again?::It leaves the community list. Ratings and Fame you already earned stay" />
+<FaqList items="Do I have to finish a routine for it to count?::No, whatever you actually played gets logged. Finishing simply means everything is ticked off|Can I edit a ready-made plan?::Not in place, but you can build your own version with the exercises you like|Is a routine worth more points than free practice?::No. Time is time. Following a plan does let you tick the Exercise plan habit, which is worth a point|What happens to a shared exercise if I make it private again?::It leaves the community list. Ratings and Fame you already earned stay" />
 
-<ReadNext links="Ways to practise::/wiki/practice-modes-overview|Logging a practice session::/wiki/practice-sessions-and-logging|Skills & achievements::/wiki/skills-and-achievements|Free, Pro & Master::/wiki/membership-plans" />
+<ReadNext links="Ways to practise::/wiki/practice-modes-overview|Logging a practice session::/wiki/practice-sessions-and-logging|Skills & achievements::/wiki/skills-and-achievements" />

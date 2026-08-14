@@ -1,3 +1,5 @@
+import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
+
 import { parsePairs } from "./parseProps";
 
 interface FaqListProps {
@@ -13,10 +15,12 @@ export const FaqList = ({ items }: FaqListProps) => {
     <div className='not-prose my-10 flex flex-col gap-3'>
       {questions.map((item) => (
         <div key={item.title} className='rounded-lg bg-zinc-900/40 p-5'>
-          <p className='font-bold text-white'>{item.title}</p>
+          <p className='font-bold text-white'>
+            {withCurrencyIcons(item.title)}
+          </p>
           {item.description && (
             <p className='mt-2 text-sm leading-relaxed text-zinc-400'>
-              {item.description}
+              {withCurrencyIcons(item.description)}
             </p>
           )}
         </div>

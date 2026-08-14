@@ -27,6 +27,7 @@ import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
 import {
+  BookOpen,
   Brain,
   ChevronDown,
   ClipboardList,
@@ -428,6 +429,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const utilityNavigation = [
     { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} />, muted: true },
+    { id: "wiki", name: "Knowledge Base", href: "/wiki", icon: <BookOpen size={18} />, muted: true, tooltip: "How every part of the app works, in plain language" },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} />, muted: true },
   ];
 

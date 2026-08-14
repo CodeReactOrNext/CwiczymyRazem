@@ -102,6 +102,14 @@ export const Footer = () => {
                 </li>
                 <li>
                   <Link
+                    href='/wiki'
+                    className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
+                    Riff Quest Knowledge Base{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href='/song-library'
                     className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                     Song Library{" "}
