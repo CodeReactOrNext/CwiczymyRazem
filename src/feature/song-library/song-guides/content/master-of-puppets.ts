@@ -280,6 +280,13 @@ export const masterOfPuppets: SongGuide = {
       message:
         "Not as an early song, and attempting it too soon is the most common way to burn out on it. A beginner is better served spending 6–12 months on C-tier metal (For Whom the Bell Tolls, Enter Sandman) building palm muting and downpicking first. The song will still be there, and the climb will take months instead of years.",
     },
+    {
+      // Exact-match phrasing for the People Also Ask box on this SERP; the
+      // question above asks the same thing in wording Google isn't surfacing.
+      title: "Is Master of Puppets hard for a beginner?",
+      message:
+        "Yes — it is one of the hardest songs a beginner can pick up, and rushing it is the most common way to burn out. The obstacle is stamina rather than any one lick: eight minutes of downpicking at roughly 212 BPM asks for conditioning a first-year player simply hasn't built yet. Spending 6–12 months on C-tier metal like For Whom the Bell Tolls and Enter Sandman first turns the climb from years into months.",
+    },
   ],
   customBlocks: [
     {
