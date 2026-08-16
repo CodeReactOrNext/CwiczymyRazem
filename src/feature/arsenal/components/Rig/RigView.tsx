@@ -10,6 +10,7 @@ import type { ArsenalUserData, RigSetup } from "../../types/arsenal.types";
 import { GuitarPickerModal } from "./GuitarPickerModal";
 import { GuitarSlot } from "./GuitarSlot";
 import { PedalboardView } from "./PedalboardView";
+import { RigStatsPanel } from "./RigStatsPanel";
 
 interface RigViewProps {
   data: ArsenalUserData;
@@ -71,6 +72,9 @@ export const RigView = ({ data }: RigViewProps) => {
 
   return (
     <div className="flex flex-col gap-8">
+      {/* What the rig below is currently worth per hour of practice. */}
+      <RigStatsPanel data={data} />
+
       {/* Guitars */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">

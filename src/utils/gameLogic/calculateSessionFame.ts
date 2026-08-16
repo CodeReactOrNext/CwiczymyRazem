@@ -23,6 +23,7 @@
 import {
   cumulativeRigFame,
   getRigFameRate,
+  RIG_FAME_HOURLY_CEILING,
 } from "feature/arsenal/data/rigFame";
 
 /** `fame = FAME_CURVE_FACTOR * sqrt(dailyMinutes)` — 1h ≈ 23, 2h ≈ 33, 4h ≈ 46. */
@@ -78,6 +79,17 @@ export interface SessionFameInput {
    * bonus, which is what keeps every pre-rig caller (and its tests) unchanged.
    */
   rigLevel?: number;
+  /**
+   * What the rig's traits pay for *this* session — see `arsenal/data/traitEval`.
+   *
+   * Passed in already computed rather than derived here, because traits read the
+   * session's per-category minutes and trained skills, and this function only
+   * ever sees a total. Absent pays nothing, so every pre-trait caller is
+   * unchanged.
+   */
+  traitFame?: number;
+  /** The same payout as a Fame/h rate, which is what the ceiling applies to. */
+  traitRate?: number;
 }
 
 export interface SessionFameResult {
@@ -91,6 +103,10 @@ export interface SessionFameResult {
   rigFame: number;
   /** Fame/hour the rig is worth right now, so the UI can show the rate itself. */
   rigFameRate: number;
+  /** The trait component, after the rig ceiling took its cut. */
+  traitFame: number;
+  /** Fame/hour the traits actually paid, i.e. after the ceiling. */
+  traitFameRate: number;
   /** Whether the accuracy multiplier applied — the UI can call it out. */
   accuracyBonusApplied: boolean;
   /** The counter to persist. */
@@ -116,12 +132,25 @@ export const calculateSessionFame = ({
   accuracy,
   isDateBackReport,
   rigLevel = 0,
+  traitFame = 0,
+  traitRate = 0,
 }: SessionFameInput): SessionFameResult => {
   // A counter from an earlier day is stale — the new day starts from zero.
   const isSameDay = fameDay?.date === dayKey;
   const minutesBefore = isSameDay ? Math.max(0, fameDay?.minutes ?? 0) : 0;
   const streakBonusClaimed = isSameDay ? Boolean(fameDay?.streakBonusClaimed) : false;
   const rigFameRate = getRigFameRate(rigLevel);
+
+  // Traits share the rig's one ceiling rather than getting a second cap of their
+  // own: two ceilings would mean two numbers to explain, and a player at the cap
+  // could not tell which one was binding. Whatever headroom the base rate leaves
+  // is what the traits get, and the payout is scaled by the same fraction so the
+  // rate the header shows is always the rate that was paid.
+  const traitHeadroom = Math.max(0, RIG_FAME_HOURLY_CEILING - rigFameRate);
+  const traitScale =
+    traitRate > 0 ? Math.min(1, traitHeadroom / traitRate) : traitRate === 0 ? 1 : 0;
+  const traitFameRate = Math.round(Math.min(traitRate, traitHeadroom) * 10) / 10;
+  const traitFameAwarded = Math.round(Math.max(0, traitFame) * traitScale);
 
   if (isDateBackReport) {
     return {
@@ -132,6 +161,10 @@ export const calculateSessionFame = ({
       // already closed — there is no counter here for it to read.
       rigFame: 0,
       rigFameRate,
+      // Same reasoning: the session being described is not today's, so its
+      // traits have no session left to be paid against.
+      traitFame: 0,
+      traitFameRate,
       accuracyBonusApplied: false,
       // Untouched: a back-dated report must not consume today's allowance.
       fameDay: { date: dayKey, minutes: minutesBefore, streakBonusClaimed },
@@ -162,11 +195,13 @@ export const calculateSessionFame = ({
   );
 
   return {
-    fame: curveFame + streakBonus + rigFame,
+    fame: curveFame + streakBonus + rigFame + traitFameAwarded,
     curveFame,
     streakBonus,
     rigFame,
     rigFameRate,
+    traitFame: traitFameAwarded,
+    traitFameRate,
     accuracyBonusApplied,
     fameDay: {
       date: dayKey,

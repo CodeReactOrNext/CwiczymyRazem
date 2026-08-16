@@ -1,4 +1,8 @@
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import {
+  buildRigTraitContext,
+  getRigTraitPayout,
+} from "feature/arsenal/data/traitEval";
 import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
@@ -154,6 +158,25 @@ export default async function handler(
       ? getRigLevel(userData.arsenal)
       : (typeof userData?.rigLevel === "number" ? userData.rigLevel : 0);
 
+    // Traits read the shape of this one session — per-category minutes and the
+    // skills it trained — which is why they are resolved here rather than inside
+    // `calculateSessionFame`, which only ever sees a total. Same rule as the rig
+    // level above: the arsenal comes from the stored document, never the body.
+    const traitPayout = getRigTraitPayout(
+      buildRigTraitContext(userData?.arsenal),
+      {
+        minutes: {
+          technique: report.timeSummary.techniqueTime / 60000,
+          theory: report.timeSummary.theoryTime / 60000,
+          hearing: report.timeSummary.hearingTime / 60000,
+          creativity: report.timeSummary.creativityTime / 60000,
+        },
+        skills: Object.entries(inputData.skillPointsGained ?? {})
+          .filter(([, points]) => Number(points) > 0)
+          .map(([skillId]) => skillId),
+      },
+    );
+
     // Fame no longer mirrors points: it pays out on a concave curve over the
     // user's daily practice total, so short daily sessions beat marathons and
     // the shop economy can't be inflated by one very long (self-reported) day.
@@ -165,6 +188,8 @@ export default async function handler(
       accuracy: inputData.micPerformance?.accuracy,
       isDateBackReport: report.isDateBackReport,
       rigLevel,
+      traitFame: traitPayout.fame,
+      traitRate: traitPayout.rate,
     });
     const fameEarned = fameResult.fame;
 

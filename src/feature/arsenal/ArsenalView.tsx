@@ -55,8 +55,6 @@ import { TraderView } from "./components/Trader/TraderView";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
-import { formatRigFameRate, getRigFameRate } from "./data/rigFame";
-import { getRigLevel } from "./data/rigLevel";
 import { useArsenalData } from "./hooks/useArsenalData";
 import { useOpenCase } from "./hooks/useOpenCase";
 import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
@@ -65,8 +63,6 @@ export const ArsenalView = () => {
   const { data, isLoading } = useArsenalData();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
-  const rigLevel = getRigLevel(data);
-  const rigFameRate = getRigFameRate(rigLevel);
 
   // Tab is URL-driven (?tab=market) so notifications/links can deep-link to it.
   const router = useRouter();
@@ -106,29 +102,14 @@ export const ArsenalView = () => {
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         backgroundContent={<HeroPattern />}
         rightContent={
-          // items-end only once the block sits on the right: on mobile it is
-          // left of the screen, where right-aligned chips read as a staircase.
-          <div className="flex flex-col items-stretch gap-2 md:items-end">
-            <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
-              <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
-              <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
-              <span className="text-xs text-zinc-400">Fame Points</span>
-            </div>
-            {/* The rate sits inside the Rig Level chip rather than beside it:
-                it is what that number does, so reading them apart would hide
-                the only causal link the Arsenal has to Fame. */}
-            <div className="flex flex-col gap-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-4 py-2">
-              <div className="flex items-center gap-2">
-                <Swords size={16} className="text-cyan-400" />
-                <span className="text-lg font-black text-cyan-300 tabular-nums">{rigLevel}</span>
-                <span className="text-xs text-zinc-400">Rig Level</span>
-              </div>
-              {rigFameRate > 0 && (
-                <span className="text-[11px] font-medium text-emerald-400 tabular-nums">
-                  +{formatRigFameRate(rigLevel)} Fame / h of practice
-                </span>
-              )}
-            </div>
+          // Fame is the only number that belongs to the whole module — it is
+          // what every tab spends. Rig Level and the trait rate moved into the
+          // Rig tab itself (`RigStatsPanel`): they are changed by moving gear,
+          // so they read as stats of that screen rather than of the banner.
+          <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
+            <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
+            <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
+            <span className="text-xs text-zinc-400">Fame Points</span>
           </div>
         }
       />

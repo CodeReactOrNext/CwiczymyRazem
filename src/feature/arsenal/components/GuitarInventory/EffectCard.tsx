@@ -17,12 +17,14 @@ import {
   getSalvageableMod,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
+import { getItemTraits } from "feature/arsenal/data/traits";
 import {
   countScrapParts,
   getEffectScrapYield,
 } from "feature/arsenal/utils/scrap";
 import { Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { ModArt } from "../Workshop/ModArt";
@@ -31,6 +33,7 @@ const NOISE_BG =`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/sv
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import { CardAffixes } from "../CardAffixes";
+import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil, HoloStripe } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
@@ -69,6 +72,12 @@ export const EffectCard = ({
   readOnly = false,
   footer,
 }: EffectCardProps) => {
+  // Resolved before the guard below because the state hook must run on every
+  // render — a pedal whose definition has been retired still has to obey the
+  // rules of hooks on its way to rendering nothing.
+  const traits = useMemo(() => getItemTraits(item), [item]);
+  const traitStates = useItemTraitStates(item.id, traits);
+
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
 
@@ -276,6 +285,7 @@ export const EffectCard = ({
       </div>
 
       <CardAffixes features={features} />
+      <CardTraits traits={traits} states={traitStates} />
 
       {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
       {footer ? (

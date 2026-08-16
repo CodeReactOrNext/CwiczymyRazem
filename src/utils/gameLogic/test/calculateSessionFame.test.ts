@@ -263,4 +263,57 @@ describe("calculateSessionFame", () => {
 
     expect(spread).toBeGreaterThan(marathon);
   });
+
+  describe("trait fame", () => {
+    it("pays nothing when the rig carries no traits", () => {
+      const result = session(60, { rigLevel: 143 });
+
+      expect(result.traitFame).toBe(0);
+      expect(result.fame).toBe(result.curveFame + result.rigFame);
+    });
+
+    it("adds what the traits earned on top of the curve and the rig", () => {
+      const result = session(60, { rigLevel: 143, traitFame: 20, traitRate: 20 });
+
+      expect(result.traitFame).toBe(20);
+      expect(result.fame).toBe(result.curveFame + result.rigFame + 20);
+    });
+
+    it("shares the rig ceiling instead of getting a second cap", () => {
+      // The top rig pays ~60/h, so a 40/h trait build overshoots the 90/h
+      // ceiling by 10 and has to give that back — scaled, so the rate the header
+      // showed is the rate that got paid.
+      const result = session(60, {
+        rigLevel: 750,
+        traitFame: 40,
+        traitRate: 40,
+      });
+
+      expect(result.rigFameRate + result.traitFameRate).toBeCloseTo(90, 1);
+      expect(result.traitFame).toBeLessThan(40);
+    });
+
+    it("pays no trait fame on a back-dated report", () => {
+      const result = session(60, {
+        rigLevel: 143,
+        traitFame: 20,
+        traitRate: 20,
+        isDateBackReport: 2,
+      });
+
+      expect(result.traitFame).toBe(0);
+      expect(result.fame).toBe(BACKDATED_REPORT_FAME);
+    });
+
+    it("pays the same split across six reports as in one", () => {
+      // Trait fame is linear in time, so splitting is neutral by arithmetic —
+      // unlike the curve, which needs the day counter to get there.
+      const oneReport = session(90, { rigLevel: 143, traitFame: 30, traitRate: 20 });
+      const split = Array.from({ length: 6 }, () =>
+        session(15, { rigLevel: 143, traitFame: 5, traitRate: 20 }),
+      ).reduce((total, r) => total + r.traitFame, 0);
+
+      expect(split).toBe(oneReport.traitFame);
+    });
+  });
 });

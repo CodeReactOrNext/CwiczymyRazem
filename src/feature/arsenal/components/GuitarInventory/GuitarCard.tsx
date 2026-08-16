@@ -16,6 +16,7 @@ import {
   getSalvageableMod,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
+import { getItemTraits } from "feature/arsenal/data/traits";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
   countScrapParts,
@@ -23,6 +24,7 @@ import {
 } from "feature/arsenal/utils/scrap";
 import { Check, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { ModArt } from "../Workshop/ModArt";
@@ -32,6 +34,7 @@ const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 import type { InventoryItem } from "../../types/arsenal.types";
 import { CardAffixes } from "../CardAffixes";
+import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil, HoloStripe } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
@@ -75,6 +78,12 @@ export const GuitarCard = ({
   readOnly = false,
   footer,
 }: GuitarCardProps) => {
+  // Resolved before the guard below because the state hook must run on every
+  // render — a guitar whose definition has been retired still has to obey the
+  // rules of hooks on its way to rendering nothing.
+  const traits = useMemo(() => getItemTraits(item), [item]);
+  const traitStates = useItemTraitStates(item.id, traits);
+
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -321,6 +330,7 @@ export const GuitarCard = ({
       </div>
 
       <CardAffixes features={features} />
+      <CardTraits traits={traits} states={traitStates} />
 
       {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
       {footer ? (

@@ -34,6 +34,7 @@ import {
 } from "./itemStats";
 import { PART_DEFINITIONS, PART_TIERS } from "./partDefinitions";
 import { getPartSupply } from "./partSupply";
+import { rollItemTraits } from "./traits";
 import type { ModFeatureDef } from "./workshop";
 import { getModPool, MOD_ROLL_BONUS } from "./workshop";
 
@@ -322,12 +323,16 @@ const drawGuitarOffer = (
   used.add(def.id);
 
   const rolled = rollItemFeatures(def.rarity, random);
+  // Driven by the same seeded `random` as every other roll on this offer, so the
+  // instance the shop card advertises is the one the purchase mints server-side.
+  const rolledTraits = rollItemTraits(def.rarity, "guitar", undefined, random);
   const roll = {
     guitarId: def.id,
     year: rollVintageYear(def.yearFrom, def.yearTo, random),
     country: seededPick(def.countries, random) ?? def.countries[0],
     condition: rollCondition(random),
     ...(rolled ? { stats: rolled.stats, features: rolled.features } : {}),
+    ...(rolledTraits ? { traits: rolledTraits } : {}),
   };
 
   // Priced off this exact instance, so a Museum-grade '61 costs what it is worth
@@ -359,12 +364,14 @@ const drawEffectOffer = (
   used.add(def.id);
 
   const rolled = rollEffectFeatures(def.rarity, def.type, random);
+  const rolledTraits = rollItemTraits(def.rarity, "effect", def.type, random);
   const roll = {
     effectId: def.id,
     year: rollEffectYear(def, random),
     country: rollEffectCountry(def, random),
     condition: rollCondition(random),
     ...(rolled ? { stats: rolled.stats, features: rolled.features } : {}),
+    ...(rolledTraits ? { traits: rolledTraits } : {}),
   };
 
   // Effect sell value is flat per rarity — condition and vintage don't move it,

@@ -68,6 +68,8 @@ export interface EffectInventoryItem {
   stats?: EffectStats;
   /** Rolled named features that produced the stats. Optional for legacy/plain items. */
   features?: ItemFeature[];
+  /** Rolled traits paying Fame/h while in service. Optional for legacy/plain items. */
+  traits?: ItemTrait[];
   /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
   buildLevel?: number;
   /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */
@@ -200,6 +202,22 @@ export interface ItemFeature {
   points: number;
 }
 
+/**
+ * A rolled trait (references a TraitDef by id) — see `data/traits.ts`.
+ *
+ * Deliberately not part of `stats`/`features`: features raise the item's *level*
+ * and through it the whole rig's base rate, while a trait pays its own Fame/h on
+ * top and usually only while something outside the item is true. Keeping them
+ * apart is what stops a trait from silently inflating the gear leaderboard.
+ */
+export interface ItemTrait {
+  id: string;
+  /** Rolled Fame/h. Per counted unit when the trait has a counter. */
+  value: number;
+  /** Rolled parameters, e.g. `{ brand: "Fairmont" }` for `{brand} Endorsement`. */
+  params?: Record<string, string>;
+}
+
 export interface InventoryItem {
   id: string;
   guitarId: number | string;
@@ -215,6 +233,8 @@ export interface InventoryItem {
   stats?: ItemStats;
   /** Rolled named features that produced the stats. Optional for legacy/plain items. */
   features?: ItemFeature[];
+  /** Rolled traits paying Fame/h while in service. Optional for legacy/plain items. */
+  traits?: ItemTrait[];
   /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
   buildLevel?: number;
   /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */

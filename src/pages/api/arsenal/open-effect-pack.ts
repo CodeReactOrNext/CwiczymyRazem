@@ -1,6 +1,7 @@
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { rollEffectCountry, rollEffectFeatures, rollEffectYear } from "feature/arsenal/data/effectStats";
 import { rollCondition } from "feature/arsenal/data/itemStats";
+import { rollItemTraits } from "feature/arsenal/data/traits";
 import type { EffectInventoryItem, GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -72,6 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const serial = (serialDoc.data()?.count || 0) + 1;
 
       const rolled = rollEffectFeatures(effect.rarity, effect.type);
+      const rolledTraits = rollItemTraits(effect.rarity, "effect", effect.type);
       const newItem: EffectInventoryItem = {
         id: generateId(),
         effectId: effect.id,
@@ -82,6 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         condition: rollCondition(),
         serial,
         ...(rolled ? { stats: rolled.stats, features: rolled.features } : {}),
+        ...(rolledTraits ? { traits: rolledTraits } : {}),
       };
 
       const newEffectInventory = [...(data.arsenal?.effectInventory || []), newItem];

@@ -5,6 +5,7 @@ import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { rollEffectCountry, rollEffectFeatures, rollEffectYear } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { rollCondition, rollItemFeatures, rollVintageYear } from "feature/arsenal/data/itemStats";
+import { rollItemTraits } from "feature/arsenal/data/traits";
 import type {
   CaseType,
   EffectDefinition,
@@ -109,6 +110,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
         const condition = rollCondition();
         const rolled = rollItemFeatures(guitar.rarity);
+        const rolledTraits = rollItemTraits(guitar.rarity, "guitar");
 
         // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
         const isNewToDex = !(data.arsenal?.inventory || []).some(
@@ -133,6 +135,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           condition,
           serial,
           ...(rolled ? { stats: rolled.stats, features: rolled.features } : {}),
+          ...(rolledTraits ? { traits: rolledTraits } : {}),
         };
 
         const newInventory = [...(data.arsenal?.inventory || []), newItem];
@@ -159,6 +162,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const effectYear = rollEffectYear(effect);
         const effectCountry = rollEffectCountry(effect);
         const effectRolled = rollEffectFeatures(effect.rarity, effect.type);
+        const effectTraits = rollItemTraits(effect.rarity, "effect", effect.type);
 
         // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
         const isNewToDex = !(data.arsenal?.effectInventory || []).some(
@@ -181,6 +185,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           condition: effectCondition,
           serial: effectSerial,
           ...(effectRolled ? { stats: effectRolled.stats, features: effectRolled.features } : {}),
+          ...(effectTraits ? { traits: effectTraits } : {}),
         };
 
         const newEffectInventory = [...(data.arsenal?.effectInventory || []), effectItem];
