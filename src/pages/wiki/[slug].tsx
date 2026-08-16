@@ -4,6 +4,7 @@ import { Checklist } from "components/Blog/Checklist";
 import { SongTierTable } from "components/Blog/SongTierTable";
 import { StatRow } from "components/Blog/StatRow";
 import { StepList } from "components/Blog/StepList";
+import { YouTube } from "components/Blog/YouTube";
 import { currencyProseComponents } from "components/CurrencyIcons/withCurrencyIcons";
 import {
   AppScreen,
@@ -54,6 +55,7 @@ const components = {
   Screenshot,
   SessionLogPreview,
   TierScale,
+  YouTube,
 };
 
 const SITE_URL = "https://riff.quest";

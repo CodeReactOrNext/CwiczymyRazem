@@ -1,4 +1,4 @@
-import { midiToFrequency, NOTES, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
+import { correctOctaveForLowStrings, getCentsDistance, midiToFrequency, NOTES, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
 
 /** Semitone offset from standard tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E). */
 export type TuningOffsets = readonly [number, number, number, number, number, number];
@@ -66,4 +66,37 @@ export function getTuningStrings(tuning: GuitarTuningPreset): TuningStringRef[] 
     const midi = STANDARD_OPEN_STRING_MIDI[string] + tuning.offsets[string - 1];
     return { string, name: midiToNoteName(midi), hz: midiToFrequency(midi) };
   });
+}
+
+export interface NearestTuningString {
+  /** Index into the `strings` array that was passed in. */
+  index: number;
+  /** Deviation from that string's reference pitch — positive = sharp, negative = flat. */
+  cents: number;
+}
+
+/**
+ * Snaps a detected frequency to the open string of the current tuning it is
+ * closest to (in cents, so the choice is register-independent), and returns how
+ * far off that reference it sits. This is what makes the tuner tuning-aware: in
+ * Drop D the 6th string resolves to D2 at 0¢ rather than E2 two semitones flat.
+ *
+ * Octave correction is anchored per candidate string, so a 2nd-harmonic reading
+ * on a low string still lands on that string instead of the one an octave up
+ * (see correctOctaveForLowStrings).
+ */
+export function findNearestTuningString(
+  frequency: number,
+  strings: readonly TuningStringRef[],
+): NearestTuningString {
+  let index = 0;
+  let cents = Infinity;
+  strings.forEach((str, i) => {
+    const distance = getCentsDistance(correctOctaveForLowStrings(frequency, str.hz), str.hz);
+    if (Math.abs(distance) < Math.abs(cents)) {
+      cents = distance;
+      index = i;
+    }
+  });
+  return { index, cents };
 }

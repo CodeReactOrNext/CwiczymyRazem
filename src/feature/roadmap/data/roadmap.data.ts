@@ -12,7 +12,6 @@ import {
   LayoutDashboard,
   Plug,
   Recycle,
-  Sparkles,
   Star,
   Swords,
   Target,
@@ -147,15 +146,6 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
   },
   { id: "t125", goal: 125, icon: Target, label: "+4 New Exercises", kind: "content" },
   { id: "t133", goal: 133, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  {
-    id: "t143",
-    goal: 143,
-    icon: Sparkles,
-    label: "Gear Flavor Text",
-    kind: "feature",
-    description:
-      "Every piece of gear you pull gets its own little story, mixed and matched from a pool of phrases, so no two drops feel the same and each one earns its place in your collection.",
-  },
   {
     id: "t153",
     goal: 153,

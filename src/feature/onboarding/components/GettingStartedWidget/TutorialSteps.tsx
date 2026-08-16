@@ -201,21 +201,3 @@ export const FakePlanCard = ({
     <ArrowUpRight size={14} className='shrink-0 text-zinc-500' />
   </span>
 );
-
-/** Icon + title + description row for feature overviews (welcome modal). */
-export const TutorialFeature = ({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  children: ReactNode;
-}) => (
-  <div className='flex items-start gap-3 rounded-lg bg-zinc-900/60 p-3'>
-    <Icon size={16} className='mt-0.5 shrink-0 text-cyan-400' />
-    <p className='text-sm leading-relaxed text-zinc-300'>
-      <span className='font-medium text-zinc-100'>{title}</span> {children}
-    </p>
-  </div>
-);

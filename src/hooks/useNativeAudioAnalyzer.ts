@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ConnectionIssueInfo, NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
 
+import type { DetectedNoteEvent } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 import type { AudioRefs } from "./useAudioAnalyzer";
 import { readPersistedChannel } from "./useNativeAudioDevices";
@@ -77,6 +78,7 @@ export const useNativeAudioAnalyzer = () => {
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
+  const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const onsetChromaRef = useRef<Float32Array | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null); // always null here (no Web Audio graph)
 
@@ -247,10 +249,11 @@ export const useNativeAudioAnalyzer = () => {
       processRef.current = createGuitarBufferProcessor({
         detectors,
         getGain: () => inputGainRef.current,
+        sampleRate: info.sampleRate,
         analyser: null, // no AnalyserNode in the native path → no chroma snapshots
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef,
         },
         onActive: () => {
           setState(prev =>
@@ -299,6 +302,7 @@ export const useNativeAudioAnalyzer = () => {
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
     onsetChromaRef.current = null;
+    noteEventsRef.current = [];
     ipcDelayEmaRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, streamInfo: null, connectionStatus: "ok" }));
@@ -364,7 +368,7 @@ export const useNativeAudioAnalyzer = () => {
 
   const audioRefs: AudioRefs = {
     frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef,
-    lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef,
+    lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef, noteEventsRef,
   };
 
   return useMemo(() => ({

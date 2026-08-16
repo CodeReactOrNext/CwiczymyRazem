@@ -50,6 +50,7 @@ przez `::`.
 | `FaqList` | krótkie pytania i odpowiedzi | `<FaqList items="Pytanie?::Odpowiedź" />` |
 | `ReadNext` | linki na koniec artykułu | `<ReadNext links="Tytuł::/wiki/slug" />` |
 | `Screenshot` | prawdziwy zrzut ekranu (patrz niżej) | `<Screenshot src="/images/wiki/plik.png" alt="..." caption="..." />` |
+| `YouTube` | osadzony film (to samo passe-partout co `Screenshot`, iframe leniwy) | `<YouTube id="x2wERUdqtL0" title="..." caption="..." />` |
 
 Plus komponenty blogowe: `StepList`, `Checklist`, `StatRow`, `BlogAlert`
 (`type="info\|tip\|warning\|important\|takeaway"`).

@@ -48,6 +48,12 @@ interface HeroPatternProps {
   maskImage?: string;
   /** Which icon set to tile. Defaults to the guitar/music/pick/headphone set from the sign-in screen. */
   variant?: PatternVariant;
+  /**
+   * Paint the tiled icons with a horizontal two-stop gradient instead of flat
+   * white, e.g. `["#22d3ee", "#f59e0b"]`. The gradient spans the whole element,
+   * not each icon, so the tiling reads as one sweep across the surface.
+   */
+  gradient?: [from: string, to: string];
   /** @deprecated use variant="heart" */
   withHeart?: boolean;
   /** @deprecated use variant="shuffle" */
@@ -62,10 +68,13 @@ export const HeroPattern = ({
   className = "opacity-[0.05]",
   maskImage = "linear-gradient(to left, black 5%, transparent 35%)",
   variant,
+  gradient,
   withHeart = false,
   withShuffle = false,
 }: HeroPatternProps) => {
   const patternId = useId();
+  const gradientId = `${patternId}-gradient`;
+  const maskId = `${patternId}-mask`;
   const resolvedVariant: PatternVariant = variant ?? (withHeart ? "heart" : withShuffle ? "shuffle" : "guitar");
   const [IconA, IconB, IconC, IconD] = ICON_SETS[resolvedVariant];
 
@@ -98,8 +107,29 @@ export const HeroPattern = ({
             <IconD size={32} className="text-white" strokeWidth={1.5} />
           </g>
         </pattern>
+
+        {gradient && (
+          <>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={gradient[0]} />
+              <stop offset="100%" stopColor={gradient[1]} />
+            </linearGradient>
+            {/* The white icons become a luminance mask, so the gradient rect
+                below is what actually gets painted — and because that rect
+                spans the element, one sweep runs across every tile instead of
+                repeating inside each icon. */}
+            <mask id={maskId}>
+              <rect x="0" y="0" width="100%" height="100%" fill={`url(#${patternId})`} />
+            </mask>
+          </>
+        )}
       </defs>
-      <rect x="0" y="0" width="100%" height="100%" fill={`url(#${patternId})`} />
+
+      {gradient ? (
+        <rect x="0" y="0" width="100%" height="100%" fill={`url(#${gradientId})`} mask={`url(#${maskId})`} />
+      ) : (
+        <rect x="0" y="0" width="100%" height="100%" fill={`url(#${patternId})`} />
+      )}
     </svg>
   );
 };

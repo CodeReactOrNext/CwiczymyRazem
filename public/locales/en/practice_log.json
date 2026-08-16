@@ -19,8 +19,8 @@
   "calendar": {
     "prev_month": "Previous month",
     "next_month": "Next month",
-    "clear_day": "Clear selected day",
-    "hint": "Tap a highlighted day",
+    "clear_range": "Clear selected dates",
+    "hint": "Tap two days for a range",
     "less": "Less",
     "more": "More"
   },
@@ -30,8 +30,7 @@
     "range_30d": "30 days",
     "range_90d": "90 days",
     "range_all": "All time",
-    "pick_day": "Pick a day",
-    "clear_date": "Clear selected day",
+    "clear_custom": "Clear the selected dates",
     "clear_all": "Clear filters",
     "type_label": "Session type",
     "type_all": "All types",

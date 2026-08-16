@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { computeChromagram, correctOctaveForLowStrings, freqToPitchClass, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
+import type { ExpectedAttack } from "./noteEventGrader";
+import { assignAttacks } from "./noteEventGrader";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
@@ -51,6 +53,10 @@ export function useNoteMatching({
   const lastLoopedBeatsRef = useRef(0);
   const processedNotesRef  = useRef<Set<string>>(new Set());
   const rafIdRef           = useRef<number>(0);
+  /** Onset timestamps of attacks already credited to some note, so one attack
+   *  can never fill a whole run of notes. Keyed by onsetMs, which the processor
+   *  derives per hop and is therefore unique per attack. */
+  const consumedAttacksRef = useRef<Set<number>>(new Set());
 
   // ── Derived ───────────────────────────────────────────────────────────────────
 
@@ -131,6 +137,28 @@ export function useNoteMatching({
     const halfSpeedPenalty = speedMultiplier;
     const bpmBonus         = 1 + (rawBpm - 100) * 0.001;
 
+    /** Expected pitch of a note, plus the unbent pitch of an in-progress bend.
+     *  Shared by the attack-assignment pre-pass and the live grading pass so the
+     *  two can never disagree about what a note is supposed to sound like. */
+    const targetFreqsFor = (note: any): { targetFreq: number; preBendTargetFreq: number } => {
+      if (note.isDead) return { targetFreq: 0, preBendTargetFreq: 0 };
+      const bendOffset = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
+      const freqForOffset = (semitoneOffset: number) => typeof note.midiNote === "number"
+        ? midiToFrequency(note.midiNote + semitoneOffset)
+        : getFrequencyFromTab(note.string, note.fret + semitoneOffset, tuningOffsets);
+      return {
+        targetFreq: getAdjustedTargetFreq(note.string, freqForOffset(bendOffset)),
+        preBendTargetFreq: note.isBend && !note.isPreBend && bendOffset !== 0
+          ? getAdjustedTargetFreq(note.string, freqForOffset(0))
+          : 0,
+      };
+    };
+
+    const baseToleranceFor = (targetFreq: number) =>
+      targetFreq < 100 ? CENTS_TOLERANCE + 25
+        : targetFreq < 165 ? CENTS_TOLERANCE + 15
+          : CENTS_TOLERANCE;
+
     const tick = () => {
       const now = Date.now();
 
@@ -177,6 +205,7 @@ export function useNoteMatching({
         hitNotesRef.current   = {};
         missedNotesRef.current = {};
         processedNotesRef.current.clear();
+        consumedAttacksRef.current.clear();
         needsFlushRef.current = true;
       }
       lastLoopedBeatsRef.current = loopedBeatsElapsed;
@@ -191,6 +220,68 @@ export function useNoteMatching({
         const mid = (low + high) >> 1;
         if (flatBeats[mid].beatEnd < searchTarget) { startIdx = mid + 1; low = mid + 1; }
         else high = mid - 1;
+      }
+
+      // ── Attack assignment (onset-anchored pitch) ──────────────────────────
+      // Pitch reaches us later than the attack that produced it — ~40 ms in the
+      // high register, ~105 ms in the low one. Read as a "what is sounding now"
+      // value it therefore gets attributed to whichever note the cursor has
+      // reached by the time it lands, which past ~140 BPM in sixteenths is the
+      // NEXT note. Each detected attack instead carries its own onset timestamp,
+      // and matching attacks to expected notes is a small assignment problem
+      // solved once per tick over only the notes currently in window.
+      //
+      // Strictly additive: a note credited here is one whose correct pitch WAS
+      // detected, merely too late for the live check below to see it against the
+      // right note. Nothing the live check already credits changes.
+      const eventHits = new Map<string, number>();
+      const attacks = audioRefs.noteEventsRef.current;
+      if (attacks.length > 0) {
+        const expected: ExpectedAttack[] = [];
+        const msPerBeat = 1000 / beatsPerSec;
+        for (let i = startIdx; i < flatBeats.length; i++) {
+          const { beat, beatStart, beatEnd, notes } = flatBeats[i];
+          if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
+          // Chords are graded on the chromagram, not on a single pitch.
+          if (beat.notes.length !== 1) continue;
+          const inWindow = loopedBeatsElapsed >= beatStart - earlyWindowBeats
+            && loopedBeatsElapsed <= beatEnd + windowBeats;
+          if (!inWindow) continue;
+
+          for (const { note, noteKey } of notes) {
+            if (note.isDead) continue;                       // no pitch to attribute
+            if (note.isHammerOn || note.isPullOff) continue;  // no attack of their own
+            if (hitNotesRef.current[noteKey] || processedNotesRef.current.has(noteKey)) continue;
+            const { targetFreq } = targetFreqsFor(note);
+            if (targetFreq <= 0) continue;
+            expected.push({
+              key: noteKey,
+              // Expected attack time in the events' own timestamp domain: both
+              // sides are latency-compensated by getLatencyMs() via
+              // loopedBeatsElapsed, so they line up without a second correction.
+              timeMs: now + (beatStart - loopedBeatsElapsed) * msPerBeat,
+              targetFreq,
+              toleranceCents: baseToleranceFor(targetFreq),
+              volumeGate: getDetectionGates(targetFreq, volumeGateBase, CHORD_CHROMA_THRESHOLD).volumeGate,
+            });
+          }
+        }
+
+        if (expected.length > 0) {
+          const fresh = attacks.filter(a => !consumedAttacksRef.current.has(a.onsetMs));
+          for (const assignment of assignAttacks(fresh, expected, windowMs)) {
+            eventHits.set(assignment.key, assignment.deltaMs);
+            consumedAttacksRef.current.add(fresh[assignment.eventIndex].onsetMs);
+          }
+        }
+        // The attack buffer is bounded, so anything no longer in it can never be
+        // offered again and its "consumed" marker is dead weight.
+        if (consumedAttacksRef.current.size > 256) {
+          const live = new Set(attacks.map(a => a.onsetMs));
+          consumedAttacksRef.current = new Set(
+            [...consumedAttacksRef.current].filter(t => live.has(t))
+          );
+        }
       }
 
       for (let i = startIdx; i < flatBeats.length; i++) {
@@ -212,20 +303,9 @@ export function useNoteMatching({
           // Prefer the note's real MIDI pitch (carries the track's actual tuning:
           // Drop C/D, 7-string, capo). Falls back to standard-tuning fret math for
           // regular exercises, where midiNote is undefined.
-          let targetFreq = 0;
-          // Unbent pitch for an in-progress (not pre-bent) bend — see below.
-          // Only ever set for isBend notes; 0 elsewhere (never a real target).
-          let preBendTargetFreq = 0;
-          if (!note.isDead) {
-            const bendOffset = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
-            const freqForOffset = (semitoneOffset: number) => typeof note.midiNote === "number"
-              ? midiToFrequency(note.midiNote + semitoneOffset)
-              : getFrequencyFromTab(note.string, note.fret + semitoneOffset, tuningOffsets);
-            targetFreq = getAdjustedTargetFreq(note.string, freqForOffset(bendOffset));
-            if (note.isBend && !note.isPreBend && bendOffset !== 0) {
-              preBendTargetFreq = getAdjustedTargetFreq(note.string, freqForOffset(0));
-            }
-          }
+          // (`preBendTargetFreq` is the unbent pitch of an in-progress, not
+          // pre-bent, bend — see the bend branch below. 0 for every other note.)
+          const { targetFreq, preBendTargetFreq } = targetFreqsFor(note);
 
           // High strings (≥ E4) ring quieter and carry weaker chroma energy, so
           // relax the volume/chroma gates there to cut false negatives.
@@ -247,7 +327,7 @@ export function useNoteMatching({
               return !!chroma && chroma[freqToPitchClass(targetFreq)] >= threshold;
             }
             // Thicker strings (like E6) often drift sharp on attack and are harder to tune…
-            const baseTolerance = targetFreq < 100 ? CENTS_TOLERANCE + 25 : (targetFreq < 165 ? CENTS_TOLERANCE + 15 : CENTS_TOLERANCE);
+            const baseTolerance = baseToleranceFor(targetFreq);
             // …and a confidently-detected expected note earns a little extra, so tuning
             // drift on the intended note is forgiven (never a full semitone).
             const tolerance = getExpectationBiasedTolerance(baseTolerance, audioRefs.confidenceRef.current);
@@ -306,24 +386,29 @@ export function useNoteMatching({
           }
 
           if (isWithinWindow) {
-            if (currentVolume > gates.volumeGate && (hasRecentOnset || hasRecentTick || !requiresOnset)) {
-              if (pitchIsSounding(false)) {
-                // First (and only) grade of this note — the guards above guarantee
-                // it was neither processed nor hit before.
-                processedNotesRef.current.add(noteKey);
+            // Two independent routes to a hit. The live check is unchanged; the
+            // attack route only ever fires for a note the live check could not
+            // credit, because the pitch proving it arrived too late.
+            const liveHit = currentVolume > gates.volumeGate
+              && (hasRecentOnset || hasRecentTick || !requiresOnset)
+              && pitchIsSounding(false);
 
-                s.hits++;
-                consecutiveMissesRef.current = 0;
-                const newCombo      = gs.combo + 1;
-                if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
-                const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
-                gs.combo  = newCombo;
-                gs.multiplier = newMultiplier;
+            if (liveHit || eventHits.has(noteKey)) {
+              // First (and only) grade of this note — the guards above guarantee
+              // it was neither processed nor hit before.
+              processedNotesRef.current.add(noteKey);
 
-                hitNotesRef.current[noteKey] = loopedBeatsElapsed;
-                needsFlushRef.current = true;
-              }
+              s.hits++;
+              consecutiveMissesRef.current = 0;
+              const newCombo      = gs.combo + 1;
+              if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
+              const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+              gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
+              gs.combo  = newCombo;
+              gs.multiplier = newMultiplier;
+
+              hitNotesRef.current[noteKey] = loopedBeatsElapsed;
+              needsFlushRef.current = true;
             }
           } else if (isPassed) {
 

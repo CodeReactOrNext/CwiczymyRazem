@@ -18,6 +18,21 @@ const DURATION_BOUNDS_MS = {
 
 const RANGE_DAYS = { "7d": 7, "30d": 30, "90d": 90 } as const;
 
+/**
+ * The single day a custom range collapses to, or `null` when it spans several
+ * days (or no custom range is active). Drives the day-timeline drill-down.
+ */
+export const getSelectedDay = (filters: PracticeLogFilters): string | null =>
+  filters.range === "custom" && filters.from && filters.from === filters.to
+    ? filters.from
+    : null;
+
+/** `YYYY-MM-DD` → a `Date` at local midnight (never shifts across timezones). */
+export const parseDateKey = (dateKey: string): Date => {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const getSessionType = (log: FirebaseUserExceriseLog): SessionType => {
   if (log.planId) return "plan";
   if (log.songId) return "song";
@@ -40,7 +55,7 @@ const resolveTitle = (log: FirebaseUserExceriseLog, type: SessionType) => {
 };
 
 export const mapLogToSession = (
-  log: FirebaseUserExceriseLog
+  log: FirebaseUserExceriseLog,
 ): PracticeLogSession | null => {
   if (!log.id || !log.reportDate?.seconds) return null;
 
@@ -64,15 +79,19 @@ export const mapLogToSession = (
 
 export const applyFilters = (
   sessions: PracticeLogSession[],
-  filters: PracticeLogFilters
+  filters: PracticeLogFilters,
 ): PracticeLogSession[] => {
   let result = sessions;
 
-  if (filters.date) {
-    result = result.filter(
-      (session) => getLocalDateKey(session.date) === filters.date
-    );
-  } else if (filters.range !== "all") {
+  if (filters.range === "custom" && filters.from && filters.to) {
+    // Compared as `YYYY-MM-DD` strings: lexicographic order matches calendar
+    // order, so both bounds stay inclusive without any DST/offset arithmetic.
+    const { from, to } = filters;
+    result = result.filter((session) => {
+      const dateKey = getLocalDateKey(session.date);
+      return dateKey >= from && dateKey <= to;
+    });
+  } else if (filters.range !== "all" && filters.range !== "custom") {
     const cutoff = new Date();
     cutoff.setHours(0, 0, 0, 0);
     cutoff.setDate(cutoff.getDate() - RANGE_DAYS[filters.range]);
@@ -86,7 +105,7 @@ export const applyFilters = (
   if (filters.duration !== "all") {
     const { min, max } = DURATION_BOUNDS_MS[filters.duration];
     result = result.filter(
-      (session) => session.timeMs >= min && session.timeMs < max
+      (session) => session.timeMs >= min && session.timeMs < max,
     );
   }
 
@@ -95,7 +114,7 @@ export const applyFilters = (
 
 export const applySort = (
   sessions: PracticeLogSession[],
-  sort: PracticeLogFilters["sort"]
+  sort: PracticeLogFilters["sort"],
 ): PracticeLogSession[] => {
   const sorted = [...sessions];
   switch (sort) {
@@ -113,7 +132,7 @@ export const applySort = (
 
 /** Groups sessions by local calendar day, keeping the incoming session order. */
 export const groupSessionsByDay = (
-  sessions: PracticeLogSession[]
+  sessions: PracticeLogSession[],
 ): DayGroup[] => {
   const groups: DayGroup[] = [];
   const groupsByKey: Record<string, DayGroup> = {};
@@ -147,7 +166,7 @@ export const groupSessionsByDay = (
  */
 export const paginateDayGroups = (
   dayGroups: DayGroup[],
-  targetPerPage: number
+  targetPerPage: number,
 ): DayGroup[][] => {
   if (dayGroups.length === 0) return [];
 
@@ -171,7 +190,7 @@ export const paginateDayGroups = (
 };
 
 export const summarize = (
-  sessions: PracticeLogSession[]
+  sessions: PracticeLogSession[],
 ): PracticeLogSummaryData => {
   const perCategoryMs = {
     techniqueTime: 0,

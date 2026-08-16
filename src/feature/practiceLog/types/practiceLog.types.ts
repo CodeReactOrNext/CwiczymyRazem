@@ -2,7 +2,7 @@ import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.ty
 
 export type SessionType = "manual" | "plan" | "song";
 
-export type DateRangeKey = "7d" | "30d" | "90d" | "all";
+export type DateRangeKey = "7d" | "30d" | "90d" | "all" | "custom";
 
 export type DurationKey = "all" | "short" | "medium" | "long";
 
@@ -36,8 +36,12 @@ export interface PracticeLogSession {
 
 export interface PracticeLogFilters {
   range: DateRangeKey;
-  /** YYYY-MM-DD; when set it wins over range. */
-  date: string | null;
+  /**
+   * Inclusive bounds of a hand-picked range as `YYYY-MM-DD`. Only meaningful
+   * when `range === "custom"`; a single selected day is `from === to`.
+   */
+  from: string | null;
+  to: string | null;
   type: SessionType | "all";
   duration: DurationKey;
   sort: SortKey;

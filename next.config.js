@@ -353,7 +353,10 @@ const nextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), midi=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)",
+            // YouTube is listed for fullscreen because the embedded player runs
+            // cross-origin: with a bare `fullscreen=(self)` its expand button is
+            // there but does nothing. Everything else stays same-origin only.
+            value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), midi=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self \"https://www.youtube.com\")",
           },
         ],
       },

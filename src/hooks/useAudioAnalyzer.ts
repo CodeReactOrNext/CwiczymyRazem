@@ -1,6 +1,7 @@
 
 import { useCallback,useEffect, useMemo, useRef, useState } from "react";
 
+import type { DetectedNoteEvent } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 
 interface AudioAnalyzerState {
@@ -26,6 +27,11 @@ export interface AudioRefs {
   /** Measured ambient noise floor (see guitarBufferProcessor.ts), same 0–1 scale
    *  as rawVolumeRef. 0 means "not measured yet this session". */
   noiseFloorRef: React.MutableRefObject<number>;
+  /** Attacks with the pitch each one turned out to have, oldest first. Unlike
+   *  frequencyRef (a "what is ringing now" readout, which necessarily lags the
+   *  attack), each entry carries the timestamp of its own onset — so a consumer
+   *  can attribute a late-arriving pitch to the note that actually produced it. */
+  noteEventsRef: React.MutableRefObject<DetectedNoteEvent[]>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -95,6 +101,7 @@ export const useAudioAnalyzer = () => {
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
+  const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
 
   const init = useCallback(async () => {
     try {
@@ -165,10 +172,11 @@ export const useAudioAnalyzer = () => {
       const process = createGuitarBufferProcessor({
         detectors,
         getGain: () => inputGainRef.current,
+        sampleRate: audioContext.sampleRate,
         analyser: analyserNodeRef, // chromagram-at-onset snapshots (web path)
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef,
         },
         onActive: () => {
           setState(prev =>
@@ -252,6 +260,7 @@ export const useAudioAnalyzer = () => {
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
+    noteEventsRef.current = [];
 
     setState(prev => ({ ...prev, isListening: false }));
   }, []);
@@ -280,7 +289,7 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30;
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef, noteEventsRef };
 
   return useMemo(() => ({
     ...state,

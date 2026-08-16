@@ -8,6 +8,8 @@ order: 1
 
 riff.quest is a practice tracker that behaves like a game. You practise, you tell the app what you did, and it turns that into points, a level, a streak and a place on the rankings. It replaces the practice notebook you were supposed to keep and never did.
 
+<YouTube id="x2wERUdqtL0" title="Getting Started with Riff Quest" caption="The tour: logging a session, reading what it was worth, and where everything lives. The rest of this page is the same ground in writing." />
+
 And there is plenty to practise. The library holds over 200 exercises and more than 50 ready-made routines, the Learning Path runs 36 steps across two modules, and the Scale Map covers 9 scale families. On top of that, a Mastery Roadmap is written for you when you ask for one, usually somewhere between 35 and 55 steps long.
 
 <StatRow stats="200+:exercises in the library|50+:ready-made routines|36:steps in the Learning Path|9:scale families on the Scale Map" caption="The first two are rounded down and the real numbers keep climbing, so treat them as the floor rather than the count." />
