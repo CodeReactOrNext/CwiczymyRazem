@@ -61,6 +61,8 @@ export interface ReportDataInterface {
   fameStreakBonus?: number;
   /** Whether the high-accuracy multiplier applied to this session's fame. */
   fameAccuracyBonus?: boolean;
+  /** Fame the user's rig paid for this session, already included in `fameEarned`. */
+  fameRigBonus?: number;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;

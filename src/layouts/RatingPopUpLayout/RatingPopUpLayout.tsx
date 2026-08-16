@@ -7,7 +7,7 @@ import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Swords, Timer, Trophy } from "lucide-react";
 import Router from "next/router";
 import { useMemo } from "react";
 import {
@@ -116,8 +116,13 @@ const RatingPopUpLayout = ({
   } = useRatingPopUp({ ratingData, currentUserStats, previousUserStats, activityData });
 
   const fame = ratingData.fameEarned ?? 0;
+  // Part of `fame`, not an extra on top — it gets its own chip because the gear
+  // that earned it is the one thing the player can act on.
+  const rigBonus = ratingData.fameRigBonus ?? 0;
   // Fame scales on a curve over the day's practice total, so spell out the parts
-  // that aren't just "time" — otherwise the number looks arbitrary.
+  // that aren't just "time" — otherwise the number looks arbitrary. The rig's
+  // rate belongs in the Arsenal, where it can be acted on; here it was only ever
+  // read as a second, contradictory number next to the chip.
   const fameBreakdown = [
     (ratingData.fameStreakBonus ?? 0) > 0 ? `+${ratingData.fameStreakBonus} streak bonus` : null,
     ratingData.fameAccuracyBonus ? "×1.25 accuracy" : null,
@@ -342,10 +347,29 @@ const RatingPopUpLayout = ({
               </div>
 
               {fame > 0 && (
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded bg-amber-500/10 px-3 py-1 text-amber-400">
-                  <img src="/images/coin.png" alt="Fame" className="h-4 w-4 object-contain" />
-                  <span className="text-sm font-bold tabular-nums">+{fame}</span>
-                  <span className="text-sm font-medium">Fame</span>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  <div className="inline-flex items-center gap-1.5 rounded bg-amber-500/10 px-3 py-1 text-amber-400">
+                    <img src="/images/coin.png" alt="Fame" className="h-4 w-4 object-contain" />
+                    <span className="text-sm font-bold tabular-nums">+{fame}</span>
+                    <span className="text-sm font-medium">Fame</span>
+                  </div>
+
+                  {/* Amber, like the Fame chip beside it: this *is* Fame, and a
+                      second colour read as a second currency. The crossed swords
+                      carry the Arsenal reference on their own. Delayed so it
+                      lands after the total — the rig arriving as its own beat is
+                      what makes the gear feel responsible for it. */}
+                  {rigBonus > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.94 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: 0.9, duration: 0.35, ease: "easeOut" }}
+                      className="inline-flex items-center gap-1.5 rounded bg-amber-500/10 px-3 py-1 text-amber-400">
+                      <Swords size={14} />
+                      <span className="text-sm font-bold tabular-nums">+{rigBonus}</span>
+                      <span className="text-sm font-medium">from your rig</span>
+                    </motion.div>
+                  )}
                 </div>
               )}
 

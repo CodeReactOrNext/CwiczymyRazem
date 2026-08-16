@@ -14,7 +14,16 @@
  * Consistency is rewarded with a flat daily bonus (paid once per day) rather
  * than the old streak multiplier, which stacked multiplicatively with session
  * length and paid marathon-plus-streak users the most.
+ *
+ * On top of all that sits the rig bonus — see `feature/arsenal/data/rigFame`.
+ * It rides the same daily-minutes counter, so it inherits the split-proofing
+ * rather than reimplementing it.
  */
+
+import {
+  cumulativeRigFame,
+  getRigFameRate,
+} from "feature/arsenal/data/rigFame";
 
 /** `fame = FAME_CURVE_FACTOR * sqrt(dailyMinutes)` — 1h ≈ 23, 2h ≈ 33, 4h ≈ 46. */
 export const FAME_CURVE_FACTOR = 3;
@@ -64,6 +73,11 @@ export interface SessionFameInput {
   accuracy?: number;
   /** Days back — non-zero marks a back-dated report. */
   isDateBackReport?: number;
+  /**
+   * Total level of the gear the user has in service. Absent or 0 pays no rig
+   * bonus, which is what keeps every pre-rig caller (and its tests) unchanged.
+   */
+  rigLevel?: number;
 }
 
 export interface SessionFameResult {
@@ -73,6 +87,10 @@ export interface SessionFameResult {
   curveFame: number;
   /** The flat streak component (0 when already paid today). */
   streakBonus: number;
+  /** The rig component — what the user's gear paid for this session. */
+  rigFame: number;
+  /** Fame/hour the rig is worth right now, so the UI can show the rate itself. */
+  rigFameRate: number;
   /** Whether the accuracy multiplier applied — the UI can call it out. */
   accuracyBonusApplied: boolean;
   /** The counter to persist. */
@@ -97,17 +115,23 @@ export const calculateSessionFame = ({
   fameDay,
   accuracy,
   isDateBackReport,
+  rigLevel = 0,
 }: SessionFameInput): SessionFameResult => {
   // A counter from an earlier day is stale — the new day starts from zero.
   const isSameDay = fameDay?.date === dayKey;
   const minutesBefore = isSameDay ? Math.max(0, fameDay?.minutes ?? 0) : 0;
   const streakBonusClaimed = isSameDay ? Boolean(fameDay?.streakBonusClaimed) : false;
+  const rigFameRate = getRigFameRate(rigLevel);
 
   if (isDateBackReport) {
     return {
       fame: BACKDATED_REPORT_FAME,
       curveFame: BACKDATED_REPORT_FAME,
       streakBonus: 0,
+      // The rig pays against a day's minutes, and a back-dated report's day is
+      // already closed — there is no counter here for it to read.
+      rigFame: 0,
+      rigFameRate,
       accuracyBonusApplied: false,
       // Untouched: a back-dated report must not consume today's allowance.
       fameDay: { date: dayKey, minutes: minutesBefore, streakBonusClaimed },
@@ -128,10 +152,21 @@ export const calculateSessionFame = ({
   // actually earned something — an empty report shouldn't claim it.
   const streakBonus = !streakBonusClaimed && curveFame > 0 ? getStreakFameBonus(streak) : 0;
 
+  // Read off the same daily counter as the curve, so six short reports pay
+  // exactly what one long one does. `max` guards the one case the monotonicity
+  // argument doesn't cover: a rig rebuilt mid-day changes the rate under us.
+  const rigFame = Math.max(
+    0,
+    cumulativeRigFame(minutesAfter, rigLevel) -
+      cumulativeRigFame(minutesBefore, rigLevel)
+  );
+
   return {
-    fame: curveFame + streakBonus,
+    fame: curveFame + streakBonus + rigFame,
     curveFame,
     streakBonus,
+    rigFame,
+    rigFameRate,
     accuracyBonusApplied,
     fameDay: {
       date: dayKey,
