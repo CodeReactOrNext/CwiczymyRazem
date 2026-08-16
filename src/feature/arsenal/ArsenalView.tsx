@@ -55,6 +55,7 @@ import { TraderView } from "./components/Trader/TraderView";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
+import { formatRigFameRate, getRigFameRate } from "./data/rigFame";
 import { getRigLevel } from "./data/rigLevel";
 import { useArsenalData } from "./hooks/useArsenalData";
 import { useOpenCase } from "./hooks/useOpenCase";
@@ -65,6 +66,7 @@ export const ArsenalView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
   const rigLevel = getRigLevel(data);
+  const rigFameRate = getRigFameRate(rigLevel);
 
   // Tab is URL-driven (?tab=market) so notifications/links can deep-link to it.
   const router = useRouter();
@@ -112,10 +114,20 @@ export const ArsenalView = () => {
               <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
               <span className="text-xs text-zinc-400">Fame Points</span>
             </div>
-            <div className="flex items-center gap-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-4 py-2">
-              <Swords size={16} className="text-cyan-400" />
-              <span className="text-lg font-black text-cyan-300 tabular-nums">{rigLevel}</span>
-              <span className="text-xs text-zinc-400">Rig Level</span>
+            {/* The rate sits inside the Rig Level chip rather than beside it:
+                it is what that number does, so reading them apart would hide
+                the only causal link the Arsenal has to Fame. */}
+            <div className="flex flex-col gap-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-4 py-2">
+              <div className="flex items-center gap-2">
+                <Swords size={16} className="text-cyan-400" />
+                <span className="text-lg font-black text-cyan-300 tabular-nums">{rigLevel}</span>
+                <span className="text-xs text-zinc-400">Rig Level</span>
+              </div>
+              {rigFameRate > 0 && (
+                <span className="text-[11px] font-medium text-emerald-400 tabular-nums">
+                  +{formatRigFameRate(rigLevel)} Fame / h of practice
+                </span>
+              )}
             </div>
           </div>
         }

@@ -1,3 +1,4 @@
+import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
@@ -144,6 +145,15 @@ export default async function handler(
     // Calculate points gained in this session - use the points from current report only
     const pointsGained = report.raitingData.totalPoints || 0;
 
+    // Recomputed from the stored arsenal rather than read off the denormalized
+    // `rigLevel` field: that field is only refreshed by arsenal writes, so a
+    // stale one would pay the wrong rate. The arsenal is already in memory from
+    // `firebaseGetUserData`, so this costs no extra read. Never trust the
+    // request body for it — the payload is client-controlled.
+    const rigLevel = userData?.arsenal
+      ? getRigLevel(userData.arsenal)
+      : (typeof userData?.rigLevel === "number" ? userData.rigLevel : 0);
+
     // Fame no longer mirrors points: it pays out on a concave curve over the
     // user's daily practice total, so short daily sessions beat marathons and
     // the shop economy can't be inflated by one very long (self-reported) day.
@@ -154,6 +164,7 @@ export default async function handler(
       fameDay: currentUserStats.fameDay,
       accuracy: inputData.micPerformance?.accuracy,
       isDateBackReport: report.isDateBackReport,
+      rigLevel,
     });
     const fameEarned = fameResult.fame;
 
@@ -238,6 +249,7 @@ export default async function handler(
         fameEarned,
         fameStreakBonus: fameResult.streakBonus,
         fameAccuracyBonus: fameResult.accuracyBonusApplied,
+        fameRigBonus: fameResult.rigFame,
       },
     });
   }

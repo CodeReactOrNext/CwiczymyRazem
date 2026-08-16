@@ -161,6 +161,95 @@ describe("calculateSessionFame", () => {
     expect(backdated.fameDay).toEqual(earlier.fameDay);
   });
 
+  it("pays no rig bonus when the caller has no rig", () => {
+    const result = session(60);
+
+    expect(result.rigFame).toBe(0);
+    expect(result.rigFameRate).toBe(0);
+  });
+
+  it("adds the rig bonus on top of the curve and the streak", () => {
+    const plain = session(30, { streak: 7 });
+    const geared = session(30, { streak: 7, rigLevel: 750 });
+
+    expect(geared.rigFame).toBeGreaterThan(0);
+    expect(geared.curveFame).toBe(plain.curveFame);
+    expect(geared.streakBonus).toBe(plain.streakBonus);
+    expect(geared.fame).toBe(plain.fame + geared.rigFame);
+  });
+
+  it("gives splitters no rig advantage over one long session", () => {
+    let fameDay = undefined as any;
+    let total = 0;
+
+    for (let i = 0; i < 6; i++) {
+      const result = calculateSessionFame({
+        sessionTimeMs: 20 * MINUTE,
+        dayKey: TODAY,
+        streak: 1,
+        fameDay,
+        rigLevel: 750,
+      });
+      total += result.rigFame;
+      fameDay = result.fameDay;
+    }
+
+    expect(total).toBe(session(120, { rigLevel: 750 }).rigFame);
+  });
+
+  it("never pays a negative rig bonus when the rig changes mid-day", () => {
+    const first = session(20, { rigLevel: 750 });
+    const afterSellingTheRig = calculateSessionFame({
+      sessionTimeMs: 20 * MINUTE,
+      dayKey: TODAY,
+      streak: 1,
+      fameDay: first.fameDay,
+      rigLevel: 40,
+    });
+
+    expect(afterSellingTheRig.rigFame).toBeGreaterThanOrEqual(0);
+  });
+
+  it("pays the rig bonus again on a new day", () => {
+    const yesterday = session(120, { rigLevel: 750 });
+    const today = calculateSessionFame({
+      sessionTimeMs: 30 * MINUTE,
+      dayKey: "2026-08-08",
+      streak: 2,
+      fameDay: yesterday.fameDay,
+      rigLevel: 750,
+    });
+
+    expect(today.rigFame).toBe(session(30, { rigLevel: 750 }).rigFame);
+  });
+
+  it("pays no rig bonus on a back-dated report", () => {
+    const result = session(60, { rigLevel: 750, isDateBackReport: 3 });
+
+    expect(result.fame).toBe(BACKDATED_REPORT_FAME);
+    expect(result.rigFame).toBe(0);
+  });
+
+  it("still reports the rate on a back-dated report so the UI can explain it", () => {
+    expect(session(60, { rigLevel: 750, isDateBackReport: 3 }).rigFameRate).toBeGreaterThan(0);
+  });
+
+  it("keeps practice worth more than gear at the average rig", () => {
+    // Most players sit at rig 100–200, and there the curve has to stay the bigger
+    // half — the rig is a bonus on practising, not a reason to stop.
+    const result = session(25, { rigLevel: 200 });
+
+    expect(result.rigFame).toBeLessThan(result.curveFame);
+  });
+
+  it("lets a top rig out-earn the curve, on purpose", () => {
+    // The other side of that line, pinned so it can't drift back by accident:
+    // 750 is the top rig in the game and it is meant to feel like it.
+    const result = session(25, { rigLevel: 750 });
+
+    expect(result.rigFame).toBeGreaterThan(result.curveFame);
+  });
+
   it("rewards four days of one hour over a single four-hour day", () => {
     const marathon = session(240).fame;
     const spread = [1, 2, 3, 4].reduce((total, day) => {
