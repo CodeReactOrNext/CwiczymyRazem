@@ -180,7 +180,12 @@ const PayoutNote = () => {
           <div className='space-y-2 text-xs font-normal leading-relaxed text-zinc-300'>
             <p>Fame per hour of practice.</p>
             <p>
-              Traits are quoted on an even hour, affinity on a full hour of one
+              <span className='font-semibold text-white'>Traits</span> are quoted
+              on an even hour — 15 minutes in each category.
+            </p>
+            <p>
+              <span className='font-semibold text-white'>Per category</span> is
+              what those same traits pay on an hour spent only on that one
               category.
             </p>
             <p>Traits pay only while the gear carrying them is on the rig.</p>
@@ -296,7 +301,7 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
               />
             </StatGroup>
 
-            <StatGroup label='Affinity'>
+            <StatGroup label='Per category'>
               {PRACTICE_CATEGORIES.map((category) => {
                 const Icon = SKILL_CATEGORY_ICONS[category];
                 const rate = categoryRates[category];
@@ -313,7 +318,8 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
                       />
                     }
                     // Bars only once there is something to compare — four empty
-                    // tracks would read as a broken chart, not as "no affinity".
+                    // tracks would read as a broken chart, not as "pays nothing
+                    // extra on any category yet".
                     share={
                       bestCategoryRate > 0 ? rate / bestCategoryRate : undefined
                     }
