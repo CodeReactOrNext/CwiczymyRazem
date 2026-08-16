@@ -96,6 +96,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Star,
     label: "Gear Affects Fame Points",
     kind: "feature",
+    done: true,
     description:
       "The gear you're using changes how many Fame Points you earn per exercise type, so pick the right rig for the right drill.",
   },
