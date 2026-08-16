@@ -106,6 +106,23 @@ export interface StatisticsDataInterface {
   achievements: AchievementList[];
   actualDayWithoutBreak: number;
   lastReportDate: string;
+  /**
+   * Streak as the app actually displays it — derived from the local-time
+   * activity log on the client and persisted here on every report.
+   *
+   * `actualDayWithoutBreak` above is a counter mutated from a single stored date
+   * and a past timezone slip pins it to the wrong calendar day for good (see
+   * getReconciledStreak). Consumers that cannot load the activity log — the
+   * reminder cron, the Discord feed — read this instead, so they quote the same
+   * number the user is looking at.
+   */
+  streakDays?: number;
+  /** The user's local calendar day of the last practice, `YYYY-MM-DD`. */
+  lastPracticeLocalDay?: string;
+  /** IANA zone reported by the browser on the last report, e.g. "Europe/Warsaw". */
+  timeZone?: string;
+  /** UTC hour bucket the streak reminder cron picks this user up on. */
+  reminderHourUtc?: number;
   guitarStartDate: Timestamp | null;
   songLists?: {
     wantToLearn: string[];

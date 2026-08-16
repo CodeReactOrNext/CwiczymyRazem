@@ -1,4 +1,5 @@
 import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import { DEFAULT_REMINDER_HOUR_UTC } from "constants/streakReminder";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
   batchMarkCooldown,
@@ -10,6 +11,8 @@ import {
   sendSeasonStartEmail,
   sendStreakReminderEmail,
 } from "lib/email/send";
+import type { StreakEmailType } from "lib/email/streakCandidate";
+import { evaluateStreakReminder } from "lib/email/streakCandidate";
 import { sendThrottled } from "lib/email/throttle";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore, messaging } from "utils/firebase/api/firebase.config";
@@ -21,12 +24,6 @@ interface RankedParticipant {
   displayName: string;
   email: string;
   seasonUpdates: boolean;
-}
-
-function diffInDays(today: Date, other: Date): number {
-  return Math.ceil(
-    Math.abs(today.getTime() - other.getTime()) / (1000 * 60 * 60 * 24)
-  );
 }
 
 async function getSeasonParticipants(seasonId: string): Promise<RankedParticipant[]> {
@@ -87,6 +84,13 @@ export default async function handler(
   today.setHours(0, 0, 0, 0);
   const dateKey = todayKey(now);
 
+  // The cron fires hourly so streak reminders can land in each user's own
+  // evening (see the streak block below). Everything else here is a once-a-day
+  // job and would otherwise go out 24 times, so it stays pinned to one hour —
+  // the same one the pre-hourly cron ran on.
+  const currentHourUtc = now.getUTCHours();
+  const isDailyBlockHour = currentHourUtc === DEFAULT_REMINDER_HOUR_UTC;
+
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const currentSeasonId = `${year}-${month}`;
@@ -112,57 +116,54 @@ export default async function handler(
   const errors: string[] = [];
 
   // ── 1. Push notifications ────────────────────────────────────────────────
-  try {
-    const snapshot = await firestore
-      .collection("users")
-      .where("fcmData.notificationsEnabled", "==", true)
-      .get();
+  if (isDailyBlockHour) {
+    try {
+      const snapshot = await firestore
+        .collection("users")
+        .where("fcmData.notificationsEnabled", "==", true)
+        .get();
 
-    const pushJobs: Promise<any>[] = [];
-    const allEnabledTokens: string[] = [];
-    snapshot.docs.forEach((doc: any) => {
-      const tokens = doc.data().fcmData?.tokens || [];
-      allEnabledTokens.push(...tokens);
-    });
+      const pushJobs: Promise<any>[] = [];
+      const allEnabledTokens: string[] = [];
+      snapshot.docs.forEach((doc: any) => {
+        const tokens = doc.data().fcmData?.tokens || [];
+        allEnabledTokens.push(...tokens);
+      });
 
-    if (today.getDate() === 1 && allEnabledTokens.length > 0) {
-      pushJobs.push(
-        messaging.sendEachForMulticast({
-          tokens: allEnabledTokens,
-          notification: {
-            title: "🎸 A new season has started!",
-            body: `Season ${currentSeasonId} is now live. Start practicing and fight for top 5!`,
-          },
-          data: { url: "/seasons" },
-        })
-      );
-    }
-
-    snapshot.docs.forEach((doc: any) => {
-      const data = doc.data();
-      const tokens = data.fcmData?.tokens || [];
-      if (!tokens.length) return;
-
-      const lastReportDateStr = data.statistics?.lastReportDate;
-      if (!lastReportDateStr) return;
-
-      const lastReportDate = new Date(lastReportDateStr);
-      if (isNaN(lastReportDate.getTime())) return;
-      lastReportDate.setHours(0, 0, 0, 0);
-
-      const diffDays = diffInDays(today, lastReportDate);
-
-      let title = "";
-      let body = "";
-      if (diffDays === 1) {
-        title = "🔥 Keep your streak alive!";
-        body = "You haven't practiced today! Do a quick session to keep your streak.";
-      } else if (diffDays === 3) {
-        title = "We miss you! 🎸";
-        body = "It's been 3 days since your last practice. Come back and play/sing a bit!";
+      if (today.getDate() === 1 && allEnabledTokens.length > 0) {
+        pushJobs.push(
+          messaging.sendEachForMulticast({
+            tokens: allEnabledTokens,
+            notification: {
+              title: "🎸 A new season has started!",
+              body: `Season ${currentSeasonId} is now live. Start practicing and fight for top 5!`,
+            },
+            data: { url: "/seasons" },
+          })
+        );
       }
 
-      if (title && body) {
+      snapshot.docs.forEach((doc: any) => {
+        const data = doc.data();
+        const tokens = data.fcmData?.tokens || [];
+        if (!tokens.length) return;
+
+        // Same "1 or 3 days since practice" rule the emails use, so a user never
+        // gets a push and an email that disagree about whether they lapsed.
+        const target = evaluateStreakReminder(data.statistics, now);
+        if (!target) return;
+
+        const { title, body } =
+          target.daysSincePractice === 1
+            ? {
+                title: "🔥 Keep your streak alive!",
+                body: "You haven't practiced today! Do a quick session to keep your streak.",
+              }
+            : {
+                title: "We miss you! 🎸",
+                body: "It's been 3 days since your last practice. Come back and play/sing a bit!",
+              };
+
         pushJobs.push(
           messaging.sendEachForMulticast({
             tokens,
@@ -170,66 +171,86 @@ export default async function handler(
             data: { url: "/timer" },
           })
         );
-      }
-    });
+      });
 
-    const settled = await Promise.allSettled(pushJobs);
-    settled.forEach((r) => {
-      if (r.status === "fulfilled") {
-        pushSent += r.value.successCount ?? 0;
-        pushFailed += r.value.failureCount ?? 0;
-      } else {
-        pushFailed += 1;
-        errors.push(`push: ${r.reason?.message ?? String(r.reason)}`);
-      }
-    });
-  } catch (err: any) {
-    errors.push(`push-block: ${err?.message ?? String(err)}`);
-    console.error("[cron] push block failed", err);
+      const settled = await Promise.allSettled(pushJobs);
+      settled.forEach((r) => {
+        if (r.status === "fulfilled") {
+          pushSent += r.value.successCount ?? 0;
+          pushFailed += r.value.failureCount ?? 0;
+        } else {
+          pushFailed += 1;
+          errors.push(`push: ${r.reason?.message ?? String(r.reason)}`);
+        }
+      });
+    } catch (err: any) {
+      errors.push(`push-block: ${err?.message ?? String(err)}`);
+      console.error("[cron] push block failed", err);
+    }
   }
 
   // ── 2. Streak reminder emails (with 7-day per-user cooldown) ──────────────
+  // Runs on every hourly tick, but each user is only ever *considered* on the
+  // one tick matching their own evening (`statistics.reminderHourUtc`, written
+  // on every report). That is an indexed equality query, not a scan — the daily
+  // read budget is unchanged, just spread across the day instead of dumping
+  // "your streak ends at midnight" on people at 11am local while they're at work.
   try {
-    const emailUsersSnapshot = await firestore
+    const scheduledSnapshot = await firestore
       .collection("users")
-      .where("email", "!=", null)
+      .where("statistics.reminderHourUtc", "==", currentHourUtc)
       .get();
+
+    const docsByUid = new Map<string, any>();
+    scheduledSnapshot.docs.forEach((doc: any) => docsByUid.set(doc.id, doc.data()));
+
+    // Accounts that have not reported since per-user scheduling shipped carry no
+    // `reminderHourUtc`, and Firestore cannot query for a missing field — so the
+    // pre-existing full scan survives, once a day, on the hour the cron used to
+    // run. They keep exactly their old behaviour and migrate off this path by
+    // themselves the first time they log a session. No backfill needed.
+    if (isDailyBlockHour) {
+      const legacySnapshot = await firestore
+        .collection("users")
+        .where("email", "!=", null)
+        .get();
+
+      legacySnapshot.docs.forEach((doc: any) => {
+        const data = doc.data();
+        if (typeof data.statistics?.reminderHourUtc === "number") return;
+        docsByUid.set(doc.id, data);
+      });
+    }
 
     interface StreakCandidate {
       uid: string;
       email: string;
       displayName: string;
       streakDays: number;
+      hoursLeft: number | null;
       variant: "d1" | "d3";
-      type: "streak_d1" | "streak_d3";
+      type: StreakEmailType;
     }
     const candidates: StreakCandidate[] = [];
 
-    emailUsersSnapshot.docs.forEach((doc: any) => {
-      const data = doc.data();
+    docsByUid.forEach((data, uid) => {
       const email: string | null = data.email ?? null;
       if (!email) return;
 
       // Respect opt-out: only an explicit `false` disables streak emails.
       if (data.emailNotifications?.streakReminders === false) return;
 
-      const lastReportDateStr = data.statistics?.lastReportDate;
-      if (!lastReportDateStr) return;
-
-      const lastReportDate = new Date(lastReportDateStr);
-      if (isNaN(lastReportDate.getTime())) return;
-      lastReportDate.setHours(0, 0, 0, 0);
-
-      const diffDays = diffInDays(today, lastReportDate);
-      if (diffDays !== 1 && diffDays !== 3) return;
+      const target = evaluateStreakReminder(data.statistics, now);
+      if (!target) return;
 
       candidates.push({
-        uid: doc.id,
+        uid,
         email,
         displayName: data.displayName ?? "",
-        streakDays: data.statistics?.actualDayWithoutBreak ?? 0,
-        variant: diffDays === 1 ? "d1" : "d3",
-        type: diffDays === 1 ? "streak_d1" : "streak_d3",
+        streakDays: target.streakDays,
+        hoursLeft: target.hoursLeft,
+        variant: target.variant,
+        type: target.type,
       });
     });
 
@@ -237,7 +258,7 @@ export default async function handler(
 
     interface StreakJob {
       uid: string;
-      type: "streak_d1" | "streak_d3";
+      type: StreakEmailType;
       run: () => Promise<unknown>;
     }
     const jobs: StreakJob[] = [];
@@ -256,13 +277,14 @@ export default async function handler(
             to: c.email,
             userName: c.displayName,
             streakDays: c.streakDays,
+            hoursLeft: c.hoursLeft,
             variant: c.variant,
           }),
       });
     });
 
     const settled = await sendThrottled(jobs, (j) => j.run());
-    const succeeded: { uid: string; type: "streak_d1" | "streak_d3" }[] = [];
+    const succeeded: { uid: string; type: StreakEmailType }[] = [];
     settled.forEach((r, idx) => {
       if (r.status === "fulfilled") {
         streakSent += 1;
@@ -280,7 +302,7 @@ export default async function handler(
   }
 
   // ── 3. Season emails on day 1 of month ────────────────────────────────────
-  if (today.getDate() === 1) {
+  if (isDailyBlockHour && today.getDate() === 1) {
     const prevDate = new Date(year, today.getMonth() - 1, 1);
     const prevSeasonId = `${prevDate.getFullYear()}-${String(
       prevDate.getMonth() + 1
@@ -393,7 +415,7 @@ export default async function handler(
   }
 
   // ── 4. Season ending soon (7 days before end of current season) ──────────
-  if (daysLeftInSeason === 7) {
+  if (isDailyBlockHour && daysLeftInSeason === 7) {
     try {
       const currentParticipants = await getSeasonParticipants(currentSeasonId);
       const cooldowns = await fetchCooldownsMap(
@@ -442,6 +464,8 @@ export default async function handler(
   }
 
   return res.status(200).json({
+    hourUtc: currentHourUtc,
+    ranDailyBlocks: isDailyBlockHour,
     pushSent,
     pushFailed,
     streakSent,

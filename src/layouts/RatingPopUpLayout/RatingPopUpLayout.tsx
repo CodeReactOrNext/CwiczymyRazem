@@ -2,11 +2,12 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { HeroPattern } from "components/UI/HeroBanner";
+import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Brain, Ear, Flame, Hand, Moon, Music, RotateCcw, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
 import Router from "next/router";
 import { useMemo } from "react";
 import {
@@ -25,6 +26,10 @@ import { useRatingPopUp } from "./hooks/useRatingPopUp";
 
 const MIN = 60 * 1000;
 const DAILY_GOAL_MIN = 30; // goal line on the weekly chart
+// Time points are floor(ms × TIME_POINTS_VALUE), so this is the practice time the
+// *first* point actually costs (~3min). Derived from the rate in
+// constants/ratingValue so the "no points" screen can never quote a stale number.
+const FIRST_POINT_MS = Math.ceil(1 / TIME_POINTS_VALUE);
 
 type ActivityDay = {
   date: string;
@@ -46,6 +51,14 @@ const CATS: { key: CatKey; label: string; field: keyof ActivityDay; Icon: typeof
 const CAT_BY_KEY = Object.fromEntries(CATS.map((c) => [c.key, c]));
 
 const fmtMin = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}min` : `${m}min`);
+// Sub-minute precision — the no-points screen quotes sessions that fmtMin would
+// flatten to a confusing "0min".
+const fmtShort = (ms: number) => {
+  const totalSec = Math.round(ms / 1000);
+  if (totalSec < 60) return `${totalSec}s`;
+  const sec = totalSec % 60;
+  return sec > 0 ? `${Math.floor(totalSec / 60)}min ${sec}s` : `${Math.floor(totalSec / 60)}min`;
+};
 const prettify = (id: string) => id.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 const dayStr = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -130,6 +143,9 @@ const RatingPopUpLayout = ({
   const skillGains = Object.entries(ratingData.skillPointsGained ?? {}).filter(([, v]) => v > 0);
 
   const sessionTimeMs = ratingData.bonusPoints?.time ?? 0;
+  // How close the session got to the first point — shown on the no-points screen
+  // so "0" reads as "not yet", not as a bug.
+  const firstPointPct = Math.min(100, Math.round((sessionTimeMs / FIRST_POINT_MS) * 100));
 
   // weekly chart — last 7 calendar days.
   // Timezone-safe: every report instant is bucketed by its *local* calendar day
@@ -244,21 +260,65 @@ const RatingPopUpLayout = ({
       </Card>
 
       {isRest ? (
-        /* ── Rest-day hero ── */
+        /* ── No-points hero ──
+           The session was too short to earn anything. Say that outright and name
+           the threshold — a silent "0" reads like a scoring bug, not a rule. */
         <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-16 text-center md:px-10">
           <HeroPattern className="opacity-[0.03]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
-          <div className="relative flex flex-col items-center gap-4">
+          <div className="relative flex flex-col items-center gap-5">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 text-zinc-400">
-              <Moon className="h-7 w-7" />
+              <Timer className="h-7 w-7" />
             </div>
-            <p className="text-xl font-semibold text-zinc-100">Rest day</p>
-            <p className="max-w-sm text-sm leading-relaxed text-zinc-400">
-              Recovery counts too — your {streak}-day streak is safe. Come back tomorrow for more points.
+
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-xl font-semibold text-zinc-100">No points this time</p>
+              <p className="max-w-md text-sm leading-relaxed text-zinc-400">
+                You practised {fmtShort(sessionTimeMs)} — too short to score. Points start at{" "}
+                {fmtMin(Math.round(FIRST_POINT_MS / MIN))} of practice, so this session added nothing to your total.
+              </p>
+            </div>
+
+            {/* progress toward the first point */}
+            <div className="mt-2 w-full max-w-xs">
+              <div className="mb-2 flex items-baseline justify-between text-xs">
+                <span className="font-medium text-zinc-400">Next point</span>
+                <span className="font-semibold tabular-nums text-zinc-400">
+                  {fmtShort(sessionTimeMs)} / {fmtMin(Math.round(FIRST_POINT_MS / MIN))}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                <motion.div
+                  className="h-full rounded-full bg-cyan-500/50"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${firstPointPct}%` }}
+                  transition={{ delay: 0.3, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+            </div>
+
+            <p className="max-w-md text-xs leading-relaxed text-zinc-500">
+              The session was still logged — your {streak}-day streak is safe.
             </p>
-            <Button onClick={handleContinue} className="mt-2 gap-2 bg-white font-semibold text-zinc-950 hover:bg-zinc-200">
-              Back to dashboard
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Button>
+
+            <div className="mt-2 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+              {onRestart && (
+                <Button
+                  variant="ghost"
+                  onClick={onRestart}
+                  className="w-full gap-2 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden />
+                  Practise a bit more
+                </Button>
+              )}
+              <Button
+                onClick={handleContinue}
+                className="w-full gap-2 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
+              >
+                Back to dashboard
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </div>
           </div>
         </div>
       ) : (

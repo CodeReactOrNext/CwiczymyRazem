@@ -7,70 +7,84 @@ export const precisionBendingDrillExercise: Exercise = {
   whyItMatters: "This exercise gives you total control over string tension during sustained bends and releases. You will learn to hold bent notes perfectly in tune and guide them back down smoothly without any abrupt noise.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 2.5,
+  timeInMinutes: 1.5,
   instructions: [
-    "Bend the string smoothly to reach the exact target pitch with perfect intonation.",
+    "Play the reference note first, then take a full half note to bend up and settle on that exact pitch.",
     "Maintain steady finger pressure and hand stability at the peak of the bend.",
-    "Listen carefully to match the pitch perfectly with the underlying harmony."
+    "Use the rest bars to let the string ring out, judge your intonation, and relax your hand completely."
   ],
   tips: [
     "Support the bending finger with adjacent fingers on the same string for maximum strength.",
     "Rotate your wrist and forearm upward to execute the bend rather than pushing with fingers alone.",
-    "Keep idle strings muted with your picking hand palm to prevent unwanted noise."
+    "If your hand starts to ache, stop and come back later — bending strength builds over weeks, not minutes."
   ],
   metronomeSpeed: {
-    min: 50,
-    max: 80,
-    recommended: 60,
+    min: 44,
+    max: 72,
+    recommended: 56,
   },
   relatedSkills: ["bending"],
   tablature: [
-    // Bar 1: reference note then bend, ×4
+    // Bar 1: reference note (half), then a half note to bend up and settle on it
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
+        { duration: 2, notes: [{ string: 2, fret: 9 }] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
       ],
     },
-    // Bar 2: same — more repetition, nail the intonation
+    // Bar 2: full bar of rest — let the bend ring, judge it, unclench the hand
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 9 }] },
-        { duration: 0.5, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
+        { duration: 4, notes: [] },
       ],
     },
-    // Bar 3: bend and release — no reference, trust your ear
+    // Bar 3: same reference-then-bend pair
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 1, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
+        { duration: 2, notes: [{ string: 2, fret: 9 }] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
       ],
     },
-    // Bar 4: bend and release — same, longer hold implied by quarter-note durations
+    // Bar 4: rest
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 1, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
-        { duration: 1, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
+        { duration: 4, notes: [] },
+      ],
+    },
+    // Bar 5: bend and slow release — no reference, trust your ear
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
+      ],
+    },
+    // Bar 6: unbent note — checks the release actually landed back at pitch
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 1, notes: [{ string: 2, fret: 7 }] },
+        { duration: 3, notes: [] },
+      ],
+    },
+    // Bar 7: bend and slow release again
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 7, isBend: true, bendSemitones: 2 }] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isRelease: true, bendSemitones: 2 }] },
+      ],
+    },
+    // Bar 8: unbent note, then rest before the loop restarts
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 1, notes: [{ string: 2, fret: 7 }] },
+        { duration: 3, notes: [] },
       ],
     },
   ],

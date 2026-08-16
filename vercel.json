@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/cron/notifications",
-      "schedule": "0 10 * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/support-ask-update",

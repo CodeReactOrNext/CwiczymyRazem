@@ -12,6 +12,7 @@ import {
   sendStreakReminderEmail,
   sendWelcomeEmail,
 } from "lib/email/send";
+import { evaluateStreakReminder } from "lib/email/streakCandidate";
 import { sendThrottled } from "lib/email/throttle";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
@@ -125,12 +126,25 @@ async function getSeasonParticipants(seasonId: string): Promise<RankedParticipan
     .filter((p) => !!p.email);
 }
 
+/**
+ * Preview of who the cron would mail. Shares `evaluateStreakReminder` with it so
+ * this screen can never disagree with what actually goes out — including the
+ * streak number, which comes from the app's activity-log-derived `streakDays`
+ * rather than the drift-prone `actualDayWithoutBreak` counter.
+ *
+ * Unlike the cron this scans every user regardless of their reminder hour: an
+ * admin looking at the list wants the whole cohort, not the current bucket.
+ */
 async function getStreakCandidates(diffTarget: 1 | 3): Promise<
-  { uid: string; email: string; displayName: string; streakDays: number }[]
+  {
+    uid: string;
+    email: string;
+    displayName: string;
+    streakDays: number;
+    hoursLeft: number | null;
+  }[]
 > {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  const now = new Date();
   const snap = await firestore.collection("users").where("email", "!=", null).get();
 
   const list: {
@@ -138,29 +152,22 @@ async function getStreakCandidates(diffTarget: 1 | 3): Promise<
     email: string;
     displayName: string;
     streakDays: number;
+    hoursLeft: number | null;
   }[] = [];
   snap.docs.forEach((doc: any) => {
     const data = doc.data();
     const email: string | undefined = data.email;
     if (!email) return;
 
-    const lastReportDateStr = data.statistics?.lastReportDate;
-    if (!lastReportDateStr) return;
-
-    const lastReportDate = new Date(lastReportDateStr);
-    if (isNaN(lastReportDate.getTime())) return;
-    lastReportDate.setHours(0, 0, 0, 0);
-
-    const diffDays = Math.ceil(
-      Math.abs(today.getTime() - lastReportDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    if (diffDays !== diffTarget) return;
+    const target = evaluateStreakReminder(data.statistics, now);
+    if (!target || target.daysSincePractice !== diffTarget) return;
 
     list.push({
       uid: doc.id,
       email,
       displayName: data.displayName ?? "",
-      streakDays: data.statistics?.actualDayWithoutBreak ?? 0,
+      streakDays: target.streakDays,
+      hoursLeft: target.hoursLeft,
     });
   });
 
@@ -188,7 +195,7 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         uid: u.uid,
         email: u.email,
         displayName: u.displayName,
-        extras: { streakDays: u.streakDays },
+        extras: { streakDays: u.streakDays, hoursLeft: u.hoursLeft },
       })),
       cooldownExcluded: excluded,
       description: `Users whose last practice was exactly ${diff} day${diff > 1 ? "s" : ""} ago.`,
@@ -320,10 +327,12 @@ async function sendOne(
   if (type === "streak_d1" || type === "streak_d3") {
     const variant = type === "streak_d1" ? "d1" : "d3";
     const streakDays = Number(recipient.extras?.streakDays ?? 0);
+    const rawHoursLeft = recipient.extras?.hoursLeft;
     await sendStreakReminderEmail({
       to: recipient.email,
       userName: recipient.displayName,
       streakDays,
+      hoursLeft: typeof rawHoursLeft === "number" ? rawHoursLeft : null,
       variant,
     });
     return;

@@ -20,6 +20,8 @@ Every month the community picks **five songs**, and everyone tries to record the
 
 While one board is live, the next one is being decided. You nominate songs you'd like to see, and back the nominations you like the look of.
 
+Don't recognise a nomination? Click it. The song opens with a player, so you can listen first and vote from the same place if you like what you hear.
+
 <Checklist items="Nominate::Put a song forward for next month's board|Vote::You get 5 votes per cycle to spread across the nominations|Top five wins::The five most-backed songs become next month's board|Nothing is wasted::A song that keeps missing out stays in the running for a while before it's cleared out" />
 
 ## The archive

@@ -6,7 +6,7 @@ import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getStreakFromActivityLog } from 'utils/gameLogic';
+import { getClientReportContext } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
 
@@ -97,14 +97,8 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           ...(exerciseRecords && { exerciseRecords }),
           ...(micPerformance && { micPerformance }),
           ...(earTrainingPerformance && { earTrainingPerformance }),
-          clientTodayISO: (() => {
-            const d = new Date();
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          })(),
-          clientNowISO: new Date().toISOString(),
-          clientDisplayStreak: getStreakFromActivityLog(
-            ((reportList as any[]) ?? []).map((report) => report.date),
-            { includeToday: true }
+          ...getClientReportContext(
+            ((reportList as any[]) ?? []).map((report) => report.date)
           ),
         };
 

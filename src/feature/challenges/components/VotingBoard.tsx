@@ -12,6 +12,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { SongPreviewDialog } from "feature/challenges/components/SongPreviewDialog";
 import { useChallengeMutations } from "feature/challenges/hooks/useChallenges";
 import type { ChallengeNomination } from "feature/challenges/types/challenge.types";
 import {
@@ -29,7 +30,7 @@ import {
 import { SongPickerPanel } from "feature/songs/components/Playlists/SongPickerPanel";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ChevronUp, Music, Plus, Vote } from "lucide-react";
+import { ChevronUp, Music, Play, Plus, Vote } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -53,6 +54,7 @@ interface NominationRowProps {
   canVote: boolean;
   isQualifying: boolean;
   onToggleVote: () => void;
+  onPreview: () => void;
 }
 
 const NominationRow = ({
@@ -62,6 +64,7 @@ const NominationRow = ({
   canVote,
   isQualifying,
   onToggleVote,
+  onPreview,
 }: NominationRowProps) => {
   const tier = getSongTier(
     (nomination.avgDifficulty ?? 0) === 0
@@ -72,9 +75,22 @@ const NominationRow = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors sm:px-3",
-        isQualifying ? "bg-amber-400/[0.06]" : "bg-white/[0.02]",
+        "group relative flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors sm:px-3",
+        isQualifying
+          ? "bg-amber-400/[0.06] hover:bg-amber-400/[0.12]"
+          : "bg-white/[0.02] hover:bg-white/[0.06]",
       )}>
+      {/* Whole row opens the song so you can hear it before spending a vote.
+          Everything already interactive sits above it on the z-axis. */}
+      <button
+        type='button'
+        onClick={onPreview}
+        className='absolute inset-0 rounded-lg'>
+        <span className='sr-only'>
+          Listen to {nomination.title} by {nomination.artist}
+        </span>
+      </button>
+
       <span
         className={cn(
           "w-8 shrink-0 text-center text-2xl font-black tabular-nums leading-none sm:w-10",
@@ -85,7 +101,7 @@ const NominationRow = ({
         {index + 1}
       </span>
 
-      <div className='h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
+      <div className='pointer-events-none relative h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
         {nomination.coverUrl ? (
           <img
             src={nomination.coverUrl}
@@ -97,6 +113,9 @@ const NominationRow = ({
             <Music className='h-4 w-4' />
           </div>
         )}
+        <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+          <Play className='h-4 w-4 fill-current' />
+        </span>
       </div>
 
       <div className='min-w-0 flex-1'>
@@ -109,7 +128,7 @@ const NominationRow = ({
           <UserTooltip userId={nomination.nominatedBy}>
             <Link
               href={`/user/${nomination.nominatedBy}`}
-              className='hover:text-zinc-300'>
+              className='relative z-10 hover:text-zinc-300'>
               put up by {nomination.nominatedByName}
             </Link>
           </UserTooltip>
@@ -130,7 +149,7 @@ const NominationRow = ({
             disabled={!hasVoted && !canVote}
             aria-pressed={hasVoted}
             className={cn(
-              "flex h-11 w-14 shrink-0 flex-col items-center justify-center rounded-lg text-xs font-bold transition-all active:scale-95",
+              "relative z-10 flex h-11 w-14 shrink-0 flex-col items-center justify-center rounded-lg text-xs font-bold transition-all active:scale-95",
               hasVoted
                 ? "bg-amber-400/15 text-amber-300 hover:bg-amber-400/25"
                 : canVote
@@ -174,6 +193,7 @@ export const VotingBoard = ({
   userName,
 }: VotingBoardProps) => {
   const [isNominateOpen, setIsNominateOpen] = useState(false);
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const { nominate, isNominating, toggleVote } = useChallengeMutations();
 
   const ballotId = votingChallengeId();
@@ -183,6 +203,12 @@ export const VotingBoard = ({
     () => new Set(nominations.map((n) => n.songId)),
     [nominations],
   );
+
+  // Tracked by id, not by value, so the preview's vote button keeps up with the
+  // refetch that follows a vote.
+  const preview = nominations.find((n) => n.id === previewId) ?? null;
+  const previewHasVoted =
+    !!currentUserId && (preview?.voters ?? []).some((v) => v.id === currentUserId);
 
   const handleToggleVote = (nomination: ChallengeNomination) => {
     if (!currentUserId) return;
@@ -279,11 +305,27 @@ export const VotingBoard = ({
                 canVote={!!currentUserId && votesLeft > 0}
                 isQualifying={index < CHALLENGE_SONG_COUNT}
                 onToggleVote={() => handleToggleVote(nomination)}
+                onPreview={() => setPreviewId(nomination.id)}
               />
             </div>
           ))}
         </div>
       )}
+
+      <SongPreviewDialog
+        song={preview}
+        onClose={() => setPreviewId(null)}
+        vote={
+          preview
+            ? {
+                count: preview.voteCount ?? 0,
+                hasVoted: previewHasVoted,
+                canVote: !!currentUserId && votesLeft > 0,
+                onToggle: () => handleToggleVote(preview),
+              }
+            : undefined
+        }
+      />
 
       <Dialog open={isNominateOpen} onOpenChange={setIsNominateOpen}>
         <DialogContent className='flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[560px] sm:max-w-lg sm:rounded-2xl'>

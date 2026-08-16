@@ -37,6 +37,19 @@ export const firebaseUpdateUserStats = async (
     "statistics.actualDayWithoutBreak": statistics.actualDayWithoutBreak,
     "statistics.achievements": statistics.achievements,
     "statistics.lastReportDate": statistics.lastReportDate,
+    // Denormalized streak state the reminder cron reads instead of re-deriving
+    // it from a UTC clock it has no business trusting. Each is written only when
+    // present, so a report that carries no timezone leaves the stored one alone.
+    ...(statistics.streakDays !== undefined && {
+      "statistics.streakDays": statistics.streakDays,
+    }),
+    ...(statistics.lastPracticeLocalDay && {
+      "statistics.lastPracticeLocalDay": statistics.lastPracticeLocalDay,
+    }),
+    ...(statistics.timeZone && { "statistics.timeZone": statistics.timeZone }),
+    ...(statistics.reminderHourUtc !== undefined && {
+      "statistics.reminderHourUtc": statistics.reminderHourUtc,
+    }),
     "skills": statistics.skills,
     ...(fameEarned > 0 && { "statistics.fame": increment(fameEarned) }),
     ...(fameDay && { "statistics.fameDay": fameDay }),

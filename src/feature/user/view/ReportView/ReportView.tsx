@@ -46,7 +46,7 @@ import {
   getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
-import { getDailyStreakMultiplier, getStreakFromActivityLog } from "utils/gameLogic";
+import { getClientReportContext, getDailyStreakMultiplier } from "utils/gameLogic";
 import { resolveInternalPath } from "utils/resolveInternalPath";
 import { i18n } from "utils/translation";
 
@@ -369,11 +369,8 @@ const ReportView = () => {
       songId: primarySong?.songId,
       songTitle: primarySong?.songTitle,
       songArtist: primarySong?.songArtist,
-      clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
-      clientNowISO: new Date().toISOString(),
-      clientDisplayStreak: getStreakFromActivityLog(
-        (reportList ?? []).map((report: { date: Date | string }) => report.date),
-        { includeToday: true }
+      ...getClientReportContext(
+        (reportList ?? []).map((report: { date: Date | string }) => report.date)
       ),
     };
 

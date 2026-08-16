@@ -50,6 +50,7 @@ export interface ReportFormikInterface {
   clientTodayISO?: string;
   clientNowISO?: string;
   clientDisplayStreak?: number;
+  clientTimeZone?: string;
 }
 
 export interface ReportDataInterface {

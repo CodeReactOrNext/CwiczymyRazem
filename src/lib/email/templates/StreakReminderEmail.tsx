@@ -19,6 +19,20 @@ interface StreakReminderEmailProps {
   timerUrl: string;
   logoUrl: string;
   variant: StreakEmailVariant;
+  /** Hours before the streak dies, in the reader's own timezone. */
+  hoursLeft?: number | null;
+}
+
+/**
+ * The deadline as the reader experiences it. "at midnight" is only technically
+ * true and reads as "hours away" to someone opening the mail in their evening,
+ * so a concrete hour count goes in whenever the timezone is known.
+ */
+export function formatHoursLeft(hoursLeft?: number | null): string {
+  if (typeof hoursLeft !== "number" || !Number.isFinite(hoursLeft) || hoursLeft <= 0) {
+    return "tonight";
+  }
+  return hoursLeft === 1 ? "in 1 hour" : `in ${hoursLeft} hours`;
 }
 
 const colors = {
@@ -183,17 +197,19 @@ export default function StreakReminderEmail({
   timerUrl,
   logoUrl,
   variant,
+  hoursLeft = null,
 }: StreakReminderEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
   const days = streakDays ?? 0;
   const isD1 = variant === "d1";
+  const deadline = formatHoursLeft(hoursLeft);
 
   const accentColor = isD1 ? colors.red : colors.gold;
   const accentBg = isD1 ? colors.redBg : colors.goldBg;
   const accentMuted = isD1 ? colors.redMuted : colors.goldMuted;
 
   const previewText = isD1
-    ? `🔥 Your ${days}-day streak ends at midnight — one session saves it`
+    ? `🔥 Your ${days}-day streak ends ${deadline} — one session saves it`
     : `Hey ${displayName}, it's been 3 days. Time to play something.`;
 
   return (
@@ -211,7 +227,7 @@ export default function StreakReminderEmail({
               <>
                 <Text style={eyebrow(accentColor)}>Streak at risk</Text>
                 <Heading style={heading}>
-                  {displayName}, your streak ends at midnight
+                  {displayName}, your streak ends {deadline}
                 </Heading>
                 <Text style={paragraph}>
                   You&apos;ve built something real. Don&apos;t let one missed day

@@ -6,6 +6,7 @@ import {
   FameIcon,
   PointsIcon,
 } from "feature/challenges/components/RewardIcons";
+import { SongPreviewDialog } from "feature/challenges/components/SongPreviewDialog";
 import { SubmissionsDialog } from "feature/challenges/components/SubmissionsDialog";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
 import type {
@@ -33,6 +34,7 @@ import {
   Check,
   Flag,
   Music,
+  Play,
   Swords,
   Trophy,
   Upload,
@@ -57,6 +59,7 @@ interface ChallengeRowProps {
   songSubmissions: ChallengeSubmission[];
   onSubmit: () => void;
   onOpenRuns: () => void;
+  onOpenSong: () => void;
 }
 
 const ChallengeRow = ({
@@ -69,6 +72,7 @@ const ChallengeRow = ({
   songSubmissions,
   onSubmit,
   onOpenRuns,
+  onOpenSong,
 }: ChallengeRowProps) => {
   const tier = getSongTier(
     (song.avgDifficulty ?? 0) === 0
@@ -124,10 +128,21 @@ const ChallengeRow = ({
       {/* Station */}
       <div
         className={cn(
-          "my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-3 rounded-lg bg-white/[0.02] px-2 py-2.5 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
+          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-3 rounded-lg bg-white/[0.02] px-2 py-2.5 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
           isCleared && "opacity-80 group-hover:opacity-100",
         )}>
-        <div className='h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
+        {/* The station itself opens the song — everything already interactive
+            sits above it on the z-axis. */}
+        <button
+          type='button'
+          onClick={onOpenSong}
+          className='absolute inset-0 rounded-lg'>
+          <span className='sr-only'>
+            Listen to {song.title} by {song.artist}
+          </span>
+        </button>
+
+        <div className='pointer-events-none relative h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
           {song.coverUrl ? (
             <img
               src={song.coverUrl}
@@ -139,6 +154,9 @@ const ChallengeRow = ({
               <Music className='h-4 w-4' />
             </div>
           )}
+          <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+            <Play className='h-4 w-4 fill-current' />
+          </span>
         </div>
 
         <div className='min-w-0 flex-1'>
@@ -162,7 +180,7 @@ const ChallengeRow = ({
           type='button'
           onClick={onOpenRuns}
           className={cn(
-            "flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 text-xs font-bold transition-colors",
+            "relative z-10 flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 text-xs font-bold transition-colors",
             runCount > 0
               ? "text-zinc-300 hover:bg-white/10 hover:text-white"
               : "text-zinc-600 hover:bg-white/5",
@@ -196,7 +214,7 @@ const ChallengeRow = ({
             disabled={isLocked}
             onClick={onSubmit}
             className={cn(
-              "h-8 shrink-0 px-3 text-xs font-bold",
+              "relative z-10 h-8 shrink-0 px-3 text-xs font-bold",
               isLocked
                 ? "text-zinc-600"
                 : "bg-white/5 text-zinc-200 hover:bg-white/10 hover:text-white",
@@ -220,6 +238,7 @@ export const ChallengeBoard = ({
 }: ChallengeBoardProps) => {
   const [submitSong, setSubmitSong] = useState<ChallengeSong | null>(null);
   const [runsSong, setRunsSong] = useState<ChallengeSong | null>(null);
+  const [previewSong, setPreviewSong] = useState<ChallengeSong | null>(null);
 
   const isLive = isChallengeLive(challenge.id);
   const daysLeft = daysLeftInChallenge(challenge.id);
@@ -382,6 +401,7 @@ export const ChallengeBoard = ({
               songSubmissions={bySong.get(song.songId) ?? []}
               onSubmit={() => setSubmitSong(song)}
               onOpenRuns={() => setRunsSong(song)}
+              onOpenSong={() => setPreviewSong(song)}
             />
           ))}
 
@@ -450,6 +470,11 @@ export const ChallengeBoard = ({
         isFinalSong={clearedCount === songs.length - 1}
         paysReward={isLive}
         onClose={() => setSubmitSong(null)}
+      />
+
+      <SongPreviewDialog
+        song={previewSong}
+        onClose={() => setPreviewSong(null)}
       />
 
       <SubmissionsDialog

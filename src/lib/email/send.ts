@@ -3,6 +3,7 @@ import SeasonEndingSoonEmail from "./templates/SeasonEndingSoonEmail";
 import SeasonResultsEmail from "./templates/SeasonResultsEmail";
 import SeasonStartEmail from "./templates/SeasonStartEmail";
 import StreakReminderEmail, {
+  formatHoursLeft,
   type StreakEmailVariant,
 } from "./templates/StreakReminderEmail";
 import WelcomeEmail from "./templates/WelcomeEmail";
@@ -43,6 +44,12 @@ interface SendStreakReminderArgs {
   to: string;
   userName?: string | null;
   streakDays: number;
+  /**
+   * Hours before the streak actually dies, in the recipient's own timezone.
+   * Null when their zone is unknown — the copy then falls back to "tonight"
+   * rather than quoting a deadline computed from the server's clock.
+   */
+  hoursLeft?: number | null;
   variant: StreakEmailVariant;
 }
 
@@ -50,6 +57,7 @@ export async function sendStreakReminderEmail({
   to,
   userName,
   streakDays,
+  hoursLeft = null,
   variant,
 }: SendStreakReminderArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
@@ -57,8 +65,9 @@ export async function sendStreakReminderEmail({
     process.env.EMAIL_LOGO_URL ??
     "https://riff.quest/images/longlightlogo.png";
 
+  const deadline = formatHoursLeft(hoursLeft);
   const subjects: Record<StreakEmailVariant, string> = {
-    d1: `Your ${streakDays}-day streak ends tonight — practice now`,
+    d1: `Your ${streakDays}-day streak ends ${deadline} — practice now`,
     d3: "It's been 3 days. Time to pick up the guitar again",
   };
 
@@ -69,6 +78,7 @@ export async function sendStreakReminderEmail({
     react: StreakReminderEmail({
       userName: userName ?? "",
       streakDays,
+      hoursLeft,
       timerUrl: `${baseUrl}/dashboard`,
       logoUrl,
       variant,

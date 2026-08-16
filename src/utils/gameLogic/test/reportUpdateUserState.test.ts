@@ -4,19 +4,10 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getPointsToLvlUp } from "../getPointsToLvlUp";
 
 describe("reportHandler", () => {
   const currentUserStats: StatisticsDataInterface = statisticsInitial;
 
-  const updatedUserStats: StatisticsDataInterface = {
-    ...statisticsInitial,
-    currentLevelMaxPoints: getPointsToLvlUp(2),
-    dayWithoutBreak: 1,
-    lastReportDate: new Date(1998, 11, 19).toISOString(),
-    actualDayWithoutBreak: 1,
-    sessionCount: 1,
-  };
   const emptyInputData: ReportFormikInterface = {
     techniqueHours: "0",
     techniqueMinutes: " 0",
@@ -31,36 +22,6 @@ describe("reportHandler", () => {
     habbits: [],
     avatarUrl: null,
   };
-  const raitingData = {
-    totalPoints: 0,
-    reportDate: new Date(1998, 11, 19),
-    bonusPoints: {
-      streak: 1,
-      multiplier: 0,
-      habitsCount: 0,
-      additionalPoints: 0,
-      time: 0,
-      timePoints: 0,
-    },
-  };
-
-  const deafultExpectedDate = {
-    currentUserStats: updatedUserStats,
-    previousUserStats: currentUserStats,
-    raitingData: raitingData,
-    reportDate: new Date(1998, 11, 19),
-    isDateBackReport: 0,
-    timeSummary: {
-      techniqueTime: 0,
-      theoryTime: 0,
-      hearingTime: 0,
-      creativityTime: 0,
-      sumTime: 0,
-    },
-    newAchievements: [],
-    isNewLevel: false,
-  };
-
   beforeEach(() => {
     const date = new Date(1998, 11, 19);
     vi.useFakeTimers();
@@ -96,6 +57,89 @@ describe("reportHandler", () => {
       longestSession: false,
       maxStreak: true, // streak goes 0 → 1, which exceeds previous dayWithoutBreak of 0
       newLevel: false,
+    });
+  });
+
+  describe("denormalized streak state (read by the reminder cron)", () => {
+    const withClientContext = (
+      overrides: Partial<ReportFormikInterface> = {}
+    ): ReportFormikInterface => ({
+      ...emptyInputData,
+      clientTodayISO: "1998-12-19",
+      clientNowISO: new Date(Date.UTC(1998, 11, 19, 17, 0)).toISOString(),
+      clientTimeZone: "Europe/Warsaw",
+      ...overrides,
+    });
+
+    const run = (inputData: ReportFormikInterface) =>
+      reportUpdateUserStats({
+        currentUserStats,
+        inputData,
+        currentUserSongLists: { wantToLearn: [], learned: [], learning: [] },
+      });
+
+    it("persists the client's log-derived streak over the stored counter", () => {
+      // The reported bug: the counter drifted to 8 while the app showed 79.
+      const result = run(
+        withClientContext({ clientDisplayStreak: 79 })
+      );
+
+      expect(result.currentUserStats.streakDays).toBe(79);
+      // The legacy counter keeps its own (wrong) value — achievements read it,
+      // so healing it is a separate decision.
+      expect(result.currentUserStats.actualDayWithoutBreak).toBe(1);
+    });
+
+    it("falls back to the computed streak when the client sends nothing usable", () => {
+      expect(run(withClientContext()).currentUserStats.streakDays).toBe(1);
+      expect(
+        run(withClientContext({ clientDisplayStreak: -3 })).currentUserStats
+          .streakDays
+      ).toBe(1);
+      expect(
+        run(withClientContext({ clientDisplayStreak: 2.5 })).currentUserStats
+          .streakDays
+      ).toBe(1);
+    });
+
+    it("stores the practice day as the client's plain local day string", () => {
+      expect(run(withClientContext()).currentUserStats.lastPracticeLocalDay).toBe(
+        "1998-12-19"
+      );
+    });
+
+    it("schedules the reminder at the user's local evening", () => {
+      // Warsaw is UTC+1 in December, so 19:00 local is 18:00 UTC.
+      const result = run(withClientContext());
+
+      expect(result.currentUserStats.timeZone).toBe("Europe/Warsaw");
+      expect(result.currentUserStats.reminderHourUtc).toBe(18);
+    });
+
+    it("leaves the stored zone alone when the browser won't report one", () => {
+      const stats = {
+        ...currentUserStats,
+        timeZone: "America/New_York",
+        reminderHourUtc: 0,
+      };
+      const result = reportUpdateUserStats({
+        currentUserStats: stats,
+        inputData: withClientContext({ clientTimeZone: "Nowhere/Fake" }),
+        currentUserSongLists: { wantToLearn: [], learned: [], learning: [] },
+      });
+
+      expect(result.currentUserStats.timeZone).toBe("America/New_York");
+      expect(result.currentUserStats.reminderHourUtc).toBe(0);
+    });
+
+    it("ignores the client streak on a back-dated report", () => {
+      // The client's log has no entry for the day being filed, so its walk would
+      // undercount — the server's own streak stands.
+      const result = run(
+        withClientContext({ countBackDays: 3, clientDisplayStreak: 79 })
+      );
+
+      expect(result.currentUserStats.streakDays).toBe(0);
     });
   });
 

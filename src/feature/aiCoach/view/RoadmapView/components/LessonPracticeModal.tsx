@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { DailyQuestTaskType } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
-import { getStreakFromActivityLog } from "utils/gameLogic";
+import { getClientReportContext } from "utils/gameLogic";
 
 const SKILL_OPTIONS: { id: SkillsType; label: string; Icon: typeof MdSchool }[] = [
   { id: "technique", label: "Technique", Icon: IoMdHand },
@@ -118,11 +118,8 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
       countBackDays: 0,
       reportTitle: `Lesson: ${lesson.title}`,
       avatarUrl: userAvatar ?? null,
-      clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
-      clientNowISO: new Date().toISOString(),
-      clientDisplayStreak: getStreakFromActivityLog(
-        ((reportList as any[]) ?? []).map((report) => report.date),
-        { includeToday: true }
+      ...getClientReportContext(
+        ((reportList as any[]) ?? []).map((report) => report.date)
       ),
     };
 

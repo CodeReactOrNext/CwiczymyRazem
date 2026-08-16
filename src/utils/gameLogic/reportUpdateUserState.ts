@@ -1,3 +1,4 @@
+import { STREAK_REMINDER_LOCAL_HOUR } from "constants/streakReminder";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -11,6 +12,7 @@ import {
   levelUpUser,
   makeRatingData,
 } from "./index";
+import { getReminderHourUtc, isValidTimeZone } from "./localDay";
 
 interface updateUserStatsProps {
   currentUserStats: StatisticsDataInterface;
@@ -107,6 +109,34 @@ export const reportUpdateUserStats = ({
 
   const finalStreak = isDateBackReport ? backDateStreak : updatedActualDayWithoutBreak;
 
+  const finalLastReportDate = isDateBackReport
+    ? backDateLastReport
+    : clientToday.toISOString();
+
+  // `lastReportDate` is UTC-midnight of the reporter's *local* day, so its date
+  // part already IS that local day — no offset maths, nothing to re-interpret.
+  const lastPracticeLocalDay = finalLastReportDate.slice(0, 10);
+
+  // The stored counter can be pinned to the wrong calendar day by a single past
+  // timezone slip and never recovers; the client sends the streak it derived
+  // from the local-time activity log, which self-heals and is exactly what the
+  // UI renders (see getReconciledStreak). Persisting it lets the reminder cron
+  // and the Discord feed quote the app's number without loading any logs.
+  // Back-dated reports are excluded: the client's log predates the entry being
+  // filed, so its walk would miss the very day this report adds.
+  const clientStreak = inputData.clientDisplayStreak;
+  const streakDays =
+    !isDateBackReport &&
+    typeof clientStreak === "number" &&
+    Number.isInteger(clientStreak) &&
+    clientStreak >= 0
+      ? clientStreak
+      : finalStreak;
+
+  const timeZone = isValidTimeZone(inputData.clientTimeZone)
+    ? inputData.clientTimeZone
+    : null;
+
   const raiting = {
     ...(isDateBackReport
       ? makeRatingData(inputData, sumTime, 1, clientNow)
@@ -146,9 +176,19 @@ export const reportUpdateUserStats = ({
     maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: finalStreak,
     achievements: achievements,
-    lastReportDate: isDateBackReport
-      ? backDateLastReport
-      : clientToday.toISOString(),
+    lastReportDate: finalLastReportDate,
+    streakDays,
+    lastPracticeLocalDay,
+    // Absent zone leaves whatever was stored before untouched (spread above) —
+    // one browser that won't resolve `Intl` must not un-schedule the user.
+    ...(timeZone && {
+      timeZone,
+      reminderHourUtc: getReminderHourUtc(
+        timeZone,
+        STREAK_REMINDER_LOCAL_HOUR,
+        clientNow
+      ),
+    }),
     guitarStartDate: null
   };
 
