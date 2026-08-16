@@ -3,7 +3,10 @@ import {
   GUITARS_BY_ID,
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
-import { getSalvageableMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  getScrappedMods,
+} from "feature/arsenal/data/salvage";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
@@ -330,6 +333,7 @@ export const GuitarInventory = ({
             itemName={`${guitar.brand} ${guitar.name}`}
             parts={getGuitarScrapYield(item, guitar)}
             salvaged={getSalvageableMod(item, "guitar")}
+            scrapped={getScrappedMods(item, "guitar")}
             onConfirm={handleConfirmScrap}
             onCancel={closeScrapDialog}
             isLoading={isScrapping}

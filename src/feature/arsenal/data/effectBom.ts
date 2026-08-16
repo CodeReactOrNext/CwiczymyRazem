@@ -5,8 +5,9 @@ import type { EffectType, ScrapBom } from "../types/arsenal.types";
  * so the list comes from the effect *type* and only genuine exceptions get a
  * per-id override.
  *
- * Same rules as guitars: order is priority, not inventory, and a part the circuit
- * does not have is simply omitted — a fuzz is discrete, so it has no op-amp slot.
+ * Same rules as guitars: order is priority, not inventory, a part the circuit does
+ * not have is simply omitted — a fuzz is discrete, so it has no op-amp slot — and
+ * screws never take a slot, because `getScrewYield` pays them on top of the BOM.
  */
 
 export const EFFECT_BOM_BY_TYPE: Record<EffectType, ScrapBom> = {
@@ -43,7 +44,6 @@ export const EFFECT_BOM_BY_TYPE: Record<EffectType, ScrapBom> = {
     { partId: "opamp", qty: 2 },
     { partId: "enclosure", qty: 1 },
     { partId: "pot", qty: 1 },
-    { partId: "screws", qty: 1 },
   ],
   Reverb: [
     { partId: "opamp", qty: 2 },
@@ -86,7 +86,6 @@ export const EFFECT_BOM_BY_TYPE: Record<EffectType, ScrapBom> = {
   Tuner: [
     { partId: "opamp", qty: 1 },
     { partId: "enclosure", qty: 1 },
-    { partId: "screws", qty: 1 },
   ],
 };
 
@@ -97,7 +96,6 @@ export const EFFECT_BOM_OVERRIDES: Record<number, ScrapBom> = {
     { partId: "opamp", qty: 3 },
     { partId: "enclosure", qty: 1 },
     { partId: "pot", qty: 2 },
-    { partId: "screws", qty: 1 },
   ],
 };
 

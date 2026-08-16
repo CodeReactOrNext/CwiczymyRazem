@@ -12,6 +12,7 @@ import type {
   TablatureMeasure,
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
+import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
 import {
   beatsDurationInQuarters,
   isMeasureComplete,
@@ -1492,6 +1493,11 @@ export default function TabEditor() {
   );
   const incompleteCount = incompleteMeasures.filter(Boolean).length;
 
+  // An untouched grid is still a full set of measures, so the CTA leans on the
+  // notes: nothing written means the user is after an instruction-only
+  // exercise, not a tab they forgot to fill in.
+  const hasNotes = React.useMemo(() => hasTablatureNotes(measures), [measures]);
+
   const selectedMeasure = selectedCell
     ? measures[selectedCell.measureIdx]
     : undefined;
@@ -1765,7 +1771,13 @@ export default function TabEditor() {
                   );
                 }}
                 className='gap-2 bg-zinc-100 text-zinc-900 shadow-none hover:bg-zinc-200'>
-                <span>{editId ? "Save changes" : "Publish exercise"}</span>
+                <span>
+                  {editId
+                    ? "Save changes"
+                    : hasNotes
+                      ? "Publish exercise"
+                      : "Add exercise without tab"}
+                </span>
                 <LucideChevronsRight size={14} />
               </Button>
             </div>

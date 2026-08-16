@@ -12,6 +12,7 @@ import type {
   ExerciseCategory,
   TablatureMeasure,
 } from "feature/exercisePlan/types/exercise.types";
+import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
@@ -21,6 +22,7 @@ import {
   AlertCircle,
   Check,
   ChevronDown,
+  Compass,
   Globe,
   Lock,
   Plus,
@@ -167,6 +169,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
     });
   }, [editId]);
 
+  // Some exercises genuinely have no tab (they're driven by their steps alone),
+  // so an untouched grid from the editor is a valid submission — it's just
+  // stored as no tablature at all, which is what makes the session render the
+  // open-exercise panel instead of an empty tab.
+  const hasTab = hasTablatureNotes(tablature);
+
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!title.trim()) newErrors.title = "Title is required.";
@@ -177,9 +185,6 @@ const PublishExercisePage: NextPageWithLayout = () => {
       newErrors.bpm = "BPM range is invalid. Min must be lower than Max.";
     if (bpmRecommended < bpmMin || bpmRecommended > bpmMax)
       newErrors.bpm = "Recommended BPM must be between Min and Max.";
-    if (tablature.length === 0)
-      newErrors.tablature =
-        "No tablature data found. Go back to the Tab Editor and click Publish from there.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -203,7 +208,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
       timeInMinutes,
       instructions: instructions.filter((i) => i.trim()),
       tips: tips.filter((t) => t.trim()),
-      tablature,
+      tablature: hasTab ? tablature : [],
       isPublic,
     };
 
@@ -267,7 +272,6 @@ const PublishExercisePage: NextPageWithLayout = () => {
   // Live readiness checklist for the summary rail — mirrors validate() so the
   // user sees what's missing before hitting Publish instead of after.
   const checklist: { label: string; done: boolean }[] = [
-    { label: "Tablature loaded", done: tablature.length > 0 },
     { label: "Title", done: !!title.trim() },
     { label: "Description", done: !!description.trim() },
     {
@@ -370,8 +374,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
         <div className='grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start'>
           <div className='min-w-0 space-y-8'>
             {/* Tablature preview */}
-            <FormSection title='Tablature Preview'>
-              {tablature.length > 0 ? (
+            <FormSection title={hasTab ? "Tablature Preview" : "No Tablature"}>
+              {hasTab ? (
                 <div className='space-y-2'>
                   <div className='overflow-hidden rounded-lg'>
                     <TablatureViewer
@@ -388,19 +392,18 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   </p>
                 </div>
               ) : (
-                <div
-                  className={cn(
-                    "flex items-start gap-3 rounded-lg p-4",
-                    errors.tablature ? "bg-rose-500/5" : "bg-zinc-950/40",
-                  )}>
-                  <AlertCircle
-                    size={16}
-                    className='mt-0.5 shrink-0 text-rose-400'
-                  />
-                  <p className='text-sm text-zinc-400'>
-                    {errors.tablature ||
-                      "No tablature found. Please go back to the Tab Editor and click Publish from there."}
-                  </p>
+                <div className='flex items-start gap-3 rounded-lg bg-zinc-950/40 p-4'>
+                  <Compass size={16} className='mt-0.5 shrink-0 text-indigo-400' />
+                  <div className='space-y-1'>
+                    <p className='text-sm text-zinc-300'>
+                      This will be published as an open exercise.
+                    </p>
+                    <p className='text-xs leading-relaxed text-zinc-500'>
+                      Nothing was written in the Tab Editor, so players get the
+                      steps below instead of a tab. Go back and add notes if you
+                      wanted one.
+                    </p>
+                  </div>
                 </div>
               )}
             </FormSection>

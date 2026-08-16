@@ -12,6 +12,9 @@ import type { ScrapBom } from "../types/arsenal.types";
  * up simply has no slot. That, plus the differing slot order between archetypes,
  * is what keeps every model from yielding the same rows.
  *
+ * Screws never take a slot here. `getScrewYield` hands them out on top of whatever
+ * the BOM pays, so a screws entry only ever cost the archetype a real part.
+ *
  * The order also drives tier coverage: a part only ever reaches Legendary if it
  * sits in the first two slots of an archetype that exists at Legendary or Mythic.
  * `scrapYield.test.ts` asserts every part/tier pair stays reachable — reorder these
@@ -29,19 +32,36 @@ const STRAT: ScrapBom = [
 /**
  * Single-cut layout. No `neck` slot: these are set-neck builds, the neck is glued
  * into the body and cannot be salvaged.
+ *
+ * Four pots on the harness, and they sit in a routed control cavity behind a plate
+ * — the electronics come out before anything soldered into the body does, so the
+ * pots outrank the pickups here. They used to sit last, which put them a slot past
+ * anything but a Mythic; no single-cut in the roster is Mythic, so twenty guitars
+ * listed `pot ×2` and paid out exactly none.
+ *
+ * One pot, not the four the harness holds: a teardown recovers the one that comes
+ * off the board clean. Paying the full count made pots three times more abundant
+ * than the best-supplied structural part, which is screw territory, not filler.
  */
 const SINGLECUT: ScrapBom = [
   { partId: "body", qty: 1 },
   { partId: "bridge", qty: 1 },
+  { partId: "pot", qty: 1 },
   { partId: "pickup", qty: 2 },
-  { partId: "pot", qty: 2 },
 ];
 
-/** Two pickups, bolt-on neck — covers Telecaster, superstrat and seven-string. */
+/**
+ * Two pickups, bolt-on neck — covers Telecaster, superstrat and seven-string.
+ *
+ * The slot the pots took used to be a screws slot, which paid out nothing a
+ * teardown was not already handed on top of the BOM by `getScrewYield`. The bridge
+ * keeps the last slot it always had: it is this archetype's Unique part and the
+ * only thing a Mythic teardown of one is really after.
+ */
 const TWIN: ScrapBom = [
   { partId: "tuners", qty: 1 },
   { partId: "neck", qty: 1 },
-  { partId: "screws", qty: 1 },
+  { partId: "pot", qty: 1 },
   { partId: "bridge", qty: 1 },
 ];
 

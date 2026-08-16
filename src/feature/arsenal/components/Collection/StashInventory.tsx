@@ -26,6 +26,7 @@ import {
   canFitSalvagedMod,
   getSalvageableMod,
   getSalvagedModOptions,
+  getScrappedMods,
 } from "feature/arsenal/data/salvage";
 import {
   getEffectSubject,
@@ -1075,6 +1076,11 @@ export const StashInventory = ({
               guitar
                 ? getSalvageableMod(guitar.item, "guitar")
                 : getSalvageableMod(effect!.item, "effect")
+            }
+            scrapped={
+              guitar
+                ? getScrappedMods(guitar.item, "guitar")
+                : getScrappedMods(effect!.item, "effect")
             }
             onConfirm={confirmScrap}
             onCancel={cancel}

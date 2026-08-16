@@ -7,6 +7,7 @@ import {
   canFitSalvagedMod,
   getSalvageableMod,
   getSalvagedModOptions,
+  getScrappedMods,
   SALVAGE_POINT_LOSS,
   toSalvagedMod,
 } from "./salvage";
@@ -166,6 +167,66 @@ describe("getSalvageableMod", () => {
     )!;
     expect(mod.featureId).toBe("nos-opamp");
     expect(mod.kind).toBe("effect");
+  });
+});
+
+describe("getScrappedMods", () => {
+  const modded = {
+    id: "item-42",
+    features: [
+      feature("cts-pots", 3),
+      feature("hand-wound", 5),
+      feature("locking-tuners", 2),
+      feature("bone-nut", 1),
+    ],
+  };
+
+  it("returns nothing for an item with no mods", () => {
+    expect(getScrappedMods({ id: "a", features: [] }, "guitar")).toEqual([]);
+    expect(getScrappedMods({ id: "a" }, "guitar")).toEqual([]);
+  });
+
+  it("lists every fitted mod except the one that survives", () => {
+    const survivor = getSalvageableMod(modded, "guitar")!;
+    const burned = getScrappedMods(modded, "guitar");
+
+    expect(burned).toHaveLength(modded.features.length - 1);
+    expect(burned.map((m) => m.featureId)).not.toContain(survivor.featureId);
+  });
+
+  it("accounts for every mod exactly once between the two lists", () => {
+    const survivor = getSalvageableMod(modded, "guitar")!;
+    const seen = [
+      survivor.featureId,
+      ...getScrappedMods(modded, "guitar").map((m) => m.featureId),
+    ];
+    expect(new Set(seen)).toEqual(new Set(modded.features.map((f) => f.id)));
+  });
+
+  it("reports the points the mod carried on the instrument", () => {
+    const burned = getScrappedMods(modded, "guitar");
+    for (const mod of burned) {
+      const fitted = modded.features.find((f) => f.id === mod.featureId)!;
+      expect(mod.points).toBe(fitted.points);
+      expect(mod.label).toBe(getModDef("guitar", mod.featureId)!.label);
+    }
+  });
+
+  it("burns the lot when nothing can be rescued", () => {
+    // A pedal mod on a guitar resolves in neither pool, so no mod survives and
+    // the list must not quietly promise one back.
+    const item = { id: "item-9", features: [feature("no-such-mod", 4)] };
+    expect(getSalvageableMod(item, "guitar")).toBeNull();
+    expect(getScrappedMods(item, "guitar")).toEqual([]);
+  });
+
+  it("keeps the order the item stores its mods in", () => {
+    const survivor = getSalvageableMod(modded, "guitar")!;
+    expect(getScrappedMods(modded, "guitar").map((m) => m.featureId)).toEqual(
+      modded.features
+        .map((f) => f.id)
+        .filter((id) => id !== survivor.featureId),
+    );
   });
 });
 

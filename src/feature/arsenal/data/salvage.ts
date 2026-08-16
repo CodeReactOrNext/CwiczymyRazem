@@ -111,6 +111,40 @@ export const getSalvageableMod = (
   };
 };
 
+/** A mod the teardown burns, with what it was worth on the way in. */
+export interface ScrappedMod {
+  featureId: string;
+  label: string;
+  points: number;
+}
+
+/**
+ * The mods a teardown destroys — everything fitted except the one that survives.
+ *
+ * The confirm dialog already names the mod that comes off whole, which quietly
+ * implied it was the only one that mattered. On a Mythic carrying six of them the
+ * other five are the actual cost of the teardown, and they were never shown.
+ *
+ * Returned in the order the item stores them, so the list reads the same here as
+ * it does on the card the player just came from. Features the pool no longer
+ * knows are dropped rather than rendered as a raw id: `getSalvageableMod` already
+ * skips them, so naming them here would promise a rescue that cannot happen.
+ */
+export const getScrappedMods = (
+  item: { id: string; features?: ItemFeature[] },
+  kind: WorkshopKind,
+): ScrappedMod[] => {
+  const survivor = getSalvageableMod(item, kind)?.featureId ?? null;
+
+  return (item.features ?? []).flatMap((feature) => {
+    if (feature.id === survivor) return [];
+    const def = getModDef(kind, feature.id);
+    return def
+      ? [{ featureId: def.id, label: def.label, points: feature.points }]
+      : [];
+  });
+};
+
 /**
  * The stash entry a teardown writes. Keyed on the item it came off — that item
  * is gone by the time this is stored, so the id can never be handed out twice.

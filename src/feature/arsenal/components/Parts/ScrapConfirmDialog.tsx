@@ -8,7 +8,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
-import type { SalvageableMod } from "feature/arsenal/data/salvage";
+import type {
+  SalvageableMod,
+  ScrappedMod,
+} from "feature/arsenal/data/salvage";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { countScrapParts } from "feature/arsenal/utils/scrap";
 
@@ -22,6 +25,8 @@ interface ScrapConfirmDialogProps {
   parts: ScrapPart[];
   /** The one mod this teardown pulls out whole. Absent on an unmodded item. */
   salvaged?: SalvageableMod | null;
+  /** Every other fitted mod — these burn with the instrument. */
+  scrapped?: ScrappedMod[];
   onConfirm: () => void;
   onCancel: () => void;
   isLoading: boolean;
@@ -38,6 +43,7 @@ export const ScrapConfirmDialog = ({
   itemName,
   parts,
   salvaged,
+  scrapped = [],
   onConfirm,
   onCancel,
   isLoading,
@@ -84,6 +90,33 @@ export const ScrapConfirmDialog = ({
                   +{salvaged.points}
                 </span>
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* The other side of the same ledger, and the reason it sits last: the
+            parts and the blueprint are what the teardown pays, this is what it
+            costs. Dimmed art and zinc numbers rather than a warning colour — it
+            is a consequence to read, not an error to fix. */}
+        {scrapped.length > 0 && (
+          <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/50 p-4'>
+            <p className='text-xs text-zinc-400'>
+              {scrapped.length === 1
+                ? "This mod goes with it"
+                : `These ${scrapped.length} mods go with it`}
+            </p>
+            <div className='flex flex-col gap-2.5'>
+              {scrapped.map((mod) => (
+                <div key={mod.featureId} className='flex items-center gap-3'>
+                  <ModArt modId={mod.featureId} size={32} dimmed />
+                  <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
+                    {mod.label}
+                  </span>
+                  <span className='shrink-0 text-sm font-bold tabular-nums text-zinc-500'>
+                    +{mod.points}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}

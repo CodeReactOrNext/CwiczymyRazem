@@ -12,7 +12,10 @@ import {
   getItemFeatures,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
-import { getSalvageableMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  getScrappedMods,
+} from "feature/arsenal/data/salvage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
   countScrapParts,
@@ -22,6 +25,7 @@ import { Check, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
+import { ModArt } from "../Workshop/ModArt";
 
 // SVG noise rasterized once by the browser and cached as a bitmap — no runtime GPU cost
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -99,6 +103,7 @@ export const GuitarCard = ({
   const scrapParts = getGuitarScrapYield(item, guitar);
   const scrapTotal = countScrapParts(scrapParts);
   const salvagedMod = getSalvageableMod(item, "guitar");
+  const scrappedMods = getScrappedMods(item, "guitar");
 
   return (
     <div
@@ -414,6 +419,26 @@ export const GuitarCard = ({
                           {salvagedMod.label} +{salvagedMod.points} comes off
                           whole
                         </span>
+                      )}
+                      {/* Named, this ran to eleven mods on a loaded guitar and
+                          buried the yield above it. The plates say the same
+                          thing at a glance; the names stay for screen readers,
+                          which get nothing from `ModArt` — it is decorative. */}
+                      {scrappedMods.length > 0 && (
+                        <div className='flex flex-wrap items-center gap-1.5'>
+                          <span className='sr-only'>
+                            {scrappedMods.map((m) => m.label).join(", ")}{" "}
+                            {scrappedMods.length === 1 ? "goes" : "go"} with it
+                          </span>
+                          {scrappedMods.map((mod) => (
+                            <ModArt
+                              key={mod.featureId}
+                              modId={mod.featureId}
+                              size={24}
+                              dimmed
+                            />
+                          ))}
+                        </div>
                       )}
                     </div>
                   )}

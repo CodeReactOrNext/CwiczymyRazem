@@ -2,8 +2,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets
 import Avatar from "components/UI/Avatar";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import { countScrapParts, getEffectScrapYield, getGuitarScrapYield } from "feature/arsenal/utils/scrap";
-import { ShoppingCart, Tag, Wrench, X } from "lucide-react";
+import { ShoppingCart, Tag, Unplug, Wrench, X } from "lucide-react";
 import Link from "next/link";
 
 import type { EffectInventoryItem, InventoryItem, ScrapPart } from "../../types/arsenal.types";
@@ -12,6 +13,7 @@ import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { PartIcon } from "../Parts/PartIcon";
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
+import { ModArt } from "../Workshop/ModArt";
 
 interface MarketListingCardProps {
   listing: MarketplaceListing;
@@ -57,6 +59,10 @@ export const MarketListingCard = ({
 
   const scrapParts = getListingScrapYield(listing);
   const scrapTotal = countScrapParts(scrapParts);
+  // The mod a teardown of this instance would hand over. Picked by hashing the
+  // item's own id, so the buyer gets exactly the one advertised here — nothing
+  // is rolled at purchase.
+  const salvaged = getSalvageableMod(listing.item, listing.itemType);
 
   // Seller + price + action, rendered inside the card's own frame so the whole
   // thing reads as one trading card instead of a floating, detached badge.
@@ -104,6 +110,32 @@ export const MarketListingCard = ({
                 </span>
                 <ScrapYieldList parts={scrapParts} compact />
               </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {/* Sits under the scrap strip because it answers the same question one
+          step further on: that strip says what the instance breaks into, this
+          says what survives being broken. Purple is the blueprint colour the
+          scrap dialog and the bench already use for a rescued mod. */}
+      {salvaged && (
+        <TooltipProvider>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <div className="flex cursor-help items-center gap-2 text-purple-300/70 transition-colors hover:text-purple-300">
+                <Unplug size={13} strokeWidth={2.5} className="shrink-0" />
+                <ModArt modId={salvaged.featureId} size={24} />
+                <span className="min-w-0 truncate text-[11px] font-semibold">{salvaged.label}</span>
+                <span className="shrink-0 text-[11px] font-bold tabular-nums">+{salvaged.points}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[260px] border border-zinc-700 bg-zinc-950 text-white">
+              <span className="text-[11px] text-zinc-300">
+                Scrap this and {salvaged.label} comes off whole, worn down to +{salvaged.points} from +
+                {salvaged.pointsBefore}. It goes to the stash and fits onto another{" "}
+                {listing.itemType === "guitar" ? "guitar" : "pedal"} for free.
+              </span>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

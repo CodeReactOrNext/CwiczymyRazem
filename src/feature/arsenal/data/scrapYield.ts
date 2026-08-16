@@ -169,10 +169,11 @@ export const getScrapYield = ({
   }
 
   // Screws come off *everything*, so they are handed out on top of the BOM rather
-  // than competing for a slot in it. Only four BOMs in the game list them, which
-  // left screws scarcer than pickups — the exact opposite of what filler should be,
-  // and unusable as the workshop's entry-level ingredient. This also covers the
-  // defensive case of a BOM authored empty: a teardown always pays out something.
+  // than competing for a slot in it. No BOM lists them any more: a screws slot paid
+  // out nothing this line does not already pay, while costing the archetype a real
+  // part — the merge below is what is left of that, and it keeps a re-added screws
+  // entry from reading as a second row. This also covers the defensive case of a
+  // BOM authored empty: a teardown always pays out something.
   const bonus = getScrewYield(rarity);
   const screwRow = parts.find((p) => p.partId === "screws");
   if (screwRow) screwRow.qty += bonus;

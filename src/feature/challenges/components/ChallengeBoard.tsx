@@ -202,10 +202,12 @@ const ChallengeRow = ({
           {tier.tier}
         </span>
 
+        {/* Both states share one width so the tier badges line up in a column
+            instead of zig-zagging with the label length. */}
         {isCleared ? (
-          <span className='flex shrink-0 items-center gap-1.5 rounded-lg bg-green-500/10 px-3 py-1.5 text-xs font-bold text-green-400'>
+          <span className='flex h-8 w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-500/10 text-xs font-bold text-green-400'>
             <Check className='h-3.5 w-3.5' strokeWidth={3} />
-            done
+            Done
           </span>
         ) : (
           <Button
@@ -214,7 +216,7 @@ const ChallengeRow = ({
             disabled={isLocked}
             onClick={onSubmit}
             className={cn(
-              "relative z-10 h-8 shrink-0 px-3 text-xs font-bold",
+              "relative z-10 h-8 w-[92px] shrink-0 px-0 text-xs font-bold",
               isLocked
                 ? "text-zinc-600"
                 : "bg-white/5 text-zinc-200 hover:bg-white/10 hover:text-white",

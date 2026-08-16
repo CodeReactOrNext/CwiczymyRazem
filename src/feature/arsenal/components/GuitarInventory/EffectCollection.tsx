@@ -2,7 +2,10 @@ import {
   EFFECT_DEFINITIONS,
   EFFECTS_BY_ID,
 } from "feature/arsenal/data/effectDefinitions";
-import { getSalvageableMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  getScrappedMods,
+} from "feature/arsenal/data/salvage";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
@@ -237,6 +240,7 @@ export const EffectCollection = ({
             itemName={`${effect.brand} ${effect.name}`}
             parts={getEffectScrapYield(item, effect)}
             salvaged={getSalvageableMod(item, "effect")}
+            scrapped={getScrappedMods(item, "effect")}
             onConfirm={handleConfirmScrap}
             onCancel={closeScrapDialog}
             isLoading={isScrapping}
