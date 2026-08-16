@@ -5,6 +5,7 @@ import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { ArrowRight, Clock, Music } from "lucide-react";
 import Link from "next/link";
 
+import { notationEmbedHeightPx } from "../lib/notationEmbedHeight";
 import { InlineText } from "./InlineText";
 import { MountOnVisible } from "./MountOnVisible";
 import { NotationPreview } from "./NotationPreview";
@@ -40,13 +41,18 @@ export const ExerciseShowcase = ({
 }: ExerciseShowcaseProps) => {
   const slug = idToSlug(exercise.id);
   const difficulty = difficultyBadges[exercise.difficulty];
+  const notationHeightPx = notationEmbedHeightPx(
+    exercise.tablature?.length ?? 0,
+  );
   const duration =
     exercise.timeInMinutes < 1
       ? `${Math.round(exercise.timeInMinutes * 60)} sec`
       : `${exercise.timeInMinutes} min`;
 
   return (
-    <div id={slug} className='scroll-mt-28 rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
+    <div
+      id={slug}
+      className='scroll-mt-28 rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
       <div className='mb-5 flex flex-wrap items-center gap-2'>
         {position !== undefined && total !== undefined && (
           <span className='rounded bg-cyan-500/10 px-2.5 py-1 text-xs font-bold text-cyan-400'>
@@ -72,7 +78,9 @@ export const ExerciseShowcase = ({
       <h3 className='mb-2 text-2xl font-bold tracking-tight text-white'>
         {exercise.title}
       </h3>
-      <p className='mb-5 leading-relaxed text-zinc-400'>{exercise.description}</p>
+      <p className='mb-5 leading-relaxed text-zinc-400'>
+        {exercise.description}
+      </p>
 
       <div className='space-y-4'>
         {commentary.map((paragraph, idx) => (
@@ -85,12 +93,14 @@ export const ExerciseShowcase = ({
       {exercise.tablature && (
         <div className='mt-8 space-y-3'>
           <MountOnVisible
+            reserveHeightPx={notationHeightPx}
             placeholder={
-              <div className='min-h-[180px] animate-pulse rounded-lg bg-zinc-950/70' />
+              <div className='h-full animate-pulse rounded-lg bg-zinc-950/70' />
             }>
             <NotationPreview
               measures={exercise.tablature}
               bpm={exercise.metronomeSpeed?.recommended || 120}
+              heightPx={notationHeightPx}
             />
           </MountOnVisible>
           <details className='group'>
@@ -135,7 +145,7 @@ export const ExerciseShowcase = ({
       <div className='mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
         <Link
           href={`/practice/exercise/${slug}`}
-          className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+          className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
           Practice this with real-time feedback
           <ArrowRight className='h-4 w-4' aria-hidden='true' />
         </Link>

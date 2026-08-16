@@ -4,6 +4,14 @@ interface MountOnVisibleProps {
   children: React.ReactNode;
   /** Rendered until the container scrolls near the viewport. */
   placeholder?: React.ReactNode;
+  /**
+   * Fixed height of the container in px. Both the placeholder and the mounted
+   * children live inside a box of exactly this height, so the swap — and any
+   * async growth inside the children afterwards — cannot change the page's
+   * height. Without it, an embed that renders taller than its placeholder
+   * shifts the whole article below it, mid-scroll, seconds after it mounted.
+   */
+  reserveHeightPx?: number;
   className?: string;
 }
 
@@ -15,6 +23,7 @@ interface MountOnVisibleProps {
 export const MountOnVisible = ({
   children,
   placeholder = null,
+  reserveHeightPx,
   className,
 }: MountOnVisibleProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -33,14 +42,17 @@ export const MountOnVisible = ({
           observer.disconnect();
         }
       },
-      { rootMargin: "300px 0px" }
+      { rootMargin: "300px 0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, [visible]);
 
   return (
-    <div ref={ref} className={className}>
+    <div
+      ref={ref}
+      className={className}
+      style={reserveHeightPx ? { height: reserveHeightPx } : undefined}>
       {visible ? children : placeholder}
     </div>
   );

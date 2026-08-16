@@ -6,6 +6,13 @@ import { useEffect, useRef, useState } from "react";
 interface NotationPreviewProps {
   measures: TablatureMeasure[];
   bpm: number;
+  /**
+   * Fixed height of the box in px — see notationEmbedHeightPx. The engraved
+   * height isn't known until AlphaTab has rendered, so the box is sized up
+   * front and scrolls a taller score internally rather than growing and
+   * shoving the article down under the reader.
+   */
+  heightPx: number;
   className?: string;
 }
 
@@ -18,6 +25,7 @@ interface NotationPreviewProps {
 export const NotationPreview = ({
   measures,
   bpm,
+  heightPx,
   className,
 }: NotationPreviewProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -78,9 +86,10 @@ export const NotationPreview = ({
   return (
     <div
       className={cn(
-        "relative min-h-[180px] overflow-x-auto rounded-lg bg-zinc-950/70 p-3",
-        className
-      )}>
+        "relative overflow-auto rounded-lg bg-zinc-950/70 p-3",
+        className,
+      )}
+      style={{ height: heightPx }}>
       {!ready && (
         <div className='absolute inset-0 animate-pulse rounded-lg bg-zinc-900/60' />
       )}
@@ -88,7 +97,7 @@ export const NotationPreview = ({
         ref={containerRef}
         className={cn(
           "transition-opacity duration-300",
-          ready ? "opacity-100" : "opacity-0"
+          ready ? "opacity-100" : "opacity-0",
         )}
       />
     </div>
