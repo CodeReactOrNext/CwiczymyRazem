@@ -12,6 +12,8 @@ interface EffectPickerModalProps {
   occupiedItemIds: string[];
   slotIndex: number;
   currentItemId: string | null;
+  /** Is there still board space for this pedal? A wide one needs more of it. */
+  canFit?: (itemId: string) => boolean;
   onSelect: (itemId: string | null) => void;
   onClose: () => void;
 }
@@ -21,6 +23,7 @@ export const EffectPickerModal = ({
   occupiedItemIds,
   slotIndex,
   currentItemId,
+  canFit,
   onSelect,
   onClose,
 }: EffectPickerModalProps) => {
@@ -33,6 +36,11 @@ export const EffectPickerModal = ({
     }
   }
   const items = Array.from(uniqueMap.values());
+
+  const boardFull =
+    !!canFit &&
+    items.length > 0 &&
+    !items.some((item) => !occupiedItemIds.includes(item.id) && canFit(item.id));
 
   return (
     <div
@@ -57,6 +65,12 @@ export const EffectPickerModal = ({
             <X size={18} />
           </button>
         </div>
+
+        {boardFull && (
+          <p className='mb-6 rounded-lg bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-400'>
+            The board is full — take a pedal off it before adding another one.
+          </p>
+        )}
 
         {currentItemId && (
           <button
@@ -86,6 +100,9 @@ export const EffectPickerModal = ({
             const rarity = getEffectiveRarity(effect.rarity, item.buildLevel);
             const isSelected = item.id === currentItemId;
             const isOccupied = occupiedItemIds.includes(item.id) && !isSelected;
+            const noRoom =
+              !isSelected && !isOccupied && !!canFit && !canFit(item.id);
+            const unavailable = isOccupied || noRoom;
 
             return (
               <div key={item.id} className='flex flex-col gap-2'>
@@ -93,8 +110,8 @@ export const EffectPickerModal = ({
                   <EffectStashTile
                     item={item}
                     isOnPedalboard={isSelected}
-                    dimmed={isOccupied}
-                    disabled={isOccupied}
+                    dimmed={unavailable}
+                    disabled={unavailable}
                     onClick={() => {
                       onSelect(item.id);
                       onClose();
@@ -105,7 +122,7 @@ export const EffectPickerModal = ({
                 <div
                   className={cn(
                     "flex min-w-0 flex-col",
-                    isOccupied && "opacity-40",
+                    unavailable && "opacity-40",
                   )}>
                   <span
                     className='truncate text-[10px] font-bold capitalize'
@@ -118,6 +135,11 @@ export const EffectPickerModal = ({
                   {isOccupied && (
                     <span className='text-[10px] font-semibold text-zinc-500'>
                       On another slot
+                    </span>
+                  )}
+                  {noRoom && (
+                    <span className='text-[10px] font-semibold text-amber-500/90'>
+                      No room on the board
                     </span>
                   )}
                 </div>

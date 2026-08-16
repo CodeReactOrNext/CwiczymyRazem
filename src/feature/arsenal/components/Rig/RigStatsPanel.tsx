@@ -1,6 +1,15 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { CurrencyIcon } from "components/CurrencyIcons/withCurrencyIcons";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
-import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { Guitar, Info, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import {
   formatRigFameRate,
@@ -15,35 +24,70 @@ import {
 } from "../../data/traitEval";
 import { formatTraitValue, PRACTICE_CATEGORIES } from "../../data/traits";
 import type { ArsenalUserData } from "../../types/arsenal.types";
+import { CountUp } from "../Workshop/workshopMotion";
+
+/** Spring the sheet rolls its bars with — the same one `CountUp` uses. */
+const ROLL = { type: "spring" as const, stiffness: 90, damping: 18 };
+
+/**
+ * The currency each headline is quoted in: cyan for level, amber for Fame —
+ * the palette the rest of the app already reads them in.
+ */
+const TONES = {
+  level: { value: "text-cyan-300", affix: "text-cyan-500/70" },
+  fame: { value: "text-amber-300", affix: "text-amber-500/70" },
+} as const;
 
 interface HeadlineProps {
+  tone: keyof typeof TONES;
   /** Sits before the number, small — "Lv". */
   prefix?: string;
-  value: string;
-  /** Sits after it, same treatment — "/h". */
+  /** Sits before the number at its own size — the Fame coin. */
+  icon?: React.ReactNode;
+  value: number;
+  decimals?: number;
+  /** Sits after it, same treatment as the prefix — "/h". */
   suffix?: string;
-  caption: string;
+  caption: React.ReactNode;
 }
 
 /** One of the two numbers the sheet is read for. */
-const Headline = ({ prefix, value, suffix, caption }: HeadlineProps) => (
+const Headline = ({
+  tone,
+  prefix,
+  icon,
+  value,
+  decimals = 0,
+  suffix,
+  caption,
+}: HeadlineProps) => (
   <div className='flex flex-col gap-1'>
     <div className='flex items-baseline gap-1.5'>
       {prefix && (
-        <span className='font-teko text-xl leading-none text-zinc-500'>
+        <span
+          className={cn("font-teko text-xl leading-none", TONES[tone].affix)}>
           {prefix}
         </span>
       )}
-      <span className='font-teko text-6xl font-bold tabular-nums leading-none text-zinc-100'>
-        {value}
-      </span>
+      {icon}
+      <CountUp
+        value={value}
+        decimals={decimals}
+        className={cn(
+          "font-teko text-6xl font-bold tabular-nums leading-none",
+          TONES[tone].value,
+        )}
+      />
       {suffix && (
-        <span className='font-teko text-xl leading-none text-zinc-500'>
+        <span
+          className={cn("font-teko text-xl leading-none", TONES[tone].affix)}>
           {suffix}
         </span>
       )}
     </div>
-    <span className='text-[11px] tracking-wide text-zinc-500'>{caption}</span>
+    <div className='flex items-center gap-2 text-xs tracking-wide text-zinc-500'>
+      {caption}
+    </div>
   </div>
 );
 
@@ -53,11 +97,11 @@ interface StatGroupProps {
 }
 
 const StatGroup = ({ label, children }: StatGroupProps) => (
-  <div className='flex flex-col gap-2.5'>
-    <p className='text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
+  <div className='flex flex-col gap-3'>
+    <p className='text-[11px] font-bold tracking-[0.2em] text-zinc-500'>
       {label}
     </p>
-    <dl className='flex flex-col gap-2'>{children}</dl>
+    <dl className='flex flex-col gap-2.5'>{children}</dl>
   </div>
 );
 
@@ -65,33 +109,87 @@ interface StatRowProps {
   label: string;
   value: string;
   icon?: React.ReactNode;
+  /** 0–1 of the group's best row. Draws the bar; omit it and the row is plain. */
+  share?: number;
   /** Brightest line in its group — the rig's strongest category. */
   strong?: boolean;
   /** Nothing to pay: the row stays, the number steps back. */
   muted?: boolean;
 }
 
-const StatRow = ({ label, value, icon, strong, muted }: StatRowProps) => (
-  <div className='flex items-baseline justify-between gap-4'>
-    <dt className='flex min-w-0 items-center gap-2'>
+const StatRow = ({ label, value, icon, share, strong, muted }: StatRowProps) => (
+  <div className='flex items-center gap-3'>
+    <dt className='flex min-w-0 shrink-0 items-center gap-2'>
       {icon}
-      <span className='truncate text-[11px] capitalize tracking-wide text-zinc-400'>
+      <span className='truncate text-[13px] capitalize tracking-wide text-zinc-300'>
         {label}
       </span>
     </dt>
+
+    {share === undefined ? (
+      <div className='flex-1' />
+    ) : (
+      <div className='h-1.5 flex-1 overflow-hidden rounded bg-zinc-800'>
+        <motion.div
+          className={cn(
+            "h-full rounded",
+            strong ? "bg-amber-400" : "bg-amber-400/50",
+          )}
+          initial={false}
+          animate={{ width: `${Math.min(100, share * 100)}%` }}
+          transition={ROLL}
+        />
+      </div>
+    )}
+
     <dd
       className={cn(
-        "font-mono text-[13px] tabular-nums",
+        "shrink-0 font-mono text-[15px] tabular-nums",
         muted
           ? "text-zinc-500"
           : strong
             ? "font-bold text-zinc-100"
-            : "text-zinc-300",
+            : "text-zinc-200",
       )}>
       {value}
     </dd>
   </div>
 );
+
+/** The small print, folded away — it explains the numbers, it is not one of them. */
+const PayoutNote = () => {
+  // Radix opens a tooltip on hover and focus but never on touch, so the trigger
+  // also toggles it — otherwise this text simply does not exist on a phone.
+  const [open, setOpen] = useState(false);
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={150} open={open} onOpenChange={setOpen}>
+        <TooltipTrigger asChild>
+          <button
+            type='button'
+            onClick={() => setOpen((prev) => !prev)}
+            className='flex shrink-0 items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold tracking-wide text-zinc-500 transition-colors hover:bg-zinc-800/60 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+            <Info size={13} />
+            How it pays
+          </button>
+        </TooltipTrigger>
+        <TooltipContent
+          side='left'
+          className='w-64 border border-zinc-700 bg-zinc-950 p-3'>
+          <div className='space-y-2 text-xs font-normal leading-relaxed text-zinc-300'>
+            <p>Fame per hour of practice.</p>
+            <p>
+              Traits are quoted on an even hour, affinity on a full hour of one
+              category.
+            </p>
+            <p>Traits pay only while the gear carrying them is on the rig.</p>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 interface RigStatsPanelProps {
   data: ArsenalUserData;
@@ -109,9 +207,12 @@ interface RigStatsPanelProps {
  * gear adds up to, and the Fame an hour of practice is now worth. Everything
  * else is the working that produces them and sits to the side at stat size.
  *
- * Deliberately monochrome. Every figure here is the same currency measured the
- * same way, so tinting them apart would invent a distinction the game does not
- * make — rank is carried by size and brightness instead.
+ * Colour is spent only where it names a currency — cyan for level, amber for
+ * Fame, the same pairing the header and the item cards use. The working stays
+ * neutral, so nothing in it competes with the two numbers it adds up to.
+ *
+ * The numbers roll rather than snap: swapping a pedal is the whole point of the
+ * screen below, and a rate that visibly climbs is the feedback for it.
  */
 export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   const rigLevel = getRigLevel(data);
@@ -128,9 +229,10 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   // Traits are paid out of whatever headroom the base rate leaves under the one
   // ceiling in the system (see `calculateSessionFame`), so the honest total is
   // the clamped one — base + traits raw would advertise Fame no report pays.
+  // The ceiling itself stays off the sheet: nothing in the game reaches it, so
+  // showing it only invited the question of why the number was short.
   const rawTotal = baseRate + traitRate;
   const totalRate = Math.min(RIG_FAME_HOURLY_CEILING, rawTotal);
-  const isCapped = rawTotal > RIG_FAME_HOURLY_CEILING;
 
   const bestCategoryRate = Math.max(
     ...PRACTICE_CATEGORIES.map((category) => categoryRates[category]),
@@ -138,25 +240,38 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
 
   return (
     <div className='flex flex-col gap-3'>
-      <div className='flex flex-col gap-0.5'>
-        <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
-          Loadout
-        </p>
-        <p className='text-base font-black capitalize tracking-wide text-white'>
-          Rig Sheet
-        </p>
+      <div className='flex items-end justify-between gap-4'>
+        <div className='flex flex-col gap-0.5'>
+          <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
+            Loadout
+          </p>
+          <p className='text-base font-black capitalize tracking-wide text-white'>
+            Rig Sheet
+          </p>
+        </div>
+        <PayoutNote />
       </div>
 
       <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-        <div className='grid grid-cols-1 gap-8 sm:grid-cols-[minmax(0,180px)_1fr] sm:gap-12'>
+        <div className='grid grid-cols-1 gap-8 sm:grid-cols-[minmax(0,200px)_1fr] sm:gap-12'>
           <div className='flex flex-col gap-5'>
             <Headline
+              tone='level'
               prefix='Lv'
-              value={String(rigLevel)}
+              value={rigLevel}
               caption='Rig level'
             />
+
             <Headline
-              value={totalRate.toFixed(1)}
+              tone='fame'
+              icon={
+                <CurrencyIcon
+                  currency='fame'
+                  className='mr-0 h-7 w-7 self-center'
+                />
+              }
+              value={totalRate}
+              decimals={1}
               suffix='/h'
               caption='Fame per hour'
             />
@@ -164,8 +279,21 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
 
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-10'>
             <StatGroup label='Sources'>
-              <StatRow label='Base' value={`+${formatRigFameRate(rigLevel)}`} />
-              <StatRow label='Traits' value={formatTraitValue(traitRate)} />
+              <StatRow
+                label='Base'
+                value={`+${formatRigFameRate(rigLevel)}`}
+                icon={<Guitar size={14} className='shrink-0 text-zinc-500' />}
+                share={rawTotal > 0 ? baseRate / rawTotal : 0}
+                strong={baseRate >= traitRate}
+              />
+              <StatRow
+                label='Traits'
+                value={formatTraitValue(traitRate)}
+                icon={<Sparkles size={14} className='shrink-0 text-zinc-500' />}
+                share={rawTotal > 0 ? traitRate / rawTotal : 0}
+                strong={traitRate > baseRate}
+                muted={traitRate === 0}
+              />
             </StatGroup>
 
             <StatGroup label='Affinity'>
@@ -180,9 +308,14 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
                     value={rate > 0 ? formatTraitValue(rate) : "—"}
                     icon={
                       <Icon
-                        size='small'
+                        size='medium'
                         className='shrink-0 self-center text-zinc-500'
                       />
+                    }
+                    // Bars only once there is something to compare — four empty
+                    // tracks would read as a broken chart, not as "no affinity".
+                    share={
+                      bestCategoryRate > 0 ? rate / bestCategoryRate : undefined
                     }
                     strong={rate > 0 && rate === bestCategoryRate}
                     muted={rate === 0}
@@ -192,14 +325,6 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
             </StatGroup>
           </div>
         </div>
-
-        <p className='text-[10px] leading-relaxed text-zinc-500'>
-          Fame per hour of practice. Traits are quoted on an even hour, affinity
-          on a full hour of one category.
-          {bestCategoryRate === 0 &&
-            " Traits pay only while the gear carrying them is on the rig."}
-          {isCapped && ` Capped at ${RIG_FAME_HOURLY_CEILING}/h.`}
-        </p>
       </div>
     </div>
   );

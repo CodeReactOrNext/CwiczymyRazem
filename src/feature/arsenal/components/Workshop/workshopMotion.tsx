@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 
 /**
- * Shared motion for the workshop.
+ * Shared motion for the arsenal — the workshop is where it started, and the rig
+ * sheet now rolls its numbers with the same spring.
  *
- * Kept in one place so the whole tab moves with the same rhythm, and so the
+ * Kept in one place so the whole feature moves with the same rhythm, and so the
  * styleguide's rule holds everywhere: things animate on *entry* and on *click*,
  * never on hover, and never by growing.
  */
@@ -35,6 +36,8 @@ interface CountUpProps {
   value: number;
   className?: string;
   prefix?: string;
+  /** Decimals to hold while rolling — a Fame rate moves by tenths. */
+  decimals?: number;
 }
 
 /**
@@ -44,10 +47,15 @@ interface CountUpProps {
  * is read as a re-render. This is the whole reward moment for a build, so it is
  * worth the two hundred milliseconds.
  */
-export const CountUp = ({ value, className, prefix = "" }: CountUpProps) => {
+export const CountUp = ({
+  value,
+  className,
+  prefix = "",
+  decimals = 0,
+}: CountUpProps) => {
   const raw = useMotionValue(value);
   const spring = useSpring(raw, { stiffness: 90, damping: 18 });
-  const text = useTransform(spring, (v) => `${prefix}${Math.round(v)}`);
+  const text = useTransform(spring, (v) => `${prefix}${v.toFixed(decimals)}`);
 
   useEffect(() => {
     raw.set(value);

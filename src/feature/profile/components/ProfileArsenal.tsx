@@ -11,25 +11,19 @@ import type {
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+// Layout is shared with the editable board (PedalboardView) so a pedal sits in
+// exactly the same place here as it does in the owner's arsenal — including the
+// repair of boards saved before pedals were kept from overlapping.
+import {
+  createWidthResolver,
+  layoutBoard,
+  PEDAL_H_PCT,
+} from "feature/arsenal/utils/pedalboardLayout";
 import { doc, getDoc } from "firebase/firestore";
 import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { db } from "utils/firebase/client/firebase.utils";
-
-const PEDAL_H_PCT = 42;
-
-// Mirror of the pedalboard editor (PedalboardView): pedals share the same
-// on-board height but keep their natural image proportions, so widths must be
-// derived from each image's aspect ratio rather than fixed. This keeps the
-// readonly profile view pixel-consistent with the editable arsenal view.
-const BOARD_W = 16;
-const BOARD_H = 7;
-/** Aspect used before an image has reported its natural size (a typical pedal). */
-const DEFAULT_ASPECT = 480 / 515;
-
-const widthPctForAspect = (aspect: number) =>
-  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
 
 interface TooltipData {
   x: number;
@@ -162,19 +156,18 @@ const GuitarSlotReadonly = ({ item, slotIndex, onHover, onSelect }: GuitarSlotRe
 
 interface PedalReadonlyProps {
   placement: PedalboardPlacement;
+  /** Width in board-%, from the shared layout so both views agree. */
+  wPct: number;
   effectInventory: ArsenalUserData["effectInventory"];
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
   onSelect: (content: React.ReactNode) => void;
 }
 
-const PedalReadonly = ({ placement, effectInventory, onHover, onSelect }: PedalReadonlyProps) => {
-  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
+const PedalReadonly = ({ placement, wPct, effectInventory, onHover, onSelect }: PedalReadonlyProps) => {
   const invItem = effectInventory.find((e) => e.id === placement.itemId);
   const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
   const rs = effect ? RARITY_STYLES[effect.rarity] : null;
   if (!effect || !rs) return null;
-
-  const wPct = widthPctForAspect(aspect);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     onHover(e, {
@@ -208,11 +201,6 @@ const PedalReadonly = ({ placement, effectInventory, onHover, onSelect }: PedalR
         alt={effect.name}
         className="w-full h-full object-contain"
         draggable={false}
-        onLoad={(e) => {
-          const img = e.currentTarget;
-          if (!img.naturalWidth || !img.naturalHeight) return;
-          setAspect(img.naturalWidth / img.naturalHeight);
-        }}
       />
       <div
         className="absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full"
@@ -248,6 +236,11 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   const hasPedals = (rig?.pedalboardItems?.length ?? 0) > 0;
   const hasGuitars = rig?.guitarSlots?.some(Boolean) ?? false;
   if (!hasPedals && !hasGuitars) return null;
+
+  // The same layout pass the editor runs, so a board stored with pedals piled
+  // on top of each other still reads cleanly here.
+  const widthOf = createWidthResolver(effectInventory ?? []);
+  const board = layoutBoard(rig?.pedalboardItems ?? [], widthOf);
 
   const guitarItems: (InventoryItem | null)[] = ([null, null, null] as (string | null)[])
     .map((_, i) => rig?.guitarSlots?.[i] ?? null)
@@ -344,10 +337,11 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               </div>
 
               {/* Pedals */}
-              {(rig.pedalboardItems ?? []).map((placement) => (
+              {board.placed.map((placement) => (
                 <PedalReadonly
                   key={placement.itemId}
                   placement={placement}
+                  wPct={widthOf(placement.itemId)}
                   effectInventory={effectInventory ?? []}
                   onHover={handleTooltip}
                   onSelect={setPinnedCard}
@@ -366,6 +360,39 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               <div style={{ width: 52, height: 9, background: "linear-gradient(180deg,#555,#2a2a2a)", borderRadius: 4, boxShadow: "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)" }} />
             </div>
           </div>
+
+          {/* Equipped, but the board ran out of room for them. */}
+          {board.overflow.length > 0 && (
+            <div className="mt-4 flex flex-col gap-2">
+              <p className="text-xs font-semibold tracking-wide text-zinc-500">Off the board</p>
+              <div className="flex flex-wrap items-end gap-5">
+                {board.overflow.map((placement) => {
+                  const invItem = (effectInventory ?? []).find((e) => e.id === placement.itemId);
+                  const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+                  if (!effect || !invItem) return null;
+
+                  return (
+                    <img
+                      key={placement.itemId}
+                      src={`/static/images/effects/${effect.imageId}.png`}
+                      alt={effect.name}
+                      className="h-12 w-auto cursor-pointer object-contain opacity-50 transition-opacity hover:opacity-100"
+                      draggable={false}
+                      onMouseMove={(e) =>
+                        handleTooltip(e, {
+                          x: e.clientX,
+                          y: e.clientY,
+                          content: <EffectCard item={invItem} readOnly />,
+                        })
+                      }
+                      onMouseLeave={() => handleTooltip(null as any, null)}
+                      onClick={() => setPinnedCard(<EffectCard item={invItem} readOnly />)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
