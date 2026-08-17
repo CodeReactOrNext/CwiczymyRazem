@@ -10,6 +10,7 @@ import {
   resizeAccentPattern,
 } from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
+import { getCountInBeats } from "../utils/countInDuration";
 import { isIOSDevice } from "../utils/deviceDetection";
 
 interface UseMobileMetronomeProps {
@@ -72,8 +73,9 @@ export const useMobileMetronome = ({
   const startTimeRef = useRef<number | null>(null);
   const audioStartTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
-  // Count-in length in beats — mirrors accentPattern.length at start time, so
-  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4".
+  // Count-in length in beats — derived from accentPattern.length at start time, so
+  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4" (and two bars
+  // at fast tempos, see getCountInBeats).
   const countInStartRef  = useRef<number>(4);
   const beatCounterRef = useRef<number>(0);
   // Position within the current beat's subdivision grid — 0 is always the beat
@@ -283,7 +285,7 @@ export const useMobileMetronome = ({
 
     if (audioContextRef.current) {
       const useCountIn   = !options?.skipCountIn;
-      const countInBeats = Math.max(1, accentPattern.length);
+      const countInBeats = getCountInBeats(accentPattern.length, bpm * (speedMultiplier || 1));
       nextNoteTimeRef.current   = audioContextRef.current.currentTime;
       countInTargetRef.current  = useCountIn ? countInBeats : 0;
       countInStartRef.current   = countInBeats;
@@ -298,7 +300,7 @@ export const useMobileMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [initializeAudio, resumeAudioContext, scheduler, accentPattern.length]);
+  }, [initializeAudio, resumeAudioContext, scheduler, accentPattern.length, bpm, speedMultiplier]);
 
   const stopMetronome = useCallback(() => {
     if (timeoutRef.current) {

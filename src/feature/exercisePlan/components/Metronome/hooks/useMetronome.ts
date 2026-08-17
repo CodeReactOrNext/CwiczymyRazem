@@ -10,6 +10,7 @@ import {
   resizeAccentPattern,
 } from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
+import { getCountInBeats } from "../utils/countInDuration";
 
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
 // Using an inline Blob URL avoids the need to serve a separate .js file.
@@ -101,8 +102,9 @@ export const useMetronome = ({
   const workletNodeRef       = useRef<AudioWorkletNode | null>(null);
   const workletReadyRef      = useRef(false);
   const countInTargetRef     = useRef<number>(0);
-  // Count-in length in beats — mirrors accentPattern.length at start time, so
-  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4".
+  // Count-in length in beats — derived from accentPattern.length at start time, so
+  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4" (and two bars
+  // at fast tempos, see getCountInBeats).
   const countInStartRef      = useRef<number>(4);
   const startTimeRef         = useRef<number | null>(null);
   const audioStartTimeRef    = useRef<number | null>(null);
@@ -329,7 +331,7 @@ export const useMetronome = ({
     if (ctx.state === 'suspended') ctx.resume();
 
     const useCountIn  = !options?.skipCountIn;
-    const countInBeats = Math.max(1, accentPattern.length);
+    const countInBeats = getCountInBeats(accentPattern.length, bpm * (speedMultiplier || 1));
     nextNoteTimeRef.current   = ctx.currentTime;
     countInTargetRef.current  = useCountIn ? countInBeats : 0;
     countInStartRef.current   = countInBeats;
@@ -349,7 +351,7 @@ export const useMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [scheduler, ensureWorkletNode, accentPattern.length]);
+  }, [scheduler, ensureWorkletNode, accentPattern.length, bpm, speedMultiplier]);
 
   const stopMetronome = useCallback(() => {
     workletNodeRef.current?.port.postMessage({ type: 'stop' });
