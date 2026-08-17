@@ -15,8 +15,6 @@ import type { GuitarRarity } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 
 export interface DexCardProps {
-  /** Fixed dex slot number, e.g. "007". */
-  dexNumber: string;
   name: string;
   brand: string;
   rarity: GuitarRarity;
@@ -63,7 +61,6 @@ const PreviewModal = ({
 };
 
 export const DexCard = ({
-  dexNumber,
   name,
   brand,
   rarity,
@@ -93,11 +90,8 @@ export const DexCard = ({
           : undefined
       }
       title={owned ? undefined : "Not discovered yet — open cases to find it"}>
-      {/* Dex number + copy count / lock */}
-      <div className='relative z-10 flex h-5 items-center justify-between'>
-        <span className='font-mono text-[10px] text-zinc-500'>
-          #{dexNumber}
-        </span>
+      {/* Copy count / lock */}
+      <div className='relative z-10 flex h-5 items-center justify-end'>
         {owned ? (
           ownedCount > 1 && (
             <span className='rounded bg-zinc-950/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300'>

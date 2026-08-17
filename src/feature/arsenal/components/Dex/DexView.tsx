@@ -28,8 +28,6 @@ interface DexViewProps {
   data: ArsenalUserData;
 }
 
-const padDexNumber = (id: number | string) => String(id).padStart(3, "0");
-
 const SummaryBar = ({
   icon,
   label,
@@ -113,7 +111,6 @@ export const DexView = ({ data }: DexViewProps) => {
         const ownership = guitarOwnership.get(def.id);
         return {
           key: `guitar-${def.id}`,
-          dexNumber: padDexNumber(def.id),
           name: def.name,
           brand: def.brand,
           rarity: def.rarity,
@@ -132,7 +129,6 @@ export const DexView = ({ data }: DexViewProps) => {
         const ownership = effectOwnership.get(def.id);
         return {
           key: `effect-${def.id}`,
-          dexNumber: padDexNumber(def.id),
           name: def.name,
           brand: def.brand,
           rarity: def.rarity,
