@@ -16,11 +16,11 @@ describe("getRigFameRate", () => {
 
   it("follows the published table", () => {
     // The numbers the design was signed off on — 1 decimal, as the UI prints it.
-    expect(getRigFameRate(100).toFixed(1)).toBe("13.3");
-    expect(getRigFameRate(150).toFixed(1)).toBe("18.0");
-    expect(getRigFameRate(200).toFixed(1)).toBe("22.3");
-    expect(getRigFameRate(400).toFixed(1)).toBe("37.6");
-    expect(getRigFameRate(750).toFixed(1)).toBe("60.2");
+    expect(getRigFameRate(100).toFixed(1)).toBe("28.5");
+    expect(getRigFameRate(150).toFixed(1)).toBe("38.6");
+    expect(getRigFameRate(200).toFixed(1)).toBe("47.9");
+    expect(getRigFameRate(400).toFixed(1)).toBe("80.5");
+    expect(getRigFameRate(750).toFixed(1)).toBe("129.0");
   });
 
   it("keeps paying for the top of the ladder", () => {
@@ -73,11 +73,11 @@ describe("cumulativeRigFame", () => {
   });
 
   it("follows the published table for a typical rig", () => {
-    expect(cumulativeRigFame(5, 400)).toBe(3);
-    expect(cumulativeRigFame(15, 400)).toBe(9);
-    expect(cumulativeRigFame(25, 400)).toBe(16);
-    expect(cumulativeRigFame(30, 400)).toBe(19);
-    expect(cumulativeRigFame(60, 400)).toBe(38);
+    expect(cumulativeRigFame(5, 400)).toBe(7);
+    expect(cumulativeRigFame(15, 400)).toBe(20);
+    expect(cumulativeRigFame(25, 400)).toBe(34);
+    expect(cumulativeRigFame(30, 400)).toBe(40);
+    expect(cumulativeRigFame(60, 400)).toBe(80);
   });
 
   it("pays an hour of practice exactly the rate it advertises", () => {
@@ -133,7 +133,7 @@ describe("cumulativeRigFame", () => {
 
 describe("formatRigFameRate", () => {
   it("prints one decimal so every level shows", () => {
-    expect(formatRigFameRate(473)).toBe("42.6");
+    expect(formatRigFameRate(473)).toBe("91.3");
     expect(formatRigFameRate(0)).toBe("0.0");
   });
 });

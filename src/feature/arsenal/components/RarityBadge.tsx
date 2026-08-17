@@ -68,19 +68,33 @@ export const RARITY_STYLES: Record<
     baseColor: "#fbbf24",
     rpgGradient: "from-amber-300 via-amber-500 to-orange-700",
   },
-  // Platinum: the only tier above Mythic, and the only one that cannot be dropped.
-  // Every other accent is already spoken for (amber = Fame, cyan = brand, purple =
-  // Epic), so the top of the ladder gets the one finish nothing else uses.
+  // The only tier above Mythic, and the only one that cannot be dropped. It used
+  // to be white/platinum, which read as a brighter Common everywhere the flat
+  // `baseColor` is used (badges, chips, dots, activity feed). Ice cyan is the
+  // opening hue of the HoloFoil sheen on the card itself, so the flat colour and
+  // the foil now say the same thing — and cyan-300 sits well clear of both Rare
+  // blue and the darker brand cyan-500 used for gems.
   "Custom Shop": {
-    badge: "bg-zinc-800/80 border-zinc-300",
-    text: "text-zinc-100",
-    glow: "shadow-[0_0_50px_rgba(228,228,231,0.75)]",
-    border: "border-b-zinc-100",
-    bg: "from-zinc-100/15 to-transparent",
-    baseColor: "#e4e4e7",
-    rpgGradient: "from-white via-zinc-300 to-zinc-500",
+    badge: "bg-cyan-950/80 border-cyan-300",
+    text: "text-cyan-300",
+    glow: "shadow-[0_0_50px_rgba(103,232,249,0.75)]",
+    border: "border-b-cyan-300",
+    bg: "from-cyan-300/15 to-transparent",
+    baseColor: "#67e8f9",
+    rpgGradient: "from-cyan-200 via-cyan-400 to-cyan-700",
   },
 };
+
+/**
+ * Flat rarity hex for callers outside Arsenal (activity feed, avatar glow,
+ * profile banners) that only need one colour and may hold the rarity as a plain
+ * string read back from Firestore. Always resolve through this instead of
+ * re-declaring a local map — the copies that used to live in those files had
+ * Legendary and Mythic swapped and no entry for Custom Shop at all.
+ */
+export const getRarityColor = (rarity: string | undefined | null): string =>
+  RARITY_STYLES[rarity as GuitarRarity]?.baseColor ??
+  RARITY_STYLES.Common.baseColor;
 
 interface RarityBadgeProps {
   rarity: GuitarRarity;
@@ -121,5 +135,5 @@ export const RARITY_GLOW_CLASS: Record<GuitarRarity, string> = {
   Epic: "shadow-[0_0_30px_rgba(168,85,247,0.5)]",
   Legendary: "shadow-[0_0_40px_rgba(244,63,94,0.6)]",
   Mythic: "shadow-[0_0_50px_rgba(251,191,36,0.7)]",
-  "Custom Shop": "shadow-[0_0_60px_rgba(228,228,231,0.75)]",
+  "Custom Shop": "shadow-[0_0_60px_rgba(103,232,249,0.75)]",
 };

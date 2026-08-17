@@ -8,10 +8,14 @@ import { cn } from "assets/lib/utils";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type {
   BuildQuote,
+  FittedMod,
   ModQuote,
   RepairQuote,
 } from "feature/arsenal/data/workshop";
-import { getGradeByRank } from "feature/arsenal/data/workshop";
+import {
+  getGradeByRank,
+  MOD_REMOVE_FAME_COST,
+} from "feature/arsenal/data/workshop";
 import { useWorkshopBuild } from "feature/arsenal/hooks/useWorkshopBuild";
 import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
 import { useWorkshopRepair } from "feature/arsenal/hooks/useWorkshopRepair";
@@ -26,6 +30,7 @@ import { ConditionDelta, LevelDelta, RarityDelta } from "./BeforeAfter";
 import { BuildLadder } from "./BuildLadder";
 import { CostList } from "./CostList";
 import { ModPicker } from "./ModPicker";
+import { ModRemoveDialog } from "./ModRemoveDialog";
 import { GateRow, RewardPanel } from "./RewardPanel";
 import type { WorkshopResult } from "./WorkshopResultView";
 import { WorkshopResultView } from "./WorkshopResultView";
@@ -42,6 +47,8 @@ interface WorkshopJobModalProps {
   salvagedOptions: SalvagedModOption[];
   /** Passed through to the ladder map so every rung shows stock, not just the next. */
   wallet: ScrapPart[];
+  /** The player's Fame — the build's gate, and what a mod removal is paid with. */
+  fame: number;
   onClose: () => void;
   /** Lets the finished job hand the player straight into the next one. */
   onChangeJob: (job: WorkshopJob) => void;
@@ -72,6 +79,7 @@ export const WorkshopJobModal = ({
   modQuote,
   salvagedOptions,
   wallet,
+  fame,
   onClose,
   onChangeJob,
 }: WorkshopJobModalProps) => {
@@ -79,11 +87,14 @@ export const WorkshopJobModal = ({
   const repair = useWorkshopRepair();
   const mod = useWorkshopMod();
   const [result, setResult] = useState<WorkshopResult | null>(null);
+  /** The mod the player has asked to strip off, waiting on the confirm. */
+  const [removing, setRemoving] = useState<FittedMod | null>(null);
 
   const isPending = build.isPending || repair.isPending || mod.isPending;
 
   const close = () => {
     setResult(null);
+    setRemoving(null);
     onClose();
   };
 
@@ -141,7 +152,8 @@ export const WorkshopJobModal = ({
     mod.mutate(
       { itemId: entry.id, kind: entry.kind, featureId, action, salvagedId },
       {
-        onSuccess: (data) =>
+        onSuccess: (data) => {
+          setRemoving(null);
           setResult({
             kind: entry.kind,
             rarity: entry.rarity,
@@ -154,8 +166,11 @@ export const WorkshopJobModal = ({
             headline:
               data.action === "reroll"
                 ? `${data.label} +${data.pointsBefore} → +${data.points}`
-                : `${data.label} +${data.points}`,
-          }),
+                : data.action === "remove"
+                  ? `${data.label} +${data.pointsBefore} taken off`
+                  : `${data.label} +${data.points}`,
+          });
+        },
       },
     );
 
@@ -198,12 +213,30 @@ export const WorkshopJobModal = ({
       onOpenChange={(open) => {
         if (!open && !isPending) close();
       }}>
+      {/* Stacked on top of the bench rather than replacing it: cancelling a
+          removal should put the player back in the list they were reading. */}
+      <ModRemoveDialog
+        mod={removing}
+        itemName={entry.name}
+        fameCost={MOD_REMOVE_FAME_COST}
+        fame={fame}
+        isLoading={mod.isPending}
+        onConfirm={() => removing && runMod(removing.id, "remove")}
+        onCancel={() => setRemoving(null)}
+      />
       <DialogContent
         hideCloseButton
         // A job in flight must not be dismissed out from under itself.
         onEscapeKeyDown={(e) => isPending && e.preventDefault()}
         onInteractOutside={(e) => isPending && e.preventDefault()}
-        className='flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:max-w-3xl sm:overflow-y-auto sm:p-7'>
+        className={cn(
+          "flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:overflow-y-auto sm:p-7",
+          // The mod bench is the one job that is a *list*: every row carries art,
+          // a name, a whole bill and two buttons, and at the width the other two
+          // jobs need those bills wrap into a second line each. Held for the
+          // result too, so finishing a mod does not snap the dialog narrower.
+          job === "mod" ? "sm:max-w-5xl" : "sm:max-w-3xl",
+        )}>
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-col gap-1'>
             <DialogDescription className={sectionLabelClass}>
@@ -296,11 +329,18 @@ export const WorkshopJobModal = ({
               fitted={modQuote.fitted}
               salvaged={salvagedOptions}
               slotsFull={modQuote.slots.free === 0}
+              removeFame={MOD_REMOVE_FAME_COST}
+              canRemove={modQuote.canRemove}
               busy={isPending}
               onFit={(featureId) => runMod(featureId, "fit")}
               onReroll={(featureId) => runMod(featureId, "reroll")}
               onFitSalvaged={(salvagedId) =>
                 runMod(null, "fit-salvaged", salvagedId)
+              }
+              onRemove={(featureId) =>
+                setRemoving(
+                  modQuote.fitted.find((f) => f.id === featureId) ?? null,
+                )
               }
             />
           </>

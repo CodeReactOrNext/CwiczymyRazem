@@ -226,9 +226,9 @@ export const repairItem = async (
 };
 
 /**
- * Fits or re-rolls one named mod. Which one is the player's call; the value is
- * rolled server-side. A `fit-salvaged` job names a stash entry instead of a
- * feature, and brings its own value with it.
+ * Fits, re-rolls or removes one named mod. Which one is the player's call; the
+ * value is rolled server-side. A `fit-salvaged` job names a stash entry instead
+ * of a feature, and brings its own value with it.
  */
 export const modItem = async (
   itemId: string,

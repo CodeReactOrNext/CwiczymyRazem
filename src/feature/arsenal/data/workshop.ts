@@ -696,7 +696,7 @@ export const getRepairQuote = (
  * what the item *is* — it is the only way to put a `+4 Hand-wound pickups` on a
  * guitar that did not roll one out of the case.
  *
- * Four rules, all deliberate:
+ * Five rules, all deliberate:
  *
  *  • **Every mod has its own bill, and it is the same on every item.** Unlike a
  *    build — whose recipe is derived from the subject's own BOM — a mod costs
@@ -720,10 +720,27 @@ export const getRepairQuote = (
  *    bench mod draws from the feature's own range widened by `MOD_ROLL_BONUS`, so
  *    workshop work can beat anything a case can drop. A re-roll costs that mod's
  *    bill again and *always* replaces the old number, downward included.
+ *
+ *  • **A mod can be taken back off, and taking it off destroys it.** The only
+ *    thing the job hands back is the slot: the mod is not stashed, not refittable
+ *    and not recoverable. Salvage is what moves a mod between instruments, and it
+ *    costs an entire teardown — a bench fee that returned the mod would be a
+ *    cheaper salvage than salvage, so this one returns nothing at all.
  */
 
 /** Extra headroom a bench-rolled value has over a case-rolled one. */
 export const MOD_ROLL_BONUS = 2;
+
+/**
+ * Fame charged to strip a fitted mod off an instrument.
+ *
+ * Priced in Fame rather than parts because there is nothing being made: the bench
+ * is undoing work, not building it, and a parts bill would read as if the mod were
+ * being rebuilt. Flat, too — every mod costs the same to pull, whatever it was
+ * worth, since what the player is buying is the empty slot and one slot is one
+ * slot.
+ */
+export const MOD_REMOVE_FAME_COST = 50;
 
 const bill = (...rows: [PartId, PartTier, number][]): ScrapPart[] =>
   rows.map(([partId, tier, qty]) => ({ partId, tier, qty }));
@@ -894,6 +911,8 @@ export interface ModQuote {
   canFit: boolean;
   /** At least one fitted mod whose bill the wallet covers. */
   canReroll: boolean;
+  /** Something fitted to pull off, and the Fame to pay the bench for pulling it. */
+  canRemove: boolean;
 }
 
 /**
@@ -924,6 +943,8 @@ const priceMod = (def: ModFeatureDef, wallet: ScrapPart[]): ModOption => {
 export const getModQuote = (
   subject: WorkshopSubject,
   wallet: ScrapPart[],
+  /** Only removal is priced in Fame; the rest of the bench runs on parts. */
+  fame = 0,
 ): ModQuote => {
   const slots = getModSlots(subject);
 
@@ -948,6 +969,9 @@ export const getModQuote = (
     fitted,
     canFit: slots.free > 0 && candidates.some((c) => c.affordable),
     canReroll: fitted.some((f) => f.affordable),
+    // Counted off `subject.features` rather than `fitted`, so a mod the pool has
+    // since dropped can still be taken off the instrument carrying it.
+    canRemove: subject.features.length > 0 && fame >= MOD_REMOVE_FAME_COST,
   };
 };
 

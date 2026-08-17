@@ -13,6 +13,7 @@ import { formatDistanceToNow } from "date-fns";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
+import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
@@ -135,15 +136,6 @@ const PLAYLIST_KIND_LABEL: Record<string, string> = {
   top: "top 10",
 };
 
-const RARITY_COLORS: Record<string, string> = {
-  Common: "#9ca3af",
-  Uncommon: "#4ade80",
-  Rare: "#60a5fa",
-  Epic: "#c084fc",
-  Legendary: "#fb923c",
-  Mythic: "#f43f5e",
-};
-
 const ItemTooltipCard = ({
   itemType,
   itemName,
@@ -157,7 +149,7 @@ const ItemTooltipCard = ({
   itemRarity: string;
   itemImageId: number | string;
 }) => {
-  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const color = getRarityColor(itemRarity);
   const imgSrc = itemType === "guitar"
     ? getRankBadgeSrc(itemImageId, "small")
     : `/static/images/effects/${itemImageId}.png`;
@@ -286,7 +278,7 @@ const ItemPill = ({
 }) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
-  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const color = getRarityColor(itemRarity);
   const imgSrc = itemType === "guitar"
     ? getRankBadgeSrc(itemImageId, "small")
     : `/static/images/effects/${itemImageId}.png`;

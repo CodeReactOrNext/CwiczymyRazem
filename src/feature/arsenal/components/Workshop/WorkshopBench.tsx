@@ -61,8 +61,8 @@ export const WorkshopBench = ({
     [entry.subject, wallet],
   );
   const modQuote = useMemo(
-    () => getModQuote(entry.subject, wallet),
-    [entry.subject, wallet],
+    () => getModQuote(entry.subject, wallet, fame),
+    [entry.subject, wallet, fame],
   );
   const salvagedOptions = useMemo(
     () => getSalvagedModOptions(entry.subject, salvagedMods),
@@ -95,6 +95,7 @@ export const WorkshopBench = ({
         modQuote={modQuote}
         salvagedOptions={salvagedOptions}
         wallet={wallet}
+        fame={fame}
         onClose={() => setJob(null)}
         onChangeJob={setJob}
       />
@@ -223,9 +224,16 @@ export const WorkshopBench = ({
         readyNote={
           modQuote.canFit || canRefit
             ? `${modQuote.slots.free} slot${modQuote.slots.free === 1 ? "" : "s"} free`
-            : "re-roll only"
+            : modQuote.canReroll
+              ? "re-roll only"
+              : "removal only"
         }
-        ready={modQuote.canFit || modQuote.canReroll || canRefit}
+        ready={
+          modQuote.canFit ||
+          modQuote.canReroll ||
+          modQuote.canRemove ||
+          canRefit
+        }
         blockedNote={canRefit ? undefined : describeModBlocker(modQuote)}
         accent='purple'
         disabled={

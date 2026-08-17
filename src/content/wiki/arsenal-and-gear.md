@@ -28,7 +28,7 @@ Point at a socket to read the full card without leaving the board, and click it 
 
 ## Opening cases
 
-<StatRow stats="150 Fame:Standard Case (anything can drop)|200 Fame:Featured Case (a rotating pool of 10 items)|300 Fame:Premium Case (guitars or effects, better odds)|400 Fame:Elite Case (guitars or effects, Rare or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
+<StatRow stats="120 Fame:Standard Case (anything can drop)|160 Fame:Featured Case (a rotating pool of 10 items)|250 Fame:Premium Case (guitars or effects, better odds)|350 Fame:Elite Case (guitars or effects, Rare or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
 
 ## Rarity and item level
 
@@ -43,6 +43,8 @@ Scrapping gear you don't want breaks it down into **parts**, and parts are what 
 The gear you're actually playing comes first in the rack and is marked wherever it shows up: an amber dot for the guitar on your profile, a cyan one for a rig slot or a pedal on your board. Worth a glance before you spend anything: only work on equipped gear moves your Rig Level.
 
 <StepList steps="Restore::Raises an item's condition one grade at a time, up to Museum. It costs more the better the condition and the rarer the item, and it adds Item Level, but it never raises what the game will buy the item back for. Restoring is for keeps, not for flipping|Build::Fits one more upgrade. There's no ceiling on build levels, but every level asks for more than the last|Fit a mod::Bolts a named upgrade onto the instrument, such as hand-wound pickups, a bone nut or a charge pump. Each mod has its own price in parts, the same on every instrument, and how many an item can carry depends on its rarity" />
+
+**A mod you regret is not permanent.** Every mod on the bench can be taken back off for 50 Fame, which frees the slot for something else. It's a one-way trip for the mod, though: it's destroyed on the way out, it doesn't go to your stash, and the Item Level it was worth leaves with it. The bench asks you to confirm before it happens.
 
 Higher builds also get pickier: they want more _different_ kinds of parts, they refuse anything below a minimum rarity, they ask for rare Unique parts near the top, and they require the item to be in good condition first, and eventually Museum condition. Each build level adds a flat amount of Item Level depending on rarity, and the cost is the same whatever the rarity, so parts poured into a Mythic go a lot further than the same parts spent on a Common.
 

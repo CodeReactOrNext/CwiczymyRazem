@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
@@ -18,27 +19,38 @@ interface LevelDeltaProps {
   rarity: GuitarRarity;
 }
 
-export const LevelDelta = ({ from, to, rarity }: LevelDeltaProps) => (
-  <div className='flex items-center gap-3'>
-    <LevelEmblem
-      level={from}
-      rarity={rarity}
-      dimmed
-      size={36}
-      title='Level now'
-    />
-    <ArrowRight size={14} className='text-zinc-600' />
-    <LevelEmblem
-      level={to}
-      rarity={rarity}
-      size={44}
-      title='Level after this job'
-    />
-    <span className='text-sm font-black tabular-nums text-cyan-400'>
-      +{to - from}
-    </span>
-  </div>
-);
+export const LevelDelta = ({ from, to, rarity }: LevelDeltaProps) => {
+  // Not every job on the bench adds level: a re-roll can land under what the mod
+  // was worth, and taking a mod off always costs its whole value. Printing those
+  // as `+-4` reads as a rendering fault rather than as the loss the player chose.
+  const delta = to - from;
+
+  return (
+    <div className='flex items-center gap-3'>
+      <LevelEmblem
+        level={from}
+        rarity={rarity}
+        dimmed
+        size={36}
+        title='Level now'
+      />
+      <ArrowRight size={14} className='text-zinc-600' />
+      <LevelEmblem
+        level={to}
+        rarity={rarity}
+        size={44}
+        title='Level after this job'
+      />
+      <span
+        className={cn(
+          "text-sm font-black tabular-nums",
+          delta < 0 ? "text-amber-400" : "text-cyan-400",
+        )}>
+        {delta < 0 ? delta : `+${delta}`}
+      </span>
+    </div>
+  );
+};
 
 interface RarityDeltaProps {
   from: GuitarRarity;

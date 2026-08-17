@@ -35,6 +35,41 @@ function drawRarity(probabilities: Partial<Record<GuitarRarity, number>>): Guita
   return "Common";
 }
 
+/**
+ * How often a pull prefers a model the player does not own yet, given the rarity
+ * already rolled.
+ *
+ * Rarity is drawn first and is never touched by this — the odds printed on the
+ * case card stay exactly true. All this decides is *which* item of that rarity
+ * comes out, and only while the player is still missing some.
+ *
+ * Without it the collection ran into the coupon-collector wall: past about fifty
+ * cases roughly two pulls in three were a model already in the Dex, and the
+ * player was paying full price for a sell-for-scrap duplicate. Not 100%, because
+ * duplicates are load-bearing elsewhere — they are the scrap and build economy's
+ * raw material, and a stream that never repeats starves the workshop.
+ */
+const NEW_ITEM_BIAS = 0.7;
+
+/**
+ * One item of `rarity`, biased toward models the player is missing.
+ *
+ * Falls back to the full pool whenever the bias does not fire or the player
+ * already owns everything at that rarity, so this can never fail to return.
+ */
+function pickBiased<T>(
+  pool: readonly T[],
+  isOwned: (item: T) => boolean,
+): T {
+  if (Math.random() < NEW_ITEM_BIAS) {
+    const missing = pool.filter((item) => !isOwned(item));
+    if (missing.length > 0) {
+      return missing[Math.floor(Math.random() * missing.length)];
+    }
+  }
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
@@ -76,6 +111,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const existingEquipped = data.arsenal?.equippedGuitarId ?? data.selectedGuitar ?? null;
       const newFame = currentFame - caseDef.fameCost;
 
+      // What the Dex already has, for the new-item bias below. Built once here
+      // rather than per draw site, and read from the stored document — the
+      // request body has no say in what the player is deemed to own.
+      const ownedGuitarIds = new Set<number | string>(
+        (data.arsenal?.inventory || []).map((i: InventoryItem) => i.guitarId),
+      );
+      const ownedEffectIds = new Set<number | string>(
+        (data.arsenal?.effectInventory || []).map(
+          (i: EffectInventoryItem) => i.effectId,
+        ),
+      );
+
       // Daily case: the drop comes from today's deterministic featured pool —
       // the exact 10 items the shop preview shows. Rarity is still rolled from
       // the case's probability table; the item is then picked from the pool's
@@ -87,7 +134,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const candidates = pool.filter((e) => e.def.rarity === rarity);
         // Slots guarantee every rarity is present; fall back to the whole pool just in case.
         const pickFrom = candidates.length > 0 ? candidates : pool;
-        dailyPick = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+        dailyPick = pickBiased(pickFrom, (entry) =>
+          entry.kind === "guitar"
+            ? ownedGuitarIds.has(entry.def.id)
+            : ownedEffectIds.has(entry.def.id),
+        );
       }
 
       const isGuitarDrop = dailyPick
@@ -104,7 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
           const rarity = drawRarity(caseDef.probabilities);
           const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
-          guitar = pool[Math.floor(Math.random() * pool.length)];
+          guitar = pickBiased(pool, (g) => ownedGuitarIds.has(g.id));
         }
         const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
@@ -156,7 +207,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
           const rarity = drawRarity(caseDef.probabilities);
           const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
-          effect = pool[Math.floor(Math.random() * pool.length)];
+          effect = pickBiased(pool, (e) => ownedEffectIds.has(e.id));
         }
         const effectCondition = rollCondition();
         const effectYear = rollEffectYear(effect);

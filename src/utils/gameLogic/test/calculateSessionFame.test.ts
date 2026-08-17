@@ -5,7 +5,6 @@ import {
   calculateSessionFame,
   cumulativeDailyFame,
   getStreakFameBonus,
-  MAX_DAILY_CURVE_FAME,
 } from "../calculateSessionFame";
 
 const MINUTE = 60000;
@@ -35,9 +34,17 @@ describe("cumulativeDailyFame", () => {
     expect(cumulativeDailyFame(240)).toBe(46);
   });
 
-  it("caps the daily curve", () => {
-    expect(cumulativeDailyFame(600)).toBe(MAX_DAILY_CURVE_FAME);
-    expect(cumulativeDailyFame(60 * 24)).toBe(MAX_DAILY_CURVE_FAME);
+  it("keeps paying past what used to be the daily cap", () => {
+    // The flat 60-fame ceiling is gone: a ten-hour day used to pay exactly what a
+    // six-and-a-half-hour day paid, which made the extra practice worth nothing.
+    expect(cumulativeDailyFame(600)).toBeGreaterThan(cumulativeDailyFame(400));
+    expect(cumulativeDailyFame(60 * 24)).toBeGreaterThan(cumulativeDailyFame(600));
+  });
+
+  it("still leans on the square root to bound a long day", () => {
+    // The concavity is now the only thing holding self-reported time down, so it
+    // is pinned: ten hours must pay well under ten times what one hour pays.
+    expect(cumulativeDailyFame(600)).toBeLessThan(cumulativeDailyFame(60) * 4);
   });
 
   it("never goes backwards", () => {
@@ -87,7 +94,7 @@ describe("calculateSessionFame", () => {
     expect(today.fameDay.minutes).toBe(60);
   });
 
-  it("stops paying the curve once the daily cap is reached", () => {
+  it("keeps paying later sessions of a long day, at a lower rate", () => {
     const first = session(600);
     const second = calculateSessionFame({
       sessionTimeMs: 60 * MINUTE,
@@ -96,8 +103,10 @@ describe("calculateSessionFame", () => {
       fameDay: first.fameDay,
     });
 
-    expect(first.curveFame).toBe(MAX_DAILY_CURVE_FAME);
-    expect(second.curveFame).toBe(0);
+    // Used to be flatly 0 here, once the day passed the cap. It now pays, but an
+    // hour tacked onto a ten-hour day is worth far less than the day's first.
+    expect(second.curveFame).toBeGreaterThan(0);
+    expect(second.curveFame).toBeLessThan(session(60).curveFame);
   });
 
   it("keeps sub-minute practice from paying zero", () => {
@@ -234,12 +243,24 @@ describe("calculateSessionFame", () => {
     expect(session(60, { rigLevel: 750, isDateBackReport: 3 }).rigFameRate).toBeGreaterThan(0);
   });
 
-  it("keeps practice worth more than gear at the average rig", () => {
-    // Most players sit at rig 100–200, and there the curve has to stay the bigger
-    // half — the rig is a bonus on practising, not a reason to stop.
+  it("lets an average rig out-earn the curve, on purpose", () => {
+    // This assertion used to run the other way: the curve had to stay the bigger
+    // half at rig 100–200. That was the rule that made the Arsenal decoration —
+    // practice fame is concave and everyone lands on the same shallow stretch of
+    // it, so the gear a player actually chose barely moved their income. The rig
+    // is the half of the economy they steer, and it now pays like it.
     const result = session(25, { rigLevel: 200 });
 
-    expect(result.rigFame).toBeLessThan(result.curveFame);
+    expect(result.rigFame).toBeGreaterThan(result.curveFame);
+  });
+
+  it("still pays a player with no gear at all", () => {
+    // The other side of that line: the rig is a multiplier on showing up, never a
+    // gate in front of it. A bare account has to earn something for practising.
+    const result = session(25, { rigLevel: 0 });
+
+    expect(result.rigFame).toBe(0);
+    expect(result.curveFame).toBeGreaterThan(0);
   });
 
   it("lets a top rig out-earn the curve, on purpose", () => {
@@ -280,17 +301,27 @@ describe("calculateSessionFame", () => {
     });
 
     it("shares the rig ceiling instead of getting a second cap", () => {
-      // The top rig pays ~60/h, so a 40/h trait build overshoots the 90/h
-      // ceiling by 10 and has to give that back — scaled, so the rate the header
-      // showed is the rate that got paid.
+      // Deliberately absurd numbers: the ceiling sits at 1000/h and the top rig
+      // pays ~129, so nothing reachable comes near it. What is pinned here is the
+      // mechanism — one shared ceiling, and the excess given back scaled, so the
+      // rate the header showed is the rate that got paid.
       const result = session(60, {
         rigLevel: 750,
-        traitFame: 40,
-        traitRate: 40,
+        traitFame: 1000,
+        traitRate: 1000,
       });
 
-      expect(result.rigFameRate + result.traitFameRate).toBeCloseTo(90, 1);
-      expect(result.traitFame).toBeLessThan(40);
+      expect(result.rigFameRate + result.traitFameRate).toBeCloseTo(1000, 1);
+      expect(result.traitFame).toBeLessThan(1000);
+    });
+
+    it("leaves a realistic trait build untouched by the ceiling", () => {
+      // The ceiling is a backstop, not a balance lever — a good rig plus a good
+      // set of traits has to land under it, or the cards advertise rates the
+      // game never pays.
+      const result = session(60, { rigLevel: 400, traitFame: 60, traitRate: 60 });
+
+      expect(result.traitFame).toBe(60);
     });
 
     it("pays no trait fame on a back-dated report", () => {

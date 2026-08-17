@@ -1,3 +1,4 @@
+import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
@@ -32,12 +33,9 @@ interface TooltipData {
 }
 
 const RpgTooltip = ({ tooltip }: { tooltip: TooltipData }) => (
-  <div
-    className="pointer-events-none fixed z-[9999]"
-    style={{ left: tooltip.x + 14, top: tooltip.y - 8, width: 250 }}
-  >
+  <CursorTooltip x={tooltip.x} y={tooltip.y}>
     {tooltip.content}
-  </div>
+  </CursorTooltip>
 );
 
 interface GuitarSlotReadonlyProps {

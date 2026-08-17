@@ -29,6 +29,7 @@ import {
   getModSlots,
   getRepairQuote,
   isPromotionLevel,
+  MOD_REMOVE_FAME_COST,
   MOD_ROLL_BONUS,
   recipeToParts,
   rollModPoints,
@@ -292,6 +293,35 @@ describe("mods — rarity caps how many", () => {
 
     expect(full.canFit).toBe(false);
     expect(full.canReroll).toBe(true);
+  });
+});
+
+describe("mods — taking one off", () => {
+  const fitted = subject({ features: [{ id: "hand-wound", points: 4 }] });
+
+  it("needs the Fame, not the parts", () => {
+    // An empty wallet blocks every other job on the bench; removal is priced in
+    // Fame alone, so it stays open.
+    const broke = getModQuote(fitted, [], MOD_REMOVE_FAME_COST - 1);
+    const paid = getModQuote(fitted, [], MOD_REMOVE_FAME_COST);
+
+    expect(broke.canRemove).toBe(false);
+    expect(paid.canRemove).toBe(true);
+    expect(paid.canReroll).toBe(false);
+  });
+
+  it("has nothing to take off an unmodded item", () => {
+    expect(getModQuote(subject(), modWallet(), 10_000).canRemove).toBe(false);
+  });
+
+  it("offers to take off a mod the pool no longer knows", () => {
+    // The bench cannot re-roll a retired feature — it has no range left — but the
+    // slot it occupies is real, and stranding it would strand the slot.
+    const legacy = subject({ features: [{ id: "retired-mod", points: 3 }] });
+    const quote = getModQuote(legacy, modWallet(), MOD_REMOVE_FAME_COST);
+
+    expect(quote.fitted).toEqual([]);
+    expect(quote.canRemove).toBe(true);
   });
 });
 

@@ -36,9 +36,24 @@
  *    every skill named here has real exercises behind it and every counter cap
  *    is reachable — see the note on `SKILL_MIN_EXERCISES` there.
  *
- * The steep spread of values is deliberate: an unconditional trait pays ~3
+ * The steep spread of values is deliberate: an unconditional trait pays ~8
  * Fame/h and `Monk` — empty board, one guitar, a single-category session — pays
- * ~80. Very conditional has to pay very differently, or nobody builds for it.
+ * ~85. Very conditional has to pay very differently, or nobody builds for it.
+ *
+ * Every rate here was lifted by 5 Fame/h over the launch table, to make the item
+ * a player pulled matter more than the number of days they logged in. Two notes
+ * on how that was applied, because the table is not uniform:
+ *
+ *  • **Counter traits pay per unit**, so they were raised by `5 / cap` instead —
+ *    the trait gains the same ~5 Fame/h once it is fully stacked, rather than 5
+ *    per pedal. A flat +5 on `bench-boss` (cap 20) would have been +100 Fame/h.
+ *
+ *  • **Amps were left alone.** They hand a flat rate to every other trait they
+ *    match, so their real worth is already a multiple of what the table says,
+ *    and they collect the buff second-hand from the traits they amplify.
+ *
+ * Every value stays on a single decimal — `rollTraitValue` rounds to one, so a
+ * two-decimal bound would roll outside its own range.
  */
 
 import type { GuitarSkillId } from "feature/skills/skills.types";
@@ -181,8 +196,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     description: "Fame/h on any practice, whatever you play.",
     kind: "guitar",
     clock: "session",
-    min: 1.5,
-    max: 3.5,
+    min: 6.5,
+    max: 8.5,
   },
   {
     id: "long-take",
@@ -191,8 +206,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Reverb"],
     clock: "session",
-    min: 1.5,
-    max: 3.5,
+    min: 6.5,
+    max: 8.5,
   },
   {
     id: "reliable",
@@ -200,8 +215,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     description: "Fame/h on any practice. No conditions, no surprises.",
     kind: "guitar",
     clock: "session",
-    min: 2,
-    max: 4,
+    min: 7,
+    max: 9,
   },
 
   // 2. Category engines — the clock runs only on their own category.
@@ -211,8 +226,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     description: "Fame/h on technique practice.",
     kind: "guitar",
     clock: "technique",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "jazz-box",
@@ -220,8 +235,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     description: "Fame/h on theory practice. Built for chords, not for speed.",
     kind: "guitar",
     clock: "theory",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "songbook",
@@ -229,8 +244,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     description: "Fame/h on creativity practice.",
     kind: "guitar",
     clock: "creativity",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "intonation-monster",
@@ -239,8 +254,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       "Fame/h on ear training. It holds pitch all the way up the neck.",
     kind: "guitar",
     clock: "hearing",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "ear-trainer",
@@ -249,8 +264,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Delay"],
     clock: "hearing",
-    min: 3,
-    max: 7.5,
+    min: 8,
+    max: 12.5,
   },
   {
     id: "timing-trainer",
@@ -259,8 +274,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Delay"],
     clock: "technique",
-    min: 3,
-    max: 7.5,
+    min: 8,
+    max: 12.5,
   },
   {
     id: "frequency-work",
@@ -269,8 +284,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["EQ"],
     clock: "hearing",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "harmony-bench",
@@ -279,8 +294,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["EQ"],
     clock: "theory",
-    min: 3,
-    max: 7.5,
+    min: 8,
+    max: 12.5,
   },
   {
     id: "texture-lab",
@@ -289,8 +304,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Chorus", "Phaser", "Vibrato"],
     clock: "creativity",
-    min: 3.5,
-    max: 8,
+    min: 8.5,
+    max: 13,
   },
   {
     id: "noise-session",
@@ -299,8 +314,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Fuzz"],
     clock: "creativity",
-    min: 4,
-    max: 8.5,
+    min: 9,
+    max: 13.5,
   },
   {
     id: "pitch-reference",
@@ -309,8 +324,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     appliesTo: ["Tuner"],
     clock: "hearing",
-    min: 3,
-    max: 7.5,
+    min: 8,
+    max: 12.5,
   },
 
   // 3. Skills — one named skill trained anywhere in the session.
@@ -321,8 +336,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["alternate_picking"] },
-    min: 7,
-    max: 16,
+    min: 12,
+    max: 21,
   },
   {
     id: "legato-neck",
@@ -331,8 +346,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["legato"] },
-    min: 7,
-    max: 16,
+    min: 12,
+    max: 21,
   },
   {
     id: "bender",
@@ -341,8 +356,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["bending"] },
-    min: 6,
-    max: 15,
+    min: 11,
+    max: 20,
   },
   {
     id: "vibrato-arm",
@@ -351,8 +366,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["vibrato"] },
-    min: 6,
-    max: 15,
+    min: 11,
+    max: 20,
   },
   {
     id: "chord-shop",
@@ -361,8 +376,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["chords"] },
-    min: 7,
-    max: 16,
+    min: 12,
+    max: 21,
   },
   {
     id: "scale-runner",
@@ -371,8 +386,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "skills", skills: ["scales"] },
-    min: 7,
-    max: 16,
+    min: 12,
+    max: 21,
   },
   {
     id: "metronome",
@@ -382,8 +397,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Delay"],
     clock: "session",
     condition: { type: "skills", skills: ["rhythm"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
   {
     id: "phrase-repeat",
@@ -394,8 +409,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Delay"],
     clock: "session",
     condition: { type: "skills", skills: ["phrasing"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
   {
     id: "harmony-ear",
@@ -405,8 +420,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["EQ"],
     clock: "session",
     condition: { type: "skills", skills: ["harmony-ear"] },
-    min: 9,
-    max: 18,
+    min: 14,
+    max: 23,
   },
   {
     id: "interval-trainer",
@@ -416,8 +431,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Tuner"],
     clock: "session",
     condition: { type: "skills", skills: ["ear_training"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
   {
     id: "improv-pedal",
@@ -427,8 +442,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Fuzz"],
     clock: "session",
     condition: { type: "skills", skills: ["improvisation"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
   {
     id: "phrase-machine",
@@ -438,8 +453,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Chorus", "Phaser"],
     clock: "session",
     condition: { type: "skills", skills: ["phrasing"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
   {
     id: "improv-room",
@@ -449,8 +464,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Reverb"],
     clock: "session",
     condition: { type: "skills", skills: ["improvisation"] },
-    min: 9,
-    max: 18,
+    min: 14,
+    max: 23,
   },
   {
     id: "theory-board",
@@ -460,8 +475,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["EQ"],
     clock: "session",
     condition: { type: "skills", skills: ["music_theory"] },
-    min: 8,
-    max: 17,
+    min: 13,
+    max: 22,
   },
 
   // 4. Counters — the rate is per unit of something the rig holds.
@@ -474,8 +489,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     counter: { type: "brand-items", cap: 3 },
     brandParam: true,
-    min: 2,
-    max: 4,
+    min: 3.7,
+    max: 5.7,
   },
   {
     id: "pedal-platform",
@@ -485,8 +500,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     counter: { type: "board-pedals", cap: 6 },
-    min: 1,
-    max: 2,
+    min: 1.8,
+    max: 2.8,
   },
   {
     id: "backline",
@@ -495,8 +510,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     counter: { type: "other-guitars", cap: 2 },
-    min: 2,
-    max: 4,
+    min: 4.5,
+    max: 6.5,
   },
   {
     id: "vintage-row",
@@ -506,8 +521,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     counter: { type: "items-before-year", year: 1985, cap: 4 },
-    min: 1.5,
-    max: 3.5,
+    min: 2.8,
+    max: 4.8,
   },
   {
     id: "boutique-row",
@@ -517,8 +532,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     clock: "session",
     counter: { type: "board-rarity", minRarity: "Epic", cap: 4 },
-    min: 2,
-    max: 4,
+    min: 3.3,
+    max: 5.3,
   },
   {
     id: "bench-boss",
@@ -528,8 +543,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     counter: { type: "other-build-levels", cap: 20 },
-    min: 0.3,
-    max: 0.7,
+    min: 0.6,
+    max: 1,
   },
   {
     id: "well-equipped",
@@ -539,8 +554,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     clock: "session",
     counter: { type: "other-traits", cap: 8 },
-    min: 1.5,
-    max: 3.5,
+    min: 2.1,
+    max: 4.1,
   },
 
   // 5. Rig conditions — one thing outside the item has to be true.
@@ -552,8 +567,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "board-drives", min: 1 },
-    min: 4.5,
-    max: 9.5,
+    min: 9.5,
+    max: 14.5,
   },
   {
     id: "clean-machine",
@@ -563,8 +578,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "board-no-drive" },
-    min: 5.5,
-    max: 10.5,
+    min: 10.5,
+    max: 15.5,
   },
   {
     id: "solo-act",
@@ -573,8 +588,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "only-guitar" },
-    min: 6,
-    max: 12,
+    min: 11,
+    max: 17,
   },
   {
     id: "straight-to-amp",
@@ -584,8 +599,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     condition: { type: "board-empty" },
     maxRarity: "Epic",
-    min: 8,
-    max: 16,
+    min: 13,
+    max: 21,
   },
   {
     id: "cable-and-amp",
@@ -597,8 +612,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     condition: { type: "board-empty" },
     minRarity: "Legendary",
     maxRarity: "Legendary",
-    min: 18,
-    max: 30,
+    min: 23,
+    max: 35,
   },
   {
     id: "nothing-but-the-guitar",
@@ -609,8 +624,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     condition: { type: "board-empty" },
     minRarity: "Mythic",
-    min: 30,
-    max: 50,
+    min: 35,
+    max: 55,
   },
   {
     id: "matched-set",
@@ -620,8 +635,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "guitar",
     clock: "session",
     condition: { type: "same-brand" },
-    min: 4,
-    max: 8,
+    min: 9,
+    max: 13,
   },
   {
     id: "ambient-pair",
@@ -632,8 +647,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Delay", "Reverb"],
     clock: "session",
     condition: { type: "board-has-types", types: ["Delay", "Reverb"] },
-    min: 4.5,
-    max: 9.5,
+    min: 9.5,
+    max: 14.5,
   },
   {
     id: "gain-stack",
@@ -644,8 +659,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Overdrive", "Boost"],
     clock: "session",
     condition: { type: "board-second-drive" },
-    min: 4.5,
-    max: 9.5,
+    min: 9.5,
+    max: 14.5,
   },
   {
     id: "front-of-chain",
@@ -656,8 +671,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Fuzz"],
     clock: "session",
     condition: { type: "chain-before-drives" },
-    min: 4,
-    max: 8,
+    min: 9,
+    max: 13,
   },
   {
     id: "tail-of-chain",
@@ -668,8 +683,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     appliesTo: ["Delay", "Reverb"],
     clock: "session",
     condition: { type: "chain-after-drives" },
-    min: 4,
-    max: 8,
+    min: 9,
+    max: 13,
   },
   {
     id: "purist",
@@ -678,8 +693,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     clock: "session",
     condition: { type: "board-max", max: 2 },
-    min: 7,
-    max: 13,
+    min: 12,
+    max: 18,
   },
   {
     id: "full-board",
@@ -688,8 +703,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     kind: "effect",
     clock: "session",
     condition: { type: "board-min", min: 6 },
-    min: 5.5,
-    max: 10.5,
+    min: 10.5,
+    max: 15.5,
   },
 
   // 6. Heavy — a rig condition and a session condition at once.
@@ -707,8 +722,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "technique", minutes: 45 },
       ],
     },
-    min: 16,
-    max: 32,
+    min: 21,
+    max: 37,
   },
   {
     id: "ambient-study",
@@ -725,8 +740,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "hearing", minutes: 30 },
       ],
     },
-    min: 18,
-    max: 34,
+    min: 23,
+    max: 39,
   },
   {
     id: "writing-room",
@@ -742,8 +757,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "creativity", minutes: 45 },
       ],
     },
-    min: 16,
-    max: 32,
+    min: 21,
+    max: 37,
   },
   {
     id: "practice-room",
@@ -756,8 +771,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       type: "all",
       of: [{ type: "only-guitar" }, { type: "session-min", minutes: 60 }],
     },
-    min: 15,
-    max: 30,
+    min: 20,
+    max: 35,
   },
   {
     id: "theory-desk",
@@ -774,8 +789,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "theory", minutes: 30 },
       ],
     },
-    min: 17,
-    max: 33,
+    min: 22,
+    max: 38,
   },
   {
     id: "session-rig",
@@ -791,8 +806,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "categories-min", minutes: 15, count: 3 },
       ],
     },
-    min: 19,
-    max: 37,
+    min: 24,
+    max: 42,
   },
   {
     id: "fuzz-workout",
@@ -809,8 +824,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "technique", minutes: 45 },
       ],
     },
-    min: 18,
-    max: 34,
+    min: 23,
+    max: 39,
   },
   {
     id: "modulation-study",
@@ -827,8 +842,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "skills", skills: ["phrasing"] },
       ],
     },
-    min: 19,
-    max: 35,
+    min: 24,
+    max: 40,
   },
   {
     id: "vintage-session",
@@ -844,8 +859,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "session-min", minutes: 45 },
       ],
     },
-    min: 17,
-    max: 33,
+    min: 22,
+    max: 38,
   },
   {
     id: "stack-study",
@@ -862,8 +877,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "skills", skills: ["alternate_picking"] },
       ],
     },
-    min: 15,
-    max: 31,
+    min: 20,
+    max: 36,
   },
   {
     id: "tone-lab",
@@ -880,8 +895,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "creativity", minutes: 30 },
       ],
     },
-    min: 18,
-    max: 34,
+    min: 23,
+    max: 39,
   },
   {
     id: "quiet-room",
@@ -897,8 +912,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
         { type: "category-min", category: "hearing", minutes: 45 },
       ],
     },
-    min: 16,
-    max: 32,
+    min: 21,
+    max: 37,
   },
 
   // 7. Extreme — three or more conditions, and they exclude other builds.
@@ -918,8 +933,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Mythic",
-    min: 60,
-    max: 100,
+    min: 65,
+    max: 105,
   },
   {
     id: "virtuoso",
@@ -939,8 +954,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 32,
-    max: 56,
+    min: 37,
+    max: 61,
   },
   {
     id: "conservatory",
@@ -958,8 +973,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 30,
-    max: 54,
+    min: 35,
+    max: 59,
   },
   {
     id: "total-recall",
@@ -977,8 +992,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 32,
-    max: 56,
+    min: 37,
+    max: 61,
   },
   {
     id: "brand-artist",
@@ -996,8 +1011,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     },
     brandParam: true,
     minRarity: "Legendary",
-    min: 28,
-    max: 52,
+    min: 33,
+    max: 57,
   },
   {
     id: "wall-of-sound",
@@ -1015,8 +1030,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 28,
-    max: 48,
+    min: 33,
+    max: 53,
   },
   {
     id: "time-capsule",
@@ -1033,8 +1048,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 26,
-    max: 46,
+    min: 31,
+    max: 51,
   },
   {
     id: "one-man-band",
@@ -1051,8 +1066,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 30,
-    max: 54,
+    min: 35,
+    max: 59,
   },
   {
     id: "arranger",
@@ -1070,8 +1085,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
       ],
     },
     minRarity: "Legendary",
-    min: 30,
-    max: 54,
+    min: 35,
+    max: 59,
   },
 
   // 8. Amplifiers — flat Fame/h handed to other traits.
@@ -1164,8 +1179,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     condition: { type: "session-min", minutes: 30 },
     minRarity: "Epic",
-    min: 45,
-    max: 75,
+    min: 50,
+    max: 80,
   },
   {
     id: "diva",
@@ -1176,8 +1191,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     penalty: { type: "others-minus", amount: 9 },
     minRarity: "Legendary",
-    min: 50,
-    max: 82,
+    min: 55,
+    max: 87,
   },
   {
     id: "prima-donna",
@@ -1187,8 +1202,8 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     clock: "session",
     penalty: { type: "others-zero" },
     minRarity: "Mythic",
-    min: 90,
-    max: 150,
+    min: 95,
+    max: 155,
   },
 ];
 

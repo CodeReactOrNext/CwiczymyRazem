@@ -344,23 +344,26 @@ export interface WorkshopBuildResult {
 }
 
 /**
- * Fitting a new mod, re-rolling one already on the item, or bolting on a mod
- * rescued from a teardown — the third keeps the value it came with instead of
- * rolling a new one.
+ * Fitting a new mod, re-rolling one already on the item, bolting on a mod rescued
+ * from a teardown, or stripping one back off — the third keeps the value it came
+ * with instead of rolling a new one, and the fourth destroys the mod outright.
  */
-export type WorkshopModAction = "fit" | "reroll" | "fit-salvaged";
+export type WorkshopModAction = "fit" | "reroll" | "remove" | "fit-salvaged";
 
 export interface WorkshopModResult {
   action: WorkshopModAction;
-  /** The feature that was fitted or re-rolled. */
+  /** The feature that was fitted, re-rolled or removed. */
   featureId: string;
   label: string;
+  /** Zero on a removal — the mod is off the item and worth nothing to it. */
   points: number;
-  /** The value before a re-roll — absent on a fresh fit. */
+  /** The value before a re-roll or a removal — absent on a fresh fit. */
   pointsBefore?: number;
-  /** Item Level the job was worth. Negative when a re-roll came out worse. */
+  /** Item Level the job was worth. Negative on a removal, or a re-roll gone bad. */
   levelGain: number;
   spent: ScrapPart[];
+  /** Fame the job cost. Only a removal charges any — the rest run on parts. */
+  fameSpent?: number;
   /** The finished item, so the result card renders without waiting for a refetch. */
   item: InventoryItem | EffectInventoryItem;
   newParts: ScrapPart[];

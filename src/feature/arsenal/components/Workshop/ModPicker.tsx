@@ -8,10 +8,11 @@ import { cn } from "assets/lib/utils";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type { FittedMod, ModOption } from "feature/arsenal/data/workshop";
 import { motion } from "framer-motion";
-import { Dices } from "lucide-react";
+import { Dices, Trash2 } from "lucide-react";
 
 import { PartRow } from "../Parts/PartRow";
 import { SectionLabel } from "../SectionLabel";
+import { FameCoin } from "./FameCoin";
 import { ModArt } from "./ModArt";
 
 /**
@@ -92,6 +93,51 @@ const ActionButton = ({
   );
 };
 
+/**
+ * The other way a fitted mod can leave the instrument.
+ *
+ * Quiet zinc that only turns red under the cursor, and always *beside* the
+ * re-roll rather than in its place: one of the two buys the mod again, the other
+ * throws it away, and the pair has to read as a choice rather than as one button
+ * with a hidden second meaning. The price is on the face of it because it is the
+ * only job on this bench paid for in Fame.
+ */
+const RemoveButton = ({
+  fame,
+  disabled,
+  onRemove,
+}: {
+  fame: number;
+  disabled: boolean;
+  onRemove: () => void;
+}) => (
+  <TooltipProvider delayDuration={100}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={onRemove}
+          disabled={disabled}
+          aria-label={`Take this mod off for ${fame} Fame`}
+          className={cn(
+            "flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3.5 text-sm font-bold text-zinc-400 transition-colors click-behavior",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400/60",
+            "disabled:pointer-events-none disabled:opacity-40",
+            "hover:bg-red-500/15 hover:text-red-300",
+          )}>
+          <Trash2 size={16} />
+          <FameCoin size={16} />
+          <span className='tabular-nums'>{fame}</span>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className='max-w-[280px] leading-relaxed'>
+        Takes the mod off the instrument for {fame} Fame and frees its slot. The
+        mod is destroyed on the way out — it is not put in your stash and cannot
+        be fitted again.
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+);
+
 interface ModRowProps {
   mod: ModOption;
   /** Present on a fitted mod — its current value. */
@@ -101,6 +147,10 @@ interface ModRowProps {
   actionHint?: string;
   disabled: boolean;
   onAction: () => void;
+  /** Fitted mods only — the second, destructive way off the instrument. */
+  onRemove?: () => void;
+  removeFame?: number;
+  removeDisabled?: boolean;
   index?: number;
 }
 
@@ -111,6 +161,9 @@ const ModRow = ({
   actionHint,
   disabled,
   onAction,
+  onRemove,
+  removeFame = 0,
+  removeDisabled = false,
   index = 0,
 }: ModRowProps) => (
   <motion.div
@@ -150,13 +203,22 @@ const ModRow = ({
       <MiniBill recipe={mod.recipe} />
     </div>
 
-    <ActionButton
-      label={actionLabel}
-      hint={actionHint}
-      rolls={points != null}
-      disabled={disabled}
-      onAction={onAction}
-    />
+    <div className='flex shrink-0 flex-wrap items-center gap-2'>
+      <ActionButton
+        label={actionLabel}
+        hint={actionHint}
+        rolls={points != null}
+        disabled={disabled}
+        onAction={onAction}
+      />
+      {onRemove && (
+        <RemoveButton
+          fame={removeFame}
+          disabled={removeDisabled}
+          onRemove={onRemove}
+        />
+      )}
+    </div>
   </motion.div>
 );
 
@@ -228,10 +290,15 @@ interface ModPickerProps {
   salvaged: SalvagedModOption[];
   /** No free slot — the fit menu is shown, but nothing in it can be bought. */
   slotsFull: boolean;
+  /** Flat Fame the bench charges to strip a mod off, whatever it is worth. */
+  removeFame: number;
+  /** Whether the player's Fame covers that charge. */
+  canRemove: boolean;
   busy: boolean;
   onFit: (featureId: string) => void;
   onReroll: (featureId: string) => void;
   onFitSalvaged: (salvagedId: string) => void;
+  onRemove: (featureId: string) => void;
 }
 
 /**
@@ -246,10 +313,13 @@ export const ModPicker = ({
   fitted,
   salvaged,
   slotsFull,
+  removeFame,
+  canRemove,
   busy,
   onFit,
   onReroll,
   onFitSalvaged,
+  onRemove,
 }: ModPickerProps) => (
   <div className='flex flex-col gap-7'>
     {fitted.length > 0 && (
@@ -265,6 +335,12 @@ export const ModPicker = ({
             A re-roll buys the mod again for a brand-new value from its range.
             Whatever comes up replaces what the mod is worth now — there is no
             keeping the better of the two.
+          </p>
+          <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+            Taking one off costs {removeFame} Fame and frees its slot. The mod
+            comes off the instrument for good: it is not put in your stash, it
+            cannot be fitted anywhere else, and the level it was worth goes with
+            it.
           </p>
         </div>
         <div className='flex flex-col gap-2'>
@@ -282,6 +358,9 @@ export const ModPicker = ({
               }.`}
               disabled={!mod.affordable || busy}
               onAction={() => onReroll(mod.id)}
+              onRemove={() => onRemove(mod.id)}
+              removeFame={removeFame}
+              removeDisabled={!canRemove || busy}
             />
           ))}
         </div>

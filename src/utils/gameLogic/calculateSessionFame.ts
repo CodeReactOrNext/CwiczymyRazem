@@ -8,8 +8,10 @@
  *  - the curve reads the user's DAILY total, not the single session, so
  *    splitting 2h into six 20-minute reports earns exactly the same as one 2h
  *    report,
- *  - self-reported time can't inflate the economy without bound — the curve
- *    component is capped per day.
+ *  - self-reported time still can't run away with the economy: the square root
+ *    means the tenth hour of a day is worth a fraction of the first. Note that
+ *    this is now the *only* thing bounding the curve — the flat daily ceiling is
+ *    gone, and `sumTime` is not clamped server-side.
  *
  * Consistency is rewarded with a flat daily bonus (paid once per day) rather
  * than the old streak multiplier, which stacked multiplicatively with session
@@ -28,9 +30,6 @@ import {
 
 /** `fame = FAME_CURVE_FACTOR * sqrt(dailyMinutes)` — 1h ≈ 23, 2h ≈ 33, 4h ≈ 46. */
 export const FAME_CURVE_FACTOR = 3;
-
-/** Ceiling on the curve component alone. Flat bonuses are added on top. */
-export const MAX_DAILY_CURVE_FAME = 60;
 
 /** Mic accuracy (%) at or above which the session's curve fame is multiplied. */
 export const HIGH_ACCURACY_THRESHOLD = 85;
@@ -113,13 +112,20 @@ export interface SessionFameResult {
   fameDay: FameDayState;
 }
 
-/** Cumulative fame owed for `minutes` of practice in one day. Monotone, so the
- * difference between two calls is never negative. */
+/**
+ * Cumulative fame owed for `minutes` of practice in one day. Monotone, so the
+ * difference between two calls is never negative.
+ *
+ * Uncapped. There used to be a hard 60-fame ceiling here, which meant a day past
+ * about six and a half hours paid nothing at all for the rest of it — and since
+ * the shop is priced in fame, a player who practised twice as much as another
+ * finished the month with roughly the same collection. The square root is the
+ * concavity that keeps a marathon from paying like six short days; a second,
+ * absolute stop on top of it was making long practice literally worthless rather
+ * than merely worth less.
+ */
 export const cumulativeDailyFame = (minutes: number): number =>
-  Math.min(
-    MAX_DAILY_CURVE_FAME,
-    Math.round(FAME_CURVE_FACTOR * Math.sqrt(Math.max(0, minutes)))
-  );
+  Math.round(FAME_CURVE_FACTOR * Math.sqrt(Math.max(0, minutes)));
 
 export const getStreakFameBonus = (streak: number): number =>
   STREAK_FAME_BONUSES.find((tier) => streak >= tier.minStreak)?.fame ?? 0;

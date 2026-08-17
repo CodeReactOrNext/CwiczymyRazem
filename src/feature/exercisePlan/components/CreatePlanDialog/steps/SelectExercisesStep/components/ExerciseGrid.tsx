@@ -14,6 +14,8 @@ interface ExerciseGridProps {
   selectedExercises: Exercise[];
   onToggleExercise: (exercise: Exercise) => void;
   onPreviewExercise?: (exercise: Exercise) => void;
+  /** Ids of exercises the user owns but hasn't published — marked with a badge. */
+  privateExerciseIds?: Set<string>;
 }
 
 export const ExerciseGrid = ({
@@ -21,6 +23,7 @@ export const ExerciseGrid = ({
   selectedExercises,
   onToggleExercise,
   onPreviewExercise,
+  privateExerciseIds,
 }: ExerciseGridProps) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const dispatch = useAppDispatch();
@@ -72,6 +75,7 @@ export const ExerciseGrid = ({
               isSelected={isSelected}
               onToggle={onToggleExercise}
               onPreview={onPreviewExercise}
+              isPrivate={privateExerciseIds?.has(exercise.id)}
               isLocked={locked}
               onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
               isFavorite={isFavorite}

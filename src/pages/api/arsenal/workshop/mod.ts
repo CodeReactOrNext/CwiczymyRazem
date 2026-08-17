@@ -7,7 +7,9 @@ import { getSalvagedModOptions } from "feature/arsenal/data/salvage";
 import {
   getEffectSubject,
   getGuitarSubject,
+  getModDef,
   getModQuote,
+  MOD_REMOVE_FAME_COST,
   recipeToParts,
   rollModPoints,
   subtractParts,
@@ -18,6 +20,7 @@ import type {
   ItemFeature,
   SalvagedMod,
   ScrapPart,
+  WorkshopModAction,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import { appendBuildLog } from "feature/arsenal/utils/buildLog";
@@ -26,8 +29,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Fits a mod, re-rolls one already fitted, or bolts on one rescued from a
- * teardown.
+ * Fits a mod, re-rolls one already fitted, bolts on one rescued from a teardown,
+ * or strips one back off.
  *
  * The player picks *which* mod — each one has its own bill, so there is nothing
  * random about the price — but the value is rolled here and never on the client.
@@ -37,6 +40,11 @@ import { auth, firestore } from "utils/firebase/api/firebase.config";
  * A salvaged fit is the one case where nothing is rolled and nothing is charged:
  * the mod already has a value, earned on the instrument it was pulled off, and
  * the player already paid that instrument for it — see `data/salvage.ts`.
+ *
+ * A removal is the mirror image: nothing is rolled, nothing is spent out of the
+ * wallet, a flat `MOD_REMOVE_FAME_COST` is charged, and the mod is *gone* — it is
+ * never written to `salvagedMods`, because a fee this small must not undercut the
+ * teardown that is the real way to move a mod between instruments.
  */
 export default async function handler(
   req: NextApiRequest,
@@ -50,14 +58,15 @@ export default async function handler(
     idToken: string;
     itemId: string;
     kind: "guitar" | "effect";
-    /** The named mod to fit or re-roll. Unused by a salvaged fit. */
+    /** The named mod to fit, re-roll or remove. Unused by a salvaged fit. */
     featureId?: string;
-    action: "fit" | "reroll" | "fit-salvaged";
+    action: WorkshopModAction;
     /** The stash entry a salvaged fit consumes. */
     salvagedId?: string;
   };
 
   const isSalvaged = action === "fit-salvaged";
+  const isRemove = action === "remove";
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (!itemId) return res.status(400).json({ error: "Missing itemId" });
@@ -67,7 +76,7 @@ export default async function handler(
   } else if (!featureId) {
     return res.status(400).json({ error: "Missing featureId" });
   }
-  if (action !== "fit" && action !== "reroll" && !isSalvaged) {
+  if (action !== "fit" && action !== "reroll" && !isRemove && !isSalvaged) {
     return res.status(400).json({ error: "Invalid action" });
   }
   if (kind !== "guitar" && kind !== "effect") {
@@ -96,6 +105,7 @@ export default async function handler(
       const effectInventory: EffectInventoryItem[] =
         data.arsenal?.effectInventory ?? [];
       const wallet: ScrapPart[] = data.arsenal?.parts ?? [];
+      const fame: number = data.statistics?.fame ?? 0;
 
       const list = kind === "guitar" ? inventory : effectInventory;
       const index = list.findIndex((item) => item.id === itemId);
@@ -117,7 +127,7 @@ export default async function handler(
               return getEffectSubject(item as EffectInventoryItem, def);
             })();
 
-      const quote = getModQuote(subject, wallet);
+      const quote = getModQuote(subject, wallet, fame);
       const isReroll = action === "reroll";
       const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
 
@@ -126,10 +136,28 @@ export default async function handler(
       let target: ItemFeature;
       let label: string;
       let spent: ScrapPart[];
+      let fameSpent = 0;
       let logLine: string;
       let newSalvagedMods = salvagedMods;
 
-      if (isSalvaged) {
+      if (isRemove) {
+        // Resolved off the item's own features rather than off `quote.fitted`:
+        // a mod the pool no longer knows has no definition and so never reaches
+        // that list, and being unable to take it off would strand the slot.
+        const at = features.findIndex((f) => f.id === featureId);
+        if (at === -1) throw new Error("REQUIREMENT_NOT_FITTED");
+        if (fame < MOD_REMOVE_FAME_COST) throw new Error("REQUIREMENT_FAME");
+
+        const [removed] = features.splice(at, 1);
+        // Not pushed anywhere: the mod is destroyed, not stashed. `salvagedMods`
+        // is only ever written by a teardown.
+        target = { id: removed.id, points: 0 };
+        pointsBefore = removed.points;
+        label = getModDef(subject.kind, removed.id)?.label ?? removed.id;
+        spent = [];
+        fameSpent = MOD_REMOVE_FAME_COST;
+        logLine = `${label} +${removed.points} stripped out`;
+      } else if (isSalvaged) {
         // Resolved from the stash the same way the bench resolved it, so a
         // request cannot name a mod the player does not own or one that does
         // not fit this instrument.
@@ -210,6 +238,7 @@ export default async function handler(
           : effectInventory;
 
       const newParts = subtractParts(wallet, spent);
+      const newFame = fame - fameSpent;
 
       const rigLevel = getRigLevel({
         inventory: newInventory,
@@ -222,6 +251,7 @@ export default async function handler(
           newList,
         "arsenal.parts": newParts,
         ...(isSalvaged ? { "arsenal.salvagedMods": newSalvagedMods } : {}),
+        ...(fameSpent > 0 ? { "statistics.fame": newFame } : {}),
         rigLevel,
       });
 
@@ -231,11 +261,15 @@ export default async function handler(
         label,
         points: target.points,
         pointsBefore,
-        // Feature points feed the item level one for one, so the delta is the gain.
+        // Feature points feed the item level one for one, so the delta is the
+        // gain — negative on a removal, which hands the whole value back.
         levelGain: target.points - (pointsBefore ?? 0),
         spent,
+        // Mirrored into the client's Fame counter, which lives outside this query.
+        fameSpent,
         item: upgraded,
         newParts,
+        newFame,
         rigLevel,
       };
     });
@@ -257,6 +291,7 @@ export default async function handler(
         slots: "Every mod slot at this rarity is filled — promote it first",
         not_fitted: "That mod is not on this item",
         unavailable: "That mod does not fit this instrument",
+        fame: `Taking a mod off costs ${MOD_REMOVE_FAME_COST} Fame`,
       };
       return res
         .status(400)

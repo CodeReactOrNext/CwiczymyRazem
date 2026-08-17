@@ -87,6 +87,7 @@ const modQuote = (over: Partial<ModQuote>): ModQuote => ({
   fitted: [],
   canFit: false,
   canReroll: false,
+  canRemove: false,
   ...over,
 });
 

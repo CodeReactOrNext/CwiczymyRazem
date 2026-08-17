@@ -85,12 +85,12 @@ export const alternatePickingCrossStringExercise: Exercise = {
         { duration: 0.25, notes: [{ string: 6, fret: 8 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 5 }] },
       ],
     },
-    // M6: ending — resolve to A (2/4)
+    // M6: ending — climbs to E (the 5th) and hands back to the A that opens M1 (5/16)
     {
-      timeSignature: [2, 4],
+      timeSignature: [5, 16],
       beats: [
         { duration: 0.25, notes: [{ string: 6, fret: 5 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 8 }] }, { duration: 0.25, notes: [{ string: 5, fret: 5 }] },
-        { duration: 0.25, notes: [{ string: 5, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 8 }] }, { duration: 0.25, notes: [{ string: 6, fret: 7 }] }, { duration: 0.25, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 7 }] },
       ],
     },
   ],

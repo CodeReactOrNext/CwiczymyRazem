@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { Textarea } from "assets/components/ui/textarea";
+import { createCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
+import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
 import type {
     BackingTrack,
     DifficultyLevel,
@@ -28,9 +30,9 @@ import type {
 } from "feature/exercisePlan/types/exercise.types";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { uploadUserGpFile } from "feature/songs/services/userGpFiles.service";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { AlignLeft, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X } from "lucide-react";
+import { AlignLeft, BookMarked, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -40,6 +42,8 @@ interface CreateCustomExerciseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onExerciseCreate: (exercise: Exercise) => void;
+  /** Fired after a copy landed in the user's own exercise library. */
+  onSavedToLibrary?: () => void;
   initialData?: Exercise;
   mode?: "create" | "edit" | "clone";
 }
@@ -48,11 +52,13 @@ export const CreateCustomExerciseDialog = ({
   open,
   onOpenChange,
   onExerciseCreate,
+  onSavedToLibrary,
   initialData,
   mode = "create",
 }: CreateCustomExerciseDialogProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const userId = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("5");
@@ -81,9 +87,18 @@ export const CreateCustomExerciseDialog = ({
   const [gpFileCleared, setGpFileCleared] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Mirrors the exercise into the user's own library (privately), so an
+  // exercise written here isn't stranded inside this one plan — it shows up on
+  // /my-exercises and in the "My Exercises" source tab like any other.
+  const [saveToLibrary, setSaveToLibrary] = useState(mode === "create");
+  const [isSavingToLibrary, setIsSavingToLibrary] = useState(false);
+
   // Effect to reset/initialize when open status changes
   useEffect(() => {
     if (open) {
+      // Only a brand-new exercise defaults to being saved — editing or cloning
+      // an existing one shouldn't quietly pile up copies in the library.
+      setSaveToLibrary(mode === "create");
       if (initialData && (mode === "edit" || mode === "clone")) {
         setTitle(initialData.title);
         setDescription(initialData.description);
@@ -241,15 +256,56 @@ export const CreateCustomExerciseDialog = ({
       ...(effectiveGpFileUrl && { gpFileUrl: effectiveGpFileUrl }),
     };
 
+    let librarySave: "saved" | "failed" | null = null;
+    if (saveToLibrary && userId) {
+      const libraryInput: CreateCommunityExerciseInput = {
+        title: newExercise.title,
+        description: newExercise.description,
+        category: newExercise.category,
+        difficulty: newExercise.difficulty,
+        relatedSkills: newExercise.relatedSkills,
+        metronomeSpeed: newExercise.metronomeSpeed,
+        timeInMinutes: newExercise.timeInMinutes,
+        instructions: newExercise.instructions,
+        tips: newExercise.tips,
+        tablature: newExercise.tablature ?? [],
+        videoUrl: newExercise.videoUrl ?? null,
+        imageUrl: newExercise.imageUrl ?? null,
+        ...(newExercise.gpFileUrl && { gpFileUrl: newExercise.gpFileUrl }),
+        ...(newExercise.backingTracks && { backingTracks: newExercise.backingTracks }),
+        // Always private — the plan creator is not a publishing flow. The user
+        // can publish it later from My Exercises.
+        isPublic: false,
+      };
+
+      setIsSavingToLibrary(true);
+      const savedId = await createCommunityExercise(
+        libraryInput,
+        userId,
+        userInfo?.displayName || "Anonymous"
+      );
+      setIsSavingToLibrary(false);
+      librarySave = savedId ? "saved" : "failed";
+      if (savedId) onSavedToLibrary?.();
+    }
+
     onExerciseCreate(newExercise);
     onOpenChange(false);
 
+    const savedToLibrary = librarySave === "saved"
+      ? { description: "Also saved privately to My Exercises." }
+      : undefined;
+
     if (mode === "edit") {
-        toast.success(t("exercises:custom_exercise.edit_success"));
+        toast.success(t("exercises:custom_exercise.edit_success"), savedToLibrary);
     } else if (mode === "clone") {
-        toast.success(t("exercises:custom_exercise.clone_success"));
+        toast.success(t("exercises:custom_exercise.clone_success"), savedToLibrary);
     } else {
-        toast.success(t("exercises:custom_exercise.created_success"));
+        toast.success(t("exercises:custom_exercise.created_success"), savedToLibrary);
+    }
+
+    if (librarySave === "failed") {
+      toast.error("Couldn't save it to My Exercises — it's still added to this plan.");
     }
 
     resetForm();
@@ -598,6 +654,28 @@ export const CreateCustomExerciseDialog = ({
                     </p>
                 )}
             </div>
+
+            {/* Keep a copy outside this plan */}
+            {userId && (
+              <div className="flex items-start justify-between gap-5 p-5 bg-zinc-900/30 rounded-xl border border-white/5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="saveToLibrary" className="flex items-center gap-2 text-zinc-300 font-medium">
+                    <BookMarked className="h-4 w-4 text-cyan-500" />
+                    Save to My Exercises
+                  </Label>
+                  <p className="text-xs text-zinc-500 leading-relaxed">
+                    Keeps a private copy in your own exercise library, so you can reuse it in other plans.
+                    Nobody else sees it unless you publish it later.
+                  </p>
+                </div>
+                <Checkbox
+                  id="saveToLibrary"
+                  checked={saveToLibrary}
+                  onCheckedChange={(checked) => setSaveToLibrary(!!checked)}
+                  className="mt-1 shrink-0 border-zinc-700 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
+                />
+              </div>
+            )}
             </form>
         </div>
 
@@ -606,9 +684,11 @@ export const CreateCustomExerciseDialog = ({
                 <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto mt-2 sm:mt-0 border-zinc-700 hover:bg-zinc-800">
                     {t("common:cancel" as any)}
                 </Button>
-                <Button type="submit" form="create-exercise-form" disabled={isUploading} className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
+                <Button type="submit" form="create-exercise-form" disabled={isUploading || isSavingToLibrary} className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
                     {isUploading ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading GP file...</>
+                    ) : isSavingToLibrary ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
                     ) : mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
                 </Button>
             </DialogFooter>

@@ -36,8 +36,8 @@ const STRAT: ScrapBom = [
  * Four pots on the harness, and they sit in a routed control cavity behind a plate
  * — the electronics come out before anything soldered into the body does, so the
  * pots outrank the pickups here. They used to sit last, which put them a slot past
- * anything but a Mythic; no single-cut in the roster is Mythic, so twenty guitars
- * listed `pot ×2` and paid out exactly none.
+ * anything but a Mythic; the roster held no Mythic single-cut at the time, so twenty
+ * guitars listed `pot ×2` and paid out exactly none.
  *
  * One pot, not the four the harness holds: a teardown recovers the one that comes
  * off the board clean. Paying the full count made pots three times more abundant
@@ -148,6 +148,14 @@ export const GUITAR_BOMS: Record<number, ScrapBom> = {
   57: SINGLECUT,
   58: TWIN,
   59: STRAT,
+  // Private Stock batch — set-neck double-cuts, one bolt-on offset, two Explorers
+  60: SINGLECUT,
+  61: SINGLECUT,
+  62: SUPER_HSS,
+  63: SINGLECUT,
+  64: SINGLECUT,
+  65: SINGLECUT,
+  66: SINGLECUT,
 };
 
 /** Fallback for any guitar id added before its BOM is authored. */

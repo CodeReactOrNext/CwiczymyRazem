@@ -1,14 +1,20 @@
 import { Button } from "assets/components/ui/button";
-import { getCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
+import {
+  getCommunityExercises,
+  getUserCommunityExercises,
+} from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
 import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, BookOpen, Globe } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import { ArrowRight, BookOpen, Globe, User } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 
 import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
 import { ExerciseFilters } from "./components/ExerciseFilters";
@@ -24,6 +30,42 @@ interface SelectExercisesStepProps {
   onNext: () => void;
 }
 
+type SourceTab = "library" | "community" | "mine";
+
+const SOURCE_TABS: { id: SourceTab; label: string; icon: LucideIcon }[] = [
+  { id: "library", label: "Library", icon: BookOpen },
+  { id: "community", label: "Community", icon: Globe },
+  { id: "mine", label: "My Exercises", icon: User },
+];
+
+/** Prefix keeps ids from the community collection apart from the built-in
+ *  library ones — and makes the same exercise resolve to the same id whether it
+ *  was picked from the Community tab or from My Exercises. */
+const communityExerciseId = (id: string) => `community-${id}`;
+
+const communityToExercise = (ce: CommunityExercise): Exercise => ({
+  id: communityExerciseId(ce.id),
+  title: ce.title,
+  description: ce.description,
+  category: ce.category,
+  difficulty: ce.difficulty,
+  timeInMinutes: ce.timeInMinutes,
+  instructions: ce.instructions,
+  tips: ce.tips,
+  metronomeSpeed: ce.metronomeSpeed,
+  relatedSkills: ce.relatedSkills,
+  tablature: ce.tablature,
+  videoUrl: ce.videoUrl,
+  imageUrl: ce.imageUrl,
+  gpFileUrl: ce.gpFileUrl,
+  backingTracks: ce.backingTracks,
+});
+
+const matchesSearch = (exercise: Exercise, search: string) =>
+  search === "" ||
+  exercise.title.toLowerCase().includes(search.toLowerCase()) ||
+  exercise.description?.toLowerCase().includes(search.toLowerCase());
+
 export const SelectExercisesStep = ({
   selectedExercises,
   onExercisesSelect,
@@ -38,25 +80,16 @@ export const SelectExercisesStep = ({
   const [pendingExercise, setPendingExercise] = useState<Exercise | undefined>(undefined);
   const [editingBuiltinExercise, setEditingBuiltinExercise] = useState<Exercise | undefined>(undefined);
   const [previewingExercise, setPreviewingExercise] = useState<Exercise | undefined>(undefined);
-  const [sourceTab, setSourceTab] = useState<"library" | "community">("library");
+  const [sourceTab, setSourceTab] = useState<SourceTab>("library");
   const [communityExercises, setCommunityExercises] = useState<Exercise[]>([]);
   const [communitySearch, setCommunitySearch] = useState("");
   const [communityLoading, setCommunityLoading] = useState(false);
   const communityFetched = useRef(false);
-
-  const communityToExercise = (ce: CommunityExercise): Exercise => ({
-    id: `community-${ce.id}`,
-    title: ce.title,
-    description: ce.description,
-    category: ce.category,
-    difficulty: ce.difficulty,
-    timeInMinutes: ce.timeInMinutes,
-    instructions: ce.instructions,
-    tips: ce.tips,
-    metronomeSpeed: ce.metronomeSpeed,
-    relatedSkills: ce.relatedSkills,
-    tablature: ce.tablature,
-  });
+  const userAuth = useAppSelector(selectUserAuth);
+  const [myExercises, setMyExercises] = useState<CommunityExercise[]>([]);
+  const [mySearch, setMySearch] = useState("");
+  const [myLoading, setMyLoading] = useState(false);
+  const myFetched = useRef(false);
 
   useEffect(() => {
     if (sourceTab !== "community" || communityFetched.current) return;
@@ -67,10 +100,47 @@ export const SelectExercisesStep = ({
       .finally(() => setCommunityLoading(false));
   }, [sourceTab]);
 
+  // The user's own exercises — unlike the Community tab this includes the ones
+  // that were never published, so a private draft can still go into a plan.
+  const loadMyExercises = useCallback(() => {
+    if (!userAuth) return;
+    myFetched.current = true;
+    setMyLoading(true);
+    getUserCommunityExercises(userAuth)
+      .then(setMyExercises)
+      .finally(() => setMyLoading(false));
+  }, [userAuth]);
+
+  useEffect(() => {
+    if (sourceTab !== "mine" || myFetched.current) return;
+    loadMyExercises();
+  }, [sourceTab, loadMyExercises]);
+
+  // Only worth refetching when the list is already on screen — otherwise the
+  // first visit to the tab loads it fresh anyway.
+  const handleSavedToLibrary = () => {
+    if (myFetched.current) loadMyExercises();
+  };
+
   const filteredCommunityExercises = communityExercises.filter(e =>
-    communitySearch === "" ||
-    e.title.toLowerCase().includes(communitySearch.toLowerCase()) ||
-    e.description?.toLowerCase().includes(communitySearch.toLowerCase())
+    matchesSearch(e, communitySearch)
+  );
+
+  const myLibraryExercises = useMemo(
+    () => myExercises.map(communityToExercise),
+    [myExercises]
+  );
+
+  const privateExerciseIds = useMemo(
+    () =>
+      new Set(
+        myExercises.filter(e => !e.isPublic).map(e => communityExerciseId(e.id))
+      ),
+    [myExercises]
+  );
+
+  const filteredMyExercises = myLibraryExercises.filter(e =>
+    matchesSearch(e, mySearch)
   );
 
   const {
@@ -172,6 +242,19 @@ export const SelectExercisesStep = ({
     onExercisesSelect(reordered);
   };
 
+  // The Community and My Exercises tabs render the same list UI — only the
+  // source, its search box and the empty state differ.
+  const isMineTab = sourceTab === "mine";
+  const remoteSearch = isMineTab ? mySearch : communitySearch;
+  const setRemoteSearch = isMineTab ? setMySearch : setCommunitySearch;
+  const remoteLoading = isMineTab ? myLoading : communityLoading;
+  const remoteExercises = isMineTab ? filteredMyExercises : filteredCommunityExercises;
+  const remoteEmptyMessage = remoteSearch
+    ? "No exercises match your search."
+    : isMineTab
+      ? "You haven't created any exercises yet. Build one in the Tab Editor — it shows up here whether you publish it or keep it private."
+      : "No community exercises published yet.";
+
   const handleChordGenerated = (generatedExercise: Exercise) => {
       if (editingBuiltinExercise) {
          onExercisesSelect(selectedExercises.map(e => e.id === editingBuiltinExercise.id ? generatedExercise : e));
@@ -238,31 +321,22 @@ export const SelectExercisesStep = ({
 
         <div className="lg:col-span-7 space-y-6 min-w-0">
           {/* Source tabs */}
-          <div className="flex items-center gap-1 bg-zinc-900 border border-white/5 rounded-lg p-1 w-fit">
-            <button
-              type="button"
-              onClick={() => setSourceTab("library")}
-              className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
-                sourceTab === "library"
-                  ? "bg-zinc-800 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              <BookOpen size={14} />
-              Library
-            </button>
-            <button
-              type="button"
-              onClick={() => setSourceTab("community")}
-              className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
-                sourceTab === "community"
-                  ? "bg-zinc-800 text-white"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              <Globe size={14} />
-              Community
-            </button>
+          <div className="flex flex-wrap items-center gap-1 bg-zinc-900 border border-white/5 rounded-lg p-1 w-fit">
+            {SOURCE_TABS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setSourceTab(id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
+                  sourceTab === id
+                    ? "bg-zinc-800 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <Icon size={14} />
+                {label}
+              </button>
+            ))}
           </div>
 
           {sourceTab === "library" ? (
@@ -309,27 +383,28 @@ export const SelectExercisesStep = ({
             <>
               <input
                 type="text"
-                value={communitySearch}
-                onChange={e => setCommunitySearch(e.target.value)}
-                placeholder="Search community exercises…"
+                value={remoteSearch}
+                onChange={e => setRemoteSearch(e.target.value)}
+                placeholder={isMineTab ? "Search your exercises…" : "Search community exercises…"}
                 className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50"
               />
-              {communityLoading ? (
+              {remoteLoading ? (
                 <div className="flex h-40 items-center justify-center">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
                 </div>
-              ) : filteredCommunityExercises.length === 0 ? (
+              ) : remoteExercises.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-white/5 p-12 text-center">
-                  <p className="text-zinc-500 text-sm">
-                    {communitySearch ? "No exercises match your search." : "No community exercises published yet."}
+                  <p className="text-zinc-500 text-sm max-w-sm mx-auto leading-relaxed">
+                    {remoteEmptyMessage}
                   </p>
                 </div>
               ) : (
                 <ExerciseGrid
-                  exercises={filteredCommunityExercises}
+                  exercises={remoteExercises}
                   selectedExercises={selectedExercises}
                   onToggleExercise={handleExerciseToggleWithTimeModal}
                   onPreviewExercise={setPreviewingExercise}
+                  privateExerciseIds={isMineTab ? privateExerciseIds : undefined}
                 />
               )}
             </>
@@ -341,6 +416,7 @@ export const SelectExercisesStep = ({
         open={isCustomExerciseDialogOpen}
         onOpenChange={setIsCustomExerciseDialogOpen}
         onExerciseCreate={handleCustomExerciseCreate}
+        onSavedToLibrary={handleSavedToLibrary}
         initialData={editingExercise}
         mode={customExerciseMode}
       />

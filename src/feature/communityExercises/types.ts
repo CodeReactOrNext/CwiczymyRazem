@@ -1,4 +1,4 @@
-import type { DifficultyLevel, ExerciseCategory, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { BackingTrack, DifficultyLevel, ExerciseCategory, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { Timestamp } from "firebase/firestore";
 
@@ -14,6 +14,12 @@ export interface CommunityExercise {
   instructions: string[];
   tips: string[];
   tablature: TablatureMeasure[];
+  /** Set on exercises saved from the plan creator, which supports a bit more
+   *  than the Tab Editor does (a YouTube/image reference, an uploaded GP file). */
+  videoUrl?: string | null;
+  imageUrl?: string | null;
+  gpFileUrl?: string;
+  backingTracks?: BackingTrack[];
   authorId: string;
   authorUsername: string;
   createdAt: Timestamp;
@@ -56,5 +62,9 @@ export interface CreateCommunityExerciseInput {
   instructions: string[];
   tips: string[];
   tablature: TablatureMeasure[];
+  videoUrl?: string | null;
+  imageUrl?: string | null;
+  gpFileUrl?: string;
+  backingTracks?: BackingTrack[];
   isPublic: boolean;
 }

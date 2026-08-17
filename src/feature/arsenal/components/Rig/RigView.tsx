@@ -1,3 +1,4 @@
+import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -117,16 +118,11 @@ export const RigView = ({ data }: RigViewProps) => {
         />
       )}
 
-      {hover && typeof document !== "undefined" &&
-        createPortal(
-          <div
-            className="pointer-events-none fixed z-[9999]"
-            style={{ left: hover.x + 16, top: hover.y - 8, width: 250 }}
-          >
-            {hover.content}
-          </div>,
-          document.body
-        )}
+      {hover && (
+        <CursorTooltip x={hover.x} y={hover.y}>
+          {hover.content}
+        </CursorTooltip>
+      )}
 
       {pinnedCard && typeof document !== "undefined" &&
         createPortal(

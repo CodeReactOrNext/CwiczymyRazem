@@ -1,19 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { useState } from "react";
 import { FaGem } from "react-icons/fa";
-
-const RARITY_COLORS: Record<string, string> = {
-  Common: "#9ca3af",
-  Uncommon: "#4ade80",
-  Rare: "#60a5fa",
-  Epic: "#c084fc",
-  Legendary: "#fb923c",
-  Mythic: "#f43f5e",
-};
 
 interface AvatarProps {
   name: string;
@@ -47,7 +39,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, guitarY
 
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
   const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
-  const specialGuitarColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? RARITY_COLORS.Common) : RARITY_COLORS.Common;
+  const specialGuitarColor = getRarityColor(specialGuitarDef?.rarity);
   const guitarGlow = `drop-shadow(0 0 4px ${specialGuitarColor}40) drop-shadow(0 8px 20px rgba(0,0,0,0.95))`;
   const specialGuitarImgStyle = size === "2xl"
     ? { bottom: "-40px", right: "-40px", width: 160, height: 160, transform: "rotate(-90deg)", filter: guitarGlow }

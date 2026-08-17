@@ -43,18 +43,35 @@
  * Doubled from an initial 0.21, which made the rig read as decoration: the average
  * rig paid 4 Fame for a 25-minute session against a practice curve of 15, so the
  * one number the whole Arsenal feeds was worth about a quarter of just showing up.
+ *
+ * Raised again from 0.42 to 0.9, this time to make the gear itself the thing that
+ * separates two players. Practice fame is concave and everyone hits the same
+ * shallow part of it, so at 0.42 a player with a 300-level rig out-earned a bare
+ * one by about 15 Fame an hour — real, but small enough that the collection came
+ * down to how many days you logged in rather than what you had built. The rig is
+ * the part of the economy a player actually steers, so it now pays like it:
+ * roughly 33 Fame/h at rig 120, 65 at rig 300, 129 at the top of the ladder.
  */
-export const RIG_FAME_COEFF = 0.42;
+export const RIG_FAME_COEFF = 0.9;
 
 /** Curvature. Owns the top-end payoff; leave it alone when rebalancing. */
 export const RIG_FAME_EXPONENT = 0.75;
 
 /**
- * Backstop, not a balance lever — nothing in the game reaches it today (the top
- * rig pays ~60/h). `buildLevel` is uncapped and promotions compound, so without
- * this a rig of 4000 would quietly pay 200/h a year from now.
+ * Backstop, not a balance lever. `buildLevel` is uncapped and promotions
+ * compound, so this exists only to stop a runaway rig years from now — it takes
+ * a rig level of roughly 11,000 to reach it, against ~750 at the top of the game
+ * today (~129/h).
+ *
+ * Raised from 90, and it had to move: this one number is shared with traits (see
+ * `calculateSessionFame`), which silently scale down to whatever headroom the
+ * base rate leaves. At 90 it had quietly become the binding constraint on every
+ * decent rig — the rig and trait buffs would have cancelled each other out, and
+ * cards would have advertised rates the game never paid. Set well clear of any
+ * reachable build so that it stays what it claims to be: a stop against
+ * arithmetic running away, not a number anyone plays against.
  */
-export const RIG_FAME_HOURLY_CEILING = 90;
+export const RIG_FAME_HOURLY_CEILING = 1000;
 
 /**
  * Fame per hour of practice this rig is worth. Continuous in `rigLevel`, so it

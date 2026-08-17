@@ -17,6 +17,8 @@ interface ExerciseCardProps {
   onPreview?: (exercise: Exercise) => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  /** The user owns this exercise but hasn't published it — it's still usable in a plan. */
+  isPrivate?: boolean;
 }
 
 export const ExerciseCard = ({
@@ -28,6 +30,7 @@ export const ExerciseCard = ({
   onPreview,
   isFavorite = false,
   onToggleFavorite,
+  isPrivate = false,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -114,6 +117,12 @@ export const ExerciseCard = ({
             )}>
               {t(`common:difficulty.${exercise.difficulty}` as any)}
             </Badge>
+
+            {isPrivate && (
+              <Badge className="bg-cyan-500/10 text-cyan-400 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
+                <Lock className="mr-1 h-3 w-3" />Private
+              </Badge>
+            )}
 
             {exercise.isPlayalong && (
               <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">

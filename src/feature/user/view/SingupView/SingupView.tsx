@@ -20,6 +20,7 @@ import {
   Loader2,
   Lock,
   Mail,
+  Monitor,
   Music,
   Shield,
   User,
@@ -31,6 +32,12 @@ import { useEffect,useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { TbGuitarPick } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useResponsiveStore } from "store/useResponsiveStore";
+
+// Mobile gets the desktop-app notice on the success screen, which 3s is not
+// enough to read.
+const SUCCESS_REDIRECT_DELAY = 3000;
+const SUCCESS_REDIRECT_DELAY_MOBILE = 8000;
 
 export interface SignUpCredentials {
   login: string;
@@ -46,7 +53,8 @@ const SingupView = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
 
@@ -82,12 +90,15 @@ const SingupView = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      const timer = setTimeout(() => {
-        router.push("/dashboard");
-      }, 3000);
+      const timer = setTimeout(
+        () => {
+          router.push("/dashboard");
+        },
+        isMobile ? SUCCESS_REDIRECT_DELAY_MOBILE : SUCCESS_REDIRECT_DELAY
+      );
       return () => clearTimeout(timer);
     }
-  }, [isSuccess, router]);
+  }, [isSuccess, isMobile, router]);
 
   if (isSuccess) {
     return (
@@ -108,8 +119,25 @@ const SingupView = () => {
           <p className="text-zinc-400 mb-8 leading-relaxed">
             Your account has been created successfully. Are you ready to level up your guitar skills?
           </p>
-          
-          <Button 
+
+          {isMobile && (
+            <div className='mb-8 flex items-start gap-3 rounded-lg bg-zinc-800/40 p-5 text-left'>
+              <Monitor className='mt-0.5 h-5 w-5 shrink-0 text-cyan-400' />
+              <div className='space-y-1.5'>
+                <p className='text-sm font-semibold text-zinc-200'>
+                  Best experienced on desktop
+                </p>
+                <p className='text-xs leading-relaxed text-zinc-400'>
+                  Riff Quest works on your phone, but note detection, tablature and
+                  full practice sessions are built for a bigger screen. For the best
+                  experience, open riff.quest on your computer — or grab the desktop
+                  app for low-latency audio input.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <Button
             onClick={() => router.push("/dashboard")}
             className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-base transition-all group"
           >

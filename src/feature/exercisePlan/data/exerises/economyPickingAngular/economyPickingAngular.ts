@@ -4,7 +4,7 @@ import economyPickingImage from "./image.png";
 
 export const economyPickingAngularExercise: Exercise = {
   id: "economy_picking_angular",
-  title: "Economy Picking — Angular Lines",
+  title: "Diagonal Runs — Chromatic Box",
   description: "Practice angular economy picking to minimize picking hand movement and transition fluidly across adjacent strings.",
   whyItMatters: "This exercise develops picking hand efficiency through directional economy picking. By allowing the pick to continue its path through adjacent strings rather than forcing strict alternate strokes, you minimize wasted physical movement, increase potential playing speed, and build a smooth, sweeping cross-string motion.",
   difficulty: "hard",

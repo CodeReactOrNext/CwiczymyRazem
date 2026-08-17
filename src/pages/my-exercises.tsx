@@ -53,6 +53,11 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
     metronomeSpeed: ex.metronomeSpeed,
     relatedSkills: ex.relatedSkills,
     tablature: ex.tablature,
+    // Set on exercises saved from the plan creator instead of the Tab Editor
+    videoUrl: ex.videoUrl,
+    imageUrl: ex.imageUrl,
+    gpFileUrl: ex.gpFileUrl,
+    backingTracks: ex.backingTracks,
   }],
   unlockDescription: "",
   streakDays: 0,

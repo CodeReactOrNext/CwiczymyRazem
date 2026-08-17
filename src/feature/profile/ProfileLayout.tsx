@@ -4,6 +4,7 @@ import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
@@ -102,15 +103,8 @@ const ProfileLayout = ({
   const imgPath = selectedGuitar ?? (statistics.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : statistics.lvl);
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
   const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
-  const RARITY_COLORS: Record<string, string> = {
-    Common: "#9ca3af",
-    Uncommon: "#4ade80",
-    Rare: "#60a5fa",
-    Epic: "#c084fc",
-    Legendary: "#fb923c",
-    Mythic: "#f43f5e",
-  };
-  const glowColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? "#0891b2") : "#0891b2";
+  // No special guitar equipped falls back to the brand cyan, not to a rarity.
+  const glowColor = specialGuitarDef ? getRarityColor(specialGuitarDef.rarity) : "#0891b2";
 
   return (
     <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>

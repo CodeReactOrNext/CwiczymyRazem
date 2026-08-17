@@ -101,6 +101,14 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   { id: 57, imageId: "special/58", name: "Luther Sovereign Custom", brand: "Louis Carver", rarity: "Common", yearFrom: 1950, yearTo: 1960, countries: ["UK", "USA"] },
   { id: 58, imageId: "special/59", name: "Solidbody Special", brand: "Corvin", rarity: "Rare", yearFrom: 1950, yearTo: 2020, countries: ["Czech Republic", "UK"] },
   { id: 59, imageId: "special/60", name: "Stratocaster Shoreline Gold", brand: "Fairmont", rarity: "Epic", yearFrom: 1970, yearTo: 2020, countries: ["USA", "Japan"] },
+  // Private Stock batch (60-66) — ornate inlay work sits at the top of the pool
+  { id: 60, imageId: "special/61", name: "Monarch Private Stock Emerald", brand: "RPS", rarity: "Mythic", yearFrom: 2005, yearTo: 2026, countries: ["USA"] },
+  { id: 61, imageId: "special/62", name: "Monarch V Bubinga", brand: "Grayson", rarity: "Epic", yearFrom: 1980, yearTo: 2015, countries: ["USA", "Korea"] },
+  { id: 62, imageId: "special/63", name: "Osprey Custom", brand: "RPS", rarity: "Legendary", yearFrom: 2015, yearTo: 2026, countries: ["USA"] },
+  { id: 63, imageId: "special/64", name: "Monarch Private Stock Aviary", brand: "RPS", rarity: "Mythic", yearFrom: 2005, yearTo: 2026, countries: ["USA"] },
+  { id: 64, imageId: "special/65", name: "Monarch Private Stock Nightshade", brand: "RPS", rarity: "Mythic", yearFrom: 2005, yearTo: 2026, countries: ["USA"] },
+  { id: 65, imageId: "special/66", name: "Voyager Celestial", brand: "Grayson", rarity: "Legendary", yearFrom: 1976, yearTo: 2020, countries: ["USA"] },
+  { id: 66, imageId: "special/67", name: "Voyager", brand: "Grayson", rarity: "Uncommon", yearFrom: 1976, yearTo: 2020, countries: ["China", "Korea", "USA"] },
 ];
 
 export const GUITARS_BY_ID = new Map<number | string, GuitarDefinition>(
