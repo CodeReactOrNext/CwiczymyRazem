@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { Lock, X } from "lucide-react";
+import { Archive, Lock, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -21,9 +21,11 @@ export interface DexCardProps {
   imageSrc: string;
   /** Guitar art ships vertical — rotate it to fit the horizontal tile. */
   imageRotated?: boolean;
-  /** 0 = still undiscovered (locked silhouette). */
+  /** False = never held by this account (locked silhouette). */
+  discovered: boolean;
+  /** Copies in the stash right now. 0 on a discovered entry = sold, scrapped or listed. */
   ownedCount: number;
-  /** Full item card shown on hover (desktop) or tap (mobile) for owned entries. */
+  /** Full item card shown on hover (desktop) or tap (mobile) for entries still owned. */
   preview?: ReactNode;
 }
 
@@ -66,40 +68,49 @@ export const DexCard = ({
   rarity,
   imageSrc,
   imageRotated = false,
+  discovered,
   ownedCount,
   preview,
 }: DexCardProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [previewOpen, setPreviewOpen] = useState(false);
   const rs = RARITY_STYLES[rarity];
-  const owned = ownedCount > 0;
-  const hasPreview = owned && preview != null;
+  // Discovery is the record; the stash is what the player holds today. An entry
+  // can be one without the other — a sold guitar stays revealed, just faded.
+  const inStash = ownedCount > 0;
+  const hasPreview = inStash && preview != null;
 
   const tile = (
     <div
       className={cn(
         "group relative flex h-full flex-col overflow-hidden rounded-lg p-3",
-        !owned && "bg-zinc-900/40 transition-colors hover:bg-zinc-800/40",
+        !discovered && "bg-zinc-900/40 transition-colors hover:bg-zinc-800/40",
         hasPreview && "cursor-pointer"
       )}
       style={
-        owned
+        discovered
           ? {
-              background: `linear-gradient(160deg, ${rs.baseColor}2e 0%, rgba(17,17,22,0.92) 60%)`,
+              background: `linear-gradient(160deg, ${rs.baseColor}${
+                inStash ? "2e" : "17"
+              } 0%, rgba(17,17,22,0.92) 60%)`,
             }
           : undefined
       }
-      title={owned ? undefined : "Not discovered yet — open cases to find it"}>
-      {/* Copy count / lock */}
+      title={
+        discovered
+          ? inStash
+            ? undefined
+            : "Discovered — no copy in your stash right now"
+          : "Not discovered yet — open cases to find it"
+      }>
+      {/* Copy count / gone from the stash / lock */}
       <div className='relative z-10 flex h-5 items-center justify-end'>
-        {owned ? (
-          ownedCount > 1 && (
-            <span className='rounded bg-zinc-950/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300'>
-              ×{ownedCount}
-            </span>
-          )
-        ) : (
-          <Lock size={12} className='text-zinc-600' />
+        {!discovered && <Lock size={12} className='text-zinc-600' />}
+        {discovered && !inStash && <Archive size={12} className='text-zinc-600' />}
+        {discovered && ownedCount > 1 && (
+          <span className='rounded bg-zinc-950/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300'>
+            ×{ownedCount}
+          </span>
         )}
       </div>
 
@@ -108,22 +119,23 @@ export const DexCard = ({
         <div
           className={cn(
             "absolute h-16 w-16 rounded-full blur-[20px] transition-opacity",
-            owned && "opacity-70 group-hover:opacity-100"
+            discovered && "opacity-70 group-hover:opacity-100"
           )}
           style={{
-            background: owned
+            background: discovered
               ? `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 50%, transparent 75%)`
               : `radial-gradient(circle at center, ${rs.baseColor}30 0%, transparent 70%)`,
           }}
         />
         <img
           src={imageSrc}
-          alt={owned ? `${brand} ${name}` : "Undiscovered item silhouette"}
+          alt={discovered ? `${brand} ${name}` : "Undiscovered item silhouette"}
           className={cn(
             "relative z-10 h-24 w-24 object-contain",
-            imageRotated && "-rotate-90"
+            imageRotated && "-rotate-90",
+            discovered && !inStash && "opacity-55"
           )}
-          style={owned ? undefined : { filter: "brightness(0) invert(0.22)" }}
+          style={discovered ? undefined : { filter: "brightness(0) invert(0.22)" }}
           draggable={false}
           loading='lazy'
         />
@@ -131,12 +143,18 @@ export const DexCard = ({
 
       {/* Name — hidden until discovered, Pokédex style */}
       <div className='relative z-10 mt-2 min-w-0 text-center'>
-        {owned ? (
+        {discovered ? (
           <>
-            <p className='truncate text-xs font-bold text-zinc-100'>{name}</p>
+            <p
+              className={cn(
+                "truncate text-xs font-bold",
+                inStash ? "text-zinc-100" : "text-zinc-400"
+              )}>
+              {name}
+            </p>
             <p
               className='mt-0.5 truncate text-[10px] font-semibold'
-              style={{ color: rs.baseColor }}>
+              style={{ color: rs.baseColor, opacity: inStash ? 1 : 0.7 }}>
               {brand}
             </p>
           </>

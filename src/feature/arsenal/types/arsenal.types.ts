@@ -303,6 +303,15 @@ export interface ArsenalUserData {
   stashLayout?: Record<string, number>;
   /** Mods rescued from teardowns, waiting to be fitted onto something else. */
   salvagedMods?: SalvagedMod[];
+  /**
+   * Every guitarId the account has ever held, whether or not a copy is still in
+   * the stash. The Dex reads this — selling, scrapping or listing a model does
+   * not un-discover it. Absent until the account's first read after the feature
+   * shipped; the inventory route backfills it from what is currently owned.
+   */
+  dexGuitars?: (number | string)[];
+  /** Same, for pedals. See `dexGuitars`. */
+  dexEffects?: (number | string)[];
 }
 
 export interface ScrapResult {
@@ -312,6 +321,18 @@ export interface ScrapResult {
   newParts: ScrapPart[];
   /** The one mod that survived the teardown, if the item carried any. */
   salvaged?: SalvagedMod | null;
+}
+
+/** What a whole batch teardown paid out — the duplicate sweep's receipt. */
+export interface BulkScrapResult {
+  /** The merged yield of the whole batch. */
+  parts: ScrapPart[];
+  /** The full wallet after the teardown. */
+  newParts: ScrapPart[];
+  /** How many items actually came apart — protected copies are skipped. */
+  scrappedCount: number;
+  /** How many mods were pulled out whole into the stash. */
+  salvagedCount: number;
 }
 
 export interface OpenCaseResult {

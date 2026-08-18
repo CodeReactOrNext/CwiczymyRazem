@@ -3,6 +3,7 @@ import { auth } from "utils/firebase/client/firebase.utils";
 
 import type {
   ArsenalUserData,
+  BulkScrapResult,
   CaseType,
   OpenCaseResult,
   OpenEffectPackResult,
@@ -190,6 +191,28 @@ export const scrapEffect = async (
     idToken,
     inventoryItemId,
   });
+  return data;
+};
+
+export const scrapGuitarsBulk = async (
+  inventoryItemIds: string[],
+): Promise<BulkScrapResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<BulkScrapResult>(
+    "/api/arsenal/scrap-guitars-bulk",
+    { idToken, inventoryItemIds },
+  );
+  return data;
+};
+
+export const scrapEffectsBulk = async (
+  inventoryItemIds: string[],
+): Promise<BulkScrapResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<BulkScrapResult>(
+    "/api/arsenal/scrap-effects-bulk",
+    { idToken, inventoryItemIds },
+  );
   return data;
 };
 

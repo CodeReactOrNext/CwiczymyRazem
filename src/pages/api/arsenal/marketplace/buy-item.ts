@@ -49,6 +49,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const itemType: "guitar" | "effect" = listing.itemType;
       const invKey = itemType === "guitar" ? "inventory" : "effectInventory";
+      const dexKey = itemType === "guitar" ? "dexGuitars" : "dexEffects";
+      const definitionId =
+        itemType === "guitar" ? listing.item?.guitarId : listing.item?.effectId;
 
       // Transfer the escrowed instance into the buyer's inventory (flagged new).
       const transferredItem = { ...listing.item, isNew: true, acquiredAt: Date.now() };
@@ -58,6 +61,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       t.update(buyerRef, {
         [`arsenal.${invKey}`]: newBuyerInventory,
         "statistics.fame": buyerFame - price,
+        // The buyer has now held this model — discovery is permanent, so it
+        // stays in their Dex even if they flip it straight back onto the market.
+        ...(definitionId != null
+          ? { [`arsenal.${dexKey}`]: FieldValue.arrayUnion(definitionId) }
+          : {}),
       });
       t.update(sellerRef, {
         "statistics.fame": FieldValue.increment(price),

@@ -36,7 +36,9 @@ import {
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
+import { useScrapEffectsBulk } from "feature/arsenal/hooks/useScrapEffectsBulk";
 import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
+import { useScrapGuitarsBulk } from "feature/arsenal/hooks/useScrapGuitarsBulk";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -95,7 +97,7 @@ import type {
   ScrapPart,
 } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
-import { BulkSellConfirmDialog } from "../GuitarInventory/BulkSellConfirmDialog";
+import { BulkDuplicatesDialog } from "../GuitarInventory/BulkDuplicatesDialog";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { EquipTargetDialog } from "../GuitarInventory/EquipTargetDialog";
@@ -223,6 +225,10 @@ export const StashInventory = ({
     useSellGuitarsBulk();
   const { mutate: sellEffectsBulk, isPending: isSellingEffectsBulk } =
     useSellEffectsBulk();
+  const { mutate: scrapGuitarsBulk, isPending: isScrappingGuitarsBulk } =
+    useScrapGuitarsBulk();
+  const { mutate: scrapEffectsBulk, isPending: isScrappingEffectsBulk } =
+    useScrapEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: scrapGuitar, isPending: isScrappingGuitar } =
     useScrapGuitar();
@@ -629,10 +635,16 @@ export const StashInventory = ({
     );
   };
 
-  const confirmBulk = () => {
+  const confirmBulkSell = () => {
     const done = { onSuccess: () => setBulk(null) };
     if (bulk === "guitar") sellGuitarsBulk(guitarDuplicates.ids, done);
     if (bulk === "effect") sellEffectsBulk(effectDuplicates.ids, done);
+  };
+
+  const confirmBulkScrap = () => {
+    const done = { onSuccess: () => setBulk(null) };
+    if (bulk === "guitar") scrapGuitarsBulk(guitarDuplicates.ids, done);
+    if (bulk === "effect") scrapEffectsBulk(effectDuplicates.ids, done);
   };
 
   const isSelling = isSellingGuitar || isSellingEffect;
@@ -793,9 +805,9 @@ export const StashInventory = ({
             {guitarDuplicates.ids.length > 0 && (
               <button
                 onClick={() => setBulk("guitar")}
-                disabled={isSellingGuitarsBulk}
+                disabled={isSellingGuitarsBulk || isScrappingGuitarsBulk}
                 className={bulkButtonClass}
-                title='Sell every lower-level duplicate guitar, keeping the best copy of each'>
+                title='Sell or scrap every lower-level duplicate guitar, keeping the best copy of each'>
                 <Layers size={14} />
                 Duplicate guitars ({guitarDuplicates.ids.length})
               </button>
@@ -803,9 +815,9 @@ export const StashInventory = ({
             {effectDuplicates.ids.length > 0 && (
               <button
                 onClick={() => setBulk("effect")}
-                disabled={isSellingEffectsBulk}
+                disabled={isSellingEffectsBulk || isScrappingEffectsBulk}
                 className={bulkButtonClass}
-                title='Sell every lower-level duplicate pedal, keeping the best copy of each'>
+                title='Sell or scrap every lower-level duplicate pedal, keeping the best copy of each'>
                 <Layers size={14} />
                 Duplicate pedals ({effectDuplicates.ids.length})
               </button>
@@ -1089,7 +1101,7 @@ export const StashInventory = ({
         );
       })()}
 
-      <BulkSellConfirmDialog
+      <BulkDuplicatesDialog
         isOpen={bulk !== null}
         items={
           bulk === "effect" ? effectDuplicates.items : guitarDuplicates.items
@@ -1097,14 +1109,24 @@ export const StashInventory = ({
         fameReward={
           bulk === "effect" ? effectDuplicates.fame : guitarDuplicates.fame
         }
+        scrapParts={
+          bulk === "effect" ? effectDuplicates.parts : guitarDuplicates.parts
+        }
+        salvagedCount={
+          bulk === "effect"
+            ? effectDuplicates.salvagedCount
+            : guitarDuplicates.salvagedCount
+        }
         protectedNote={
           bulk === "effect"
-            ? "Pedals on your pedalboard are never sold."
+            ? "Pedals on your pedalboard are never touched."
             : undefined
         }
-        onConfirm={confirmBulk}
+        onSell={confirmBulkSell}
+        onScrap={confirmBulkScrap}
         onCancel={() => setBulk(null)}
-        isLoading={isSellingGuitarsBulk || isSellingEffectsBulk}
+        isSelling={isSellingGuitarsBulk || isSellingEffectsBulk}
+        isScrapping={isScrappingGuitarsBulk || isScrappingEffectsBulk}
       />
 
       {(() => {
@@ -1112,9 +1134,9 @@ export const StashInventory = ({
         return (
           <EquipTargetDialog
             isOpen={found !== null}
-            itemName={found ? `${found.guitar.brand} ${found.guitar.name}` : ""}
             itemId={equipItemId ?? ""}
-            isEquipped={data.equippedItemId === equipItemId}
+            inventory={data.inventory}
+            equippedItemId={data.equippedItemId}
             rigSlots={rig.guitarSlots}
             onSelect={(target) => {
               if (equipItemId) handleEquipTo(equipItemId, target);

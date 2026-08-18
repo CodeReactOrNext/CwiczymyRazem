@@ -33,6 +33,24 @@ export const buildOwnershipMap = <TItem>(
   return map;
 };
 
+/**
+ * What the Dex counts as discovered: every id on the account's record, plus
+ * everything sitting in the stash right now.
+ *
+ * The stash half keeps the record self-healing — an account that predates the
+ * record, or an item that arrived through a path that forgot to write to it,
+ * still shows up as discovered while it is owned.
+ */
+export const buildDiscoveredSet = <TItem>(
+  recorded: readonly (number | string)[] | undefined,
+  items: readonly TItem[] | undefined,
+  getDefinitionId: (item: TItem) => number | string
+): Set<number | string> => {
+  const discovered = new Set<number | string>(recorded ?? []);
+  for (const item of items ?? []) discovered.add(getDefinitionId(item));
+  return discovered;
+};
+
 export interface RarityCount {
   owned: number;
   total: number;

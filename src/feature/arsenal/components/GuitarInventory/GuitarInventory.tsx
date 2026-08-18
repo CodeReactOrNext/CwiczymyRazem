@@ -10,6 +10,7 @@ import {
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
+import { useScrapGuitarsBulk } from "feature/arsenal/hooks/useScrapGuitarsBulk";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { useSellGuitarsBulk } from "feature/arsenal/hooks/useSellGuitarsBulk";
 import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
@@ -35,7 +36,7 @@ import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
 import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
-import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
+import { BulkDuplicatesDialog } from "./BulkDuplicatesDialog";
 import { EquipTargetDialog } from "./EquipTargetDialog";
 import type { EquipTarget } from "./GuitarCard";
 import { GuitarCard } from "./GuitarCard";
@@ -68,15 +69,18 @@ export const GuitarInventory = ({
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellGuitarsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: scrap, isPending: isScrapping } = useScrapGuitar();
+  const { mutate: scrapBulk, isPending: isScrappingBulk } =
+    useScrapGuitarsBulk();
   const { mutate: saveRig } = useUpdateRig();
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
 
-  // Sellable duplicates: for every guitar owned more than once, keep the
-  // highest-level instance and mark the lower-level copies for bulk selling.
-  // The equipped guitar and any rig-slotted guitar are never sold.
+  // Spare duplicates: for every guitar owned more than once, keep the
+  // highest-level instance and offer the lower-level copies to the bulk sweep —
+  // sold for Fame or scrapped for parts. The equipped guitar and any
+  // rig-slotted guitar are never touched.
   const duplicates = useMemo(
     () =>
       getGuitarDuplicates(data.inventory, {
@@ -157,6 +161,13 @@ export const GuitarInventory = ({
     });
   };
 
+  const handleConfirmBulkScrap = () => {
+    if (duplicates.ids.length === 0) return;
+    scrapBulk(duplicates.ids, {
+      onSuccess: () => setIsBulkSellOpen(false),
+    });
+  };
+
   if (data.inventory.length === 0) return null;
 
   const uniqueOwnedIds = new Set(data.inventory.map((item) => item.guitarId));
@@ -232,11 +243,11 @@ export const GuitarInventory = ({
             duplicates.ids.length > 0 ? (
               <button
                 onClick={() => setIsBulkSellOpen(true)}
-                disabled={isSellingBulk}
+                disabled={isSellingBulk || isScrappingBulk}
                 className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
-                title='Sell every lower-level duplicate, keeping the best copy of each guitar'>
+                title='Sell or scrap every lower-level duplicate, keeping the best copy of each guitar'>
                 <Layers size={14} />
-                Sell duplicates ({duplicates.ids.length})
+                Clear duplicates ({duplicates.ids.length})
               </button>
             ) : null
           }
@@ -341,24 +352,24 @@ export const GuitarInventory = ({
         ) : null;
       })()}
 
-      <BulkSellConfirmDialog
+      <BulkDuplicatesDialog
         isOpen={isBulkSellOpen}
         items={duplicates.items}
         fameReward={duplicates.fame}
-        onConfirm={handleConfirmBulkSell}
+        scrapParts={duplicates.parts}
+        salvagedCount={duplicates.salvagedCount}
+        onSell={handleConfirmBulkSell}
+        onScrap={handleConfirmBulkScrap}
         onCancel={() => setIsBulkSellOpen(false)}
-        isLoading={isSellingBulk}
+        isSelling={isSellingBulk}
+        isScrapping={isScrappingBulk}
       />
 
       <EquipTargetDialog
         isOpen={equipItem !== null}
-        itemName={
-          equipItem
-            ? `${GUITARS_BY_ID.get(equipItem.guitarId)?.brand ?? ""} ${GUITARS_BY_ID.get(equipItem.guitarId)?.name ?? ""}`
-            : ""
-        }
         itemId={equipItem?.id ?? ""}
-        isEquipped={data.equippedItemId === equipItem?.id}
+        inventory={data.inventory}
+        equippedItemId={data.equippedItemId}
         rigSlots={rig.guitarSlots}
         onSelect={(target) => {
           if (equipItem) handleEquipTo(equipItem, target);

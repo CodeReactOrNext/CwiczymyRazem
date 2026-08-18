@@ -8,6 +8,7 @@ import {
 } from "feature/arsenal/data/salvage";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
+import { useScrapEffectsBulk } from "feature/arsenal/hooks/useScrapEffectsBulk";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellEffectsBulk } from "feature/arsenal/hooks/useSellEffectsBulk";
 import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
@@ -26,7 +27,7 @@ import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
 import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
-import { BulkSellConfirmDialog } from "./BulkSellConfirmDialog";
+import { BulkDuplicatesDialog } from "./BulkDuplicatesDialog";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
 
@@ -55,6 +56,8 @@ export const EffectCollection = ({
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const { mutate: scrap, isPending: isScrapping } = useScrapEffect();
+  const { mutate: scrapBulk, isPending: isScrappingBulk } =
+    useScrapEffectsBulk();
   const { mutate: savePedalboard, isPending: isRemovingFromBoard } =
     useUpdatePedalboard();
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -99,9 +102,9 @@ export const EffectCollection = ({
     savePedalboard(placements.filter((p) => p.itemId !== inventoryItemId));
   };
 
-  // Sellable duplicates: for every pedal owned more than once, keep the
-  // highest-level copy and mark the lower-level ones for bulk selling.
-  // Pedals placed on the pedalboard are never sold.
+  // Spare duplicates: for every pedal owned more than once, keep the
+  // highest-level copy and offer the lower-level ones to the bulk sweep — sold
+  // for Fame or scrapped for parts. Pedals on the pedalboard are never touched.
   const duplicates = useMemo(
     () =>
       getEffectDuplicates(
@@ -114,6 +117,13 @@ export const EffectCollection = ({
   const handleConfirmBulkSell = () => {
     if (duplicates.ids.length === 0) return;
     sellBulk(duplicates.ids, {
+      onSuccess: () => setIsBulkSellOpen(false),
+    });
+  };
+
+  const handleConfirmBulkScrap = () => {
+    if (duplicates.ids.length === 0) return;
+    scrapBulk(duplicates.ids, {
       onSuccess: () => setIsBulkSellOpen(false),
     });
   };
@@ -195,11 +205,11 @@ export const EffectCollection = ({
             duplicates.ids.length > 0 ? (
               <button
                 onClick={() => setIsBulkSellOpen(true)}
-                disabled={isSellingBulk}
+                disabled={isSellingBulk || isScrappingBulk}
                 className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
-                title='Sell every lower-level duplicate, keeping the best copy of each pedal'>
+                title='Sell or scrap every lower-level duplicate, keeping the best copy of each pedal'>
                 <Layers size={14} />
-                Sell duplicates ({duplicates.ids.length})
+                Clear duplicates ({duplicates.ids.length})
               </button>
             ) : null
           }
@@ -248,14 +258,18 @@ export const EffectCollection = ({
         ) : null;
       })()}
 
-      <BulkSellConfirmDialog
+      <BulkDuplicatesDialog
         isOpen={isBulkSellOpen}
         items={duplicates.items}
         fameReward={duplicates.fame}
-        protectedNote='Pedals on your pedalboard are never sold.'
-        onConfirm={handleConfirmBulkSell}
+        scrapParts={duplicates.parts}
+        salvagedCount={duplicates.salvagedCount}
+        protectedNote='Pedals on your pedalboard are never touched.'
+        onSell={handleConfirmBulkSell}
+        onScrap={handleConfirmBulkScrap}
         onCancel={() => setIsBulkSellOpen(false)}
-        isLoading={isSellingBulk}
+        isSelling={isSellingBulk}
+        isScrapping={isScrappingBulk}
       />
 
       {(() => {

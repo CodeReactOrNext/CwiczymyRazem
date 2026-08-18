@@ -1,6 +1,7 @@
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
+import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -54,6 +55,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       (equippedGuitarId != null
         ? inventory.find((item) => item.guitarId === equippedGuitarId)?.id ?? null
         : null);
+    const effectInventory: ArsenalUserData["effectInventory"] =
+      data.arsenal.effectInventory || [];
+
+    // Discovery is a record of everything the account has ever held, not a
+    // snapshot of the stash — selling a guitar must not un-discover it. Accounts
+    // that predate the record have none, so it is seeded from what they own now.
+    const discoveredGuitars = buildDiscoveredSet(
+      data.arsenal.dexGuitars,
+      inventory,
+      (item) => item.guitarId
+    );
+    const discoveredEffects = buildDiscoveredSet(
+      data.arsenal.dexEffects,
+      effectInventory,
+      (item) => item.effectId
+    );
+
     const arsenal: ArsenalUserData = {
       inventory,
       equippedGuitarId,
@@ -66,7 +84,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ampHeadId: storedRig?.ampHeadId ?? null,
         ampId: storedRig?.ampId ?? null,
       },
-      effectInventory: data.arsenal.effectInventory || [],
+      effectInventory,
+      dexGuitars: [...discoveredGuitars],
+      dexEffects: [...discoveredEffects],
       // Accounts created before the scrap system have no wallet yet.
       parts: data.arsenal.parts || [],
       // Trader purchases. Sent as stored; a counter from an earlier window is
@@ -85,10 +105,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals
-    // after gear-balance changes in itemStats/effectStats).
+    // after gear-balance changes in itemStats/effectStats) and persist any
+    // discovery the record was still missing, so it survives the next sale.
     const computedRigLevel = getRigLevel(arsenal);
-    if (data.rigLevel !== computedRigLevel) {
-      await userRef.update({ rigLevel: computedRigLevel });
+    const updates: Record<string, unknown> = {};
+    if (data.rigLevel !== computedRigLevel) updates.rigLevel = computedRigLevel;
+    if (new Set(data.arsenal.dexGuitars || []).size !== discoveredGuitars.size) {
+      updates["arsenal.dexGuitars"] = [...discoveredGuitars];
+    }
+    if (new Set(data.arsenal.dexEffects || []).size !== discoveredEffects.size) {
+      updates["arsenal.dexEffects"] = [...discoveredEffects];
+    }
+    if (Object.keys(updates).length > 0) {
+      await userRef.update(updates);
     }
 
     return res.status(200).json({ ...arsenal, fame });

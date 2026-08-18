@@ -61,7 +61,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { FaArrowTrendUp } from "react-icons/fa6";
+import { FaArrowTrendUp, FaDiscord } from "react-icons/fa6";
 import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -75,6 +75,8 @@ export interface SidebarLinkInterface {
   icon: React.ReactNode;
   external?: boolean;
 }
+
+const DISCORD_INVITE_URL = "https://discord.com/invite/6yJmsZW2Ne";
 
 /** Fixed-size slot so icons of different sizes keep the labels on one line. */
 const NAV_ICON_SLOT = "flex h-5 w-5 shrink-0 items-center justify-center";
@@ -94,6 +96,7 @@ const SidebarNavLink = ({
   showBadge = false,
   tooltip,
   muted = false,
+  external = false,
 }: {
   href: string;
   name: string;
@@ -103,11 +106,14 @@ const SidebarNavLink = ({
   showBadge?: boolean;
   tooltip?: string;
   muted?: boolean;
+  external?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
   const link = (
     <Link
       href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
       onClick={(e) => {
         createRipple(e);
         onClick?.();
@@ -431,6 +437,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} />, muted: true },
     { id: "wiki", name: "Knowledge Base", href: "/wiki", icon: <BookOpen size={18} />, muted: true, tooltip: "How every part of the app works, in plain language" },
     { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} />, muted: true },
+    {
+      id: "discord",
+      name: "Discord",
+      href: DISCORD_INVITE_URL,
+      icon: <FaDiscord size={18} />,
+      muted: true,
+      external: true,
+      tooltip: "Join the community server",
+    },
   ];
 
   const renderNavLinks = (
@@ -441,11 +456,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: React.ReactNode;
       tooltip?: string;
       muted?: boolean;
+      external?: boolean;
       children?: SidebarSubLink[];
     }[],
     onClick?: () => void
   ) =>
-    items.map(({ id, name, href, icon, tooltip, muted, children }) => {
+    items.map(({ id, name, href, icon, tooltip, muted, external, children }) => {
       if (children) {
         return (
           <SidebarExpandableNavLink
@@ -474,6 +490,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           showBadge={id === "summary" && hasUnclaimedMilestone}
           tooltip={tooltip}
           muted={muted}
+          external={external}
         />
       );
     });

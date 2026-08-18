@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildOwnershipMap, getDexProgress } from "./dex";
+import { buildDiscoveredSet, buildOwnershipMap, getDexProgress } from "./dex";
 
 interface FakeItem {
   id: string;
@@ -47,6 +47,28 @@ describe("buildOwnershipMap", () => {
       (i) => i.level
     );
     expect(map.get(1)?.best.id).toBe("a");
+  });
+});
+
+describe("buildDiscoveredSet", () => {
+  it("keeps ids from the record that are no longer owned", () => {
+    const discovered = buildDiscoveredSet([1, 2], [item("a", 3, 1)], (i) => i.defId);
+    expect([...discovered].sort()).toEqual([1, 2, 3]);
+  });
+
+  it("seeds from the inventory when there is no record yet", () => {
+    const discovered = buildDiscoveredSet(
+      undefined,
+      [item("a", 1, 1), item("b", 1, 2), item("c", 2, 1)],
+      (i) => i.defId
+    );
+    expect([...discovered].sort()).toEqual([1, 2]);
+  });
+
+  it("is empty for an account with neither", () => {
+    expect(buildDiscoveredSet(undefined, undefined, (i: FakeItem) => i.defId).size).toBe(
+      0
+    );
   });
 });
 

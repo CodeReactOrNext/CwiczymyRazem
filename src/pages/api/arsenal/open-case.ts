@@ -14,7 +14,9 @@ import type {
   GuitarRarity,
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
+import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
+import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -114,13 +116,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // What the Dex already has, for the new-item bias below. Built once here
       // rather than per draw site, and read from the stored document — the
       // request body has no say in what the player is deemed to own.
-      const ownedGuitarIds = new Set<number | string>(
-        (data.arsenal?.inventory || []).map((i: InventoryItem) => i.guitarId),
+      //
+      // The Dex record, not the stash: a model the player pulled and later sold
+      // stays discovered, so the bias keeps steering pulls toward the models
+      // that have genuinely never come out of a case.
+      const discoveredGuitarIds = buildDiscoveredSet(
+        data.arsenal?.dexGuitars,
+        data.arsenal?.inventory as InventoryItem[] | undefined,
+        (i) => i.guitarId,
       );
-      const ownedEffectIds = new Set<number | string>(
-        (data.arsenal?.effectInventory || []).map(
-          (i: EffectInventoryItem) => i.effectId,
-        ),
+      const discoveredEffectIds = buildDiscoveredSet(
+        data.arsenal?.dexEffects,
+        data.arsenal?.effectInventory as EffectInventoryItem[] | undefined,
+        (i) => i.effectId,
       );
 
       // Daily case: the drop comes from today's deterministic featured pool —
@@ -136,8 +144,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const pickFrom = candidates.length > 0 ? candidates : pool;
         dailyPick = pickBiased(pickFrom, (entry) =>
           entry.kind === "guitar"
-            ? ownedGuitarIds.has(entry.def.id)
-            : ownedEffectIds.has(entry.def.id),
+            ? discoveredGuitarIds.has(entry.def.id)
+            : discoveredEffectIds.has(entry.def.id),
         );
       }
 
@@ -155,7 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
           const rarity = drawRarity(caseDef.probabilities);
           const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
-          guitar = pickBiased(pool, (g) => ownedGuitarIds.has(g.id));
+          guitar = pickBiased(pool, (g) => discoveredGuitarIds.has(g.id));
         }
         const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
@@ -164,9 +172,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const rolledTraits = rollItemTraits(guitar.rarity, "guitar");
 
         // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
-        const isNewToDex = !(data.arsenal?.inventory || []).some(
-          (i: InventoryItem) => i.guitarId === guitar.id
-        );
+        const isNewToDex = !discoveredGuitarIds.has(guitar.id);
 
         // Mint a global, sequential serial number for this guitar model.
         // Read happens before any write, so it's transaction-safe.
@@ -195,6 +201,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           "statistics.fame": newFame,
           "arsenal.inventory": newInventory,
           "arsenal.equippedGuitarId": existingEquipped,
+          // Discovery is permanent — recorded on the pull, never removed on a sale.
+          "arsenal.dexGuitars": FieldValue.arrayUnion(guitar.id),
         });
         t.set(serialRef, { count: serial }, { merge: true });
 
@@ -207,7 +215,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
           const rarity = drawRarity(caseDef.probabilities);
           const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
-          effect = pickBiased(pool, (e) => ownedEffectIds.has(e.id));
+          effect = pickBiased(pool, (e) => discoveredEffectIds.has(e.id));
         }
         const effectCondition = rollCondition();
         const effectYear = rollEffectYear(effect);
@@ -216,9 +224,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const effectTraits = rollItemTraits(effect.rarity, "effect", effect.type);
 
         // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.
-        const isNewToDex = !(data.arsenal?.effectInventory || []).some(
-          (i: EffectInventoryItem) => i.effectId === effect.id
-        );
+        const isNewToDex = !discoveredEffectIds.has(effect.id);
 
         const effectSerialRef = firestore
           .collection("arsenalSerials")
@@ -244,6 +250,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         t.update(userRef, {
           "statistics.fame": newFame,
           "arsenal.effectInventory": newEffectInventory,
+          // Discovery is permanent — recorded on the pull, never removed on a sale.
+          "arsenal.dexEffects": FieldValue.arrayUnion(effect.id),
         });
         t.set(effectSerialRef, { count: effectSerial }, { merge: true });
 

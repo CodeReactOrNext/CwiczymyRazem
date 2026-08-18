@@ -1,4 +1,4 @@
-import type { BulkSellItem } from "../components/GuitarInventory/BulkSellConfirmDialog";
+import type { DuplicateItem } from "../components/GuitarInventory/BulkDuplicatesDialog";
 import { EFFECTS_BY_ID } from "../data/effectDefinitions";
 import { getEffectLevel, getEffectValue } from "../data/effectStats";
 import { GUITARS_BY_ID } from "../data/guitarDefinitions";
@@ -7,21 +7,42 @@ import {
   getItemLevel,
   getItemValue,
 } from "../data/itemStats";
+import { getSalvageableMod } from "../data/salvage";
+import { mergeScrapParts } from "../data/scrapYield";
 import type {
   EffectInventoryItem,
   InventoryItem,
+  ScrapPart,
 } from "../types/arsenal.types";
+import {
+  countScrapParts,
+  getEffectScrapYield,
+  getGuitarScrapYield,
+} from "./scrap";
 
 export interface DuplicateSummary {
-  /** Inventory ids the bulk sell would take. */
+  /** Inventory ids the bulk action would take. */
   ids: string[];
   /** What the confirm dialog lists, most valuable first. */
-  items: BulkSellItem[];
-  /** Fame the whole batch pays out. */
+  items: DuplicateItem[];
+  /** Fame the whole batch pays out if it is sold. */
   fame: number;
+  /** Merged teardown yield if the same batch is scrapped instead. */
+  parts: ScrapPart[];
+  /** Total pieces in `parts` — the headline on the scrap option. */
+  partCount: number;
+  /** How many fitted mods a teardown would pull out whole into the stash. */
+  salvagedCount: number;
 }
 
-const EMPTY: DuplicateSummary = { ids: [], items: [], fame: 0 };
+const emptySummary = (): DuplicateSummary => ({
+  ids: [],
+  items: [],
+  fame: 0,
+  parts: [],
+  partCount: 0,
+  salvagedCount: 0,
+});
 
 /**
  * For every model owned more than once, keep the best copy and offer the rest.
@@ -29,6 +50,9 @@ const EMPTY: DuplicateSummary = { ids: [], items: [], fame: 0 };
  * Both collection views put the same button in their header, so the rule that
  * decides what "the rest" means — and what is protected from it — lives here
  * rather than being written out twice.
+ *
+ * The batch is priced both ways: the dialog offers selling it for Fame or
+ * scrapping it for parts, and the same set of copies goes either way.
  */
 export const getGuitarDuplicates = (
   inventory: InventoryItem[],
@@ -44,12 +68,13 @@ export const getGuitarDuplicates = (
     else byGuitar.set(item.guitarId, [item]);
   }
 
-  const result: DuplicateSummary = { ...EMPTY, ids: [], items: [] };
+  const result = emptySummary();
+  const yields: ScrapPart[][] = [];
   for (const [guitarId, group] of byGuitar) {
     if (group.length < 2) continue;
     const guitar = GUITARS_BY_ID.get(guitarId);
     if (!guitar) continue;
-    // Best copy first (level desc, value as tie-break); keep it, sell the rest.
+    // Best copy first (level desc, value as tie-break); keep it, take the rest.
     const sorted = [...group].sort(
       (a, b) =>
         getItemLevel(b, guitar) - getItemLevel(a, guitar) ||
@@ -69,11 +94,15 @@ export const getGuitarDuplicates = (
         value,
       });
       result.fame += value;
+      yields.push(getGuitarScrapYield(item, guitar));
+      if (getSalvageableMod(item, "guitar")) result.salvagedCount += 1;
     }
   }
 
   // Highest-level (most valuable) first so the biggest losses are visible up top.
   result.items.sort((a, b) => b.level - a.level || b.value - a.value);
+  result.parts = mergeScrapParts(yields);
+  result.partCount = countScrapParts(result.parts);
   return result;
 };
 
@@ -89,7 +118,8 @@ export const getEffectDuplicates = (
     else byEffect.set(item.effectId, [item]);
   }
 
-  const result: DuplicateSummary = { ...EMPTY, ids: [], items: [] };
+  const result = emptySummary();
+  const yields: ScrapPart[][] = [];
   for (const [effectId, group] of byEffect) {
     if (group.length < 2) continue;
     const effect = EFFECTS_BY_ID.get(effectId);
@@ -110,9 +140,13 @@ export const getEffectDuplicates = (
         value,
       });
       result.fame += value;
+      yields.push(getEffectScrapYield(item, effect));
+      if (getSalvageableMod(item, "effect")) result.salvagedCount += 1;
     }
   }
 
   result.items.sort((a, b) => b.level - a.level || b.value - a.value);
+  result.parts = mergeScrapParts(yields);
+  result.partCount = countScrapParts(result.parts);
   return result;
 };

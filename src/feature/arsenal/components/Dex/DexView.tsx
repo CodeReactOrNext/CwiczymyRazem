@@ -9,7 +9,11 @@ import {
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
 import type { DexProgress } from "feature/arsenal/utils/dex";
-import { buildOwnershipMap, getDexProgress } from "feature/arsenal/utils/dex";
+import {
+  buildDiscoveredSet,
+  buildOwnershipMap,
+  getDexProgress,
+} from "feature/arsenal/utils/dex";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Guitar, Layers } from "lucide-react";
 import type { ReactNode } from "react";
@@ -63,7 +67,7 @@ const DexRarityGroups = ({ entries }: { entries: DexEntry[] }) => (
     {RARITY_ORDER.map((rarity) => {
       const group = entries.filter((e) => e.rarity === rarity);
       if (group.length === 0) return null;
-      const owned = group.filter((e) => e.ownedCount > 0).length;
+      const owned = group.filter((e) => e.discovered).length;
       return (
         <div key={rarity}>
           <RaritySectionHeader rarity={rarity} owned={owned} total={group.length} />
@@ -105,6 +109,18 @@ export const DexView = ({ data }: DexViewProps) => {
     [data.effectInventory]
   );
 
+  // Discovery outlives ownership: the account's record plus whatever is in the
+  // stash right now. Sell a guitar and its entry stays revealed, only faded.
+  const discoveredGuitars = useMemo(
+    () => buildDiscoveredSet(data.dexGuitars, data.inventory, (i) => i.guitarId),
+    [data.dexGuitars, data.inventory]
+  );
+  const discoveredEffects = useMemo(
+    () =>
+      buildDiscoveredSet(data.dexEffects, data.effectInventory, (i) => i.effectId),
+    [data.dexEffects, data.effectInventory]
+  );
+
   const guitarEntries = useMemo<DexEntry[]>(
     () =>
       GUITAR_DEFINITIONS.map((def) => {
@@ -116,11 +132,12 @@ export const DexView = ({ data }: DexViewProps) => {
           rarity: def.rarity,
           imageSrc: getRankBadgeSrc(def.imageId, "small"),
           imageRotated: true,
+          discovered: discoveredGuitars.has(def.id),
           ownedCount: ownership?.count ?? 0,
           preview: ownership ? <GuitarCard item={ownership.best} readOnly /> : undefined,
         };
       }),
-    [guitarOwnership]
+    [discoveredGuitars, guitarOwnership]
   );
 
   const effectEntries = useMemo<DexEntry[]>(
@@ -133,20 +150,21 @@ export const DexView = ({ data }: DexViewProps) => {
           brand: def.brand,
           rarity: def.rarity,
           imageSrc: `/static/images/effects/${def.imageId}.png`,
+          discovered: discoveredEffects.has(def.id),
           ownedCount: ownership?.count ?? 0,
           preview: ownership ? <EffectCard item={ownership.best} readOnly /> : undefined,
         };
       }),
-    [effectOwnership]
+    [discoveredEffects, effectOwnership]
   );
 
   const guitarProgress = useMemo(
-    () => getDexProgress(GUITAR_DEFINITIONS, guitarOwnership),
-    [guitarOwnership]
+    () => getDexProgress(GUITAR_DEFINITIONS, discoveredGuitars),
+    [discoveredGuitars]
   );
   const effectProgress = useMemo(
-    () => getDexProgress(EFFECT_DEFINITIONS, effectOwnership),
-    [effectOwnership]
+    () => getDexProgress(EFFECT_DEFINITIONS, discoveredEffects),
+    [discoveredEffects]
   );
 
   const totalOwned = guitarProgress.owned + effectProgress.owned;
@@ -164,7 +182,8 @@ export const DexView = ({ data }: DexViewProps) => {
             </h2>
             <p className='mt-1 text-sm text-zinc-400'>
               Every guitar and pedal in the game. Open cases to reveal the ones
-              still in the dark.
+              still in the dark — once something has been yours, it stays
+              revealed even after you sell it.
             </p>
           </div>
           <div className='flex items-baseline gap-2'>

@@ -4,6 +4,7 @@ import { rollCondition } from "feature/arsenal/data/itemStats";
 import { rollItemTraits } from "feature/arsenal/data/traits";
 import type { EffectInventoryItem, GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
+import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -88,7 +89,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       const newEffectInventory = [...(data.arsenal?.effectInventory || []), newItem];
-      t.update(userRef, { "arsenal.effectInventory": newEffectInventory });
+      t.update(userRef, {
+        "arsenal.effectInventory": newEffectInventory,
+        // Discovery is permanent — recorded on the pull, never removed on a sale.
+        "arsenal.dexEffects": FieldValue.arrayUnion(effect.id),
+      });
       t.set(serialRef, { count: serial }, { merge: true });
 
       return { newItem, newEffectInventory };

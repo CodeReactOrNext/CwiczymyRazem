@@ -14,8 +14,10 @@ import type {
   TraderBuyResult,
   TraderState,
 } from "feature/arsenal/types/trader.types";
+import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import { addPartsToWallet } from "feature/arsenal/utils/scrap";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
+import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -175,12 +177,19 @@ export default async function handler(
           };
 
           const inventory: InventoryItem[] = data.arsenal?.inventory || [];
-          const isNewToDex = !inventory.some((i) => i.guitarId === def.id);
+          // Against the Dex record, not the stash: a model sold months ago is
+          // still discovered, so this stays a duplicate.
+          const isNewToDex = !buildDiscoveredSet(
+            data.arsenal?.dexGuitars,
+            inventory,
+            (i) => i.guitarId
+          ).has(def.id);
 
           t.update(userRef, {
             "statistics.fame": newFame,
             "arsenal.inventory": [...inventory, item],
             "arsenal.trader": trader,
+            "arsenal.dexGuitars": FieldValue.arrayUnion(def.id),
           });
           t.set(serialRef, { count: serial }, { merge: true });
 
@@ -206,12 +215,17 @@ export default async function handler(
 
         const effectInventory: EffectInventoryItem[] =
           data.arsenal?.effectInventory || [];
-        const isNewToDex = !effectInventory.some((i) => i.effectId === def.id);
+        const isNewToDex = !buildDiscoveredSet(
+          data.arsenal?.dexEffects,
+          effectInventory,
+          (i) => i.effectId
+        ).has(def.id);
 
         t.update(userRef, {
           "statistics.fame": newFame,
           "arsenal.effectInventory": [...effectInventory, item],
           "arsenal.trader": trader,
+          "arsenal.dexEffects": FieldValue.arrayUnion(def.id),
         });
         t.set(serialRef, { count: serial }, { merge: true });
 
