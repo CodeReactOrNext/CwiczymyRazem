@@ -8,7 +8,7 @@ import { cn } from "assets/lib/utils";
 import { CurrencyIcon } from "components/CurrencyIcons/withCurrencyIcons";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { motion } from "framer-motion";
-import { Guitar, Info, Sparkles } from "lucide-react";
+import { Cable, Guitar, Info, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
@@ -17,6 +17,7 @@ import {
   RIG_FAME_HOURLY_CEILING,
 } from "../../data/rigFame";
 import { getRigLevel } from "../../data/rigLevel";
+import { getChainFameRate } from "../../data/signalChain";
 import {
   buildRigTraitContext,
   getRigTraitCategoryRates,
@@ -184,6 +185,11 @@ const PayoutNote = () => {
               on an even hour — 15 minutes in each category.
             </p>
             <p>
+              <span className='font-semibold text-white'>Signal path</span> is
+              what the order of the pedals on the board is worth — see the panel
+              above it.
+            </p>
+            <p>
               <span className='font-semibold text-white'>Per category</span> is
               what those same traits pay on an hour spent only on that one
               category.
@@ -222,6 +228,10 @@ interface RigStatsPanelProps {
 export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   const rigLevel = getRigLevel(data);
   const baseRate = getRigFameRate(rigLevel);
+  // The saved board, not the live one: this is the sheet of what the gear pays,
+  // and the panel over the pedalboard is where a rate still being dragged around
+  // belongs.
+  const chainRate = getChainFameRate(data);
 
   const { traitRate, categoryRates } = useMemo(() => {
     const rig = buildRigTraitContext(data);
@@ -236,8 +246,12 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   // the clamped one — base + traits raw would advertise Fame no report pays.
   // The ceiling itself stays off the sheet: nothing in the game reaches it, so
   // showing it only invited the question of why the number was short.
-  const rawTotal = baseRate + traitRate;
+  const rawTotal = baseRate + chainRate + traitRate;
   const totalRate = Math.min(RIG_FAME_HOURLY_CEILING, rawTotal);
+
+  // Three sources now, so "brightest line in the group" has to be worked out
+  // rather than written as one comparison.
+  const bestSourceRate = Math.max(baseRate, chainRate, traitRate);
 
   const bestCategoryRate = Math.max(
     ...PRACTICE_CATEGORIES.map((category) => categoryRates[category]),
@@ -289,14 +303,22 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
                 value={`+${formatRigFameRate(rigLevel)}`}
                 icon={<Guitar size={14} className='shrink-0 text-zinc-500' />}
                 share={rawTotal > 0 ? baseRate / rawTotal : 0}
-                strong={baseRate >= traitRate}
+                strong={baseRate === bestSourceRate}
+              />
+              <StatRow
+                label='Signal path'
+                value={formatTraitValue(chainRate)}
+                icon={<Cable size={14} className='shrink-0 text-zinc-500' />}
+                share={rawTotal > 0 ? chainRate / rawTotal : 0}
+                strong={chainRate > 0 && chainRate === bestSourceRate}
+                muted={chainRate === 0}
               />
               <StatRow
                 label='Traits'
                 value={formatTraitValue(traitRate)}
                 icon={<Sparkles size={14} className='shrink-0 text-zinc-500' />}
                 share={rawTotal > 0 ? traitRate / rawTotal : 0}
-                strong={traitRate > baseRate}
+                strong={traitRate > 0 && traitRate === bestSourceRate}
                 muted={traitRate === 0}
               />
             </StatGroup>

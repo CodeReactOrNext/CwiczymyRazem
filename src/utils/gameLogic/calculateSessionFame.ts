@@ -19,10 +19,16 @@
  *
  * On top of all that sits the rig bonus — see `feature/arsenal/data/rigFame`.
  * It rides the same daily-minutes counter, so it inherits the split-proofing
- * rather than reimplementing it.
+ * rather than reimplementing it. The signal-path bonus (what the pedalboard's
+ * wiring order is worth, see `feature/arsenal/data/signalChain`) rides it too,
+ * and is kept a separate component rather than folded into the rig rate: the two
+ * are earned by different things — one by owning better gear, the other by
+ * arranging it properly — and a player who cannot see them apart cannot tell
+ * which of the two their next move would move.
  */
 
 import {
+  cumulativeRateFame,
   cumulativeRigFame,
   getRigFameRate,
   RIG_FAME_HOURLY_CEILING,
@@ -89,6 +95,12 @@ export interface SessionFameInput {
   traitFame?: number;
   /** The same payout as a Fame/h rate, which is what the ceiling applies to. */
   traitRate?: number;
+  /**
+   * Fame/h the pedalboard's wiring order is worth — see
+   * `feature/arsenal/data/signalChain`. Absent pays nothing, so every caller
+   * from before the signal path existed is unchanged.
+   */
+  chainRate?: number;
 }
 
 export interface SessionFameResult {
@@ -106,6 +118,10 @@ export interface SessionFameResult {
   traitFame: number;
   /** Fame/hour the traits actually paid, i.e. after the ceiling. */
   traitFameRate: number;
+  /** The signal-path component — what the board's wiring paid this session. */
+  chainFame: number;
+  /** Fame/hour that wiring is worth, after the ceiling. */
+  chainFameRate: number;
   /** Whether the accuracy multiplier applied — the UI can call it out. */
   accuracyBonusApplied: boolean;
   /** The counter to persist. */
@@ -140,6 +156,7 @@ export const calculateSessionFame = ({
   rigLevel = 0,
   traitFame = 0,
   traitRate = 0,
+  chainRate = 0,
 }: SessionFameInput): SessionFameResult => {
   // A counter from an earlier day is stale — the new day starts from zero.
   const isSameDay = fameDay?.date === dayKey;
@@ -147,12 +164,20 @@ export const calculateSessionFame = ({
   const streakBonusClaimed = isSameDay ? Boolean(fameDay?.streakBonusClaimed) : false;
   const rigFameRate = getRigFameRate(rigLevel);
 
-  // Traits share the rig's one ceiling rather than getting a second cap of their
-  // own: two ceilings would mean two numbers to explain, and a player at the cap
-  // could not tell which one was binding. Whatever headroom the base rate leaves
-  // is what the traits get, and the payout is scaled by the same fraction so the
-  // rate the header shows is always the rate that was paid.
-  const traitHeadroom = Math.max(0, RIG_FAME_HOURLY_CEILING - rigFameRate);
+  // Every gear payout shares the rig's one ceiling rather than getting a cap of
+  // its own: three ceilings would mean three numbers to explain, and a player at
+  // the cap could not tell which one was binding. They are taken in the order
+  // they are earned — the rig's own rate first, then the wiring, then the traits
+  // — and each gets whatever headroom the ones before it left.
+  const chainFameRate = Math.max(
+    0,
+    Math.min(chainRate, RIG_FAME_HOURLY_CEILING - rigFameRate),
+  );
+  const gearRate = rigFameRate + chainFameRate;
+
+  // Whatever headroom is left is what the traits get, and the payout is scaled by
+  // the same fraction so the rate the header shows is always the rate paid.
+  const traitHeadroom = Math.max(0, RIG_FAME_HOURLY_CEILING - gearRate);
   const traitScale =
     traitRate > 0 ? Math.min(1, traitHeadroom / traitRate) : traitRate === 0 ? 1 : 0;
   const traitFameRate = Math.round(Math.min(traitRate, traitHeadroom) * 10) / 10;
@@ -171,6 +196,8 @@ export const calculateSessionFame = ({
       // traits have no session left to be paid against.
       traitFame: 0,
       traitFameRate,
+      chainFame: 0,
+      chainFameRate,
       accuracyBonusApplied: false,
       // Untouched: a back-dated report must not consume today's allowance.
       fameDay: { date: dayKey, minutes: minutesBefore, streakBonusClaimed },
@@ -200,14 +227,24 @@ export const calculateSessionFame = ({
       cumulativeRigFame(minutesBefore, rigLevel)
   );
 
+  // Read off that same counter, for the same reason: a board rewired mid-day
+  // must not let the player collect the day's minutes twice.
+  const chainFame = Math.max(
+    0,
+    cumulativeRateFame(minutesAfter, chainFameRate) -
+      cumulativeRateFame(minutesBefore, chainFameRate)
+  );
+
   return {
-    fame: curveFame + streakBonus + rigFame + traitFameAwarded,
+    fame: curveFame + streakBonus + rigFame + chainFame + traitFameAwarded,
     curveFame,
     streakBonus,
     rigFame,
     rigFameRate,
     traitFame: traitFameAwarded,
     traitFameRate,
+    chainFame,
+    chainFameRate,
     accuracyBonusApplied,
     fameDay: {
       date: dayKey,

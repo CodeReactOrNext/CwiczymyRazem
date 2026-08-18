@@ -134,7 +134,7 @@ export const findFreeSpot = (
 };
 
 /** Which row a stored `yPct` belongs to — used to read the board in order. */
-const rowIndexOf = (yPct: number) => {
+export const rowIndexOf = (yPct: number) => {
   let closest = 0;
   for (let i = 1; i < ROW_Y_PCT.length; i++) {
     if (Math.abs(yPct - ROW_Y_PCT[i]) < Math.abs(yPct - ROW_Y_PCT[closest])) {
@@ -144,8 +144,14 @@ const rowIndexOf = (yPct: number) => {
   return closest;
 };
 
-/** Row first, then left to right — the order the player reads the board in. */
-const inReadingOrder = (items: PedalboardPlacement[]) =>
+/**
+ * Row first, then left to right — the order the player reads the board in, and
+ * with it the order the signal runs through it: the input jack sits at the top
+ * left and the amp jack at the bottom right, so reading the board and tracing
+ * the cable are the same act. `data/signalChain` judges the chain in this order,
+ * which is why `tidyBoard` can straighten a board without ever rewiring it.
+ */
+export const inChainOrder = (items: PedalboardPlacement[]) =>
   [...items].sort(
     (a, b) => rowIndexOf(a.yPct) - rowIndexOf(b.yPct) || a.xPct - b.xPct,
   );
@@ -218,11 +224,13 @@ export const layoutBoard = (
 };
 
 /**
- * Repacks the whole board into tidy rows, keeping the order the pedals are
- * read in. Pedals past the last row come back as `overflow`.
+ * Packs the board into rows in exactly the order it is handed, so the caller
+ * owns the ordering decision: `tidyBoard` keeps the order the pedals are already
+ * read in, while "Wire It Up" hands over a chain-sorted list and gets the same
+ * neat rows out. Pedals past the last row come back as `overflow`.
  */
-export const tidyBoard = (
-  items: PedalboardPlacement[],
+export const packInOrder = (
+  ordered: PedalboardPlacement[],
   widthOf: WidthResolver,
 ): BoardLayout => {
   const placed: PedalboardPlacement[] = [];
@@ -230,7 +238,7 @@ export const tidyBoard = (
   let row = 0;
   let cursor = EDGE_PCT;
 
-  for (const item of inReadingOrder(items)) {
+  for (const item of ordered) {
     const wPct = widthOf(item.itemId);
     if (cursor + wPct > 100 - EDGE_PCT) {
       row += 1;
@@ -244,8 +252,14 @@ export const tidyBoard = (
     cursor += wPct + GAP_PCT;
   }
 
-  return buildLayout(items, placed, overflow);
+  return buildLayout(ordered, placed, overflow);
 };
+
+/** Repacks the whole board into rows without changing the signal order. */
+export const tidyBoard = (
+  items: PedalboardPlacement[],
+  widthOf: WidthResolver,
+): BoardLayout => packInOrder(inChainOrder(items), widthOf);
 
 /**
  * Width lookup for a board, in the units `layoutBoard` and friends work in.

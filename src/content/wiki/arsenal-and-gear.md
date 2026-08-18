@@ -80,8 +80,28 @@ The Trader also stocks **two guitars and two pedals a day**, each a specific ins
 
 Your **Rig Level** is the sum of the Item Level of everything currently equipped in your Rig, guitars plus pedalboard effects. It's the number the [gear board](/wiki/leaderboard-and-seasons) ranks you on. Only equipped gear counts, so swapping in something stronger moves it immediately, and Workshop work only pays off if it went into something you actually use.
 
+## Signal path
+
+The board cares about the **order** you put the pedals in, not only what they are. Guitarists settled on a running order for effects decades ago, and a board wired that way earns Fame every hour you practise, on top of everything the gear is already worth.
+
+The signal comes in at the top left of the board and leaves for the amp at the bottom right, so the chain runs exactly the way you read it: along the top row left to right, then along the bottom row. A patch cable is drawn between the pedals so you can see the route it takes without working it out.
+
+<TierScale items="Tuner|Filter|Compressor|Fuzz|Overdrive|Distortion|Boost|EQ|Modulation|Delay|Reverb" caption="Guitar on the left, amp on the right. The chart on the Rig tab lists only the stages you can actually fill today — a few of these have no pedal in the game yet." />
+
+**Every cable that runs into the pedal that belongs next pays 2 Fame an hour**, and a board with three or more pedals and nothing out of order pays 6 Fame an hour on top of that. Two things follow: a big board is worth more than a small one, and putting one pedal right pays a little more straight away — you never have to fix the whole thing before you see anything for it.
+
+<StepList steps="Green cable::That run goes into the pedal that belongs next|Red cable::That run doubles back on itself — the pedal it feeds should be standing earlier in the chain|The whole cable pulsing::Nothing is out of order, and the board is glowing for it" />
+
+**Order inside a stage is yours.** Two overdrives can go either way round, and a chorus, a phaser and a vibrato can be in any order among themselves. Where the choice is taste rather than craft, the game has no opinion and never marks a cable wrong for it.
+
+**Don't fancy arranging it by hand?** **Wire it up**, next to the board, lays the whole thing out in the right order in one go and keeps your own arrangement wherever the order doesn't matter. It's also how you rearrange a board on a phone, where pedals can't be dragged.
+
+<BlogAlert type="tip">
+The reasons behind the order are real, not arbitrary. A tuner needs a signal nothing has coloured yet. A fuzz wants to hear your pickups almost first-hand, so anything in front of it chokes it. A boost in front of your dirt only makes the same tone louder; behind it, it pushes it. And a reverb is the room the whole rig is played in, which is why it always goes last. Hover any stage in the chart to read why it sits where it does.
+</BlogAlert>
+
 ## Questions people ask
 
-<FaqList items="Can I buy Fame with real money?::No. Every route to it is in the app: practice itself, quests, milestones, challenges, seasons and the community|I opened a case and got a duplicate::Scrap it. Duplicates become parts, and parts are what upgrade the copy you kept|Does gear affect my points or level?::Not at all. It's a separate game with its own board|Restore or build first?::Restore. Building past the early levels needs good condition anyway|Can I choose which mod I salvage?::No, each instrument has its own, decided when it was made and shown to you before you scrap it|If I sell instead of scrapping, do I still get the mod?::No. Selling pays Fame and the instrument leaves intact. The mod only comes off on the bench" />
+<FaqList items="Can I buy Fame with real money?::No. Every route to it is in the app: practice itself, quests, milestones, challenges, seasons and the community|I opened a case and got a duplicate::Scrap it. Duplicates become parts, and parts are what upgrade the copy you kept|Does gear affect my points or level?::Not at all. It's a separate game with its own board|Restore or build first?::Restore. Building past the early levels needs good condition anyway|Can I choose which mod I salvage?::No, each instrument has its own, decided when it was made and shown to you before you scrap it|If I sell instead of scrapping, do I still get the mod?::No. Selling pays Fame and the instrument leaves intact. The mod only comes off on the bench|Does the order of my pedals really pay?::Yes, and it's the one bonus that costs nothing to collect — the gear is already yours, it just has to stand in the right places|Which row does the chain start on?::The top one, left to right, then the bottom one. The cable drawn on the board always shows the route|Do parked pedals count?::Yes. A pedal the board has no room for is still in the chain, so it can still cost you a cable" />
 
 <ReadNext links="Where Fame comes from::/wiki/fame|Points, levels & streaks::/wiki/how-scoring-works|Rankings & seasons::/wiki/leaderboard-and-seasons|Weekly Milestones::/wiki/ai-coach-and-weekly-milestones" />

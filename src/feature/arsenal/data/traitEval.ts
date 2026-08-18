@@ -35,6 +35,7 @@ import type {
   ItemTrait,
   RigSetup,
 } from "../types/arsenal.types";
+import { inChainOrder } from "../utils/pedalboardLayout";
 import { EFFECTS_BY_ID } from "./effectDefinitions";
 import { GUITARS_BY_ID } from "./guitarDefinitions";
 import { getEffectiveRarity, RARITY_LADDER } from "./itemStats";
@@ -108,6 +109,16 @@ export interface RigItem {
   traits: ItemTrait[];
   /** Horizontal position on the board. Undefined for guitars. */
   x?: number;
+  /**
+   * Where the pedal sits in the signal chain — 0 is closest to the guitar. See
+   * `data/signalChain`, which is also what the board draws its cable from, so a
+   * trait reading "in front of every drive" means the same thing the player can
+   * see running across the board.
+   *
+   * Undefined for guitars, and for the hand-built rigs in the trait tests, where
+   * the horizontal position is the whole fixture.
+   */
+  chain?: number;
 }
 
 export interface RigTraitContext {
@@ -150,6 +161,15 @@ export const buildRigTraitContext = (
     });
   }
 
+  // Chain position rather than raw x, because a two-row board is read row by
+  // row: a pedal at the far left of the bottom row comes *after* one at the far
+  // right of the top row, which comparing x alone gets backwards.
+  const chainIndex = new Map(
+    inChainOrder(arsenal.rig?.pedalboardItems ?? []).map(
+      (placement, index) => [placement.itemId, index] as const,
+    ),
+  );
+
   for (const placement of arsenal.rig?.pedalboardItems ?? []) {
     const item = arsenal.effectInventory?.find((e) => e.id === placement.itemId);
     const def: EffectDefinition | undefined = item
@@ -166,6 +186,7 @@ export const buildRigTraitContext = (
       buildLevel: item.buildLevel ?? 0,
       traits: item.traits ?? [],
       x: placement.xPct,
+      chain: chainIndex.get(placement.itemId),
     });
   }
 
@@ -177,6 +198,13 @@ export const buildRigTraitContext = (
 const isDrive = (pedal: RigItem): boolean =>
   !!pedal.effectType &&
   (DRIVE_TYPES as string[]).includes(pedal.effectType);
+
+/**
+ * How far down the signal chain a pedal sits. Falls back to the raw board x for
+ * a rig assembled without chain positions, where the two agree anyway: on a
+ * single row, left to right *is* the chain.
+ */
+const chainPos = (pedal: RigItem): number => pedal.chain ?? pedal.x ?? 0;
 
 const rarityRank = (rarity: GuitarRarity): number =>
   RARITY_LADDER.indexOf(rarity);
@@ -271,7 +299,7 @@ export const evaluateCondition = (
         (p) => p.itemId !== self.itemId && isDrive(p),
       );
       if (drives.length === 0) return false;
-      return drives.every((d) => (self.x ?? 0) < (d.x ?? 0));
+      return drives.every((d) => chainPos(self) < chainPos(d));
     }
 
     case "chain-after-drives": {
@@ -279,7 +307,7 @@ export const evaluateCondition = (
         (p) => p.itemId !== self.itemId && isDrive(p),
       );
       if (drives.length === 0) return false;
-      return drives.every((d) => (self.x ?? 0) > (d.x ?? 0));
+      return drives.every((d) => chainPos(self) > chainPos(d));
     }
 
     case "only-guitar":
@@ -541,7 +569,7 @@ export const evaluateRigTraits = (
             return usesSkills(e.def);
           case "pedals-right": {
             const target = rig.pedals.find((p) => p.itemId === e.itemId);
-            return !!target && (target.x ?? 0) > (item.x ?? 0);
+            return !!target && chainPos(target) > chainPos(item);
           }
           case "same-brand": {
             const owner = all.find((i) => i.itemId === e.itemId);

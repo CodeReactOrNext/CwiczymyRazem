@@ -63,6 +63,12 @@ export interface ReportDataInterface {
   fameAccuracyBonus?: boolean;
   /** Fame the user's rig paid for this session, already included in `fameEarned`. */
   fameRigBonus?: number;
+  /**
+   * Fame the pedalboard's wiring order paid, also already inside `fameEarned`.
+   * Kept apart from `fameRigBonus` because it is earned by a different move:
+   * that one is for owning the gear, this one for arranging it properly.
+   */
+  fameChainBonus?: number;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;

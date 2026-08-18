@@ -1,4 +1,5 @@
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { getChainFameRate } from "feature/arsenal/data/signalChain";
 import {
   buildRigTraitContext,
   getRigTraitPayout,
@@ -162,6 +163,11 @@ export default async function handler(
     // skills it trained — which is why they are resolved here rather than inside
     // `calculateSessionFame`, which only ever sees a total. Same rule as the rig
     // level above: the arsenal comes from the stored document, never the body.
+    // Same rule as the rig level: scored off the stored board, never off the
+    // request body. The wiring bonus is worth real Fame, so a client must not be
+    // able to claim a by-the-book chain it has not actually arranged.
+    const chainRate = getChainFameRate(userData?.arsenal);
+
     const traitPayout = getRigTraitPayout(
       buildRigTraitContext(userData?.arsenal),
       {
@@ -190,6 +196,7 @@ export default async function handler(
       rigLevel,
       traitFame: traitPayout.fame,
       traitRate: traitPayout.rate,
+      chainRate,
     });
     const fameEarned = fameResult.fame;
 
@@ -275,6 +282,7 @@ export default async function handler(
         fameStreakBonus: fameResult.streakBonus,
         fameAccuracyBonus: fameResult.accuracyBonusApplied,
         fameRigBonus: fameResult.rigFame,
+        fameChainBonus: fameResult.chainFame,
       },
     });
   }

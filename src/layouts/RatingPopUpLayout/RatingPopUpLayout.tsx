@@ -7,7 +7,7 @@ import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Swords, Timer, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Cable, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Swords, Timer, Trophy } from "lucide-react";
 import Router from "next/router";
 import { useMemo } from "react";
 import {
@@ -119,6 +119,10 @@ const RatingPopUpLayout = ({
   // Part of `fame`, not an extra on top — it gets its own chip because the gear
   // that earned it is the one thing the player can act on.
   const rigBonus = ratingData.fameRigBonus ?? 0;
+  // Also part of `fame`, and also its own chip — because unlike the rig bonus it
+  // was not bought. It is what the order of the pedals on the board was worth,
+  // and a player who has never noticed that the order pays finds out here.
+  const chainBonus = ratingData.fameChainBonus ?? 0;
   // Fame scales on a curve over the day's practice total, so spell out the parts
   // that aren't just "time" — otherwise the number looks arbitrary. The rig's
   // rate belongs in the Arsenal, where it can be acted on; here it was only ever
@@ -368,6 +372,20 @@ const RatingPopUpLayout = ({
                       <Swords size={14} />
                       <span className="text-sm font-bold tabular-nums">+{rigBonus}</span>
                       <span className="text-sm font-medium">from your rig</span>
+                    </motion.div>
+                  )}
+
+                  {/* One beat later again, so the wiring reads as its own reward
+                      rather than as part of the rig's. */}
+                  {chainBonus > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.94 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: 1.2, duration: 0.35, ease: "easeOut" }}
+                      className="inline-flex items-center gap-1.5 rounded bg-amber-500/10 px-3 py-1 text-amber-400">
+                      <Cable size={14} />
+                      <span className="text-sm font-bold tabular-nums">+{chainBonus}</span>
+                      <span className="text-sm font-medium">signal path</span>
                     </motion.div>
                   )}
                 </div>

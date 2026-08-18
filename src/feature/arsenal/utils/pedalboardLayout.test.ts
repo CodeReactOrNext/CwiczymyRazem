@@ -4,7 +4,9 @@ import type { PedalboardPlacement } from "../types/arsenal.types";
 import {
   collidesWithAny,
   findFreeSpot,
+  inChainOrder,
   layoutBoard,
+  packInOrder,
   PEDAL_H_PCT,
   ROW_Y_PCT,
   tidyBoard,
@@ -127,6 +129,56 @@ describe("layoutBoard", () => {
     const layout = layoutBoard(items, resolve);
 
     expect(hasOverlap(layout.placed, resolve)).toBe(false);
+  });
+});
+
+describe("inChainOrder", () => {
+  it("reads the top row before the bottom one, each left to right", () => {
+    const items = [
+      at("bottom-right", 70, ROW_Y_PCT[1]),
+      at("top-right", 70, ROW_Y_PCT[0]),
+      at("bottom-left", 3, ROW_Y_PCT[1]),
+      at("top-left", 3, ROW_Y_PCT[0]),
+    ];
+
+    expect(inChainOrder(items).map((i) => i.itemId)).toEqual([
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+    ]);
+  });
+
+  it("leaves the caller's array alone", () => {
+    const items = [at("b", 70, ROW_Y_PCT[0]), at("a", 3, ROW_Y_PCT[0])];
+    inChainOrder(items);
+    expect(items.map((i) => i.itemId)).toEqual(["b", "a"]);
+  });
+});
+
+describe("packInOrder", () => {
+  it("keeps the order it was handed rather than re-reading the board", () => {
+    // Deliberately against reading order: this is what "Wire It Up" relies on.
+    const items = [at("second", 3, ROW_Y_PCT[0]), at("first", 70, ROW_Y_PCT[1])];
+    const layout = packInOrder(items, widthOf);
+
+    expect(layout.placed.map((i) => i.itemId)).toEqual(["second", "first"]);
+    expect(layout.placed[0].xPct).toBeLessThan(layout.placed[1].xPct);
+    expect(layout.placed.every((i) => i.yPct === ROW_Y_PCT[0])).toBe(true);
+  });
+
+  it("reports the board as changed when it had to move something", () => {
+    const layout = packInOrder([at("a", 40, ROW_Y_PCT[1])], widthOf);
+    expect(layout.changed).toBe(true);
+  });
+
+  it("reports no change when everything was already where it belongs", () => {
+    const packed = packInOrder(
+      [at("a", 0, 0), at("b", 0, 0)],
+      widthOf,
+    ).placed;
+
+    expect(packInOrder(packed, widthOf).changed).toBe(false);
   });
 });
 

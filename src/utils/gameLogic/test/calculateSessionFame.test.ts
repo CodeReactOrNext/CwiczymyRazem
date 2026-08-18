@@ -347,4 +347,93 @@ describe("calculateSessionFame", () => {
       expect(split).toBe(oneReport.traitFame);
     });
   });
+
+  describe("signal path fame", () => {
+    it("pays nothing for a board with no bonus to give", () => {
+      const result = session(60, { rigLevel: 143 });
+
+      expect(result.chainFame).toBe(0);
+      expect(result.chainFameRate).toBe(0);
+    });
+
+    it("adds the wiring bonus on top of the curve and the rig", () => {
+      const result = session(60, { rigLevel: 143, chainRate: 18 });
+
+      expect(result.chainFame).toBe(18);
+      expect(result.fame).toBe(result.curveFame + result.rigFame + 18);
+    });
+
+    it("pays for the minutes actually practised", () => {
+      expect(session(30, { chainRate: 18 }).chainFame).toBe(9);
+      expect(session(120, { chainRate: 18 }).chainFame).toBe(36);
+    });
+
+    it("gives splitters no advantage over one long session", () => {
+      let fameDay = undefined as any;
+      let total = 0;
+
+      for (let i = 0; i < 6; i++) {
+        const result = calculateSessionFame({
+          sessionTimeMs: 20 * MINUTE,
+          dayKey: TODAY,
+          streak: 1,
+          fameDay,
+          chainRate: 18,
+        });
+        total += result.chainFame;
+        fameDay = result.fameDay;
+      }
+
+      expect(total).toBe(session(120, { chainRate: 18 }).chainFame);
+    });
+
+    it("never pays a negative bonus when the board is rewired mid-day", () => {
+      const first = session(60, { chainRate: 24 });
+      const afterPullingThePedalsOff = calculateSessionFame({
+        sessionTimeMs: 20 * MINUTE,
+        dayKey: TODAY,
+        streak: 1,
+        fameDay: first.fameDay,
+        chainRate: 0,
+      });
+
+      expect(afterPullingThePedalsOff.chainFame).toBe(0);
+    });
+
+    it("pays no wiring bonus on a back-dated report", () => {
+      const result = session(60, { chainRate: 18, isDateBackReport: 2 });
+
+      expect(result.chainFame).toBe(0);
+      expect(result.fame).toBe(BACKDATED_REPORT_FAME);
+    });
+
+    it("shares the one gear ceiling with the rig and the traits", () => {
+      // Absurd numbers again: what is pinned is that the three gear components
+      // add up to the ceiling rather than each getting their own.
+      const result = session(60, {
+        rigLevel: 750,
+        chainRate: 1000,
+        traitFame: 1000,
+        traitRate: 1000,
+      });
+
+      expect(
+        result.rigFameRate + result.chainFameRate + result.traitFameRate,
+      ).toBeCloseTo(1000, 1);
+    });
+
+    it("takes its headroom before the traits do, not after", () => {
+      // The order matters: wiring is a property of the rig itself, so it is paid
+      // ahead of the traits riding on it.
+      const result = session(60, {
+        rigLevel: 750,
+        chainRate: 30,
+        traitFame: 1000,
+        traitRate: 1000,
+      });
+
+      expect(result.chainFameRate).toBe(30);
+      expect(result.traitFameRate).toBeLessThan(1000);
+    });
+  });
 });
