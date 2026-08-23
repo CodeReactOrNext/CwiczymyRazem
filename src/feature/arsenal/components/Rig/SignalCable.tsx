@@ -344,19 +344,21 @@ interface PlugProps {
 
 /**
  * A quarter-inch plug, drawn tip-first at the origin so it reads as pushed into
- * the pedal's own enclosure — which covers the shaft, leaving only the collar
- * and the moulded boot in the open.
+ * the pedal's own enclosure — which is where the whole of the sleeve belongs,
+ * so no part of it is drawn at all. A plug that is actually seated shows its
+ * handle and its boot and nothing else; leave a length of bare pin standing in
+ * the gap and it reads as a cable half pulled out, not a cable plugged in.
  *
  * Sized off the cable rather than off the board. What tells a big jack from a
  * 3.5mm one is not its length but its girth: a real plug's handle is about twice
- * the cable's diameter and its sleeve about half again, so anything drawn
- * thinner than the cable it terminates reads as a mini jack no matter how long
- * it is. The handle here is `1.5×` the jacket's width for exactly that reason.
+ * the cable's diameter, so anything drawn thinner than the cable it terminates
+ * reads as a mini jack no matter how long it is. The handle here is `1.5×` the
+ * jacket's width for exactly that reason.
  *
  * Length is the one place it cannot be honest. A real plug stands some 45mm out
  * of the socket — four times the gap a tidy board leaves between pedals — so it
- * is cut to a little over the gap instead, which lets two facing plugs sit
- * nearly nose to nose on a tight board rather than swallowing their neighbours.
+ * is cut to about that gap instead, which lets two facing plugs sit nearly nose
+ * to nose on a tight board rather than swallowing their neighbours.
  *
  * Only the pedals get one. The board's own sockets are drawn at something near
  * life size, and at that size all a plugged-in jack shows is a cable vanishing
@@ -369,60 +371,43 @@ const Plug = ({ at: point, flip, metal }: PlugProps) => (
   <g transform={`translate(${at(point)})${flip ? " scale(-1 1)" : ""}`}>
     {/* What it throws on the surface. */}
     <ellipse
-      cx={-1.7}
+      cx={-1.2}
       cy={1.95}
-      rx={2.7}
-      ry={0.68}
+      rx={2.2}
+      ry={0.66}
       fill='#000000'
       opacity={0.42}
     />
 
     {/* The moulded strain-relief boot, tapering onto the cable. */}
     <path
-      d='M -2.7 -1.7 L -3.6 -1.15 Q -4 -0.95 -4 0 Q -4 0.95 -3.6 1.15 L -2.7 1.7 Z'
+      d='M -0.95 -1.72 L -2.1 -1.2 Q -2.65 -1 -2.65 0 Q -2.65 1 -2.1 1.2 L -0.95 1.72 Z'
       fill='#131316'
     />
     <g stroke='#000000' strokeWidth={0.18} opacity={0.55}>
-      <line x1={-3.05} y1={-1.48} x2={-3.05} y2={1.48} />
-      <line x1={-3.45} y1={-1.26} x2={-3.45} y2={1.26} />
+      <line x1={-1.5} y1={-1.5} x2={-1.5} y2={1.5} />
+      <line x1={-1.95} y1={-1.28} x2={-1.95} y2={1.28} />
     </g>
     <path
-      d='M -2.7 -1.7 L -3.6 -1.15 L -3.6 -0.72 L -2.7 -1.14 Z'
+      d='M -0.95 -1.72 L -2.1 -1.2 L -2.1 -0.76 L -0.95 -1.16 Z'
       fill='#ffffff'
       opacity={0.1}
     />
 
-    {/* The sleeve, sunk into the socket, then the handle it screws onto. */}
-    <rect x={-2.05} y={-1.08} width={3.25} height={2.16} rx={1} fill={metal} />
+    {/* The handle, seated flush and tucked a little under the enclosure so no
+        seam opens up against a pedal image with a transparent margin. */}
     <rect
-      x={-0.95}
-      y={-1.08}
-      width={0.3}
-      height={2.16}
-      fill='#23262a'
-      opacity={0.8}
-    />
-    <rect
-      x={-1.95}
-      y={-0.86}
-      width={3}
-      height={0.34}
-      rx={0.17}
-      fill='#ffffff'
-      opacity={0.26}
-    />
-    <rect
-      x={-2.75}
+      x={-1.05}
       y={-1.72}
-      width={0.95}
+      width={1.4}
       height={3.44}
       rx={0.36}
       fill={metal}
     />
     <g stroke='#15181b' strokeWidth={0.14} opacity={0.5}>
-      <line x1={-2.52} y1={-1.46} x2={-2.52} y2={1.46} />
-      <line x1={-2.28} y1={-1.46} x2={-2.28} y2={1.46} />
-      <line x1={-2.04} y1={-1.46} x2={-2.04} y2={1.46} />
+      <line x1={-0.82} y1={-1.46} x2={-0.82} y2={1.46} />
+      <line x1={-0.52} y1={-1.46} x2={-0.52} y2={1.46} />
+      <line x1={-0.22} y1={-1.46} x2={-0.22} y2={1.46} />
     </g>
   </g>
 );
