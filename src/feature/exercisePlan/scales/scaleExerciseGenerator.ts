@@ -1,7 +1,7 @@
 import type { Exercise } from '../types/exercise.types';
-import { getScaleOnString,getScalePatternForPosition } from './fretboardMapper';
+import { getScaleOnString, getScaleShape, getShapeStartFrets } from './fretboardMapper';
 import { generatePattern, getPatternName,type PatternType } from './patternGenerators';
-import { rootNotes,scaleDefinitions, type ScaleType } from './scaleDefinitions';
+import { getNotesPerString,rootNotes,scaleDefinitions, type ScaleType } from './scaleDefinitions';
 
 const STRING_NAMES = ["high E", "B", "G", "D", "A", "low E"] as const;
 
@@ -75,6 +75,7 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
 
   // Get scale definition
   const scaleDef = scaleDefinitions[scaleType];
+  const notesPerString = getNotesPerString(scaleType);
 
   // Calculate root MIDI note
   const rootIndex = rootNotes.indexOf(rootNote);
@@ -85,16 +86,19 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
   let description = '';
   let instructions: string[] = [];
   let positionsToPractice: number[] = [];
+  // Frets the shape actually occupies, for the tip below — a shape is anchored on
+  // a scale note, so it rarely starts exactly on the fret it is named after.
+  let shapeSpan: [number, number] | null = null;
 
   if (position === 'all') {
     // For 'all', we practice main positions across the fretboard
-    positionsToPractice = [1, 3, 5, 7, 8, 10, 12];
+    positionsToPractice = getShapeStartFrets(rootMidi, scaleDef.intervals);
     title = `${rootNote} ${scaleDef.name} - All Positions`;
     description = `Master the entire fretboard with ${rootNote} ${scaleDef.name} across all main positions.`;
 
     // Generate patterns for each position and concatenate
     positionsToPractice.forEach((pos, index) => {
-      const fretPositions = getScalePatternForPosition(rootMidi, scaleDef.intervals, pos);
+      const fretPositions = getScaleShape(rootMidi, scaleDef.intervals, pos, notesPerString);
       const posTab = generatePattern({
         patternType,
         positions: fretPositions,
@@ -106,7 +110,7 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
 
     instructions = [
       `Practice ${rootNote} ${scaleDef.name} scale across the ENTIRE fretboard.`,
-      `You will move through 7 different positions: ${positionsToPractice.join(', ')}.`,
+      `You will move through ${positionsToPractice.length} different positions: ${positionsToPractice.join(', ')}.`,
       `Pattern: ${getPatternName(patternType)}`,
       `Focus on the shift between positions. Use the common notes to transition smoothly.`,
       `Use alternate picking throughout.`,
@@ -114,7 +118,9 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
     ];
   } else {
     // Single position logic
-    const fretPositions = getScalePatternForPosition(rootMidi, scaleDef.intervals, position);
+    const fretPositions = getScaleShape(rootMidi, scaleDef.intervals, position, notesPerString);
+    const frets = fretPositions.map((fretPosition) => fretPosition.fret);
+    shapeSpan = [Math.min(...frets), Math.max(...frets)];
     tablature = generatePattern({
       patternType,
       positions: fretPositions,
@@ -151,7 +157,7 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
     `${scaleDef.description}`,
     position === 'all'
       ? `Moving across positions helps you understand how the scale is mapped globally.`
-      : `Position ${position} spans frets ${position}-${position + 4}.`,
+      : `This shape spans frets ${shapeSpan?.[0] ?? position}-${shapeSpan?.[1] ?? position}.`,
     `Keep your thumb behind the neck for better reach.`,
     `Practice with a metronome to build consistent timing.`,
     `Visualize the scale pattern before you play it.`,

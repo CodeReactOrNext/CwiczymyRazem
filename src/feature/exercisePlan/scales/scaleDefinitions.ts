@@ -95,3 +95,13 @@ function getMidiFromNoteName(noteName: string): number {
   if (baseNote === -1) return 0;
   return baseNote;
 }
+
+/**
+ * How many notes one string carries in this scale's canonical shape. The five-note
+ * pentatonic boxes put two on every string; the seven-note scales and modes are
+ * learned as three-notes-per-string shapes, which is also what makes every shape
+ * span the whole fretboard evenly instead of leaving a string with a stray pair.
+ */
+export function getNotesPerString(scaleType: ScaleType): number {
+  return scaleDefinitions[scaleType].intervals.length === 5 ? 2 : 3;
+}

@@ -16,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'assets/components/ui/select';
-import { type FretPosition,getScalePatternForPosition } from 'feature/exercisePlan/scales/fretboardMapper';
-import { rootNotes as chromaticRootNotes,scaleDefinitions } from 'feature/exercisePlan/scales/scaleDefinitions';
+import { type FretPosition,getScaleShape, getShapeStartFrets } from 'feature/exercisePlan/scales/fretboardMapper';
+import { getNotesPerString,rootNotes as chromaticRootNotes,scaleDefinitions } from 'feature/exercisePlan/scales/scaleDefinitions';
 import {
   generateScaleExercise,
   getAvailablePatterns,
@@ -90,12 +90,13 @@ export function ScaleSelectionDialog({
     if (!config.rootNote || !config.scaleType) return null;
     const rootMidi = 60 + chromaticRootNotes.indexOf(config.rootNote);
     const intervals = scaleDefinitions[config.scaleType].intervals;
+    const notesPerString = getNotesPerString(config.scaleType);
 
     if (config.position === 'all') {
       const seen = new Set<string>();
       const allPositions: FretPosition[] = [];
-      for (const pos of [1, 3, 5, 7, 8, 10, 12]) {
-        for (const fp of getScalePatternForPosition(rootMidi, intervals, pos)) {
+      for (const pos of getShapeStartFrets(rootMidi, intervals)) {
+        for (const fp of getScaleShape(rootMidi, intervals, pos, notesPerString)) {
           const key = `${fp.string}-${fp.fret}`;
           if (!seen.has(key)) { seen.add(key); allPositions.push(fp); }
         }
@@ -104,10 +105,14 @@ export function ScaleSelectionDialog({
     }
 
     const pos = config.position as number;
+    const positions = getScaleShape(rootMidi, intervals, pos, notesPerString);
+    // The diagram follows the shape rather than a nominal window, so a
+    // three-notes-per-string shape isn't cropped at its top fret.
+    const frets = positions.map((position) => position.fret);
     return {
-      positions: getScalePatternForPosition(rootMidi, intervals, pos),
-      startFret: pos - 1,
-      endFret: pos + 3,
+      positions,
+      startFret: Math.max(0, Math.min(...frets) - 1),
+      endFret: Math.max(...frets) + 1,
       rootMidi,
     };
   })();
