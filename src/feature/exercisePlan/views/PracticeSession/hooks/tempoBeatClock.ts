@@ -78,3 +78,120 @@ export function createBeatClock(
     },
   };
 }
+
+// ── Tempo ruler ───────────────────────────────────────────────────────────────
+// `createBeatClock` above answers "given elapsed seconds, what beat are we on?",
+// which is what a cursor needs. Schedulers need the opposite: "this note sits at
+// beat N — when does it sound?". Rather than hand every scheduler the segment
+// walk, the ruler folds the tempo curve into a single *warped beat* coordinate:
+//
+//     seconds(beat) = toWarped(beat) × 60 / bpm
+//
+// A stretch of beats played at ratio r costs 1/r warped beats, so a bar taken at
+// double tempo occupies half the time a plain bar does. The pay-off is that any
+// existing `beats × secondsPerBeat` line becomes correct by swapping in warped
+// beats — no scheduler has to learn what a tempo map is, and the user's BPM knob
+// still scales the whole piece because `bpm` stays outside the warp.
+
+export interface TempoRuler {
+  /** Score beats → warped beats. Multiply by 60/bpm for seconds. */
+  toWarped(beat: number): number;
+  /** Warped beats → score beats. Inverse of `toWarped`. */
+  fromWarped(warped: number): number;
+  /** Warped length of one full pass — the loop duration in warped beats. */
+  totalWarped: number;
+  /** Tempo ratio in force at a score beat (1 where nothing is automated). */
+  ratioAt(beat: number): number;
+  /** No automation at all, so warped beats == score beats. Lets callers keep a fast path. */
+  isConstant: boolean;
+}
+
+/** A ratio has to be a positive finite number to divide by — anything else means
+ *  "no change here", which is safer than propagating NaN into an audio clock. */
+const safeRatio = (ratio: number): number =>
+  Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+
+export function createTempoRuler(tempoMap: TempoPoint[], totalBeats: number): TempoRuler {
+  const usable = tempoMap.filter(p => Number.isFinite(p.beatPos) && p.beatPos >= 0);
+
+  if (usable.length === 0) {
+    return {
+      toWarped:   beat   => beat,
+      fromWarped: warped => warped,
+      totalWarped: Math.max(0, totalBeats),
+      ratioAt:    () => 1,
+      isConstant: true,
+    };
+  }
+
+  const points = [...usable].sort((a, b) => a.beatPos - b.beatPos);
+  // A map that starts mid-piece leaves the opening bars at the base tempo.
+  if (points[0].beatPos > 0) points.unshift({ beatPos: 0, ratio: 1 });
+
+  // Cumulative warped position at the start of each segment, so a lookup is one
+  // scan plus one multiply rather than re-walking the curve every call.
+  const startBeats:  number[] = [];
+  const startWarped: number[] = [];
+  const ratios:      number[] = [];
+  let warpedCursor = 0;
+  for (let i = 0; i < points.length; i++) {
+    const ratio = safeRatio(points[i].ratio);
+    startBeats.push(points[i].beatPos);
+    startWarped.push(warpedCursor);
+    ratios.push(ratio);
+    if (i + 1 < points.length) warpedCursor += (points[i + 1].beatPos - points[i].beatPos) / ratio;
+  }
+
+  const lastIdx = points.length - 1;
+  const tailBeats = Math.max(0, totalBeats - startBeats[lastIdx]);
+  const totalWarped = startWarped[lastIdx] + tailBeats / ratios[lastIdx];
+
+  /** Index of the segment covering `beat` — the last one starting at or before it. */
+  const segmentAt = (beat: number): number => {
+    let lo = 0, hi = lastIdx;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (startBeats[mid] <= beat) lo = mid; else hi = mid - 1;
+    }
+    return lo;
+  };
+
+  return {
+    isConstant: false,
+    totalWarped,
+
+    ratioAt(beat: number): number {
+      return ratios[segmentAt(beat)];
+    },
+
+    toWarped(beat: number): number {
+      // Before the piece starts (latency pre-roll) the opening tempo is all we
+      // have to extrapolate from; past the end, the closing tempo.
+      if (beat <= 0) return beat / ratios[0];
+      const i = segmentAt(beat);
+      return startWarped[i] + (beat - startBeats[i]) / ratios[i];
+    },
+
+    fromWarped(warped: number): number {
+      if (warped <= 0) return warped * ratios[0];
+      let lo = 0, hi = lastIdx;
+      while (lo < hi) {
+        const mid = (lo + hi + 1) >> 1;
+        if (startWarped[mid] <= warped) lo = mid; else hi = mid - 1;
+      }
+      return startBeats[lo] + (warped - startWarped[lo]) * ratios[lo];
+    },
+  };
+}
+
+/** Convenience for callers that hold measures rather than a prepared map. */
+export function createTempoRulerFromMeasures(
+  measures: TablatureMeasure[] | undefined,
+): TempoRuler {
+  if (!measures?.length) return createTempoRuler([], 0);
+  const totalBeats = measures.reduce(
+    (sum, m) => sum + m.beats.reduce((s, b) => s + b.duration, 0),
+    0,
+  );
+  return createTempoRuler(buildTempoMap(measures), totalBeats);
+}

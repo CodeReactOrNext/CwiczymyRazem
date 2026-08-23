@@ -1,5 +1,5 @@
+import { cn } from "assets/lib/utils";
 import { Settings2, X, ZoomIn, ZoomOut } from "lucide-react";
-import dynamic from "next/dynamic";
 import React, {
   memo,
   useCallback,
@@ -8,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { STANDARD_TUNING_ID } from "utils/audio/tunings";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
@@ -31,13 +30,6 @@ import {
 import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TuningGutterString } from "./useTablatureWorkerBridge";
 
-// three.js is only pulled in when the user actually switches to the 3D highway,
-// keeping it out of the main bundle. ssr:false — the scene touches `window`.
-const NoteHighway3D = dynamic(
-  () => import("./NoteHighway3D").then((m) => m.NoteHighway3D),
-  { ssr: false },
-);
-
 // The floating control and the "Note spacing" slider in settings drive one and
 // the same stored value, so the two can never disagree.
 const ZOOM_STEP = 0.25;
@@ -52,7 +44,9 @@ interface TablatureSectionProps {
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
   baseTempo?: number;
   showAlphaTabScore: boolean;
-  show3dHighway?: boolean;
+  /** Cinema mode: the backing video plays behind the notation, so the board
+   *  turns translucent instead of hiding it. */
+  cinema?: boolean;
   isAudioPlaying: boolean;
   onSeek?: (beatPosition: number) => void;
   onLoopRestart?: (loopStartBeat: number) => void;
@@ -79,12 +73,16 @@ interface TablatureSectionProps {
   isExamMode?: boolean;
   /** Docks the score/combo HUD next to the minimap instead of floating it above the card. */
   isMicEnabled?: boolean;
-  /** Exercise/song title — shown top-left when the 3D highway goes full screen. */
-  title?: string;
-  /** Song cover art (only set when practicing a song that has one assigned). */
-  coverUrl?: string;
-  /** Artist name — only set (alongside coverUrl) when practicing a song. */
-  subtitle?: string;
+  /**
+   * An opaque full-screen surface — today the backing-track alignment screen —
+   * is covering the session.
+   *
+   * Playback carries on underneath (the alignment screen is precisely where you
+   * listen to the two against each other), but every pixel this section draws
+   * while that is true is a pixel nobody can see. So the drawing stops and only
+   * the sound goes on.
+   */
+  obscured?: boolean;
 }
 
 interface TablatureZoomControlProps {
@@ -151,7 +149,7 @@ export const TablatureSection = memo(function TablatureSection({
   rawGpFile,
   baseTempo,
   showAlphaTabScore,
-  show3dHighway = false,
+  cinema = false,
   isAudioPlaying,
   onSeek,
   onLoopRestart,
@@ -174,18 +172,10 @@ export const TablatureSection = memo(function TablatureSection({
   volumeRef,
   isExamMode = false,
   isMicEnabled = false,
-  title,
-  coverUrl,
-  subtitle,
+  obscured = false,
 }: TablatureSectionProps) {
   const { hitNotes, missedNotes } = useNoteMatchingContext();
   const { tuning } = useGuitarTuningContext();
-  // "E Standard" reads better than the bare preset name for the default tuning;
-  // every alternate tuning's own name (e.g. "Drop D") is already descriptive.
-  const tuningLabel =
-    tuning.id === STANDARD_TUNING_ID
-      ? `${tuning.notation.split(/\s+/)[0]} ${tuning.name}`
-      : tuning.name;
   const {
     settings,
     palette,
@@ -216,12 +206,32 @@ export const TablatureSection = memo(function TablatureSection({
 
   const [loopStart, setLoopStart] = useState<number | null>(null);
   const [loopEnd, setLoopEnd] = useState<number | null>(null);
-  const [currentBeat, setCurrentBeat] = useState(0);
+  /**
+   * The live playhead, in beats.
+   *
+   * This used to be state, written from an animation frame — so every frame of
+   * every session re-rendered this section, the minimap and the tab viewer, all
+   * to move a cursor a couple of pixels. It is a ref now: the minimap reads it
+   * per frame and writes the DOM itself, and React never hears about it.
+   */
+  const currentBeatRef = useRef(0);
+  /**
+   * Where the playhead came to rest — after a seek, a reset, or a pause.
+   *
+   * Only these moments need a render: they are the ones that move the cursor
+   * with no animation loop running, and the only ones anything else in the tree
+   * (the "From the start" button) cares about. There are a handful per session.
+   */
+  const [restingBeat, setRestingBeat] = useState(0);
+  const settleBeat = useCallback((beat: number) => {
+    currentBeatRef.current = beat;
+    setRestingBeat(beat);
+  }, []);
   // Horizontal spread lives in the settings store as "Note spacing", so this
   // floating control and the slider on the settings page stay in lockstep.
   const zoom = settings.noteSpacing;
   const setSetting = useTablatureSettings((s) => s.set);
-  // Shared viewer height (tab / notation / 3D), persisted to localStorage.
+  // Shared viewer height (tab / notation), persisted to localStorage.
   const { height, setHeight } = useTablatureHeight();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -240,18 +250,20 @@ export const TablatureSection = memo(function TablatureSection({
   const handleSeek = useCallback(
     (beat: number) => {
       seekedBeatRef.current = beat;
-      setCurrentBeat(beat);
+      settleBeat(beat);
       seekWorkerRef.current?.(beat);
       onSeek?.(beat);
     },
-    [onSeek],
+    [onSeek, settleBeat],
   );
 
-  // Update minimap playhead via rAF while playing; also triggers loop restart when end is reached
+  // Advance the playhead via rAF while playing; also triggers loop restart when
+  // end is reached. The position lands in a ref — the minimap paints itself off
+  // it — so this loop costs one subtraction and no render at all.
   useEffect(() => {
     isRestartingRef.current = false; // clear guard on every effect re-run (new play session)
     if (!isMetronomePlaying || !startTime || countInRemaining > 0) {
-      setCurrentBeat(seekedBeatRef.current);
+      settleBeat(seekedBeatRef.current);
       return;
     }
     let rafId: number;
@@ -292,7 +304,7 @@ export const TablatureSection = memo(function TablatureSection({
       // Track the displayed position so pausing / count-in / restart bridging
       // (the early-return branch above) resumes from where the cursor actually is.
       seekedBeatRef.current = beat;
-      setCurrentBeat(beat);
+      currentBeatRef.current = beat;
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -306,6 +318,7 @@ export const TablatureSection = memo(function TablatureSection({
     loopStart,
     loopEnd,
     onLoopRestart,
+    settleBeat,
   ]);
 
   // Reset loop + beat when exercise changes
@@ -313,8 +326,8 @@ export const TablatureSection = memo(function TablatureSection({
     seekedBeatRef.current = 0;
     setLoopStart(null);
     setLoopEnd(null);
-    setCurrentBeat(0);
-  }, [tabResetKey]);
+    settleBeat(0);
+  }, [tabResetKey, settleBeat]);
 
   const showMinimap =
     !isExamMode && activeTablature.length > 3 && measureEndXs.length > 0;
@@ -365,16 +378,25 @@ export const TablatureSection = memo(function TablatureSection({
   // Song navigator strip — shared between the score (notation) view and the
   // canvas tab view, since both drive the same seek/loop wiring off `activeTablature`.
   const minimapRow = (showMinimap || isMicEnabled) && (
-    <div className='flex items-center gap-6'>
+    <div
+      className={cn(
+        "flex items-center gap-6",
+        // Cinema pins the tab to the bottom edge, so the bar navigator and the
+        // score go to the opposite one rather than floating in the picture.
+        // pt clears the Electron titlebar, which is portalled above this.
+        cinema && "fixed inset-x-0 top-0 z-20 px-6 pb-3 pt-12",
+      )}>
       <div className='min-w-0 flex-1'>
         {showMinimap && (
           <TablatureMinimapBar
             measureEndXs={measureEndXs}
             totalBeats={totalBeats}
-            currentBeat={currentBeat}
+            currentBeatRef={currentBeatRef}
+            beatVersion={restingBeat}
             loopStart={loopStart}
             loopEnd={loopEnd}
             isPlaying={isMetronomePlaying && countInRemaining === 0}
+            paused={obscured}
             measureAccuracy={measureAccuracy}
             onSeek={handleSeek}
             onLoopRangeChange={(s, e) => {
@@ -404,9 +426,26 @@ export const TablatureSection = memo(function TablatureSection({
   );
 
   return (
-    <div className='relative mb-4 w-full rounded-lg bg-[#0f0f12]'>
+    <div
+      className={cn(
+        "relative w-full rounded-lg",
+        // Cinema pins the board to the bottom edge and drops its panel entirely,
+        // so the picture owns the whole frame and only the notation sits on it.
+        // pb clears the session's bottom bar (fixed, ~90px tall).
+        cinema
+          ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[104px]"
+          : "mb-4 bg-[#0f0f12]",
+      )}>
       {canShowAlphaTabScore && scoreEverShown && (
-        <div className={showAlphaTabScore ? undefined : "hidden"}>
+        <div
+          className={showAlphaTabScore ? undefined : "hidden"}
+          // AlphaTab draws the score as SVG and sweeps a cursor across it every
+          // frame. Under the alignment screen that is a full-page SVG repaint
+          // nobody can see — but this same player is also making the sound being
+          // aligned against, so it must keep playing. `visibility` skips the
+          // paint while leaving the audio, and the layout AlphaTab renders
+          // itself into, exactly as they were.
+          style={obscured ? { visibility: "hidden" } : undefined}>
           {minimapRow && <div className='px-2 pt-0'>{minimapRow}</div>}
           <AlphaTabScoreViewer
             rawGpFile={rawGpFile}
@@ -434,68 +473,47 @@ export const TablatureSection = memo(function TablatureSection({
       {!showAlphaTabScore && (
         <div className='px-2 pt-0'>
           {minimapRow}
-          {show3dHighway ? (
-            <div className='relative'>
-              <NoteHighway3D
-                measures={activeTablature}
-                resetKey={tabResetKey}
-                hideNotes={hideNotes}
-                heightPx={height}
-                className='w-full overflow-hidden rounded-lg'
-                isMicEnabled={isMicEnabled}
-                title={title}
-                coverUrl={coverUrl}
-                subtitle={subtitle}
-                tuningLabel={tuningLabel}
-                bpm={Math.round(effectiveBpm)}
-                countInRemaining={countInRemaining}
-                onSeek={handleSeek}
-              />
-              <TablatureResizeHandle height={height} onChange={setHeight} />
+          <div className='relative'>
+            <TablatureViewer
+              measures={activeTablature}
+              bpm={effectiveBpm}
+              isPlaying={isMetronomePlaying}
+              startTime={startTime}
+              countInRemaining={countInRemaining}
+              className='w-full'
+              frequencyRef={frequencyRef}
+              isListening={isListening}
+              hitNotes={hitNotes}
+              missedNotes={missedNotes}
+              currentBeatsElapsed={0}
+              hideNotes={hideNotes}
+              audioContext={audioContext}
+              audioStartTime={audioStartTime}
+              resetKey={tabResetKey}
+              hideDynamicsLane={hideDynamicsLane}
+              volumeRef={volumeRef}
+              onSeek={handleSeek}
+              currentBeat={restingBeat}
+              obscured={obscured}
+              loopStartBeat={loopStart}
+              loopEndBeat={loopEnd}
+              seekWorkerRef={seekWorkerRef}
+              viewerWidthRef={viewerWidthRef}
+              zoom={zoom}
+              heightPx={height}
+              tuningStrings={tuningStrings}
+              style={tabStyle}
+              cinema={cinema}
+              ambientGlow={settings.ambientGlow}
+              palette={palette}
+              isLightBoard={isLightBoard}
+            />
+            <div className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
+              <TablatureSettingsButton onOpen={() => setIsSettingsOpen(true)} />
+              <TablatureZoomControl zoom={zoom} onChange={handleZoomChange} />
             </div>
-          ) : (
-            <div className='relative'>
-              <TablatureViewer
-                measures={activeTablature}
-                bpm={effectiveBpm}
-                isPlaying={isMetronomePlaying}
-                startTime={startTime}
-                countInRemaining={countInRemaining}
-                className='w-full'
-                frequencyRef={frequencyRef}
-                isListening={isListening}
-                hitNotes={hitNotes}
-                missedNotes={missedNotes}
-                currentBeatsElapsed={0}
-                hideNotes={hideNotes}
-                audioContext={audioContext}
-                audioStartTime={audioStartTime}
-                resetKey={tabResetKey}
-                hideDynamicsLane={hideDynamicsLane}
-                volumeRef={volumeRef}
-                onSeek={handleSeek}
-                currentBeat={currentBeat}
-                loopStartBeat={loopStart}
-                loopEndBeat={loopEnd}
-                seekWorkerRef={seekWorkerRef}
-                viewerWidthRef={viewerWidthRef}
-                zoom={zoom}
-                heightPx={height}
-                tuningStrings={tuningStrings}
-                style={tabStyle}
-                ambientGlow={settings.ambientGlow}
-                palette={palette}
-                isLightBoard={isLightBoard}
-              />
-              <div className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
-                <TablatureSettingsButton
-                  onOpen={() => setIsSettingsOpen(true)}
-                />
-                <TablatureZoomControl zoom={zoom} onChange={handleZoomChange} />
-              </div>
-              <TablatureResizeHandle height={height} onChange={setHeight} />
-            </div>
-          )}
+            <TablatureResizeHandle height={height} onChange={setHeight} />
+          </div>
         </div>
       )}
 

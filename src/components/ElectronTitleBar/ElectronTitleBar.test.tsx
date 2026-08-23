@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { act, cleanup, render, screen } from "@testing-library/react";
 import type { ElectronWindowApi } from "types/electronWindow";
 import { afterEach, describe, expect, it, vi } from "vitest";

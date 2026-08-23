@@ -202,6 +202,10 @@ const noteVisualFill = new Map<string, number>();
 const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
 // Dirty flag — skip rAF paint when nothing changed (paused, no animations)
 let needsRedraw = true;
+// False while something opaque covers the board (the alignment screen). Playback
+// is unaffected — this worker only ever draws — so the frames are simply skipped
+// until it comes back, and the dirty flag above survives to force one repaint.
+let isVisible = true;
 // Cache for bend badge text widths — ctx.measureText is expensive, text never changes
 const bendTextWidthCache = new Map<string, number>();
 // Wall-clock time (ms) at which the last TICK was received — used for interpolation
@@ -523,6 +527,10 @@ function drawRestSymbol(x: number, dur: number) {
 function render() {
   rafId = requestAnimationFrame(render);
   if (!ctx || W === 0) return;
+
+  // Covered: skip the paint but keep `needsRedraw` intact, so uncovering repaints
+  // once with whatever arrived in the meantime rather than showing a stale board.
+  if (!isVisible) return;
 
   // Skip paint when paused and nothing animating
   if (!isPlaying && !needsRedraw && visual.hitTimestampsCount === 0) {
@@ -1610,6 +1618,10 @@ self.onmessage = (e: MessageEvent) => {
       // though the score/game state had already been reset back to zero.
       resetNoteHitVisualState(visual);
       // loop range is intentionally NOT cleared here so it survives loop restarts
+      break;
+    }
+    case 'VISIBLE': {
+      isVisible = msg.visible !== false;
       break;
     }
     case 'STOP': {

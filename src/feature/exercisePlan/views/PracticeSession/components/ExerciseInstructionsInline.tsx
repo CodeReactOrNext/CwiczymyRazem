@@ -97,14 +97,7 @@ export const ExerciseInstructionsInline = ({
 
   return (
     <div className="w-full overflow-hidden text-left">
-      <div className="w-full px-6 py-3 flex items-center">
-        <div className="flex items-center gap-2.5 text-zinc-400">
-          <FaInfoCircle size={14} className="text-zinc-400" />
-          <span className="text-[11px] font-semibold capitalize tracking-wider text-zinc-300">Exercise Instructions</span>
-        </div>
-      </div>
-
-      <div className="p-6 md:p-8 pt-0 border-t border-white/[0.02]">
+      <div className="p-6 md:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                 <div className="space-y-8">
                   {exercise.instructions && exercise.instructions.length > 0 && (

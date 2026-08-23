@@ -25,6 +25,13 @@ const TEMPO_SHORTCUTS: ShortcutRow[] = [
   { keys: ["Enter"], label: "Reset tempo to recommended" },
 ];
 
+const BACKING_SHORTCUTS: ShortcutRow[] = [
+  { keys: ["["], label: "Backing track 20 ms earlier" },
+  { keys: ["]"], label: "Backing track 20 ms later" },
+  { keys: ["Shift", "["], label: "Backing track 100 ms earlier" },
+  { keys: ["Shift", "]"], label: "Backing track 100 ms later" },
+];
+
 const Kbd = ({ children }: { children: string }) => (
   <kbd className="flex h-6 min-w-6 items-center justify-center rounded bg-zinc-800 px-1.5 font-mono text-[11px] font-bold text-zinc-200">
     {children}
@@ -52,9 +59,12 @@ const ShortcutList = ({ rows }: { rows: ShortcutRow[] }) => (
 /** Compact keyboard-shortcuts legend for the practice session — desktop only. */
 export const ShortcutsLegend = memo(function ShortcutsLegend({
   hasTempoControl,
+  hasBackingTrack = false,
   className,
 }: {
   hasTempoControl: boolean;
+  /** Song practice with a backing track — adds the live nudge keys. */
+  hasBackingTrack?: boolean;
   className?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -89,6 +99,14 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
                   Tempo
                 </span>
                 <ShortcutList rows={TEMPO_SHORTCUTS} />
+              </div>
+            )}
+            {hasBackingTrack && (
+              <div className="flex flex-col gap-2.5 pt-4">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                  Backing track
+                </span>
+                <ShortcutList rows={BACKING_SHORTCUTS} />
               </div>
             )}
           </div>

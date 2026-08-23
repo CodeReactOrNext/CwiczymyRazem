@@ -3,10 +3,27 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "
 interface TablatureMinimapBarProps {
   measureEndXs: number[];
   totalBeats: number;
-  currentBeat: number;
+  /**
+   * Live playhead position in beats.
+   *
+   * A ref rather than a value: the beat changes on every animation frame, and
+   * pushing that through React re-rendered this strip — and everything else the
+   * section holds — sixty times a second so a playhead could move a few pixels.
+   * The position is read once per frame and written straight to the DOM instead.
+   */
+  currentBeatRef: React.MutableRefObject<number>;
+  /**
+   * Bumped by the parent whenever the playhead moves *outside* of playback: a
+   * seek, a reset, a pause. Those are the moments a parked strip has to repaint
+   * with no loop running, and there are only a handful of them per session.
+   */
+  beatVersion: number;
   loopStart: number | null;
   loopEnd: number | null;
   isPlaying: boolean;
+  /** Something opaque is covering the session (the alignment screen), so a
+   *  per-frame paint is work nobody can see. */
+  paused?: boolean;
   /** Pitch-detect accuracy per measure (0..1), same index as measureEndXs.
    *  null/undefined = not attempted yet this pass — cell stays unfilled. */
   measureAccuracy?: (number | null)[];
@@ -49,20 +66,34 @@ interface MeasureRange { lo: number; hi: number; }
  * scrollable strip. Click a bar to jump there; drag across bars (mouse) to set a
  * loop. Loop state is owned by the parent and drives playback restart, so the
  * loop selected here actually loops during practice.
+ *
+ * The playhead is the one thing here that moves continuously, so it is the one
+ * thing that is not React state: it is positioned by writing a transform inside
+ * an animation frame. Everything else — cells, loop outline — only changes when
+ * the player does something, and stays ordinary state.
  */
 export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   measureEndXs,
   totalBeats,
-  currentBeat,
+  currentBeatRef,
+  beatVersion,
   loopStart,
   loopEnd,
   isPlaying,
+  paused = false,
   measureAccuracy,
   onSeek,
   onLoopRangeChange,
 }: TablatureMinimapBarProps) {
   const scrollRef  = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Positioned every frame while playing, and never read back by React.
+  const activeCellRef   = useRef<HTMLDivElement>(null);
+  const playheadTipRef  = useRef<HTMLDivElement>(null);
+  const playheadLineRef = useRef<HTMLDivElement>(null);
+  /** Last bar the playhead was in, so the strip only re-centres on a change. */
+  const lastIdxRef = useRef(-1);
 
   const [draft, setDraft] = useState<MeasureRange | null>(null);
 
@@ -168,19 +199,73 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     el.scrollLeft += e.deltaY;
   }, []);
 
-  const activeIdx = useMemo(() => getMeasureIdx(currentBeat), [currentBeat, getMeasureIdx]);
+  /**
+   * Puts the playhead and the active-cell highlight where the beat ref says
+   * they belong. The only thing on this strip that runs per frame.
+   */
+  const paint = useCallback(() => {
+    const tip  = playheadTipRef.current;
+    const line = playheadLineRef.current;
+    const cell = activeCellRef.current;
+    if (!tip || !line || !cell || count === 0) return;
 
-  // Follow the playhead: re-centre only once the active cell drifts near the edge,
-  // so the strip stays put while the user manually scrolls to look ahead.
-  useEffect(() => {
+    const beat = currentBeatRef.current;
+    const show = isPlaying || beat > 0;
+    const display = show ? "block" : "none";
+    if (tip.style.display !== display) {
+      tip.style.display  = display;
+      line.style.display = display;
+      cell.style.display = display;
+    }
+    if (!show) {
+      lastIdxRef.current = -1;
+      return;
+    }
+
+    const idx = getMeasureIdx(beat);
+    const m = measures[idx];
+    // Playhead sweeps across the active cell as the beat advances through the measure.
+    const frac = m
+      ? Math.max(0, Math.min(1, (beat - m.startBeat) / (m.endBeat - m.startBeat)))
+      : 0;
+    const playheadX = PAD + idx * UNIT + frac * CELL;
+
+    // A transform rather than `left`: the playhead then moves without dirtying
+    // the strip's layout on every frame of every bar.
+    tip.style.transform  = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
+    line.style.transform = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
+
+    if (idx === lastIdxRef.current) return;
+    lastIdxRef.current = idx;
+    cell.style.transform = `translate3d(${idx * UNIT}px, 0, 0)`;
+
+    // Follow the playhead: re-centre only once the active cell drifts near the
+    // edge, so the strip stays put while the user scrolls ahead to look around.
     const el = scrollRef.current;
-    if (!el || isDraggingRef.current || count === 0) return;
-    const cellLeft = PAD + activeIdx * UNIT;
+    if (!el || isDraggingRef.current) return;
+    const cellLeft = PAD + idx * UNIT;
     const margin = CELL * 2;
     if (cellLeft < el.scrollLeft + margin || cellLeft + CELL > el.scrollLeft + el.clientWidth - margin) {
       el.scrollTo({ left: Math.max(0, cellLeft + CELL / 2 - el.clientWidth / 2), behavior: "smooth" });
     }
-  }, [activeIdx, count]);
+  }, [count, currentBeatRef, getMeasureIdx, isPlaying, measures]);
+
+  // While the beat is moving, follow it. Parked — paused, or covered by the
+  // alignment screen — there is nothing to follow and no loop runs at all.
+  useEffect(() => {
+    if (!isPlaying || paused || count === 0) return undefined;
+    let rafId = requestAnimationFrame(function tick() {
+      paint();
+      rafId = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying, paused, count, paint]);
+
+  // Seeks, resets and pauses move the playhead with no loop running.
+  useEffect(() => {
+    lastIdxRef.current = -1;
+    paint();
+  }, [beatVersion, paint]);
 
   // Cells re-render when accuracy changes (mic mode), not just when the
   // measure layout does.
@@ -215,13 +300,6 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   const displayRange: MeasureRange | null =
     draft ??
     (hasLoop ? { lo: getMeasureIdx(loopStart!), hi: getMeasureIdx(loopEnd! - 0.001) } : null);
-
-  const showPlayhead = isPlaying || currentBeat > 0;
-
-  // Playhead sweeps across the active cell as the beat advances through the measure.
-  const m = measures[activeIdx];
-  const frac = m ? Math.max(0, Math.min(1, (currentBeat - m.startBeat) / (m.endBeat - m.startBeat))) : 0;
-  const playheadX = PAD + activeIdx * UNIT + frac * CELL;
 
   return (
     <div className="mb-6 w-full select-none">
@@ -258,51 +336,52 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
           )}
 
           {/* ── Active cell highlight ───────────────────────────────────── */}
-          {showPlayhead && (
-            <div
-              className="pointer-events-none absolute z-10 rounded"
-              style={{
-                left:   PAD + activeIdx * UNIT,
-                top:    TOP,
-                width:  CELL,
-                height: CELL_H,
-                background: "rgba(34,211,238,0.18)",
-                boxShadow: "inset 0 0 0 1.5px rgba(34,211,238,0.85)",
-              }}
-            />
-          )}
+          {/* Mounted whether or not it shows: unmounting it with the playhead
+              would put React back into the animation loop. `paint` owns both
+              its position and whether it is displayed at all. */}
+          <div
+            ref={activeCellRef}
+            className="pointer-events-none absolute z-10 rounded"
+            style={{
+              left:   PAD,
+              top:    TOP,
+              width:  CELL,
+              height: CELL_H,
+              display: "none",
+              background: "rgba(34,211,238,0.18)",
+              boxShadow: "inset 0 0 0 1.5px rgba(34,211,238,0.85)",
+            }}
+          />
 
           {/* ── Playhead (triangle + line) ──────────────────────────────── */}
-          {showPlayhead && (
-            <>
-              <div
-                className="pointer-events-none absolute z-20"
-                style={{
-                  left: playheadX,
-                  top: 2,
-                  transform: "translateX(-50%)",
-                  width: 0,
-                  height: 0,
-                  borderLeft: "5px solid transparent",
-                  borderRight: "5px solid transparent",
-                  borderTop: `7px solid ${ACCENT}`,
-                  filter: "drop-shadow(0 0 3px rgba(34,211,238,0.7))",
-                }}
-              />
-              <div
-                className="pointer-events-none absolute z-20"
-                style={{
-                  left: playheadX,
-                  top: TOP - 4,
-                  height: CELL_H + 8,
-                  width: 2,
-                  transform: "translateX(-50%)",
-                  background: ACCENT,
-                  boxShadow: "0 0 8px 1px rgba(34,211,238,0.6)",
-                }}
-              />
-            </>
-          )}
+          <div
+            ref={playheadTipRef}
+            className="pointer-events-none absolute z-20"
+            style={{
+              left: 0,
+              top: 2,
+              display: "none",
+              width: 0,
+              height: 0,
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderTop: `7px solid ${ACCENT}`,
+              filter: "drop-shadow(0 0 3px rgba(34,211,238,0.7))",
+            }}
+          />
+          <div
+            ref={playheadLineRef}
+            className="pointer-events-none absolute z-20"
+            style={{
+              left: 0,
+              top: TOP - 4,
+              height: CELL_H + 8,
+              width: 2,
+              display: "none",
+              background: ACCENT,
+              boxShadow: "0 0 8px 1px rgba(34,211,238,0.6)",
+            }}
+          />
         </div>
       </div>
     </div>

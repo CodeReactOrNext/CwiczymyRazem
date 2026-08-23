@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
+import { getEffectImageSrc } from "../../utils/effectImage";
 import type { BoardLayout, LayoutBox } from "../../utils/pedalboardLayout";
 import {
   collidesWithAny,
@@ -412,7 +413,7 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
                 }}
               >
                 <img
-                  src={`/static/images/effects/${effect.imageId}.png`}
+                  src={getEffectImageSrc(effect.imageId, "full")}
                   alt={effect.name}
                   className="w-full h-full object-contain"
                   draggable={false}
@@ -485,7 +486,7 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
                   onClick={() => { if (onShowCard) onShowCard(cardFor(placement.itemId)); }}
                 >
                   <img
-                    src={`/static/images/effects/${effect.imageId}.png`}
+                    src={getEffectImageSrc(effect.imageId, "small")}
                     alt={effect.name}
                     className="h-14 w-auto object-contain opacity-60 transition-opacity group-hover:opacity-100"
                     draggable={false}

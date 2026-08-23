@@ -11,6 +11,7 @@ import type {
   InventoryItem,
   PedalboardPlacement,
 } from "feature/arsenal/types/arsenal.types";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // Layout is shared with the editable board (PedalboardView) so a pedal sits in
 // exactly the same place here as it does in the owner's arsenal — including the
@@ -195,7 +196,7 @@ const PedalReadonly = ({ placement, wPct, effectInventory, onHover, onSelect }: 
       onClick={handleClick}
     >
       <img
-        src={`/static/images/effects/${effect.imageId}.png`}
+        src={getEffectImageSrc(effect.imageId, "full")}
         alt={effect.name}
         className="w-full h-full object-contain"
         draggable={false}
@@ -372,7 +373,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   return (
                     <img
                       key={placement.itemId}
-                      src={`/static/images/effects/${effect.imageId}.png`}
+                      src={getEffectImageSrc(effect.imageId, "small")}
                       alt={effect.name}
                       className="h-12 w-auto cursor-pointer object-contain opacity-50 transition-opacity hover:opacity-100"
                       draggable={false}

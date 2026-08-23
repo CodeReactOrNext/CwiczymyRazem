@@ -183,8 +183,19 @@ export const HIT_COLORS: Record<HitColorKey, HitColor> = {
   lime: { label: "Lime", fill: "#84cc16", glow: "#bef264" },
 };
 
-/** Which viewer opens automatically when a practice session starts. */
-export type DefaultViewMode = "tab" | "highway" | "notation";
+/**
+ * Which viewer opens automatically when a practice session starts.
+ *
+ * Builds up to v2 of the store also offered `"highway"` (the 3D note highway,
+ * since removed). The persist migration below heals that stored value back to
+ * `"tab"`, and every read site falls through to the flat tab anyway.
+ */
+export type DefaultViewMode = "tab" | "notation";
+
+/** Guards the value read out of localStorage — anything unknown means flat tab. */
+export function normalizeDefaultViewMode(value: unknown): DefaultViewMode {
+  return value === "notation" ? "notation" : "tab";
+}
 
 export type FretTextKey = "black" | "white" | "auto";
 
@@ -302,7 +313,9 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
     }),
     {
       name: "practice-tab-settings",
-      version: 2,
+      // v3 dropped the 3D highway; anyone who had it as their default view is
+      // migrated back to the flat tab below.
+      version: 3,
       /**
        * Drops stored choices that no longer exist (an option removed between
        * builds) back to their default, so the pickers show a real selection
@@ -314,6 +327,7 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
           ...DEFAULT_SETTINGS,
           ...(persisted as Partial<TablatureSettings>),
         };
+        s.defaultViewMode = normalizeDefaultViewMode(s.defaultViewMode);
         if (!(s.pillPreset in PILL_PRESETS))
           s.pillPreset = DEFAULT_SETTINGS.pillPreset;
         if (!(s.palette in STRING_PALETTES))

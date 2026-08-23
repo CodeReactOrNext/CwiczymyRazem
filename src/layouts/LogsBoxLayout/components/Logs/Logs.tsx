@@ -19,6 +19,7 @@ import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { GUITAR_DEFINITIONS, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
 import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -152,7 +153,7 @@ const ItemTooltipCard = ({
   const color = getRarityColor(itemRarity);
   const imgSrc = itemType === "guitar"
     ? getRankBadgeSrc(itemImageId, "small")
-    : `/static/images/effects/${itemImageId}.png`;
+    : getEffectImageSrc(itemImageId, "medium");
 
   const guitarDef = itemType === "guitar"
     ? GUITAR_DEFINITIONS.find((g) => g.imageId === itemImageId)
@@ -281,7 +282,7 @@ const ItemPill = ({
   const color = getRarityColor(itemRarity);
   const imgSrc = itemType === "guitar"
     ? getRankBadgeSrc(itemImageId, "small")
-    : `/static/images/effects/${itemImageId}.png`;
+    : getEffectImageSrc(itemImageId, "small");
 
   const cardContent = rolledGuitar ? (
     <div style={{ width: 250 }}>

@@ -28,7 +28,7 @@ When you stop the timer, you get this form with the time already filled in. Chec
 
 <Screenshot src="/images/wiki/log-session-time.webp" alt="The 'Enter exercise time' step: three minutes on Technique, five on Hearing, eight minutes in total, with a Save Now button" caption="Eight minutes across two categories. Small on purpose: the point is that it got saved, not that it's impressive." />
 
-Practice pays 20 points an hour, so those eight minutes are worth 2 points. Unimpressive, and entirely beside the point: you are now a player with a streak of one, a level, and a row on the rankings.
+Practice pays 22 points an hour, so those eight minutes are worth 2 points. Unimpressive, and entirely beside the point: you are now a player with a streak of one, a level, and a row on the rankings.
 
 <BlogAlert type="tip">
 No microphone, no interface, no setup is required for any of this. [Note detection](/wiki/note-detection) exists and is fun, but everything in the app works if you just type in your minutes.
@@ -44,7 +44,7 @@ Right after signing up you're asked where you'd like to begin. It only decides w
 
 One session is a data point. Two days in a row is a streak, and the streak multiplies everything you log, practice time and habit points alike.
 
-<Screenshot src="/images/wiki/streak-multiplier.webp" alt="The streak breakdown: a 1-day streak at ×1.0, earning 20 points per hour of practice and 1 point per habit ticked, above a ladder reading Day 1 ×1.0, Day 2 ×1.2, Day 3 ×1.3, Day 4 ×1.4, Day 5+ ×1.5" caption="The flame at the top of the screen opens this. Day one pays the plain rate; from day two the multiplier climbs, and it stops at ×1.5." maxWidth="420px" />
+<Screenshot src="/images/wiki/streak-multiplier.webp" alt="The streak breakdown: a 1-day streak at ×1.0, earning 22 points per hour of practice and 1 point per habit ticked, above a ladder reading Day 1 ×1.0, Day 2 ×1.2, Day 3 ×1.3, Day 4 ×1.4, Day 5+ ×1.5" caption="The flame at the top of the screen opens this. Day one pays the plain rate; from day two the multiplier climbs, and it stops at ×1.5." maxWidth="420px" />
 
 Ten minutes keeps it alive. Miss a day and it resets to zero, but your points, level and gear are never taken away.
 

@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import { afterEach, describe, expect, it } from "vitest";

@@ -9,6 +9,7 @@ import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDef
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -255,7 +256,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                           />
                         ) : (
                           <img
-                            src={`/static/images/effects/${item.def.imageId}.png`}
+                            src={getEffectImageSrc(item.def.imageId, "medium")}
                             alt={item.def.name}
                             className="relative z-10 h-32 w-32 object-contain"
                           />

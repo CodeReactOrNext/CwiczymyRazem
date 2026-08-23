@@ -22,6 +22,7 @@ const nativeAudioEngine = require("./nativeAudioEngine");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
 const toneStore = require("./toneStore");
+const backingTrackStore = require("./backingTrackStore");
 const { requireMicrophoneAccess } = require("./macPermissions");
 
 const isDev = !app.isPackaged;
@@ -472,6 +473,52 @@ ipcMain.handle("tone:import-nam-model", async () => {
   return toneStore.importNamModel(result.filePaths[0]);
 });
 
+// ── Backing tracks IPC (local audio library + per-song sync settings) ────────
+// Desktop-only on purpose: the audio files live on this machine. The renderer
+// asks for raw bytes and wraps them in a Blob, because the window is served from
+// a remote origin and cannot load a file:// URL.
+ipcMain.handle("backing:list-tracks", () => backingTrackStore.listTracks());
+ipcMain.handle("backing:import-track", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Select backing track files",
+    filters: [{ name: "Audio", extensions: backingTrackStore.SUPPORTED_EXTENSIONS }],
+    // Stems of one song (backing, guitar, vocals) are picked together.
+    properties: ["openFile", "multiSelections"],
+  });
+  if (result.canceled || result.filePaths.length === 0) return [];
+
+  // One bad file among several must not lose the good ones, so failures are
+  // reported per file rather than rejecting the whole import.
+  return result.filePaths.map((filePath) => {
+    try {
+      return { ok: true, track: backingTrackStore.importTrack(filePath) };
+    } catch (error) {
+      return { ok: false, fileName: path.basename(filePath), message: error.message };
+    }
+  });
+});
+// Dropping files onto the alignment screen hands over paths rather than going
+// through the picker, so the import itself is shared and only the source of the
+// paths differs.
+ipcMain.handle("backing:import-paths", (_e, filePaths) =>
+  (Array.isArray(filePaths) ? filePaths : [])
+    .filter((filePath) => typeof filePath === "string" && filePath.length > 0)
+    .map((filePath) => {
+      try {
+        return { ok: true, track: backingTrackStore.importTrack(filePath) };
+      } catch (error) {
+        return { ok: false, fileName: path.basename(filePath), message: error.message };
+      }
+    }),
+);
+ipcMain.handle("backing:delete-track", (_e, id) => backingTrackStore.deleteTrack(id));
+ipcMain.handle("backing:read-track", (_e, id) => backingTrackStore.readTrack(id));
+ipcMain.handle("backing:get-assignment", (_e, songId) => backingTrackStore.getAssignment(songId));
+ipcMain.handle("backing:save-assignment", (_e, songId, patch) =>
+  backingTrackStore.saveAssignment(songId, patch),
+);
+ipcMain.handle("backing:clear-assignment", (_e, songId) => backingTrackStore.clearAssignment(songId));
+
 // ── Tray / dock integration ──────────────────────────────────────────────────
 function createTray() {
   const faviconDir = path.join(__dirname, "..", "public", "favicon");
@@ -578,6 +625,32 @@ if (!isPrimaryInstance) {
     session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) =>
       cb(true),
     );
+
+    // Backing-track waveform learning (feature/backingTrack): a YouTube video's
+    // audio lives in a cross-origin iframe and cannot be read from the page, so
+    // the app listens to what is already playing instead. Answering the request
+    // here means the desktop build never shows a share picker, and never has to
+    // ask at all — which is what lets listening run with the practice session
+    // rather than behind a button. The web build still has to ask, since only
+    // the browser can grant this.
+    //
+    // The frame is both the video and the audio source: capturing our own frame
+    // takes the whole page's output, the embedded player included. enableLocalEcho
+    // keeps it audible, so listening doesn't silence the thing being listened to.
+    //
+    // Two things downstream depend on `audio: request.frame` specifically, so
+    // narrowing it would break them quietly rather than loudly. The obvious one
+    // is the video. The other is tabAudioCapture's latency calibration, which
+    // finds its own 15 kHz burst coming back around to work out how far behind
+    // the capture runs — that burst is this page's WebAudio output, so it is
+    // only in the stream while the frame's own audio is.
+    session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
+      if (!request.frame) {
+        callback({});
+        return;
+      }
+      callback({ video: request.frame, audio: request.frame, enableLocalEcho: true });
+    });
     Menu.setApplicationMenu(
       buildMenu({ isDev, shell, dialog, getMainWindow: () => mainWindow }),
     );

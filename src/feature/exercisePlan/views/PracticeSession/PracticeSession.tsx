@@ -1,14 +1,17 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
+import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
+import { barBeatsOf } from "feature/backingTrack/utils/alignment";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
-import { selectUserInfo} from "feature/user/store/userSlice";
+import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
@@ -29,6 +32,7 @@ import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMa
 import { CLICK_EXAM_MISTAKE_LIMIT, NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
+import { withBackingTempo } from "./helpers/backingTempoOverlay";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import {
   loadGlobalMasterVolume,
@@ -38,6 +42,8 @@ import {
   saveGlobalMetronomeVolume,
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
+import type { TempoRuler } from "./hooks/tempoBeatClock";
+import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
@@ -110,6 +116,7 @@ export const PracticeSession = ({
   const isScaleExam = isExamMode && currentExercise.category === "theory";
 
   const userInfo   = useAppSelector(selectUserInfo);
+  const userId     = useAppSelector(selectUserAuth);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
 
@@ -155,7 +162,7 @@ export const PracticeSession = ({
 
   // ── GP file loading ───────────────────────────────────────────────────────
 
-  const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks } = useGpFileLoader({
+  const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
     rawGpFile, gpFileUrl: currentExercise.gpFileUrl, exerciseTitle: currentExercise.title,
   });
 
@@ -178,9 +185,9 @@ export const PracticeSession = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, show3dHighway, selectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
-    toggleAlphaTabScore, toggle3dHighway, resetForExercise
+    toggleAlphaTabScore, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
@@ -203,6 +210,17 @@ export const PracticeSession = ({
   });
   useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
+  /**
+   * Tempo curve the click follows, filled in further down once the aligned
+   * backing track has been folded into the tablature.
+   *
+   * A ref breaks a genuine cycle: the metronome owns the session clock, the
+   * backing track is positioned against that clock, and the curve comes from the
+   * backing track. The scheduler only reads it at tick time, by which point it
+   * is set.
+   */
+  const tempoRulerRef = useRef<TempoRuler | null>(null);
+
   const metronome = useDeviceMetronome({
     initialBpm:     lockedExamBpm ?? (activeExercise.metronomeSpeed?.recommended || 60),
     minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
@@ -219,6 +237,7 @@ export const PracticeSession = ({
     // Only mute the *steady* click post-count-in; count-in beeps stay on this metronome.
     mutePlaybackClick: showAlphaTabScore,
     speedMultiplier: speedMultiplier,
+    tempoRulerRef,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
   });
@@ -229,6 +248,58 @@ export const PracticeSession = ({
   // speeds (e.g. 55 × 0.75 = 41.25 vs rounded 41).
   const effectiveBpm           = metronome.bpm * speedMultiplier;
   const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
+
+  // ── Aligning a backing track is start-stop-start work ─────────────────────
+  //
+  // A count-in before every attempt costs more time than the alignment does, and
+  // it puts four clicks between the player and the thing they are listening for.
+  // Practice keeps its count-in; this transport does not.
+  /** True while the backing-track editor covers the session. */
+  const [isAligningBacking, setIsAligningBacking] = useState(false);
+
+  const toggleWithoutCountIn = useCallback(() => {
+    if (metronome.isPlaying) metronome.stopMetronome();
+    else metronome.startMetronome({ skipCountIn: true });
+  }, [metronome]);
+
+  /** Clicking the tab in the alignment screen plays from there. Mirrors the
+   *  session's own bar-click seek, count-in skipped for the same reason. */
+  const handleAlignSeek = useCallback(
+    (beat: number) => {
+      const at = Math.max(0, beat);
+      if (!metronome.isPlaying) {
+        metronome.seekToBeats?.(at);
+        return;
+      }
+      if (isExamMode) return;
+      metronome.stopMetronome();
+      metronome.seekToBeats(at);
+      setTimeout(() => metronome.startMetronome({ skipCountIn: true }), 0);
+    },
+    [metronome, isExamMode],
+  );
+
+  // ── Backing track (song practice only) ────────────────────────────────────
+  // Owns an <audio> element / YouTube iframe, so it lives here rather than in a
+  // view: the desktop and mobile views mount simultaneously, and two copies
+  // would play the same recording twice. Idle unless the plan is a song.
+  const backingTrack = useBackingTrackSession({
+    songId:       plan.song?.id ?? null,
+    userId:       userId ?? null,
+    gpTempo,
+    isPlaying:    isAudioPlaying,
+    startTime:    metronome.startTime,
+    // The same ruler the metronome schedules against. Elapsed time from
+    // `startTime` counts warped beats, so without this the recording chases a
+    // bar of the tab that is not the one being played — a whole beat out per
+    // bar of automation, growing, and unreachable by any offset.
+    scoreClockRef: tempoRulerRef,
+    // So Stop leaves the playhead on the spot the next Play will pick up from,
+    // instead of throwing it — and the view following it — back to bar 1.
+    getResumeBeat: metronome.getResumeBeat,
+    effectiveBpm,
+    sessionBpm:   metronome.bpm,
+  });
 
   // ── Ear training ──────────────────────────────────────────────────────────
 
@@ -297,9 +368,56 @@ export const PracticeSession = ({
   // a device-wide preference, so it's lazily restored from storage on the first render.
   const [masterVolume, setMasterVolume] = useState(() => loadGlobalMasterVolume() ?? 1);
 
-  const activeTablature = riddleMeasures
+  const rawTablature = riddleMeasures
     || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
     || activeExercise.tablature;
+
+  /**
+   * The recording's tempo curve, one step behind the hand that is dragging it.
+   *
+   * Dragging a bar line on the Align screen rewrites this on every pointer move,
+   * and everything below re-walks the whole song when it does: the measures are
+   * re-stamped, the ruler is rebuilt, the audio's track configs are rebuilt and
+   * the notation's alphaTex is regenerated. At sixty pointer moves a second that
+   * is not a slow session, it is a frozen one.
+   *
+   * None of that work is wanted *during* the gesture — only at the end of it.
+   * Deferring lets React render the drag at full rate against the curve it
+   * already had, and do the expensive re-derivation once the values stop
+   * changing. The Align screen's own lanes read the live map, so the grid still
+   * follows the pointer exactly.
+   */
+  const settledTempoMap = useDeferredValue(backingTrack.tempoMap);
+
+  /**
+   * The tablature the session actually plays, with the aligned recording's tempo
+   * curve stamped onto it.
+   *
+   * Everything downstream — the cursor, the note matcher, the tab's own audio —
+   * already reads per-measure tempo, so bending the band's drift into the
+   * measures here is what makes the whole session follow a recording that was
+   * never played to a click. Without an aligned backing track this is the same
+   * array it was, identity included.
+   */
+  const activeTablature = useMemo(
+    () =>
+      withBackingTempo(
+        rawTablature,
+        settledTempoMap.isConstant
+          ? null
+          : (beat: number) => settledTempoMap.ratioAtBeat(beat),
+      ),
+    [rawTablature, settledTempoMap],
+  );
+
+  // Same curve the cursor reads, in the form the click's scheduler needs.
+  const sessionTempoRuler = useMemo(
+    () => createTempoRulerFromMeasures(activeTablature),
+    [activeTablature],
+  );
+  useEffect(() => {
+    tempoRulerRef.current = sessionTempoRuler.isConstant ? null : sessionTempoRuler;
+  }, [sessionTempoRuler]);
 
   const dynamicBackingTracks = useMemo(() => {
     if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
@@ -328,6 +446,28 @@ export const PracticeSession = ({
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
     tuningOffsets: guitarTuning.tuning.offsets,
   });
+
+  /**
+   * One instrument level, changed from the alignment screen's mixer.
+   *
+   * A track that has never been touched has no entry in `trackConfigs` at all —
+   * its level lives in the defaults `audioTracks` fills in. Writing only the
+   * field that changed would therefore save an `isMuted` next to an undefined
+   * volume, so the current effective value is read back for the other half.
+   */
+  const handleMixerChange = useCallback(
+    (id: string, next: { volume?: number; isMuted?: boolean }) => {
+      const current = audioTracks.find(track => track.id === id);
+      setTrackConfigs(prev => ({
+        ...prev,
+        [id]: {
+          volume:  next.volume  ?? prev[id]?.volume  ?? current?.volume  ?? 1,
+          isMuted: next.isMuted ?? prev[id]?.isMuted ?? current?.isMuted ?? false,
+        },
+      }));
+    },
+    [audioTracks, setTrackConfigs],
+  );
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
   tabTickBridgeRef.current = () => tabSchedulerTickRef.current?.();
@@ -505,6 +645,7 @@ export const PracticeSession = ({
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
+    shortcutsDisabled: isAligningBacking,
     isPlaying, stopTimer, startTimer, resetTimer, metronome,
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
@@ -691,13 +832,28 @@ export const PracticeSession = ({
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
-        show3dHighway={show3dHighway} handleToggle3dHighway={toggle3dHighway}
         selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
         handleToggleAlphaTabScore={toggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
         isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}
         effectiveBpm={effectiveBpm} isAudioMuted={isAudioMuted}
-      
+        backingTrackSlot={backingTrack.enabled ? (
+          <BackingTrackBar
+            controller={backingTrack}
+            sessionBpm={metronome.bpm}
+            isPlaying={metronome.isPlaying}
+            onTogglePlay={toggleWithoutCountIn}
+            onSeekToBeat={handleAlignSeek}
+            onAligningChange={setIsAligningBacking}
+            onSessionBpmChange={isExamMode ? undefined : metronome.setBpm}
+            beatsPerBar={barBeatsOf(activeTablature, metronome.accentPattern?.length ?? 4)}
+            measures={activeTablature}
+            mixerTracks={audioTracks}
+            onMixerChange={handleMixerChange}
+          />
+        ) : undefined}
+        backingCinema={backingTrack.isCinema}
+        backingAligning={isAligningBacking}
         countInRemaining={(metronome as any).countInRemaining ?? 0}
         frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef}
         isListening={isListening} metronomeAudioContext={metronome.audioContext}

@@ -15,8 +15,8 @@ interface TablatureSettingsDialogProps {
 
 /**
  * In-session shortcut to the tablature look settings. The full set — including
- * the 3D highway sliders and a live preview — also lives under Settings →
- * Tablature; both edit the same persisted store.
+ * a live preview — also lives under Settings → Tablature; both edit the same
+ * persisted store.
  */
 export function TablatureSettingsDialog({
   open,

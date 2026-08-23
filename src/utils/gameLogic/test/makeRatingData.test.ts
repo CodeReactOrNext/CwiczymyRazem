@@ -110,6 +110,15 @@ describe("makeRatingData", () => {
     expect(ratingData).toEqual(expectedRaintingData);
   });
 
+  it("pays 22 points for a full practised hour", () => {
+    // Pins the balance rather than the arithmetic: every other case here derives
+    // its expectation from TIME_POINTS_VALUE, so a fumbled constant sails past
+    // them. This one fails if the hourly rate ever moves by accident.
+    const oneHour = 3_600_000;
+    expect(makeRatingData(emptyInputData, oneHour, 0).bonusPoints.timePoints).toBe(22);
+    expect(makeRatingData(emptyInputData, oneHour / 2, 0).bonusPoints.timePoints).toBe(11);
+  });
+
   it("calculate multiplier correctly", () => {
     const totalTime = 20000000;
     const actualDayWithoutBreak = 4;

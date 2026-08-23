@@ -16,6 +16,8 @@ There isn't one leaderboard, there are three, and they rank completely different
 
 A season is one calendar month. Seasonal points are kept in their own pile, separate from your all-time total, so on the 1st everybody starts from zero again. Nothing carries over, and nothing you've earned is lost from your all-time score.
 
+A season counts your practice time, healthy habits, daily quests and challenge recordings. It leaves out the one-off rewards — learning a song and clearing a Scale Map box — because those can only be collected once each, and a month should rank what you practised that month.
+
 <BlogAlert type="tip">
 Finish in the **top 5** of a season and you get a one-off Fame payout when it ends: **500 / 300 / 200 / 100 / 50** Fame for 1st through 5th.
 </BlogAlert>

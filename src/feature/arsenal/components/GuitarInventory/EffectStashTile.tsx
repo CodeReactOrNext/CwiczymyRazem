@@ -1,6 +1,7 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import type { StashPlacement } from "../Collection/StashTile";
@@ -30,7 +31,7 @@ export const EffectStashTile = ({
     <StashTile
       {...placement}
       color={RARITY_STYLES[rarity].baseColor}
-      imageSrc={`/static/images/effects/${effect.imageId}.png`}
+      imageSrc={getEffectImageSrc(effect.imageId, "small")}
       label={`${effect.brand} ${effect.name} — ${rarity}`}
       level={getEffectLevel(item, effect)}
       isNew={item.isNew}

@@ -53,7 +53,7 @@ interface NoteMatchingContextValue {
   huntTarget: string | null;
   /** Live mic volume (0..1) for the detection waveform. */
   volumeRef: MutableRefObject<number>;
-  /** Live detected pitch in Hz (0 = silence) — drives the 3D neck's pitch glow. */
+  /** Live detected pitch in Hz (0 = silence) — drives the tab's pitch readout. */
   frequencyRef: MutableRefObject<number>;
   /** Per-string semitone offset from standard tuning (index 0 = string 1 … 5 = string 6). */
   tuningOffsets?: readonly number[];

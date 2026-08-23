@@ -1,5 +1,7 @@
+import type { MutableRefObject } from "react";
 import { useEffect, useMemo,useState } from "react";
 
+import type { TempoRuler } from "../../../views/PracticeSession/hooks/tempoBeatClock";
 import { isMobileDevice } from "../utils/deviceDetection";
 import { useMetronome } from "./useMetronome";
 import { useMobileMetronome } from "./useMobileMetronome";
@@ -12,6 +14,9 @@ interface UseDeviceMetronomeProps {
   isMuted?: boolean;
   mutePlaybackClick?: boolean;
   speedMultiplier?: number;
+  /** Tempo curve the click follows — forwarded to whichever metronome this
+   *  device uses. Omit for plain constant-tempo exercises. */
+  tempoRulerRef?: MutableRefObject<TempoRuler | null>;
   onTick?: () => void;
   /** Shared AudioContext — forwarded to the underlying metronome hook (e.g. AlphaTab's context). */
   externalAudioContext?: AudioContext | null;

@@ -6,44 +6,31 @@ import {
 } from "feature/exercisePlan/views/PracticeSession/components/sampleTablature";
 import { useTablatureStyle } from "feature/exercisePlan/views/PracticeSession/components/tablatureSettings";
 import {
-  Highway3DSettingsPanel,
   NotationSettingsPanel,
   TablatureSettingsPanel,
 } from "feature/exercisePlan/views/PracticeSession/components/TablatureSettingsPanel";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { TuningGutterString } from "feature/exercisePlan/views/PracticeSession/components/useTablatureWorkerBridge";
-import { AlignJustify, Box, Music } from "lucide-react";
-import dynamic from "next/dynamic";
+import { AlignJustify, Music } from "lucide-react";
 import { useMemo, useState } from "react";
-
-// three.js only loads if the player actually opens the 3D tab here.
-const NoteHighway3D = dynamic(
-  () =>
-    import("feature/exercisePlan/views/PracticeSession/components/NoteHighway3D").then(
-      (m) => m.NoteHighway3D,
-    ),
-  { ssr: false },
-);
 
 /** Standard tuning, low→high — the preview is not tied to a real exercise. */
 const STANDARD_TUNING = ["E", "A", "D", "G", "B", "E"];
 
 const PREVIEW_HEIGHT = 300;
 
-type PreviewMode = "tab" | "highway" | "notation";
+type PreviewMode = "tab" | "notation";
 
 function ModeButton({
   active,
   onClick,
   icon: Icon,
   label,
-  beta,
 }: {
   active: boolean;
   onClick: () => void;
   icon: typeof AlignJustify;
   label: string;
-  beta?: boolean;
 }) {
   return (
     <button
@@ -58,14 +45,9 @@ function ModeButton({
           : "text-zinc-400 hover:bg-white/5 hover:text-white",
       )}>
       <Icon className='h-4 w-4 shrink-0' />
-      {/* Label text only from sm: up — three full labels don't fit next to each
+      {/* Label text only from sm: up — the full labels don't fit next to each
           other on a phone-width screen, so mobile falls back to icon + title. */}
       <span className='hidden sm:inline'>{label}</span>
-      {beta && (
-        <span className='rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400'>
-          Beta
-        </span>
-      )}
     </button>
   );
 }
@@ -120,13 +102,6 @@ export const TablatureAppearance = () => {
               label='Tablature'
             />
             <ModeButton
-              active={mode === "highway"}
-              onClick={() => setMode("highway")}
-              icon={Box}
-              label='3D Highway'
-              beta
-            />
-            <ModeButton
               active={mode === "notation"}
               onClick={() => setMode("notation")}
               icon={Music}
@@ -149,11 +124,6 @@ export const TablatureAppearance = () => {
             ambientGlow={false}
             isLightBoard={isLightBoard}
           />
-        ) : mode === "highway" ? (
-          <NoteHighway3D
-            measures={SAMPLE_TABLATURE}
-            heightPx={PREVIEW_HEIGHT}
-          />
         ) : (
           <AlphaTabScoreViewer
             measures={SAMPLE_TABLATURE}
@@ -170,20 +140,12 @@ export const TablatureAppearance = () => {
         <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-600'>
           {mode === "tab"
             ? "Hit colour and hit animations only show while you are actually playing."
-            : mode === "highway"
-              ? "Drag any slider below and the board updates as you go. 3D Highway is in beta — it may be buggy."
-              : "The same viewer used mid-session — toggle the board below to see it on paper or on black."}
+            : "The same viewer used mid-session — toggle the board below to see it on paper or on black."}
         </p>
       </div>
 
       {/* ── Controls for whichever view is being previewed ── */}
-      {mode === "tab" ? (
-        <TablatureSettingsPanel />
-      ) : mode === "highway" ? (
-        <Highway3DSettingsPanel />
-      ) : (
-        <NotationSettingsPanel />
-      )}
+      {mode === "tab" ? <TablatureSettingsPanel /> : <NotationSettingsPanel />}
     </div>
   );
 };

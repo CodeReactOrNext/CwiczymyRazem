@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { afterEach, describe, expect, it, vi } from "vitest";

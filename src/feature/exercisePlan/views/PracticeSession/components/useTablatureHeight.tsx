@@ -31,9 +31,9 @@ export interface TablatureHeightOptions {
 }
 
 /**
- * Shared height for the practice viewers (tablature / notation / 3D highway),
- * persisted to localStorage. Dragging the resize handle scales the tab & 3D
- * content and grows the notation viewport.
+ * Shared height for the practice viewers (tablature / notation), persisted to
+ * localStorage. Dragging the resize handle scales the tab content and grows
+ * the notation viewport.
  */
 export function useTablatureHeight({
   storageKey = HEIGHT_STORAGE_KEY,

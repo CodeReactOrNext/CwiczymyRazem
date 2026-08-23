@@ -3,6 +3,7 @@ import type {
   ChallengeSubmission,
 } from "feature/challenges/types/challenge.types";
 import {
+  CHALLENGE_SONG_COUNT,
   FAME_CLEAR_BONUS,
   FAME_PER_SUBMISSION,
   POINTS_PER_SUBMISSION,
@@ -58,6 +59,12 @@ export interface SubmissionReward {
  * but they pay nothing: back-filling a year of boards must never be a shortcut
  * to the leaderboard. The run still counts as clearing the board, it just
  * doesn't move points or fame.
+ *
+ * Points stop after `CHALLENGE_SONG_COUNT` recordings on one board, whatever
+ * length that board actually ended up being — a board drawn with more than the
+ * intended five songs must not hand out a bigger slice of the season score than
+ * a normal one. Fame keeps paying for every song, so the extra runs are still
+ * worth doing; they just don't buy leaderboard position.
  */
 export const calculateSubmissionReward = (
   clearedBefore: number,
@@ -66,8 +73,9 @@ export const calculateSubmissionReward = (
 ): SubmissionReward => {
   const isClear = totalSongs > 0 && clearedBefore + 1 >= totalSongs;
   if (!isLive) return { points: 0, fame: 0, isClear, isPaid: false };
+  const withinPointsCap = clearedBefore < CHALLENGE_SONG_COUNT;
   return {
-    points: POINTS_PER_SUBMISSION,
+    points: withinPointsCap ? POINTS_PER_SUBMISSION : 0,
     fame: FAME_PER_SUBMISSION + (isClear ? FAME_CLEAR_BONUS : 0),
     isClear,
     isPaid: true,

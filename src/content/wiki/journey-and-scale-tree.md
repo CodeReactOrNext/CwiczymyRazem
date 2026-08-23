@@ -34,6 +34,8 @@ The map covers minor and major pentatonic, natural minor, major, and the five mo
 The reward isn't automatic. Hitting the tempo unlocks the node, but you have to open it and claim it.
 </BlogAlert>
 
+Those 100 points go on your lifetime total and your level. They stay out of the monthly season, which ranks the month's practice rather than one-off rewards you can only collect once.
+
 Each node shows where you stand (locked, available, in progress or done) based on the tempo you've actually recorded on it. The map opens up as you get faster, not as time passes.
 
 ## Questions people ask

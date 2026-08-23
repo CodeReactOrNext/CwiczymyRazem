@@ -26,9 +26,13 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
   const effectiveRawGpFile = rawGpFile ?? fetchedGpFile ?? undefined;
 
   const [parsedGpTracks, setParsedGpTracks] = useState<BackingTrack[] | null>(null);
+  // The score's own tempo, kept alongside the tracks: a backing recording of the
+  // same song was almost certainly played at it, so it seeds the sync defaults
+  // (see feature/backingTrack). Null until the file is parsed.
+  const [gpTempo,        setGpTempo]        = useState<number | null>(null);
 
   useEffect(() => {
-    if (!effectiveRawGpFile) { setParsedGpTracks(null); return; }
+    if (!effectiveRawGpFile) { setParsedGpTracks(null); setGpTempo(null); return; }
     parseGpFile(effectiveRawGpFile)
       .then(data => {
         setParsedGpTracks(data.tracks.map((t, idx) => ({
@@ -38,9 +42,10 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
           trackType: t.trackType as BackingTrack["trackType"],
           pan:       t.pan,
         })));
+        setGpTempo(data.tempo > 0 ? data.tempo : null);
       })
-      .catch(() => setParsedGpTracks(null));
+      .catch(() => { setParsedGpTracks(null); setGpTempo(null); });
   }, [effectiveRawGpFile]);
 
-  return { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks };
+  return { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks, gpTempo };
 }

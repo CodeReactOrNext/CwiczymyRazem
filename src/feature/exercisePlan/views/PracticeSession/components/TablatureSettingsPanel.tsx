@@ -1,16 +1,8 @@
 import { cn } from "assets/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import { AlignJustify, Box, Music, RotateCcw } from "lucide-react";
+import { AlignJustify, Music, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 
-import type { GemShapeKey, Highway3DThemeKey } from "./highway3dSettings";
-import {
-  GEM_SHAPE_ORDER,
-  GEM_SHAPES,
-  HIGHWAY3D_THEME_ORDER,
-  HIGHWAY3D_THEMES,
-  useHighway3DSettings,
-} from "./highway3dSettings";
 import type { PillPresetKey } from "./tablaturePillPresets";
 import { PILL_PRESET_ORDER, PILL_PRESETS } from "./tablaturePillPresets";
 import type {
@@ -127,47 +119,6 @@ function PillSwatch({ presetKey }: { presetKey: PillPresetKey }) {
   );
 }
 
-/** 2D stand-in for a highway gem silhouette, in the same landscape proportion. */
-function GemSwatch({ shape }: { shape: GemShapeKey }) {
-  if (shape === "hex") {
-    return (
-      <span
-        className='block h-6 w-11 bg-cyan-400'
-        style={{
-          clipPath:
-            "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)",
-        }}
-      />
-    );
-  }
-  return (
-    <span
-      className='block h-6 w-11 bg-cyan-400'
-      style={{
-        borderRadius: shape === "coin" ? "9999px" : shape === "sharp" ? 0 : 6,
-      }}
-    />
-  );
-}
-
-/** Miniature of a highway sky: the theme's own background with its nebula blobs. */
-function ThemeSwatch({ themeKey }: { themeKey: Highway3DThemeKey }) {
-  const { bg, nebula } = HIGHWAY3D_THEMES[themeKey];
-  return (
-    <span
-      className='block h-12 w-full overflow-hidden rounded-md'
-      style={{
-        backgroundColor: bg,
-        backgroundImage: [
-          `radial-gradient(circle at 28% 62%, ${nebula[0]}, transparent 62%)`,
-          `radial-gradient(circle at 74% 32%, ${nebula[1]}, transparent 58%)`,
-          `radial-gradient(circle at 54% 88%, ${nebula[2]}, transparent 60%)`,
-        ].join(","),
-      }}
-    />
-  );
-}
-
 interface SliderRowProps {
   label: string;
   value: number;
@@ -181,8 +132,7 @@ interface SliderRowProps {
 /**
  * Native range input rather than the Radix slider: wrapping it in the <label>
  * gives the control a real accessible name (Radix puts role="slider" on an inner
- * thumb that a Root-level aria-label never reaches), and the 3D panel renders
- * nearly forty of these at once.
+ * thumb that a Root-level aria-label never reaches).
  */
 function SliderRow({
   label,
@@ -217,20 +167,12 @@ const DEFAULT_VIEW_OPTIONS: {
   label: string;
   desc: string;
   Icon: LucideIcon;
-  beta?: boolean;
 }[] = [
   {
     key: "tab",
     label: "Tablature",
     desc: "Classic fretboard tab",
     Icon: AlignJustify,
-  },
-  {
-    key: "highway",
-    label: "3D Highway",
-    desc: "Beta — may be buggy",
-    Icon: Box,
-    beta: true,
   },
   {
     key: "notation",
@@ -366,8 +308,8 @@ export function TablatureSettingsPanel() {
       <Section
         title='Default view'
         hint='Which view opens automatically when you start a practice session.'>
-        <div className='grid grid-cols-3 gap-2'>
-          {DEFAULT_VIEW_OPTIONS.map(({ key, label, desc, Icon, beta }) => (
+        <div className='grid grid-cols-2 gap-2'>
+          {DEFAULT_VIEW_OPTIONS.map(({ key, label, desc, Icon }) => (
             <OptionCard
               key={key}
               active={settings.defaultViewMode === key}
@@ -377,11 +319,6 @@ export function TablatureSettingsPanel() {
               </span>
               <span className='flex items-center gap-1.5 text-xs font-semibold text-zinc-100'>
                 {label}
-                {beta && (
-                  <span className='rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-400'>
-                    Beta
-                  </span>
-                )}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
                 {desc}
@@ -526,94 +463,6 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <ResetButton onClick={reset} label='Reset tablature settings' />
-    </div>
-  );
-}
-
-/**
- * The 3D highway's slider set — the same definitions the in-view panel uses,
- * laid out for a full-width settings page.
- */
-export function Highway3DSettingsPanel() {
-  const settings = useHighway3DSettings((s) => s.settings);
-  const setGemShape = useHighway3DSettings((s) => s.setGemShape);
-  const setPalette = useHighway3DSettings((s) => s.setPalette);
-  const setTheme = useHighway3DSettings((s) => s.setTheme);
-  const reset = useHighway3DSettings((s) => s.reset);
-
-  return (
-    <div className='space-y-4'>
-      <Section
-        title='Backdrop'
-        hint='Sky, fog and the light around the hit line all change together.'>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
-          {HIGHWAY3D_THEME_ORDER.map((key) => (
-            <OptionCard
-              key={key}
-              active={settings.theme === key}
-              onClick={() => setTheme(key)}>
-              <ThemeSwatch themeKey={key} />
-              <span className='text-xs font-semibold text-zinc-100'>
-                {HIGHWAY3D_THEMES[key].label}
-              </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
-                {HIGHWAY3D_THEMES[key].desc}
-              </span>
-            </OptionCard>
-          ))}
-        </div>
-      </Section>
-
-      <Section
-        title='Note shape'
-        hint='Silhouette of the blocks coming down the highway.'>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
-          {GEM_SHAPE_ORDER.map((key) => (
-            <OptionCard
-              key={key}
-              active={settings.gemShape === key}
-              onClick={() => setGemShape(key)}>
-              <span className='flex h-8 items-center'>
-                <GemSwatch shape={key} />
-              </span>
-              <span className='text-xs font-semibold text-zinc-100'>
-                {GEM_SHAPES[key].label}
-              </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
-                {GEM_SHAPES[key].desc}
-              </span>
-            </OptionCard>
-          ))}
-        </div>
-      </Section>
-
-      <Section
-        title='String palette'
-        hint='Note and string colours on the board.'>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
-          {(Object.keys(STRING_PALETTES) as PaletteKey[]).map((key) => (
-            <OptionCard
-              key={key}
-              active={settings.palette === key}
-              onClick={() => setPalette(key)}>
-              <span className='flex h-8 items-center gap-1'>
-                {STRING_PALETTES[key].colors.map((c) => (
-                  <span
-                    key={c}
-                    className='h-5 w-2.5 rounded-sm'
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
-              </span>
-              <span className='text-xs font-semibold text-zinc-100'>
-                {STRING_PALETTES[key].label}
-              </span>
-            </OptionCard>
-          ))}
-        </div>
-      </Section>
-
-      <ResetButton onClick={reset} label='Reset 3D view' />
     </div>
   );
 }

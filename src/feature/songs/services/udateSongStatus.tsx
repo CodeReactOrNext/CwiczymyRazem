@@ -1,13 +1,18 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
-import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import type { SongStatus } from "feature/songs/types/songs.type";
 import { arrayUnion, doc, getDoc, increment,setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-export const LEARNED_POINTS = 40;
+/**
+ * Awarded once per song, to the global score only. Song points deliberately
+ * stay OUT of the seasonal leaderboard (no `updateSeasonalPoints` call below):
+ * a season should rank practice time, not how many songs someone flipped to
+ * "learned". Reversing the status still reverses the global points.
+ */
+export const LEARNED_POINTS = 30;
 // Minimum accumulated practice time on a song before marking it as
 // "learned" awards points. Prevents gaming points by flipping the status.
-const MIN_PRACTICE_MS_FOR_POINTS = 10 * 60 * 1000;
+const MIN_PRACTICE_MS_FOR_POINTS = 30 * 60 * 1000;
 
 export const updateSongStatus = async (
   userId: string,
@@ -64,7 +69,6 @@ export const updateSongStatus = async (
         });
         pointsAdded = LEARNED_POINTS;
         pointsAwarded = true;
-        await updateSeasonalPoints(userId, LEARNED_POINTS);
       } else {
         insufficientPracticeTime = true;
       }
@@ -74,7 +78,6 @@ export const updateSongStatus = async (
           "statistics.points": increment(-LEARNED_POINTS)
         });
         pointsAdded = -LEARNED_POINTS;
-        await updateSeasonalPoints(userId, -LEARNED_POINTS);
       }
       pointsAwarded = false;
     }

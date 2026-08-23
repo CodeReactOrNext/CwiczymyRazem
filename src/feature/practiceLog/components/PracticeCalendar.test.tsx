@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { fireEvent, render } from "@testing-library/react";
 import { useState } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";

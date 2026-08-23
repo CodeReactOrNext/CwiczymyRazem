@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { cleanup, render, screen } from "@testing-library/react";
 import { Star } from "lucide-react";
 import { afterEach, describe, expect, it } from "vitest";

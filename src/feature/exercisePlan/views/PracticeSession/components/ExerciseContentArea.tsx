@@ -29,7 +29,6 @@ interface ExerciseContentAreaProps {
   rawGpFile?: File;
   showAlphaTabScore: boolean;
   onToggleAlphaTabScore: () => void;
-  show3dHighway?: boolean;
   isAudioPlaying: boolean;
   startTime: number | null;
   effectiveBpm: number;
@@ -85,6 +84,15 @@ interface ExerciseContentAreaProps {
   rewardAmount?: number;
   /** Playback controls (media toolbar + metronome) docked under the player, above the instructions. */
   controlsSlot?: React.ReactNode;
+  /** Backing-track bar, docked directly above the tablature — the video sits in
+   *  the same column as the notation you play along to. */
+  backingTrackSlot?: React.ReactNode;
+  /** Cinema mode — see BackingTrackBar. Turns this card translucent so the
+   *  full-bleed video behind it is visible. */
+  cinema?: boolean;
+  /** The alignment screen is open over the session. Playback continues — that
+   *  is the point of it — but the notation underneath stops drawing. */
+  obscured?: boolean;
 }
 
 export const ExerciseContentArea = memo(function ExerciseContentArea({
@@ -94,7 +102,6 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rawGpFile,
   showAlphaTabScore,
   onToggleAlphaTabScore,
-  show3dHighway,
   isAudioPlaying,
   startTime,
   effectiveBpm,
@@ -136,6 +143,9 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rewardSkillId,
   rewardAmount,
   controlsSlot,
+  backingTrackSlot,
+  cinema = false,
+  obscured = false,
 }: ExerciseContentAreaProps) {
   const { backingVideoId, setBackingVideoId } = useSessionUI();
 
@@ -150,7 +160,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-xl bg-[#1a1a1d] shadow-xl shadow-black/40"
+      "relative w-full overflow-hidden rounded-xl",
+      cinema ? "bg-transparent" : "bg-[#1a1a1d] shadow-xl shadow-black/40"
     )}>
 
       {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here.
@@ -247,12 +258,14 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           )}
         </div>
       ) : hasTablature ? (
+        <>
+        {backingTrackSlot}
         <TablatureSection
+          cinema={cinema}
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           baseTempo={currentExercise.metronomeSpeed?.recommended ?? effectiveBpm}
           showAlphaTabScore={showAlphaTabScore}
-          show3dHighway={show3dHighway}
           onSeek={onSeek}
           isAudioPlaying={isAudioPlaying}
           startTime={startTime}
@@ -275,10 +288,9 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isExamMode={isExamMode}
           isMicEnabled={isMicEnabled}
           onLoopRestart={onLoopRestart}
-          title={activeExercise.title}
-          coverUrl={activeExercise.imageUrl ?? undefined}
-          subtitle={activeExercise.imageUrl ? activeExercise.description : undefined}
+          obscured={obscured}
         />
+        </>
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         <VideoSection
           youtubeVideoId={currentExercise.youtubeVideoId}
@@ -318,7 +330,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         />
       )}
       
-      {controlsSlot && (
+      {controlsSlot && !cinema && (
         <div
           style={{ zoom: 0.9 }}
           className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-4 [&>*]:!mb-0"

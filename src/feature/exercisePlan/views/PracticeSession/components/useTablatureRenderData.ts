@@ -8,7 +8,7 @@ export const STRING_COLORS  = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a
 
 export interface NoteRD {
   noteKey: string;
-  /** 1–6 string number (1 = high e). Exposed for the 3D highway lane mapping. */
+  /** 1–6 string number (1 = high e). */
   string: number;
   noteY: number;
   fret: number;

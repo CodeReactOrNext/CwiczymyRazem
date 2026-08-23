@@ -9,6 +9,10 @@ import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
 import { TAB_BASE_HEIGHT, useTablatureWorkerBridge } from "./useTablatureWorkerBridge";
 
+/** Wash under the staff in cinema mode: dark enough to bind the notes together
+ *  over a moving picture, light enough that the video still reads through. */
+const CINEMA_BOARD_WASH = "rgba(0, 0, 0, 0.35)";
+
 interface TablatureViewerProps {
   measures?: TablatureMeasure[];
   bpm: number;
@@ -32,6 +36,9 @@ interface TablatureViewerProps {
    *  whenever paused away from 0, whether that's from a manual seek or just
    *  having played partway through. */
   currentBeat?: number;
+  /** An opaque full-screen surface is covering the board, so the canvas paints
+   *  for nobody. Playback carries on; only the drawing stops. */
+  obscured?: boolean;
   loopStartBeat?: number | null;
   loopEndBeat?: number | null;
   /** Populated by the viewer so callers (e.g. minimap) can drive the canvas cursor without a canvas click */
@@ -54,6 +61,10 @@ interface TablatureViewerProps {
   tuningStrings?: TuningGutterString[];
   /** Look settings forwarded to the worker (pill shape, colours, visible layers). */
   style?: TablatureStylePatch;
+  /** Cinema mode: all but drop the board colour so the backing video shows
+   *  through. Only the CSS backdrop — the worker keeps painting the gutter and
+   *  bend labels in the board colour, which is what makes them legible. */
+  cinema?: boolean;
   /** Highlights the beats/strings an editor has selected. Memoize it — a new
    *  object identity means a new message to the worker. */
   selection?: TablatureSelection | null;
@@ -84,6 +95,7 @@ const TablatureViewerInner = ({
   volumeRef,
   onSeek,
   currentBeat = 0,
+  obscured = false,
   loopStartBeat,
   loopEndBeat,
   seekWorkerRef,
@@ -93,6 +105,7 @@ const TablatureViewerInner = ({
   heightPx = TAB_BASE_HEIGHT,
   tuningStrings,
   style,
+  cinema = false,
   selection,
   ambientGlow = true,
   palette,
@@ -113,7 +126,7 @@ const TablatureViewerInner = ({
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
-    loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection,
+    loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
   });
 
   // Expose seekWorker so parent (TablatureSection minimap) can drive the canvas cursor
@@ -131,7 +144,10 @@ const TablatureViewerInner = ({
     if (viewerWidthRef) viewerWidthRef.current = containerSize.width;
   }, [viewerWidthRef, containerSize.width]);
 
-  useAmbientMicGlow(ambientGlowRef, volumeRef, frequencyRef);
+  // The glow rewrites three style properties on a large blurred element every
+  // frame — worth it when you can see it react to your playing, pure cost when
+  // the board is covered or the effect is switched off entirely.
+  useAmbientMicGlow(ambientGlowRef, volumeRef, frequencyRef, ambientGlow && !obscured);
 
   useEffect(() => {
     const update = () => {
@@ -151,11 +167,18 @@ const TablatureViewerInner = ({
     <div
       className={cn(
         "w-full px-4 pb-4 pt-0 relative select-none overflow-hidden",
+        // Square corners would give the wash away as a stray rectangle.
+        cinema && "rounded-lg",
         !isPlaying && onSeek && "cursor-pointer",
         !isPlaying && !onSeek && "cursor-grab active:cursor-grabbing",
         className,
       )}
-      style={{ height: heightPx, backgroundColor: style?.background ?? "#09090b" }}
+      style={{
+        height: heightPx,
+        // Cinema keeps a thin black wash under the staff — enough to hold the
+        // notes together over a moving picture without hiding it.
+        backgroundColor: cinema ? CINEMA_BOARD_WASH : style?.background ?? "#09090b",
+      }}
       ref={containerRef}
       onMouseDown={(e)  => handleDragStart(e.clientX)}
       onMouseMove={(e)  => { handleDragMove(e.clientX); handleHover(e.clientX); }}
@@ -222,6 +245,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.missedNotes      === next.missedNotes        &&
   prev.hideDynamicsLane === next.hideDynamicsLane   &&
   prev.currentBeat      === next.currentBeat        &&
+  prev.obscured         === next.obscured           &&
   prev.loopStartBeat    === next.loopStartBeat      &&
   prev.loopEndBeat      === next.loopEndBeat         &&
   prev.zoom             === next.zoom               &&

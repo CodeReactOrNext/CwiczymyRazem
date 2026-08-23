@@ -18,6 +18,7 @@ import {
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
 import { getItemTraits } from "feature/arsenal/data/traits";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import {
   countScrapParts,
   getEffectScrapYield,
@@ -245,7 +246,7 @@ export const EffectCard = ({
         )}
 
         <img
-          src={`/static/images/effects/${effect.imageId}.png`}
+          src={getEffectImageSrc(effect.imageId, "medium")}
           alt={effect.name}
           className='relative z-10 object-contain'
           style={{

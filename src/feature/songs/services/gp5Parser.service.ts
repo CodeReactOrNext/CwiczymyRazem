@@ -217,12 +217,18 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
                   midiNote = art.outputMidiNumber;
                 }
               }
-              // Fallback: some AlphaTab versions expose MIDI pitch directly on note.value
+              // Fallback: some AlphaTab versions expose the key directly, on `value`
+              // for a percussion stave and on `fret` for older files. Both get tried:
+              // `value ?? fret` stops at a `value` of 0 and never reaches the `fret`
+              // that actually held the key, which left every hit unresolved and piled
+              // onto a single row of the drum lane.
               if (!midiNote) {
-                const rawVal = altNote.value ?? altNote.fret;
-                if (typeof rawVal === 'number' && rawVal >= 25) {
-                  midiNote = rawVal;
-                }
+                // A drum tab's line index is a small number and the GM percussion map
+                // starts at 27, so anything from there up can only be a key.
+                midiNote = [altNote.value, altNote.fret].find(
+                  (candidate: unknown): candidate is number =>
+                    typeof candidate === 'number' && candidate >= 27 && candidate <= 127,
+                );
               }
             } else {
               // Guitar / bass — real sounding pitch from the track's actual tuning.

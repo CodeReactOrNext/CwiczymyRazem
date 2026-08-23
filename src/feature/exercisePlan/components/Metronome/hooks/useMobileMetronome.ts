@@ -1,7 +1,9 @@
 import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
+import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import type { TempoRuler } from "../../../views/PracticeSession/hooks/tempoBeatClock";
 import {
   type AccentLevel,
   cycleAccentLevel,
@@ -21,6 +23,8 @@ interface UseMobileMetronomeProps {
   isMuted?: boolean;
   speedMultiplier?: number;
   enabled?: boolean;
+  /** Tempo curve the click follows — see the same prop on useMetronome. */
+  tempoRulerRef?: MutableRefObject<TempoRuler | null>;
   onPlayStart?: () => void;
   /** Called on every ~25ms scheduler tick — use to drive external schedulers */
   onTick?: () => void;
@@ -40,6 +44,7 @@ export const useMobileMetronome = ({
   isMuted = false,
   speedMultiplier = 1,
   enabled = true,
+  tempoRulerRef,
   onPlayStart,
   onTick,
   externalAudioContext,
@@ -209,7 +214,13 @@ export const useMobileMetronome = ({
     const currentTime = context.currentTime;
     const secondsPerBeat   = 60.0 / (bpm * speedMultiplier);
     const subdivisionCount = Math.max(1, subdivision);
-    const tickInterval     = secondsPerBeat / subdivisionCount;
+
+    // Tempo automation in warped-beat space — see the same block in useMetronome.
+    const ruler = tempoRulerRef?.current ?? null;
+    const hasTempoMap = !!ruler && !ruler.isConstant;
+    const warped = (beat: number) => (hasTempoMap ? ruler!.toWarped(beat) : beat);
+    const stepSeconds = (fromBeat: number, beats: number): number =>
+      (warped(fromBeat + beats) - warped(fromBeat)) * secondsPerBeat;
 
     // Schedule notes ahead of time for precise timing
     while (nextNoteTimeRef.current < currentTime + 0.1) {
@@ -224,7 +235,8 @@ export const useMobileMetronome = ({
         }
         setCountInRemaining(countInTargetRef.current);
         countInTargetRef.current -= 1;
-        nextNoteTimeRef.current  += secondsPerBeat;
+        // The count-in leads into bar 1, so it ticks at bar 1's tempo.
+        nextNoteTimeRef.current  += stepSeconds(0, 1);
       } else {
         // Only a true beat (subdivision index 0) drives the playback anchor and the
         // 4-beat accent grid — subdivision ticks in between are just extra clicks.
@@ -244,6 +256,10 @@ export const useMobileMetronome = ({
           setPlaybackAnchor({ wall: startTimeRef.current, audio: audioStartTimeRef.current });
         }
 
+        // Captured before the counters advance: the gap to the next tick is set
+        // by the tempo in force at the tick being scheduled right now.
+        const tickBeatPos = beatCounterRef.current + subdivisionIndexRef.current / subdivisionCount;
+
         if (isBeat) {
           const beatIndex = beatCounterRef.current;
           const level     = getAccentLevel(accentPattern, beatIndex);
@@ -255,7 +271,7 @@ export const useMobileMetronome = ({
         }
 
         subdivisionIndexRef.current = (subdivisionIndexRef.current + 1) % subdivisionCount;
-        nextNoteTimeRef.current    += tickInterval;
+        nextNoteTimeRef.current    += stepSeconds(tickBeatPos, 1 / subdivisionCount);
       }
     }
 
@@ -400,12 +416,40 @@ export const useMobileMetronome = ({
     setAccentPattern((prev) => prev.map((level, i) => (i === index ? cycleAccentLevel(level) : level)));
   }, []);
 
+  /**
+   * Score beat the next play() will start from.
+   *
+   * Only meaningful while stopped — it reads the paused anchor, which is stale
+   * the moment playback is running. The Align screen draws its playhead here so
+   * that pressing Stop leaves a marker on the spot instead of snapping the
+   * whole view back to bar 1, and so that clicking the tab to seek shows where
+   * the seek landed.
+   *
+   * Each metronome answers for its own resume rule rather than publishing the
+   * raw elapsed time, because the two devices do not share one: this one snaps
+   * to a whole beat and the mobile one does not.
+   */
+  const getResumeBeat = useCallback((): number => {
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    if (!(secondsPerBeat > 0)) return 0;
+    const ruler = tempoRulerRef?.current ?? null;
+    const hasTempoMap = !!ruler && !ruler.isConstant;
+    // This metronome resumes exactly where it paused, with no snap to a whole
+    // beat, so the marker must not round either.
+    const warped = (pausedElapsedTimeRef.current / 1000) / secondsPerBeat;
+    return Math.max(0, hasTempoMap ? ruler!.fromWarped(warped) : warped);
+  }, [bpm, speedMultiplier, tempoRulerRef]);
+
   const seekToBeats = useCallback((beats: number) => {
     // Use startTimeRef (not React state) so callers can seek immediately after stopMetronome()
     // without waiting for the next React render cycle.
     if (startTimeRef.current !== null) return;
     const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
-    const elapsedMs = beats * secondsPerBeat * 1000;
+    // Score beats in, warped beats out — a seek into a slowed section costs more
+    // seconds than beats.
+    const ruler = tempoRulerRef?.current ?? null;
+    const warpedBeats = ruler && !ruler.isConstant ? ruler.toWarped(beats) : beats;
+    const elapsedMs = warpedBeats * secondsPerBeat * 1000;
     pausedElapsedTimeRef.current  = elapsedMs;
     pausedAudioElapsedRef.current = elapsedMs;
     pendingSeekBeatRef.current    = beats; // GP audio jumps here on the next play()
@@ -435,6 +479,7 @@ export const useMobileMetronome = ({
     pendingSeekBeatRef,
     handleSetRecommendedBpm,
     recommendedBpm,
+    getResumeBeat,
     initializeAudio,
     audioInitialized,
     startTime: playbackAnchor.wall,
@@ -444,7 +489,7 @@ export const useMobileMetronome = ({
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
     subdivision, setSubdivision, accentPattern, setBeatsPerBar, cycleBeatAccent, currentBeat,
     toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
-    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
+    getResumeBeat, handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
     playbackAnchor,
   ]);
 }; 

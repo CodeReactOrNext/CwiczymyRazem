@@ -1,5 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { FameIcon, PointsIcon } from "feature/challenges/components/RewardIcons";
 import {
   Calendar,
   Flame,
@@ -11,24 +12,32 @@ import {
   Timer,
   TrendingUp,
   Trophy,
+  Video,
 } from "lucide-react";
 
+/**
+ * A reward figure with its currency mark. The `currency` switch earns its keep:
+ * a couple of the actions below pay fame rather than points, and stamping the
+ * points coin next to them is exactly the drift this page exists to prevent.
+ */
 const PointsValue = ({
   value,
   className,
   iconClassName,
+  currency = "points",
 }: {
   value: string;
   className?: string;
   iconClassName?: string;
+  currency?: "points" | "fame";
 }) => (
   <span className={cn("inline-flex items-center gap-1.5 font-bold", className)}>
     {value}
-    <img
-      src='/images/points.png'
-      alt='points'
-      className={cn("h-5 w-5 object-contain", iconClassName)}
-    />
+    {currency === "fame" ? (
+      <FameIcon className={cn("h-5 w-5", iconClassName)} />
+    ) : (
+      <PointsIcon className={cn("h-5 w-5", iconClassName)} />
+    )}
   </span>
 );
 
@@ -44,12 +53,14 @@ const EarnCard = ({
   title,
   reward,
   description,
+  currency = "points",
   children,
 }: {
   icon: React.ReactNode;
   title: string;
   reward: string;
   description: string;
+  currency?: "points" | "fame";
   children?: React.ReactNode;
 }) => (
   <Card className='flex flex-col p-5 sm:p-6'>
@@ -61,6 +72,7 @@ const EarnCard = ({
     </div>
     <PointsValue
       value={reward}
+      currency={currency}
       className='mt-4 text-2xl text-white tracking-tight'
       iconClassName='h-6 w-6'
     />
@@ -98,13 +110,13 @@ export const ScoringGuideView = () => {
           <EarnCard
             icon={<Timer size={18} />}
             title='Practice Time'
-            reward='+1 / 3 min'
-            description='Log your practice session. Every 3 minutes earns 1 point — all categories count the same.'>
+            reward='+22 / hour'
+            description='Log your practice session. Every practised hour is worth 22 points — all four categories count the same.'>
             <div className='mt-4 grid grid-cols-3 gap-2'>
               {[
                 { time: "15 min", pts: "+5" },
-                { time: "30 min", pts: "+10" },
-                { time: "1 hour", pts: "+20" },
+                { time: "30 min", pts: "+11" },
+                { time: "1 hour", pts: "+22" },
               ].map(({ time, pts }) => (
                 <div
                   key={time}
@@ -139,15 +151,16 @@ export const ScoringGuideView = () => {
           <EarnCard
             icon={<Music size={18} />}
             title='Learn a Song'
-            reward='+40'
-            description='Mark a song as Learned — the biggest single reward. Moving it back takes the points back.'
+            reward='+30'
+            description='Mark a song as Learned after at least 30 minutes of practice on it. Counts toward your level, not the season. Moving it back takes the points away.'
           />
 
           <EarnCard
             icon={<Star size={18} />}
             title='Rate Song Difficulty'
             reward='+3'
-            description='Rate how hard a song is in the community library. Awarded once per song, on your first rating.'
+            currency='fame'
+            description='Rate how hard a song is in the community library. Pays fame, not points — awarded once per song, on your first rating.'
           />
 
           <EarnCard
@@ -158,10 +171,17 @@ export const ScoringGuideView = () => {
           />
 
           <EarnCard
+            icon={<Video size={18} />}
+            title='Monthly Challenge'
+            reward='+50'
+            description='Put a recording on a song from the current challenge board. Points pay for your first 5 songs on a board; every recording still pays fame.'
+          />
+
+          <EarnCard
             icon={<Gem size={18} />}
             title='Scale Journey Rewards'
             reward='+100'
-            description='Master a full scale position on the Scale Tree to unlock a one-time reward of 100 points and 50 fame.'
+            description='Master a full scale position on the Scale Tree for a one-time 100 points and 50 fame. Counts toward your level, not the season.'
           />
         </div>
       </section>
@@ -219,7 +239,7 @@ export const ScoringGuideView = () => {
           <div className='flex flex-wrap items-center justify-center gap-2 text-center sm:gap-3'>
             <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-zinc-800/60 px-4 py-3.5'>
               <span className='text-[11px] text-zinc-500'>30 min practice</span>
-              <PointsValue value='+10' className='text-base text-white' iconClassName='h-4 w-4' />
+              <PointsValue value='+11' className='text-base text-white' iconClassName='h-4 w-4' />
             </div>
             <span className='text-lg font-bold text-zinc-600'>+</span>
             <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-zinc-800/60 px-4 py-3.5'>
@@ -230,7 +250,7 @@ export const ScoringGuideView = () => {
             <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-orange-500/10 px-4 py-3.5'>
               <span className='text-[11px] text-orange-400/80'>streak +50%</span>
               <PointsValue
-                value='+6'
+                value='+7'
                 className='text-base text-orange-300'
                 iconClassName='h-4 w-4'
               />
@@ -238,7 +258,7 @@ export const ScoringGuideView = () => {
             <span className='text-lg font-bold text-zinc-600'>=</span>
             <div className='flex min-w-[110px] flex-col items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-5 py-3.5'>
               <span className='text-[11px] text-cyan-400/80'>session total</span>
-              <PointsValue value='+19' className='text-xl text-cyan-300' iconClassName='h-5 w-5' />
+              <PointsValue value='+21' className='text-xl text-cyan-300' iconClassName='h-5 w-5' />
             </div>
           </div>
         </Card>
@@ -260,7 +280,7 @@ export const ScoringGuideView = () => {
             {
               icon: <Calendar size={18} />,
               title: "Seasons",
-              text: "Every point also counts toward the current season and its fresh monthly leaderboard.",
+              text: "Practice time, habits, daily quests and challenge recordings also feed the current season. Learned songs and Scale Journey rewards stay on your lifetime total.",
             },
             {
               icon: <Trophy size={18} />,

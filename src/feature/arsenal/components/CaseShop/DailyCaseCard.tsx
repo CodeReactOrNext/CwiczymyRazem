@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { getDailyPool, getNextDailyReset } from "feature/arsenal/data/dailyCase";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { motion } from "framer-motion";
 import { Clock3 } from "lucide-react";
@@ -107,7 +108,7 @@ export const DailyCaseCard = ({ currentFame, onOpen, isOpening }: DailyCaseCardP
           const imageSrc =
             entry.kind === "guitar"
               ? getRankBadgeSrc(entry.def.imageId, "medium")
-              : `/static/images/effects/${entry.def.imageId}.png`;
+              : getEffectImageSrc(entry.def.imageId, "medium");
           return (
             <div
               key={`${entry.kind}-${entry.def.id}`}

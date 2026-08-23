@@ -13,6 +13,8 @@ import { MainTimerSection } from "./MainTimerSection";
 import { ShortcutsLegend } from "./ShortcutsLegend";
 
 interface SessionBottomBarProps {
+  /** Song practice with a backing track — surfaces its nudge keys in the legend. */
+  hasBackingTrack?: boolean;
   onClose?: () => void;
   skipExitDialog?: boolean;
   exerciseKey: number;
@@ -56,6 +58,7 @@ const SessionBottomBarComponent = ({
   onFinishSession,
   skipExitDialog = false,
   examMode = false,
+  hasBackingTrack = false,
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -80,7 +83,7 @@ const SessionBottomBarComponent = ({
             <FaSignOutAlt />
             {t("common:practice.exit")}
           </Button>
-          <ShortcutsLegend hasTempoControl={hasTempoControl} />
+          <ShortcutsLegend hasTempoControl={hasTempoControl} hasBackingTrack={hasBackingTrack} />
         </div>
 
         {/* Center: Timer */}

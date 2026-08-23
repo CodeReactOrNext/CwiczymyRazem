@@ -17,6 +17,7 @@ import {
   submitChallengeRecording,
 } from "feature/challenges/services/submitChallenge.service";
 import type { ChallengeNomination } from "feature/challenges/types/challenge.types";
+import { CHALLENGE_SONG_COUNT } from "feature/challenges/types/challenge.types";
 import {
   currentChallengeId,
   votingChallengeId,
@@ -103,6 +104,14 @@ export const useChallengeMutations = () => {
           reward.isClear
             ? "Archive board cleared! Late runs don't pay points or fame."
             : "Run added to the archive — no points or fame for a closed board.",
+        );
+        return;
+      }
+      // Past the per-board points cap the run still pays fame, so say what it
+      // earned rather than flashing a "+0 points" that reads like a bug.
+      if (reward.points === 0) {
+        toast.success(
+          `Recording accepted — +${reward.fame} fame. Points stop after ${CHALLENGE_SONG_COUNT} songs on one board.`,
         );
         return;
       }

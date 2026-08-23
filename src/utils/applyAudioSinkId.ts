@@ -45,3 +45,22 @@ export async function applyAlphaTabOutputDevice(api: AlphaTabOutputApi | null | 
     /* ignore — leave AlphaTab on its default device */
   }
 }
+
+/**
+ * Media-element counterpart to applySinkId above. The backing-track player is a
+ * plain <audio> element rather than a Web Audio graph (only the element does
+ * pitch-preserving time stretching), and the element has its own setSinkId.
+ */
+export async function applyMediaElementSinkId(
+  el: HTMLMediaElement | null | undefined,
+  deviceId: string | null,
+): Promise<void> {
+  if (!el || !deviceId) return;
+  if (typeof el.setSinkId !== "function") return;
+  if (el.sinkId === deviceId) return;
+  try {
+    await el.setSinkId(deviceId);
+  } catch {
+    /* ignore — device may have disappeared, or the API may reject mid-session */
+  }
+}

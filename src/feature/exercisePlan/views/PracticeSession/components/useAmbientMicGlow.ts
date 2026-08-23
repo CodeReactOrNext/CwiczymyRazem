@@ -13,9 +13,12 @@ export function useAmbientMicGlow(
   ambientGlowRef: { current: HTMLDivElement | null },
   volumeRef:      MutableRefObject<number> | undefined,
   frequencyRef:   MutableRefObject<number> | undefined,
+  /** False while the glow is switched off or the board is covered — the loop
+   *  then does not run at all, rather than painting where nobody looks. */
+  enabled = true,
 ): void {
   useEffect(() => {
-    if (!volumeRef) return;
+    if (!volumeRef || !enabled) return;
     let rafId: number;
     let smoothedVolume = 0;
     let currentHue = 150;
@@ -52,5 +55,5 @@ export function useAmbientMicGlow(
     };
     rafId = requestAnimationFrame(updateGlow);
     return () => cancelAnimationFrame(rafId);
-  }, [volumeRef, ambientGlowRef, frequencyRef]);
+  }, [volumeRef, ambientGlowRef, frequencyRef, enabled]);
 }

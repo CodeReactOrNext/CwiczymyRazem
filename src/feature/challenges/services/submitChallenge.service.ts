@@ -156,7 +156,7 @@ export const submitChallengeRecording = async (
   }
 
   // Season standings mirror lifetime points — best-effort, the reward is banked.
-  if (reward.isPaid) {
+  if (reward.isPaid && reward.points > 0) {
     await updateSeasonalPoints(userId, reward.points).catch((error) =>
       logger.error(error, { context: "submitChallengeRecording:season" }),
     );

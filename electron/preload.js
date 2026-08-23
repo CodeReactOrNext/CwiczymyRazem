@@ -1,7 +1,7 @@
 // Preload runs in an isolated context with Node access and bridges a minimal,
 // safe API to the renderer (the existing Next.js app). The renderer detects
 // `window.nativeAudio` to switch from the browser mic path to native capture.
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("nativeAudio", {
   isAvailable: true,
@@ -101,6 +101,49 @@ contextBridge.exposeInMainWorld("toneStudio", {
   deleteNamModel: (id) => ipcRenderer.invoke("tone:delete-nam-model", id),
   /** Opens a native file picker for a .nam model; resolves null if the user cancels. */
   importNamModel: () => ipcRenderer.invoke("tone:import-nam-model"),
+});
+
+// Backing tracks: a local audio library plus the per-song sync settings that line
+// a recording up with the Guitar Pro tab (see feature/backingTrack on the
+// renderer side). YouTube backing tracks don't come through here — they work on
+// the web build too, so their config lives in Firestore instead.
+contextBridge.exposeInMainWorld("backingTracks", {
+  isAvailable: true,
+
+  listTracks: () => ipcRenderer.invoke("backing:list-tracks"),
+  /** Opens a native audio-file picker (multi-select, for stems) and copies every
+   *  pick into the app's data folder. Resolves one result per chosen file —
+   *  { ok: true, track } or { ok: false, fileName, message } — so one bad file
+   *  doesn't lose the rest. Empty array if the user cancels. */
+  importTracks: () => ipcRenderer.invoke("backing:import-track"),
+  deleteTrack: (id) => ipcRenderer.invoke("backing:delete-track", id),
+  /** Imports files the user dropped, by path. Same result shape as the picker. */
+  importPaths: (filePaths) => ipcRenderer.invoke("backing:import-paths", filePaths),
+  /**
+   * Real path of a dropped File.
+   *
+   * Electron removed the `path` property it used to graft onto File objects;
+   * webUtils.getPathForFile is the supported replacement, and it only works from
+   * a preload, which is why this crosses the bridge rather than the renderer
+   * reading it directly.
+   */
+  pathForFile: (file) => {
+    try {
+      return webUtils.getPathForFile(file) || null;
+    } catch {
+      return null;
+    }
+  },
+  /** Raw bytes of one track — the renderer wraps them in a Blob object URL,
+   *  since a page served from https:// cannot load a file:// source. */
+  readTrack: (id) => ipcRenderer.invoke("backing:read-track", id),
+
+  /** Which track a song plays, and how it is aligned: { trackId, offsetMs,
+   *  sourceBpm, volume, muted }. Null when the song has none. */
+  getAssignment: (songId) => ipcRenderer.invoke("backing:get-assignment", songId),
+  /** Merge-writes a partial assignment and resolves the stored (clamped) result. */
+  saveAssignment: (songId, patch) => ipcRenderer.invoke("backing:save-assignment", songId, patch),
+  clearAssignment: (songId) => ipcRenderer.invoke("backing:clear-assignment", songId),
 });
 
 // App-shell integration: design-matched context menu + tray/dock quick actions

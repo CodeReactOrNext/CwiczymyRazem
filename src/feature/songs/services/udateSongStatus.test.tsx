@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";

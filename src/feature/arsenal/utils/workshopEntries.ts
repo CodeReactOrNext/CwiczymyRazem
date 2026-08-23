@@ -15,6 +15,7 @@ import type {
   WorkshopKind,
 } from "../types/arsenal.types";
 import { readBuildLog } from "./buildLog";
+import { getEffectImageSrc } from "./effectImage";
 import { getRankBadgeSrc } from "./guitarImage";
 import type { ItemUse } from "./inUse";
 import { getItemUses } from "./inUse";
@@ -95,7 +96,7 @@ export const getWorkshopEntries = (
       name: def.name,
       brand: def.brand,
       rarity: getEffectiveRarity(def.rarity, item.buildLevel),
-      imageSrc: `/static/images/effects/${def.imageId}.png`,
+      imageSrc: getEffectImageSrc(def.imageId, "medium"),
       rotate: false,
       buildLevel: item.buildLevel ?? 0,
       condition: getItemCondition(item),

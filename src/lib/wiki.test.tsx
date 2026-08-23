@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { evaluate } from "@mdx-js/mdx";
 import { BlogAlert } from "components/Blog/BlogAlert";
 import { Checklist } from "components/Blog/Checklist";

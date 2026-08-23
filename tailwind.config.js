@@ -109,6 +109,11 @@ module.exports = {
     "src/layouts/**/*.{js,ts,jsx,tsx}",
     "src/design-system/**/*.{js,ts,jsx,tsx}",
     "./src/**/*.{ts,tsx}",
+    // Testy nie zawierają klas Tailwinda, a trzymanie ich w content sprawia, że
+    // dodanie/skasowanie pliku testowego unieważnia cache CSS (a skasowanie
+    // takiego, który cache już zna, wywala build na ENOENT w resolveChangedFiles).
+    "!./src/**/*.test.{ts,tsx}",
+    "!./src/**/*.spec.{ts,tsx}",
   ],
 
   darkMode: "class",

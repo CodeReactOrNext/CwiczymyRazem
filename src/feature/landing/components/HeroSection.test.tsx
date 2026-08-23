@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { HERO_STATS } from "feature/landing/data/heroStats";
 import { renderToString } from "react-dom/server";

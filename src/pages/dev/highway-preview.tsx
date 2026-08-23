@@ -7,7 +7,7 @@ import { useMemo } from "react";
 
 /**
  * Dev-only harness: renders PracticeSession with static fixture tablature and
- * no Firebase auth, so the 3D highway / 2D tab styling can be screenshotted
+ * no Firebase auth, so the tab / notation styling can be screenshotted
  * headlessly. Not linked from any nav; 404s outside development.
  */
 export default function HighwayPreviewPage() {

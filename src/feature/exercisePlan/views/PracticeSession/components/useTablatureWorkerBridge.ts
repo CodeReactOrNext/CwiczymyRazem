@@ -59,6 +59,15 @@ interface WorkerBridgeOptions {
   selection?:      TablatureSelection | null;
   /** Visual settings patch forwarded to the worker's STYLE message. Omit to keep its defaults. */
   style?:          TablatureStylePatch;
+  /**
+   * An opaque full-screen surface is covering the board.
+   *
+   * Playback is untouched — the worker only ever draws — but there is no point
+   * clocking it, and no point in it painting. Both stop until the board is
+   * visible again, at which point the next tick puts the cursor back where the
+   * audio clock says it should be.
+   */
+  obscured?:       boolean;
 }
 
 /**
@@ -101,6 +110,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
+  obscured = false,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -177,9 +187,15 @@ export function useTablatureWorkerBridge({
     });
   }, [isPlaying, startTime, audioStartTime, bpm, countInRemaining]);
 
+  // Tell the worker whether anyone can see it. A covered board keeps its state
+  // and its clock; it just stops painting frames into a canvas nobody is looking at.
+  useEffect(() => {
+    workerRef.current?.postMessage({ type: 'VISIBLE', visible: !obscured });
+  }, [obscured]);
+
   // Audio-clock tick at ~30fps so the worker can interpolate smooth cursor position
   useEffect(() => {
-    if (!isPlaying || !audioContext || countInRemaining > 0) return;
+    if (!isPlaying || !audioContext || countInRemaining > 0 || obscured) return;
     let rafId: number;
     let lastTick = 0;
     const tick = (ts: number) => {
@@ -191,7 +207,7 @@ export function useTablatureWorkerBridge({
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, audioContext, countInRemaining]);
+  }, [isPlaying, audioContext, countInRemaining, obscured]);
 
   // Clear rest state when stopped
   useEffect(() => {

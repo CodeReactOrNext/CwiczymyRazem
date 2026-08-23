@@ -3,6 +3,7 @@ import type {
   ChallengeSubmission,
 } from "feature/challenges/types/challenge.types";
 import {
+  CHALLENGE_SONG_COUNT,
   FAME_CLEAR_BONUS,
   FAME_PER_SUBMISSION,
   POINTS_PER_SUBMISSION,
@@ -130,6 +131,28 @@ describe("calculateSubmissionReward", () => {
       isClear: true,
       isPaid: false,
     });
+  });
+
+  it("stops paying points past the board size cap, but keeps paying fame", () => {
+    // An oversized board must not be worth a bigger slice of the season than a
+    // normal one: the sixth song onward is fame-only.
+    const sixth = calculateSubmissionReward(CHALLENGE_SONG_COUNT, 10);
+    expect(sixth.points).toBe(0);
+    expect(sixth.fame).toBe(FAME_PER_SUBMISSION);
+    expect(sixth.isPaid).toBe(true);
+
+    const last = calculateSubmissionReward(9, 10);
+    expect(last.points).toBe(0);
+    expect(last.fame).toBe(FAME_PER_SUBMISSION + FAME_CLEAR_BONUS);
+    expect(last.isClear).toBe(true);
+  });
+
+  it("still pays points for every song of a regular five-song board", () => {
+    for (let clearedBefore = 0; clearedBefore < CHALLENGE_SONG_COUNT; clearedBefore++) {
+      expect(calculateSubmissionReward(clearedBefore, CHALLENGE_SONG_COUNT).points).toBe(
+        POINTS_PER_SUBMISSION,
+      );
+    }
   });
 });
 

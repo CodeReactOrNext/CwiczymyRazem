@@ -39,8 +39,6 @@ interface DesktopSessionViewProps {
   isMicEnabled:             boolean;
   allGpTracks:              BackingTrack[] | null;
   showAlphaTabScore:        boolean;
-  show3dHighway:            boolean;
-  handleToggle3dHighway:    () => void;
   selectedGpTrackIdx:       number;
   setSelectedGpTrackIdx:    (idx: number) => void;
   handleToggleAlphaTabScore:() => void;
@@ -109,6 +107,15 @@ interface DesktopSessionViewProps {
   planHasTablature:         boolean;
   planHasGpFile:            boolean;
   planHasStrumming:         boolean;
+  /** Backing-track bar — only a song practice session passes one. Rendered above
+   *  the tablature, but owned by PracticeSession, since it drives real audio. */
+  backingTrackSlot?:        React.ReactNode;
+  /** Cinema mode — the backing video fills the session behind the notation. */
+  backingCinema?:           boolean;
+  /** The backing-track alignment screen is open over the whole session. It plays
+   *  the session's own audio, so playback runs on — the notation just stops
+   *  drawing frames into pixels the overlay is covering. */
+  backingAligning?:         boolean;
   skillRewardSkillId?:      string;
   skillRewardAmount?:       number;
 }
@@ -178,16 +185,14 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
-            {/* One menu for every tab view: flat tablature, 3D highway, notation.
+            {/* One menu for every tab view: flat tablature, notation.
                 Notation is a practice-only convenience, so it's dropped in exams. */}
             {(!!p.activeTablature?.length || (!p.isExamMode && !!p.effectiveRawGpFile)) && (
               <TablatureViewMenu
                 showAlphaTabScore={p.showAlphaTabScore}
-                show3dHighway={p.show3dHighway}
                 hasTablature={!!p.activeTablature?.length}
                 canNotation={!p.isExamMode && (!!p.effectiveRawGpFile || !!p.activeTablature?.length)}
                 onToggleNotation={p.handleToggleAlphaTabScore}
-                onToggle3d={p.handleToggle3dHighway}
               />
             )}
             <SpeedsMasteredButton exercise={p.currentExercise} examMode={p.isExamMode} />
@@ -233,6 +238,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               </div>
             ) : (
               <>
+                {!p.backingCinema && (
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
                   <div className="min-w-0 flex-1">
                     <ExerciseHeroHeader
@@ -249,22 +255,24 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     />
                   </div>
                 </div>
+                )}
 
                 <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-4")}>
-                  <ExerciseHeroHeader
-                    variant="goals"
-                    exercise={p.currentExercise}
-                    activeExercise={p.activeExercise}
-                    plan={p.plan}
-                  />
-                  {p.allGpTracks && !p.showAlphaTabScore && (
+                  {!p.backingCinema && (
+                    <ExerciseHeroHeader
+                      variant="goals"
+                      exercise={p.currentExercise}
+                      activeExercise={p.activeExercise}
+                      plan={p.plan}
+                    />
+                  )}
+                  {p.allGpTracks && !p.showAlphaTabScore && !p.backingCinema && (
                     <GpTrackSelector tracks={p.allGpTracks} selectedIdx={p.selectedGpTrackIdx} onChange={p.setSelectedGpTrackIdx} />
                   )}
                   <ExerciseContentArea
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
                     activeExercise={p.activeExercise} rawGpFile={p.effectiveRawGpFile}
                     showAlphaTabScore={p.showAlphaTabScore} onToggleAlphaTabScore={p.handleToggleAlphaTabScore}
-                    show3dHighway={p.show3dHighway}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
                     isMetronomeMuted={p.isMetronomeMuted}
@@ -293,6 +301,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     rewardSkillId={p.skillRewardSkillId}
                     rewardAmount={p.skillRewardAmount}
                     controlsSlot={playbackControls}
+                    backingTrackSlot={p.backingTrackSlot}
+                    cinema={p.backingCinema}
+                    obscured={p.backingAligning}
                   />
                 </div>
 
@@ -303,6 +314,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     isLastExercise={p.isLastExercise} isPlaying={p.isPlaying}
                     toggleTimer={p.handleToggleTimer} handleRestart={p.handleRestart}
                     handleNextExerciseClick={p.handleNextExerciseClick}
+                    hasBackingTrack={!!p.backingTrackSlot}
                   
                     canFinishSession={p.canFinishSession}
                     isSkillExercise={p.isSkillExercise}

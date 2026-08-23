@@ -72,7 +72,7 @@ export const SAMPLE_TABLATURE: TablatureMeasure[] = [
       { duration: 0.5, notes: [{ string: 4, fret: 12 }] },
       { duration: 0.5, notes: [{ string: 5, fret: 12 }] },
       { duration: 0.5, notes: [{ string: 6, fret: 12 }] },
-      // Whole-ish closing chord so sustain tails are visible in the 3D highway.
+      // Whole-ish closing chord so sustain tails are visible.
       {
         duration: 1,
         chordName: "E5",
@@ -86,5 +86,5 @@ export const SAMPLE_TABLATURE: TablatureMeasure[] = [
   },
 ];
 
-/** Tempo the preview renders at — slow enough that the 3D highway reads clearly. */
+/** Tempo the preview renders at — slow enough that the preview reads clearly. */
 export const SAMPLE_TEMPO = 90;

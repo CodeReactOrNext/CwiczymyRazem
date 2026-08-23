@@ -24,7 +24,7 @@ Songs you've never practised show a dash in all three columns, which makes the l
 
 ## What mastering a song pays
 
-Moving a song to **Mastered** pays **+40 points**, as long as you've logged at least **10 minutes** of practice on that specific song first. Mark it earlier and the status changes without paying anything. Move it back out again and the +40 is taken back off. Either way, the change is mirrored into the current season's total.
+Moving a song to **Mastered** pays **+30 points**, as long as you've logged at least **30 minutes** of practice on that specific song first. Mark it earlier and the status changes without paying anything. Move it back out again and the +30 is taken back off. These points go on your lifetime total and your level; they stay out of the monthly season, which is there to measure the month's practice.
 
 <BlogAlert type="tip">
 Practise the song from its own page, because that's what builds up the 10 minutes, and it's also what tells the app which songs you actually work on.

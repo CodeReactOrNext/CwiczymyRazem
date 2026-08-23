@@ -28,9 +28,9 @@ On top of the curve there are two modifiers:
 
 These are the big, predictable payouts. Most of the Fame that ends up buying a Legendary comes from here.
 
-<StatRow stats="+300:a monthly challenge recording|+500:bonus for clearing all five|+50:clearing a Scale Map box|+40:finishing your daily quests" caption="A full challenge board is 2000 Fame in a month, which is why it's the fastest legitimate income in the app." />
+<StatRow stats="+500:a monthly challenge recording|+750:bonus for clearing all five|+50:clearing a Scale Map box|+40:finishing your daily quests" caption="A full challenge board is 3250 Fame in a month, which is why it's the fastest legitimate income in the app." />
 
-<Checklist items="Monthly challenges::300 Fame per accepted recording, plus 500 once every song on the board has one. Recordings on a closed month's board pay nothing|Weekly Milestones::Each level you've unlocked pays out every week you meet its goal, from 20 Fame a week at the bottom to 300 at the top, and every unlocked level you've met pays at once|Daily quests::40 Fame for finishing all three, once you press Claim|Scale Map::50 Fame each time you clear a full box, alongside the points|Season placings::Finishing a month in the top five pays 500 / 300 / 200 / 100 / 50 Fame when the season closes" />
+<Checklist items="Monthly challenges::500 Fame per accepted recording, plus 750 once every song on the board has one. Recordings on a closed month's board pay nothing|Weekly Milestones::Each level you've unlocked pays out every week you meet its goal, from 20 Fame a week at the bottom to 300 at the top, and every unlocked level you've met pays at once|Daily quests::40 Fame for finishing all three, once you press Claim|Scale Map::50 Fame each time you clear a full box, alongside the points|Season placings::Finishing a month in the top five pays 500 / 300 / 200 / 100 / 50 Fame when the season closes" />
 
 ## The community pays you
 

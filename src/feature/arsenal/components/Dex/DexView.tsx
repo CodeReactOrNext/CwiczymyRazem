@@ -14,6 +14,7 @@ import {
   buildOwnershipMap,
   getDexProgress,
 } from "feature/arsenal/utils/dex";
+import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Guitar, Layers } from "lucide-react";
 import type { ReactNode } from "react";
@@ -149,7 +150,7 @@ export const DexView = ({ data }: DexViewProps) => {
           name: def.name,
           brand: def.brand,
           rarity: def.rarity,
-          imageSrc: `/static/images/effects/${def.imageId}.png`,
+          imageSrc: getEffectImageSrc(def.imageId, "medium"),
           discovered: discoveredEffects.has(def.id),
           ownedCount: ownership?.count ?? 0,
           preview: ownership ? <EffectCard item={ownership.best} readOnly /> : undefined,

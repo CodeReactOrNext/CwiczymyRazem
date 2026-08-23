@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { render } from "@testing-library/react";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { describe, expect, it } from "vitest";

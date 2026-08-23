@@ -1,5 +1,6 @@
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import { removeUserSong } from "feature/songs/services/removeUserSong";
+import { LEARNED_POINTS } from "feature/songs/services/udateSongStatus";
 import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -47,13 +48,20 @@ describe("removeUserSong", () => {
 
     const result = await removeUserSong("user1", "song1");
 
-    expect(result.pointsAdded).toBe(-40);
-    expect(updateSeasonalPoints).toHaveBeenCalledWith("user1", -40);
+    expect(result.pointsAdded).toBe(-LEARNED_POINTS);
     expect(updateDoc).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ "statistics.points": expect.anything() })
     );
     expect(deleteDoc).toHaveBeenCalled();
+  });
+
+  it("leaves the season untouched — song points are a lifetime reward only", async () => {
+    mockUserSongsSnapshot({ status: "learned", pointsAwarded: true });
+
+    await removeUserSong("user1", "song1");
+
+    expect(updateSeasonalPoints).not.toHaveBeenCalled();
   });
 
   it("does not subtract points when the song is learned but points were never awarded", async () => {

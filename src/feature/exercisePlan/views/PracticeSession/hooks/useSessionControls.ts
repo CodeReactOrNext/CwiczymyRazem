@@ -21,6 +21,8 @@ interface Metronome {
 }
 
 interface UseSessionControlsOptions {
+  /** True while a full-screen surface over the session owns the keyboard. */
+  shortcutsDisabled?:     boolean;
   isPlaying:              boolean;
   stopTimer:              () => void;
   startTimer:             (delayMs?: number) => void;
@@ -58,6 +60,7 @@ export function useSessionControls({
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
   tabRestartKey, setTabRestartKey,
+  shortcutsDisabled = false,
 }: UseSessionControlsOptions) {
   const isPlayingRef = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -166,6 +169,10 @@ export function useSessionControls({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // A full-screen surface over the session owns the keyboard while it is up.
+      // Space would otherwise start the metronome *behind* the alignment editor,
+      // count-in and all, on top of whatever that screen does with the key.
+      if (shortcutsDisabled) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.code === "Space") {
         e.preventDefault(); handleToggleTimer(); return;
@@ -181,7 +188,7 @@ export function useSessionControls({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLastExercise, currentExerciseIndex, handleToggleTimer, handleNextExerciseClick, stopTimer, metronome, jumpToExercise, hasTempoControl, handleTempoStep]);
+  }, [shortcutsDisabled, isLastExercise, currentExerciseIndex, handleToggleTimer, handleNextExerciseClick, stopTimer, metronome, jumpToExercise, hasTempoControl, handleTempoStep]);
 
   return useMemo(() => ({
     tabRestartKey, isPlayingRef,

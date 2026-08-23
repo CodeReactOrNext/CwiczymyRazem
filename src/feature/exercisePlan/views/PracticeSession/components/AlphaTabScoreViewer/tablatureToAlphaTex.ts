@@ -83,7 +83,7 @@ function bendEffect(note: TablatureNote): string | null {
 // Our model flags the *destination* of a hammer-on / pull-off — the note you arrive at
 // (higher fret for a hammer, lower for a pull) — matching how gp5Parser reads GP files
 // (isHammerOn/isPullOff derived from the arrival note's `hammerPullOrigin`) and how the
-// tab / highway / 3D views badge the technique on that same note.
+// the flat tab view badges the technique on that same note.
 //
 // alphaTex is the mirror image: its `h` effect marks the *origin*, and AlphaTab resolves
 // the destination itself as the next note on the same string (Note.finish →

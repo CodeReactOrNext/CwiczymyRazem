@@ -4,6 +4,7 @@ import Soundfont from "soundfont-player";
 import { applySinkId } from "utils/applyAudioSinkId";
 
 import type { TablatureBeat, TablatureNote } from "../../types/exercise.types";
+import { createTempoRulerFromMeasures } from "../../views/PracticeSession/hooks/tempoBeatClock";
 import { playDrumNote } from "./synth.drums";
 import type { StringPlayers } from "./synth.strings";
 import { playStringNote } from "./synth.strings";
@@ -33,7 +34,7 @@ export const useTablatureAudio = ({
 
   // ── Absolute-clock playback state ─────────────────────────────────────────
   // beatIdx grows monotonically — audio time = startAudioTime
-  //   + floor(beatIdx / N) * loopDuration  +  offsets[beatIdx % N]
+  //   + floor(beatIdx / N) * loopDuration  +  warpedOffsets[beatIdx % N]
   // No floating-point accumulation between tracks.
   const startAudioTimeRef        = useRef<number | null>(null);
   const audioStartTimePropRef    = useRef<number | null>(null);
@@ -73,7 +74,10 @@ export const useTablatureAudio = ({
 
   const trackDataRef = useRef<Record<string, {
     flattened:     TablatureBeat[];
-    offsets:       number[];
+    /** Beat start positions in warped beats — x secondsPerBeat gives audio seconds. */
+    warpedOffsets:   number[];
+    /** Each beat's sounding length in warped beats, so a note in a fast bar is shorter. */
+    warpedDurations: number[];
     totalDuration: number;
     loopStartIdx:  number;
     loopStartOff:  number;
@@ -86,26 +90,41 @@ export const useTablatureAudio = ({
     trackDataRef.current = {};
     activeTracks.forEach(track => {
       const flattened = track.measures.flatMap(m => m.beats);
-      const offsets: number[] = [];
+      // Positions are stored in *warped* beats (see createTempoRuler): a bar
+      // marked faster than the base tempo takes up proportionally fewer of them.
+      // Every read below still multiplies by a single secondsPerBeat, so the
+      // scheduler needs to know nothing about tempo automation — and the user's
+      // BPM knob keeps scaling the whole piece.
+      const ruler = createTempoRulerFromMeasures(track.measures);
+      const warpedOffsets:   number[] = [];
+      const warpedDurations: number[] = [];
       let cursor = 0;
-      for (const beat of flattened) { offsets.push(cursor); cursor += beat.duration; }
+      for (const beat of flattened) {
+        const start = ruler.toWarped(cursor);
+        warpedOffsets.push(start);
+        cursor += beat.duration;
+        warpedDurations.push(ruler.toWarped(cursor) - start);
+      }
 
-      let loopStartIdx = 0; let loopStartOff = 0;
+      let loopStartIdx = 0; let loopStartBeat = 0;
       for (const m of track.measures) {
         if (!m.firstLoopOnly) break;
-        loopStartIdx += m.beats.length;
-        loopStartOff += m.beats.reduce((s, b) => s + b.duration, 0);
+        loopStartIdx  += m.beats.length;
+        loopStartBeat += m.beats.reduce((s, b) => s + b.duration, 0);
       }
 
-      let loopEndIdx = flattened.length; let loopEndOff = cursor;
+      let loopEndIdx = flattened.length; let loopEndBeat = cursor;
       for (let i = track.measures.length - 1; i >= 0; i--) {
         if (!track.measures[i].lastLoopOnly) break;
-        loopEndIdx -= track.measures[i].beats.length;
-        loopEndOff -= track.measures[i].beats.reduce((s, b) => s + b.duration, 0);
+        loopEndIdx  -= track.measures[i].beats.length;
+        loopEndBeat -= track.measures[i].beats.reduce((s, b) => s + b.duration, 0);
       }
 
+      const loopStartOff = ruler.toWarped(loopStartBeat);
+      const loopEndOff   = ruler.toWarped(loopEndBeat);
+
       trackDataRef.current[track.id] = {
-        flattened, offsets, totalDuration: cursor,
+        flattened, warpedOffsets, warpedDurations, totalDuration: ruler.toWarped(cursor),
         loopStartIdx, loopStartOff, loopDuration: loopEndOff - loopStartOff,
         loopEndIdx, loopEndOff,
       };
@@ -239,7 +258,7 @@ export const useTablatureAudio = ({
   // Beat times computed ABSOLUTELY from startAudioTime — no accumulation drift.
   // beatAudioTime(i) = startAudioTime
   //   + floor(i / N) * loopDurationSeconds   ← which loop
-  //   + offsets[i % N] * secondsPerBeat       ← position in loop
+  //   + warpedOffsets[i % N] * secondsPerBeat ← position in loop
   const scheduler = useCallback(() => {
     if (timeoutRef.current) { window.clearTimeout(timeoutRef.current); timeoutRef.current = null; }
     const ctx = audioContextRef.current;
@@ -262,10 +281,10 @@ export const useTablatureAudio = ({
       activeTracksRef.current.forEach(track => {
         const data = trackDataRef.current[track.id];
         let startIdx = 0;
-        if (data && data.offsets.length > 0) {
+        if (data && data.warpedOffsets.length > 0) {
           // Skip beats that are already in the past so they don't all fire at once
-          for (let i = 0; i < data.offsets.length; i++) {
-            if (anchor + data.offsets[i] * spb >= ctx.currentTime - 0.1) break;
+          for (let i = 0; i < data.warpedOffsets.length; i++) {
+            if (anchor + data.warpedOffsets[i] * spb >= ctx.currentTime - 0.1) break;
             startIdx = i + 1;
           }
         }
@@ -317,9 +336,9 @@ export const useTablatureAudio = ({
 
         let beatAudioTime: number;
         if (loopCount === 0) {
-          beatAudioTime = startAudio + data.offsets[localIdx] * secondsPerBeat;
+          beatAudioTime = startAudio + data.warpedOffsets[localIdx] * secondsPerBeat;
         } else {
-          const relOff = (data.offsets[localIdx] - loopStartOff) * secondsPerBeat;
+          const relOff = (data.warpedOffsets[localIdx] - loopStartOff) * secondsPerBeat;
           beatAudioTime = startAudio + firstLoopSec + (loopCount - 1) * loopDurSec + relOff;
         }
 
@@ -327,7 +346,7 @@ export const useTablatureAudio = ({
         if (localIdx >= N) { state.beatIdx++; continue; }
 
         const beat         = data.flattened[localIdx];
-        const beatDuration = Math.max(0.05, beat.duration * secondsPerBeat);
+        const beatDuration = Math.max(0.05, data.warpedDurations[localIdx] * secondsPerBeat);
         const t = Math.max(ctx.currentTime + 0.001, beatAudioTime);
 
         if (!track.isMuted) {

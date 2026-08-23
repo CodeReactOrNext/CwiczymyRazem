@@ -4,10 +4,10 @@ import type { Timestamp } from "firebase/firestore";
 export const CHALLENGE_SONG_COUNT = 5;
 
 /** Reward for a single accepted challenge recording. */
-export const POINTS_PER_SUBMISSION = 100;
-export const FAME_PER_SUBMISSION = 300;
+export const POINTS_PER_SUBMISSION = 50;
+export const FAME_PER_SUBMISSION = 500;
 /** Extra fame once every song on the board has a recording. */
-export const FAME_CLEAR_BONUS = 500;
+export const FAME_CLEAR_BONUS = 750;
 
 /** How many nominations one player may back per voting cycle. */
 export const VOTES_PER_USER = 5;

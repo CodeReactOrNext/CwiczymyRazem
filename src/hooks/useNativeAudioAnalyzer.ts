@@ -89,7 +89,7 @@ export const useNativeAudioAnalyzer = () => {
   // EMA of the main→renderer IPC hand-off delay (see native.onFrame below) —
   // folded into getLatencyMs() so note-matching's compensation reflects this
   // hop instead of silently assuming it's zero (it isn't: this is where the
-  // actual aubio DSP work happens, on the same thread as React/3D rendering).
+  // actual aubio DSP work happens, on the same thread as React rendering).
   const ipcDelayEmaRef = useRef<number>(0);
   // Set once the stream is open and aubio detectors are built for its *actual*
   // negotiated sample rate (see init() — the driver doesn't always grant the

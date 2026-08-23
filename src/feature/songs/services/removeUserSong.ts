@@ -1,4 +1,3 @@
-import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import { LEARNED_POINTS } from "feature/songs/services/udateSongStatus";
 import { arrayRemove, deleteDoc, doc, getDoc, increment, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -26,7 +25,6 @@ export const removeUserSong = async (userId: string, songId: string) => {
         "statistics.points": increment(-LEARNED_POINTS)
       });
       pointsAdded = -LEARNED_POINTS;
-      await updateSeasonalPoints(userId, -LEARNED_POINTS);
     }
 
     await updateDoc(songRef, {

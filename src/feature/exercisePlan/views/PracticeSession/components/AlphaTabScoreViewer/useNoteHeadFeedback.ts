@@ -23,7 +23,7 @@ interface AtNote { start: number; fret: number; string: number; x: number; y: nu
 
 /**
  * Colours the actual fret numbers in the AlphaTab tab staff green (hit) / red
- * (miss), mirroring the 3D highway.
+ * (miss), mirroring the flat tablature view.
  *
  * AlphaTab owns its canvas, so a glyph can't be recoloured directly. Instead we
  * read each note head's pixel bounds from AlphaTab's `boundsLookup` (requires
