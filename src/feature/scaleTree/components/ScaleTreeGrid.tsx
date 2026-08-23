@@ -77,7 +77,7 @@ export function ScaleTreeGrid({
   }, [scaleNodes]);
 
   const positions = useMemo(() => {
-    return SCALE_TREE_POSITIONS[scaleType] || [1, 2, 3, 5, 7, 8, 10];
+    return SCALE_TREE_POSITIONS[scaleType] ?? [];
   }, [scaleType]);
 
   const family = scaleNodes[0]?.data?.scaleFamily || 'diatonic';

@@ -47,6 +47,8 @@ interface LandscapeSessionModalProps {
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
   hasPlayedRiddleOnce?: boolean;
+  /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
+  onPlayRiddle?: () => void;
   handleRevealRiddle?: () => void;
   handleNextRiddle?: () => void;
   earTrainingScore?: number;
@@ -99,6 +101,7 @@ export function LandscapeSessionModal({
   isRiddleRevealed,
   isRiddleGuessed,
   hasPlayedRiddleOnce,
+  onPlayRiddle,
   handleRevealRiddle,
   handleNextRiddle,
   earTrainingScore,
@@ -174,7 +177,7 @@ export function LandscapeSessionModal({
                     handleNextRiddle={handleNextRiddle}
                     onEarTrainingGuessed={onEarTrainingGuessed}
                     riddleProgress={riddleProgress}
-                    onPlayRiddle={handleToggleTimer}
+                    onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
                     isExamMode={examMode}
                   />
                 </div>

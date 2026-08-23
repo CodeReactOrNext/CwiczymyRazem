@@ -1,6 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { getEffectEntries } from "feature/arsenal/utils/collectionEntries";
+import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { X } from "lucide-react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
@@ -27,20 +29,22 @@ export const EffectPickerModal = ({
   onSelect,
   onClose,
 }: EffectPickerModalProps) => {
-  // Deduplicate by effectId — show one per unique effect
-  const uniqueMap = new Map<number | string, EffectInventoryItem>();
-  for (const item of effectInventory) {
-    const existing = uniqueMap.get(item.effectId);
-    if (!existing || item.acquiredAt > existing.acquiredAt) {
-      uniqueMap.set(item.effectId, item);
-    }
-  }
-  const items = Array.from(uniqueMap.values());
+  // Every copy the player owns gets its own tile. Two copies of the same pedal
+  // are two different pedals — level, condition and fitted mods all differ — so
+  // collapsing them to one hid the better one behind the worse. The order is the
+  // stash's own: rarest first, copies of a model side by side, best copy leading.
+  const items = filterAndSortEntries(
+    getEffectEntries(effectInventory),
+    "",
+    "rarity",
+  );
 
   const boardFull =
     !!canFit &&
     items.length > 0 &&
-    !items.some((item) => !occupiedItemIds.includes(item.id) && canFit(item.id));
+    !items.some(
+      (item) => !occupiedItemIds.includes(item.id) && canFit(item.id),
+    );
 
   return (
     <div

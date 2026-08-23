@@ -16,6 +16,7 @@ import type { SkillsType } from "types/skillsTypes";
 import { getLocalDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
+import { subtractReportedTime } from "./timerReporting";
 import {
   autoLogIn,
   changeUserDisplayName,
@@ -34,7 +35,6 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
-
 
 
 const initialState: userSliceInitialState = {
@@ -346,10 +346,18 @@ const userSlice = createSlice({
       })
       .addCase(updateUserStats.fulfilled, (state, action) => {
         const { payload } = action;
-        state.timer.technique = 0;
-        state.timer.creativity = 0;
-        state.timer.hearing = 0;
-        state.timer.theory = 0;
+
+        // A report only consumes the time it actually logged. Whatever is left
+        // in the timer — the Free Timer, a drill the player walked away from —
+        // is still unreported, so it stays put instead of being wiped.
+        const reported = action.meta.arg?.inputData;
+        if (!state.timer) {
+          state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
+        }
+        state.timer.technique = subtractReportedTime(state.timer.technique, reported?.techniqueHours, reported?.techniqueMinutes);
+        state.timer.creativity = subtractReportedTime(state.timer.creativity, reported?.creativityHours, reported?.creativityMinutes);
+        state.timer.hearing = subtractReportedTime(state.timer.hearing, reported?.hearingHours, reported?.hearingMinutes);
+        state.timer.theory = subtractReportedTime(state.timer.theory, reported?.theoryHours, reported?.theoryMinutes);
 
         if (payload?.currentUserStats && state.currentUserStats) {
           const prevStats = { ...state.currentUserStats };

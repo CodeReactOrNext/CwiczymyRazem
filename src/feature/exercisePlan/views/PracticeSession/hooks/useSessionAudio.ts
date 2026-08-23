@@ -33,6 +33,8 @@ interface UseSessionAudioOptions {
   stopTimer:               () => void;
   setTimerTime:            (t: number) => void;
   setHasPlayedRiddleOnce:  (v: boolean) => void;
+  /** Ear-training riddles: hand the floor back to the player after a single pass. */
+  autoStopAfterFirstLoop?: boolean;
   onAlphaTabAudioContextReady: (ctx: AudioContext) => void;
   /** Incremented on explicit restarts so AlphaTab resets to beat 0 instead of resuming. */
   tabRestartKey:           number;
@@ -49,7 +51,7 @@ export function useSessionAudio({
   currentExerciseId, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
   isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
-  stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
+  stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
   onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
@@ -175,6 +177,16 @@ export function useSessionAudio({
     startTime:  metronomeStartTime,
     onLoopComplete: () => {
       setHasPlayedRiddleOnce(true);
+      // An ear-training riddle is a question, not a backing loop: it asks once and
+      // then goes quiet. Looping forever meant the player had to stop playback by
+      // hand before the mic would judge their answer at all (the matcher only
+      // arms in silence — see useRiddleSequenceMatcher), which is the click-heavy
+      // flow the exercise was reported for.
+      if (autoStopAfterFirstLoop) {
+        stopMetronome();
+        stopTimer();
+        return;
+      }
       if (tabRepeatCount > 0) {
         loopsCompletedRef.current += 1;
         if (loopsCompletedRef.current >= tabRepeatCount) {

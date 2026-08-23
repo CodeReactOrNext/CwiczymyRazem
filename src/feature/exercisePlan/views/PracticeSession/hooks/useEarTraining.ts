@@ -8,7 +8,8 @@ import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 
 interface UseEarTrainingOptions {
   currentExercise: Exercise;
-
+  /** True while the riddle's melody is actually coming out of the speakers. */
+  isRiddleSounding: boolean;
   restartMetronome: () => void;
   startMetronome: () => void;
   currentBpm: number;
@@ -17,7 +18,7 @@ interface UseEarTrainingOptions {
 
 export function useEarTraining({
   currentExercise,
-
+  isRiddleSounding,
   restartMetronome,
   startMetronome,
   currentBpm,
@@ -58,15 +59,42 @@ export function useEarTraining({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
 
+  // The riddle counts as heard the moment it starts sounding, not once its last
+  // beat has run out. Waiting for the end used to strand the exercise: the flag
+  // was set by the tablature scheduler's end-of-loop callback, which playback
+  // being stopped cancels — and stopping playback is exactly what the player has
+  // to do to be listened to. Stop a beat early and the mic never armed again,
+  // which is what "it stopped listening to my notes" looked like from the couch.
+  useEffect(() => {
+    if (!isRiddleSounding || currentExercise.riddleConfig?.mode !== "sequenceRepeat") return;
+    // A latch over time, not a value derivable from the current props: the phrase
+    // stays heard long after it has stopped sounding.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHasPlayedRiddleOnce(true);
+  }, [isRiddleSounding, currentExercise.riddleConfig?.mode]);
+
+  /**
+   * Play the phrase from its first beat.
+   *
+   * Always a restart, never a resume: the metronome remembers where the last stop
+   * landed, so simply starting it again picks the phrase up mid-flight — which is
+   * exactly where a player who stopped the moment they had heard enough left it.
+   */
+  const playRiddleFromTop = () => {
+    restartMetronome();
+    setTimeout(() => { startMetronome(); }, 100);
+  };
+
   const handleNextRiddle = () => {
     if (currentExercise.riddleConfig?.mode !== "sequenceRepeat") return;
     setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
     setIsRiddleRevealed(false);
     setIsRiddleGuessed(false);
     setHasPlayedRiddleOnce(false);
-    restartMetronome();
-    setTimeout(() => { startMetronome(); }, 100);
+    playRiddleFromTop();
   };
+
+  const handleReplayRiddle = () => playRiddleFromTop();
 
   const handleRevealRiddle = () => setIsRiddleRevealed(true);
 
@@ -83,6 +111,7 @@ export function useEarTraining({
     tabResetKey,
     setTabResetKey,
     handleNextRiddle,
+    handleReplayRiddle,
     handleRevealRiddle,
   };
 }

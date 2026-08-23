@@ -283,6 +283,7 @@ export default async function handler(
         fameAccuracyBonus: fameResult.accuracyBonusApplied,
         fameRigBonus: fameResult.rigFame,
         fameChainBonus: fameResult.chainFame,
+        fameTraitBonus: fameResult.traitFame,
       },
     });
   }

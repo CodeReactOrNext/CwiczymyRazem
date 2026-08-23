@@ -11,6 +11,13 @@ export interface RequiredExercise {
    * the old, slower speed still clears the node — see `isExerciseCleared`.
    */
   legacyRequiredBpm?: number;
+  /**
+   * Ids this exercise used to be filed under. Progress recorded against one of
+   * them still clears the node — see `isExerciseCleared`. Diatonic shapes were
+   * renamed when they were re-anchored on scale degrees, and a player who passed
+   * the old node passed this one.
+   */
+  legacyExerciseIds?: string[];
   scaleType: ScaleType;
   patternType: PatternType;
   /** Fret the shape is anchored on — what the exercise generator works with. */

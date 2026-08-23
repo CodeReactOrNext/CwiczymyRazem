@@ -1,5 +1,7 @@
 import type { SequenceRepeatRiddleConfig,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
+const BEATS_PER_MEASURE = 4;
+
 export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMeasure[] => {
   const { noteCount, difficulty, range } = config;
 
@@ -10,7 +12,6 @@ export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMea
 
   // Helper to get random item
   const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-  const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
   const validNotes: { string: number, fret: number }[] = [];
 
@@ -27,7 +28,7 @@ export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMea
   if (difficulty === 'easy') {
     // Easy: Random notes from the pool, but stick to one or two adjacent strings for simplicity if possible
     // For now, just purely random from the allowed set is fine for "Easy" if the config restricts usage (e.g. only string 1)
-    for (let i = 0; i < config.noteCount; i++) {
+    for (let i = 0; i < noteCount; i++) {
       generatedNotes.push(getRandom(validNotes));
     }
   } else if (difficulty === 'medium') {
@@ -36,7 +37,7 @@ export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMea
     let prevNote = getRandom(validNotes);
     generatedNotes.push(prevNote);
 
-    for (let i = 1; i < config.noteCount; i++) {
+    for (let i = 1; i < noteCount; i++) {
       // Find notes close to the previous one
       const closeNotes = validNotes.filter(n =>
         Math.abs(n.string - prevNote.string) <= 1 &&
@@ -50,7 +51,7 @@ export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMea
 
   } else {
     // Hard: Anything goes, larger jumps allowed
-    for (let i = 0; i < config.noteCount; i++) {
+    for (let i = 0; i < noteCount; i++) {
       generatedNotes.push(getRandom(validNotes));
     }
   }
@@ -68,26 +69,23 @@ export const generateRiddle = (config: SequenceRepeatRiddleConfig): TablatureMea
   }));
 
   // Group into measures of 4/4 (4 beats per measure)
-  // For Ear Training: Always Add a 4-beat REST measure after the notes to give user time to think/answer
   const measures: TablatureMeasure[] = [];
-  let currentBeats = [];
-
-  for (let i = 0; i < beats.length; i++) {
-    currentBeats.push(beats[i]);
-    if (currentBeats.length === 4 || i === beats.length - 1) {
-      measures.push({
-        beats: currentBeats,
-        timeSignature: [4, 4]
-      });
-      currentBeats = [];
-    }
+  for (let i = 0; i < beats.length; i += BEATS_PER_MEASURE) {
+    measures.push({
+      beats: beats.slice(i, i + BEATS_PER_MEASURE),
+      timeSignature: [4, 4]
+    });
   }
 
-  // FORCE: Add a full rest measure at the end for spacing/count-in effect
-  measures.push({
-    beats: Array(4).fill({ notes: [], duration: 1 }), // 4 beats of silence
-    timeSignature: [4, 4]
-  });
+  // The phrase ends on a whole bar padded with rests, not followed by a whole
+  // silent one. A riddle plays a single pass and then stops itself, and the
+  // answer matcher only arms once playback is silent (see useSessionAudio's
+  // autoStopAfterFirstLoop and useRiddleSequenceMatcher) — so a trailing empty
+  // bar was four beats of dead air in which the player's answer went unheard.
+  const lastMeasure = measures[measures.length - 1];
+  while (lastMeasure && lastMeasure.beats.length < BEATS_PER_MEASURE) {
+    lastMeasure.beats.push({ notes: [], duration: 1 });
+  }
 
   return measures;
 };

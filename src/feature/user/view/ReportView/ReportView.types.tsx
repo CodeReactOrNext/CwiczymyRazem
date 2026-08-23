@@ -69,6 +69,12 @@ export interface ReportDataInterface {
    * that one is for owning the gear, this one for arranging it properly.
    */
   fameChainBonus?: number;
+  /**
+   * Fame the gear's traits paid, after the rig ceiling took its cut — also
+   * already inside `fameEarned`. Reported so the post-session breakdown can name
+   * it: without it the traits' share silently lands on the practice line.
+   */
+  fameTraitBonus?: number;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;

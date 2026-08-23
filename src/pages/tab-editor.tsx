@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
+import { getCommunityExerciseById } from "feature/communityExercises/services/communityExerciseService";
 import { useTablatureAudio } from "feature/exercisePlan/hooks/useTablatureAudio";
 import type {
   TablatureBeat,
@@ -25,6 +26,10 @@ import {
   DEFAULT_TIME_SIGNATURE,
   regridMeasure,
 } from "feature/exercisePlan/utils/measureGrid";
+import {
+  readTabEditorDraft,
+  saveTabEditorDraft,
+} from "feature/exercisePlan/utils/tabEditorDraft";
 import {
   beatAtScrollLeft,
   beatRangeForCells,
@@ -412,13 +417,24 @@ export default function TabEditor() {
 
   const editId =
     typeof router.query.edit === "string" ? router.query.edit : null;
-  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+  // Which exercise the editor has been seeded for — `false` until the first
+  // restore lands. Holding the id rather than a "loaded yet?" flag means that
+  // moving between exercises re-seeds instead of leaving the previous tab on
+  // screen under the new exercise's name.
+  const [seededFor, setSeededFor] = useState<string | null | false>(false);
+  const isSeeded = seededFor === editId;
 
-  // On mount, restore any saved draft so navigating away and back (e.g. a
-  // round-trip to the publish page) doesn't wipe the editor. Works for both
-  // edit mode (draft holds the exercise's tablature) and create mode.
+  // Restore whichever tab the editor should be showing, so navigating away and
+  // back (e.g. a round-trip to the publish page) doesn't wipe it. A draft only
+  // counts when it belongs to the exercise in `?edit=`; otherwise edit mode
+  // reads the exercise's saved tablature, which is what stops "Save changes"
+  // from blanking a tab after a refresh, or after a save cleared the draft.
+  // Waits for the router so `editId` is settled before either one is chosen.
   useEffect(() => {
+    let cancelled = false;
+
     const seed = (initial: TablatureMeasure[]) => {
+      if (cancelled) return;
       measuresRef.current = initial;
       setMeasures(initial);
       setHistory({
@@ -427,34 +443,42 @@ export default function TabEditor() {
         lastKey: null,
         lastAt: 0,
       });
+      setSeededFor(editId);
     };
 
-    let restored = false;
-    try {
-      const raw = localStorage.getItem("tab-editor-draft");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          seed(parsed);
-          restored = true;
-        }
+    const restore = () => {
+      if (!router.isReady || isSeeded) return;
+
+      const draft = readTabEditorDraft(editId);
+      if (draft && draft.length > 0) {
+        seed(draft);
+        return;
       }
-    } catch {}
-    if (!restored) seed(measures);
-    setIsDraftLoaded(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      if (!editId) {
+        seed([createMeasure()]);
+        return;
+      }
+      getCommunityExerciseById(editId).then((exercise) => {
+        const saved = exercise?.tablature ?? [];
+        seed(saved.length > 0 ? saved : [createMeasure()]);
+      });
+    };
+
+    restore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router.isReady, editId, isSeeded]);
 
   // Keep the draft in sync so a round-trip to the publish page (or a refresh)
-  // preserves the user's work. Gated on isDraftLoaded (state, not a ref) so the
-  // initial render's run is skipped — otherwise it would overwrite the saved
-  // draft with the default measures before the restore above is committed.
+  // preserves the user's work. Gated on the seeded state (state, not a ref) so
+  // the initial render's run is skipped — otherwise it would overwrite the
+  // saved draft with the default measures before the restore is committed.
   useEffect(() => {
-    if (!isDraftLoaded) return;
-    try {
-      localStorage.setItem("tab-editor-draft", JSON.stringify(measures));
-    } catch {}
-  }, [isDraftLoaded, measures]);
+    if (!isSeeded) return;
+    saveTabEditorDraft(editId, measures);
+  }, [isSeeded, editId, measures]);
 
   useTablatureAudio({
     measures,
@@ -1760,10 +1784,7 @@ export default function TabEditor() {
 
               <Button
                 onClick={() => {
-                  localStorage.setItem(
-                    "tab-editor-draft",
-                    JSON.stringify(measures),
-                  );
+                  saveTabEditorDraft(editId, measures);
                   router.push(
                     editId
                       ? `/tab-editor/publish?edit=${editId}`

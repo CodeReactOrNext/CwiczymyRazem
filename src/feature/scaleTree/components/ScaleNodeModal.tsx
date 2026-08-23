@@ -114,6 +114,17 @@ export function ScaleNodeModal({
     }
   }, [req, rootNote, fret]);
 
+  // The frets the shape really covers. It is anchored on a scale note rather than
+  // on the fret it is named after, and a three-notes-per-string shape reaches
+  // past five frets — so the name is a starting point, not the span.
+  const fretRange = useMemo(() => {
+    const frets = (tablature ?? [])
+      .flatMap((measure) => measure.beats)
+      .flatMap((beat) => beat.notes)
+      .map((note) => note.fret);
+    return frets.length > 0 ? { low: Math.min(...frets), high: Math.max(...frets) } : null;
+  }, [tablature]);
+
   return (
     <AnimatePresence>
       {node && (
@@ -170,8 +181,8 @@ export function ScaleNodeModal({
                   // range chip below already says everything there is to say.
                   req.boxNumber != null && <Chip>Box {req.boxNumber}</Chip>
                 )}
-                {req.stringNum == null && (
-                  <Chip>Frets {fret}–{fret + 4}</Chip>
+                {req.stringNum == null && fretRange && (
+                  <Chip>Frets {fretRange.low}–{fretRange.high}</Chip>
                 )}
                 <Chip color='cyan'>{req.requiredBpm} BPM</Chip>
                 {rootNote !== BASE_ROOT_NOTE && <Chip color='purple'>Key of {rootNote}</Chip>}

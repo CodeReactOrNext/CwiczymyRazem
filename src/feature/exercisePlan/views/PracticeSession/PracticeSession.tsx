@@ -60,6 +60,9 @@ import { useSessionControls } from "./hooks/useSessionControls";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 
+/** How long a solved ear-training riddle stays on screen before the next one is dealt. */
+const RIDDLE_AUTO_ADVANCE_MS = 1500;
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 interface PracticeSessionProps {
@@ -307,8 +310,8 @@ export const PracticeSession = ({
     riddleMeasures, isRiddleRevealed, isRiddleGuessed, setIsRiddleGuessed,
     earTrainingScore, setEarTrainingScore, earTrainingHighScore,
     hasPlayedRiddleOnce, setHasPlayedRiddleOnce, tabResetKey,
-    handleNextRiddle, handleRevealRiddle,
-  } = useEarTraining({ currentExercise, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
+    handleNextRiddle, handleReplayRiddle, handleRevealRiddle,
+  } = useEarTraining({ currentExercise, isRiddleSounding: isAudioPlaying, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
   // Ear-training riddles have their own untimed matcher (useRiddleSequenceMatcher
   // below) that ignores wrong notes — the generic tempo-locked note matching
@@ -350,9 +353,13 @@ export const PracticeSession = ({
     skipNextSettingsSaveRef.current = true;
     resetForExercise({
       isAudioMuted: nextAudioMuted, isMetronomeMuted: nextMetronomeMuted, speedMultiplier: nextSpeedMultiplier,
-      // Exams never expose the notation toggle (see DesktopSessionView), but force it off here
-      // too in case it was left on from a prior non-exam exercise in the same session.
-      ...(isExamMode ? { showAlphaTabScore: false } : {}),
+      // Exams and ear-training riddles never expose the notation toggle (see
+      // DesktopSessionView), but force it off here too in case it was left on by an
+      // earlier exercise in the same session — or by the global default-view setting.
+      // Notation is fatal to a riddle: it hands its synth to AlphaTab, which has no GP
+      // file to play here, so the melody never sounds and the answer matcher (which
+      // waits for the melody) never arms.
+      ...(isExamMode || isEarTrainingRiddle ? { showAlphaTabScore: false } : {}),
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
@@ -435,6 +442,7 @@ export const PracticeSession = ({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
+    autoStopAfterFirstLoop: isEarTrainingRiddle,
     isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
     metronomeAudioContext: metronome.audioContext,
@@ -658,6 +666,49 @@ export const PracticeSession = ({
 
   // ── Ear training: mic answer matching ─────────────────────────────────────
 
+  const riddleAutoAdvanceRef = useRef<number | null>(null);
+  const cancelRiddleAutoAdvance = useCallback(() => {
+    if (riddleAutoAdvanceRef.current === null) return;
+    window.clearTimeout(riddleAutoAdvanceRef.current);
+    riddleAutoAdvanceRef.current = null;
+  }, []);
+  // Leaving the exercise (or the session) must not deal a riddle into a screen
+  // that has moved on.
+  useEffect(() => cancelRiddleAutoAdvance, [currentExercise.id, cancelRiddleAutoAdvance]);
+
+  // Next riddle auto-plays its melody; if the player answered while stopped
+  // (mic flow), restart the timer too so the Play/Stop button and the answer
+  // matcher stay consistent with the audible playback.
+  const handleNextRiddleClick = useCallback(() => {
+    cancelRiddleAutoAdvance();
+    if (!isPlaying) startTimer();
+    handleNextRiddle();
+  }, [cancelRiddleAutoAdvance, isPlaying, startTimer, handleNextRiddle]);
+
+  // Ear training gets its own Play/Stop instead of the session's toggle, which
+  // resumes the metronome at the offset the last stop left behind: a player who
+  // stopped the moment they had heard enough would get the tail of the phrase back,
+  // not the phrase. Here Play always means "play it again from the first note".
+  const handlePlayRiddle = useCallback(() => {
+    cancelRiddleAutoAdvance();
+    if (isPlaying || metronome.isPlaying) { stopTimer(); metronome.stopMetronome(); return; }
+    startTimer();
+    handleReplayRiddle();
+  }, [cancelRiddleAutoAdvance, isPlaying, metronome, stopTimer, startTimer, handleReplayRiddle]);
+
+  // The mic heard the whole answer, so nothing is left for the player to click:
+  // bank the point, hold the green state long enough to read, then deal and play
+  // the next phrase. Only this path auto-advances — a player who pressed "Stuck?
+  // Reveal" wants to study the tab, not watch it disappear.
+  const handleRiddleMatched = useCallback(() => {
+    handleEarTrainingGuessed();
+    cancelRiddleAutoAdvance();
+    riddleAutoAdvanceRef.current = window.setTimeout(() => {
+      riddleAutoAdvanceRef.current = null;
+      handleNextRiddleClick();
+    }, RIDDLE_AUTO_ADVANCE_MS);
+  }, [handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
+
   // Armed only while playback is fully stopped — otherwise the mic would hear
   // the riddle itself coming from the speakers and solve it on its own.
   const riddleProgress = useRiddleSequenceMatcher({
@@ -666,16 +717,8 @@ export const PracticeSession = ({
     frequencyRef: audioRefs.frequencyRef,
     volumeRef: audioRefs.volumeRef,
     tuningOffsets: guitarTuning.tuning.offsets,
-    onComplete: handleEarTrainingGuessed,
+    onComplete: handleRiddleMatched,
   });
-
-  // Next riddle auto-plays its melody; if the player answered while stopped
-  // (mic flow), restart the timer too so the Play/Stop button and the answer
-  // matcher stay consistent with the audible playback.
-  const handleNextRiddleClick = useCallback(() => {
-    if (!isPlaying) startTimer();
-    handleNextRiddle();
-  }, [isPlaying, startTimer, handleNextRiddle]);
 
   // ── Misc effects ──────────────────────────────────────────────────────────
 
@@ -817,7 +860,7 @@ export const PracticeSession = ({
           handleNextRiddle={handleNextRiddleClick} handleRevealRiddle={handleRevealRiddle}
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
           onEarTrainingGuessed={handleEarTrainingGuessed}
-          riddleProgress={riddleProgress}
+          riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
         />,
         document.body,
       )}
@@ -864,7 +907,7 @@ export const PracticeSession = ({
         earTrainingHighScore={earTrainingHighScore}
         handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddleClick}
         handleEarTrainingGuessed={handleEarTrainingGuessed}
-        riddleProgress={riddleProgress}
+        riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
         isPlaying={isPlaying} handleToggleTimer={handleToggleTimer}
         startTimer={startTimer} stopTimer={stopTimer}
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}

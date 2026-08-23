@@ -1,6 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { getGuitarEntries } from "feature/arsenal/utils/collectionEntries";
+import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
@@ -24,15 +26,10 @@ export const GuitarPickerModal = ({
   onSelect,
   onClose,
 }: GuitarPickerModalProps) => {
-  // Deduplicate by guitarId — show one card per unique guitar (latest acquired)
-  const uniqueMap = new Map<number | string, InventoryItem>();
-  for (const item of inventory) {
-    const existing = uniqueMap.get(item.guitarId);
-    if (!existing || item.acquiredAt > existing.acquiredAt) {
-      uniqueMap.set(item.guitarId, item);
-    }
-  }
-  const items = Array.from(uniqueMap.values());
+  // One tile per copy, not per model: two Stratocasters can be a level 3 and a
+  // level 17, and a picker that shows only one of them cannot say which. Ordered
+  // the way the stash orders itself — rarest first, copies together, best first.
+  const items = filterAndSortEntries(getGuitarEntries(inventory), "", "rarity");
 
   return (
     <div

@@ -18,6 +18,16 @@ const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
  * current target BPM, or the lower one it had before the tempo bump — players
  * who already cleared a node under the old rules keep it cleared.
  */
+/**
+ * Every tempo on record for this exercise, gathered across the ids it has been
+ * filed under. A shape that was renamed keeps the runs a player already logged.
+ */
+export function collectBpms(req: RequiredExercise, progress: BpmProgressMap): number[] {
+  return [req.exerciseId, ...(req.legacyExerciseIds ?? [])].flatMap(
+    (id) => progress.get(id) ?? [],
+  );
+}
+
 export function isExerciseCleared(req: RequiredExercise, bpms: number[]): boolean {
   const threshold =
     req.legacyRequiredBpm != null
@@ -79,7 +89,7 @@ export function computeNodeStatuses(progressMap: BpmProgressMap): Record<string,
       }
 
       const doneCount = node.requiredExercises.filter((req) =>
-        isExerciseCleared(req, progressMap.get(req.exerciseId) ?? [])
+        isExerciseCleared(req, collectBpms(req, progressMap))
       ).length;
 
       const newStatus: NodeStatus =

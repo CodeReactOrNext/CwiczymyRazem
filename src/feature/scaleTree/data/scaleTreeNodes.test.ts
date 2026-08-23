@@ -32,10 +32,34 @@ describe("scale tree box numbering", () => {
       expect(spine.map((n) => n.requiredExercises[0].boxNumber)).toEqual(
         spine.map(() => undefined)
       );
-      expect(spine.map((n) => n.requiredExercises[0].position)).toEqual([
-        1, 2, 3, 5, 7, 8, 10,
-      ]);
     }
+  });
+
+  it("anchors every diatonic shape on a degree of its own scale", () => {
+    // One shared list of frets used to name shapes these scales do not have:
+    // C major has no note on the low E's 2nd fret, C dorian none on the 7th. The
+    // shape at such a fret collapsed onto its neighbour, so two nodes taught one
+    // fingering and the scale's last shape had no node at all.
+    const positionsOf = (scaleId: string) =>
+      boxNodesFor(scaleId).map((n) => n.requiredExercises[0].position);
+
+    expect(positionsOf("major")).toEqual([1, 3, 5, 7, 8, 10, 12]);
+    expect(positionsOf("nat_minor")).toEqual([1, 3, 4, 6, 8, 10, 11]);
+    expect(positionsOf("dorian")).toEqual([1, 3, 5, 6, 8, 10, 11]);
+    expect(positionsOf("locrian")).toEqual([1, 2, 4, 6, 8, 9, 11]);
+  });
+
+  it("carries progress over from the fret a diatonic shape used to be named after", () => {
+    const reqOf = (id: string) =>
+      SCALE_TREE_NODES.find((n) => n.id === id)?.requiredExercises[0];
+
+    // C major's old "fret 2" node was this same shape under another name.
+    expect(reqOf("major_pos3_asc")?.legacyExerciseIds).toEqual([
+      "scale_c_major_ascending_pos2",
+    ]);
+    // Shapes that kept their fret, and every pentatonic box, have nothing to carry.
+    expect(reqOf("major_pos8_asc")?.legacyExerciseIds).toBeUndefined();
+    expect(reqOf("min_pent_pos8_asc")?.legacyExerciseIds).toBeUndefined();
   });
 
   it("labels pentatonic nodes by box, keeping the fret only as the exercise id", () => {

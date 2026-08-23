@@ -1,14 +1,12 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { selectTimerData } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
-import { useAppSelector } from "store/hooks";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
 import { useTimerContext } from "../contexts/TimerContext";
+import { sumSessionTime, useSessionTimeStore } from "../hooks/sessionTimeStore";
 import ExerciseControls from "./ExerciseControls";
 import { TimerDisplay } from "./TimerDisplay";
 
@@ -37,16 +35,10 @@ export const MainTimerSection = ({
 
   handleRestart
 }: MainTimerSectionProps) => {
-  const { t } = useTranslation(["common"]);
   const { formattedTimeLeft, progress: timerProgressValue, isFinished } = useTimerContext();
-    const sessionTimerData = useAppSelector(selectTimerData);
-
-  const totalSessionMs = sessionTimerData 
-    ? ((sessionTimerData.creativity || 0) + 
-       (sessionTimerData.hearing || 0) + 
-       (sessionTimerData.technique || 0) + 
-       (sessionTimerData.theory || 0))
-    : 0;
+  // Only what this session tracked — Redux `user.timer` also carries time the
+  // player has not reported yet, which is not part of "Session".
+  const totalSessionMs = useSessionTimeStore((state) => sumSessionTime(state.time));
 
   if (variant === "compact") {
     const formattedTotalSession = convertMsToHMS(totalSessionMs);

@@ -63,6 +63,8 @@ interface DesktopSessionViewProps {
   handleRevealRiddle:       () => void;
   handleNextRiddle:         () => void;
   handleEarTrainingGuessed: () => void;
+  /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
+  onPlayRiddle:             () => void;
   riddleProgress:           RiddleProgress | null;
   isPlaying:                boolean;
   handleToggleTimer:        () => void;
@@ -187,7 +189,11 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
           <>
             {/* One menu for every tab view: flat tablature, notation.
                 Notation is a practice-only convenience, so it's dropped in exams. */}
-            {(!!p.activeTablature?.length || (!p.isExamMode && !!p.effectiveRawGpFile)) && (
+            {/* An ear-training riddle keeps its tab hidden until the answer is in, and
+                its melody is played by the session's own synth — notation would both
+                spoil the phrase and take the sound away with it. */}
+            {p.currentExercise.riddleConfig?.mode !== "sequenceRepeat"
+              && (!!p.activeTablature?.length || (!p.isExamMode && !!p.effectiveRawGpFile)) && (
               <TablatureViewMenu
                 showAlphaTabScore={p.showAlphaTabScore}
                 hasTablature={!!p.activeTablature?.length}
@@ -285,7 +291,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     audioStartTime={p.effectiveAudioStartTime} tabResetKey={p.tabResetKey}
                     isRiddleRevealed={p.isRiddleRevealed} isRiddleGuessed={p.isRiddleGuessed}
                     hasPlayedRiddleOnce={p.hasPlayedRiddleOnce} earTrainingScore={p.earTrainingScore}
-                    earTrainingHighScore={p.earTrainingHighScore} onPlayRiddle={p.handleToggleTimer}
+                    earTrainingHighScore={p.earTrainingHighScore} onPlayRiddle={p.onPlayRiddle}
                     onRevealRiddle={p.handleRevealRiddle} onNextRiddle={p.handleNextRiddle}
                     onEarTrainingGuessed={p.handleEarTrainingGuessed}
                     riddleProgress={p.riddleProgress}

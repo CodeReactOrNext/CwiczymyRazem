@@ -1,9 +1,10 @@
-import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData } from 'feature/user/store/userSlice';
+import { selectCurrentUserStats, selectPreviousUserStats } from 'feature/user/store/userSlice';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
+import { useSessionTimeStore } from './sessionTimeStore';
 import { useExerciseNavigation } from './useExerciseNavigation';
 import { useExerciseTimerSync } from './useExerciseTimerSync';
 import { useSessionActivity } from './useSessionActivity';
@@ -29,12 +30,19 @@ export const usePracticeSessionState = ({
   freeMode,
   skillRewardSkillId,
 }: UsePracticeSessionStateProps) => {
-  const timerData = useAppSelector(selectTimerData);
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
   const avatar = useAppSelector((state) => state.user.userInfo?.avatar);
 
   const [videoDuration, setVideoDuration] = useState<number | null>(null);
+
+  // A fresh session starts from zero. Whatever the player left unreported
+  // before (an abandoned drill, the Free Timer) stays in Redux and is theirs to
+  // report later — it must not be folded into this session's category split.
+  const resetSessionTime = useSessionTimeStore((state) => state.reset);
+  useEffect(() => {
+    resetSessionTime();
+  }, [plan.id, resetSessionTime]);
 
   const {
     currentExerciseIndex,
@@ -96,9 +104,10 @@ export const usePracticeSessionState = ({
     resetReporting();
     resetProgress();
     resetExerciseTimes();
+    resetSessionTime();
     setCurrentExerciseIndex(0);
     timer.restartTime();
-  }, [timer, setCurrentExerciseIndex, resetReporting, resetProgress, resetExerciseTimes]);
+  }, [timer, setCurrentExerciseIndex, resetReporting, resetProgress, resetExerciseTimes, resetSessionTime]);
 
   const handleNextExercise = useCallback((resetTimerFn: () => void) => {
     saveTime(currentExerciseIndex, timer.getTime());
@@ -148,7 +157,13 @@ export const usePracticeSessionState = ({
       exerciseRecords?: any,
       micPerformance?: any,
       earTrainingPerformance?: any
-    ) => handleFinishSession(timerData, timer.stopTimer, exerciseRecords, micPerformance, earTrainingPerformance),
+    ) => handleFinishSession(
+      useSessionTimeStore.getState().time,
+      timer.stopTimer,
+      exerciseRecords,
+      micPerformance,
+      earTrainingPerformance
+    ),
     canFinishSession,
     isSkillExercise,
     isSubmittingReport,
@@ -165,7 +180,7 @@ export const usePracticeSessionState = ({
     isFullSessionModalOpen, isMounted, currentExercise, isLastExercise,
     setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
     restartFullSession, setVideoDuration, videoDuration, handleFinishSession,
-    timerData, canFinishSession, isSkillExercise, isSubmittingReport,
+    canFinishSession, isSkillExercise, isSubmittingReport,
     completedExercises, reportResult, currentUserStats, previousUserStats,
     planTitleString, activityDataToUse
   ]);

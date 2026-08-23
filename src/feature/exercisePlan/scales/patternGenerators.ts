@@ -43,7 +43,9 @@ function generateDescending(positions: FretPosition[], noteDuration: number): Ta
 function generateAscendingDescending(positions: FretPosition[], noteDuration: number): TablatureBeat[] {
   const ascending = generateAscending(positions, noteDuration);
   const descending = generateDescending(positions, noteDuration);
-  return [...ascending, ...descending];
+  // The top note ends the way up and starts the way down. Picking it twice is a
+  // stumble at the turnaround rather than part of the run, so the way down skips it.
+  return [...ascending, ...descending.slice(1)];
 }
 
 /**
@@ -129,6 +131,23 @@ function generateIntervalFourths(positions: FretPosition[], noteDuration: number
   return beats;
 }
 
+// Rest lengths alphaTex can notate on their own, in quarter notes. A remainder is
+// filled largest-first, so half a bar left over becomes one half-note rest and
+// two and a half beats become a half plus an eighth.
+const REST_DURATIONS = [4, 2, 1, 0.5, 0.25];
+
+function fillWithRests(remaining: number): TablatureBeat[] {
+  const rests: TablatureBeat[] = [];
+  let left = remaining;
+  for (const duration of REST_DURATIONS) {
+    while (left >= duration - 1e-6) {
+      rests.push({ duration, notes: [] });
+      left -= duration;
+    }
+  }
+  return rests;
+}
+
 /**
  * Split beats into measures
  */
@@ -155,11 +174,18 @@ function splitIntoMeasures(
     }
   }
 
-  // Add remaining beats as final measure
+  // A scale run almost never divides evenly into bars — a twelve-note pentatonic
+  // box is six beats of eighths, so the last bar used to be left holding whatever
+  // was over (1.5 beats for an eleven-note shape, 3 for a run up and back). The
+  // session's click is a free-running clock at a fixed BPM, so a bar of fractional
+  // length shifts every following beat off the click, and since the exercise loops
+  // the shift compounds on each repeat. Padding the tail out to a full bar keeps
+  // every repeat the same whole number of beats — and reads as a breath before
+  // the run starts again.
   if (currentBeats.length > 0) {
     measures.push({
       timeSignature,
-      beats: currentBeats
+      beats: [...currentBeats, ...fillWithRests(beatsPerMeasure - currentDuration)]
     });
   }
 

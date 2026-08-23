@@ -1,7 +1,9 @@
+import { getShapeStartFrets } from "feature/exercisePlan/scales/fretboardMapper";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
-import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
+import { rootNotes,scaleDefinitions, type ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 
 import type { RewardNodeDef,ScaleTreeNodeDef } from "../types/scaleTree.types";
+import { BASE_ROOT_NOTE } from "./scaleTreeKeys";
 
 // Tempo every box-position exam is locked to. Was 70–80 per family, which
 // players found sluggish; one brisk target for the whole tree instead.
@@ -43,20 +45,43 @@ const MIN_PENT_POSITIONS = [8, 10, 1, 3, 5];
 // box order keeps one set of names — only the root position moves.
 //   Major: Box 1 = fret 5, Box 2 = fret 8, Box 3 = fret 10, Box 4 = 1, Box 5 = 3
 const MAJ_PENT_POSITIONS = [5, 8, 10, 1, 3];
-// Diatonic scales and modes have no box convention — they are named by fret.
-const DIAT_POSITIONS = [1, 2, 3, 5, 7, 8, 10];
+// Diatonic scales and modes have no box convention — they are named by fret, and
+// a shape starts where one of the scale's degrees sits on the low E. Which frets
+// those are depends on the scale (C major starts shapes on 1, 3, 5, 7, 8, 10, 12;
+// C dorian on 1, 3, 5, 6, 8, 10, 11), so the list is derived per scale instead of
+// shared. The shared [1, 2, 3, 5, 7, 8, 10] named a fret that is not a degree of
+// any of them: fret 2 in C major landed on the same fingering as fret 3, leaving
+// two nodes teaching one shape and the seventh shape with no node at all.
+const BASE_ROOT_MIDI = 60 + rootNotes.indexOf(BASE_ROOT_NOTE);
+
+const diatonicPositions = (scaleType: ScaleType): number[] =>
+  getShapeStartFrets(BASE_ROOT_MIDI, scaleDefinitions[scaleType].intervals);
+
+// The frets diatonic shapes were named after before that. Progress filed under
+// one of these is still progress on the shape its fret now names, so the node
+// that absorbed it keeps the clear — see `legacyExerciseIds`.
+const LEGACY_DIAT_POSITIONS = [1, 2, 3, 5, 7, 8, 10];
+
+/** Old fret names that now resolve to `position` — the shape at or above them. */
+function legacyPositionsFor(position: number, positions: number[]): number[] {
+  return LEGACY_DIAT_POSITIONS.filter(
+    (legacy) =>
+      legacy !== position &&
+      (positions.find((candidate) => candidate >= legacy) ?? positions[0]) === position,
+  );
+}
 
 /** Frets each scale's shapes sit on, in the order they are learned. */
 export const SCALE_TREE_POSITIONS: Record<string, number[]> = {
   minor_pentatonic: MIN_PENT_POSITIONS,
   major_pentatonic: MAJ_PENT_POSITIONS,
-  minor: DIAT_POSITIONS,
-  major: DIAT_POSITIONS,
-  dorian: DIAT_POSITIONS,
-  phrygian: DIAT_POSITIONS,
-  mixolydian: DIAT_POSITIONS,
-  lydian: DIAT_POSITIONS,
-  locrian: DIAT_POSITIONS,
+  minor: diatonicPositions("minor"),
+  major: diatonicPositions("major"),
+  dorian: diatonicPositions("dorian"),
+  phrygian: diatonicPositions("phrygian"),
+  mixolydian: diatonicPositions("mixolydian"),
+  lydian: diatonicPositions("lydian"),
+  locrian: diatonicPositions("locrian"),
 };
 
 /** "Box N" is a pentatonic convention; every other family is named by its fret. */
@@ -120,6 +145,7 @@ function makeNode(
   y: number,
   prerequisite: string | null,
   exerciseId: string,
+  legacyExerciseIds: string[],
   bpm: number,
   legacyBpm: number,
   fretPos: number,
@@ -140,6 +166,7 @@ function makeNode(
     requiredExercises: [
       {
         exerciseId,
+        ...(legacyExerciseIds.length > 0 ? { legacyExerciseIds } : {}),
         requiredBpm: bpm,
         legacyRequiredBpm: legacyBpm,
         scaleType,
@@ -211,6 +238,13 @@ function buildCluster(
         y,
         prereq,
         `scale_c_${scaleKey}_${pat.type}_pos${pos}`,
+        // Only the diatonic shapes were re-anchored; the pentatonic boxes
+        // keep the frets they always had, so they have nothing to carry over.
+        usesBoxNames(scaleFamily)
+          ? []
+          : legacyPositionsFor(pos, positions).map(
+              (legacy) => `scale_c_${scaleKey}_${pat.type}_pos${legacy}`,
+            ),
         bpm,
         legacyBpm,
         pos,
@@ -284,37 +318,37 @@ const majPentNodes = buildCluster(
 
 const natMinorNodes = buildCluster(
   "nat_minor", "Natural Minor", "minor", "diatonic", "minor",
-  DIAT_POSITIONS, -1100, -100, "nat_minor_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
+  SCALE_TREE_POSITIONS.minor, -1100, -100, "nat_minor_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
 );
 
 const majorNodes = buildCluster(
   "major", "Major Scale", "major", "diatonic", "major",
-  DIAT_POSITIONS, 2300, -300, "major_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
+  SCALE_TREE_POSITIONS.major, 2300, -300, "major_single_string", EXAM_BPM, LEGACY_DIAT_BPM,
 );
 
 const dorianNodes = buildCluster(
   "dorian", "Dorian", "dorian", "mode", "dorian",
-  DIAT_POSITIONS, -2300, -300, "dorian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
+  SCALE_TREE_POSITIONS.dorian, -2300, -300, "dorian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const phrygianNodes = buildCluster(
   "phrygian", "Phrygian", "phrygian", "mode", "phrygian",
-  DIAT_POSITIONS, -1800, 600, "phrygian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
+  SCALE_TREE_POSITIONS.phrygian, -1800, 600, "phrygian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const mixolydianNodes = buildCluster(
   "mixolydian", "Mixolydian", "mixolydian", "mode", "mixolydian",
-  DIAT_POSITIONS, 2000, 500, "mixolydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
+  SCALE_TREE_POSITIONS.mixolydian, 2000, 500, "mixolydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const lydianNodes = buildCluster(
   "lydian", "Lydian", "lydian", "mode", "lydian",
-  DIAT_POSITIONS, 3100, -700, "lydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
+  SCALE_TREE_POSITIONS.lydian, 3100, -700, "lydian_single_string", EXAM_BPM, LEGACY_MODE_BPM,
 );
 
 const locrianNodes = buildCluster(
   "locrian", "Locrian", "locrian", "mode", "locrian",
-  DIAT_POSITIONS, 100, 1300, "locrian_single_string", EXAM_BPM, LEGACY_LOCRIAN_BPM,
+  SCALE_TREE_POSITIONS.locrian, 100, 1300, "locrian_single_string", EXAM_BPM, LEGACY_LOCRIAN_BPM,
 );
 
 // ─── Reward node generator ────────────────────────────────────────────────────
@@ -352,13 +386,13 @@ function buildRewardNodesForCluster(
 // ─── Generate reward nodes for all clusters ───────────────────────────────────
 const minPentRewards = buildRewardNodesForCluster("min_pent", "pentatonic", MIN_PENT_POSITIONS, 0, 0);
 const majPentRewards = buildRewardNodesForCluster("maj_pent", "pentatonic", MAJ_PENT_POSITIONS, 1100, -100);
-const natMinorRewards = buildRewardNodesForCluster("nat_minor", "diatonic", DIAT_POSITIONS, -1100, -100);
-const majorRewards = buildRewardNodesForCluster("major", "diatonic", DIAT_POSITIONS, 2300, -300);
-const dorianRewards = buildRewardNodesForCluster("dorian", "mode", DIAT_POSITIONS, -2300, -300);
-const phrygianRewards = buildRewardNodesForCluster("phrygian", "mode", DIAT_POSITIONS, -1800, 600);
-const mixolydianRewards = buildRewardNodesForCluster("mixolydian", "mode", DIAT_POSITIONS, 2000, 500);
-const lydianRewards = buildRewardNodesForCluster("lydian", "mode", DIAT_POSITIONS, 3100, -700);
-const locrianRewards = buildRewardNodesForCluster("locrian", "mode", DIAT_POSITIONS, 100, 1300);
+const natMinorRewards = buildRewardNodesForCluster("nat_minor", "diatonic", SCALE_TREE_POSITIONS.minor, -1100, -100);
+const majorRewards = buildRewardNodesForCluster("major", "diatonic", SCALE_TREE_POSITIONS.major, 2300, -300);
+const dorianRewards = buildRewardNodesForCluster("dorian", "mode", SCALE_TREE_POSITIONS.dorian, -2300, -300);
+const phrygianRewards = buildRewardNodesForCluster("phrygian", "mode", SCALE_TREE_POSITIONS.phrygian, -1800, 600);
+const mixolydianRewards = buildRewardNodesForCluster("mixolydian", "mode", SCALE_TREE_POSITIONS.mixolydian, 2000, 500);
+const lydianRewards = buildRewardNodesForCluster("lydian", "mode", SCALE_TREE_POSITIONS.lydian, 3100, -700);
+const locrianRewards = buildRewardNodesForCluster("locrian", "mode", SCALE_TREE_POSITIONS.locrian, 100, 1300);
 
 // ─── Cluster label positions (for orientation overlay) ───────────────────────
 export type ClusterLabelDef = {
