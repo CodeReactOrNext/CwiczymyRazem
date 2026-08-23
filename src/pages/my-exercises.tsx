@@ -5,6 +5,7 @@ import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
 import { deleteCommunityExercise, getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
+import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/utils/tabEditorDraft";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -85,12 +86,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   const handleCreate = () => {
-    localStorage.removeItem("tab-editor-draft");
+    clearTabEditorDraft();
     router.push("/tab-editor");
   };
 
   const handleEdit = (ex: CommunityExercise) => {
-    localStorage.setItem("tab-editor-draft", JSON.stringify(ex.tablature ?? []));
+    saveTabEditorDraft(ex.id, ex.tablature ?? []);
     router.push(`/tab-editor?edit=${ex.id}`);
   };
 

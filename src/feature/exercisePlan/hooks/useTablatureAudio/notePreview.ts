@@ -1,6 +1,8 @@
 import Soundfont from "soundfont-player";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
+import { playSoundfontNote } from "./soundfontVoice";
+
 // Own AudioContext, lazily created and kept for the page's lifetime — previews
 // are one-shot UI sounds that must work outside a running playback session, so
 // they can't ride on the session's context (which only exists while a tab is
@@ -86,14 +88,6 @@ const PREVIEW_INSTRUMENT = "electric_guitar_clean";
 
 let _instrument: Soundfont.Player | null = null;
 let _instrumentLoad: Promise<Soundfont.Player | null> | null = null;
-
-/** soundfont-player routes a note to a given node at runtime; its types omit the
- *  option, so the call is made through this signature instead of `any`. */
-type PlayIntoDestination = (
-  name: string,
-  when: number,
-  options: { duration: number; gain: number; destination: AudioNode },
-) => void;
 
 function loadInstrument(ctx: AudioContext): Promise<Soundfont.Player | null> {
   if (!_instrumentLoad) {
@@ -274,7 +268,7 @@ export function playGuitarNotePreview(midi: number, duration = 1.6, volume = 0.9
   const bus = getPreviewBus(ctx);
 
   if (_instrument) {
-    (_instrument.play as unknown as PlayIntoDestination)(String(midi), ctx.currentTime + 0.02, {
+    playSoundfontNote(_instrument, String(midi), ctx.currentTime + 0.02, {
       duration,
       gain: volume,
       destination: bus.input,
@@ -342,7 +336,7 @@ export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => 
     event.midis.forEach((midi, index) => {
       const when = start + event.at + index * spread;
       if (_instrument) {
-        (_instrument.play as unknown as PlayIntoDestination)(String(midi), when, {
+        playSoundfontNote(_instrument, String(midi), when, {
           duration,
           gain,
           destination: gate,

@@ -51,10 +51,10 @@ export const EarTrainingView = ({
 
   const status = isRevealed
     ? isGuessed
-      ? { title: "Correct — point earned", caption: "The tab below shows the melody. Replay it to compare." }
+      ? { title: "Correct — point earned", caption: isMicEnabled ? "Next melody is on its way…" : "The tab below shows the melody. Replay it to compare." }
       : { title: "Answer revealed", caption: "Compare with the tab below — did you play it right?" }
     : isPlaying
-      ? { title: "Playing melody…", caption: isMicEnabled ? "Press stop when you're ready to answer" : "Listen closely, then echo it on your guitar" }
+      ? { title: "Playing melody…", caption: "It plays once and stops on its own — then it's your turn" }
       : !canGuess
         ? { title: "Listen & repeat", caption: "Play the melody, then find it on your guitar" }
         : listening
@@ -166,7 +166,7 @@ export const EarTrainingView = ({
             >
               {isPlaying
                 ? <><Square className="mr-1.5 h-3.5 w-3.5" /> Stop</>
-                : <><Play className="mr-1.5 h-3.5 w-3.5" /> Play</>}
+                : <><Play className="mr-1.5 h-3.5 w-3.5" /> {canGuess ? "Replay" : "Play"}</>}
             </Button>
             <Button
               size="sm"

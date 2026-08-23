@@ -61,6 +61,8 @@ interface SessionModalProps {
   earTrainingHighScore?: number | null;
   handleRevealRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
+  /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
+  onPlayRiddle?: () => void;
   riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
 }
@@ -84,7 +86,7 @@ const SessionModal = ({
   isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
   handleNextRiddle, handleRevealRiddle,
   earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
-  riddleProgress,
+  riddleProgress, onPlayRiddle,
   examMode,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
@@ -154,7 +156,7 @@ const SessionModal = ({
         handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
         earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
         onEarTrainingGuessed={onEarTrainingGuessed}
-        riddleProgress={riddleProgress}
+        riddleProgress={riddleProgress} onPlayRiddle={onPlayRiddle}
         examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
         volumeRef={volumeRef} onRecalibrate={onRecalibrate}
         gradientClasses={gradientClasses} tabResetKey={tabResetKey}
@@ -208,7 +210,7 @@ const SessionModal = ({
             handleNextRiddle={handleNextRiddle}
             onEarTrainingGuessed={onEarTrainingGuessed}
             riddleProgress={riddleProgress}
-            onPlayRiddle={handleToggleTimer}
+            onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
             isExamMode={examMode}
           />
 

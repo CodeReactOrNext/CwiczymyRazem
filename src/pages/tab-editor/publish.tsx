@@ -13,6 +13,10 @@ import type {
   TablatureMeasure,
 } from "feature/exercisePlan/types/exercise.types";
 import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
+import {
+  clearTabEditorDraft,
+  readTabEditorDraft,
+} from "feature/exercisePlan/utils/tabEditorDraft";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
@@ -118,6 +122,11 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const editId =
     typeof router.query.edit === "string" ? router.query.edit : null;
   const isEditing = !!editId;
+  // Every way back to the editor has to carry the exercise being edited —
+  // dropping it turned the round-trip into a brand new exercise, so "Save
+  // changes" came back as "Publish exercise" and the filled-in details were
+  // replaced by an empty form.
+  const editorHref = editId ? `/tab-editor?edit=${editId}` : "/tab-editor";
 
   const [tablature, setTablature] = useState<TablatureMeasure[]>([]);
   const [title, setTitle] = useState("");
@@ -137,13 +146,10 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const raw = localStorage.getItem("tab-editor-draft");
-    if (raw) {
-      try {
-        setTablature(JSON.parse(raw));
-      } catch {}
-    }
-  }, []);
+    if (!router.isReady) return;
+    const draft = readTabEditorDraft(editId);
+    if (draft) setTablature(draft);
+  }, [router.isReady, editId]);
 
   // In edit mode, load the existing exercise and prefill the form.
   useEffect(() => {
@@ -223,7 +229,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
     setIsSubmitting(false);
 
     if (ok) {
-      localStorage.removeItem("tab-editor-draft");
+      clearTabEditorDraft();
       setSubmitted(true);
     } else {
       setErrors({ submit: "Something went wrong. Please try again." });
@@ -336,9 +342,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   ? "View in Library"
                   : "View My Exercises"}
             </Button>
-            <Button
-              variant='secondary'
-              onClick={() => router.push("/tab-editor")}>
+            <Button variant='secondary' onClick={() => router.push(editorHref)}>
               Back to Editor
             </Button>
           </div>
@@ -357,7 +361,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
         <div className='space-y-4'>
           <BackLink
             label='Back to Editor'
-            onClick={() => router.push("/tab-editor")}
+            onClick={() => router.push(editorHref)}
           />
           <div>
             <h1 className='text-3xl font-black tracking-tight text-zinc-100'>
@@ -894,7 +898,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 </Button>
                 <Button
                   variant='secondary'
-                  onClick={() => router.push("/tab-editor")}
+                  onClick={() => router.push(editorHref)}
                   className='w-full'>
                   Cancel
                 </Button>

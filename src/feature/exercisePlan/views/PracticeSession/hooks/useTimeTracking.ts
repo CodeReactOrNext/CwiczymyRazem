@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import type { SkillsType } from 'types/skillsTypes';
 
+import { useSessionTimeStore } from './sessionTimeStore';
+
 export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) => {
   const dispatch = useAppDispatch();
   const lastTickRef = useRef<number | null>(null);
@@ -39,6 +41,10 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
             time: delta,
           })
         );
+        // The same tick, kept session-scoped — this is what gets reported, so
+        // time left over in Redux from an earlier, unreported session cannot
+        // leak into this session's category split.
+        useSessionTimeStore.getState().add(skillType, delta);
 
         lastTickRef.current = now;
       }
