@@ -347,6 +347,17 @@ interface PlugProps {
  * the pedal's own enclosure — which covers the shaft, leaving only the collar
  * and the moulded boot in the open.
  *
+ * Sized off the cable rather than off the board. What tells a big jack from a
+ * 3.5mm one is not its length but its girth: a real plug's handle is about twice
+ * the cable's diameter and its sleeve about half again, so anything drawn
+ * thinner than the cable it terminates reads as a mini jack no matter how long
+ * it is. The handle here is `1.5×` the jacket's width for exactly that reason.
+ *
+ * Length is the one place it cannot be honest. A real plug stands some 45mm out
+ * of the socket — four times the gap a tidy board leaves between pedals — so it
+ * is cut to a little over the gap instead, which lets two facing plugs sit
+ * nearly nose to nose on a tight board rather than swallowing their neighbours.
+ *
  * Only the pedals get one. The board's own sockets are drawn at something near
  * life size, and at that size all a plugged-in jack shows is a cable vanishing
  * into a hole, so `BoardJack` gets the cable run under it and nothing else.
@@ -357,36 +368,62 @@ interface PlugProps {
 const Plug = ({ at: point, flip, metal }: PlugProps) => (
   <g transform={`translate(${at(point)})${flip ? " scale(-1 1)" : ""}`}>
     {/* What it throws on the surface. */}
-    <ellipse cx={-1.3} cy={1.05} rx={2} ry={0.5} fill='#000' opacity={0.4} />
+    <ellipse
+      cx={-1.7}
+      cy={1.95}
+      rx={2.7}
+      ry={0.68}
+      fill='#000000'
+      opacity={0.42}
+    />
+
     {/* The moulded strain-relief boot, tapering onto the cable. */}
     <path
-      d='M -1.5 -0.88 L -2.55 -0.62 Q -2.98 -0.52 -2.98 0 Q -2.98 0.52 -2.55 0.62 L -1.5 0.88 Z'
-      fill='#141416'
+      d='M -2.7 -1.7 L -3.6 -1.15 Q -4 -0.95 -4 0 Q -4 0.95 -3.6 1.15 L -2.7 1.7 Z'
+      fill='#131316'
     />
+    <g stroke='#000000' strokeWidth={0.18} opacity={0.55}>
+      <line x1={-3.05} y1={-1.48} x2={-3.05} y2={1.48} />
+      <line x1={-3.45} y1={-1.26} x2={-3.45} y2={1.26} />
+    </g>
     <path
-      d='M -1.5 -0.88 L -2.55 -0.62 L -2.55 -0.32 L -1.5 -0.5 Z'
+      d='M -2.7 -1.7 L -3.6 -1.15 L -3.6 -0.72 L -2.7 -1.14 Z'
       fill='#ffffff'
       opacity={0.1}
     />
-    {/* Knurled collar, then the shaft that disappears into the socket. */}
-    <rect x={-1.58} y={-0.8} width={0.62} height={1.6} rx={0.24} fill={metal} />
+
+    {/* The sleeve, sunk into the socket, then the handle it screws onto. */}
+    <rect x={-2.05} y={-1.08} width={3.25} height={2.16} rx={1} fill={metal} />
     <rect
-      x={-1.1}
-      y={-0.44}
-      width={1.75}
-      height={0.88}
-      rx={0.44}
+      x={-0.95}
+      y={-1.08}
+      width={0.3}
+      height={2.16}
+      fill='#23262a'
+      opacity={0.8}
+    />
+    <rect
+      x={-1.95}
+      y={-0.86}
+      width={3}
+      height={0.34}
+      rx={0.17}
+      fill='#ffffff'
+      opacity={0.26}
+    />
+    <rect
+      x={-2.75}
+      y={-1.72}
+      width={0.95}
+      height={3.44}
+      rx={0.36}
       fill={metal}
     />
-    {/* The insulator ring that makes it a tip-sleeve plug and not a nail. */}
-    <rect
-      x={-0.55}
-      y={-0.44}
-      width={0.16}
-      height={0.88}
-      fill='#26292d'
-      opacity={0.7}
-    />
+    <g stroke='#15181b' strokeWidth={0.14} opacity={0.5}>
+      <line x1={-2.52} y1={-1.46} x2={-2.52} y2={1.46} />
+      <line x1={-2.28} y1={-1.46} x2={-2.28} y2={1.46} />
+      <line x1={-2.04} y1={-1.46} x2={-2.04} y2={1.46} />
+    </g>
   </g>
 );
 
@@ -475,11 +512,13 @@ export const SignalCable = ({
       aria-hidden>
       <defs>
         <linearGradient id={metalId} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#eef2f5' />
-          <stop offset='28%' stopColor='#a8b0b7' />
-          <stop offset='58%' stopColor='#5a6167' />
-          <stop offset='82%' stopColor='#3d4247' />
-          <stop offset='100%' stopColor='#878e94' />
+          {/* Nickel read as a cylinder: highlight up top, core shadow low, and
+              a little bounce off the board underneath it. */}
+          <stop offset='0%' stopColor='#c9d1d8' />
+          <stop offset='22%' stopColor='#8e969d' />
+          <stop offset='48%' stopColor='#454b51' />
+          <stop offset='72%' stopColor='#2a2e33' />
+          <stop offset='100%' stopColor='#767d84' />
         </linearGradient>
       </defs>
 
