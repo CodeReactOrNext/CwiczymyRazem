@@ -3,6 +3,12 @@ import { AlertTriangle, LayoutGrid, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  type ChainTier,
+  evaluateChain,
+  readChainNodes,
+  wiredOrder,
+} from "../../data/signalChain";
 import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
 import { getEffectImageSrc } from "../../utils/effectImage";
 import type { BoardLayout, LayoutBox } from "../../utils/pedalboardLayout";
@@ -13,12 +19,15 @@ import {
   EFFECT_IMAGE_ASPECT,
   findFreeSpot,
   layoutBoard,
+  packInOrder,
   PEDAL_H_PCT,
   tidyBoard,
 } from "../../utils/pedalboardLayout";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
+import { BoardJack, SignalCable } from "./SignalCable";
+import { SignalPathPanel } from "./SignalPathPanel";
 
 /** How long a "no room left" message stays up next to the board controls. */
 const NOTICE_MS = 8000;
@@ -260,6 +269,30 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
     debouncedSave(next);
   };
 
+  /**
+   * Lays the whole board out in the order the craft asks for.
+   *
+   * It is the only way to reorder the board on a touch device, where dragging is
+   * off — but it earns its place on the desktop too, because watching six pedals
+   * slide into place and the cable go green in one motion is the moment that
+   * teaches the rule. Pedals sharing a stage keep the order the player put them
+   * in; only the ones actually standing in the wrong place move.
+   */
+  const handleWireUp = () => {
+    const layout = packInOrder(
+      wiredOrder(localItems, data.effectInventory),
+      widthOf
+    );
+    applyLayout(layout, localItems);
+    setNotice(null);
+    if (layout.overflow.length > 0) {
+      announce(
+        `No room for ${layout.overflow.length} pedal${layout.overflow.length > 1 ? "s" : ""} — the rest is wired in order.`,
+        setNotice
+      );
+    }
+  };
+
   const handleTidy = () => {
     const layout = tidyBoard(localItems, widthOf);
     applyLayout(layout, localItems);
@@ -283,6 +316,36 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
   const boardItems = localItems.filter(i => !overflowIds.includes(i.itemId));
   const overflowItems = localItems.filter(i => overflowIds.includes(i.itemId));
 
+  // Scored off the *live* board rather than the saved one, so the panel and the
+  // cable move under the player's hand instead of 600ms after it. Parked pedals
+  // are included because the server counts them too — what the panel promises
+  // has to be what a session pays.
+  const verdict = useMemo(
+    () => evaluateChain(readChainNodes(localItems, data.effectInventory)),
+    [localItems, data.effectInventory]
+  );
+  const isOnBoard = useCallback(
+    (itemId: string) => !overflowIds.includes(itemId),
+    [overflowIds]
+  );
+
+  // The one moment the whole system exists for: say it out loud, once, on the
+  // transition — not every render the board happens to be right.
+  const lastTierRef = useRef<ChainTier | null>(null);
+  useEffect(() => {
+    // Mid-drag the board is in whatever state the mouse left it; wait for the
+    // pedal to land before congratulating anybody.
+    if (dragging) return;
+    const previous = lastTierRef.current;
+    lastTierRef.current = verdict.tier;
+    if (previous === null || previous === verdict.tier) return;
+    if (verdict.tier === "book" && verdict.rate > 0) {
+      toast.success(
+        `By the book — the board pays +${verdict.rate.toFixed(1)} Fame/h`
+      );
+    }
+  }, [dragging, verdict.tier, verdict.rate]);
+
   // Lets the picker grey out pedals the board has no space for, so a full
   // board is visible before anything is clicked.
   const occupancy = boardItems.map(i => ({
@@ -295,6 +358,14 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
 
   return (
     <>
+      {/* What the wiring below is worth, and how to fix it. */}
+      <div className="mb-5">
+        <SignalPathPanel
+          verdict={verdict}
+          onWireUp={boardItems.length > 1 ? handleWireUp : undefined}
+        />
+      </div>
+
       {/* Board controls live off the surface so they never sit under a pedal. */}
       <div className="mb-3 flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
         {notice && (
@@ -358,25 +429,21 @@ export const PedalboardView = ({ data, onUpdateItems, onHover, onShowCard }: Ped
             backgroundImage: "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
             backgroundSize: "9px 9px",
             backgroundColor: "#141414",
-            boxShadow: "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
+            // A board wired by the book washes emerald from the inside. It is the
+            // one piece of feedback that needs no reading at all.
+            boxShadow: verdict.flawless
+              ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
+              : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
+            transition: "box-shadow 0.4s ease",
             cursor: dragging ? "grabbing" : "default",
           }}
         >
-          {/* Amp jack — top left */}
-          <div className="absolute top-2 left-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-            <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
-            </div>
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Amp</span>
-          </div>
+          {/* The signal runs the way the board is read: in at the top left,
+              out at the bottom right. */}
+          <BoardJack kind="in" />
+          <BoardJack kind="out" />
 
-          {/* Instr jack — bottom right */}
-          <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-            <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, textTransform: "capitalize", color: "#78350f" }}>Instr</span>
-            <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
-            </div>
-          </div>
+          <SignalCable verdict={verdict} widthOf={widthOf} isOnBoard={isOnBoard} />
 
           {/* Pedals */}
           {boardItems.map((placement) => {

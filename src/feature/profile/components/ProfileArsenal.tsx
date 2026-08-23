@@ -2,10 +2,19 @@ import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
+import {
+  BoardJack,
+  SignalCable,
+} from "feature/arsenal/components/Rig/SignalCable";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import {
+  CHAIN_TIERS,
+  evaluateChain,
+  readChainNodes,
+} from "feature/arsenal/data/signalChain";
 import type {
   ArsenalUserData,
   InventoryItem,
@@ -26,6 +35,14 @@ import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { db } from "utils/firebase/client/firebase.utils";
+
+/** How a visitor's eye is told what they are looking at. Chip pattern, no border. */
+const CHAIN_TONES = {
+  good: "bg-emerald-500/10 text-emerald-400",
+  warn: "bg-amber-500/10 text-amber-400",
+  bad: "bg-red-500/10 text-red-400",
+  idle: "bg-zinc-800/60 text-zinc-400",
+} as const;
 
 interface TooltipData {
   x: number;
@@ -241,6 +258,14 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   const widthOf = createWidthResolver(effectInventory ?? []);
   const board = layoutBoard(rig?.pedalboardItems ?? [], widthOf);
 
+  // The same verdict the owner sees on their own board, so a visitor can tell a
+  // properly wired rig from a pile of pedals — and so can its owner, from the
+  // outside, which is half of why anybody bothers to tidy one.
+  const verdict = evaluateChain(
+    readChainNodes(board.placed, effectInventory ?? []),
+  );
+  const chainTier = CHAIN_TIERS[verdict.tier];
+
   const guitarItems: (InventoryItem | null)[] = ([null, null, null] as (string | null)[])
     .map((_, i) => rig?.guitarSlots?.[i] ?? null)
     .map((slotId) => (slotId ? (inventory?.find((item) => item.id === slotId) ?? null) : null));
@@ -282,7 +307,22 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
       {/* Pedalboard */}
       {hasPedals && (
         <div>
-          <p className="text-xs font-semibold tracking-wide text-zinc-400 mb-3">Pedalboard</p>
+          <div className="mb-3 flex flex-wrap items-center gap-3">
+            <p className="text-xs font-semibold tracking-wide text-zinc-400">Pedalboard</p>
+            {verdict.links.length > 0 && (
+              <span
+                title={chainTier.note}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold tracking-wide ${CHAIN_TONES[chainTier.tone]}`}
+              >
+                {chainTier.label}
+                {verdict.rate > 0 && (
+                  <span className="tabular-nums text-amber-400/90">
+                    +{verdict.rate.toFixed(1)}/h
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
           <div
             style={{
               background: "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
@@ -316,24 +356,15 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                 backgroundImage: "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
                 backgroundSize: "9px 9px",
                 backgroundColor: "#141414",
-                boxShadow: "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
+                boxShadow: verdict.flawless
+                  ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
+                  : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
               }}
             >
-              {/* Amp jack — top left */}
-              <div className="absolute top-2 left-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
-                </div>
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Amp</span>
-              </div>
+              <BoardJack kind="in" />
+              <BoardJack kind="out" />
 
-              {/* Instr jack — bottom right */}
-              <div className="absolute bottom-2 right-3 flex flex-col items-center gap-0.5 z-10 pointer-events-none">
-                <span style={{ fontSize: 6, letterSpacing: "0.2em", fontWeight: 900, color: "#78350f" }}>Instr</span>
-                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#111", border: "2px solid #92400e", boxShadow: "0 0 8px rgba(146,64,14,0.5)" }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#b45309", margin: "2.5px auto" }} />
-                </div>
-              </div>
+              <SignalCable verdict={verdict} widthOf={widthOf} />
 
               {/* Pedals */}
               {board.placed.map((placement) => (

@@ -87,21 +87,25 @@ export const getRigFameRate = (rigLevel: number): number => {
 };
 
 /**
- * Cumulative rig Fame owed for `minutes` practised in one day.
+ * Cumulative Fame owed by a flat Fame/h rate for `minutes` practised in one day.
  *
  * Monotone in `minutes`, so — exactly like `cumulativeDailyFame` — the difference
  * between two calls is never negative and splitting a day into many reports pays
- * the same as filing one.
+ * the same as filing one. Every gear payout that is quoted as a rate rides this,
+ * so they all inherit the same split-proofing: the rig's own rate, and the
+ * signal-path bonus the pedalboard's wiring is worth (`data/signalChain`).
  */
-export const cumulativeRigFame = (
-  minutes: number,
-  rigLevel: number,
-): number => {
-  const rate = getRigFameRate(rigLevel);
-  if (rate <= 0) return 0;
+export const cumulativeRateFame = (minutes: number, rate: number): number => {
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
 
   return Math.round((rate * Math.max(0, minutes)) / 60);
 };
+
+/** Cumulative rig Fame owed for `minutes` practised in one day. */
+export const cumulativeRigFame = (
+  minutes: number,
+  rigLevel: number,
+): number => cumulativeRateFame(minutes, getRigFameRate(rigLevel));
 
 /** The rate as the UI prints it — one decimal, so every level visibly moves it. */
 export const formatRigFameRate = (rigLevel: number): string =>
