@@ -1,6 +1,7 @@
 import { EFFECTS_BY_ID } from "../data/effectDefinitions";
 import type {
   EffectInventoryItem,
+  EffectJackLayout,
   PedalboardPlacement,
 } from "../types/arsenal.types";
 
@@ -98,11 +99,8 @@ const boxesOverlap = (a: LayoutBox, b: LayoutBox, gap: number) =>
  * of the pedals' own footprints — zero when the player drags a pedal snug
  * against its neighbour, wider when the board picks a spot on its own.
  */
-export const collidesWithAny = (
-  box: LayoutBox,
-  others: LayoutBox[],
-  gap = 0,
-) => others.some((other) => boxesOverlap(box, other, gap));
+export const collidesWithAny = (box: LayoutBox, others: LayoutBox[], gap = 0) =>
+  others.some((other) => boxesOverlap(box, other, gap));
 
 const isOnBoard = (box: LayoutBox) =>
   box.xPct >= -EPSILON &&
@@ -199,7 +197,11 @@ export const layoutBoard = (
   const loose: PedalboardPlacement[] = [];
 
   for (const item of items) {
-    const box = { xPct: item.xPct, yPct: item.yPct, wPct: widthOf(item.itemId) };
+    const box = {
+      xPct: item.xPct,
+      yPct: item.yPct,
+      wPct: widthOf(item.itemId),
+    };
     if (isOnBoard(box) && !collidesWithAny(box, kept)) {
       kept.push(box);
       placed.push(item);
@@ -278,13 +280,44 @@ export const createWidthResolver = (
     const invItem = effectInventory.find((e) => e.id === itemId);
     const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
     const aspect = effect
-      ? measured[effect.imageId] ??
+      ? (measured[effect.imageId] ??
         EFFECT_IMAGE_ASPECT[effect.imageId] ??
-        DEFAULT_ASPECT
+        DEFAULT_ASPECT)
       : DEFAULT_ASPECT;
 
     const width = widthPctForAspect(aspect);
     cache.set(itemId, width);
     return width;
+  };
+};
+
+/** The ordinary enclosure: in on the left face, out on the right, half way up. */
+export const SIDE_JACKS: EffectJackLayout = {
+  edge: "side",
+  in: { x: 0, y: 0.5 },
+  out: { x: 1, y: 0.5 },
+};
+
+/** Resolves a pedalboard placement to where its pedal's sockets are. */
+export type JackResolver = (itemId: string) => EffectJackLayout;
+
+/**
+ * Socket lookup for a board, the companion to `createWidthResolver`. A pedal
+ * whose definition says nothing about its jacks gets the side-mounted pair,
+ * which is what all but a handful of the enclosures actually have.
+ */
+export const createJackResolver = (
+  effectInventory: EffectInventoryItem[],
+): JackResolver => {
+  const cache = new Map<string, EffectJackLayout>();
+  return (itemId: string) => {
+    const cached = cache.get(itemId);
+    if (cached !== undefined) return cached;
+
+    const invItem = effectInventory.find((e) => e.id === itemId);
+    const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+    const jacks = effect?.jacks ?? SIDE_JACKS;
+    cache.set(itemId, jacks);
+    return jacks;
   };
 };

@@ -6,7 +6,12 @@ import type {
   ChainNode,
   ChainVerdict,
 } from "feature/arsenal/data/signalChain";
-import { PEDAL_H_PCT, ROW_Y_PCT } from "feature/arsenal/utils/pedalboardLayout";
+import type { EffectJackLayout } from "feature/arsenal/types/arsenal.types";
+import {
+  PEDAL_H_PCT,
+  ROW_Y_PCT,
+  SIDE_JACKS,
+} from "feature/arsenal/utils/pedalboardLayout";
 import { describe, expect, it } from "vitest";
 
 import { SignalCable } from "./SignalCable";
@@ -14,9 +19,10 @@ import { SignalCable } from "./SignalCable";
 /**
  * The cable is drawn, not computed, so what is worth pinning down is where it
  * ends up: the return run has to take the channel between the two rows instead
- * of cutting a diagonal across the board, and every jack has to get a plug
- * pointing the right way. Both are easy to lose in a refactor and neither shows
- * up in a type error.
+ * of cutting a diagonal, a top-mounted pedal has to be met over the board
+ * rather than through its side, and a pair standing nose to nose has to give up
+ * its plugs for a coupler. All three are easy to lose in a refactor and none of
+ * them shows up in a type error.
  */
 
 /** Board percent a test pedal takes — near enough a standard single. */
@@ -25,15 +31,25 @@ const W = 11;
 /** The jacket stroke is the one path per run, so counting it counts runs. */
 const JACKET = "#0b3b2e";
 
+/** …and the one the read-only profile board swaps in for it. */
+const PLAIN_JACKET = "#0c0c0e";
+
+const TOP_JACKS: EffectJackLayout = {
+  edge: "top",
+  in: { x: 0.3, y: 0.04 },
+  out: { x: 0.45, y: 0.04 },
+};
+
 const toViewY = (yPct: number) => (yPct / 100) * 70;
 
-const row = (yPct: number, count: number): ChainNode[] =>
+/** A row of pedals, `gap` board percent apart. */
+const row = (yPct: number, count: number, gap = 1.5): ChainNode[] =>
   Array.from({ length: count }, (_, i) => ({
     itemId: `${yPct}-${i}`,
     name: `pedal ${i}`,
     type: "overdrive" as ChainNode["type"],
     stage: i,
-    xPct: 3 + i * (W + 1.5),
+    xPct: 3 + i * (W + gap),
     yPct,
   }));
 
@@ -54,17 +70,31 @@ const verdictOf = (nodes: ChainNode[]): ChainVerdict => {
   };
 };
 
-const draw = (nodes: ChainNode[]) => {
+interface DrawOptions {
+  /** Item ids whose pedal takes its cable off the top edge. */
+  topJacked?: string[];
+  plain?: boolean;
+}
+
+const draw = (nodes: ChainNode[], options: DrawOptions = {}) => {
   const { container } = render(
-    <SignalCable verdict={verdictOf(nodes)} widthOf={() => W} />,
+    <SignalCable
+      verdict={verdictOf(nodes)}
+      widthOf={() => W}
+      jacksOf={(itemId) =>
+        options.topJacked?.includes(itemId) ? TOP_JACKS : SIDE_JACKS
+      }
+      plain={options.plain}
+    />,
   );
+  const strokeOf = options.plain ? PLAIN_JACKET : JACKET;
   const runs = Array.from(container.querySelectorAll("path"))
-    .filter((path) => path.getAttribute("stroke") === JACKET)
+    .filter((path) => path.getAttribute("stroke") === strokeOf)
     .map((path) => path.getAttribute("d") ?? "");
-  const plugs = Array.from(container.querySelectorAll("g[transform]")).map(
+  const parts = Array.from(container.querySelectorAll("g[transform]")).map(
     (group) => group.getAttribute("transform") ?? "",
   );
-  return { runs, plugs };
+  return { container, runs, parts };
 };
 
 /** Every point a path passes through, in view units. */
@@ -100,16 +130,50 @@ describe("SignalCable", () => {
     });
   });
 
+  it("takes a top-mounted pedal's cable over the board, not through its side", () => {
+    // A gap wide enough that a side-mounted pair would simply sag across it.
+    const nodes = row(ROW_Y_PCT[0], 2, 6);
+    const { runs } = draw(nodes, { topJacked: [nodes[1].itemId] });
+
+    const rowTop = toViewY(ROW_Y_PCT[0]);
+    const link = pointsOf(runs[1]);
+
+    // It has to climb clear of the enclosure it is heading into…
+    expect(Math.min(...link.map((point) => point.y))).toBeLessThan(rowTop);
+    // …and finish on the top edge rather than half way down a side.
+    expect(link[link.length - 1].y).toBeLessThan(rowTop + PEDAL_H_PCT * 0.2);
+  });
+
+  it("couples a pair standing nose to nose instead of jamming two plugs in", () => {
+    const roomy = row(ROW_Y_PCT[0], 2, 6);
+    const tight = row(ROW_Y_PCT[0], 2, 0.4);
+
+    // Two pedals, so four sockets: roomy gets a plug in each.
+    expect(draw(roomy).parts).toHaveLength(4);
+    // Tight gives the middle pair up for a single coupler: 2 plugs + 1 coupler.
+    expect(draw(tight).parts).toHaveLength(3);
+  });
+
   it("plugs both sides of every pedal, and nothing else", () => {
-    const nodes = [...row(ROW_Y_PCT[0], 3)];
-    const { plugs } = draw(nodes);
+    const nodes = row(ROW_Y_PCT[0], 3, 6);
+    const { parts } = draw(nodes);
 
     // The board's own sockets are drawn at life size by `BoardJack` and show
     // only the cable going in, so nothing is plugged into them here.
-    expect(plugs).toHaveLength(nodes.length * 2);
+    expect(parts).toHaveLength(nodes.length * 2);
     // A pedal's input faces into the enclosure; its output faces back out.
-    expect(plugs[0]).not.toContain("scale(-1 1)");
-    expect(plugs[1]).toContain("scale(-1 1)");
+    expect(parts[0]).not.toContain("scale(-1 1)");
+    expect(parts[1]).toContain("scale(-1 1)");
+  });
+
+  it("drops the verdict colours on a read-only board", () => {
+    const nodes = row(ROW_Y_PCT[0], 3, 6);
+    const { container, runs } = draw(nodes, { plain: true });
+
+    expect(runs).toHaveLength(4);
+    expect(container.innerHTML).not.toContain(JACKET);
+    // No travelling pulse either — there is nothing to reward a visitor for.
+    expect(container.innerHTML).not.toContain("stroke-dasharray");
   });
 
   it("still reaches both jacks with a single pedal on the board", () => {

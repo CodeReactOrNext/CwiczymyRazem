@@ -16,6 +16,22 @@ export type EffectType =
   | "Vibrato"
   | "Tuner";
 
+/**
+ * Where a pedal's signal sockets are, so the pedalboard's cable can be drawn
+ * plugging into the artwork rather than through it.
+ *
+ * Positions are fractions of the pedal's own box, `0,0` being its top-left
+ * corner, which keeps them true at any board size. `side` is the ordinary
+ * enclosure — in on the left face, out on the right — and needs no coordinates.
+ * `top` covers the pedals whose sockets are silkscreened along the top edge,
+ * where the cable has to come up and over instead of straight across.
+ */
+export interface EffectJackLayout {
+  edge: "side" | "top";
+  in: { x: number; y: number };
+  out: { x: number; y: number };
+}
+
 export interface EffectDefinition {
   id: number | string;
   name: string;
@@ -23,6 +39,8 @@ export interface EffectDefinition {
   type: EffectType;
   imageId: number | string;
   rarity: GuitarRarity;
+  /** Where its sockets sit. Absent means the ordinary side-mounted pair. */
+  jacks?: EffectJackLayout;
   /** Optional production-era range for the vintage roll; falls back to global defaults. */
   yearFrom?: number;
   yearTo?: number;
@@ -152,8 +170,17 @@ type ProductionCountry =
   | "Sweden";
 
 const PRODUCTION_COUNTRIES: ProductionCountry[] = [
-  "USA", "Japan", "Korea", "China", "Mexico",
-  "Indonesia", "Czech Republic", "Germany", "UK", "Canada", "Sweden",
+  "USA",
+  "Japan",
+  "Korea",
+  "China",
+  "Mexico",
+  "Indonesia",
+  "Czech Republic",
+  "Germany",
+  "UK",
+  "Canada",
+  "Sweden",
 ];
 
 export interface GuitarDefinition {
@@ -246,9 +273,9 @@ export interface InventoryItem {
 }
 
 export interface PedalboardPlacement {
-  itemId: string;   // EffectInventoryItem.id
-  xPct: number;     // 0–100 from left edge of board
-  yPct: number;     // 0–100 from top edge of board
+  itemId: string; // EffectInventoryItem.id
+  xPct: number; // 0–100 from left edge of board
+  yPct: number; // 0–100 from top edge of board
 }
 
 export interface RigSetup {
