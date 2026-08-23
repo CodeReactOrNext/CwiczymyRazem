@@ -68,6 +68,12 @@ export function getNotePositionsInRange(
   return positions.sort((a, b) => a.midiNote - b.midiNote);
 }
 
+/** Membership test by pitch class, so every octave of a scale note counts. */
+function scaleNoteTest(rootMidi: number, scaleIntervals: number[]): (midi: number) => boolean {
+  const pitchClasses = new Set(scaleIntervals.map((interval) => (rootMidi + interval) % 12));
+  return (midi: number) => pitchClasses.has(((midi % 12) + 12) % 12);
+}
+
 /**
  * Frets on the low E string where this scale's shapes begin — one per scale
  * degree, so seven for a diatonic scale or mode and five for a pentatonic.
@@ -82,12 +88,6 @@ export function getShapeStartFrets(rootMidi: number, scaleIntervals: number[]): 
     if (inScale(lowE + fret)) frets.push(fret);
   }
   return frets;
-}
-
-/** Membership test by pitch class, so every octave of a scale note counts. */
-function scaleNoteTest(rootMidi: number, scaleIntervals: number[]): (midi: number) => boolean {
-  const pitchClasses = new Set(scaleIntervals.map((interval) => (rootMidi + interval) % 12));
-  return (midi: number) => pitchClasses.has(((midi % 12) + 12) % 12);
 }
 
 /**

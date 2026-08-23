@@ -105,12 +105,12 @@ export function ScaleSelectionDialog({
     }
 
     const pos = config.position as number;
-    const positions = getScaleShape(rootMidi, intervals, pos, notesPerString);
+    const shape = getScaleShape(rootMidi, intervals, pos, notesPerString);
     // The diagram follows the shape rather than a nominal window, so a
     // three-notes-per-string shape isn't cropped at its top fret.
-    const frets = positions.map((position) => position.fret);
+    const frets = shape.map((note) => note.fret);
     return {
-      positions,
+      positions: shape,
       startFret: Math.max(0, Math.min(...frets) - 1),
       endFret: Math.max(...frets) + 1,
       rootMidi,
