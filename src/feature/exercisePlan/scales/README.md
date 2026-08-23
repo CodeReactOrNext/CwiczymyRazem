@@ -51,7 +51,12 @@ const exercise = generateScaleExercise({
 - `sequence_3_notes` - Sekwencja 1-2-3, 2-3-4, 3-4-5...
 - `sequence_4_notes` - Sekwencja 1-2-3-4, 2-3-4-5...
 
-**Positions:** 1-12 (pozycja na gryfie, gdzie 1 = próg 0-4, 2 = próg 1-5, etc.)
+**Positions:** 1-12 — próg, od którego zaczyna się kształt. Kształt jest kotwiczony
+na nucie skali: generator wchodzi na pierwszy dźwięk skali na grubym E o podanym
+progu lub wyżej, a potem bierze po 2 nuty na strunę (boksy pentatoniczne) albo po 3
+(skale 7-nutowe, system 3NPS). Realny rozstaw progów wynika z kształtu, nie z
+sztywnego okna — `getShapeStartFrets()` zwraca progi, na których kształty danej
+skali faktycznie się zaczynają.
 
 ## Integracja z UI
 
@@ -177,7 +182,10 @@ const exercise = generateScaleExercise({
 ## Uwagi techniczne
 
 - Tablatura generowana jest dynamicznie na podstawie pozycji i wzoru
-- System automatycznie dzieli nuty na takty (4/4)
+- System automatycznie dzieli nuty na takty (4/4) i **dopełnia ostatni takt pauzami**
+  — bieg skali rzadko dzieli się równo na takty, a takt o ułamkowej długości
+  rozjeżdża sesyjny klik (metronom to swobodny zegar na stałym BPM, a ćwiczenie
+  chodzi w pętli, więc przesunięcie kumuluje się z każdym powtórzeniem)
 - Tempo dostosowuje się do trudności wzoru
 - Każde ćwiczenie ma unikalne ID bazowane na konfiguracji
 - Pozycje są mapowane do rzeczywistych progów na gryfie
