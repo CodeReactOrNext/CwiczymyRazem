@@ -775,19 +775,24 @@ export const SignalCable = ({
         </linearGradient>
       </defs>
 
-      {/* Every shadow first, so one run's cast never darkens the next one's core. */}
-      <g fill='none' strokeLinecap='round' strokeLinejoin='round'>
-        {runs.map((run, index) => (
-          <path
-            key={index}
-            d={run.d}
-            stroke='#000000'
-            strokeWidth={3.4}
-            opacity={0.5}
-            transform='translate(0 0.75)'
-          />
-        ))}
-      </g>
+      {/* Every shadow first, so one run's cast never darkens the next one's
+          core. A black loom skips them altogether: the cast under a dark cable
+          only thickens it into a smear, where under a lit one it was what
+          lifted the cable off the deck. */}
+      {!plain && (
+        <g fill='none' strokeLinecap='round' strokeLinejoin='round'>
+          {runs.map((run, index) => (
+            <path
+              key={index}
+              d={run.d}
+              stroke='#000000'
+              strokeWidth={3.4}
+              opacity={0.5}
+              transform='translate(0 0.75)'
+            />
+          ))}
+        </g>
+      )}
 
       {runs.map((run, index) => {
         const tone = toneFor(run.ok);

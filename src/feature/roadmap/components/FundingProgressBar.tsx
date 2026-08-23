@@ -1,5 +1,12 @@
 import { cn } from "assets/lib/utils";
-import { Check, ChevronLeft, ChevronRight, Lock, Sparkles } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Hammer,
+  Lock,
+  Sparkles,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ROADMAP_TIERS } from "../data/roadmap.data";
@@ -178,6 +185,7 @@ export const FundingProgressBar = ({
               {ROADMAP_TIERS.map((tier, i) => {
                 const reached = totalRaised >= tier.goal;
                 const done = tier.done === true;
+                const inProgress = tier.inProgress === true;
                 const isNext = nextIndex === i;
                 const isFeature = tier.kind === "feature";
                 const TierIcon = tier.icon;
@@ -191,19 +199,23 @@ export const FundingProgressBar = ({
                         isFeature ? "h-9 w-9" : "h-8 w-8",
                         done
                           ? "bg-emerald-500 text-zinc-950"
-                          : reached
-                            ? "bg-cyan-500 text-zinc-950"
-                            : isNext
-                              ? "bg-zinc-900 ring-cyan-500/50"
-                              : isFeature
-                                ? "bg-amber-500/20 ring-amber-500/50"
-                                : "bg-zinc-700",
+                          : inProgress
+                            ? "bg-orange-500 text-zinc-950"
+                            : reached
+                              ? "bg-cyan-500 text-zinc-950"
+                              : isNext
+                                ? "bg-zinc-900 ring-cyan-500/50"
+                                : isFeature
+                                  ? "bg-amber-500/20 ring-amber-500/50"
+                                  : "bg-zinc-700",
                       )}
                       style={{
                         left,
                         top: TRACK_TOP + TRACK_H / 2 - (isFeature ? 18 : 16),
                       }}>
-                      {reached ? (
+                      {inProgress ? (
+                        <Hammer size={15} strokeWidth={2.5} />
+                      ) : reached ? (
                         <Check size={16} strokeWidth={3} />
                       ) : isNext ? null : isFeature ? (
                         <Sparkles size={15} className='text-amber-400' />
@@ -220,8 +232,13 @@ export const FundingProgressBar = ({
                           ? "bg-zinc-800 ring-1 ring-amber-500/30"
                           : "bg-zinc-800/60",
                         done && "ring-1 ring-emerald-500/50",
-                        isNext && "ring-1 ring-cyan-500/50",
-                        !reached && !isNext && !isFeature && "opacity-70",
+                        inProgress && "ring-1 ring-orange-500/50",
+                        isNext && !inProgress && "ring-1 ring-cyan-500/50",
+                        !reached &&
+                          !isNext &&
+                          !isFeature &&
+                          !inProgress &&
+                          "opacity-70",
                       )}
                       style={{ left, top: BOX_TOP, width: boxWidth }}>
                       {/* caret pointing up to the dot */}
@@ -256,19 +273,23 @@ export const FundingProgressBar = ({
                             "text-[11px] font-medium",
                             done
                               ? "text-emerald-400"
-                              : reached
-                                ? "text-zinc-500"
-                                : isNext
-                                  ? "text-cyan-400"
-                                  : "text-zinc-600",
+                              : inProgress
+                                ? "text-orange-400"
+                                : reached
+                                  ? "text-zinc-500"
+                                  : isNext
+                                    ? "text-cyan-400"
+                                    : "text-zinc-600",
                           )}>
                           {done
                             ? "Done"
-                            : reached
-                              ? "Funded"
-                              : isNext
-                                ? `+$${tier.goal - totalRaised}`
-                                : "Locked"}
+                            : inProgress
+                              ? "In progress"
+                              : reached
+                                ? "Funded"
+                                : isNext
+                                  ? `+${tier.goal - totalRaised}`
+                                  : "Locked"}
                         </span>
                       </div>
 

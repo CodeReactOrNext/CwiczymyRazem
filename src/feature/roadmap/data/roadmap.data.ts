@@ -37,6 +37,8 @@ export interface RoadmapTier {
   description?: string;
   /** Marks a tier whose work is actually delivered — shown green as "Done". */
   done?: boolean;
+  /** Marks a tier that's being built right now — shown as "In progress". */
+  inProgress?: boolean;
 }
 
 /**
@@ -89,7 +91,14 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     kind: "content",
     done: true,
   },
-  { id: "t41", goal: 41, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
+  {
+    id: "t41",
+    goal: 41,
+    icon: Guitar,
+    label: "+5 New Guitars & Pedals",
+    kind: "content",
+    done: true,
+  },
   {
     id: "t51",
     goal: 51,
@@ -106,6 +115,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: AudioLines,
     label: "Sync Backing Track to Tablature",
     kind: "feature",
+    inProgress: true,
     description:
       "Backing tracks for songs synced to the tab, so you can play along in time without hunting for the beat.",
   },
@@ -116,6 +126,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Plug,
     label: "Pedalboard Synergy",
     kind: "feature",
+    done: true,
     description: "Effects interact with each other, so pick and order your pedals carefully.",
   },
   {

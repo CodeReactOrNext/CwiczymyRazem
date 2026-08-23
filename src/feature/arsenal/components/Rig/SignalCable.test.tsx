@@ -176,6 +176,19 @@ describe("SignalCable", () => {
     expect(container.innerHTML).not.toContain("stroke-dasharray");
   });
 
+  it("casts no cable shadow on a read-only board", () => {
+    const nodes = row(ROW_Y_PCT[0], 3, 6);
+    const cast = (options: DrawOptions) =>
+      Array.from(
+        draw(nodes, options).container.querySelectorAll("path"),
+      ).filter(
+        (path) => path.getAttribute("transform") === "translate(0 0.75)",
+      );
+
+    expect(cast({}).length).toBeGreaterThan(0);
+    expect(cast({ plain: true })).toHaveLength(0);
+  });
+
   it("still reaches both jacks with a single pedal on the board", () => {
     const { runs } = draw(row(ROW_Y_PCT[0], 1));
 
