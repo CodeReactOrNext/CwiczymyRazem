@@ -92,6 +92,8 @@ The signal comes in at the top left of the board and leaves for the amp at the b
 
 <StepList steps="Green cable::That run goes into the pedal that belongs next|Red cable::That run doubles back on itself — the pedal it feeds should be standing earlier in the chain|The whole cable pulsing::Nothing is out of order, and the board is glowing for it" />
 
+**To change the order, carry one pedal onto another.** The moment it covers the pedal underneath, the two swap places: the one you're holding takes that spot, and the one that was there slides into the place you took it from. Carry it across a whole row and it trades with each pedal it crosses, so you can walk a reverb from the front of the chain to the end in one go. Nothing has to be shuffled out of the way first, and a pedal you drop somewhere it doesn't fit goes back where it came from.
+
 **Order inside a stage is yours.** Two overdrives can go either way round, and a chorus, a phaser and a vibrato can be in any order among themselves. Where the choice is taste rather than craft, the game has no opinion and never marks a cable wrong for it.
 
 **Don't fancy arranging it by hand?** **Wire it up**, next to the board, lays the whole thing out in the right order in one go and keeps your own arrangement wherever the order doesn't matter. It's also how you rearrange a board on a phone, where pedals can't be dragged.

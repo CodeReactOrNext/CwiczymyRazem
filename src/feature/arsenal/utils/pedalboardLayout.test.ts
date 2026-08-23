@@ -1,14 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import type { PedalboardPlacement } from "../types/arsenal.types";
+import type {
+  EffectInventoryItem,
+  PedalboardPlacement,
+} from "../types/arsenal.types";
 import {
   collidesWithAny,
+  createJackResolver,
+  EFFECT_JACK_Y,
   findFreeSpot,
+  findSwapTarget,
   inChainOrder,
   layoutBoard,
   packInOrder,
   PEDAL_H_PCT,
+  planSwap,
   ROW_Y_PCT,
+  SIDE_JACKS,
   tidyBoard,
   type WidthResolver,
 } from "./pedalboardLayout";
@@ -17,17 +25,25 @@ import {
 const W = 15;
 
 const widthOf: WidthResolver = () => W;
-const wideAt = (wide: string[], wideW = 28): WidthResolver => (itemId) =>
-  wide.includes(itemId) ? wideW : W;
+const wideAt =
+  (wide: string[], wideW = 28): WidthResolver =>
+  (itemId) =>
+    wide.includes(itemId) ? wideW : W;
 
-const at = (itemId: string, xPct: number, yPct: number): PedalboardPlacement => ({
+const at = (
+  itemId: string,
+  xPct: number,
+  yPct: number,
+): PedalboardPlacement => ({
   itemId,
   xPct,
   yPct,
 });
 
-const boxesOf = (items: PedalboardPlacement[], resolve: WidthResolver = widthOf) =>
-  items.map((item) => ({ ...item, wPct: resolve(item.itemId) }));
+const boxesOf = (
+  items: PedalboardPlacement[],
+  resolve: WidthResolver = widthOf,
+) => items.map((item) => ({ ...item, wPct: resolve(item.itemId) }));
 
 const hasOverlap = (
   items: PedalboardPlacement[],
@@ -59,7 +75,11 @@ describe("findFreeSpot", () => {
 
   it("returns null when both rows are taken", () => {
     const full = ROW_Y_PCT.flatMap((yPct) =>
-      Array.from({ length: 6 }, (_, i) => ({ xPct: 3 + i * 16, yPct, wPct: W })),
+      Array.from({ length: 6 }, (_, i) => ({
+        xPct: 3 + i * 16,
+        yPct,
+        wPct: W,
+      })),
     );
     expect(findFreeSpot(full, W)).toBeNull();
   });
@@ -159,7 +179,10 @@ describe("inChainOrder", () => {
 describe("packInOrder", () => {
   it("keeps the order it was handed rather than re-reading the board", () => {
     // Deliberately against reading order: this is what "Wire It Up" relies on.
-    const items = [at("second", 3, ROW_Y_PCT[0]), at("first", 70, ROW_Y_PCT[1])];
+    const items = [
+      at("second", 3, ROW_Y_PCT[0]),
+      at("first", 70, ROW_Y_PCT[1]),
+    ];
     const layout = packInOrder(items, widthOf);
 
     expect(layout.placed.map((i) => i.itemId)).toEqual(["second", "first"]);
@@ -173,10 +196,7 @@ describe("packInOrder", () => {
   });
 
   it("reports no change when everything was already where it belongs", () => {
-    const packed = packInOrder(
-      [at("a", 0, 0), at("b", 0, 0)],
-      widthOf,
-    ).placed;
+    const packed = packInOrder([at("a", 0, 0), at("b", 0, 0)], widthOf).placed;
 
     expect(packInOrder(packed, widthOf).changed).toBe(false);
   });
@@ -209,5 +229,124 @@ describe("tidyBoard", () => {
     expect(layout.placed.length + layout.overflow.length).toBe(items.length);
     expect(layout.overflow.length).toBeGreaterThan(0);
     expect(hasOverlap(layout.placed)).toBe(false);
+  });
+});
+
+describe("findSwapTarget", () => {
+  const boxes = boxesOf([at("a", 3, ROW_Y_PCT[0]), at("b", 40, ROW_Y_PCT[1])]);
+
+  it("names the pedal the dragged one's centre has crossed into", () => {
+    const dragged = { xPct: 36, yPct: ROW_Y_PCT[1], wPct: W };
+    expect(findSwapTarget(dragged, boxes)?.itemId).toBe("b");
+  });
+
+  it("stays quiet while the two only touch", () => {
+    // Overlapping "b" by a sliver: carrying a pedal past its neighbour is not
+    // yet asking to take its place.
+    const dragged = { xPct: 26, yPct: ROW_Y_PCT[1], wPct: W };
+    expect(findSwapTarget(dragged, boxes)).toBeNull();
+  });
+
+  it("stays quiet over clear board", () => {
+    const dragged = { xPct: 70, yPct: ROW_Y_PCT[0], wPct: W };
+    expect(findSwapTarget(dragged, boxes)).toBeNull();
+  });
+});
+
+describe("planSwap", () => {
+  it("exchanges two pedals of the same size outright", () => {
+    const home = { xPct: 3, yPct: ROW_Y_PCT[0], wPct: W };
+    const target = { itemId: "b", xPct: 40, yPct: ROW_Y_PCT[1], wPct: W };
+    const plan = planSwap(home, target, []);
+
+    expect(plan?.target).toEqual({ xPct: 3, yPct: ROW_Y_PCT[0] });
+    expect(plan?.home).toEqual({ xPct: 40, yPct: ROW_Y_PCT[1] });
+  });
+
+  it("shifts a wide pedal inside the slot it is handed so it clears the neighbours", () => {
+    const resolve = wideAt(["wide"]);
+    const others = boxesOf([at("right", 55, ROW_Y_PCT[0])], resolve);
+    const home = { xPct: 35, yPct: ROW_Y_PCT[0], wPct: W };
+    const target = { itemId: "wide", xPct: 3, yPct: ROW_Y_PCT[0], wPct: 28 };
+    const plan = planSwap(home, target, others);
+
+    expect(plan).not.toBeNull();
+    const swapped = [
+      { ...plan!.target, wPct: 28 },
+      { ...plan!.home, wPct: W },
+      ...others,
+    ];
+    expect(
+      swapped.some((box, i) => collidesWithAny(box, swapped.slice(i + 1))),
+    ).toBe(false);
+  });
+
+  it("refuses the trade when the wide pedal cannot fit the slot at all", () => {
+    const others = boxesOf([
+      at("left", 18, ROW_Y_PCT[0]),
+      at("right", 52, ROW_Y_PCT[0]),
+    ]);
+    const home = { xPct: 35, yPct: ROW_Y_PCT[0], wPct: W };
+    const target = { itemId: "wide", xPct: 3, yPct: ROW_Y_PCT[1], wPct: 28 };
+
+    expect(planSwap(home, target, others)).toBeNull();
+  });
+
+  it("keeps the board free of overlaps when a narrow pedal takes a wide one's place", () => {
+    const resolve = wideAt(["wide"]);
+    const others = boxesOf([at("tail", 60, ROW_Y_PCT[0])], resolve);
+    const home = { xPct: 3, yPct: ROW_Y_PCT[0], wPct: 28 };
+    const target = { itemId: "narrow", xPct: 40, yPct: ROW_Y_PCT[0], wPct: W };
+    const plan = planSwap(home, target, others);
+
+    expect(plan).not.toBeNull();
+    const swapped = [
+      { ...plan!.target, wPct: W },
+      { ...plan!.home, wPct: 28 },
+      ...others,
+    ];
+    expect(
+      swapped.some((box, i) => collidesWithAny(box, swapped.slice(i + 1))),
+    ).toBe(false);
+  });
+});
+
+describe("createJackResolver", () => {
+  const owned = (id: string, effectId: number): EffectInventoryItem => ({
+    id,
+    effectId,
+    acquiredAt: 0,
+    isNew: false,
+  });
+
+  it("puts a side socket at the height its own artwork wears it", () => {
+    // Effect 17 is the compact OD-5, whose sockets sit well above centre.
+    const resolve = createJackResolver([owned("compact", 17)]);
+    const jacks = resolve("compact");
+
+    expect(jacks.edge).toBe("side");
+    expect(jacks.in.y).toBe(EFFECT_JACK_Y[18]);
+    expect(jacks.in.y).toEqual(jacks.out.y);
+    expect(jacks.in.y).toBeLessThan(0.5);
+  });
+
+  it("reads the two faces at the same height, one per side", () => {
+    const resolve = createJackResolver([owned("echo", 1)]);
+    const jacks = resolve("echo");
+
+    expect(jacks.in.x).toBe(0);
+    expect(jacks.out.x).toBe(1);
+    expect(jacks.in.y).toBe(EFFECT_JACK_Y[1]);
+  });
+
+  it("leaves a top-mounted pedal to the layout on its own definition", () => {
+    // Effect 13 takes its cable over the top, not in through a side.
+    const resolve = createJackResolver([owned("lab", 13)]);
+    expect(resolve("lab").edge).toBe("top");
+  });
+
+  it("falls back to mid-height for a pedal it knows nothing about", () => {
+    const resolve = createJackResolver([]);
+    expect(resolve("nobody")).toEqual(SIDE_JACKS);
   });
 });

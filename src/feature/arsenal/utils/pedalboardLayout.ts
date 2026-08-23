@@ -131,6 +131,93 @@ export const findFreeSpot = (
   return null;
 };
 
+/** A box that knows whose it is — what trading two pedals over has to name. */
+export interface BoardBox extends LayoutBox {
+  itemId: string;
+}
+
+/** Alignments a pedal is tried at inside a slot: flush left, centred, flush right. */
+const SLOT_ALIGNMENTS = [0, 0.5, 1];
+
+/**
+ * Where a `wPct`-wide pedal stands in a slot another pedal is vacating. The
+ * two are rarely the same width, so the slot is a region rather than a
+ * position: the pedal is tried flush left, centred and flush right, and takes
+ * the first of those that clears the rest of the board. `null` when a wider
+ * pedal simply cannot be squeezed into a narrower neighbour's place.
+ */
+const fitInSlot = (
+  slot: LayoutBox,
+  wPct: number,
+  others: LayoutBox[],
+): { xPct: number; yPct: number } | null => {
+  for (const align of SLOT_ALIGNMENTS) {
+    const xPct = Math.max(
+      0,
+      Math.min(100 - wPct, slot.xPct + (slot.wPct - wPct) * align),
+    );
+    if (!collidesWithAny({ xPct, yPct: slot.yPct, wPct }, others)) {
+      return { xPct, yPct: slot.yPct };
+    }
+  }
+  return null;
+};
+
+/**
+ * The pedal a dragged one is standing on: the one its centre has crossed into.
+ *
+ * Centre-crossing rather than first touch is what makes carrying a pedal over
+ * its neighbour feel deliberate — the two only trade places once the dragged
+ * pedal has really covered the other one.
+ */
+export const findSwapTarget = (
+  dragged: LayoutBox,
+  others: BoardBox[],
+): BoardBox | null => {
+  const xPct = dragged.xPct + dragged.wPct / 2;
+  const yPct = dragged.yPct + PEDAL_H_PCT / 2;
+  return (
+    others.find(
+      (box) =>
+        xPct >= box.xPct &&
+        xPct <= box.xPct + box.wPct &&
+        yPct >= box.yPct &&
+        yPct <= box.yPct + PEDAL_H_PCT,
+    ) ?? null
+  );
+};
+
+export interface SwapPlan {
+  /** Where the pedal being traded with moves to. */
+  target: { xPct: number; yPct: number };
+  /** The slot the dragged pedal now owns, and drops into when it is let go. */
+  home: { xPct: number; yPct: number };
+}
+
+/**
+ * Trades the slot a dragged pedal owns for the one it is standing on, which is
+ * how the board is reordered: the signal runs in reading order, so exchanging
+ * two pedals' places exchanges their places in the chain.
+ *
+ * Both halves have to land somewhere legal or nothing moves — `null` means the
+ * pair cannot trade (a wide pedal and the narrow gap it was dragged onto), and
+ * the drag carries on as an ordinary move.
+ */
+export const planSwap = (
+  home: LayoutBox,
+  target: BoardBox,
+  others: LayoutBox[],
+): SwapPlan | null => {
+  const targetSpot = fitInSlot(home, target.wPct, others);
+  if (!targetSpot) return null;
+
+  const homeSpot = fitInSlot(target, home.wPct, [
+    ...others,
+    { ...targetSpot, wPct: target.wPct },
+  ]);
+  return homeSpot ? { target: targetSpot, home: homeSpot } : null;
+};
+
 /** Which row a stored `yPct` belongs to — used to read the board in order. */
 export const rowIndexOf = (yPct: number) => {
   let closest = 0;
@@ -291,11 +378,59 @@ export const createWidthResolver = (
   };
 };
 
+/** Where a socket sits down an enclosure's side when nothing better is known. */
+const DEFAULT_JACK_Y = 0.5;
+
+/**
+ * How far down each enclosure's sides its signal sockets are, as a fraction of
+ * the pedal's height.
+ *
+ * Measured off the artwork rather than eyeballed: a quarter-inch socket is the
+ * widest thing on nearly every one of these enclosures, so the rows where an
+ * image's silhouette reaches furthest out are the rows its sockets are drawn
+ * on — the same trick a trim tool uses, run one row at a time. Half way up,
+ * which is what the board assumed before, is right for almost none of them: the
+ * compact enclosures carry theirs around `0.43`, a good plug's width above
+ * where a cable used to meet them.
+ *
+ * Only side-mounted pedals are listed. Top-mounted ones carry their own `jacks`
+ * on the definition, and an image missing from here falls back to half way up.
+ */
+export const EFFECT_JACK_Y: Record<number | string, number> = {
+  1: 0.532,
+  2: 0.534,
+  3: 0.506,
+  4: 0.506,
+  5: 0.495,
+  6: 0.53,
+  7: 0.474,
+  8: 0.486,
+  9: 0.475,
+  16: 0.472,
+  17: 0.472,
+  18: 0.432,
+  19: 0.443,
+  20: 0.444,
+  21: 0.442,
+  22: 0.507,
+  23: 0.507,
+  24: 0.507,
+  27: 0.486,
+};
+
 /** The ordinary enclosure: in on the left face, out on the right, half way up. */
 export const SIDE_JACKS: EffectJackLayout = {
   edge: "side",
-  in: { x: 0, y: 0.5 },
-  out: { x: 1, y: 0.5 },
+  in: { x: 0, y: DEFAULT_JACK_Y },
+  out: { x: 1, y: DEFAULT_JACK_Y },
+};
+
+/** The side-mounted pair at the height this particular enclosure wears them. */
+const sideJacksFor = (imageId?: number | string): EffectJackLayout => {
+  const y = (imageId !== undefined && EFFECT_JACK_Y[imageId]) || DEFAULT_JACK_Y;
+  return y === DEFAULT_JACK_Y
+    ? SIDE_JACKS
+    : { edge: "side", in: { x: 0, y }, out: { x: 1, y } };
 };
 
 /** Resolves a pedalboard placement to where its pedal's sockets are. */
@@ -304,7 +439,8 @@ export type JackResolver = (itemId: string) => EffectJackLayout;
 /**
  * Socket lookup for a board, the companion to `createWidthResolver`. A pedal
  * whose definition says nothing about its jacks gets the side-mounted pair,
- * which is what all but a handful of the enclosures actually have.
+ * which is what all but a handful of the enclosures actually have — at the
+ * height `EFFECT_JACK_Y` measured off its own artwork.
  */
 export const createJackResolver = (
   effectInventory: EffectInventoryItem[],
@@ -316,7 +452,7 @@ export const createJackResolver = (
 
     const invItem = effectInventory.find((e) => e.id === itemId);
     const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
-    const jacks = effect?.jacks ?? SIDE_JACKS;
+    const jacks = effect?.jacks ?? sideJacksFor(effect?.imageId);
     cache.set(itemId, jacks);
     return jacks;
   };
