@@ -14,7 +14,7 @@ import type {
   PedalboardPlacement,
 } from "../../types/arsenal.types";
 import { getEffectImageSrc } from "../../utils/effectImage";
-import type { BoardLayout, LayoutBox } from "../../utils/pedalboardLayout";
+import type { BoardBox, BoardLayout } from "../../utils/pedalboardLayout";
 import {
   collidesWithAny,
   createJackResolver,
@@ -22,9 +22,11 @@ import {
   DEFAULT_ASPECT,
   EFFECT_IMAGE_ASPECT,
   findFreeSpot,
+  findSwapTarget,
   layoutBoard,
   packInOrder,
   PEDAL_H_PCT,
+  planSwap,
   tidyBoard,
 } from "../../utils/pedalboardLayout";
 import { EffectCard } from "../GuitarInventory/EffectCard";
@@ -49,9 +51,15 @@ interface DragState {
   itemId: string;
   offXPct: number;
   offYPct: number;
-  /** The pedal was already sitting on a neighbour when the drag started, so
-   *  collisions have to be ignored until it reaches clear board again. */
-  escaping: boolean;
+  /** The slot the pedal owns while it is in the air, and drops back into.
+   *  Trading places with a neighbour hands it that neighbour's slot. */
+  homeXPct: number;
+  homeYPct: number;
+  /** The pedal just traded with. It is off limits until the dragged one has
+   *  stepped off it again, which is what stops a swap ping-ponging. */
+  lockedId: string | null;
+  /** Something has been traded, so letting go is an exchange, not a drop. */
+  swapped: boolean;
 }
 
 interface PedalboardViewProps {
@@ -73,7 +81,17 @@ export const PedalboardView = ({
 }: PedalboardViewProps) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
-  const [dragging, setDragging] = useState<DragState | null>(null);
+  const [dragging, setDraggingState] = useState<DragState | null>(null);
+  // Mirrors `dragging` for the window handlers: the mouse can move twice
+  // before React re-renders, and the second move has to see the slot the
+  // first one traded for.
+  const draggingRef = useRef<DragState | null>(null);
+
+  const setDragging = (next: DragState | null) => {
+    draggingRef.current = next;
+    setDraggingState(next);
+  };
+
   const [isColliding, setIsColliding] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   // Natural aspect ratio (w/h) per image, measured once the image loads. It
@@ -136,11 +154,12 @@ export const PedalboardView = ({
   }, [onUpdateItems, widthOf, overflowIds]);
 
   /** Everything currently occupying board space, minus one pedal. */
-  const boardBoxes = useCallback((excludeId?: string): LayoutBox[] => {
+  const boardBoxes = useCallback((excludeId?: string): BoardBox[] => {
     const overflow = overflowRef.current;
     return localItemsRef.current
       .filter((i) => i.itemId !== excludeId && !overflow.includes(i.itemId))
       .map((i) => ({
+        itemId: i.itemId,
         xPct: i.xPct,
         yPct: i.yPct,
         wPct: widthOfRef.current(i.itemId),
@@ -180,71 +199,88 @@ export const PedalboardView = ({
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!dragging || !boardRef.current) return;
+      const drag = draggingRef.current;
+      if (!drag || !boardRef.current) return;
+      const { itemId } = drag;
       const rect = boardRef.current.getBoundingClientRect();
-      const wPct = widthOfRef.current(dragging.itemId);
-      const rawX = Math.max(
+      const wPct = widthOfRef.current(itemId);
+      // A pedal in the air goes wherever the hand takes it — neighbours are
+      // traded with rather than bumped into, so nothing is in its way.
+      const xPct = Math.max(
         0,
         Math.min(
           100 - wPct,
-          ((e.clientX - rect.left) / rect.width) * 100 - dragging.offXPct,
+          ((e.clientX - rect.left) / rect.width) * 100 - drag.offXPct,
         ),
       );
-      const rawY = Math.max(
+      const yPct = Math.max(
         0,
         Math.min(
           100 - PEDAL_H_PCT,
-          ((e.clientY - rect.top) / rect.height) * 100 - dragging.offYPct,
+          ((e.clientY - rect.top) / rect.height) * 100 - drag.offYPct,
         ),
       );
 
-      const others = boardBoxes(dragging.itemId);
-      const current = localItemsRef.current.find(
-        (i) => i.itemId === dragging.itemId,
+      let next = localItemsRef.current.map((item) =>
+        item.itemId === itemId ? { ...item, xPct, yPct } : item,
       );
-      const prevX = current?.xPct ?? rawX;
-      const prevY = current?.yPct ?? rawY;
+      let home = { xPct: drag.homeXPct, yPct: drag.homeYPct };
 
-      let finalX = rawX;
-      let finalY = rawY;
-      const hits = (xPct: number, yPct: number) =>
-        collidesWithAny({ xPct, yPct, wPct }, others);
-
-      if (dragging.escaping) {
-        // A pedal that starts out buried would be blocked in every direction, so
-        // it moves freely until it finds clear board — then it is fenced in again.
-        if (!hits(rawX, rawY)) setDragging({ ...dragging, escaping: false });
-        setIsColliding(hits(rawX, rawY));
-      } else if (hits(rawX, rawY)) {
-        // Slide along whichever axis is still free, the way a pedal nudged into
-        // its neighbour would.
-        if (!hits(rawX, prevY)) {
-          finalY = prevY;
-        } else if (!hits(prevX, rawY)) {
-          finalX = prevX;
-        } else {
-          finalX = prevX;
-          finalY = prevY;
+      // Standing on a neighbour trades places with it: the neighbour slides
+      // into the slot being carried around, and the dragged pedal inherits the
+      // one just vacated. That is the whole of reordering the board — no
+      // shuffling anything out of the way first.
+      const others = boardBoxes(itemId);
+      const target = findSwapTarget({ xPct, yPct, wPct }, others);
+      if (target && target.itemId !== drag.lockedId) {
+        const plan = planSwap(
+          { ...home, wPct },
+          target,
+          others.filter((box) => box.itemId !== target.itemId),
+        );
+        if (plan) {
+          home = plan.home;
+          next = next.map((item) =>
+            item.itemId === target.itemId ? { ...item, ...plan.target } : item,
+          );
+          setDragging({
+            ...drag,
+            homeXPct: plan.home.xPct,
+            homeYPct: plan.home.yPct,
+            lockedId: target.itemId,
+            swapped: true,
+          });
         }
-        setIsColliding(true);
-      } else {
-        setIsColliding(false);
+      } else if (!target && drag.lockedId) {
+        setDragging({ ...drag, lockedId: null });
       }
 
-      setLocalItems(
-        localItemsRef.current.map((item) =>
-          item.itemId === dragging.itemId
-            ? { ...item, xPct: finalX, yPct: finalY }
-            : item,
-        ),
+      // Red only when the pedal has nowhere of its own to fall back to: it is
+      // covering a neighbour and its own slot is taken as well. Trading places
+      // never lights it up, because that lands cleanly.
+      const settled = next.filter(
+        (i) => i.itemId !== itemId && !overflowRef.current.includes(i.itemId),
       );
+      const boxes = settled.map((i) => ({
+        xPct: i.xPct,
+        yPct: i.yPct,
+        wPct: widthOfRef.current(i.itemId),
+      }));
+      setIsColliding(
+        collidesWithAny({ xPct, yPct, wPct }, boxes) &&
+          collidesWithAny({ ...home, wPct }, boxes),
+      );
+
+      setLocalItems(next);
     },
-    [dragging, boardBoxes],
+    [boardBoxes],
   );
 
   const handleMouseUp = useCallback(() => {
-    if (!dragging) return;
-    const { itemId } = dragging;
+    const drag = draggingRef.current;
+    if (!drag) return;
+    const { itemId, swapped } = drag;
+    const home = { xPct: drag.homeXPct, yPct: drag.homeYPct };
     setDragging(null);
     setIsColliding(false);
 
@@ -252,30 +288,43 @@ export const PedalboardView = ({
     const dropped = prev.find((i) => i.itemId === itemId);
     const wPct = widthOfRef.current(itemId);
     const others = boardBoxes(itemId);
+    const settleAt = (spot: { xPct: number; yPct: number }) =>
+      prev.map((item) =>
+        item.itemId === itemId ? { ...item, ...spot } : item,
+      );
     let next = prev;
 
-    // Only reachable after an escaping drag — put the pedal somewhere it can
-    // actually stay rather than leaving it on top of another one.
-    if (
-      dropped &&
-      collidesWithAny({ xPct: dropped.xPct, yPct: dropped.yPct, wPct }, others)
-    ) {
-      const spot = findFreeSpot(others, wPct);
-      if (spot) {
-        next = prev.map((item) =>
-          item.itemId === itemId ? { ...item, ...spot } : item,
-        );
-      } else {
-        setOverflowIds((ids) =>
-          ids.includes(itemId) ? ids : [...ids, itemId],
-        );
-        announce(BOARD_FULL, setNotice);
+    if (dropped) {
+      const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct };
+      const homeBox = { ...home, wPct };
+      const covered = collidesWithAny(box, others);
+      const homeFree = !collidesWithAny(homeBox, others);
+
+      if (
+        homeFree &&
+        (covered || (swapped && collidesWithAny(box, [homeBox])))
+      ) {
+        // An exchange finishes in the slot it traded for, so the two pedals
+        // really do end up in each other's places instead of near enough.
+        next = settleAt(home);
+      } else if (covered) {
+        // Nowhere of its own to go back to — the pedal came off a stack, or
+        // its slot was taken while it was in the air.
+        const spot = findFreeSpot(others, wPct);
+        if (spot) {
+          next = settleAt(spot);
+        } else {
+          setOverflowIds((ids) =>
+            ids.includes(itemId) ? ids : [...ids, itemId],
+          );
+          announce(BOARD_FULL, setNotice);
+        }
       }
     }
 
     setLocalItems(next);
     debouncedSave(next);
-  }, [dragging, debouncedSave, boardBoxes]);
+  }, [debouncedSave, boardBoxes]);
 
   useEffect(() => {
     if (dragging) {
@@ -300,15 +349,14 @@ export const PedalboardView = ({
     const rect = boardRef.current.getBoundingClientRect();
     const curXPct = ((e.clientX - rect.left) / rect.width) * 100;
     const curYPct = ((e.clientY - rect.top) / rect.height) * 100;
-    const wPct = widthOf(item.itemId);
     setDragging({
       itemId: item.itemId,
       offXPct: curXPct - item.xPct,
       offYPct: curYPct - item.yPct,
-      escaping: collidesWithAny(
-        { xPct: item.xPct, yPct: item.yPct, wPct },
-        boardBoxes(item.itemId),
-      ),
+      homeXPct: item.xPct,
+      homeYPct: item.yPct,
+      lockedId: null,
+      swapped: false,
     });
   };
 
@@ -583,9 +631,12 @@ export const PedalboardView = ({
                   transform: isDragging
                     ? "scale(1.07) translateY(-6px)"
                     : "scale(1)",
+                  // A pedal being traded with slides into its new place, so the
+                  // exchange is something the player watches happen rather than
+                  // a jump they have to work out afterwards.
                   transition: isDragging
                     ? "none"
-                    : "filter 0.15s, transform 0.15s",
+                    : "left 0.18s ease, top 0.18s ease, filter 0.15s, transform 0.15s",
                 }}>
                 <img
                   src={getEffectImageSrc(effect.imageId, "full")}

@@ -226,6 +226,10 @@ const PedalReadonly = ({
         top: `${placement.yPct}%`,
         width: `${wPct}%`,
         height: `${PEDAL_H_PCT}%`,
+        // Above the loom, the way the editor's pedals are. Without it the
+        // cable's own `z-index: 1` wins and every plug is painted across the
+        // enclosure it is supposed to disappear into.
+        zIndex: 2,
         filter: `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
       }}
       onMouseMove={handleMouseMove}

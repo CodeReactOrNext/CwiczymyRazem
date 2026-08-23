@@ -83,7 +83,8 @@ interface BoardJackProps {
  * rather than pixels, so the cable meets the socket at every board size instead
  * of near it. The input sits at the top left and the output at the bottom right
  * because that is the order the board is read in: the signal starts where the
- * eye does.
+ * eye does — which is also why neither is labelled. A socket in the corner the
+ * cable leaves from needs no word next to it.
  */
 export const BoardJack = ({ kind }: BoardJackProps) => {
   const anchor = kind === "in" ? INPUT_JACK : OUTPUT_JACK;
@@ -177,19 +178,6 @@ export const BoardJack = ({ kind }: BoardJackProps) => {
           opacity={0.28}
         />
       </svg>
-      <span
-        className='absolute left-1/2 -translate-x-1/2 whitespace-nowrap'
-        style={{
-          fontSize: 6.5,
-          lineHeight: 1,
-          letterSpacing: "0.22em",
-          fontWeight: 800,
-          color: "#c2833a",
-          textShadow: "0 1px 2px rgba(0,0,0,0.95)",
-          [kind === "in" ? "top" : "bottom"]: "calc(100% + 2.5px)",
-        }}>
-        {kind === "in" ? "Instr" : "Amp"}
-      </span>
     </div>
   );
 };
@@ -209,15 +197,26 @@ const BEND = 3.2;
 /** How far above a pedal a cable off its top edge runs before it turns. */
 const TOP_LANE = 2;
 
+/** How far a plug stands out of its socket: tip to the back of the boot. */
+const PLUG_REACH = 2.65;
+
+/** The shortest one can be cut back to and still read as a quarter-inch plug. */
+const MIN_PLUG_REACH = 1.9;
+
 /**
  * Gap below which two facing plugs stop being drawable as two plugs.
  *
- * Each one stands 2.65 units off its enclosure, so they need 5.3 units between
- * pedals to sit clear of each other — twice what a tidied board leaves. Rather
- * than draw them jammed through one another, anything under this becomes a
- * single rigid coupler, which is what a real board this tightly packed uses.
+ * A facing pair share the gap between their enclosures, half each, so a plug is
+ * cut back to whatever its half comes to rather than being drawn straight
+ * through its opposite number. Below `MIN_PLUG_REACH` apiece there is nothing
+ * left to cut, and the pair becomes a single rigid coupler instead — which is
+ * what a real board packed this tightly uses anyway.
  */
-const COUPLER_MAX = 3.2;
+const COUPLER_MAX = MIN_PLUG_REACH * 2 + 0.5;
+
+/** A plug's half of the gap it stands in, never longer than a real one. */
+const reachInGap = (gap: number) =>
+  Math.max(MIN_PLUG_REACH, Math.min(PLUG_REACH, gap / 2 - 0.25));
 
 const toView = (xPct: number, yPct: number) => ({
   x: (xPct / 100) * VIEW_W,
@@ -290,6 +289,39 @@ const routed = (points: Point[]): string => {
 /** Where a cable off a top-mounted socket gets to before it turns sideways. */
 const clearOf = (anchor: Anchor): Point => ({ x: anchor.at.x, y: anchor.lane });
 
+/** How much straight cable a plug needs beside it before a run may bend. */
+const PLUG_CLEAR = PLUG_REACH + BEND + 0.4;
+
+/**
+ * The climb out of a top-mounted socket: the back of the plug's boot first, and
+ * only then the lane it turns in. Standing the corner above the plug rather
+ * than inside it is what makes the cable read as coming out of the boot instead
+ * of through the side of it.
+ */
+const riseOf = (anchor: Anchor): Point[] => {
+  const lane = clearOf(anchor);
+  const boot = anchor.at.y - PLUG_REACH - 0.3;
+  return boot > lane.y ? [{ x: anchor.at.x, y: boot }, lane] : [lane];
+};
+
+/**
+ * Where a run out of a side-mounted socket turns for the lane over the row:
+ * the middle of the gap when it is wide, and as far from the socket as the gap
+ * allows when it is not. Turning any nearer would put the bend inside the plug.
+ */
+const laneTurn = (socket: Anchor, other: Anchor): number => {
+  const middle = (socket.outer + other.outer) / 2;
+  const gap = other.outer - socket.outer;
+  if (Math.abs(gap) < 1.2) return middle;
+
+  const away = Math.sign(gap);
+  const wanted = socket.outer + away * PLUG_CLEAR;
+  const limit = other.outer - away * 0.6;
+  return away > 0
+    ? Math.max(middle, Math.min(wanted, limit))
+    : Math.min(middle, Math.max(wanted, limit));
+};
+
 /**
  * Guitar to first pedal: down the side lane, then in at the socket's own height.
  * Hugging the rail keeps the run off the surface the pedals stand on, and drops
@@ -314,7 +346,7 @@ const exitRun = (from: Anchor, jack: Point): string => {
   return from.fromTop
     ? routed([
         from.at,
-        clearOf(from),
+        ...riseOf(from),
         { x: lane, y: from.lane },
         { x: lane, y: jack.y - 4 },
         jack,
@@ -322,10 +354,24 @@ const exitRun = (from: Anchor, jack: Point): string => {
     : routed([from.at, { x: lane, y: from.at.y }, jack]);
 };
 
-/** Side-mounted neighbours in a row: it just sags under its own weight. */
-const hopRun = (a: Point, b: Point): string => {
-  const sag = Math.min(4.5, 1.2 + (b.x - a.x) * 0.1);
-  return `M ${at(a)} Q ${at({ x: (a.x + b.x) / 2, y: a.y + sag })} ${at(b)}`;
+/**
+ * Side-mounted neighbours in a row: it just sags under its own weight.
+ *
+ * The first and last stretch is dead straight, and longer than the plug it
+ * leaves — a cable comes out of a strain-relief boot pointing the way the boot
+ * points and only starts to hang once it is clear of it. Curving from the
+ * socket itself put the bend under the plug, which read as a cable pushed
+ * through the enclosure sideways.
+ */
+const hopRun = (a: Point, b: Point, reach: number): string => {
+  const span = b.x - a.x;
+  const lead = Math.min(reach + 0.9, span * 0.34);
+  const from = { x: a.x + lead, y: a.y };
+  const to = { x: b.x - lead, y: b.y };
+  const sag = Math.min(4.5, 1.2 + span * 0.1);
+  const belly = { x: (from.x + to.x) / 2, y: Math.max(a.y, b.y) + sag };
+
+  return `M ${at(a)} L ${at(from)} Q ${at(belly)} ${at(to)} L ${at(b)}`;
 };
 
 /** Two pedals coupled nose to nose: the cable is too short to hang at all. */
@@ -343,14 +389,21 @@ const tautRun = (a: Point, b: Point): string => `M ${at(a)} L ${at(b)}`;
  */
 const overRun = (a: Anchor, b: Anchor): string => {
   const lane = Math.min(a.lane, b.lane);
-  const gapMid = (a.outer + b.outer) / 2;
   const points: Point[] = [a.at];
 
-  if (a.fromTop) points.push(clearOf(a));
-  else points.push({ x: gapMid, y: a.at.y }, { x: gapMid, y: lane });
+  if (a.fromTop) {
+    points.push(...riseOf(a));
+  } else {
+    const turn = laneTurn(a, b);
+    points.push({ x: turn, y: a.at.y }, { x: turn, y: lane });
+  }
 
-  if (b.fromTop) points.push({ x: b.at.x, y: lane }, b.at);
-  else points.push({ x: gapMid, y: lane }, { x: gapMid, y: b.at.y }, b.at);
+  if (b.fromTop) {
+    points.push({ x: b.at.x, y: lane }, ...riseOf(b).reverse(), b.at);
+  } else {
+    const turn = laneTurn(b, a);
+    points.push({ x: turn, y: lane }, { x: turn, y: b.at.y }, b.at);
+  }
 
   return routed(points);
 };
@@ -376,7 +429,7 @@ const returnRun = (a: Anchor, b: Anchor): string => {
 
   return routed([
     a.at,
-    ...(a.fromTop ? [from] : []),
+    ...(a.fromTop ? riseOf(a) : []),
     { x: right, y: from.y },
     { x: right, y: channel },
     // A long run of cable never lies flat. One shallow dip, kept clear of the
@@ -384,7 +437,7 @@ const returnRun = (a: Anchor, b: Anchor): string => {
     { x: (right + left) / 2, y: channel + 1.2 },
     { x: left, y: channel },
     { x: left, y: to.y },
-    ...(b.fromTop ? [to] : []),
+    ...(b.fromTop ? riseOf(b).reverse() : []),
     b.at,
   ]);
 };
@@ -404,12 +457,12 @@ const looseRun = (a: Point, b: Point): string => {
 };
 
 /** Picks the routing a run's own geometry asks for. */
-const linkRun = (a: Anchor, b: Anchor): string => {
+const linkRun = (a: Anchor, b: Anchor, reach: number): string => {
   if (a.row !== b.row) {
     return b.row > a.row ? returnRun(a, b) : looseRun(a.at, b.at);
   }
   if (a.fromTop || b.fromTop) return overRun(a, b);
-  return b.at.x > a.at.x ? hopRun(a.at, b.at) : looseRun(a.at, b.at);
+  return b.at.x > a.at.x ? hopRun(a.at, b.at, reach) : looseRun(a.at, b.at);
 };
 
 const TONES = {
@@ -437,6 +490,8 @@ interface PlugProps {
   spin: 0 | 90 | 180;
   /** Paint for the nickel parts, already turned to suit `spin`. */
   metal: string;
+  /** How far it stands out of the socket — cut back to fit a tight gap. */
+  reach?: number;
 }
 
 /**
@@ -454,16 +509,25 @@ interface PlugProps {
  *
  * Length is the one place it cannot be honest. A real plug stands some 45mm out
  * of the socket — four times the gap a tidy board leaves between pedals — so it
- * is cut to about that gap instead. Closer than `COUPLER_MAX` and it is not
- * drawn at all: `Coupler` takes over.
+ * is cut to `PLUG_REACH` instead, and cut back further still when the pair it
+ * belongs to has less room than that between them: a plug drawn through its
+ * opposite number is worse than a short one. Below `COUPLER_MAX` between the two
+ * enclosures neither is drawn at all and `Coupler` takes over. The handle keeps
+ * its size whatever happens — girth is what says quarter-inch — so it is the
+ * boot that gives up the room.
  *
  * A plug facing left is mirrored rather than rotated, because a rotated one
  * would carry its highlight round with it and end up lit from underneath. One
  * facing down has to be turned, so it is handed a gradient already laid the
  * other way to come out top-lit anyway.
  */
-const Plug = ({ at: point, spin, metal }: PlugProps) => {
+const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
   const turn = spin === 180 ? " scale(-1 1)" : spin === 90 ? " rotate(90)" : "";
+  /** The back face of the boot, and the shoulder tapering onto it. */
+  const back = -reach;
+  const shoulder = back + 0.55;
+  /** The moulded ribs, spaced along whatever boot is left. */
+  const rib = (along: number) => -0.95 + (back + 0.95) * along;
 
   return (
     <g transform={`translate(${at(point)})${turn}`}>
@@ -471,9 +535,9 @@ const Plug = ({ at: point, spin, metal }: PlugProps) => {
           a top edge is standing on the enclosure, which casts nothing. */}
       {spin !== 90 && (
         <ellipse
-          cx={-1.2}
+          cx={(0.35 + back) / 2}
           cy={1.95}
-          rx={2.2}
+          rx={(0.35 - back) / 2 + 0.7}
           ry={0.66}
           fill='#000000'
           opacity={0.42}
@@ -482,15 +546,15 @@ const Plug = ({ at: point, spin, metal }: PlugProps) => {
 
       {/* The moulded strain-relief boot, tapering onto the cable. */}
       <path
-        d='M -0.95 -1.72 L -2.1 -1.2 Q -2.65 -1 -2.65 0 Q -2.65 1 -2.1 1.2 L -0.95 1.72 Z'
+        d={`M -0.95 -1.72 L ${shoulder} -1.2 Q ${back} -1 ${back} 0 Q ${back} 1 ${shoulder} 1.2 L -0.95 1.72 Z`}
         fill='#131316'
       />
       <g stroke='#000000' strokeWidth={0.18} opacity={0.55}>
-        <line x1={-1.5} y1={-1.5} x2={-1.5} y2={1.5} />
-        <line x1={-1.95} y1={-1.28} x2={-1.95} y2={1.28} />
+        <line x1={rib(0.35)} y1={-1.5} x2={rib(0.35)} y2={1.5} />
+        <line x1={rib(0.65)} y1={-1.28} x2={rib(0.65)} y2={1.28} />
       </g>
       <path
-        d='M -0.95 -1.72 L -2.1 -1.2 L -2.1 -0.76 L -0.95 -1.16 Z'
+        d={`M -0.95 -1.72 L ${shoulder} -1.2 L ${shoulder} -0.76 L -0.95 -1.16 Z`}
         fill='#ffffff'
         opacity={0.1}
       />
@@ -687,16 +751,15 @@ export const SignalCable = ({
     const b = anchorAt(offset + 1, "in");
     const gap = b.outer - a.outer;
 
+    const facing = a.row === b.row && !a.fromTop && !b.fromTop && gap > 0;
+
     return {
       a,
       b,
       ok: entry.okIn,
-      coupled:
-        a.row === b.row &&
-        !a.fromTop &&
-        !b.fromTop &&
-        gap > 0 &&
-        gap < COUPLER_MAX,
+      coupled: facing && gap < COUPLER_MAX,
+      /** Two plugs nose to nose share the gap; every other run gets a whole one. */
+      reach: facing ? reachInGap(gap) : PLUG_REACH,
     };
   });
 
@@ -706,7 +769,9 @@ export const SignalCable = ({
       ok: true,
     },
     ...between.map((link) => ({
-      d: link.coupled ? tautRun(link.a.at, link.b.at) : linkRun(link.a, link.b),
+      d: link.coupled
+        ? tautRun(link.a.at, link.b.at)
+        : linkRun(link.a, link.b, link.reach),
       ok: link.ok,
     })),
     {
@@ -724,18 +789,28 @@ export const SignalCable = ({
   const plugs = drawn.flatMap((_, index) => {
     const inAnchor = anchorAt(index, "in");
     const outAnchor = anchorAt(index, "out");
-    const drawIn = index === 0 || !between[index - 1].coupled;
-    const drawOut = index === drawn.length - 1 || !between[index].coupled;
+    // The runs either side decide how much room this pedal's two plugs have.
+    // The first and the last face the board's own jacks, which are never in the
+    // way, so those keep their full length.
+    const before = index > 0 ? between[index - 1] : null;
+    const after = index < drawn.length - 1 ? between[index] : null;
 
     return [
-      ...(drawIn
-        ? [{ at: inAnchor.at, spin: (inAnchor.fromTop ? 90 : 0) as 0 | 90 }]
+      ...(!before || !before.coupled
+        ? [
+            {
+              at: inAnchor.at,
+              spin: (inAnchor.fromTop ? 90 : 0) as 0 | 90,
+              reach: before?.reach ?? PLUG_REACH,
+            },
+          ]
         : []),
-      ...(drawOut
+      ...(!after || !after.coupled
         ? [
             {
               at: outAnchor.at,
               spin: (outAnchor.fromTop ? 90 : 180) as 90 | 180,
+              reach: after?.reach ?? PLUG_REACH,
             },
           ]
         : []),
@@ -861,6 +936,7 @@ export const SignalCable = ({
           key={index}
           at={plug.at}
           spin={plug.spin}
+          reach={plug.reach}
           metal={`url(#${plug.spin === 90 ? metalAcross : metalDown})`}
         />
       ))}

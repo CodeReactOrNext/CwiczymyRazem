@@ -104,6 +104,23 @@ const pointsOf = (d: string) =>
     return { x, y };
   });
 
+/** Every plug on the board, with how far it stands out of its socket. */
+const plugsOf = (container: Element) =>
+  Array.from(container.querySelectorAll("g[transform]"))
+    .map((group) => ({
+      transform: group.getAttribute("transform") ?? "",
+      boot:
+        group.querySelector('path[fill="#131316"]')?.getAttribute("d") ?? "",
+    }))
+    // A coupler carries no strain-relief boot; a plug is the one that does.
+    .filter((part) => part.boot)
+    .map((part) => ({
+      x: Number(part.transform.match(/translate\((-?[\d.]+) /)?.[1]),
+      // `Q {back} -1 …` is the back face of the boot: how far it stands out.
+      reach: -Number(part.boot.match(/Q (-?[\d.]+) -1 /)?.[1]),
+    }))
+    .sort((a, b) => a.x - b.x);
+
 describe("SignalCable", () => {
   it("draws one run per pedal plus the two to the board's own jacks", () => {
     const { runs } = draw([...row(ROW_Y_PCT[0], 4), ...row(ROW_Y_PCT[1], 3)]);
@@ -202,5 +219,25 @@ describe("SignalCable", () => {
     );
 
     expect(container.querySelector("svg")).toBeNull();
+  });
+  it("cuts a facing pair back to the gap they stand in, not through each other", () => {
+    // Room for two plugs, but not for two whole ones.
+    const tight = plugsOf(draw(row(ROW_Y_PCT[0], 2, 3.4)).container);
+    const roomy = plugsOf(draw(row(ROW_Y_PCT[0], 2, 6)).container);
+
+    // Sockets two and three are the pair facing each other across the gap.
+    expect(tight[1].reach + tight[2].reach).toBeLessThanOrEqual(
+      tight[2].x - tight[1].x,
+    );
+    // …and one with the whole gap to itself keeps its full length.
+    expect(roomy[1].reach).toBeGreaterThan(tight[1].reach);
+  });
+
+  it("leaves the boot straight before the cable starts to hang", () => {
+    const link = pointsOf(draw(row(ROW_Y_PCT[0], 2, 10)).runs[1]);
+
+    // The run holds the socket's own height until it is clear of the plug.
+    expect(link[1].y).toBe(link[0].y);
+    expect(link[1].x - link[0].x).toBeGreaterThan(2.65);
   });
 });
