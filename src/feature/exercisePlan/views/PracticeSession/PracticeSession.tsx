@@ -577,7 +577,7 @@ export const PracticeSession = ({
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
-  const { saveCurrentScores, exerciseRecordsRef } = useScoreSaving({
+  const { saveCurrentScores, exerciseRecordsRef, scoredRuns } = useScoreSaving({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
   });
 
@@ -793,6 +793,7 @@ export const PracticeSession = ({
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
             onClick={onClose} activityData={activityDataToUse} onRestart={handleRestartFullSession}
+            scoredRuns={scoredRuns}
           />
         </div>
       )}
@@ -866,7 +867,7 @@ export const PracticeSession = ({
       )}
 
       <DesktopSessionView
-        reportResult={reportResult}
+        reportResult={reportResult} scoredRuns={scoredRuns}
         currentUserStats={currentUserStats} previousUserStats={previousUserStats}
         activityDataToUse={activityDataToUse} router={router}
         handleRestartFullSession={handleRestartFullSession}

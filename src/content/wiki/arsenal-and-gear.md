@@ -52,6 +52,18 @@ Higher builds also get pickier: they want more _different_ kinds of parts, they 
 Before you scrap anything, check the Rig tab. Parts are easy to come by; a specific instrument rolled with the condition and features you like isn't.
 </BlogAlert>
 
+### Reworking a pile into something better
+
+Parts pile up in the wrong shapes. You end up with a drawer of standard pickups and nothing legendary in sight, and no amount of scrapping fixes it on its own.
+
+**Tap any stack of parts in your stash and you can rework it one tier up.** Five standard pieces make one epic, four epic make one legendary, three legendary make one Unique. Each piece that comes out costs 20 Fame in bench time, and the bench tells you exactly what it will take and what you'll get before you commit.
+
+<StatRow stats="5 → 1:standard into epic|4 → 1:epic into legendary|3 → 1:legendary into Unique|20 Fame:per piece produced" caption="The part itself never changes — pickups make better pickups, never bridges. Only the tier moves." />
+
+This is the only way to get a Unique part without tearing down a Mythic, which is what makes the top of a build ladder worth starting: those levels ask for Unique parts, and Mythics are far too rare to break up for them.
+
+Two things never rework. Screws stay screws however many you pile up, and a part already at the best tier it comes in has nowhere to go — a potentiometer stops at epic, and only the parts that visibly show, bodies, bridges, pickups and enclosures, reach Unique at all. Anything that can't climb simply doesn't offer the option.
+
 ### One mod survives the scrapyard
 
 When you scrap something that carries mods, **one of them comes off whole** and lands in your stash as a thing you can hold, including the mods an instrument arrived with straight out of a case.
@@ -104,6 +116,6 @@ The reasons behind the order are real, not arbitrary. A tuner needs a signal not
 
 ## Questions people ask
 
-<FaqList items="Can I buy Fame with real money?::No. Every route to it is in the app: practice itself, quests, milestones, challenges, seasons and the community|I opened a case and got a duplicate::Scrap it. Duplicates become parts, and parts are what upgrade the copy you kept|Does gear affect my points or level?::Not at all. It's a separate game with its own board|Restore or build first?::Restore. Building past the early levels needs good condition anyway|Can I choose which mod I salvage?::No, each instrument has its own, decided when it was made and shown to you before you scrap it|If I sell instead of scrapping, do I still get the mod?::No. Selling pays Fame and the instrument leaves intact. The mod only comes off on the bench|Does the order of my pedals really pay?::Yes, and it's the one bonus that costs nothing to collect — the gear is already yours, it just has to stand in the right places|Which row does the chain start on?::The top one, left to right, then the bottom one. The cable drawn on the board always shows the route|Do parked pedals count?::Yes. A pedal the board has no room for is still in the chain, so it can still cost you a cable" />
+<FaqList items="Can I buy Fame with real money?::No. Every route to it is in the app: practice itself, quests, milestones, challenges, seasons and the community|I opened a case and got a duplicate::Scrap it. Duplicates become parts, and parts are what upgrade the copy you kept|How do I get a Unique part?::Rework three legendary ones of the same kind at your stash. Scrapping a Mythic is the only other source, and it costs you the Mythic|Does gear affect my points or level?::Not at all. It's a separate game with its own board|Restore or build first?::Restore. Building past the early levels needs good condition anyway|Can I choose which mod I salvage?::No, each instrument has its own, decided when it was made and shown to you before you scrap it|If I sell instead of scrapping, do I still get the mod?::No. Selling pays Fame and the instrument leaves intact. The mod only comes off on the bench|Does the order of my pedals really pay?::Yes, and it's the one bonus that costs nothing to collect — the gear is already yours, it just has to stand in the right places|Which row does the chain start on?::The top one, left to right, then the bottom one. The cable drawn on the board always shows the route|Do parked pedals count?::Yes. A pedal the board has no room for is still in the chain, so it can still cost you a cable" />
 
 <ReadNext links="Where Fame comes from::/wiki/fame|Points, levels & streaks::/wiki/how-scoring-works|Rankings & seasons::/wiki/leaderboard-and-seasons|Weekly Milestones::/wiki/ai-coach-and-weekly-milestones" />

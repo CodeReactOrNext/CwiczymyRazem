@@ -101,7 +101,7 @@ export const PART_UNIT_PRICE: Record<Exclude<PartTier, "Unique">, number> = {
    * Priced far above the tier below it, and far above what a teardown of a
    * Legendary donor costs. That is the point: this slot exists to unstick a
    * build that a starved drop table has walled off, not to be the way players
-   * supply themselves with Legendary parts. Two a day at this price is a month
+   * supply themselves with Legendary parts. One a day at this price is a month
    * of practice for a single top-flight build level.
    */
   Legendary: 450,
@@ -156,14 +156,20 @@ export const MOD_ROLL_PREMIUM = 0.6;
  * nothing else — a player with 30 Fame to their name can still walk out with
  * fifteen screws.
  *
- * The ceilings are what keep the workshop honest: at two a day, a Legendary part
- * still takes most of a week to add up to a single top-flight build level, which
- * is the pace `workshop.ts` was balanced around.
+ * The ceilings are what keep the workshop honest: at one piece a day, and only on
+ * the days the slot turns up at all, a Legendary part takes weeks to add up to a
+ * single top-flight build level, which is the pace `workshop.ts` was balanced
+ * around.
  */
 const SCREW_STOCK = 40;
 const STANDARD_STOCKS = [8, 6];
 const EPIC_STOCKS = [4, 3];
-const LEGENDARY_STOCK = 2;
+/**
+ * One piece, not a stack. The slot exists to unstick a build the drop tables have
+ * walled off, so it hands over the missing piece — it does not let a player buy
+ * their way through a whole Legendary bill in one visit.
+ */
+const LEGENDARY_STOCK = 1;
 
 /**
  * Potentiometers get a slot of their own because no drop table supplies them.
@@ -221,7 +227,9 @@ const MEDIAN_SUPPLY = new Map<PartTier, number>(
   PART_TIERS.map((tier) => [
     tier,
     medianOf(
-      STOCKABLE_PARTS.map((p) => getPartSupply(p.id, tier)).filter((s) => s > 0),
+      STOCKABLE_PARTS.map((p) => getPartSupply(p.id, tier)).filter(
+        (s) => s > 0,
+      ),
     ),
   ]),
 );
@@ -484,7 +492,9 @@ export const getTraderOffers = (date: Date = new Date()): TraderOffer[] => {
   ];
 
   drawParts("Standard", STANDARD_STOCKS.length, random).forEach((part, i) =>
-    parts.push(partOffer(id(`std-${i}`), part.id, "Standard", STANDARD_STOCKS[i])),
+    parts.push(
+      partOffer(id(`std-${i}`), part.id, "Standard", STANDARD_STOCKS[i]),
+    ),
   );
 
   const potTier = random() < POT_EPIC_CHANCE ? "Epic" : "Standard";

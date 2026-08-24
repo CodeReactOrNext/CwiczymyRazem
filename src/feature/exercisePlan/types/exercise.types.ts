@@ -272,3 +272,17 @@ export interface ExercisePlan {
     artist: string;
   };
 }
+
+/** Which high score a run competes against — one per scored exercise kind. */
+export type ExerciseScoreType = "mic" | "click" | "earTraining";
+
+/** A scored run of one exercise, collected so the session summary can place it
+ *  on that exercise's leaderboard. */
+export interface ScoredRun {
+  exerciseId: string;
+  exerciseTitle: string;
+  score: number;
+  scoreType: ExerciseScoreType;
+  /** The player's record on this exercise before the session touched it; 0 on a first run. */
+  previousBest: number;
+}

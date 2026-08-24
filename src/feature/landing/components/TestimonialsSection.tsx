@@ -18,7 +18,7 @@ const HoursBadge = ({ hours }: { hours: string }) => (
 const featured = {
   name: "teruimaxx",
   avatar: "/images/testimonials/teruimaxx.jpg",
-  hours: "137 hours logged",
+  hours: "150 hours logged",
   quote:
     "The only practice tool that's kept me playing for over half a year. No more pen and paper or clunky spreadsheets, I can build my own exercises or pull from RiffQuest's high-quality pre-made ones and drop them straight into a routine. Gamification, leaderboards, and sharing plans with others keep it fun, and the community is fantastic. Best and easiest way to steer your guitar journey.",
 };
@@ -27,21 +27,21 @@ const rest = [
   {
     name: "Cookie",
     avatar: "/images/testimonials/cookie.jpg",
-    hours: "106 hours logged",
+    hours: "163 hours logged",
     quote:
       "I've been playing for more years than I am prepared to admit, and this tool really stands out. Well-designed exercises, real progress tracking, and gamified extras that keep things fun.",
   },
   {
     name: "Apoth",
     avatar: "/images/testimonials/apoth.jpg",
-    hours: "27 hours logged",
+    hours: "52 hours logged",
     quote:
       "I always struggled to stay motivated. RiffQuest tracks my progress and keeps me coming back through gamification. I play more regularly now.",
   },
   {
     name: "StayAtHomeGuitarist",
     avatar: "/images/testimonials/stayathome.jpg",
-    hours: "25 hours logged",
+    hours: "66 hours logged",
     quote:
       "No more spreadsheets. I can see at a glance how much time I've spent on each category, and the leaderboards keep me consistent.",
   },

@@ -7,10 +7,13 @@ import {
   getPartResaleValue,
 } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
+import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useSellPart } from "feature/arsenal/hooks/useSellPart";
 import { useSellSalvagedMod } from "feature/arsenal/hooks/useSellSalvagedMod";
 import { groupWalletByPart } from "feature/arsenal/utils/scrap";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useMemo, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 import type {
   PartId,
@@ -57,7 +60,9 @@ const rowClass =
  */
 export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
+  const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
+  const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const [detail, setDetail] = useState<Detail>(null);
   const [pending, setPending] = useState<Pending>(null);
 
@@ -145,6 +150,16 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
               setPending({ ...detail, qty });
             }}
             isSelling={isSellingPart}
+            onFuseClick={(crafts) => {
+              setDetail(null);
+              fusePartsStack({
+                partId: detail.partId,
+                tier: detail.tier,
+                crafts,
+              });
+            }}
+            isFusing={isFusingPart}
+            fame={currentFame}
           />
         )}
         {detail?.kind === "mod" && (

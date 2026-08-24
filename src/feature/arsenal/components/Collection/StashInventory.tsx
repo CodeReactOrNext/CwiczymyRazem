@@ -34,6 +34,7 @@ import {
   getModDef,
 } from "feature/arsenal/data/workshop";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
+import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useScrapEffectsBulk } from "feature/arsenal/hooks/useScrapEffectsBulk";
@@ -240,6 +241,7 @@ export const StashInventory = ({
   const { mutate: saveLayout } = useUpdateStashLayout();
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
+  const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: fitMod, isPending: isFitting } = useWorkshopMod();
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const isMobile = useResponsiveStore((state) => state.isMobile);
@@ -991,6 +993,16 @@ export const StashInventory = ({
               });
             }}
             isSelling={isSellingPart}
+            onFuseClick={(crafts) => {
+              setPartDetail(null);
+              fusePartsStack({
+                partId: partDetail.partId,
+                tier: partDetail.tier,
+                crafts,
+              });
+            }}
+            isFusing={isFusingPart}
+            fame={currentFame}
           />
         )}
       </StashItemDialog>

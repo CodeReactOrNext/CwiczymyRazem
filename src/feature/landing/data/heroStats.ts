@@ -3,11 +3,11 @@
  * Rerun the script (see scripts/updateHeroStats.test.ts) whenever the stats
  * feel stale; they don't need to be live, just occasionally refreshed.
  *
- * Last refreshed: 2026-07-23
- * Raw counts before rounding: users=2440, sessions=7638, hours=7029
+ * Last refreshed: 2026-08-24 (set by hand by the owner, not by the script)
+ * Values: users=2800, sessions=8000, hours=7600
  */
 export const HERO_STATS = [
-  { value: 2440, label: "guitarists on board" },
-  { value: 7000, label: "hours practiced" },
-  { value: 7600, label: "sessions logged" },
+  { value: 2800, label: "guitarists on board" },
+  { value: 7600, label: "hours practiced" },
+  { value: 8000, label: "sessions logged" },
 ] as const;

@@ -566,7 +566,10 @@ const ReportView = () => {
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
         <RatingPopUpLayout
-          onClick={() => returnTo ? router.push(resolveInternalPath(returnTo, "/dashboard")) : setView('form')}
+          // The summary ends the log — nothing is left to do on the form, so
+          // Continue always leaves the page: back where the session came from,
+          // or the dashboard when /report was opened directly.
+          onClick={() => router.push(resolveInternalPath(returnTo, "/dashboard"))}
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}

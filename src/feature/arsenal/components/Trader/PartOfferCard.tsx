@@ -95,25 +95,29 @@ export const PartOfferCard = ({
         </p>
       ) : (
         <div className='flex flex-col gap-3'>
-          <div className='flex items-center justify-between gap-2'>
-            <button
-              onClick={() => setQty(Math.max(1, qty - 1))}
-              disabled={qty <= 1}
-              aria-label='One fewer'
-              className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-300 transition-colors disabled:opacity-30 hover:bg-zinc-900'>
-              <Minus size={14} strokeWidth={3} />
-            </button>
-            <span className='text-lg font-black tabular-nums text-white'>
-              {qty}
-            </span>
-            <button
-              onClick={() => setQty(Math.min(remaining, qty + 1))}
-              disabled={qty >= remaining}
-              aria-label='One more'
-              className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-300 transition-colors disabled:opacity-30 hover:bg-zinc-900'>
-              <Plus size={14} strokeWidth={3} />
-            </button>
-          </div>
+          {/* A picker with nothing to pick is just two dead buttons — a slot that
+              only ever hands over one piece says so by having no picker. */}
+          {remaining > 1 && (
+            <div className='flex items-center justify-between gap-2'>
+              <button
+                onClick={() => setQty(Math.max(1, qty - 1))}
+                disabled={qty <= 1}
+                aria-label='One fewer'
+                className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-300 transition-colors disabled:opacity-30 hover:bg-zinc-900'>
+                <Minus size={14} strokeWidth={3} />
+              </button>
+              <span className='text-lg font-black tabular-nums text-white'>
+                {qty}
+              </span>
+              <button
+                onClick={() => setQty(Math.min(remaining, qty + 1))}
+                disabled={qty >= remaining}
+                aria-label='One more'
+                className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-300 transition-colors disabled:opacity-30 hover:bg-zinc-900'>
+                <Plus size={14} strokeWidth={3} />
+              </button>
+            </div>
+          )}
 
           <button
             onClick={() => onBuy(qty)}
