@@ -1,6 +1,6 @@
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import type { Exercise,ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise,ExercisePlan, ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import type { NextRouter } from "next/router";
@@ -24,6 +24,7 @@ import { TablatureViewMenu } from "./TablatureViewMenu";
 
 interface DesktopSessionViewProps {
   reportResult:             any;
+  scoredRuns:               ScoredRun[];
   currentUserStats:         any;
   previousUserStats:        any;
   activityDataToUse:        any;
@@ -239,6 +240,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                   ratingData={p.reportResult} currentUserStats={p.currentUserStats}
                   previousUserStats={p.previousUserStats} onClick={p.onClose}
                   activityData={p.activityDataToUse} hideWrapper={true}
+                  scoredRuns={p.scoredRuns}
                   onRestart={p.handleRestartFullSession}
                 />
               </div>

@@ -5,6 +5,7 @@ import { HeroPattern } from "components/UI/HeroBanner";
 import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
+import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
@@ -17,6 +18,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { getDailyStreakMultiplier, getReconciledStreak } from "utils/gameLogic";
 
 import { RewardBreakdown } from "./components/RewardBreakdown";
+import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
 import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdown";
 
@@ -76,6 +78,8 @@ interface RatingPopUpProps {
   sessionTitle?: string;
   songTitle?: string;
   songArtist?: string;
+  /** Scored exercises of this session — each gets its leaderboard placing. */
+  scoredRuns?: ScoredRun[];
 }
 
 // ─── Card shell ───────────────────────────────────────────────────────────────
@@ -105,6 +109,7 @@ const RatingPopUpLayout = ({
   sessionTitle,
   songTitle,
   songArtist,
+  scoredRuns = [],
 }: RatingPopUpProps) => {
   const {
     currentLevel,
@@ -459,6 +464,9 @@ const RatingPopUpLayout = ({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* ── Exercise leaderboards ── */}
+          {scoredRuns.length > 0 && <SessionLeaderboardCard runs={scoredRuns} />}
 
           {/* ── Session time + Streak ── */}
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
