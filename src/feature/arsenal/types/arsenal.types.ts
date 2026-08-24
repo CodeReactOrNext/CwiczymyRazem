@@ -350,6 +350,19 @@ export interface ScrapResult {
   salvaged?: SalvagedMod | null;
 }
 
+/** What a rework at the bench consumed and produced. See `data/fusion.ts`. */
+export interface FusePartsResult {
+  /** Fame charged — mirrored into the client's counter, which lives outside the query. */
+  fameSpent: number;
+  /** The pieces that came out, one tier up. */
+  produced: ScrapPart;
+  /** The pieces that went in. */
+  spent: ScrapPart;
+  /** The full wallet afterwards. */
+  newParts: ScrapPart[];
+  newFame: number;
+}
+
 /** What a whole batch teardown paid out — the duplicate sweep's receipt. */
 export interface BulkScrapResult {
   /** The merged yield of the whole batch. */

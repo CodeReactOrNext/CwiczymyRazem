@@ -76,6 +76,18 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   async redirects() {
     return [
+      // Season emails linked to /leadboard (the feature-folder name) instead of
+      // the real /leaderboard route; keep already-sent emails working.
+      {
+        source: '/leadboard',
+        destination: '/leaderboard',
+        permanent: true,
+      },
+      {
+        source: '/leadboard/:path*',
+        destination: '/leaderboard/:path*',
+        permanent: true,
+      },
       // Navigation redesign: /practice/plans and /practice/auto were duplicate
       // routes of the canonical /timer/* pages; keep old deep links working.
       {

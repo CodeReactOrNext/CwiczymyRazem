@@ -14,8 +14,7 @@ interface SendWelcomeArgs {
 }
 
 export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
 
   const logoUrl =
     process.env.EMAIL_LOGO_URL ??
@@ -60,7 +59,7 @@ export async function sendStreakReminderEmail({
   hoursLeft = null,
   variant,
 }: SendStreakReminderArgs) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
     process.env.EMAIL_LOGO_URL ??
     "https://riff.quest/images/longlightlogo.png";
@@ -113,7 +112,7 @@ export async function sendSeasonStartEmail({
   seasonName,
   daysInSeason,
 }: SendSeasonStartArgs) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
@@ -125,7 +124,7 @@ export async function sendSeasonStartEmail({
       userName: userName ?? "",
       seasonName,
       daysInSeason,
-      leaderboardUrl: `${baseUrl}/leadboard`,
+      leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
     }),
   });
@@ -157,7 +156,7 @@ export async function sendSeasonEndingSoonEmail({
   seasonName,
   daysLeft,
 }: SendSeasonEndingSoonArgs) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
@@ -169,7 +168,7 @@ export async function sendSeasonEndingSoonEmail({
       userName: userName ?? "",
       seasonName,
       daysLeft,
-      leaderboardUrl: `${baseUrl}/leadboard`,
+      leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
     }),
   });
@@ -201,7 +200,7 @@ export async function sendSeasonResultsEmail({
   fameEarned,
   top3,
 }: SendSeasonResultsArgs) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riffquest.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
@@ -221,7 +220,7 @@ export async function sendSeasonResultsEmail({
       userPoints,
       fameEarned,
       top3,
-      leaderboardUrl: `${baseUrl}/leadboard`,
+      leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
     }),
   });

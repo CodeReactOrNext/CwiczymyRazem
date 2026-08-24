@@ -5,6 +5,7 @@ import type {
   ArsenalUserData,
   BulkScrapResult,
   CaseType,
+  FusePartsResult,
   OpenCaseResult,
   OpenEffectPackResult,
   PartId,
@@ -167,6 +168,28 @@ export const sellPart = async (
       partId,
       tier,
       qty,
+    },
+  );
+  return data;
+};
+
+/**
+ * Reworks `crafts` pieces of a part up a tier. The bill is recomputed server-side
+ * from `data/fusion.ts`, so this only says what to make and how much of it.
+ */
+export const fuseParts = async (
+  partId: PartId,
+  tier: PartTier,
+  crafts: number,
+): Promise<FusePartsResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<FusePartsResult>(
+    "/api/arsenal/parts-fuse",
+    {
+      idToken,
+      partId,
+      tier,
+      crafts,
     },
   );
   return data;
