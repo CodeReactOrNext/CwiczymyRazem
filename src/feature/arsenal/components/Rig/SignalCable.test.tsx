@@ -109,15 +109,16 @@ const plugsOf = (container: Element) =>
   Array.from(container.querySelectorAll("g[transform]"))
     .map((group) => ({
       transform: group.getAttribute("transform") ?? "",
-      boot:
-        group.querySelector('path[fill="#131316"]')?.getAttribute("d") ?? "",
+      // The boot is the one part drawn from the back of the handle outwards.
+      boot: group.querySelector('path[d^="M -0.95"]')?.getAttribute("d") ?? "",
     }))
     // A coupler carries no strain-relief boot; a plug is the one that does.
     .filter((part) => part.boot)
     .map((part) => ({
       x: Number(part.transform.match(/translate\((-?[\d.]+) /)?.[1]),
-      // `Q {back} -1 …` is the back face of the boot: how far it stands out.
-      reach: -Number(part.boot.match(/Q (-?[\d.]+) -1 /)?.[1]),
+      y: Number(part.transform.match(/translate\(-?[\d.]+ (-?[\d.]+)\)/)?.[1]),
+      // The boot's first curve starts at its back face: how far it stands out.
+      reach: -Number(part.boot.match(/Q (-?[\d.]+) /)?.[1]),
     }))
     .sort((a, b) => a.x - b.x);
 
@@ -231,6 +232,25 @@ describe("SignalCable", () => {
     );
     // …and one with the whole gap to itself keeps its full length.
     expect(roomy[1].reach).toBeGreaterThan(tight[1].reach);
+  });
+
+  it("stands a top-mounted plug proud of the enclosure, and turns above it", () => {
+    const nodes = row(ROW_Y_PCT[1], 2, 6);
+    const { container, runs } = draw(nodes, { topJacked: [nodes[1].itemId] });
+    const rowTop = toViewY(ROW_Y_PCT[1]);
+
+    // Its two sockets are the only ones up near the pedal's top edge; a
+    // side-mounted pair sits half way down it.
+    const top = plugsOf(container).filter((plug) => plug.y < rowTop + 5);
+    expect(top).toHaveLength(2);
+
+    top.forEach((plug) => {
+      // Seated any deeper and the enclosure swallows the plug whole.
+      expect(plug.y - plug.reach).toBeLessThan(rowTop);
+    });
+    // …and the run bends clear of the boot rather than through it.
+    const climb = Math.min(...pointsOf(runs[1]).map((point) => point.y));
+    expect(climb).toBeLessThanOrEqual(top[0].y - top[0].reach);
   });
 
   it("leaves the boot straight before the cable starts to hang", () => {

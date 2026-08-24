@@ -194,8 +194,29 @@ const TURN = 7;
 /** The radius every corner of a routed run is bent to. Cable, not wire. */
 const BEND = 3.2;
 
-/** How far above a pedal a cable off its top edge runs before it turns. */
-const TOP_LANE = 2;
+/**
+ * How far above a pedal a cable off its top edge runs before it turns.
+ *
+ * It has to clear the plug standing in that socket, not just the enclosure —
+ * a lane closer than the plug is tall puts the run straight through the boot
+ * it is supposed to be leaving.
+ */
+const TOP_LANE = 2.4;
+
+/**
+ * The gauge of the whole loom: jacket, boot and handle, in that order.
+ *
+ * They have to stack the way they do on a real lead — the handle fatter than
+ * the boot, the boot fatter than the jacket it grips — or the cable reads as
+ * bulging out of a strain relief too narrow to hold it, which is what happens
+ * when each part is sized on its own. The handle is also kept near the size of
+ * the socket it goes into: `EFFECT_JACK_Y`'s own measurements put those between
+ * 1.65 and 2.35 units across, and a plug half again as fat as its hole looks
+ * pushed against the pedal rather than into it.
+ */
+const JACKET_W = 1.9;
+const BOOT_H = 2.15;
+const HANDLE_H = 2.75;
 
 /** How far a plug stands out of its socket: tip to the back of the boot. */
 const PLUG_REACH = 2.65;
@@ -203,20 +224,24 @@ const PLUG_REACH = 2.65;
 /** The shortest one can be cut back to and still read as a quarter-inch plug. */
 const MIN_PLUG_REACH = 1.9;
 
+/** Cable left showing between two plugs facing each other across a gap. */
+const PLUG_BREATH = 1.5;
+
 /**
  * Gap below which two facing plugs stop being drawable as two plugs.
  *
- * A facing pair share the gap between their enclosures, half each, so a plug is
- * cut back to whatever its half comes to rather than being drawn straight
- * through its opposite number. Below `MIN_PLUG_REACH` apiece there is nothing
- * left to cut, and the pair becomes a single rigid coupler instead — which is
- * what a real board packed this tightly uses anyway.
+ * A facing pair share the gap between their enclosures — half each, less the
+ * `PLUG_BREATH` of cable that has to stay showing between them, or the two read
+ * as one grey lump bridging the pedals rather than as two plugs on a lead.
+ * Below `MIN_PLUG_REACH` apiece there is nothing left to cut, and the pair
+ * becomes a single rigid coupler instead, which is what a real board packed
+ * this tightly uses anyway.
  */
-const COUPLER_MAX = MIN_PLUG_REACH * 2 + 0.5;
+const COUPLER_MAX = MIN_PLUG_REACH * 2 + PLUG_BREATH;
 
-/** A plug's half of the gap it stands in, never longer than a real one. */
+/** A plug's share of the gap it stands in, never longer than a real one. */
 const reachInGap = (gap: number) =>
-  Math.max(MIN_PLUG_REACH, Math.min(PLUG_REACH, gap / 2 - 0.25));
+  Math.max(MIN_PLUG_REACH, Math.min(PLUG_REACH, (gap - PLUG_BREATH) / 2));
 
 const toView = (xPct: number, yPct: number) => ({
   x: (xPct / 100) * VIEW_W,
@@ -293,6 +318,17 @@ const clearOf = (anchor: Anchor): Point => ({ x: anchor.at.x, y: anchor.lane });
 const PLUG_CLEAR = PLUG_REACH + BEND + 0.4;
 
 /**
+ * How far a plug may stand out of a top-mounted socket.
+ *
+ * A board only ever leaves a few units between the top of one row and the
+ * bottom of the one above it, and the cable off that socket has to cross them
+ * too. So the plug takes what the room allows rather than its full length —
+ * a short plug reads as a plug, a plug with a cable drawn through it does not.
+ */
+const topReach = (anchor: Anchor) =>
+  Math.max(1.7, Math.min(PLUG_REACH, anchor.at.y - anchor.lane - 0.55));
+
+/**
  * The climb out of a top-mounted socket: the back of the plug's boot first, and
  * only then the lane it turns in. Standing the corner above the plug rather
  * than inside it is what makes the cable read as coming out of the boot instead
@@ -300,7 +336,7 @@ const PLUG_CLEAR = PLUG_REACH + BEND + 0.4;
  */
 const riseOf = (anchor: Anchor): Point[] => {
   const lane = clearOf(anchor);
-  const boot = anchor.at.y - PLUG_REACH - 0.3;
+  const boot = anchor.at.y - topReach(anchor) - 0.3;
   return boot > lane.y ? [{ x: anchor.at.x, y: boot }, lane] : [lane];
 };
 
@@ -528,6 +564,10 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
   const shoulder = back + 0.55;
   /** The moulded ribs, spaced along whatever boot is left. */
   const rib = (along: number) => -0.95 + (back + 0.95) * along;
+  const handle = HANDLE_H / 2;
+  const boot = BOOT_H / 2;
+  /** Where the boot has finished tapering off the handle. */
+  const taper = (handle + boot) / 2;
 
   return (
     <g transform={`translate(${at(point)})${turn}`}>
@@ -536,25 +576,27 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
       {spin !== 90 && (
         <ellipse
           cx={(0.35 + back) / 2}
-          cy={1.95}
+          cy={handle + 0.55}
           rx={(0.35 - back) / 2 + 0.7}
-          ry={0.66}
+          ry={0.6}
           fill='#000000'
           opacity={0.42}
         />
       )}
 
-      {/* The moulded strain-relief boot, tapering onto the cable. */}
+      {/* The moulded strain-relief boot, tapering onto the cable. Lifted off
+          black so it separates from the deck it lies on rather than reading as
+          a hole with a handle floating over it. */}
       <path
-        d={`M -0.95 -1.72 L ${shoulder} -1.2 Q ${back} -1 ${back} 0 Q ${back} 1 ${shoulder} 1.2 L -0.95 1.72 Z`}
-        fill='#131316'
+        d={`M -0.95 ${-handle} L ${shoulder} ${-taper} Q ${back} ${-boot} ${back} 0 Q ${back} ${boot} ${shoulder} ${taper} L -0.95 ${handle} Z`}
+        fill='#1b1c21'
       />
       <g stroke='#000000' strokeWidth={0.18} opacity={0.55}>
-        <line x1={rib(0.35)} y1={-1.5} x2={rib(0.35)} y2={1.5} />
-        <line x1={rib(0.65)} y1={-1.28} x2={rib(0.65)} y2={1.28} />
+        <line x1={rib(0.35)} y1={-taper} x2={rib(0.35)} y2={taper} />
+        <line x1={rib(0.65)} y1={-boot} x2={rib(0.65)} y2={boot} />
       </g>
       <path
-        d={`M -0.95 -1.72 L ${shoulder} -1.2 L ${shoulder} -0.76 L -0.95 -1.16 Z`}
+        d={`M -0.95 ${-handle} L ${shoulder} ${-taper} L ${shoulder} ${-taper + 0.44} L -0.95 ${-handle + 0.56} Z`}
         fill='#ffffff'
         opacity={0.1}
       />
@@ -563,16 +605,16 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
           seam opens up against a pedal image with a transparent margin. */}
       <rect
         x={-1.05}
-        y={-1.72}
+        y={-handle}
         width={1.4}
-        height={3.44}
-        rx={0.36}
+        height={HANDLE_H}
+        rx={0.34}
         fill={metal}
       />
       <g stroke='#15181b' strokeWidth={0.14} opacity={0.5}>
-        <line x1={-0.82} y1={-1.46} x2={-0.82} y2={1.46} />
-        <line x1={-0.52} y1={-1.46} x2={-0.52} y2={1.46} />
-        <line x1={-0.22} y1={-1.46} x2={-0.22} y2={1.46} />
+        <line x1={-0.82} y1={-handle + 0.26} x2={-0.82} y2={handle - 0.26} />
+        <line x1={-0.52} y1={-handle + 0.26} x2={-0.52} y2={handle - 0.26} />
+        <line x1={-0.22} y1={-handle + 0.26} x2={-0.22} y2={handle - 0.26} />
       </g>
     </g>
   );
@@ -600,67 +642,73 @@ interface CouplerProps {
  */
 const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
   const span = Math.max(0, to.x - from.x);
+  /** Barrel and rings, at the gauge the plugs it stands in for are drawn to. */
+  const ring = HANDLE_H / 2;
+  const barrel = BOOT_H / 2;
+  /** The slot down the middle, wide enough for the run's colour to read
+   *  through it without eating the barrel it is cut into. */
+  const slot = JACKET_W / 4;
 
   return (
     <g transform={`translate(${at(from)})`}>
       <ellipse
         cx={span / 2}
-        cy={2}
+        cy={ring + 0.55}
         rx={span / 2 + 1.5}
-        ry={0.66}
+        ry={0.6}
         fill='#000000'
         opacity={0.42}
       />
       {/* The barrel, split so the cable inside it stays readable. */}
       <rect
         x={-0.3}
-        y={-1.42}
+        y={-barrel}
         width={span + 0.6}
-        height={0.92}
-        rx={0.3}
+        height={barrel - slot}
+        rx={0.28}
         fill={metal}
       />
       <rect
         x={-0.3}
-        y={0.5}
+        y={slot}
         width={span + 0.6}
-        height={0.92}
-        rx={0.3}
+        height={barrel - slot}
+        rx={0.28}
         fill={metal}
       />
       {/* A hairline of the run's own colour along the slot, so a coupler on a
           backwards link is as red as the cable either side of it. */}
       <rect
         x={-0.3}
-        y={-0.5}
+        y={-slot}
         width={span + 0.6}
-        height={1}
+        height={slot * 2}
         fill={tone.jacket}
         opacity={0.55}
       />
       {/* The rings seated in each enclosure. */}
       <rect
         x={-0.7}
-        y={-1.72}
+        y={-ring}
         width={1.05}
-        height={3.44}
-        rx={0.34}
+        height={HANDLE_H}
+        rx={0.32}
         fill={metal}
       />
       <rect
         x={span - 0.35}
-        y={-1.72}
+        y={-ring}
         width={1.05}
-        height={3.44}
-        rx={0.34}
+        height={HANDLE_H}
+        rx={0.32}
         fill={metal}
       />
       {/* The seam where the two halves meet. */}
       <line
         x1={span / 2}
-        y1={-1.42}
+        y1={-barrel}
         x2={span / 2}
-        y2={1.42}
+        y2={barrel}
         stroke='#15181b'
         strokeWidth={0.2}
         opacity={0.7}
@@ -801,7 +849,9 @@ export const SignalCable = ({
             {
               at: inAnchor.at,
               spin: (inAnchor.fromTop ? 90 : 0) as 0 | 90,
-              reach: before?.reach ?? PLUG_REACH,
+              reach: inAnchor.fromTop
+                ? topReach(inAnchor)
+                : (before?.reach ?? PLUG_REACH),
             },
           ]
         : []),
@@ -810,7 +860,9 @@ export const SignalCable = ({
             {
               at: outAnchor.at,
               spin: (outAnchor.fromTop ? 90 : 180) as 90 | 180,
-              reach: after?.reach ?? PLUG_REACH,
+              reach: outAnchor.fromTop
+                ? topReach(outAnchor)
+                : (after?.reach ?? PLUG_REACH),
             },
           ]
         : []),
@@ -861,7 +913,7 @@ export const SignalCable = ({
               key={index}
               d={run.d}
               stroke='#000000'
-              strokeWidth={3.4}
+              strokeWidth={2.8}
               opacity={0.5}
               transform='translate(0 0.75)'
             />
@@ -883,30 +935,30 @@ export const SignalCable = ({
               <path
                 d={run.d}
                 stroke={tone.core}
-                strokeWidth={5}
+                strokeWidth={4.1}
                 opacity={run.ok ? (verdict.flawless ? 0.14 : 0.08) : 0.18}
               />
             )}
-            <path d={run.d} stroke={tone.jacket} strokeWidth={2.3} />
+            <path d={run.d} stroke={tone.jacket} strokeWidth={JACKET_W} />
             {/* The sheen off a rubber jacket, which is what makes it round. */}
             <path
               d={run.d}
               stroke='#ffffff'
-              strokeWidth={0.5}
+              strokeWidth={0.42}
               opacity={0.12}
               transform='translate(0 -0.5)'
             />
             <path
               d={run.d}
               stroke={tone.core}
-              strokeWidth={0.75}
+              strokeWidth={0.62}
               opacity={0.95}
             />
             {pulsing && (
               <motion.path
                 d={run.d}
                 stroke={tone.pulse}
-                strokeWidth={1.3}
+                strokeWidth={1.08}
                 strokeDasharray='3 15'
                 initial={{ strokeDashoffset: 0 }}
                 animate={{ strokeDashoffset: -18 }}
