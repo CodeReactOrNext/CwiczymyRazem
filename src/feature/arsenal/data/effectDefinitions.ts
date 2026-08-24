@@ -13,29 +13,38 @@ import type {
  * theirs holds stereo, expression and power while the mono in and out stay on
  * the sides where their own arrows point — those keep the default.
  *
- * Coordinates are fractions of the pedal's box, read off the artwork, so they
- * land on the socket the label belongs to at any board size. They are eyeballed
- * rather than measured: near enough that the cable meets the right hole, not so
- * exact that redrawing a pedal would demand new numbers.
+ * Coordinates are fractions of the pedal's box, measured off the artwork the
+ * same way `EFFECT_JACK_Y` measures the side-mounted ones: a socket nut stands
+ * proud of the case, so the columns where an image's silhouette reaches highest
+ * are the columns its sockets are drawn in. The first two from the left are
+ * always the signal pair — every one of these enclosures prints its ins and
+ * outs before its expression, USB and power.
+ *
+ * The `y` is a seating depth rather than a position. Those nuts reach the very
+ * top row of their image, so a plug pushed in any deeper than the sliver that
+ * hides the seam disappears behind the enclosure handle and all, which leaves
+ * a dark stub standing on the pedal instead of a plug.
  */
+const TOP_JACK_SEAT = 0.012;
+
 const TOP_JACKS = {
   /** "L-IN · L-OUT · R-OUT · EXP · USB · 9V DC" — the wide Lab enclosures. */
   lab: {
     edge: "top",
-    in: { x: 0.39, y: 0.045 },
-    out: { x: 0.49, y: 0.045 },
+    in: { x: 0.405, y: TOP_JACK_SEAT },
+    out: { x: 0.496, y: TOP_JACK_SEAT },
   },
   /** "SOURCE IN · ECHO OUT · CONTROL CV · LINK MIDI" — Astral Reverberator. */
   astral: {
     edge: "top",
-    in: { x: 0.25, y: 0.035 },
-    out: { x: 0.41, y: 0.035 },
+    in: { x: 0.232, y: TOP_JACK_SEAT },
+    out: { x: 0.379, y: TOP_JACK_SEAT },
   },
   /** "L-IN · R-OUT · EXP · USB" — Cosmic Resonance. */
   cosmic: {
     edge: "top",
-    in: { x: 0.24, y: 0.04 },
-    out: { x: 0.4, y: 0.04 },
+    in: { x: 0.239, y: TOP_JACK_SEAT },
+    out: { x: 0.383, y: TOP_JACK_SEAT },
   },
 } satisfies Record<string, EffectJackLayout>;
 
