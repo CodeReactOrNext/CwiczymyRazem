@@ -2,14 +2,12 @@
 
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Reveal } from "feature/landing/components/Reveal";
-import { songGuides } from "feature/song-library/song-guides/content";
+import { featuredGuides } from "feature/landing/data/featuredGuides";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, BookMarked, Disc3, Filter, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const featuredGuides = songGuides.slice(0, 3);
 
 interface SongsLibrarySectionProps {
   guideLiveData?: PathSongLiveDataMap;
@@ -91,10 +89,10 @@ export const SongsLibrarySection = ({
 
             {/* Featured song guides */}
             <div className='mt-8'>
-              <p className='mb-3 text-sm font-bold text-white'>
+              <p className='mb-2.5 text-sm font-bold text-white'>
                 Popular guides
               </p>
-              <div className='flex flex-wrap gap-2'>
+              <div className='flex flex-wrap gap-1.5'>
                 {featuredGuides.map((guide) => {
                   const live = guide.songId
                     ? guideLiveData[guide.songId]
@@ -108,14 +106,14 @@ export const SongsLibrarySection = ({
                     <Link
                       key={guide.slug}
                       href={`/song-library/${guide.slug}`}
-                      className='group inline-flex items-center gap-2 rounded-lg bg-zinc-900/40 px-3 py-2 text-sm transition-colors hover:bg-zinc-900/70'>
+                      className='group inline-flex items-center gap-1.5 rounded-md bg-zinc-900/40 px-2.5 py-1 text-xs transition-colors hover:bg-zinc-900/70'>
                       <span
                         translate='no'
-                        className='font-semibold text-zinc-200 transition-colors group-hover:text-white'>
+                        className='font-semibold text-zinc-300 transition-colors group-hover:text-white'>
                         {guide.title}
                       </span>
                       <span
-                        className='text-xs font-bold'
+                        className='text-[11px] font-bold'
                         style={{ color: tier.color }}>
                         {tier.label}
                       </span>

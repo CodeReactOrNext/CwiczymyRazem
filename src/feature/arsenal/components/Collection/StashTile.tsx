@@ -8,6 +8,7 @@ import { cn } from "assets/lib/utils";
 import { Star } from "lucide-react";
 import type {
   CSSProperties,
+  MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
   ReactNode,
 } from "react";
@@ -58,6 +59,8 @@ export interface StashPlacement {
   disabled?: boolean;
   dropTarget?: StashDropTarget;
   dragHandlers?: StashDragHandlers;
+  /** Right-click on the socket. The board answers it with its own menu. */
+  onContextMenu?: (event: ReactMouseEvent<HTMLElement>) => void;
 }
 
 interface StashTileProps {
@@ -86,6 +89,8 @@ interface StashTileProps {
   dropTarget?: StashDropTarget;
   /** Makes the socket draggable. Absent = the piece is fixed in place. */
   dragHandlers?: StashDragHandlers;
+  /** Right-click on the socket — the board opens its menu for this piece. */
+  onContextMenu?: (event: ReactMouseEvent<HTMLElement>) => void;
   /** Read out to screen readers and shown as the native tooltip. */
   label: string;
   /** Stack size, bottom-right. Only parts stack — gear is one socket per copy. */
@@ -130,6 +135,7 @@ export const StashTile = ({
   disabled = false,
   dropTarget,
   dragHandlers,
+  onContextMenu,
   label,
   count,
   level,
@@ -185,6 +191,7 @@ export const StashTile = ({
     <Socket
       {...(onClick ? { type: "button" as const, onClick, disabled } : {})}
       {...dragHandlers}
+      onContextMenu={onContextMenu}
       // Art is natively draggable: left alone, the browser starts its own image
       // drag, the pointer stream is cancelled, and the piece never moves.
       draggable={false}
@@ -282,17 +289,15 @@ export const StashTile = ({
         className='pointer-events-none absolute inset-0 bg-white/0 transition-colors group-hover:bg-white/[0.09]'
       />
 
-      {/* Level, as the emblem the cards use, shrunk to corner size: a dark
-          capsule ringed in the tier's colour, digits in white. Bare coloured
-          text used to sit straight on the artwork, where a light pickup or a
-          bright pedal face swallowed it. */}
+      {/* Level: the same flat chip the stack size gets, digits in the tier's
+          colour. No ring and no glow — the plate around it already says which
+          tier this is, and the number only has to be read. The chip is there
+          at all because bare text used to sit straight on the artwork, where a
+          light pickup or a bright pedal face swallowed it. */}
       {level != null && level > 0 && (
         <span
-          className='absolute left-1 top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full px-1 text-[10px] font-black tabular-nums leading-none text-white'
-          style={{
-            background: "radial-gradient(circle at 50% 35%, #1c1c22, #0b0b0e)",
-            boxShadow: `inset 0 0 0 1px ${color}, 0 0 8px ${color}55, 0 1px 3px rgba(0,0,0,0.9)`,
-          }}>
+          className='absolute left-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded px-1.5 text-xs font-black tabular-nums leading-none'
+          style={{ color, background: "rgba(0,0,0,0.85)" }}>
           {levelPrefix}
           {level}
         </span>
@@ -315,13 +320,11 @@ export const StashTile = ({
         />
       )}
 
-      {/* Stack size, in the opposite corner and in a different shape from the
-          level — a dark chip, no tier colour, and the × that says out loud this
-          is "how many", not "how good". */}
+      {/* Stack size, in the opposite corner and told apart from the level by
+          its colour rather than its shape — plain zinc digits, and the ×
+          that says out loud this is "how many", not "how good". */}
       {count != null && count > 0 && (
-        <span
-          className='absolute bottom-1 right-1 rounded-[3px] bg-black/80 px-1 py-0.5 text-[10px] font-black tabular-nums leading-none text-zinc-100'
-          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
+        <span className='absolute bottom-1 right-1 rounded bg-black/85 px-1.5 py-1 text-xs font-black tabular-nums leading-none text-zinc-100'>
           ×{count}
         </span>
       )}

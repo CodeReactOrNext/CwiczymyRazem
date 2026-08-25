@@ -1,30 +1,16 @@
 import { cn } from "assets/lib/utils";
-import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
-import { motion } from "framer-motion";
 
 import type { CaseDefinition } from "../../types/arsenal.types";
 import { DropRates } from "./DropRates";
 import { OpenCaseButton } from "./OpenCaseButton";
 
-/** Per-tier identity lives in the background + glow only — structure,
-    typography and the button are identical across every case. Tier is
-    derived from the id prefix (e.g. "elite-effect" -> "elite"). */
-const CASE_ACCENT: Record<string, { color: string; gradient: string; image: string }> = {
-  standard: {
-    color: "#a1a1aa",
-    gradient: "linear-gradient(160deg, #1a1a1f 0%, #101013 45%, #0b0b0d 100%)",
-    image: "/images/case-2.webp",
-  },
-  premium: {
-    color: "#818cf8",
-    gradient: "linear-gradient(160deg, #161425 0%, #0e0d1a 45%, #08070d 100%)",
-    image: "/images/case-3.webp",
-  },
-  elite: {
-    color: "#fbbf24",
-    gradient: "linear-gradient(160deg, #1c1200 0%, #0d0900 45%, #080600 100%)",
-    image: "/images/case-1.webp",
-  },
+/** Per-tier identity is carried by one tinted glow behind the art and by the
+    tier word in the name — structure, typography and the button stay identical
+    across the shelf. Tier is derived from the id prefix ("elite-effect" -> "elite"). */
+const CASE_ACCENT: Record<string, { color: string; image: string }> = {
+  standard: { color: "#a1a1aa", image: "/images/case-2.webp" },
+  premium: { color: "#818cf8", image: "/images/case-3.webp" },
+  elite: { color: "#fbbf24", image: "/images/case-1.webp" },
 };
 
 /** Effect-pool cases get dedicated pedal-case art instead of the shared guitar case. */
@@ -38,8 +24,12 @@ interface CaseCardProps {
   currentFame: number;
   onOpen: (caseType: string) => void;
   isOpening: boolean;
-  /** "compact" halves the card's visual footprint for the Premium/Elite pool grid. */
-  size?: "full" | "compact";
+  /**
+   * Both layouts read art-left / copy-right. `wide` additionally pulls the
+   * actions out into a third column — used for Standard alone, so the everyday
+   * case reads as its own thing instead of a fifth clone of the grid.
+   */
+  layout?: "tile" | "wide";
   className?: string;
 }
 
@@ -48,120 +38,82 @@ export const CaseCard = ({
   currentFame,
   onOpen,
   isOpening,
-  size = "full",
+  layout = "tile",
   className,
 }: CaseCardProps) => {
   const tier = caseDef.id.split("-")[0];
   const accent = CASE_ACCENT[tier] || CASE_ACCENT.standard;
-  const image = caseDef.dropKind === "effect" ? EFFECT_CASE_IMAGE[tier] || accent.image : accent.image;
+  const image =
+    caseDef.dropKind === "effect" ? EFFECT_CASE_IMAGE[tier] || accent.image : accent.image;
   const canAfford = currentFame >= caseDef.fameCost;
-  const isCompact = size === "compact";
+  const isWide = layout === "wide";
+
+  // "Premium Guitar Case" -> the tier word takes the accent, the rest stays neutral.
+  const [tierWord, ...restOfName] = caseDef.name.split(" ");
 
   return (
-    // 1px shell showing the animated border underneath the card face.
-    <div
-      className={cn("relative overflow-hidden rounded-lg p-px", className)}
-      style={{ background: `${accent.color}24` }}>
-      {/* Light beam travelling around the border — oversized rotating conic
-          gradient; only the 1px ring around the opaque card face is visible. */}
-      <motion.div
-        className='pointer-events-none absolute -inset-full'
+    <article
+      className={cn(
+        "group relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-900/60 p-5 transition-colors hover:bg-zinc-800/50",
+        isWide && "sm:flex-row sm:items-center sm:gap-8 sm:p-6",
+        className,
+      )}>
+      {/* Tier tint — a wash off the top edge instead of a tier-colored frame. */}
+      <div
+        className='pointer-events-none absolute inset-0'
         style={{
-          background: `conic-gradient(from 0deg, transparent 0deg, transparent 290deg, ${accent.color}d9 340deg, transparent 360deg)`,
+          background: `radial-gradient(120% 70% at 50% 0%, ${accent.color}14 0%, transparent 70%)`,
         }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
       />
 
-      <div
-        className={cn(
-          "relative flex h-full flex-col overflow-hidden rounded-[7px]",
-          isCompact ? "gap-2 p-4" : "gap-4 p-6"
-        )}
-        style={{ background: accent.gradient }}>
-        {/* Guitar icon watermark — same texture as /login */}
-        <GuitarPatternBackground opacity={0.05} />
-
-        {/* Soft tier-colored glows drifting in the background */}
+      {/* Art and copy sit side by side at every size: a case is a thing on a
+          shelf, and a thing on a shelf has its label beside it, not under it. */}
+      <div className={cn("relative flex items-center gap-4", isWide && "sm:flex-1 sm:gap-8")}>
         <div
           className={cn(
-            "pointer-events-none absolute -left-12 -top-12 rounded-full animate-glow-float-1",
-            isCompact ? "h-32 w-32 blur-[36px]" : "h-48 w-48 blur-[50px]"
-          )}
-          style={{
-            background: `radial-gradient(circle at center, ${accent.color}50 0%, transparent 70%)`,
-          }}
-        />
-        <div
-          className={cn(
-            "pointer-events-none absolute -bottom-12 -right-12 rounded-full animate-glow-float-2",
-            isCompact ? "h-32 w-32 blur-[36px]" : "h-48 w-48 blur-[50px]"
-          )}
-          style={{
-            background: `radial-gradient(circle at center, ${accent.color}45 0%, transparent 70%)`,
-          }}
-        />
-
-        {/* Case image with tier-colored glow backdrop — grows to fill the card
-            (e.g. Standard stretched to match the Premium/Elite grid's height)
-            so the image sits centered instead of leaving a dead gap above the footer. */}
-        <div className={cn("relative flex items-center justify-center", !isCompact && "flex-1 py-2")}>
+            "relative flex flex-shrink-0 items-center justify-center",
+            isWide ? "h-24 w-28 sm:h-28 sm:w-44" : "h-20 w-24",
+          )}>
           <div
             className={cn(
               "pointer-events-none absolute rounded-full",
-              isCompact ? "h-20 w-36 blur-[34px]" : "h-32 w-56 blur-[48px]"
+              isWide ? "h-20 w-40 blur-[42px]" : "h-14 w-24 blur-[32px]",
             )}
             style={{
-              background: `radial-gradient(ellipse at center, ${accent.color}40 0%, ${accent.color}12 55%, transparent 80%)`,
+              background: `radial-gradient(ellipse at center, ${accent.color}40 0%, ${accent.color}10 55%, transparent 80%)`,
             }}
           />
           <img
             src={image}
             alt={caseDef.name}
-            className={cn("relative z-10 object-contain", isCompact ? "h-28" : "h-52")}
-            style={{ filter: "drop-shadow(0 10px 24px rgba(0,0,0,0.55))" }}
+            className='relative z-10 max-h-full w-full object-contain'
             draggable={false}
           />
         </div>
 
-        {/* Name + description */}
-        <div className='relative text-center'>
+        <div className='min-w-0 flex-1'>
           <h3
             className={cn(
-              "bg-clip-text font-display font-black tracking-wide text-transparent",
-              isCompact ? "text-lg" : "text-2xl"
-            )}
-            style={{
-              backgroundImage: `linear-gradient(180deg, #ffffff 20%, ${accent.color} 135%)`,
-            }}>
-            {caseDef.name}
+              "font-display font-bold text-zinc-100",
+              isWide ? "text-xl" : "text-base",
+            )}>
+            <span style={{ color: accent.color }}>{tierWord}</span> {restOfName.join(" ")}
           </h3>
-          {!isCompact && <p className='mt-1.5 text-sm text-zinc-400'>{caseDef.description}</p>}
-        </div>
-
-        {/* Footer — drop rates, cost, uniform button */}
-        <div className={cn("relative mt-auto flex flex-col", isCompact ? "gap-2" : "gap-4 pt-2")}>
-          <div className='flex items-center justify-between'>
-            <DropRates probabilities={caseDef.probabilities} />
-            <div className='flex items-center gap-1.5 text-sm font-bold'>
-              <img
-                src='/images/coin.png'
-                alt='coin'
-                className={cn("h-5 w-5 object-contain", !canAfford && "opacity-50 grayscale")}
-              />
-              <span className={canAfford ? "text-zinc-100" : "text-red-400"}>
-                {caseDef.fameCost} Fame
-              </span>
-            </div>
-          </div>
-          <OpenCaseButton
-            canAfford={canAfford}
-            isOpening={isOpening}
-            onClick={() => onOpen(caseDef.id)}
-            className={cn("w-full", isCompact && "py-2")}
-          />
+          <p className='mt-1 text-xs leading-relaxed text-zinc-500'>{caseDef.description}</p>
         </div>
       </div>
-    </div>
+
+      <div className={cn("relative flex flex-col gap-3", isWide ? "w-full sm:w-56" : "mt-auto")}>
+        <DropRates probabilities={caseDef.probabilities} />
+        <OpenCaseButton
+          canAfford={canAfford}
+          isOpening={isOpening}
+          onClick={() => onOpen(caseDef.id)}
+          fameCost={caseDef.fameCost}
+          variant='soft'
+          className='w-full'
+        />
+      </div>
+    </article>
   );
 };

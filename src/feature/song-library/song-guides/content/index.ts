@@ -5,6 +5,7 @@ import { hotelCalifornia } from "./hotel-california";
 import { masterOfPuppets } from "./master-of-puppets";
 import { nothingElseMatters } from "./nothing-else-matters";
 import { sevenNationArmy } from "./seven-nation-army";
+import { smokeOnTheWater } from "./smoke-on-the-water";
 import { snowHeyOh } from "./snow-hey-oh";
 import { stairwayToHeaven } from "./stairway-to-heaven";
 import { sweetChildOMine } from "./sweet-child-o-mine";
@@ -25,6 +26,7 @@ export const songGuides: SongGuide[] = [
   snowHeyOh,
   tornadoOfSouls,
   eruption,
+  smokeOnTheWater,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>

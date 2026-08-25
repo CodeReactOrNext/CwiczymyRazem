@@ -33,6 +33,7 @@ import { ModArt } from "../Workshop/ModArt";
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { InventoryItem } from "../../types/arsenal.types";
+import { CardAction, CardActionRow } from "../CardActions";
 import { CardAffixes } from "../CardAffixes";
 import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
@@ -346,28 +347,14 @@ export const GuitarCard = ({
 
       {/* Equip / Sell */}
       {!readOnly && !footer && (
-        <div
-          className='flex flex-shrink-0 border-t'
-          style={{
-            borderColor: `${rs.baseColor}20`,
-            background: "rgba(0,0,0,0.35)",
-          }}>
-          <button
+        <CardActionRow>
+          <CardAction
+            tone={isEquipped ? "active" : "neutral"}
+            icon={isEquipped ? Check : undefined}
             onClick={() => onEquipClick?.()}
-            disabled={isEquipping}
-            className={cn(
-              "flex flex-1 items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide transition-colors",
-              isEquipped
-                ? "text-amber-400"
-                : "text-zinc-300 disabled:opacity-30 hover:text-white",
-            )}
-            style={{
-              borderColor: `${rs.baseColor}15`,
-              background: isEquipped ? "rgba(251,191,36,0.06)" : undefined,
-            }}>
-            {isEquipped && <Check size={10} strokeWidth={3} />}
+            disabled={isEquipping}>
             Equip
-          </button>
+          </CardAction>
 
           <TooltipProvider>
             {onListClick && (
@@ -375,14 +362,13 @@ export const GuitarCard = ({
                 <TooltipTrigger asChild>
                   {/* Wrapper span keeps the tooltip working while the button is disabled. */}
                   <span className='flex flex-1'>
-                    <button
+                    <CardAction
+                      tone='market'
+                      icon={Store}
                       onClick={() => onListClick(item.id, guitar.id)}
-                      disabled={isListing || isEquipped || rigSlot != null}
-                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
-                      style={{ borderColor: `${rs.baseColor}15` }}>
-                      <Store size={10} strokeWidth={2.5} />
+                      disabled={isListing || isEquipped || rigSlot != null}>
                       Market
-                    </button>
+                    </CardAction>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent
@@ -397,14 +383,13 @@ export const GuitarCard = ({
               <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>
                   <span className='flex flex-1'>
-                    <button
+                    <CardAction
+                      tone='scrap'
+                      icon={Wrench}
                       onClick={() => onScrapClick(item.id, guitar.id)}
-                      disabled={isScrapping || isEquipped || rigSlot != null}
-                      className='flex w-full items-center justify-center gap-1 border-r px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
-                      style={{ borderColor: `${rs.baseColor}15` }}>
-                      <Wrench size={10} strokeWidth={2.5} />
+                      disabled={isScrapping || isEquipped || rigSlot != null}>
                       Scrap
-                    </button>
+                    </CardAction>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent
@@ -460,13 +445,13 @@ export const GuitarCard = ({
               <TooltipTrigger asChild>
                 {/* Wrapper span keeps the tooltip working while the button is disabled. */}
                 <span className='flex flex-1'>
-                  <button
+                  <CardAction
+                    tone='sell'
+                    icon={Trash2}
                     onClick={() => onSellClick?.(item.id, guitar.id)}
-                    disabled={isSelling || isEquipped}
-                    className='flex w-full items-center justify-center gap-1 px-1 py-3.5 text-[11px] font-semibold capitalize tracking-wide text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'>
-                    <Trash2 size={10} strokeWidth={2.5} />
+                    disabled={isSelling || isEquipped}>
                     Sell
-                  </button>
+                  </CardAction>
                 </span>
               </TooltipTrigger>
               <TooltipContent
@@ -476,7 +461,7 @@ export const GuitarCard = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
+        </CardActionRow>
       )}
     </div>
   );

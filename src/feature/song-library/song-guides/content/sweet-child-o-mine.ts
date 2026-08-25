@@ -208,6 +208,7 @@ export const sweetChildOMine: SongGuide = {
         artist: "Deep Purple",
         difficulty: 3,
         why: "The first single-note riff milestone: teaches riff discipline with zero skip risk.",
+        guideSlug: "smoke-on-the-water",
         songId: "3vZNl6um01tBIr2qwqUo",
       },
       {
