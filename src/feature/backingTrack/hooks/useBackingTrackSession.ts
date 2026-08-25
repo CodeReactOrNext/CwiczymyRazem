@@ -824,18 +824,19 @@ export function useBackingTrackSession({
   });
 
   /**
-   * Listening runs here, beside the players, rather than on the Align screen.
+   * The waveform the session *reads*. It never listens.
    *
-   * A video's waveform can only be learned by hearing the video play, which used
-   * to mean opening Align, pressing a button and then sitting through the whole
-   * song before any alignment work could start. Held at session level it listens
-   * to the play-throughs that were happening anyway, so by the time anyone opens
-   * Align the picture is usually already there.
+   * Learning it alongside practice was meant to be free — the video is playing
+   * anyway — and it is not: a tab capture, a second audio graph and a buffer
+   * growing at 120 values a second all sit on the thread that has to keep a
+   * metronome, a tab and a microphone in time, and that showed up as a session
+   * that stutters. Capturing is now a job of its own, done deliberately in the
+   * Align screen's capture dialog and stored; this copy just reads the store.
    */
   const youtubeWaveform = useYouTubeWaveform({
     videoId: source === "youtube" || videoOverlay ? (youtube?.videoId ?? null) : null,
     getClock: youtubePlayer.getPlayerClock,
-    enabled: enabled && (source === "youtube" || videoOverlay),
+    listen: false,
   });
 
   const setYouTubeVideoId = useCallback(

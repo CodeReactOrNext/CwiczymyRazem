@@ -10,6 +10,13 @@ import { AlignmentScreen } from "./AlignmentScreen";
 
 vi.mock("utils/firebase/client/firebase.utils", () => ({ db: {} }));
 
+// The capture dialog mounts a real player; jsdom has nowhere to put one.
+vi.mock("react-youtube", () => ({
+  default: function YouTubeStub() {
+    return <div data-testid='youtube-player' />;
+  },
+}));
+
 // jsdom ships no ResizeObserver, which Radix's Slider measures its thumb with.
 vi.stubGlobal(
   "ResizeObserver",
@@ -81,6 +88,8 @@ function buildController(overrides: Partial<BackingTrackController> = {}): Backi
       start: vi.fn(),
       stop: vi.fn(),
       watch: () => () => {},
+      flush: () => Promise.resolve(),
+      refresh: vi.fn(),
     },
     driftMsRef: { current: 0 },
   // An exercise with no tempo automation, where warped beats and score beats
@@ -1038,5 +1047,177 @@ describe("instrument mixer", () => {
 
     expect(screen.getByText("Tablature")).toBeTruthy();
     expect(screen.queryByLabelText(/Drum part/)).toBeNull();
+  });
+});
+
+describe("capturing a video's waveform", () => {
+  /** A video source whose waveform could be captured but has not been. */
+  const withVideo = (overrides: Partial<BackingTrackController["youtubeWaveform"]> = {}) => {
+    const base = buildController();
+    return buildController({
+      source: "youtube",
+      youtubeVideoId: "abc",
+      youtubeWaveform: { ...base.youtubeWaveform, status: "idle", ...overrides },
+    });
+  };
+
+  it("offers a capture rather than listening on its own", () => {
+    render(<AlignmentScreen controller={withVideo()} beatsPerBar={4} onClose={vi.fn()} />);
+
+    expect(screen.getByText("No waveform captured yet")).toBeTruthy();
+    expect(screen.getByText("Capture waveform")).toBeTruthy();
+  });
+
+  it("stops the session on the way in, so only one video is heard", () => {
+    const onTogglePlay = vi.fn();
+    render(
+      <AlignmentScreen
+        controller={withVideo()}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+        isPlaying
+        onTogglePlay={onTogglePlay}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Capture waveform"));
+
+    expect(onTogglePlay).toHaveBeenCalled();
+    expect(screen.getByText("Capture the waveform")).toBeTruthy();
+  });
+
+  it("asks for more of a video it already knows some of", () => {
+    render(
+      <AlignmentScreen
+        controller={withVideo({ coverage: 0.4 })}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("40% of the video captured")).toBeTruthy();
+    expect(screen.getByText("Capture more")).toBeTruthy();
+  });
+
+  it("has nothing left to ask for once the whole video is known", () => {
+    render(
+      <AlignmentScreen
+        controller={withVideo({ coverage: 1, isComplete: true })}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Whole video captured.")).toBeTruthy();
+    expect(screen.queryByText(/^Capture/)).toBeNull();
+  });
+});
+
+describe("silencing a lane", () => {
+  const tracks = [
+    { id: "main", name: "Główny Instrument", trackType: "guitar" as const, volume: 1, isMuted: false },
+    { id: "gp-2", name: "Drums", trackType: "drums" as const, volume: 0.6, isMuted: false },
+  ];
+
+  const renderWithMix = (mixerTracks: typeof tracks, onMixerChange = vi.fn()) => {
+    render(
+      <AlignmentScreen
+        controller={buildController()}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+        mixerTracks={mixerTracks}
+        onMixerChange={onMixerChange}
+      />,
+    );
+    return onMixerChange;
+  };
+
+  it("mutes every instrument the tablature plays at once", () => {
+    const onMixerChange = renderWithMix(tracks);
+
+    fireEvent.click(screen.getByLabelText("Mute the tablature"));
+
+    expect(onMixerChange).toHaveBeenCalledWith("main", { isMuted: true });
+    expect(onMixerChange).toHaveBeenCalledWith("gp-2", { isMuted: true });
+  });
+
+  it("counts as muted only once nothing is left making a sound", () => {
+    renderWithMix([tracks[0], { ...tracks[1], isMuted: true }]);
+
+    // One instrument off is a mix, not a mute.
+    expect(screen.getByLabelText("Mute the tablature")).toBeTruthy();
+    expect(screen.getByText("what you play")).toBeTruthy();
+  });
+
+  it("hands back the mix it silenced rather than turning everything on", () => {
+    // The drums were already off before the lane was muted, so unmuting must
+    // not switch them back on — that would be a mix nobody asked for.
+    const onMixerChange = vi.fn();
+    const { rerender } = render(
+      <AlignmentScreen
+        controller={buildController()}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+        mixerTracks={[tracks[0], { ...tracks[1], isMuted: true }]}
+        onMixerChange={onMixerChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Mute the tablature"));
+    expect(onMixerChange).toHaveBeenCalledTimes(1);
+    expect(onMixerChange).toHaveBeenCalledWith("main", { isMuted: true });
+
+    // The session applies it and hands the new levels back.
+    rerender(
+      <AlignmentScreen
+        controller={buildController()}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+        mixerTracks={tracks.map((track) => ({ ...track, isMuted: true }))}
+        onMixerChange={onMixerChange}
+      />,
+    );
+
+    expect(screen.getByText("muted")).toBeTruthy();
+    fireEvent.click(screen.getByLabelText("Unmute the tablature"));
+
+    expect(onMixerChange).toHaveBeenLastCalledWith("main", { isMuted: false });
+    expect(onMixerChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("mutes the video from its own lane", () => {
+    const setAlignment = vi.fn();
+    render(
+      <AlignmentScreen
+        controller={buildController({
+          source: "youtube",
+          youtubeVideoId: "abc",
+          setAlignment,
+        })}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Mute the video"));
+
+    expect(setAlignment).toHaveBeenCalledWith({ muted: true });
+  });
+
+  it("says so on the video lane once it is silent", () => {
+    render(
+      <AlignmentScreen
+        controller={buildController({
+          source: "youtube",
+          youtubeVideoId: "abc",
+          alignment: { offsetMs: 0, sourceBpm: 120, volume: 0.8, muted: true },
+        })}
+        beatsPerBar={4}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Unmute the video")).toBeTruthy();
+    expect(screen.queryByText("tap to align")).toBeNull();
   });
 });

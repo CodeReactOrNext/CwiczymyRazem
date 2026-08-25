@@ -37,6 +37,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://riff.quest/song-library/smoke-on-the-water</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://riff.quest/song-library/snow-hey-oh</loc>
     <lastmod>2026-08-14</lastmod>
     <changefreq>monthly</changefreq>

@@ -30,9 +30,10 @@ import { useMemo } from "react";
 import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { ModArt } from "../Workshop/ModArt";
 
-const NOISE_BG =`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
+const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
+import { CardAction, CardActionRow } from "../CardActions";
 import { CardAffixes } from "../CardAffixes";
 import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
@@ -303,45 +304,33 @@ export const EffectCard = ({
       {/* On the board every other action is blocked, so the whole row becomes
           the one action that is available: taking the pedal off. */}
       {!readOnly && !footer && isOnPedalboard && onRemoveFromBoard && (
-        <div
-          className='flex flex-shrink-0 border-t'
-          style={{
-            borderColor: `${rs.baseColor}20`,
-            background: "rgba(0,0,0,0.35)",
-          }}>
-          <button
+        <CardActionRow>
+          <CardAction
+            icon={Unplug}
             onClick={() => onRemoveFromBoard(item.id)}
             disabled={isRemovingFromBoard}
-            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-300 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-cyan-400'
             title='Take this pedal off the pedalboard'>
-            <Unplug size={9} strokeWidth={2.5} />
             Remove from board
-          </button>
-        </div>
+          </CardAction>
+        </CardActionRow>
       )}
 
       {/* Sell */}
       {!readOnly && !footer && !(isOnPedalboard && onRemoveFromBoard) && (
-        <div
-          className='flex flex-shrink-0 border-t'
-          style={{
-            borderColor: `${rs.baseColor}20`,
-            background: "rgba(0,0,0,0.35)",
-          }}>
+        <CardActionRow>
           {onListClick && (
-            <button
+            <CardAction
+              tone='market'
+              icon={Store}
               onClick={() => onListClick(item.id, item.effectId)}
               disabled={isListing || isOnPedalboard}
-              className='flex flex-1 items-center justify-center gap-1.5 border-r py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-amber-400'
-              style={{ borderColor: `${rs.baseColor}15` }}
               title={
                 isOnPedalboard
                   ? "Remove from pedalboard before listing"
                   : "List on the market"
               }>
-              <Store size={9} strokeWidth={2.5} />
               Market
-            </button>
+            </CardAction>
           )}
 
           {onScrapClick && (
@@ -350,14 +339,13 @@ export const EffectCard = ({
                 <TooltipTrigger asChild>
                   {/* Wrapper span keeps the tooltip working while the button is disabled. */}
                   <span className='flex flex-1'>
-                    <button
+                    <CardAction
+                      tone='scrap'
+                      icon={Wrench}
                       onClick={() => onScrapClick(item.id, item.effectId)}
-                      disabled={isScrapping || isOnPedalboard}
-                      className='flex w-full items-center justify-center gap-1.5 border-r py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-orange-400'
-                      style={{ borderColor: `${rs.baseColor}15` }}>
-                      <Wrench size={9} strokeWidth={2.5} />
+                      disabled={isScrapping || isOnPedalboard}>
                       Scrap
-                    </button>
+                    </CardAction>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent
@@ -405,17 +393,17 @@ export const EffectCard = ({
             </TooltipProvider>
           )}
 
-          <button
+          <CardAction
+            tone='sell'
+            icon={Trash2}
             onClick={() => onSellClick?.(item.id, item.effectId)}
             disabled={isSelling || isOnPedalboard}
-            className='flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold capitalize tracking-wider text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-20 hover:text-red-400'
             title={
               isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined
             }>
-            <Trash2 size={9} strokeWidth={2.5} />
             Sell
-          </button>
-        </div>
+          </CardAction>
+        </CardActionRow>
       )}
     </div>
   );

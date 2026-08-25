@@ -113,6 +113,8 @@ function buildController(overrides: Partial<BackingTrackController> = {}): Backi
       start: vi.fn(),
       stop: vi.fn(),
       watch: () => () => {},
+      flush: () => Promise.resolve(),
+      refresh: vi.fn(),
     },
     driftMsRef: { current: 0 },
   // An exercise with no tempo automation, where warped beats and score beats

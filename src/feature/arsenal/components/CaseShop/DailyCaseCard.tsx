@@ -1,15 +1,20 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { getDailyPool, getNextDailyReset } from "feature/arsenal/data/dailyCase";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { motion } from "framer-motion";
 import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { RARITY_STYLES } from "../RarityBadge";
-import { DropRates } from "./DropRates";
+import { oddsTooltipClass, rollChance } from "./DropRates";
 import { OpenCaseButton } from "./OpenCaseButton";
 
 interface DailyCaseCardProps {
@@ -45,154 +50,125 @@ export const DailyCaseCard = ({ currentFame, onOpen, isOpening }: DailyCaseCardP
   const msLeft = getNextDailyReset(now).getTime() - now.getTime();
 
   return (
-    // 1px shell showing the animated border underneath the card face.
-    <div
-      className='relative overflow-hidden rounded-lg p-px'
-      style={{ background: "rgba(34,211,238,0.16)" }}>
-      {/* Light beam travelling around the border — oversized rotating conic
-          gradient; only the 1px ring around the opaque card face is visible. */}
-      <motion.div
-        className='pointer-events-none absolute -inset-full'
+    // Quiet, flat surface on purpose: the ten item cards are what this section
+    // is for, and they only read as cards while the thing behind them stays
+    // darker and plainer than they are.
+    <section className='relative flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
+      {/* Guitar icon watermark — same texture as /login */}
+      <GuitarPatternBackground opacity={0.04} />
+
+      {/* Single cyan wash off the top-left corner, carrying the section's identity */}
+      <div
+        className='pointer-events-none absolute -left-24 -top-32 h-80 w-[36rem] rounded-full blur-[80px]'
         style={{
           background:
-            "conic-gradient(from 0deg, transparent 0deg, transparent 290deg, rgba(34,211,238,0.85) 340deg, transparent 360deg)",
-        }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
-      />
-
-      <div
-        className='relative flex h-full flex-col gap-5 overflow-hidden rounded-[7px] p-6'
-        style={{
-          background: "linear-gradient(160deg, #04202a 0%, #0a1318 45%, #07090c 100%)",
-        }}>
-      {/* Guitar icon watermark — same texture as /login */}
-      <GuitarPatternBackground opacity={0.05} />
-
-      {/* Soft cyan glows drifting in the background */}
-      <div
-        className='pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full blur-[60px] animate-glow-float-1'
-        style={{
-          background: "radial-gradient(circle at center, rgba(34,211,238,0.3) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className='pointer-events-none absolute -bottom-16 -right-16 h-56 w-56 rounded-full blur-[60px] animate-glow-float-2'
-        style={{
-          background: "radial-gradient(circle at center, rgba(34,211,238,0.28) 0%, transparent 70%)",
+            "radial-gradient(ellipse at center, rgba(34,211,238,0.16) 0%, transparent 70%)",
         }}
       />
 
-      {/* Header + rotation countdown */}
-      <div className='relative flex flex-wrap items-start justify-between gap-3'>
+      <div className='relative flex flex-wrap items-start justify-between gap-4'>
         <div>
-          <h3
-            className='bg-clip-text font-display text-2xl font-black tracking-wide text-transparent'
-            style={{
-              backgroundImage: "linear-gradient(180deg, #ffffff 20%, #22d3ee 135%)",
-            }}>
+          <h3 className='font-display text-3xl font-black tracking-wide text-zinc-100'>
             {caseDef.name}
           </h3>
           <p className='mt-1.5 text-sm text-zinc-400'>{caseDef.description}</p>
         </div>
-        <div className='flex items-center gap-1.5 rounded bg-cyan-500/10 px-2.5 py-1.5 text-xs font-bold tabular-nums text-cyan-300'>
-          <Clock3 size={13} />
+        <div className='flex items-center gap-2 rounded bg-zinc-100/10 px-3 py-2 text-xs font-bold tabular-nums text-zinc-100'>
+          <Clock3 size={14} className='text-zinc-400' />
           New pool in {formatCountdown(msLeft)}
         </div>
       </div>
 
-      {/* Today's pool — the exact 10 items this case can drop */}
-      <div className='relative grid grid-cols-2 gap-3 xsm:grid-cols-3 md:grid-cols-5'>
-        {pool.map((entry) => {
-          const rs = RARITY_STYLES[entry.def.rarity];
-          const imageSrc =
-            entry.kind === "guitar"
-              ? getRankBadgeSrc(entry.def.imageId, "medium")
-              : getEffectImageSrc(entry.def.imageId, "medium");
-          return (
-            <div
-              key={`${entry.kind}-${entry.def.id}`}
-              className='group relative flex flex-col overflow-hidden rounded-lg'
-              style={{
-                background: `linear-gradient(160deg, ${rs.baseColor}30 0%, rgba(13,15,18,0.95) 55%)`,
-              }}
-              title={`${entry.def.brand} ${entry.def.name} — ${entry.def.rarity}`}>
-              {/* Rarity top stripe */}
-              <div
-                className='h-[2px] w-full flex-shrink-0'
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${rs.baseColor}, transparent)`,
-                }}
-              />
+      {/* Today's pool — the exact ten items this case can drop, best first.
+          Each one carries the odds for its own rarity on hover: standing in
+          front of a Mythic, the question is what the chance of *that* is. */}
+      <TooltipProvider>
+        <div className='relative grid grid-cols-1 gap-3 xsm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'>
+          {pool.map((entry) => {
+            const rs = RARITY_STYLES[entry.def.rarity];
+            const chance = rollChance(caseDef.probabilities, entry.def.rarity);
+            const imageSrc =
+              entry.kind === "guitar"
+                ? getRankBadgeSrc(entry.def.imageId, "medium")
+                : getEffectImageSrc(entry.def.imageId, "medium");
+            return (
+              <Tooltip key={`${entry.kind}-${entry.def.id}`} delayDuration={150}>
+                <TooltipTrigger asChild>
+                  <div
+                    tabIndex={0}
+                    className='group relative flex cursor-help items-center gap-3 overflow-hidden rounded-lg p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                    style={{
+                      background: `linear-gradient(120deg, ${rs.baseColor}30 0%, rgba(13,15,18,0.95) 65%)`,
+                    }}>
+                    {/* Rarity stripe down the leading edge */}
+                    <div
+                      className='absolute inset-y-0 left-0 w-[2px]'
+                      style={{
+                        background: `linear-gradient(180deg, transparent, ${rs.baseColor}, transparent)`,
+                      }}
+                    />
 
-              {/* Art with spotlight + rarity glow backdrop */}
-              <div className='relative flex h-36 items-center justify-center overflow-hidden'>
-                <div
-                  className='pointer-events-none absolute inset-0'
-                  style={{
-                    background:
-                      "radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 40%, transparent 72%)",
-                  }}
-                />
-                <div
-                  className='pointer-events-none absolute h-28 w-28 rounded-full blur-[28px] opacity-70 transition-opacity group-hover:opacity-100'
-                  style={{
-                    background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 50%, transparent 75%)`,
-                  }}
-                />
-                <img
-                  src={imageSrc}
-                  alt={`${entry.def.brand} ${entry.def.name}`}
-                  className={cn(
-                    "relative z-10 h-32 w-32 object-contain",
-                    entry.kind === "guitar" && "-rotate-90"
-                  )}
-                  style={{ filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))" }}
-                  draggable={false}
-                  loading='lazy'
-                />
-              </div>
+                    {/* Art on a rarity-colored pool of light */}
+                    <div className='relative flex h-20 w-20 flex-shrink-0 items-center justify-center'>
+                      <div
+                        className='pointer-events-none absolute h-16 w-16 rounded-full opacity-70 blur-[22px] transition-opacity group-hover:opacity-100'
+                        style={{
+                          background: `radial-gradient(circle at center, ${rs.baseColor}66 0%, ${rs.baseColor}1f 50%, transparent 75%)`,
+                        }}
+                      />
+                      <img
+                        src={imageSrc}
+                        alt={`${entry.def.brand} ${entry.def.name}`}
+                        className={cn(
+                          "relative z-10 h-20 w-20 object-contain",
+                          entry.kind === "guitar" && "-rotate-90",
+                        )}
+                        draggable={false}
+                        loading='lazy'
+                      />
+                    </div>
 
-              {/* Label */}
-              <div className='px-2 pb-3 pt-1 text-center'>
-                <p className='w-full truncate text-xs font-bold text-zinc-100'>
-                  {entry.def.name}
-                </p>
-                <p
-                  className='mt-0.5 w-full truncate text-[10px] font-semibold'
-                  style={{ color: rs.baseColor }}>
-                  {entry.def.brand} · {entry.def.rarity}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Drop rates + cost + open */}
-      <div className='relative flex flex-wrap items-center justify-between gap-4'>
-        <DropRates probabilities={caseDef.probabilities} />
-
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-1.5 text-sm font-bold'>
-            <img
-              src='/images/coin.png'
-              alt='coin'
-              className={cn("h-5 w-5 object-contain", !canAfford && "opacity-50 grayscale")}
-            />
-            <span className={canAfford ? "text-zinc-100" : "text-red-400"}>
-              {caseDef.fameCost} Fame
-            </span>
-          </div>
-          <OpenCaseButton
-            canAfford={canAfford}
-            isOpening={isOpening}
-            onClick={() => onOpen(caseDef.id)}
-            className='px-8'
-          />
+                    <div className='relative min-w-0 flex-1'>
+                      <p className='line-clamp-2 text-sm font-bold leading-tight text-zinc-100'>
+                        {entry.def.name}
+                      </p>
+                      <p
+                        className='mt-1 truncate text-[11px] font-semibold'
+                        style={{ color: rs.baseColor }}>
+                        {entry.def.brand} · {entry.def.rarity}
+                      </p>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side='top' className={oddsTooltipClass}>
+                  <p className='truncate text-xs font-bold text-zinc-100'>
+                    {entry.def.brand} {entry.def.name}
+                  </p>
+                  <div className='mt-2.5 flex items-baseline justify-between gap-4'>
+                    <span className='text-[11px] font-semibold' style={{ color: rs.baseColor }}>
+                      {entry.def.rarity}
+                    </span>
+                    <span
+                      className='text-lg font-black tabular-nums'
+                      style={{ color: rs.baseColor }}>
+                      {chance !== undefined ? `${(chance * 100).toFixed(1)}%` : "—"}
+                    </span>
+                  </div>
+                  <p className='mt-0.5 text-[10px] text-zinc-500'>chance from this case</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </div>
-      </div>
-      </div>
-    </div>
+      </TooltipProvider>
+
+      <OpenCaseButton
+        canAfford={canAfford}
+        isOpening={isOpening}
+        onClick={() => onOpen(caseDef.id)}
+        fameCost={caseDef.fameCost}
+        className='relative w-full py-3.5 sm:ml-auto sm:w-80'
+      />
+    </section>
   );
 };

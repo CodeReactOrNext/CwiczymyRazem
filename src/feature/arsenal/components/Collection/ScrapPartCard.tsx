@@ -1,12 +1,7 @@
-import {
-  FUSION_FAME_COST,
-  getFusionQuote,
-  getMaxFusionCrafts,
-} from "feature/arsenal/data/fusion";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { Chip } from "assets/components/ui/chip";
+import { cn } from "assets/lib/utils";
+import { FUSION_FAME_COST, getFusionQuote, getMaxFusionCrafts } from "feature/arsenal/data/fusion";
+import { getPartLabel, PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { getPartResaleValue } from "feature/arsenal/data/resale";
 import type { PartId, PartTier } from "feature/arsenal/types/arsenal.types";
 import { ArrowRight } from "lucide-react";
@@ -30,6 +25,23 @@ interface ScrapPartCardProps {
   /** What the player can spend on the bench fee. Only read when reworking. */
   fame?: number;
 }
+
+/** Both bills read the same way: what the action is on the left, what it costs
+    or pays on the right. The price never wraps onto a second line, and Fame
+    keeps its amber so the coin isn't a dark smudge on a dark button. */
+const billButtonClass =
+  "flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+
+/** The quieter second option under each bill — trimming one off the stack. */
+const minorButtonClass =
+  "rounded-lg px-4 py-2 text-xs font-bold text-zinc-400 transition-colors hover:bg-zinc-800/40 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40";
+
+const Price = ({ amount }: { amount: number }) => (
+  <span className='flex shrink-0 items-center gap-1.5 tabular-nums text-amber-400'>
+    <FameCoin size={18} />
+    {amount}
+  </span>
+);
 
 /**
  * What a stack of loose parts is, opened from its socket.
@@ -58,47 +70,47 @@ export const ScrapPartCard = ({
   const all = getPartResaleValue(partId, tier, qty);
 
   const quote = getFusionQuote(partId, tier);
-  const maxCrafts = quote
-    ? getMaxFusionCrafts([{ partId, tier, qty }], partId, tier, fame)
-    : 0;
+  const maxCrafts = quote ? getMaxFusionCrafts([{ partId, tier, qty }], partId, tier, fame) : 0;
   // Which of the two limits is actually biting, so the card can say so rather
   // than leaving a dead button with no explanation.
   const shortOfParts = quote ? Math.max(0, quote.ratio - qty) : 0;
 
   return (
-    <div className='flex flex-col gap-6 rounded-lg bg-zinc-900 p-6'>
+    <div className='flex flex-col gap-7 rounded-lg bg-zinc-900 p-6'>
       <div className='flex items-center gap-4'>
         <TierPlate color={color} size={72}>
           <PartIcon partId={partId} size={40} />
         </TierPlate>
-        <div className='flex min-w-0 flex-col gap-1'>
-          <span
-            className='text-[10px] font-semibold tracking-[0.18em]'
-            style={{ color }}>
-            {tier.toUpperCase()} PART
+        <div className='flex min-w-0 flex-col gap-1.5'>
+          <span className='text-[11px] font-semibold tracking-wide' style={{ color }}>
+            {tier} part
           </span>
-          <span className='truncate text-lg font-black text-white'>
-            {getPartLabel(partId)}
-          </span>
-          <span className='text-2xl font-black tabular-nums text-zinc-300'>
-            ×{qty}
-          </span>
+          {/* The holding is a count, not a headline — it used to be set larger
+              than the part's own name, which read as the name of the thing. */}
+          <div className='flex min-w-0 items-center gap-2'>
+            <span className='truncate text-xl font-black text-zinc-100'>
+              {getPartLabel(partId)}
+            </span>
+            <Chip className='shrink-0 px-2 py-0.5 tabular-nums'>×{qty}</Chip>
+          </div>
         </div>
       </div>
 
-      <p className='text-sm text-zinc-400'>
-        Spent on the workshop bench — builds, repairs and mods all bill in
-        parts. Selling is for what the bench will never ask for.
+      <p className='text-sm leading-relaxed text-zinc-400'>
+        Spent on the workshop bench — builds, repairs and mods all bill in parts. Selling is for
+        what the bench will never ask for.
       </p>
 
       {/* The bench. Hidden outright for a part with nowhere to climb — screws,
           a pot already at Epic — rather than shown greyed out, because that is
-          a permanent fact about the part, not a shortage the player can fix. */}
+          a permanent fact about the part, not a shortage the player can fix.
+
+          Set apart by space and its own label rather than by a second card
+          face: a panel inside the panel put a third surface on screen for a
+          section that is four lines long. */}
       {quote && (
-        <div className='flex flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
-          <SectionLabel className='text-[11px] tracking-[0.16em]'>
-            Rework
-          </SectionLabel>
+        <div className='flex flex-col gap-5'>
+          <SectionLabel>Rework</SectionLabel>
 
           {/*
             The trade reads down the card, not across it. Laid out in a row the
@@ -113,10 +125,7 @@ export const ScrapPartCard = ({
                 <PartIcon partId={partId} size={28} />
               </TierPlate>
               <ArrowRight size={16} className='shrink-0 text-zinc-600' />
-              <TierPlate
-                color={PART_TIER_COLORS[quote.outputTier]}
-                size={46}
-                count={1}>
+              <TierPlate color={PART_TIER_COLORS[quote.outputTier]} size={46} count={1}>
                 <PartIcon partId={partId} size={28} />
               </TierPlate>
             </div>
@@ -128,8 +137,7 @@ export const ScrapPartCard = ({
                 {quote.outputTier} {getPartLabel(partId)}
               </span>
               <span className='text-[11px] text-zinc-500'>
-                {quote.ratio} {tier.toLowerCase()} pieces + {FUSION_FAME_COST}{" "}
-                Fame
+                {quote.ratio} {tier.toLowerCase()} pieces + {FUSION_FAME_COST} Fame
               </span>
             </div>
           </div>
@@ -152,10 +160,12 @@ export const ScrapPartCard = ({
                 <button
                   onClick={() => onFuseClick(maxCrafts)}
                   disabled={isFusing}
-                  className='flex items-center justify-center gap-2 rounded-lg bg-cyan-500/15 px-4 py-3 text-sm font-bold text-cyan-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-cyan-500/25'>
-                  <FameCoin size={16} />
-                  Rework {maxCrafts > 1 ? `×${maxCrafts}` : "one"} for{" "}
-                  {quote.fame * maxCrafts} Fame
+                  className={cn(
+                    billButtonClass,
+                    "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25"
+                  )}>
+                  <span>Rework {maxCrafts > 1 ? `×${maxCrafts}` : "one"}</span>
+                  <Price amount={quote.fame * maxCrafts} />
                 </button>
 
                 {/* Spending the whole stack is rarely what the bench wants — the
@@ -169,7 +179,7 @@ export const ScrapPartCard = ({
                     <button
                       onClick={() => onFuseClick(1)}
                       disabled={isFusing}
-                      className='rounded-lg px-4 py-2 text-xs font-bold text-zinc-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-zinc-800/40 hover:text-zinc-300'>
+                      className={minorButtonClass}>
                       Rework just one for {quote.fame} Fame
                     </button>
                   </>
@@ -190,17 +200,17 @@ export const ScrapPartCard = ({
           <button
             onClick={() => onSellClick(qty)}
             disabled={isSelling}
-            className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3 text-sm font-bold text-zinc-200 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-red-500/15 hover:text-red-300'>
-            <FameCoin size={16} />
-            Sell {qty > 1 ? `all ${qty}` : "it"} for {all} Fame
+            className={cn(
+              billButtonClass,
+              "bg-zinc-800/60 text-zinc-200 hover:bg-red-500/15 hover:text-red-300"
+            )}>
+            <span>Sell {qty > 1 ? `all ${qty}` : "it"}</span>
+            <Price amount={all} />
           </button>
 
           {/* Trimming a stack is the common case: the bench wants some of it. */}
           {qty > 1 && (
-            <button
-              onClick={() => onSellClick(1)}
-              disabled={isSelling}
-              className='rounded-lg px-4 py-2 text-xs font-bold text-zinc-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-zinc-800/40 hover:text-zinc-300'>
+            <button onClick={() => onSellClick(1)} disabled={isSelling} className={minorButtonClass}>
               Sell one for {one} Fame
             </button>
           )}

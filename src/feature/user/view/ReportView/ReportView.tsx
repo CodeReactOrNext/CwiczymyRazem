@@ -574,19 +574,6 @@ const ReportView = () => {
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
           activityData={activityDataToUse}
-          sessionTitle={submittedValues?.reportTitle}
-          // With several songs the title already lists them — repeating just the
-          // primary one underneath would read as if it were the only one.
-          songTitle={
-            (submittedValues?.songs?.length ?? 0) > 1
-              ? undefined
-              : submittedValues?.songTitle
-          }
-          songArtist={
-            (submittedValues?.songs?.length ?? 0) > 1
-              ? undefined
-              : submittedValues?.songArtist
-          }
         />
       ) : (
         <Formik

@@ -120,7 +120,7 @@ export const EFFECT_FEATURES: EffectFeatureDef[] = [
   // Headroom — noise / dynamics / power
   {
     id: "charge-pump-18v",
-    label: "18V charge pump",
+    label: "18V rail",
     category: "headroom",
     min: 2,
     max: 4,

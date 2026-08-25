@@ -1,7 +1,7 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { serializeExercises } from "feature/exercises/lib/serializeExercise";
+import { featuredGuideSongIds } from "feature/landing/data/featuredGuides";
 import LandingPage from "feature/landing/LandingPage";
-import { songGuides } from "feature/song-library/song-guides/content";
 import { getPathSongLiveData } from "feature/song-library/song-guides/services/getSongGuideLiveData";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import type { BlogFrontmatter} from "lib/blog";
@@ -52,12 +52,8 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
       timeInMinutes: ex.timeInMinutes,
     }));
 
-  // Only the first 3 guides are featured in the "Popular guides" list.
-  const featuredSongIds = songGuides
-    .slice(0, 3)
-    .map((guide) => guide.songId)
-    .filter((id): id is string => Boolean(id));
-  const guideLiveData = await getPathSongLiveData(featuredSongIds);
+  // Live tier badges for the "Popular guides" strip: see featuredGuides.
+  const guideLiveData = await getPathSongLiveData(featuredGuideSongIds);
 
   return {
     props: {

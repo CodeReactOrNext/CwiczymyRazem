@@ -213,6 +213,7 @@ export const sevenNationArmy: SongGuide = {
         artist: "Deep Purple",
         difficulty: 3,
         why: "The other classic 'first real riff' song; slightly more finger movement, similar single-line simplicity.",
+        guideSlug: "smoke-on-the-water",
         songId: "3vZNl6um01tBIr2qwqUo",
       },
     ],

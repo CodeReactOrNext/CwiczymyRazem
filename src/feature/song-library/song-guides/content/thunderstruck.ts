@@ -204,7 +204,9 @@ export const thunderstruck: SongGuide = {
         title: "Smoke on the Water",
         artist: "Deep Purple",
         difficulty: 3,
-        why: "The classic first single-note riff: builds basic riff discipline with none of the speed pressure.",
+        why: "The classic first riff: builds basic riff discipline with none of the speed pressure.",
+        guideSlug: "smoke-on-the-water",
+        songId: "3vZNl6um01tBIr2qwqUo",
       },
       {
         title: "Back in Black",

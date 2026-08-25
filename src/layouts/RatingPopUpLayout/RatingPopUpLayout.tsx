@@ -75,9 +75,6 @@ interface RatingPopUpProps {
   activityData?: ActivityDay[];
   hideWrapper?: boolean;
   onRestart?: () => void;
-  sessionTitle?: string;
-  songTitle?: string;
-  songArtist?: string;
   /** Scored exercises of this session — each gets its leaderboard placing. */
   scoredRuns?: ScoredRun[];
 }
@@ -106,9 +103,6 @@ const RatingPopUpLayout = ({
   activityData = [],
   hideWrapper = false,
   onRestart,
-  sessionTitle,
-  songTitle,
-  songArtist,
   scoredRuns = [],
 }: RatingPopUpProps) => {
   const {
@@ -243,10 +237,6 @@ const RatingPopUpLayout = ({
     return { radarData, radarRows };
   }, [activityData]);
 
-  const dateLabel = new Date(ratingData.reportDate).toLocaleDateString("en-US", {
-    weekday: "long", day: "numeric", month: "long",
-  });
-
   // ── render helpers ──
 
   const renderWeeklyDot = (props: { cx?: number; cy?: number; index?: number }) => {
@@ -266,21 +256,6 @@ const RatingPopUpLayout = ({
       )}
     >
       <div ref={topRef} />
-
-      {/* ── Session header ── */}
-      <Card className="flex items-center justify-between gap-4 py-5">
-        <div className="min-w-0">
-          <p className="truncate text-base font-semibold text-zinc-100">{sessionTitle || "Session summary"}</p>
-          {songTitle && (
-            <p className="truncate text-sm text-zinc-400">
-              {songArtist ? `${songArtist} — ` : ""}{songTitle}
-            </p>
-          )}
-        </div>
-        <div className="shrink-0 text-right text-sm">
-          <p className="text-zinc-300">{dateLabel}</p>
-        </div>
-      </Card>
 
       {isRest ? (
         /* ── No-points hero ──

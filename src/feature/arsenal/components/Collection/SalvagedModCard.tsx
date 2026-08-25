@@ -35,7 +35,10 @@ export const SalvagedModCard = ({
           <span className='text-[10px] font-semibold tracking-[0.18em] text-purple-300/70'>
             SALVAGED MOD
           </span>
-          <span className='truncate text-lg font-black text-white'>
+          {/* Wraps rather than truncates: mod labels run from "18V rail" to
+              "Carbon comp resistors", and a clipped name tells the player
+              nothing about what they are holding. */}
+          <span className='text-lg font-black leading-tight text-white'>
             {def?.label ?? mod.featureId}
           </span>
           <span className='text-2xl font-black tabular-nums text-purple-300'>
@@ -46,7 +49,7 @@ export const SalvagedModCard = ({
 
       <p className='text-sm text-zinc-400'>
         Drag it onto any {mod.kind === "guitar" ? "guitar" : "pedal"} that
-        lights up and it goes on at the value it carries — nothing to pay,
+        lights up and it goes on at the value it carries: nothing to pay,
         nothing re-rolled. It is also waiting on the workshop bench.
       </p>
 

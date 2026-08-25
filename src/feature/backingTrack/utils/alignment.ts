@@ -104,6 +104,41 @@ export interface BeatLine {
 const MAX_GRID_LINES = 2000;
 
 /**
+ * Closest two lines may sit before the grid stops being a grid.
+ *
+ * Zoomed out to a whole song, one line per beat is several hundred strokes a
+ * frame per lane for a picture that is a solid grey smear — neighbouring lines
+ * land nearer to each other than a line is wide. Thinning them out is what the
+ * picture wants anyway, and since every lane rebuilds this list sixty times a
+ * second it is also the difference between a screen that keeps up and one that
+ * does not.
+ */
+const MIN_LINE_GAP_PX = 5;
+
+/**
+ * Beats between drawn lines: every beat while they are still readable, then
+ * every bar, then every second, fourth, eighth… bar as the view opens out.
+ *
+ * Stepping in multiples of the meter keeps every drawn line a bar start, so a
+ * thinned grid never leaves a bar number standing on a line that isn't there.
+ */
+function gridStepBeats(params: {
+  secPerBeat: number;
+  secondsPerPixel?: number;
+  beatsPerBar: number;
+}): number {
+  const { secPerBeat, secondsPerPixel, beatsPerBar } = params;
+  if (!secondsPerPixel || secondsPerPixel <= 0 || secPerBeat <= 0) return 1;
+
+  const beatGapPx = secPerBeat / secondsPerPixel;
+  if (beatGapPx >= MIN_LINE_GAP_PX) return 1;
+
+  let step = beatsPerBar;
+  while (beatGapPx * step < MIN_LINE_GAP_PX && step < MAX_GRID_LINES) step *= 2;
+  return step;
+}
+
+/**
  * Every tab beat inside a window, with enough about each to draw a DAW-style
  * ruler: spacing comes from the recording's tempo, phase from the offset, and
  * bar boundaries from the metronome's own meter.
@@ -111,6 +146,9 @@ const MAX_GRID_LINES = 2000;
  * Pass `tempoMap` for a recording whose bars have been pinned by hand — the
  * spacing then varies across the window, bunching up where the band pushed and
  * opening out where it dragged, which is the whole point of anchoring bars.
+ *
+ * Pass `secondsPerPixel` — the zoom it is being drawn at — and the grid thins
+ * itself out instead of handing back lines that cannot be told apart.
  */
 export function beatGridLines(params: {
   windowStartSec: number;
@@ -120,8 +158,12 @@ export function beatGridLines(params: {
   beatsPerBar?: number;
   /** Bends the grid to a recording that drifts. Omit for an even grid. */
   tempoMap?: RecordingTempoMap;
+  /** Zoom, so lines too close together to see are never built in the first
+   *  place. Omitted, every beat in the window comes back. */
+  secondsPerPixel?: number;
 }): BeatLine[] {
-  const { windowStartSec, windowEndSec, sourceBpm, offsetMs, tempoMap } = params;
+  const { windowStartSec, windowEndSec, sourceBpm, offsetMs, tempoMap, secondsPerPixel } =
+    params;
   const beatsPerBar = Math.max(1, Math.round(params.beatsPerBar ?? 4));
   if (windowEndSec <= windowStartSec) return [];
 
@@ -133,9 +175,21 @@ export function beatGridLines(params: {
   });
 
   if (tempoMap && !tempoMap.isConstant) {
-    const firstIndex = Math.ceil(tempoMap.beatForSec(windowStartSec));
+    const firstBeat = tempoMap.beatForSec(windowStartSec);
+    // The map bends across the window, so there is no single beat length to
+    // measure density against — what the eye sees is the window's average.
+    const beatsInWindow = Math.max(
+      1e-6,
+      tempoMap.beatForSec(windowEndSec) - firstBeat,
+    );
+    const step = gridStepBeats({
+      secPerBeat: (windowEndSec - windowStartSec) / beatsInWindow,
+      secondsPerPixel,
+      beatsPerBar,
+    });
+    const firstIndex = Math.ceil(firstBeat / step) * step;
     const lines: BeatLine[] = [];
-    for (let index = firstIndex; lines.length < MAX_GRID_LINES; index += 1) {
+    for (let index = firstIndex; lines.length < MAX_GRID_LINES; index += step) {
       const sec = tempoMap.secForBeat(index);
       if (sec > windowEndSec) break;
       lines.push(lineAt(sec, index));
@@ -145,18 +199,31 @@ export function beatGridLines(params: {
 
   const spacing = secondsPerBeat(sourceBpm);
   if (spacing <= 0) return [];
-  if ((windowEndSec - windowStartSec) / spacing > MAX_GRID_LINES) return [];
+  const step = gridStepBeats({ secPerBeat: spacing, secondsPerPixel, beatsPerBar });
+  if ((windowEndSec - windowStartSec) / (spacing * step) > MAX_GRID_LINES) return [];
 
   const phase = offsetMs / 1000;
-  const firstIndex = Math.ceil((windowStartSec - phase) / spacing);
+  const firstIndex = Math.ceil((windowStartSec - phase) / spacing / step) * step;
   const lines: BeatLine[] = [];
-  for (let index = firstIndex; ; index += 1) {
+  for (let index = firstIndex; ; index += step) {
     const sec = phase + index * spacing;
     if (sec > windowEndSec) break;
     lines.push(lineAt(sec, index));
   }
   return lines;
 }
+
+/**
+ * How often a drag on the timeline is handed to React, in ms.
+ *
+ * Every write re-renders the practice session that owns the alignment, so one
+ * per pointer event spent a whole frame's budget re-rendering a session nobody
+ * can see behind the editor — which is what made dragging in there stutter.
+ * Twenty a second is still four times finer than the sync loop that acts on the
+ * result (200 ms), and the lanes paint the frames in between from the live
+ * gesture, so the hand feels no throttle at all.
+ */
+export const DRAG_COMMIT_MS = 50;
 
 /**
  * How far a drag moves an offset, in ms. Dragging right pulls the clip later,

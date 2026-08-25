@@ -58,7 +58,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   "premium-guitar": {
     id: "premium-guitar",
     name: "Premium Guitar Case",
-    description: "Guitars only. Higher odds for the rare and sought-after.",
+    description: "Higher odds for the rare and sought-after.",
     fameCost: 250,
     dropKind: "guitar",
     yearFrom: 2018,
@@ -76,7 +76,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   "premium-effect": {
     id: "premium-effect",
     name: "Premium Effects Case",
-    description: "Effects only. Higher odds for the rare and sought-after.",
+    description: "Higher odds for the rare and sought-after.",
     fameCost: 250,
     dropKind: "effect",
     yearFrom: 2018,
@@ -111,7 +111,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   "elite-guitar": {
     id: "elite-guitar",
     name: "Elite Guitar Case",
-    description: "Guitars only. Reserved for the most dedicated players.",
+    description: "Reserved for the most dedicated players.",
     fameCost: 350,
     dropKind: "guitar",
     yearFrom: 2020,
@@ -129,7 +129,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   "elite-effect": {
     id: "elite-effect",
     name: "Elite Effects Case",
-    description: "Effects only. Reserved for the most dedicated players.",
+    description: "Reserved for the most dedicated players.",
     fameCost: 350,
     dropKind: "effect",
     yearFrom: 2020,

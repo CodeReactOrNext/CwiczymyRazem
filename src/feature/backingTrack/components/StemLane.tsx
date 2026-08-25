@@ -171,6 +171,7 @@ export function StemLane({
           onDragOffset={(deltaMs, options) =>
             onStemOffsetChange(stem.offsetMs + deltaMs, options)
           }
+          dragEdits='stemOffset'
           dragMode={dragMode}
           onPanStart={onPanStart}
           onPanMove={onPanMove}

@@ -43,7 +43,7 @@ const clock = () => ({ currentTime: 0, duration: 240, rate: 1, isPlaying: true }
 const render = (videoId: string | null = "abc123") =>
   renderHook(
     ({ id }: { id: string | null }) =>
-      useYouTubeWaveform({ videoId: id, getClock: clock, enabled: true }),
+      useYouTubeWaveform({ videoId: id, getClock: clock, listen: true }),
     { initialProps: { id: videoId } },
   );
 

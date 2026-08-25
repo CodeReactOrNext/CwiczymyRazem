@@ -81,7 +81,17 @@ import {
   rowOf,
 } from "feature/arsenal/utils/stashLayout";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { ArrowDownWideNarrow, Layers } from "lucide-react";
+import {
+  ArrowDownWideNarrow,
+  Guitar,
+  Info,
+  Layers,
+  Store,
+  Trash2,
+  Unplug,
+  Wrench,
+} from "lucide-react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
@@ -116,6 +126,8 @@ import { FitSalvagedDialog } from "./FitSalvagedDialog";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
 import { StashBoard } from "./StashBoard";
+import type { StashMenuItem } from "./StashContextMenu";
+import { StashContextMenu } from "./StashContextMenu";
 import { StashItemDialog } from "./StashItemDialog";
 import type { StashDropTarget, StashPlacement } from "./StashTile";
 import { StashTile } from "./StashTile";
@@ -290,6 +302,12 @@ export const StashInventory = ({
   const [fitPending, setFitPending] = useState<{
     mod: SalvagedMod;
     targetId: string;
+  } | null>(null);
+  /** The socket that was right-clicked, and where the menu should hang. */
+  const [menu, setMenu] = useState<{
+    piece: BoardPiece;
+    x: number;
+    y: number;
   } | null>(null);
   const [bulk, setBulk] = useState<Kind | null>(null);
   const [equipItemId, setEquipItemId] = useState<string | null>(null);
@@ -694,6 +712,190 @@ export const StashInventory = ({
     return !inScope || !matchesQuery(piece.name, query);
   };
 
+  /**
+   * What the right-click menu offers for one piece.
+   *
+   * The same actions its card carries, under the same locks: a guitar on the
+   * profile cannot be sold from here either. Blocked entries stay in the list
+   * rather than vanishing — "why can this not be scrapped" is a question the
+   * menu should answer, and a missing row answers nothing.
+   */
+  const menuItemsFor = (piece: BoardPiece): StashMenuItem[] => {
+    if (piece.kind === "guitar") {
+      const equipped = data.equippedItemId === piece.id;
+      const slot = rigSlotOf(piece.id);
+      const inUse = equipped || slot != null;
+      const reason = equipped
+        ? "Unequip from your profile first"
+        : slot != null
+          ? `Remove from rig slot ${slot + 1} first`
+          : undefined;
+
+      return [
+        {
+          id: "details",
+          label: "Details",
+          icon: Info,
+          onSelect: () => setDetail({ kind: "guitar", itemId: piece.id }),
+        },
+        {
+          id: "equip",
+          label: "Equip…",
+          icon: Guitar,
+          disabled: isEquipping,
+          onSelect: () => setEquipItemId(piece.id),
+        },
+        ...(equipped
+          ? [
+              {
+                id: "unequip",
+                label: "Unequip from profile",
+                icon: Unplug,
+                onSelect: () => handleRemoveFrom(piece.id, "profile"),
+              },
+            ]
+          : []),
+        ...(slot != null
+          ? [
+              {
+                id: "unrig",
+                label: `Take out of rig slot ${slot + 1}`,
+                icon: Unplug,
+                onSelect: () => handleRemoveFrom(piece.id, slot as EquipTarget),
+              },
+            ]
+          : []),
+        {
+          id: "list",
+          label: "Market",
+          icon: Store,
+          disabled: isListing || inUse,
+          reason,
+          onSelect: () => open("list", "guitar", piece.id),
+        },
+        {
+          id: "scrap",
+          label: "Scrap",
+          icon: Wrench,
+          danger: true,
+          disabled: isScrappingGuitar || inUse,
+          reason,
+          onSelect: () => open("scrap", "guitar", piece.id),
+        },
+        {
+          id: "sell",
+          label: "Sell",
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingGuitar || equipped,
+          reason: equipped ? "Unequip from your profile first" : undefined,
+          onSelect: () => open("sell", "guitar", piece.id),
+        },
+      ];
+    }
+
+    if (piece.kind === "effect") {
+      const onBoard = pedalboardItemIds.has(piece.id);
+      const reason = onBoard ? "Take it off the pedalboard first" : undefined;
+
+      return [
+        {
+          id: "details",
+          label: "Details",
+          icon: Info,
+          onSelect: () => setDetail({ kind: "effect", itemId: piece.id }),
+        },
+        ...(onBoard
+          ? [
+              {
+                id: "unboard",
+                label: "Remove from board",
+                icon: Unplug,
+                disabled: isRemovingFromBoard,
+                onSelect: () => handleRemoveFromBoard(piece.id),
+              },
+            ]
+          : []),
+        {
+          id: "list",
+          label: "Market",
+          icon: Store,
+          disabled: isListing || onBoard,
+          reason,
+          onSelect: () => open("list", "effect", piece.id),
+        },
+        {
+          id: "scrap",
+          label: "Scrap",
+          icon: Wrench,
+          danger: true,
+          disabled: isScrappingEffect || onBoard,
+          reason,
+          onSelect: () => open("scrap", "effect", piece.id),
+        },
+        {
+          id: "sell",
+          label: "Sell",
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingEffect || onBoard,
+          reason,
+          onSelect: () => open("sell", "effect", piece.id),
+        },
+      ];
+    }
+
+    if (piece.kind === "mod")
+      return [
+        {
+          id: "details",
+          label: "Details",
+          icon: Info,
+          onSelect: () => setModDetail(piece.mod),
+        },
+        {
+          id: "sell",
+          label: "Sell",
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingMod,
+          onSelect: () => setResale({ kind: "mod", mod: piece.mod }),
+        },
+      ];
+
+    // A part stack sells whole from here; splitting one off is what its sheet
+    // is for, and the menu is the shortcut, not the second way of doing it.
+    return [
+      {
+        id: "details",
+        label: "Details",
+        icon: Info,
+        onSelect: () => setPartDetail(piece.part),
+      },
+      {
+        id: "sell",
+        label: `Sell all ×${piece.part.qty}`,
+        icon: Trash2,
+        danger: true,
+        disabled: isSellingPart,
+        onSelect: () =>
+          setResale({
+            kind: "part",
+            partId: piece.part.partId,
+            tier: piece.part.tier,
+            qty: piece.part.qty,
+          }),
+      },
+    ];
+  };
+
+  const openMenu =
+    (piece: BoardPiece) => (event: ReactMouseEvent<HTMLElement>) => {
+      // The browser's own menu has nothing to say about a socket.
+      event.preventDefault();
+      setMenu({ piece, x: event.clientX, y: event.clientY });
+    };
+
   const renderPiece = (piece: BoardPiece, carried = false) => {
     const placement: StashPlacement = carried
       ? { column: 0, row: 0 }
@@ -704,6 +906,7 @@ export const StashInventory = ({
           dimmed: isDimmed(piece),
           dropTarget: dropTargetOf(piece),
           dragHandlers: dragHandlers(piece),
+          onContextMenu: openMenu(piece),
         };
 
     if (piece.kind === "guitar")
@@ -752,7 +955,9 @@ export const StashInventory = ({
         key={piece.id}
         {...placement}
         color={PART_TIER_COLORS[piece.part.tier]}
-        art={<PartIcon partId={piece.part.partId} size={42} />}
+        // Sized off the socket rather than in px: the board's cells grow with
+        // the viewport, and a fixed box left a part swimming in a wide one.
+        art={<PartIcon partId={piece.part.partId} className='p-[14%]' />}
         label={`${piece.name} ×${piece.part.qty}`}
         count={piece.part.qty}
         preview={
@@ -859,6 +1064,14 @@ export const StashInventory = ({
           </div>,
           document.body,
         )}
+
+      {/* Right-click: the same actions, without opening the card first. */}
+      <StashContextMenu
+        anchor={menu}
+        title={menu?.piece.name ?? ""}
+        items={menu ? menuItemsFor(menu.piece) : []}
+        onClose={() => setMenu(null)}
+      />
 
       {/* A socket opens the item's own card, actions and all. */}
       {(() => {

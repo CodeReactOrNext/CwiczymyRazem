@@ -96,17 +96,24 @@ export function TabLane({
   /** Window the last frame drew, so a click maps to what is on screen. */
   const viewRef = useRef({ startSec: 0, secondsPerPixel: 0.004 });
   const events = useMemo<TabNoteEvent[]>(() => tabNoteEvents(measures), [measures]);
+  /** Longest note in the piece, in beats. An event can only reach into the
+   *  window from behind by its own length, so this is how far back the search
+   *  for the first visible note has to start. */
+  const maxEventBeats = useMemo(
+    () => events.reduce((longest, event) => Math.max(longest, event.durationBeats), 0),
+    [events],
+  );
   /** Signature of the last frame drawn, so an idle lane stops repainting. */
   const lastFrameKeyRef = useRef("");
 
   const paramsRef = useRef({
-    events, startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm, offsetMs, tempoMap,
-    beatsPerBar, windowSec, centreSecOverride, heightPx,
+    events, maxEventBeats, startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm,
+    offsetMs, tempoMap, beatsPerBar, windowSec, centreSecOverride, heightPx,
   });
   useEffect(() => {
     paramsRef.current = {
-      events, startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm, offsetMs, tempoMap,
-      beatsPerBar, windowSec, centreSecOverride, heightPx,
+      events, maxEventBeats, startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm,
+      offsetMs, tempoMap, beatsPerBar, windowSec, centreSecOverride, heightPx,
     };
   });
 
@@ -174,6 +181,7 @@ export function TabLane({
       offsetMs: p.offsetMs,
       beatsPerBar: p.beatsPerBar,
       tempoMap: p.tempoMap,
+      secondsPerPixel,
     });
 
     // Zinc, like every other bar line on the screen. Drawn cyan they were the
@@ -198,7 +206,23 @@ export function TabLane({
     // reads as sitting on its string rather than replacing it.
     const blockH = Math.min(18, rail * 0.74);
 
-    for (const event of p.events) {
+    // Only the notes that can be on screen. Walking a five-minute song's worth
+    // of events sixty times a second to draw the two bars in view is most of
+    // what this lane used to cost — and the list is in beat order, so the first
+    // one that can reach the window is a binary search away.
+    const firstBeat = p.tempoMap.beatForSec(windowStart - 1) - p.maxEventBeats;
+    const lastBeat = p.tempoMap.beatForSec(windowEnd + 1);
+    let lo = 0;
+    let hi = p.events.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (p.events[mid].beat < firstBeat) lo = mid + 1;
+      else hi = mid;
+    }
+
+    for (let i = lo; i < p.events.length; i += 1) {
+      const event = p.events[i];
+      if (event.beat > lastBeat) break;
       const startSec = p.tempoMap.secForBeat(event.beat);
       const endSec = p.tempoMap.secForBeat(event.beat + event.durationBeats);
       if (endSec < windowStart - 1 || startSec > windowEnd + 1) continue;

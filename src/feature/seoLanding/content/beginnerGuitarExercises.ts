@@ -237,5 +237,9 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
     "beginner-guitar-practice-checklist-daily-essentials",
     "how-long-practice-guitar-daily",
   ],
-  relatedSongGuideSlugs: ["nothing-else-matters", "hotel-california"],
+  relatedSongGuideSlugs: [
+    "smoke-on-the-water",
+    "nothing-else-matters",
+    "hotel-california",
+  ],
 };

@@ -119,6 +119,24 @@ describe("StemLane dragging", () => {
     expect(last?.[0]).toBe(350);
   });
 
+  it("writes less often than the pointer moves, without losing any of the drag", () => {
+    // Every write re-renders the session that owns the alignment, so a drag is
+    // committed on a throttle and the lane paints the frames in between itself.
+    const { onStemOffsetChange, lane } = renderLane(0);
+
+    fireEvent.pointerDown(lane, { clientX: 500, pointerId: 1 });
+    for (const clientX of [510, 520, 530, 540, 560]) {
+      fireEvent.pointerMove(lane, { clientX, pointerId: 1 });
+    }
+    fireEvent.pointerUp(lane, { clientX: 560, pointerId: 1 });
+
+    // 60 px right at 4 ms per pixel: the clip ends up 240 ms earlier, whichever
+    // way those milliseconds were split across the writes.
+    const moved = onStemOffsetChange.mock.calls.reduce((sum, [next]) => sum + next, 0);
+    expect(moved).toBeCloseTo(-240);
+    expect(onStemOffsetChange.mock.calls.length).toBeLessThan(5);
+  });
+
   it("ignores pointer movement that never started on the lane", () => {
     const { onStemOffsetChange, lane } = renderLane(0);
 

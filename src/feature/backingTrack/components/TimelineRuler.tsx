@@ -3,7 +3,12 @@ import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
 import { useCanvasSize, useTimelineFrame } from "../hooks/useTimelineFrame";
-import { beatGridLines, secondsPerBeat, snapSecToTransient } from "../utils/alignment";
+import {
+  beatGridLines,
+  DRAG_COMMIT_MS,
+  secondsPerBeat,
+  snapSecToTransient,
+} from "../utils/alignment";
 import type { ScoreClock } from "../utils/backingSync";
 import { sessionBeats } from "../utils/backingSync";
 import type { RecordingTempoMap } from "../utils/tempoMap";
@@ -185,8 +190,13 @@ export function TimelineRuler({
   } | null>(null);
   /** Beat of the bar line under the pointer — drawn as a hint. */
   const hoverBeatRef = useRef<number | null>(null);
+  /** When the drag last wrote to the alignment — see DRAG_COMMIT_MS. */
+  const lastCommitAtRef = useRef(0);
   /** Signature of the last frame drawn, so an idle ruler stops repainting. */
   const lastFrameKeyRef = useRef("");
+  /** Bar numbers are measured every frame and there are only ever a few dozen
+   *  distinct ones, so their widths are measured once each instead. */
+  const labelWidthRef = useRef(new Map<string, number>());
 
   useTimelineFrame(() => {
     const canvas = canvasRef.current;
@@ -238,6 +248,7 @@ export function TimelineRuler({
       offsetMs: p.offsetMs,
       beatsPerBar: p.beatsPerBar,
       tempoMap: p.tempoMap,
+      secondsPerPixel,
     });
 
     // Bars carrying an anchor of their own are the ones the tempo changes at.
@@ -255,23 +266,39 @@ export function TimelineRuler({
       : Math.max(2, Math.ceil(MIN_BAR_LABEL_GAP_PX / Math.max(1, barGapPx)));
 
     ctx.textBaseline = "alphabetic";
-    for (const line of lines) {
-      const x = Math.round((line.sec - windowStart) / secondsPerPixel) + 0.5;
-      ctx.strokeStyle = line.isBarStart
-        ? TIMELINE_COLORS.barLine
-        : TIMELINE_COLORS.beatLine;
-      ctx.beginPath();
-      ctx.moveTo(x, line.isBarStart ? TEMPO_ROW_PX + 8 : TEMPO_ROW_PX + 18);
-      ctx.lineTo(x, HEIGHT_PX);
-      ctx.stroke();
 
-      if (!line.isBarStart || line.bar === null) continue;
+    // One path per weight rather than one per line. A stroke is a rasteriser
+    // pass, and a zoomed-out ruler asking for a hundred of them a frame is a
+    // hundred passes for what is two shapes.
+    const strokeLines = (barStarts: boolean) => {
+      ctx.strokeStyle = barStarts ? TIMELINE_COLORS.barLine : TIMELINE_COLORS.beatLine;
+      ctx.beginPath();
+      for (const line of lines) {
+        if (line.isBarStart !== barStarts) continue;
+        const x = Math.round((line.sec - windowStart) / secondsPerPixel) + 0.5;
+        ctx.moveTo(x, barStarts ? TEMPO_ROW_PX + 8 : TEMPO_ROW_PX + 18);
+        ctx.lineTo(x, HEIGHT_PX);
+      }
+      ctx.stroke();
+    };
+    strokeLines(false);
+    strokeLines(true);
+
+    // Setting `font` reparses the shorthand and drops the text metrics cache,
+    // so it is set once for the whole pass rather than once per number.
+    ctx.font = BAR_LABEL_FONT;
+    for (const line of barLines) {
+      if (line.bar === null) continue;
       // Bar 1 always earns a number; it is the one every other is counted from.
       if (line.bar !== 1 && (line.bar - 1) % labelEvery !== 0) continue;
 
+      const x = Math.round((line.sec - windowStart) / secondsPerPixel) + 0.5;
       const label = String(line.bar);
-      ctx.font = BAR_LABEL_FONT;
-      const labelW = ctx.measureText(label).width;
+      let labelW = labelWidthRef.current.get(label);
+      if (labelW === undefined) {
+        labelW = ctx.measureText(label).width;
+        labelWidthRef.current.set(label, labelW);
+      }
       // A plate behind the digits, so the number reads against a busy waveform
       // instead of dissolving into the grid lines.
       ctx.fillStyle = "rgba(9, 9, 11, 0.85)";
@@ -346,6 +373,19 @@ export function TimelineRuler({
       ctx.lineTo(ghostX, HEIGHT_PX);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      // And where the hand is holding it. The grid line itself only moves when
+      // the drag is written to the alignment, which is throttled — this one is
+      // drawn from the gesture, so the line under the pointer never lags it.
+      ctx.strokeStyle = drag.snapped
+        ? "rgba(16, 185, 129, 0.95)"
+        : TIMELINE_COLORS.anchor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(liveX, 0);
+      ctx.lineTo(liveX, HEIGHT_PX);
+      ctx.stroke();
+      ctx.lineWidth = 1;
 
       // Emerald says the line locked onto an attack rather than landing where
       // the hand happened to stop — the one thing a drag cannot otherwise tell.
@@ -481,26 +521,35 @@ export function TimelineRuler({
     return { sec: snapped, snapped: true };
   };
 
-  const applyDrop = (
+  /** Where the line is right now, for the frame loop to draw. Costs nothing
+   *  outside this component — no state, so no render. */
+  const previewDrop = (
     event: React.PointerEvent<HTMLCanvasElement>,
     drag: NonNullable<typeof dragRef.current>,
-    realign: boolean,
   ) => {
-    const editing = paramsRef.current.tempoEditing;
-    if (!editing) return;
     const { sec, snapped } = dropSecFor(event, drag);
     drag.currentSec = sec;
     drag.snapped = snapped;
+  };
+
+  /** Writes the dragged line into the alignment, which re-renders the session
+   *  around it — hence the throttle on the caller's side. */
+  const commitDrop = (drag: NonNullable<typeof dragRef.current>, realign: boolean) => {
+    const editing = paramsRef.current.tempoEditing;
+    if (!editing) return;
     // Bar 1 is not an anchor — it is the offset, the thing every other bar is
     // measured from — so dragging it moves that instead.
-    if (drag.beat === 0) editing.onOffsetChange(sec * 1000, { realign });
-    else editing.onAnchorChange(drag.beat, sec, { realign });
+    if (drag.beat === 0) editing.onOffsetChange(drag.currentSec * 1000, { realign });
+    else editing.onAnchorChange(drag.beat, drag.currentSec, { realign });
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const beat = barLineAt(event);
     if (beat === null) return;
     paramsRef.current.tempoEditing?.onEditStart?.();
+    // The first movement writes at once: the throttle is there to thin out a
+    // continuous drag, not to make the start of one feel late.
+    lastCommitAtRef.current = Number.NEGATIVE_INFINITY;
     const map = paramsRef.current.tempoMap;
     const previous = map.points.filter((point) => point.beat < beat).pop();
     dragRef.current = {
@@ -530,7 +579,17 @@ export function TimelineRuler({
       return;
     }
     if (Math.abs(event.clientX - drag.originX) > 2) drag.moved = true;
-    if (drag.moved) applyDrop(event, drag, false);
+    if (!drag.moved) return;
+
+    previewDrop(event, drag);
+    // The line is painted from `drag` every frame either way, so telling React
+    // less often costs nothing on screen — and each write re-renders the whole
+    // session behind this editor, which at one per pointer event is what made
+    // dragging a bar line stutter.
+    const now = performance.now();
+    if (now - lastCommitAtRef.current < DRAG_COMMIT_MS) return;
+    lastCommitAtRef.current = now;
+    commitDrop(drag, false);
   };
 
   const endDrag = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -549,7 +608,8 @@ export function TimelineRuler({
       return;
     }
     // One last write that re-seeks the recording to where it was let go.
-    applyDrop(event, drag, true);
+    previewDrop(event, drag);
+    commitDrop(drag, true);
   };
 
   const handleDoubleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
