@@ -80,29 +80,6 @@ export function beatAtScrollLeft(
 }
 
 /**
- * Where a run of grid cells sits in the piece. `firstBeatIdx`/`lastBeatIdx` are
- * cell indices inside `measureIdx` (pass the same index twice for a single
- * cell); the returned range is what the preview needs to mark the same spot.
- *
- * Returns null when the cells don't exist — the grid can hold a stale selection
- * for a beat that an undo or a re-grid has since removed.
- */
-export function beatRangeForCells(
-  measures: TablatureMeasure[],
-  measureIdx: number,
-  firstBeatIdx: number,
-  lastBeatIdx: number,
-): BeatRange | null {
-  return beatRangeForSpan(
-    measures,
-    measureIdx,
-    Math.min(firstBeatIdx, lastBeatIdx),
-    measureIdx,
-    Math.max(firstBeatIdx, lastBeatIdx),
-  );
-}
-
-/**
  * Same as `beatRangeForCells`, for a run that crosses bar lines — the editor's
  * selection can start in one measure and end in another.
  */
@@ -117,7 +94,10 @@ export function beatRangeForSpan(
   const lastMeasure = measures[Math.min(lastMeasureIdx, measures.length - 1)];
   if (!firstMeasure?.beats.length || !lastMeasure?.beats.length) return null;
 
-  const first = Math.max(0, Math.min(firstBeatIdx, firstMeasure.beats.length - 1));
+  const first = Math.max(
+    0,
+    Math.min(firstBeatIdx, firstMeasure.beats.length - 1),
+  );
   const last = Math.max(0, Math.min(lastBeatIdx, lastMeasure.beats.length - 1));
 
   let startBeat = 0;
@@ -139,4 +119,27 @@ export function beatRangeForSpan(
   }
 
   return { startBeat, endBeat };
+}
+
+/**
+ * Where a run of grid cells sits in the piece. `firstBeatIdx`/`lastBeatIdx` are
+ * cell indices inside `measureIdx` (pass the same index twice for a single
+ * cell); the returned range is what the preview needs to mark the same spot.
+ *
+ * Returns null when the cells don't exist — the grid can hold a stale selection
+ * for a beat that an undo or a re-grid has since removed.
+ */
+export function beatRangeForCells(
+  measures: TablatureMeasure[],
+  measureIdx: number,
+  firstBeatIdx: number,
+  lastBeatIdx: number,
+): BeatRange | null {
+  return beatRangeForSpan(
+    measures,
+    measureIdx,
+    Math.min(firstBeatIdx, lastBeatIdx),
+    measureIdx,
+    Math.max(firstBeatIdx, lastBeatIdx),
+  );
 }

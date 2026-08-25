@@ -81,7 +81,9 @@ export function isBeatInSelection(
   if (measureIdx > firstMeasure && measureIdx < lastMeasure) return true;
   if (firstMeasure === lastMeasure)
     return beatIdx >= firstBeat && beatIdx <= lastBeat;
-  return measureIdx === firstMeasure ? beatIdx >= firstBeat : beatIdx <= lastBeat;
+  return measureIdx === firstMeasure
+    ? beatIdx >= firstBeat
+    : beatIdx <= lastBeat;
 }
 
 export function isCellInSelection(
@@ -223,7 +225,8 @@ export function countSelectedNotes(
     return (
       total +
       notes.filter(
-        (note) => note.string - 1 >= firstString && note.string - 1 <= lastString,
+        (note) =>
+          note.string - 1 >= firstString && note.string - 1 <= lastString,
       ).length
     );
   }, 0);
