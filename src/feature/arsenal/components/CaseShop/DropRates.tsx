@@ -19,7 +19,7 @@ import { RARITY_STYLES } from "../RarityBadge";
  */
 export const rollChance = (
   probabilities: CaseDefinition["probabilities"],
-  rarity: GuitarRarity
+  rarity: GuitarRarity,
 ): number | undefined => (rarity === "Custom Shop" ? undefined : probabilities[rarity]);
 
 /** The odds table itself, without a trigger around it. */
@@ -29,7 +29,7 @@ export const RarityOddsTable = ({
   probabilities: CaseDefinition["probabilities"];
 }) => {
   const probs = (Object.entries(probabilities) as [GuitarRarity, number][]).filter(
-    ([, prob]) => prob > 0
+    ([, prob]) => prob > 0,
   );
   return (
     <div className='space-y-1.5'>
@@ -83,8 +83,8 @@ export const DropRates = ({
         <button
           type='button'
           className={cn(
-            "flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            className
+            "flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200",
+            className,
           )}>
           <Info size={12} />
           Drop Rates

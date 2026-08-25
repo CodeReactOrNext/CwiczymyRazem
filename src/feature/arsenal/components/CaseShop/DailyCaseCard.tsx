@@ -121,7 +121,7 @@ export const DailyCaseCard = ({ currentFame, onOpen, isOpening }: DailyCaseCardP
                         alt={`${entry.def.brand} ${entry.def.name}`}
                         className={cn(
                           "relative z-10 h-20 w-20 object-contain",
-                          entry.kind === "guitar" && "-rotate-90"
+                          entry.kind === "guitar" && "-rotate-90",
                         )}
                         draggable={false}
                         loading='lazy'
