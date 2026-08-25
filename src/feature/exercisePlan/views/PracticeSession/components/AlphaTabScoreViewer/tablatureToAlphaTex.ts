@@ -151,6 +151,9 @@ function beatTex(beat: TablatureBeat, origins: WeakSet<TablatureNote>): string {
         : `(${beat.notes.map((note) => noteTex(note, origins)).join(" ")})`;
   const beatEffectTokens: string[] = [];
   if (beat.tuplet) beatEffectTokens.push(`tu ${beat.tuplet}`);
+  // Picking direction is a beat effect in alphaTex too (`sd` = down, `su` = up),
+  // which AlphaTab draws as the usual ⊓ / ⋁ markers above the staff.
+  if (beat.pickStroke) beatEffectTokens.push(beat.pickStroke === "down" ? "sd" : "su");
   if (dots === 1) beatEffectTokens.push("d");
   if (dots === 2) beatEffectTokens.push("dd");
   const beatEffects = beatEffectTokens.length > 0 ? ` {${beatEffectTokens.join(" ")}}` : "";

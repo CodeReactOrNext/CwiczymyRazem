@@ -282,10 +282,16 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
             };
           }); // end .map — closes filter().map() chain started above
 
+          // AlphaTab PickStroke enum: 0 = None, 1 = Up, 2 = Down.
+          const pickStroke = altBeat.pickStroke === 1 ? 'up'
+            : altBeat.pickStroke === 2 ? 'down'
+            : undefined;
+
           beats.push({
             notes,
             duration: durationInQuarterNotes,
             chordName: altBeat.chord?.name || (altBeat.chordId ? "Chord" : undefined),
+            ...(pickStroke ? { pickStroke } : {}),
           });
         });
       }

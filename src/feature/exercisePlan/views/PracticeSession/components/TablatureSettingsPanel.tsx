@@ -237,7 +237,7 @@ export function TablatureSettingsPanel() {
     {
       key: "showTechniqueLabels",
       label: "Technique markers",
-      desc: "H/P, bends, PM, vibrato, harmonics",
+      desc: "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁",
     },
   ];
 

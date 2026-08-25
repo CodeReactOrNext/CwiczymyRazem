@@ -45,11 +45,18 @@ export interface TablatureNote {
   slideOut?: number;      // 0=None, 1=Shift, 2=Legato, 3=SlideTo
 }
 
+/** Picking direction marked above the tab: "down" = ⊓ (downstroke), "up" = ⋁ (upstroke). */
+export type PickStroke = "down" | "up";
+
 export interface TablatureBeat {
   notes: TablatureNote[];
   duration: number; // 1 = quarter note, 0.5 = eighth note
   chordName?: string;
   tuplet?: number; // e.g. 3 = triplet, 5 = quintuplet
+  /** Picking direction for the whole beat — a chord is struck one way, not per note.
+   *  Rendered above the staff in both the flat tab and the standard notation
+   *  (alphaTex `{sd}` / `{su}`). Omitted = no marking. */
+  pickStroke?: PickStroke;
 }
 
 export interface TablatureMeasure {
