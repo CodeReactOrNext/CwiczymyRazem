@@ -143,6 +143,11 @@ const BEND_AMOUNTS: { value: number; short: string; label: string }[] = [
   { value: 4, short: "2", label: "Two-step bend" },
 ];
 
+/** Only a real direction survives an import — anything else means "not marked". */
+function importedPickStroke(raw: unknown): { pickStroke?: PickStroke } {
+  return raw === "down" || raw === "up" ? { pickStroke: raw } : {};
+}
+
 // Picking direction is a property of the whole beat — a chord is struck one
 // way, not per string — so these apply to every beat the selection covers.
 const PICK_STROKES: { value: PickStroke; label: string }[] = [
@@ -578,10 +583,7 @@ export default function TabEditor() {
           timeSignature: m.timeSignature || [4, 4],
           beats: (m.beats || []).map((b: any) => ({
             duration: b.duration || 0.25,
-            pickStroke:
-              b.pickStroke === "down" || b.pickStroke === "up"
-                ? b.pickStroke
-                : undefined,
+            ...importedPickStroke(b.pickStroke),
             notes: (b.notes || []).map((n: any) => ({
               string: n.string,
               fret: n.fret,
@@ -601,10 +603,7 @@ export default function TabEditor() {
             .slice(i, i + BEATS_PER_MEASURE)
             .map((b: any) => ({
               duration: b.duration || 0.25,
-              pickStroke:
-                b.pickStroke === "down" || b.pickStroke === "up"
-                  ? b.pickStroke
-                  : undefined,
+              ...importedPickStroke(b.pickStroke),
               notes: (b.notes || []).map((n: any) => ({
                 string: n.string,
                 fret: n.fret,
@@ -618,11 +617,7 @@ export default function TabEditor() {
             }));
 
           while (beatsInMeasure.length < BEATS_PER_MEASURE) {
-            beatsInMeasure.push({
-              duration: 0.25,
-              pickStroke: undefined,
-              notes: [],
-            });
+            beatsInMeasure.push({ duration: 0.25, notes: [] });
           }
 
           processedMeasures.push({
@@ -2162,6 +2157,13 @@ export default function TabEditor() {
                                     aria-label={`Picking direction on measure ${mIdx + 1}, beat ${bIdx + 1}`}
                                     className={cn(
                                       "group flex h-6 w-8 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                      // Invisible stand-in for the beat-group
+                                      // separator below, so a marker stays over
+                                      // its own column instead of drifting a
+                                      // pixel per group across the bar.
+                                      bIdx % groupSize === 0 &&
+                                        bIdx !== 0 &&
+                                        "border-l border-transparent",
                                       isBeatSelected
                                         ? "bg-cyan-500/20"
                                         : isBeatInSelection
