@@ -288,8 +288,8 @@ const HISTORY_COALESCE_MS = 600;
 // String 1 (top row) = high e, string 6 = low E — standard tuning labels.
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
 
-// Cell geometry used by the click/drag fallback math below — keep in sync
-// with the h-8/w-8 cells in the grid.
+// Row height of one string in the grid — keep in sync with the h-8 cells. Cell
+// *widths* come from the beat's duration instead (see tabGridLayout).
 const CELL_SIZE = 32;
 
 function NoteDurationIcon({
@@ -403,7 +403,7 @@ function RestIcon({
               key={i}
               cx={9.8 - i * 1.5}
               cy={4.2 + i * 3.1}
-              r='1.3'
+              r='1.6'
               fill='currentColor'
             />
           ))}
@@ -2702,7 +2702,7 @@ export default function TabEditor() {
         </div>
 
         {/* Note Inspector — mouse-friendly fret & articulation editor for the selected cell */}
-        <div className='fixed right-6 top-1/2 z-40 hidden w-72 -translate-y-1/2 flex-col gap-5 rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
+        <div className='custom-scrollbar fixed right-6 top-1/2 z-40 hidden max-h-[calc(100vh-8rem)] w-72 -translate-y-1/2 flex-col gap-5 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
           {selectedCell ? (
             <>
               <div className='space-y-1'>
