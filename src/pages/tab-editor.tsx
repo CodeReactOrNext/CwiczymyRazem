@@ -16,6 +16,7 @@ import type {
 } from "feature/exercisePlan/types/exercise.types";
 import {
   beatOffsetsInQuarters,
+  fitMeasureToTimeSignature,
   restBeatsAt,
   setBeatsDuration,
   startsCountedBeat,
@@ -1060,6 +1061,55 @@ export default function TabEditor() {
           stepsForDuration(m.timeSignature, duration),
         ),
       ),
+    );
+  };
+
+  /**
+   * Pads one measure back out to its own time signature with rests, leaving
+   * every note exactly where it sits. This is the repair for tabs written
+   * before beat lengths were kept in step with the bar: their rests are too
+   * short, so the bar ends early and drags everything after it along.
+   *
+   * A bar whose *notes* overflow can't be fixed this way — which note to lose
+   * is the user's call, so it's left alone and said out loud.
+   */
+  const fixMeasureLength = (mIdx: number) => {
+    const next = measuresRef.current.map((measure, i) =>
+      i === mIdx ? fitMeasureToTimeSignature(measure) : measure,
+    );
+    if (!isMeasureComplete(next[mIdx])) {
+      showToast(
+        `Measure #${mIdx + 1} runs past its time signature — shorten a note first.`,
+        "error",
+      );
+      return;
+    }
+    commit(next);
+    showToast(`Measure #${mIdx + 1} now fills its time signature`, "success");
+  };
+
+  /** The same repair across the whole tab — what an older tab usually needs,
+   *  since a rest that was a beat short repeats everywhere the riff does. */
+  const fixAllMeasureLengths = () => {
+    const current = measuresRef.current;
+    const broken = current.filter((m) => !isMeasureComplete(m)).length;
+    const next = current.map((measure) => fitMeasureToTimeSignature(measure));
+    const fixed = broken - next.filter((m) => !isMeasureComplete(m)).length;
+
+    if (fixed === 0) {
+      showToast(
+        `${broken} measure${broken !== 1 ? "s" : ""} run past their time signature — shorten a note first.`,
+        "error",
+      );
+      return;
+    }
+
+    commit(next);
+    showToast(
+      `Padded ${fixed} measure${fixed !== 1 ? "s" : ""} with rests${
+        fixed < broken ? `, ${broken - fixed} still overflow` : ""
+      }`,
+      "success",
     );
   };
 
@@ -2259,12 +2309,20 @@ export default function TabEditor() {
                 {measures.length} measure{measures.length !== 1 ? "s" : ""}
               </span>
               {incompleteCount > 0 && (
-                <span className='flex items-center gap-1.5 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400'>
-                  <LucideTriangleAlert size={11} />
-                  {incompleteCount} measure{incompleteCount !== 1 ? "s" : ""}{" "}
-                  {incompleteCount !== 1 ? "don't" : "doesn't"} fill{" "}
-                  {incompleteCount !== 1 ? "their" : "its"} time signature
-                </span>
+                <>
+                  <span className='flex items-center gap-1.5 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400'>
+                    <LucideTriangleAlert size={11} />
+                    {incompleteCount} measure{incompleteCount !== 1 ? "s" : ""}{" "}
+                    {incompleteCount !== 1 ? "don't" : "doesn't"} fill{" "}
+                    {incompleteCount !== 1 ? "their" : "its"} time signature
+                  </span>
+                  <button
+                    onClick={fixAllMeasureLengths}
+                    title='Pad every short bar with rests until it fills its time signature — the notes stay where they are'
+                    className='rounded bg-rose-500/20 px-2 py-0.5 text-[11px] font-bold text-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-rose-500/30'>
+                    Fix all
+                  </button>
+                </>
               )}
             </div>
             <div className='p-5'>
@@ -3005,24 +3063,34 @@ export default function TabEditor() {
                   ))}
                 </div>
                 {selectedMeasure && !isMeasureComplete(selectedMeasure) && (
-                  <p className='flex items-start gap-2 rounded bg-rose-500/10 p-2 text-[11px] font-semibold leading-relaxed text-rose-400'>
-                    <LucideTriangleAlert size={13} className='mt-px shrink-0' />
-                    <span>
-                      Beats add up to{" "}
-                      {formatQuarters(
-                        beatsDurationInQuarters(selectedMeasure.beats),
-                      )}{" "}
-                      of the{" "}
-                      {formatQuarters(
-                        measureDurationInQuarters(
-                          selectedMeasure.timeSignature,
-                        ),
-                      )}{" "}
-                      quarter notes in {selectedMeasure.timeSignature[0]}/
-                      {selectedMeasure.timeSignature[1]}. Pick a step count to
-                      re-grid it.
-                    </span>
-                  </p>
+                  <div className='space-y-2 rounded bg-rose-500/10 p-2'>
+                    <p className='flex items-start gap-2 text-[11px] font-semibold leading-relaxed text-rose-400'>
+                      <LucideTriangleAlert
+                        size={13}
+                        className='mt-px shrink-0'
+                      />
+                      <span>
+                        Beats add up to{" "}
+                        {formatQuarters(
+                          beatsDurationInQuarters(selectedMeasure.beats),
+                        )}{" "}
+                        of the{" "}
+                        {formatQuarters(
+                          measureDurationInQuarters(
+                            selectedMeasure.timeSignature,
+                          ),
+                        )}{" "}
+                        quarter notes in {selectedMeasure.timeSignature[0]}/
+                        {selectedMeasure.timeSignature[1]}.
+                      </span>
+                    </p>
+                    <button
+                      onClick={() => fixMeasureLength(selectedCell.measureIdx)}
+                      title='Pad the bar with rests until it fills its time signature — the notes stay where they are'
+                      className='w-full rounded bg-rose-500/20 py-1.5 text-[11px] font-bold text-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-rose-500/30'>
+                      Fill with rests
+                    </button>
+                  </div>
                 )}
               </div>
 
