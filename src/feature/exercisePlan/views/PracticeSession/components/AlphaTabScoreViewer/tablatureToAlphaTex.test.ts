@@ -148,6 +148,23 @@ describe("tablatureToAlphaTex", () => {
     expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 7.2{v}.2 {d} 0.1.4 |");
   });
 
+  it("emits the picking direction as a beat effect (sd = down, su = up)", () => {
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 1, pickStroke: "down", notes: [{ string: 6, fret: 5 }] },
+          { duration: 1, pickStroke: "up", notes: [{ string: 6, fret: 7 }] },
+          { duration: 1, notes: [{ string: 6, fret: 5 }] },
+        ],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 4 4 5.6.4 {sd} 7.6.4 {su} 5.6.4 |",
+    );
+  });
+
   it("un-compresses a triplet's real sounding duration back to its notated base + {tu 3}", () => {
     // Real sounding duration of a triplet eighth is 1/3 of a quarter (3 fit in the time
     // of 2 eighths = 1 quarter). The previous conversion fed that real fraction straight

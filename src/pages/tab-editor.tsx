@@ -9,6 +9,7 @@ import { BackLink } from "components/BackLink/BackLink";
 import { getCommunityExerciseById } from "feature/communityExercises/services/communityExerciseService";
 import { useTablatureAudio } from "feature/exercisePlan/hooks/useTablatureAudio";
 import type {
+  PickStroke,
   TablatureBeat,
   TablatureMeasure,
   TablatureNote,
@@ -26,6 +27,13 @@ import {
   DEFAULT_TIME_SIGNATURE,
   regridMeasure,
 } from "feature/exercisePlan/utils/measureGrid";
+import type { PickStrokeRange } from "feature/exercisePlan/utils/pickStrokes";
+import {
+  alternatePickStrokes,
+  clearPickStroke,
+  pickStrokeOfRange,
+  togglePickStroke,
+} from "feature/exercisePlan/utils/pickStrokes";
 import {
   readTabEditorDraft,
   saveTabEditorDraft,
@@ -135,6 +143,18 @@ const BEND_AMOUNTS: { value: number; short: string; label: string }[] = [
   { value: 4, short: "2", label: "Two-step bend" },
 ];
 
+/** Only a real direction survives an import — anything else means "not marked". */
+function importedPickStroke(raw: unknown): { pickStroke?: PickStroke } {
+  return raw === "down" || raw === "up" ? { pickStroke: raw } : {};
+}
+
+// Picking direction is a property of the whole beat — a chord is struck one
+// way, not per string — so these apply to every beat the selection covers.
+const PICK_STROKES: { value: PickStroke; label: string }[] = [
+  { value: "down", label: "Down" },
+  { value: "up", label: "Up" },
+];
+
 const QUICK_FRETS = [0, 1, 2, 3, 5, 7, 9, 12, 15, 17, 19, 22];
 
 const DURATIONS: { value: number; short: string; label: string }[] = [
@@ -227,6 +247,35 @@ function NoteDurationIcon({
           strokeLinecap='round'
         />
       ))}
+    </svg>
+  );
+}
+
+/** ⊓ (downstroke) and ⋁ (upstroke) — the picking symbols printed above a staff. */
+function PickStrokeIcon({
+  stroke,
+  size = 12,
+  className,
+}: {
+  stroke: PickStroke;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox='0 0 12 12'
+      fill='none'
+      className={className}
+      aria-hidden='true'>
+      <path
+        d={stroke === "down" ? "M2 9.5V2.5h8v7" : "M2 2.5 6 9.5l4-7"}
+        stroke='currentColor'
+        strokeWidth='1.6'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
     </svg>
   );
 }
@@ -534,6 +583,7 @@ export default function TabEditor() {
           timeSignature: m.timeSignature || [4, 4],
           beats: (m.beats || []).map((b: any) => ({
             duration: b.duration || 0.25,
+            ...importedPickStroke(b.pickStroke),
             notes: (b.notes || []).map((n: any) => ({
               string: n.string,
               fret: n.fret,
@@ -553,6 +603,7 @@ export default function TabEditor() {
             .slice(i, i + BEATS_PER_MEASURE)
             .map((b: any) => ({
               duration: b.duration || 0.25,
+              ...importedPickStroke(b.pickStroke),
               notes: (b.notes || []).map((n: any) => ({
                 string: n.string,
                 fret: n.fret,
@@ -1104,6 +1155,89 @@ export default function TabEditor() {
     setContextMenu,
   ]);
 
+  /**
+   * What a picking command applies to: a drag selection covers its whole beat
+   * range, a single click just the one beat under the cursor. Strings don't
+   * matter — a pick stroke belongs to the beat, not to one note in it.
+   */
+  const pickStrokeRange = React.useMemo<PickStrokeRange | null>(() => {
+    if (activeSelection)
+      return {
+        measureIdx: activeSelection.measureIdx,
+        startBeat: activeSelection.startBeat,
+        endBeat: activeSelection.endBeat,
+      };
+    if (selectedCell)
+      return {
+        measureIdx: selectedCell.measureIdx,
+        startBeat: selectedCell.beatIdx,
+        endBeat: selectedCell.beatIdx,
+      };
+    return null;
+  }, [activeSelection, selectedCell]);
+
+  const selectedPickStroke = React.useMemo(
+    () => pickStrokeOfRange(measures, pickStrokeRange),
+    [measures, pickStrokeRange],
+  );
+
+  const applyPickStroke = useCallback(
+    (stroke: PickStroke) => {
+      if (!pickStrokeRange) return;
+      commit(togglePickStroke(measuresRef.current, pickStrokeRange, stroke));
+    },
+    [commit, pickStrokeRange],
+  );
+
+  const removePickStroke = useCallback(() => {
+    if (!pickStrokeRange) return;
+    commit(clearPickStroke(measuresRef.current, pickStrokeRange));
+  }, [commit, pickStrokeRange]);
+
+  /** Cycles one beat through ⊓ → ⋁ → nothing — what the lane above the grid does. */
+  const cycleBeatPickStroke = useCallback(
+    (mIdx: number, bIdx: number) => {
+      const range = { measureIdx: mIdx, startBeat: bIdx, endBeat: bIdx };
+      const current = measuresRef.current[mIdx]?.beats[bIdx]?.pickStroke;
+      commit(
+        current === "up"
+          ? clearPickStroke(measuresRef.current, range)
+          : togglePickStroke(
+              measuresRef.current,
+              range,
+              current === "down" ? "up" : "down",
+            ),
+      );
+    },
+    [commit],
+  );
+
+  /**
+   * Fills the selection with alternate picking. A single selected beat means
+   * "no range picked yet", so the whole measure gets the treatment — that's the
+   * common case: mark a bar as alternate picked and move on.
+   */
+  const applyAlternatePicking = useCallback(() => {
+    if (!pickStrokeRange) return;
+    const measure = measuresRef.current[pickStrokeRange.measureIdx];
+    if (!measure) return;
+    const isSingleBeat = pickStrokeRange.startBeat === pickStrokeRange.endBeat;
+    const range = isSingleBeat
+      ? {
+          measureIdx: pickStrokeRange.measureIdx,
+          startBeat: 0,
+          endBeat: measure.beats.length - 1,
+        }
+      : pickStrokeRange;
+    commit(alternatePickStrokes(measuresRef.current, range));
+    showToast(
+      isSingleBeat
+        ? `Measure #${range.measureIdx + 1}: alternate picking`
+        : "Alternate picking across the selection",
+      "info",
+    );
+  }, [commit, pickStrokeRange, showToast]);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (isGpModalOpen) return;
@@ -1163,6 +1297,20 @@ export default function TabEditor() {
 
       if (!selectedCell) return;
       const { measureIdx, beatIdx, stringIdx } = selectedCell;
+
+      // Picking direction, mapped onto the direction it means: Shift + ↓ marks a
+      // downstroke, Shift + ↑ an upstroke, Shift + A fills alternate picking.
+      // Plain arrows keep moving the cursor.
+      if (
+        e.shiftKey &&
+        ["arrowdown", "arrowup", "a"].includes(e.key.toLowerCase())
+      ) {
+        e.preventDefault();
+        if (e.key === "ArrowDown") applyPickStroke("down");
+        else if (e.key === "ArrowUp") applyPickStroke("up");
+        else applyAlternatePicking();
+        return;
+      }
 
       if (e.key >= "0" && e.key <= "9") {
         const beat = measures[measureIdx].beats[beatIdx];
@@ -1340,6 +1488,8 @@ export default function TabEditor() {
       isGpModalOpen,
       undo,
       redo,
+      applyPickStroke,
+      applyAlternatePicking,
       toggleEffect,
       updateFret,
       autoAdvance,
@@ -1895,6 +2045,12 @@ export default function TabEditor() {
               <div className='flex'>
                 {/* String labels (standard tuning, high e on top) */}
                 <div className='mr-2 flex flex-col pt-[25px]'>
+                  {/* Lane legend — lines up with the picking row above the strings. */}
+                  <span
+                    className='flex h-6 w-5 items-center justify-end pr-1 text-zinc-600'
+                    title='Picking direction'>
+                    <PickStrokeIcon stroke='down' size={10} />
+                  </span>
                   {STRING_LABELS.map((label, sIdx) => (
                     <span
                       key={sIdx}
@@ -1959,6 +2115,72 @@ export default function TabEditor() {
                                   aria-label={`Measure ${mIdx + 1} does not fill ${measure.timeSignature[0]}/${measure.timeSignature[1]}`}
                                 />
                               )}
+                            </div>
+                            {/* Picking lane — one cell per beat, sitting right
+                                above the strings so a ⊓/⋁ lines up with the
+                                note it belongs to. Click cycles ⊓ → ⋁ → none.
+                                Kept outside the note grid so it stays clear of
+                                the drag-selection and wheel handlers below. */}
+                            <div className='flex select-none'>
+                              {measure.beats.map((beat, bIdx) => {
+                                const isBeatSelected =
+                                  selectedCell?.measureIdx === mIdx &&
+                                  selectedCell?.beatIdx === bIdx;
+                                const isBeatInSelection =
+                                  !isDragging &&
+                                  activeSelection?.measureIdx === mIdx &&
+                                  bIdx >=
+                                    Math.min(
+                                      activeSelection.startBeat,
+                                      activeSelection.endBeat,
+                                    ) &&
+                                  bIdx <=
+                                    Math.max(
+                                      activeSelection.startBeat,
+                                      activeSelection.endBeat,
+                                    );
+
+                                return (
+                                  <button
+                                    key={bIdx}
+                                    type='button'
+                                    onClick={() =>
+                                      cycleBeatPickStroke(mIdx, bIdx)
+                                    }
+                                    title={`Picking on beat ${bIdx + 1}: ${
+                                      beat.pickStroke === "down"
+                                        ? "downstroke"
+                                        : beat.pickStroke === "up"
+                                          ? "upstroke"
+                                          : "not marked"
+                                    } — click to cycle down → up → none`}
+                                    aria-label={`Picking direction on measure ${mIdx + 1}, beat ${bIdx + 1}`}
+                                    className={cn(
+                                      "group flex h-6 w-8 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                      // Invisible stand-in for the beat-group
+                                      // separator below, so a marker stays over
+                                      // its own column instead of drifting a
+                                      // pixel per group across the bar.
+                                      bIdx % groupSize === 0 &&
+                                        bIdx !== 0 &&
+                                        "border-l border-transparent",
+                                      isBeatSelected
+                                        ? "bg-cyan-500/20"
+                                        : isBeatInSelection
+                                          ? "bg-cyan-500/10"
+                                          : "hover:bg-zinc-800/50",
+                                    )}>
+                                    <PickStrokeIcon
+                                      stroke={beat.pickStroke ?? "down"}
+                                      className={cn(
+                                        beat.pickStroke
+                                          ? "text-cyan-400"
+                                          : "text-transparent group-hover:text-zinc-600",
+                                      )}
+                                    />
+                                  </button>
+                                );
+                              })}
                             </div>
                             <div
                               id={`measure-grid-${mIdx}`}
@@ -2198,7 +2420,7 @@ export default function TabEditor() {
                       onClick={addMeasure}
                       title='Add measure'
                       aria-label='Add measure'
-                      className='ml-3 mt-[25px] flex h-48 w-10 items-center justify-center rounded border border-dashed border-zinc-700 bg-zinc-800/40 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
+                      className='ml-3 mt-[49px] flex h-48 w-10 items-center justify-center rounded border border-dashed border-zinc-700 bg-zinc-800/40 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
                       <LucidePlus size={16} />
                     </button>
                   </div>
@@ -2364,6 +2586,51 @@ export default function TabEditor() {
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
+                <div className='flex items-baseline justify-between gap-2'>
+                  <span className='text-[11px] font-semibold text-zinc-500'>
+                    Picking
+                  </span>
+                  <span className='text-[10px] font-semibold text-zinc-500'>
+                    Shift + ↓ / ↑
+                  </span>
+                </div>
+                <div className='flex gap-1.5'>
+                  {PICK_STROKES.map((p) => (
+                    <button
+                      key={p.value}
+                      onClick={() => applyPickStroke(p.value)}
+                      title={`${p.label} — marks ${
+                        activeSelection ? "the selection" : "this beat"
+                      }`}
+                      className={cn(
+                        "flex h-9 flex-1 items-center justify-center gap-2 rounded text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        selectedPickStroke === p.value
+                          ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40"
+                          : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                      )}>
+                      <PickStrokeIcon stroke={p.value} size={13} />
+                      {p.label}
+                    </button>
+                  ))}
+                  <button
+                    onClick={removePickStroke}
+                    disabled={!selectedPickStroke}
+                    title='Remove the picking marker'
+                    aria-label='Remove the picking marker'
+                    className='flex h-9 w-9 items-center justify-center rounded bg-zinc-800/40 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700 hover:text-zinc-200'>
+                    <LucideEraser size={13} />
+                  </button>
+                </div>
+                <button
+                  onClick={applyAlternatePicking}
+                  className='flex w-full items-center justify-center gap-2 rounded bg-zinc-800/40 py-2 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
+                  <PickStrokeIcon stroke='down' size={13} />
+                  <PickStrokeIcon stroke='up' size={13} />
+                  Alternate {activeSelection ? "selection" : "measure"}
+                </button>
+              </div>
+
+              <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
                   Time signature
                 </span>
@@ -2477,6 +2744,14 @@ export default function TabEditor() {
                 <div className='flex items-center justify-between'>
                   <span>Articulations</span>
                   <span className='text-zinc-300'>H P A D V T M</span>
+                </div>
+                <div className='flex items-center justify-between'>
+                  <span>Picking ⊓ / ⋁</span>
+                  <span className='text-zinc-300'>Shift + ↓ / ↑</span>
+                </div>
+                <div className='flex items-center justify-between'>
+                  <span>Alternate picking</span>
+                  <span className='text-zinc-300'>Shift + A</span>
                 </div>
                 <div className='flex items-center justify-between'>
                   <span>Clear note</span>

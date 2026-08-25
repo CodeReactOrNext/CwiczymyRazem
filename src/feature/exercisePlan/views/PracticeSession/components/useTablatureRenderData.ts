@@ -1,4 +1,4 @@
-import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { PickStroke, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { useMemo } from "react";
 
 export const STRING_SPACING = 32;
@@ -45,6 +45,7 @@ export interface BeatRD {
   notes: NoteRD[];
   isRest: boolean;
   tuplet?: number;
+  pickStroke?: PickStroke;
 }
 
 export interface TimeSigMarker { x: number; sig: [number, number]; }
@@ -145,6 +146,7 @@ export function useTablatureRenderData(
           notes,
           isRest: beat.notes.length === 0,
           tuplet: beat.tuplet,
+          pickStroke: beat.pickStroke,
         });
         currentX += beat.duration;
 

@@ -26,11 +26,18 @@ const STAFF_TOP = 62;
 const STEM_TOP_Y = 12;
 const RHY_HEAD_Y = STAFF_TOP - 36;
 const RHY_HEAD_R = 3.5;
+// Picking-direction markers (⊓ / ⋁) sit in the empty strip between the rhythm
+// lane's noteheads and the top string, exactly where a printed score puts them.
+const PICK_Y = STAFF_TOP - 17;
+const PICK_W = 9;
+const PICK_H = 8;
 const BEAM_H = 3;
 const BEAM_GAP = 4.5;
 // Recomputed from `inkColor` whenever a STYLE message lands (see below), so the
 // rhythm lane stays legible on light boards too.
 let RHYTHM_COLOR = "rgba(255,255,255,0.4)";
+/** Picking markers read as an instruction, so they sit a shade above the rhythm lane. */
+let PICK_COLOR = "rgba(255,255,255,0.65)";
 
 // ── User style (driven by the STYLE message; see tablatureSettings.ts) ────────
 // Per-string palette, used here for slide lines. The pill fill colour itself
@@ -121,6 +128,7 @@ interface BeatRD {
   notes: NoteRD[];
   isRest: boolean;
   tuplet?: number;
+  pickStroke?: "down" | "up";
 }
 
 interface TimeSigMarker { x: number; sig: [number, number]; }
@@ -276,6 +284,30 @@ function lightenHex(hex: string, amt: number): string {
   const b = parseInt(hex.slice(5, 7), 16);
   const mix = (c: number) => Math.round(c + (255 - c) * amt);
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+// ── Pick stroke marker ────────────────────────────────────────────────────────
+/** The printed picking symbols: ⊓ for a downstroke, ⋁ for an upstroke, centred on `x`. */
+function drawPickStroke(stroke: "down" | "up", x: number) {
+  if (!ctx) return;
+  const half = PICK_W / 2;
+  ctx.strokeStyle = PICK_COLOR;
+  ctx.lineWidth = 1.6;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  if (stroke === "down") {
+    // Open-bottomed bracket — the ⊓ every score uses for a downstroke.
+    ctx.moveTo(x - half, PICK_Y + PICK_H / 2);
+    ctx.lineTo(x - half, PICK_Y - PICK_H / 2);
+    ctx.lineTo(x + half, PICK_Y - PICK_H / 2);
+    ctx.lineTo(x + half, PICK_Y + PICK_H / 2);
+  } else {
+    ctx.moveTo(x - half, PICK_Y - PICK_H / 2);
+    ctx.lineTo(x, PICK_Y + PICK_H / 2);
+    ctx.lineTo(x + half, PICK_Y - PICK_H / 2);
+  }
+  ctx.stroke();
 }
 
 // ── Bend badge ────────────────────────────────────────────────────────────────
@@ -782,6 +814,12 @@ function render() {
           }
         }
       }
+    }
+
+    // Picking direction — grouped with the technique markers, since that's what
+    // it is: a hint about how to play the beat, not part of the notation itself.
+    if (inView && beat.pickStroke && showTechniqueLabels && !hideNotes) {
+      drawPickStroke(beat.pickStroke, beatL);
     }
 
     // Notes
@@ -1596,6 +1634,7 @@ self.onmessage = (e: MessageEvent) => {
         // Cached string rather than a per-draw call — the rhythm lane paints it
         // dozens of times per frame.
         RHYTHM_COLOR = withAlpha(inkColor, 0.4);
+        PICK_COLOR = withAlpha(inkColor, 0.65);
       }
       if (msg.showRhythmLane !== undefined) showRhythmLane = msg.showRhythmLane;
       if (msg.showChordNames !== undefined) showChordNames = msg.showChordNames;
