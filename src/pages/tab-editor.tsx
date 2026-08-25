@@ -14,6 +14,12 @@ import type {
   TablatureMeasure,
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
+import {
+  beatOffsetsInQuarters,
+  restBeatsAt,
+  setBeatsDuration,
+  startsCountedBeat,
+} from "feature/exercisePlan/utils/beatDuration";
 import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
 import {
   beatsDurationInQuarters,
@@ -27,11 +33,10 @@ import {
   DEFAULT_TIME_SIGNATURE,
   regridMeasure,
 } from "feature/exercisePlan/utils/measureGrid";
-import type { PickStrokeRange } from "feature/exercisePlan/utils/pickStrokes";
 import {
   alternatePickStrokes,
   clearPickStroke,
-  pickStrokeOfRange,
+  pickStrokeOfRefs,
   togglePickStroke,
 } from "feature/exercisePlan/utils/pickStrokes";
 import {
@@ -39,9 +44,26 @@ import {
   saveTabEditorDraft,
 } from "feature/exercisePlan/utils/tabEditorDraft";
 import {
+  beatCellWidth,
+  beatIndexAtX,
+} from "feature/exercisePlan/utils/tabGridLayout";
+import {
   beatAtScrollLeft,
-  beatRangeForCells,
+  beatRangeForSpan,
 } from "feature/exercisePlan/utils/tabPreviewSync";
+import type { TabSelection } from "feature/exercisePlan/utils/tabSelection";
+import {
+  cellSelection,
+  clearSelectedNotes,
+  countSelectedNotes,
+  isBeatInSelection,
+  isCellInSelection,
+  isSingleCell,
+  mapSelectedNotes,
+  normalizeSelection,
+  selectedBeatIndices,
+  selectionBeatRefs,
+} from "feature/exercisePlan/utils/tabSelection";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { AnimatePresence, motion } from "framer-motion";
@@ -133,6 +155,36 @@ const ARTICULATIONS: {
   },
 ];
 
+/**
+ * One articulation switched on or off, with the flags that can't coexist kept
+ * straight — a note is either hammered on or pulled off, never both.
+ */
+function withArticulation(
+  note: TablatureNote,
+  type: ArticulationType,
+  on: boolean,
+): TablatureNote {
+  const next: TablatureNote = { ...note, [type]: on };
+
+  if (type === "isHammerOn" && on) next.isPullOff = false;
+  if (type === "isPullOff" && on) next.isHammerOn = false;
+  if (type === "isBend") {
+    if (on) {
+      // Manual bends are authored as a plain whole-step shift — bendCurve is
+      // reserved for the richer automation captured from GP imports.
+      next.bendSemitones = 2;
+      next.bendCurve = undefined;
+    } else {
+      next.bendSemitones = undefined;
+      next.bendCurve = undefined;
+      next.isPreBend = false;
+      next.isRelease = false;
+    }
+  }
+
+  return next;
+}
+
 // bendSemitones is expressed in semitones (1 = half step); alphaTab renders
 // these as the familiar "1/4", "1/2", "full" bend labels on the tab.
 const BEND_AMOUNTS: { value: number; short: string; label: string }[] = [
@@ -157,12 +209,39 @@ const PICK_STROKES: { value: PickStroke; label: string }[] = [
 
 const QUICK_FRETS = [0, 1, 2, 3, 5, 7, 9, 12, 15, 17, 19, 22];
 
+/** Trims float noise from triplet grids: 3.9999999999999982 → "4". */
+function formatQuarters(quarters: number): string {
+  return String(Number(quarters.toFixed(2)));
+}
+
 const DURATIONS: { value: number; short: string; label: string }[] = [
+  { value: 4, short: "1/1", label: "Whole note" },
+  { value: 2, short: "1/2", label: "Half note" },
   { value: 1, short: "1/4", label: "Quarter note" },
   { value: 0.5, short: "1/8", label: "Eighth note" },
   { value: 0.25, short: "1/16", label: "Sixteenth note" },
   { value: 0.125, short: "1/32", label: "Thirty-second note" },
 ];
+
+/** A dotted note lasts half again as long — 1.5 quarter notes for a dotted quarter. */
+const DOT_FACTOR = 1.5;
+
+/** True when `duration` is a plain note value with a dot on it. */
+function isDotted(duration: number): boolean {
+  return DURATIONS.some(
+    (d) => Math.abs(d.value * DOT_FACTOR - duration) < 1e-6,
+  );
+}
+
+/** Reads a duration back as the note value it's drawn with. */
+function durationLabel(duration: number): string {
+  const base = isDotted(duration) ? duration / DOT_FACTOR : duration;
+  const match = DURATIONS.find((d) => Math.abs(d.value - base) < 1e-6);
+  if (!match) return `${formatQuarters(duration)} quarter notes`;
+  return isDotted(duration)
+    ? `Dotted ${match.label.toLowerCase()}`
+    : match.label;
+}
 
 const STEP_OPTIONS: { value: number; title: string }[] = [
   { value: 8, title: "8 steps — eighth notes" },
@@ -191,21 +270,26 @@ const BPM_FALLBACK = 80;
 
 const clampBpm = (value: number) => Math.max(BPM_MIN, Math.min(BPM_MAX, value));
 
+const clampFret = (fret: number) => Math.max(0, Math.min(FRET_MAX, fret));
+
+/**
+ * Where a column's mark sits. A long note owns a wide column, and tab reads the
+ * note as sounding at its *start*, so anything wider than a cell or so is
+ * left-aligned rather than floating in the middle of its own duration.
+ */
+const beatCellAlign = (width: number) =>
+  width > 44 ? "justify-start pl-2" : "justify-center";
+
 // A wheel gesture fires a tick every few ms. Ticks on the same cell within this
 // window collapse into a single history entry, so one flick of the wheel costs
 // one undo instead of flooding the whole buffer.
 const HISTORY_COALESCE_MS = 600;
 
-/** Trims float noise from triplet grids: 3.9999999999999982 → "4". */
-function formatQuarters(quarters: number): string {
-  return String(Number(quarters.toFixed(2)));
-}
-
 // String 1 (top row) = high e, string 6 = low E — standard tuning labels.
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
 
-// Cell geometry used by the click/drag fallback math below — keep in sync
-// with the h-8/w-8 cells in the grid.
+// Row height of one string in the grid — keep in sync with the h-8 cells. Cell
+// *widths* come from the beat's duration instead (see tabGridLayout).
 const CELL_SIZE = 32;
 
 function NoteDurationIcon({
@@ -215,8 +299,14 @@ function NoteDurationIcon({
   duration: number;
   size?: number;
 }) {
-  const flags =
-    duration >= 1 ? 0 : duration >= 0.5 ? 1 : duration >= 0.25 ? 2 : 3;
+  const dotted = isDotted(duration);
+  const base = dotted ? duration / DOT_FACTOR : duration;
+  // A half note and longer is written with an open notehead, and a whole note
+  // carries no stem at all — the two things that tell a long note apart.
+  const isOpen = base >= 2;
+  const hasStem = base < 4;
+  const flags = base >= 1 ? 0 : base >= 0.5 ? 1 : base >= 0.25 ? 2 : 3;
+
   return (
     <svg
       width={size}
@@ -229,15 +319,19 @@ function NoteDurationIcon({
         cy='12.1'
         rx='3'
         ry='2.1'
-        fill='currentColor'
+        fill={isOpen ? "none" : "currentColor"}
+        stroke={isOpen ? "currentColor" : "none"}
+        strokeWidth='1.3'
         transform='rotate(-20 5.7 12.1)'
       />
-      <path
-        d='M8.5 12.1V1.8'
-        stroke='currentColor'
-        strokeWidth='1.2'
-        strokeLinecap='round'
-      />
+      {hasStem && (
+        <path
+          d='M8.5 12.1V1.8'
+          stroke='currentColor'
+          strokeWidth='1.2'
+          strokeLinecap='round'
+        />
+      )}
       {Array.from({ length: flags }, (_, i) => (
         <path
           key={i}
@@ -247,7 +341,91 @@ function NoteDurationIcon({
           strokeLinecap='round'
         />
       ))}
+      {dotted && <circle cx='11.5' cy='12.1' r='1.1' fill='currentColor' />}
     </svg>
+  );
+}
+
+/** The rest of the same length — what an empty beat is drawn as. */
+function RestIcon({
+  duration,
+  size = 14,
+}: {
+  duration: number;
+  size?: number;
+}) {
+  const dotted = isDotted(duration);
+  const base = dotted ? duration / DOT_FACTOR : duration;
+  const flags = base >= 0.5 ? 1 : base >= 0.25 ? 2 : 3;
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox='0 0 16 16'
+      fill='none'
+      aria-hidden='true'>
+      {base >= 2 ? (
+        // Whole rest hangs under its ledger line, half rest sits on top of it.
+        <>
+          <rect
+            x='4'
+            y={base >= 4 ? 7 : 4}
+            width='8'
+            height='3'
+            fill='currentColor'
+          />
+          <path
+            d='M3 7h10'
+            stroke='currentColor'
+            strokeWidth='1.2'
+            strokeLinecap='round'
+          />
+        </>
+      ) : base >= 1 ? (
+        <path
+          d='M9.6 2.5 6.2 6.6l3 2.6-3.4 3.4c1.6-.6 3-.3 3.8.8'
+          stroke='currentColor'
+          strokeWidth='1.3'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+      ) : (
+        <>
+          <path
+            d='M10.6 3.4 6.2 12.8'
+            stroke='currentColor'
+            strokeWidth='1.2'
+            strokeLinecap='round'
+          />
+          {Array.from({ length: flags }, (_, i) => (
+            <circle
+              key={i}
+              cx={9.8 - i * 1.5}
+              cy={4.2 + i * 3.1}
+              r='1.6'
+              fill='currentColor'
+            />
+          ))}
+        </>
+      )}
+      {dotted && <circle cx='13.4' cy='11.6' r='1.1' fill='currentColor' />}
+    </svg>
+  );
+}
+
+/** Note or rest, whichever the beat is — the glyph the rhythm lane shows. */
+function BeatRhythmIcon({
+  beat,
+  size = 14,
+}: {
+  beat: TablatureBeat;
+  size?: number;
+}) {
+  return beat.notes.length === 0 ? (
+    <RestIcon duration={beat.duration} size={size} />
+  ) : (
+    <NoteDurationIcon duration={beat.duration} size={size} />
   );
 }
 
@@ -278,6 +456,37 @@ function PickStrokeIcon({
       />
     </svg>
   );
+}
+
+/** A single cell of the editor grid: which beat, on which string. */
+interface GridCell {
+  measureIdx: number;
+  beatIdx: number;
+  stringIdx: number;
+}
+
+/**
+ * The block a set of hit-tested cells adds up to. The first/last beat are read
+ * from the outer measures only, so a drag that crosses a bar line takes the
+ * whole of everything in between — the way a text selection does.
+ */
+function selectionOfCells(cells: GridCell[]): TabSelection {
+  const measures = cells.map((cell) => cell.measureIdx);
+  const startMeasure = Math.min(...measures);
+  const endMeasure = Math.max(...measures);
+  const beatsIn = (measureIdx: number) =>
+    cells
+      .filter((cell) => cell.measureIdx === measureIdx)
+      .map((cell) => cell.beatIdx);
+
+  return {
+    startMeasure,
+    startBeat: Math.min(...beatsIn(startMeasure)),
+    endMeasure,
+    endBeat: Math.max(...beatsIn(endMeasure)),
+    startString: Math.min(...cells.map((cell) => cell.stringIdx)),
+    endString: Math.max(...cells.map((cell) => cell.stringIdx)),
+  };
 }
 
 function ToolbarIconButton({
@@ -351,20 +560,13 @@ export default function TabEditor() {
   const previewScrollToBeatRef = React.useRef<
     ((beat: number, keepVisibleBeat?: number | null) => void) | null
   >(null);
-  const selectionStartRef = React.useRef<{
-    mIdx: number;
-    bIdx: number;
-    sIdx: number;
-    x: number;
-    y: number;
-  } | null>(null);
-  const [activeSelection, setActiveSelection] = useState<{
-    measureIdx: number;
-    startBeat: number;
-    endBeat: number;
-    startString: number;
-    endString: number;
-  } | null>(null);
+  // Where a drag-select started, in viewport coordinates.
+  const selectionStartRef = React.useRef<{ x: number; y: number } | null>(null);
+  // A dragged (or shift-clicked) block of cells, which may run across bar lines.
+  // Null means "just the cell in `selectedCell`" — see `selection` below.
+  const [activeSelection, setActiveSelection] = useState<TabSelection | null>(
+    null,
+  );
   const [clipboard, setClipboard] = useState<{
     beats: TablatureBeat[];
     baseStringIdx: number;
@@ -380,6 +582,17 @@ export default function TabEditor() {
     x: number;
     y: number;
   } | null>(null);
+
+  /**
+   * What every edit applies to: the dragged block when there is one, otherwise
+   * the single clicked cell. Commands don't have to care which it was — "set a
+   * half note", "mark a downstroke" and "add a palm mute" all take a selection.
+   */
+  const selection = React.useMemo<TabSelection | null>(
+    () =>
+      activeSelection ?? (selectedCell ? cellSelection(selectedCell) : null),
+    [activeSelection, selectedCell],
+  );
 
   const showToast = useCallback(
     (message: string, type: "info" | "success" | "error" = "info") => {
@@ -766,16 +979,71 @@ export default function TabEditor() {
       .catch(() => showToast("Couldn't copy — try again.", "error"));
   };
 
-  const updateDuration = (
-    measureIdx: number,
-    beatIdx: number,
-    duration: number,
-  ) => {
-    const newMeasures = [...measures];
-    newMeasures[measureIdx].beats[beatIdx].duration = duration;
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
-  };
+  /**
+   * Re-times every selected beat, one measure at a time. A longer note eats the
+   * beats after it and a shorter one leaves rests behind, so each bar keeps
+   * filling its time signature — see setBeatsDuration.
+   *
+   * Beats shift around underneath, so the cursor is pulled back inside the
+   * measure afterwards and the block selection is dropped.
+   */
+  const applyDurationToSelection = useCallback(
+    (duration: number) => {
+      if (!selection) return;
+      const current = measuresRef.current;
+
+      const next = current.map((measure, measureIdx) => {
+        const indices = selectedBeatIndices(current, selection, measureIdx);
+        return indices.length === 0
+          ? measure
+          : setBeatsDuration(measure, indices, duration);
+      });
+
+      commit(next);
+      setActiveSelection(null);
+      setSelectedCell((cell) =>
+        cell
+          ? {
+              ...cell,
+              beatIdx: Math.min(
+                cell.beatIdx,
+                (next[cell.measureIdx]?.beats.length ?? 1) - 1,
+              ),
+            }
+          : cell,
+      );
+    },
+    [commit, selection],
+  );
+
+  /** Adds or removes the dot on the selected beats (a dotted note lasts 1.5×). */
+  const toggleDotOnSelection = useCallback(() => {
+    if (!selection) return;
+    const refs = selectionBeatRefs(measuresRef.current, selection);
+    const first = refs[0]
+      ? measuresRef.current[refs[0].measureIdx].beats[refs[0].beatIdx]
+      : null;
+    if (!first) return;
+
+    applyDurationToSelection(
+      isDotted(first.duration)
+        ? first.duration / DOT_FACTOR
+        : first.duration * DOT_FACTOR,
+    );
+  }, [applyDurationToSelection, selection]);
+
+  /** Turns the selected beats into rests — same length, no notes. */
+  const restSelection = useCallback(() => {
+    if (!selection) return;
+    const current = measuresRef.current;
+
+    commit(
+      current.map((measure, measureIdx) => {
+        const indices = selectedBeatIndices(current, selection, measureIdx);
+        return indices.length === 0 ? measure : restBeatsAt(measure, indices);
+      }),
+    );
+  }, [commit, selection]);
 
   /**
    * Re-grid every measure so one step equals `duration`. The step count is
@@ -795,72 +1063,66 @@ export default function TabEditor() {
     );
   };
 
-  const updateFret = (
-    measureIdx: number,
-    beatIdx: number,
-    stringIdx: number,
-    fret: number,
-  ) => {
-    const string = stringIdx + 1;
-    const newMeasures = [...measures];
-    const beat = newMeasures[measureIdx].beats[beatIdx];
-    const note = beat.notes.find((n) => n.string === string);
+  /** Writes a fret into one cell, adding the note when the cell was empty. */
+  const updateFret = useCallback(
+    (measureIdx: number, beatIdx: number, stringIdx: number, fret: number) => {
+      const current = measuresRef.current;
+      const beat = current[measureIdx]?.beats[beatIdx];
+      if (!beat) return;
 
-    if (note) {
-      note.fret = Math.max(0, Math.min(24, fret));
-    } else {
-      beat.notes.push({ string, fret });
-    }
+      const string = stringIdx + 1;
+      const notes = beat.notes.some((n) => n.string === string)
+        ? beat.notes.map((n) =>
+            n.string === string ? { ...n, fret: clampFret(fret) } : n,
+          )
+        : [...beat.notes, { string, fret: clampFret(fret) }];
 
-    setMeasures(newMeasures);
-  };
+      commit(
+        current.map((measure, mIdx) =>
+          mIdx !== measureIdx
+            ? measure
+            : {
+                ...measure,
+                beats: measure.beats.map((b, bIdx) =>
+                  bIdx !== beatIdx ? b : { ...b, notes },
+                ),
+              },
+        ),
+      );
+    },
+    [commit],
+  );
 
-  const toggleEffect = (
-    measureIdx: number,
-    beatIdx: number,
-    stringIdx: number,
-    type: ArticulationType,
-  ) => {
-    const string = stringIdx + 1;
-    const newMeasures = [...measures];
-    const beat = newMeasures[measureIdx].beats[beatIdx];
-    const note = beat.notes.find((n) => n.string === string);
+  /**
+   * Sets or clears one articulation on every note the selection covers. The
+   * whole block moves together: if they all already carry it the press takes it
+   * off, otherwise everyone gets it — the same toggle the picking buttons use,
+   * so a mixed selection lands on "all on" in one press instead of flipping
+   * each note against the others.
+   */
+  const toggleArticulationOnSelection = useCallback(
+    (type: ArticulationType) => {
+      if (!selection) return;
+      const current = measuresRef.current;
 
-    if (note) {
-      if (type === "isHammerOn") {
-        note.isHammerOn = !note.isHammerOn;
-        if (note.isHammerOn) note.isPullOff = false;
-      } else if (type === "isPullOff") {
-        note.isPullOff = !note.isPullOff;
-        if (note.isPullOff) note.isHammerOn = false;
-      } else if (type === "isAccented") {
-        note.isAccented = !note.isAccented;
-      } else if (type === "isDead") {
-        note.isDead = !note.isDead;
-      } else if (type === "isVibrato") {
-        note.isVibrato = !note.isVibrato;
-      } else if (type === "isTap") {
-        note.isTap = !note.isTap;
-      } else if (type === "isPalmMute") {
-        note.isPalmMute = !note.isPalmMute;
-      } else if (type === "isBend") {
-        note.isBend = !note.isBend;
-        if (note.isBend) {
-          // Manual bends are authored as a plain whole-step shift — bendCurve
-          // is reserved for the richer automation captured from GP imports.
-          note.bendSemitones = 2;
-          note.bendCurve = undefined;
-        } else {
-          note.bendSemitones = undefined;
-          note.bendCurve = undefined;
-          note.isPreBend = false;
-          note.isRelease = false;
-        }
-      }
-    }
+      const { firstString, lastString } = normalizeSelection(selection);
+      const notes = selectionBeatRefs(current, selection).flatMap((ref) =>
+        current[ref.measureIdx].beats[ref.beatIdx].notes.filter(
+          (note) =>
+            note.string - 1 >= firstString && note.string - 1 <= lastString,
+        ),
+      );
+      if (notes.length === 0) return;
 
-    setMeasures(newMeasures);
-  };
+      const enable = !notes.every((note) => note[type]);
+      commit(
+        mapSelectedNotes(current, selection, (note) =>
+          withArticulation(note, type, enable),
+        ),
+      );
+    },
+    [commit, selection],
+  );
 
   // Fret nudging with the wheel. React registers `wheel` as a passive listener
   // at the root, so an onWheel prop can never preventDefault the page scroll —
@@ -928,36 +1190,32 @@ export default function TabEditor() {
    * this on the board, so the note being edited is findable up there too.
    */
   const previewSelection = React.useMemo(() => {
-    const cells = activeSelection
-      ? {
-          measureIdx: activeSelection.measureIdx,
-          beats: [activeSelection.startBeat, activeSelection.endBeat],
-          strings: [activeSelection.startString, activeSelection.endString],
-        }
-      : selectedCell
-        ? {
-            measureIdx: selectedCell.measureIdx,
-            beats: [selectedCell.beatIdx, selectedCell.beatIdx],
-            strings: [selectedCell.stringIdx, selectedCell.stringIdx],
-          }
-        : null;
-    if (!cells) return null;
+    if (!selection) return null;
+    const {
+      firstMeasure,
+      firstBeat,
+      lastMeasure,
+      lastBeat,
+      firstString,
+      lastString,
+    } = normalizeSelection(selection);
 
-    const range = beatRangeForCells(
+    const range = beatRangeForSpan(
       measures,
-      cells.measureIdx,
-      cells.beats[0],
-      cells.beats[1],
+      firstMeasure,
+      firstBeat,
+      lastMeasure,
+      lastBeat,
     );
     if (!range) return null;
 
     // The grid indexes strings from 0 (high e); the board numbers them 1–6.
     return {
       ...range,
-      startString: Math.min(...cells.strings) + 1,
-      endString: Math.max(...cells.strings) + 1,
+      startString: firstString + 1,
+      endString: lastString + 1,
     };
-  }, [activeSelection, selectedCell, measures]);
+  }, [selection, measures]);
 
   /**
    * Mirrors the grid's horizontal scroll onto the live preview: whatever beat
@@ -1021,190 +1279,156 @@ export default function TabEditor() {
     syncPreviewScroll();
   }, [syncPreviewScroll]);
 
-  const clearSelectedNote = useCallback(() => {
-    if (!selectedCell) return;
-    const newMeasures = [...measures];
-    const beat =
-      newMeasures[selectedCell.measureIdx].beats[selectedCell.beatIdx];
-    beat.notes = beat.notes.filter(
-      (n) => n.string !== selectedCell.stringIdx + 1,
-    );
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
-  }, [selectedCell, measures, saveHistory]);
+  /** Clears the notes the selection covers — one cell, or a whole block. */
+  const clearSelectedNotesInGrid = useCallback(() => {
+    if (!selection) return;
+    commit(clearSelectedNotes(measuresRef.current, selection));
+  }, [commit, selection]);
 
+  /**
+   * Drops the clipboard in beat by beat from the cursor, running on into the
+   * measures that follow. Each pasted beat is re-timed through the same rule
+   * the note-value buttons use, so pasting a half note takes over the beats it
+   * covers instead of stretching the bar past its time signature.
+   */
   const handlePasteAtCursor = useCallback(
-    (
-      rightClickCell?: {
-        measureIdx: number;
-        beatIdx: number;
-        stringIdx: number;
-      } | null,
-    ) => {
+    (rightClickCell?: GridCell | null) => {
       const target = rightClickCell || selectedCell;
       if (!clipboard || !target) return;
 
-      const newMeasures = JSON.parse(JSON.stringify(measures));
+      let next = measuresRef.current;
       const stringOffset = target.stringIdx - clipboard.baseStringIdx;
+      let measureIdx = target.measureIdx;
+      let beatIdx = target.beatIdx;
 
-      clipboard.beats.forEach((beat: TablatureBeat, offset: number) => {
-        let tMIdx = target.measureIdx;
-        let tBIdx = target.beatIdx + offset;
-
+      for (const beat of clipboard.beats) {
         while (
-          tMIdx < newMeasures.length &&
-          tBIdx >= newMeasures[tMIdx].beats.length
+          measureIdx < next.length &&
+          beatIdx >= next[measureIdx].beats.length
         ) {
-          tBIdx -= newMeasures[tMIdx].beats.length;
-          tMIdx++;
+          beatIdx -= next[measureIdx].beats.length;
+          measureIdx += 1;
         }
+        if (measureIdx >= next.length) break;
 
-        if (tMIdx < newMeasures.length) {
-          const targetBeat = newMeasures[tMIdx].beats[tBIdx];
-          targetBeat.duration = beat.duration;
+        const targetBeat = next[measureIdx].beats[beatIdx];
+        const notes = [...targetBeat.notes];
+        beat.notes.forEach((note) => {
+          const string = note.string + stringOffset;
+          if (string < 1 || string > 6) return;
+          const existing = notes.findIndex((n) => n.string === string);
+          const pasted = { ...note, string };
+          if (existing > -1) notes[existing] = pasted;
+          else notes.push(pasted);
+        });
 
-          beat.notes.forEach((note: TablatureNote) => {
-            const newString = note.string + stringOffset;
-            if (newString >= 1 && newString <= 6) {
-              const existingNoteIdx = targetBeat.notes.findIndex(
-                (n: TablatureNote) => n.string === newString,
-              );
-              const newNote = JSON.parse(JSON.stringify(note));
-              newNote.string = newString;
-              if (existingNoteIdx > -1) {
-                targetBeat.notes[existingNoteIdx] = newNote;
-              } else {
-                targetBeat.notes.push(newNote);
-              }
-            }
-          });
-        }
-      });
+        // The pasted beat brings its own picking with it — copying a run of
+        // alternate picking and dropping it elsewhere should keep the ⊓ / ⋁.
+        const { pickStroke: _replaced, ...rest } = targetBeat;
+        const written = beat.pickStroke
+          ? { ...rest, notes, pickStroke: beat.pickStroke }
+          : { ...rest, notes };
 
-      setMeasures(newMeasures);
-      saveHistory(newMeasures);
+        const targetMeasure = measureIdx;
+        const targetBeatIdx = beatIdx;
+        next = next.map((measure, mIdx) =>
+          mIdx !== targetMeasure
+            ? measure
+            : setBeatsDuration(
+                {
+                  ...measure,
+                  beats: measure.beats.map((b, bIdx) =>
+                    bIdx === targetBeatIdx ? written : b,
+                  ),
+                },
+                [targetBeatIdx],
+                beat.duration,
+              ),
+        );
+        beatIdx += 1;
+      }
+
+      commit(next);
       showToast("Pattern applied!", "success");
     },
-    [clipboard, selectedCell, measures, saveHistory, showToast],
+    [clipboard, selectedCell, commit, showToast],
   );
 
   const handleCopySelection = useCallback(() => {
-    if (activeSelection) {
-      const beats = measures[activeSelection.measureIdx].beats.slice(
-        Math.min(activeSelection.startBeat, activeSelection.endBeat),
-        Math.max(activeSelection.startBeat, activeSelection.endBeat) + 1,
-      );
+    if (!selection) return;
+    const { firstString, lastString } = normalizeSelection(selection);
 
-      const minS = Math.min(
-        activeSelection.startString,
-        activeSelection.endString,
-      );
-      const maxS = Math.max(
-        activeSelection.startString,
-        activeSelection.endString,
-      );
-
-      const filteredBeats = beats.map((beat: TablatureBeat) => ({
+    // Beats are flattened in playing order, so a selection that runs over a bar
+    // line pastes back as one continuous run.
+    const beats = selectionBeatRefs(measures, selection).map((ref) => {
+      const beat = measures[ref.measureIdx].beats[ref.beatIdx];
+      return {
         ...beat,
         notes: beat.notes.filter(
-          (n: TablatureNote) => n.string - 1 >= minS && n.string - 1 <= maxS,
+          (note) =>
+            note.string - 1 >= firstString && note.string - 1 <= lastString,
         ),
-      }));
+      };
+    });
+    if (beats.length === 0) return;
 
-      setClipboard({
-        beats: JSON.parse(JSON.stringify(filteredBeats)),
-        baseStringIdx: minS,
-      });
-      showToast("Copied selection", "success");
-      setContextMenu(null);
-    }
-  }, [activeSelection, measures, showToast, setClipboard, setContextMenu]);
+    setClipboard({
+      beats: JSON.parse(JSON.stringify(beats)),
+      baseStringIdx: firstString,
+    });
+    showToast(
+      beats.length === 1 ? "Copied beat" : `Copied ${beats.length} beats`,
+      "success",
+    );
+    setContextMenu(null);
+  }, [selection, measures, showToast, setClipboard, setContextMenu]);
 
   const handleDeleteSelection = useCallback(() => {
-    if (activeSelection) {
-      const newMeasures = JSON.parse(JSON.stringify(measures));
-      const minB = Math.min(activeSelection.startBeat, activeSelection.endBeat);
-      const maxB = Math.max(activeSelection.startBeat, activeSelection.endBeat);
-      const minS = Math.min(
-        activeSelection.startString,
-        activeSelection.endString,
-      );
-      const maxS = Math.max(
-        activeSelection.startString,
-        activeSelection.endString,
-      );
-
-      for (let b = minB; b <= maxB; b++) {
-        newMeasures[activeSelection.measureIdx].beats[b].notes = newMeasures[
-          activeSelection.measureIdx
-        ].beats[b].notes.filter(
-          (n: TablatureNote) => n.string - 1 < minS || n.string - 1 > maxS,
-        );
-      }
-      setMeasures(newMeasures);
-      saveHistory(newMeasures);
-      showToast("Selection cleared", "info");
-      setContextMenu(null);
-    }
-  }, [
-    activeSelection,
-    measures,
-    saveHistory,
-    showToast,
-    setMeasures,
-    setContextMenu,
-  ]);
+    if (!selection) return;
+    commit(clearSelectedNotes(measuresRef.current, selection));
+    showToast("Selection cleared", "info");
+    setContextMenu(null);
+  }, [selection, commit, showToast, setContextMenu]);
 
   /**
-   * What a picking command applies to: a drag selection covers its whole beat
-   * range, a single click just the one beat under the cursor. Strings don't
-   * matter — a pick stroke belongs to the beat, not to one note in it.
+   * What a picking command applies to: every beat the selection covers, which
+   * for a plain click is the one beat under the cursor. Strings don't matter —
+   * a pick stroke belongs to the beat, not to one note in it.
    */
-  const pickStrokeRange = React.useMemo<PickStrokeRange | null>(() => {
-    if (activeSelection)
-      return {
-        measureIdx: activeSelection.measureIdx,
-        startBeat: activeSelection.startBeat,
-        endBeat: activeSelection.endBeat,
-      };
-    if (selectedCell)
-      return {
-        measureIdx: selectedCell.measureIdx,
-        startBeat: selectedCell.beatIdx,
-        endBeat: selectedCell.beatIdx,
-      };
-    return null;
-  }, [activeSelection, selectedCell]);
+  const pickStrokeRefs = React.useMemo(
+    () => selectionBeatRefs(measures, selection),
+    [measures, selection],
+  );
 
   const selectedPickStroke = React.useMemo(
-    () => pickStrokeOfRange(measures, pickStrokeRange),
-    [measures, pickStrokeRange],
+    () => pickStrokeOfRefs(measures, pickStrokeRefs),
+    [measures, pickStrokeRefs],
   );
 
   const applyPickStroke = useCallback(
     (stroke: PickStroke) => {
-      if (!pickStrokeRange) return;
-      commit(togglePickStroke(measuresRef.current, pickStrokeRange, stroke));
+      if (pickStrokeRefs.length === 0) return;
+      commit(togglePickStroke(measuresRef.current, pickStrokeRefs, stroke));
     },
-    [commit, pickStrokeRange],
+    [commit, pickStrokeRefs],
   );
 
   const removePickStroke = useCallback(() => {
-    if (!pickStrokeRange) return;
-    commit(clearPickStroke(measuresRef.current, pickStrokeRange));
-  }, [commit, pickStrokeRange]);
+    if (pickStrokeRefs.length === 0) return;
+    commit(clearPickStroke(measuresRef.current, pickStrokeRefs));
+  }, [commit, pickStrokeRefs]);
 
   /** Cycles one beat through ⊓ → ⋁ → nothing — what the lane above the grid does. */
   const cycleBeatPickStroke = useCallback(
     (mIdx: number, bIdx: number) => {
-      const range = { measureIdx: mIdx, startBeat: bIdx, endBeat: bIdx };
+      const refs = [{ measureIdx: mIdx, beatIdx: bIdx }];
       const current = measuresRef.current[mIdx]?.beats[bIdx]?.pickStroke;
       commit(
         current === "up"
-          ? clearPickStroke(measuresRef.current, range)
+          ? clearPickStroke(measuresRef.current, refs)
           : togglePickStroke(
               measuresRef.current,
-              range,
+              refs,
               current === "down" ? "up" : "down",
             ),
       );
@@ -1218,25 +1442,65 @@ export default function TabEditor() {
    * common case: mark a bar as alternate picked and move on.
    */
   const applyAlternatePicking = useCallback(() => {
-    if (!pickStrokeRange) return;
-    const measure = measuresRef.current[pickStrokeRange.measureIdx];
-    if (!measure) return;
-    const isSingleBeat = pickStrokeRange.startBeat === pickStrokeRange.endBeat;
-    const range = isSingleBeat
-      ? {
-          measureIdx: pickStrokeRange.measureIdx,
-          startBeat: 0,
-          endBeat: measure.beats.length - 1,
-        }
-      : pickStrokeRange;
-    commit(alternatePickStrokes(measuresRef.current, range));
+    if (!selection || pickStrokeRefs.length === 0) return;
+    const current = measuresRef.current;
+    const singleBeat = pickStrokeRefs.length === 1;
+    const measureIdx = pickStrokeRefs[0].measureIdx;
+
+    const refs = singleBeat
+      ? (current[measureIdx]?.beats ?? []).map((_, beatIdx) => ({
+          measureIdx,
+          beatIdx,
+        }))
+      : pickStrokeRefs;
+
+    commit(alternatePickStrokes(current, refs));
     showToast(
-      isSingleBeat
-        ? `Measure #${range.measureIdx + 1}: alternate picking`
+      singleBeat
+        ? `Measure #${measureIdx + 1}: alternate picking`
         : "Alternate picking across the selection",
       "info",
     );
-  }, [commit, pickStrokeRange, showToast]);
+  }, [commit, selection, pickStrokeRefs, showToast]);
+
+  /**
+   * Grows (or shrinks) the block by `delta` beats from its far end, walking
+   * over bar lines — Shift + ← / →, and what a shift-click lands on.
+   */
+  const extendSelection = useCallback(
+    (delta: number) => {
+      if (!selectedCell) return;
+
+      setActiveSelection((previous) => {
+        const base = previous ?? cellSelection(selectedCell);
+        const current = measuresRef.current;
+        let measureIdx = base.endMeasure;
+        let beatIdx = base.endBeat + delta;
+
+        while (beatIdx < 0 && measureIdx > 0) {
+          measureIdx -= 1;
+          beatIdx += current[measureIdx].beats.length;
+        }
+        while (
+          beatIdx >= (current[measureIdx]?.beats.length ?? 0) &&
+          measureIdx + 1 < current.length
+        ) {
+          beatIdx -= current[measureIdx].beats.length;
+          measureIdx += 1;
+        }
+
+        return {
+          ...base,
+          endMeasure: measureIdx,
+          endBeat: Math.max(
+            0,
+            Math.min(beatIdx, (current[measureIdx]?.beats.length ?? 1) - 1),
+          ),
+        };
+      });
+    },
+    [selectedCell],
+  );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -1312,6 +1576,14 @@ export default function TabEditor() {
         return;
       }
 
+      // Shift + ← / → stretches the selection a beat at a time, over bar lines
+      // included, so a run can be marked without reaching for the mouse.
+      if (e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        e.preventDefault();
+        extendSelection(e.key === "ArrowRight" ? 1 : -1);
+        return;
+      }
+
       if (e.key >= "0" && e.key <= "9") {
         const beat = measures[measureIdx].beats[beatIdx];
         const note = beat.notes.find((n) => n.string === stringIdx + 1);
@@ -1319,11 +1591,10 @@ export default function TabEditor() {
 
         if (note && note.fret < 10 && note.fret > 0) {
           const combined = parseInt(`${note.fret}${e.key}`);
-          if (combined <= 24) newFret = combined;
+          if (combined <= FRET_MAX) newFret = combined;
         }
 
         updateFret(measureIdx, beatIdx, stringIdx, newFret);
-        saveHistory(measures);
 
         if (autoAdvance) {
           const nextBeat = beatIdx + 1;
@@ -1338,40 +1609,9 @@ export default function TabEditor() {
           }
         }
       } else if (e.key === "Backspace" || e.key === "Delete") {
-        const newMeasures = [...measures];
-        if (activeSelection) {
-          const minB = Math.min(
-            activeSelection.startBeat,
-            activeSelection.endBeat,
-          );
-          const maxB = Math.max(
-            activeSelection.startBeat,
-            activeSelection.endBeat,
-          );
-          const minS = Math.min(
-            activeSelection.startString,
-            activeSelection.endString,
-          );
-          const maxS = Math.max(
-            activeSelection.startString,
-            activeSelection.endString,
-          );
-          for (let b = minB; b <= maxB; b++) {
-            newMeasures[activeSelection.measureIdx].beats[b].notes =
-              newMeasures[activeSelection.measureIdx].beats[b].notes.filter(
-                (n: TablatureNote) =>
-                  n.string - 1 < minS || n.string - 1 > maxS,
-              );
-          }
-        } else {
-          newMeasures[measureIdx].beats[beatIdx].notes = newMeasures[
-            measureIdx
-          ].beats[beatIdx].notes.filter(
-            (n: TablatureNote) => n.string !== stringIdx + 1,
-          );
-        }
-        setMeasures(newMeasures);
-        saveHistory(newMeasures);
+        clearSelectedNotesInGrid();
+      } else if (e.key.toLowerCase() === "r") {
+        restSelection();
       } else if (
         ["h", "p", "a", "d", "v", "t", "m", "b"].includes(e.key.toLowerCase())
       ) {
@@ -1385,67 +1625,12 @@ export default function TabEditor() {
           m: "isPalmMute",
           b: "isBend",
         };
-        const type = typeMap[e.key.toLowerCase()];
-        if (activeSelection) {
-          const newMeasures = [...measures];
-          const minB = Math.min(
-            activeSelection.startBeat,
-            activeSelection.endBeat,
-          );
-          const maxB = Math.max(
-            activeSelection.startBeat,
-            activeSelection.endBeat,
-          );
-          const minS = Math.min(
-            activeSelection.startString,
-            activeSelection.endString,
-          );
-          const maxS = Math.max(
-            activeSelection.startString,
-            activeSelection.endString,
-          );
-          for (let b = minB; b <= maxB; b++) {
-            for (let s = minS; s <= maxS; s++) {
-              const note = newMeasures[activeSelection.measureIdx].beats[
-                b
-              ].notes.find((n: TablatureNote) => n.string === s + 1);
-              if (note) {
-                if (type === "isHammerOn") {
-                  note.isHammerOn = !note.isHammerOn;
-                  if (note.isHammerOn) note.isPullOff = false;
-                } else if (type === "isPullOff") {
-                  note.isPullOff = !note.isPullOff;
-                  if (note.isPullOff) note.isHammerOn = false;
-                } else if (type === "isAccented")
-                  note.isAccented = !note.isAccented;
-                else if (type === "isDead") note.isDead = !note.isDead;
-                else if (type === "isVibrato") note.isVibrato = !note.isVibrato;
-                else if (type === "isTap") note.isTap = !note.isTap;
-                else if (type === "isPalmMute")
-                  note.isPalmMute = !note.isPalmMute;
-                else if (type === "isBend") {
-                  note.isBend = !note.isBend;
-                  if (note.isBend) {
-                    note.bendSemitones = 2;
-                    note.bendCurve = undefined;
-                  } else {
-                    note.bendSemitones = undefined;
-                    note.bendCurve = undefined;
-                    note.isPreBend = false;
-                    note.isRelease = false;
-                  }
-                }
-              }
-            }
-          }
-          setMeasures(newMeasures);
-          saveHistory(newMeasures);
-        } else {
-          toggleEffect(measureIdx, beatIdx, stringIdx, type);
-          saveHistory(measures);
-        }
+        toggleArticulationOnSelection(typeMap[e.key.toLowerCase()]);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
+        // Moving the cursor ends the block — the arrows navigate, Shift+arrows
+        // select.
+        setActiveSelection(null);
         const nextBeat = beatIdx + 1;
         if (nextBeat < measures[measureIdx].beats.length)
           setSelectedCell({ ...selectedCell, beatIdx: nextBeat });
@@ -1457,6 +1642,7 @@ export default function TabEditor() {
           });
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
+        setActiveSelection(null);
         const prevBeat = beatIdx - 1;
         if (prevBeat >= 0)
           setSelectedCell({ ...selectedCell, beatIdx: prevBeat });
@@ -1468,10 +1654,12 @@ export default function TabEditor() {
           });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
+        setActiveSelection(null);
         if (stringIdx > 0)
           setSelectedCell({ ...selectedCell, stringIdx: stringIdx - 1 });
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
+        setActiveSelection(null);
         if (stringIdx < 5)
           setSelectedCell({ ...selectedCell, stringIdx: stringIdx + 1 });
       }
@@ -1479,23 +1667,21 @@ export default function TabEditor() {
     [
       selectedCell,
       measures,
-      activeSelection,
-      clipboard,
       handlePasteAtCursor,
       handleCopySelection,
       handleDeleteSelection,
-      showToast,
       isGpModalOpen,
       undo,
       redo,
       applyPickStroke,
       applyAlternatePicking,
-      toggleEffect,
+      clearSelectedNotesInGrid,
+      restSelection,
+      toggleArticulationOnSelection,
+      extendSelection,
       updateFret,
       autoAdvance,
       setSelectedCell,
-      setMeasures,
-      saveHistory,
     ],
   );
 
@@ -1528,12 +1714,10 @@ export default function TabEditor() {
                 }
               }
             });
-            setMeasures(newMeasures);
-            saveHistory(newMeasures);
+            commit(newMeasures);
             showToast("Snippet imported to cursor", "success");
           } else {
-            setMeasures(processed);
-            saveHistory(processed);
+            commit(processed);
             showToast("Full Tab imported", "success");
           }
         }
@@ -1541,96 +1725,64 @@ export default function TabEditor() {
     },
     [
       isGpModalOpen,
-      saveHistory,
+      commit,
       selectedCell,
       measures,
       showToast,
       processImportText,
-      setMeasures,
     ],
   );
 
   useEffect(() => {
+    const selectionBox = () => document.getElementById("tab-selection-box");
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && selectionStartRef.current) {
-        const { mIdx, x: startX, y: startY } = selectionStartRef.current;
-        const container = document.getElementById(`measure-grid-${mIdx}`);
-        const box = document.getElementById(`selection-box-${mIdx}`);
+      const start = selectionStartRef.current;
+      const box = selectionBox();
+      if (!isDragging || !start || !box) return;
 
-        if (container && box) {
-          const rect = container.getBoundingClientRect();
-          const currentX = e.clientX;
-          const currentY = e.clientY;
-
-          const left = Math.min(startX, currentX) - rect.left;
-          const top = Math.min(startY, currentY) - rect.top;
-          const width = Math.abs(currentX - startX);
-          const height = Math.abs(currentY - startY);
-
-          box.style.display = "block";
-          box.style.left = `${left}px`;
-          box.style.top = `${top}px`;
-          box.style.width = `${width}px`;
-          box.style.height = `${height}px`;
-        }
-      }
+      box.style.display = "block";
+      box.style.left = `${Math.min(start.x, e.clientX)}px`;
+      box.style.top = `${Math.min(start.y, e.clientY)}px`;
+      box.style.width = `${Math.abs(e.clientX - start.x)}px`;
+      box.style.height = `${Math.abs(e.clientY - start.y)}px`;
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (isDragging && selectionStartRef.current) {
-        const {
-          mIdx,
-          x: startAbsoluteX,
-          y: startAbsoluteY,
-        } = selectionStartRef.current;
-        const container = document.getElementById(`measure-grid-${mIdx}`);
-        const box = document.getElementById(`selection-box-${mIdx}`);
+      const start = selectionStartRef.current;
 
-        if (container) {
-          const boxLeft = Math.min(startAbsoluteX, e.clientX);
-          const boxRight = Math.max(startAbsoluteX, e.clientX);
-          const boxTop = Math.min(startAbsoluteY, e.clientY);
-          const boxBottom = Math.max(startAbsoluteY, e.clientY);
+      if (isDragging && start) {
+        // Every cell in the strip is hit-tested, not just the measure the drag
+        // started in, so a selection can run across bar lines.
+        const left = Math.min(start.x, e.clientX);
+        const right = Math.max(start.x, e.clientX);
+        const top = Math.min(start.y, e.clientY);
+        const bottom = Math.max(start.y, e.clientY);
+        const BUFFER = 2;
 
-          let minB = measures[mIdx].beats.length,
-            maxB = -1,
-            minS = 6,
-            maxS = -1;
-          const cells = container.querySelectorAll(".group-cell");
-          const BUFFER = 2;
-
-          cells.forEach((cell: any) => {
-            const cRect = cell.getBoundingClientRect();
+        const cells: GridCell[] = [];
+        gridRef.current
+          ?.querySelectorAll<HTMLElement>(".group-cell")
+          .forEach((cell) => {
+            const rect = cell.getBoundingClientRect();
             if (
-              Math.max(boxLeft + BUFFER, cRect.left) <
-                Math.min(boxRight - BUFFER, cRect.right) &&
-              Math.max(boxTop + BUFFER, cRect.top) <
-                Math.min(boxBottom - BUFFER, cRect.bottom)
-            ) {
-              const bIdx = parseInt(cell.getAttribute("data-bidx"));
-              const sIdx = parseInt(cell.getAttribute("data-sidx"));
-              minB = Math.min(minB, bIdx);
-              maxB = Math.max(maxB, bIdx);
-              minS = Math.min(minS, sIdx);
-              maxS = Math.max(maxS, sIdx);
-            }
+              Math.max(left + BUFFER, rect.left) <
+                Math.min(right - BUFFER, rect.right) &&
+              Math.max(top + BUFFER, rect.top) <
+                Math.min(bottom - BUFFER, rect.bottom)
+            )
+              cells.push({
+                measureIdx: Number(cell.dataset.midx),
+                beatIdx: Number(cell.dataset.bidx),
+                stringIdx: Number(cell.dataset.sidx),
+              });
           });
 
-          if (maxB !== -1 && maxS !== -1) {
-            setActiveSelection({
-              measureIdx: mIdx,
-              startBeat: minB,
-              endBeat: maxB,
-              startString: minS,
-              endString: maxS,
-            });
-          } else {
-            setActiveSelection(null);
-          }
-        }
-
-        if (box) box.style.display = "none";
+        setActiveSelection(cells.length > 0 ? selectionOfCells(cells) : null);
       }
+
+      const box = selectionBox();
+      if (box) box.style.display = "none";
       setIsDragging(false);
       selectionStartRef.current = null;
     };
@@ -1682,57 +1834,131 @@ export default function TabEditor() {
     ? selectedBeat?.notes.find((n) => n.string === selectedCell.stringIdx + 1)
     : undefined;
 
-  const setSelectedFret = (fret: number) => {
-    if (!selectedCell) return;
-    updateFret(
-      selectedCell.measureIdx,
-      selectedCell.beatIdx,
-      selectedCell.stringIdx,
-      fret,
+  // How much of the tab the inspector is acting on — the header says so, and
+  // the buttons switch between "this note" and "all of them".
+  const selectedBeatCount = React.useMemo(
+    () => selectionBeatRefs(measures, selection).length,
+    [measures, selection],
+  );
+  const selectedNoteCount = React.useMemo(
+    () => countSelectedNotes(measures, selection),
+    [measures, selection],
+  );
+  const isBlockSelection = !!selection && !isSingleCell(selection);
+
+  /** Every note the selection covers — what the articulation buttons light up on. */
+  const selectedNotes = React.useMemo(() => {
+    if (!selection) return [];
+    const { firstString, lastString } = normalizeSelection(selection);
+    return selectionBeatRefs(measures, selection).flatMap((ref) =>
+      measures[ref.measureIdx].beats[ref.beatIdx].notes.filter(
+        (note) =>
+          note.string - 1 >= firstString && note.string - 1 <= lastString,
+      ),
     );
-    saveHistory(measures);
+  }, [measures, selection]);
+
+  const bentNotes = React.useMemo(
+    () => selectedNotes.filter((note) => note.isBend),
+    [selectedNotes],
+  );
+
+  /** True when every selected note already carries the articulation. */
+  const hasArticulation = (type: ArticulationType) =>
+    selectedNotes.length > 0 && selectedNotes.every((note) => note[type]);
+
+  /** The duration the selection agrees on, or null when its beats differ. */
+  const selectedDuration = React.useMemo(() => {
+    const durations = selectionBeatRefs(measures, selection).map(
+      (ref) => measures[ref.measureIdx].beats[ref.beatIdx].duration,
+    );
+    if (durations.length === 0) return null;
+    return durations.every((d) => Math.abs(d - durations[0]) < 1e-6)
+      ? durations[0]
+      : null;
+  }, [measures, selection]);
+
+  /**
+   * Writes a fret. On a single cell it creates the note if the cell is empty;
+   * on a block it re-frets every note already in it, so a whole run can be
+   * moved onto one fret at once.
+   */
+  const setSelectedFret = (fret: number) => {
+    if (!selection) return;
+    if (!isBlockSelection && selectedCell) {
+      updateFret(
+        selectedCell.measureIdx,
+        selectedCell.beatIdx,
+        selectedCell.stringIdx,
+        fret,
+      );
+      return;
+    }
+    commit(
+      mapSelectedNotes(measuresRef.current, selection, (note) => ({
+        ...note,
+        fret: clampFret(fret),
+      })),
+    );
   };
 
-  const toggleSelectedArticulation = (type: ArticulationType) => {
-    if (!selectedCell || !selectedNote) return;
-    toggleEffect(
-      selectedCell.measureIdx,
-      selectedCell.beatIdx,
-      selectedCell.stringIdx,
-      type,
+  /** Fret +/- — transposes the whole block when there is one. */
+  const nudgeSelectedFret = (delta: number) => {
+    if (!selection) return;
+    if (!isBlockSelection && selectedCell) {
+      // An empty cell starts at 0 when nudged up, and stays put when nudged down.
+      const base = selectedNote?.fret ?? (delta > 0 ? -1 : 0);
+      updateFret(
+        selectedCell.measureIdx,
+        selectedCell.beatIdx,
+        selectedCell.stringIdx,
+        base + delta,
+      );
+      return;
+    }
+    commit(
+      mapSelectedNotes(measuresRef.current, selection, (note) => ({
+        ...note,
+        fret: clampFret(note.fret + delta),
+      })),
     );
-    saveHistory(measures);
   };
 
   const setSelectedBendAmount = (semitones: number) => {
-    if (!selectedCell || !selectedNote) return;
-    const string = selectedCell.stringIdx + 1;
-    const newMeasures = [...measures];
-    const note = newMeasures[selectedCell.measureIdx].beats[
-      selectedCell.beatIdx
-    ].notes.find((n) => n.string === string);
-    if (!note) return;
-    note.isBend = true;
-    note.bendSemitones = semitones;
-    note.bendCurve = undefined;
-    setMeasures(newMeasures);
-    saveHistory(newMeasures);
+    if (!selection) return;
+    commit(
+      mapSelectedNotes(measuresRef.current, selection, (note) =>
+        note.isBend
+          ? {
+              ...note,
+              bendSemitones: semitones,
+              bendCurve: undefined,
+            }
+          : null,
+      ),
+    );
   };
 
+  /** Fallback for a click that lands between cells (on a separator, say). */
   const cellFromPointer = (e: React.MouseEvent, mIdx: number) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const localX = e.clientX - rect.left;
-    const localY = e.clientY - rect.top;
-    const bIdx = Math.max(
+    const bIdx = beatIndexAtX(measures[mIdx].beats, e.clientX - rect.left);
+    const sIdx = Math.max(
       0,
-      Math.min(measures[mIdx].beats.length - 1, Math.floor(localX / CELL_SIZE)),
+      Math.min(5, Math.floor((e.clientY - rect.top) / CELL_SIZE)),
     );
-    const sIdx = Math.max(0, Math.min(5, Math.floor(localY / CELL_SIZE)));
     return { bIdx, sIdx };
   };
 
   return (
     <>
+      {/* Drag-select rectangle. Pinned to the viewport rather than to a measure
+          so a drag can run across bar lines and still draw in one piece. */}
+      <div
+        id='tab-selection-box'
+        className='pointer-events-none fixed z-[120] hidden bg-cyan-400/20 ring-1 ring-cyan-400'
+      />
+
       {/* Mobile blocker */}
       <div className='fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-zinc-950 p-8 text-center md:hidden'>
         <div className='flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-900'>
@@ -2058,6 +2284,12 @@ export default function TabEditor() {
                       {label}
                     </span>
                   ))}
+                  {/* …and the rhythm row under them. */}
+                  <span
+                    className='flex h-7 w-5 items-center justify-end pr-1 text-zinc-600'
+                    title='Note and rest values'>
+                    <NoteDurationIcon duration={1} size={11} />
+                  </span>
                 </div>
 
                 <div
@@ -2066,14 +2298,20 @@ export default function TabEditor() {
                   <div className='flex min-w-max' ref={gridRef}>
                     <div className='flex overflow-hidden rounded-lg border border-zinc-800'>
                       {measures.map((measure, mIdx) => {
-                        // Group columns per beat (e.g. 16 steps in 4/4 → 4 columns per beat)
-                        // so vertical separators land on musical beats, like real tab.
-                        const groupSize = Math.max(
-                          1,
-                          Math.round(
-                            measure.beats.length / measure.timeSignature[0],
-                          ),
+                        // Columns are as wide as the beat is long, and the
+                        // separators land wherever a counted beat starts — so a
+                        // bar that mixes a half note with sixteenths still reads
+                        // "1 2 3 4" in the right places.
+                        const offsets = beatOffsetsInQuarters(measure.beats);
+                        const widths = measure.beats.map((beat) =>
+                          beatCellWidth(beat.duration),
                         );
+                        const startsGroup = (bIdx: number) =>
+                          bIdx > 0 &&
+                          startsCountedBeat(
+                            offsets[bIdx],
+                            measure.timeSignature,
+                          );
                         const isSelectedMeasure =
                           selectedCell?.measureIdx === mIdx;
                         const isIncomplete = incompleteMeasures[mIdx];
@@ -2126,24 +2364,20 @@ export default function TabEditor() {
                                 const isBeatSelected =
                                   selectedCell?.measureIdx === mIdx &&
                                   selectedCell?.beatIdx === bIdx;
-                                const isBeatInSelection =
+                                const isBeatInBlock =
                                   !isDragging &&
-                                  activeSelection?.measureIdx === mIdx &&
-                                  bIdx >=
-                                    Math.min(
-                                      activeSelection.startBeat,
-                                      activeSelection.endBeat,
-                                    ) &&
-                                  bIdx <=
-                                    Math.max(
-                                      activeSelection.startBeat,
-                                      activeSelection.endBeat,
-                                    );
+                                  !!activeSelection &&
+                                  isBeatInSelection(
+                                    activeSelection,
+                                    mIdx,
+                                    bIdx,
+                                  );
 
                                 return (
                                   <button
                                     key={bIdx}
                                     type='button'
+                                    style={{ width: widths[bIdx] }}
                                     onClick={() =>
                                       cycleBeatPickStroke(mIdx, bIdx)
                                     }
@@ -2156,17 +2390,17 @@ export default function TabEditor() {
                                     } — click to cycle down → up → none`}
                                     aria-label={`Picking direction on measure ${mIdx + 1}, beat ${bIdx + 1}`}
                                     className={cn(
-                                      "group flex h-6 w-8 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                      "group flex h-6 items-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                      beatCellAlign(widths[bIdx]),
                                       // Invisible stand-in for the beat-group
                                       // separator below, so a marker stays over
                                       // its own column instead of drifting a
                                       // pixel per group across the bar.
-                                      bIdx % groupSize === 0 &&
-                                        bIdx !== 0 &&
+                                      startsGroup(bIdx) &&
                                         "border-l border-transparent",
                                       isBeatSelected
                                         ? "bg-cyan-500/20"
-                                        : isBeatInSelection
+                                        : isBeatInBlock
                                           ? "bg-cyan-500/10"
                                           : "hover:bg-zinc-800/50",
                                     )}>
@@ -2204,15 +2438,28 @@ export default function TabEditor() {
                                   ({ bIdx, sIdx } = cellFromPointer(e, mIdx));
                                 }
 
+                                // Shift keeps the cell the cursor is on as the
+                                // anchor and stretches the block to here — the
+                                // way a shift-click extends a text selection,
+                                // bar lines included.
+                                if (e.shiftKey && selectedCell) {
+                                  setActiveSelection((previous) => ({
+                                    ...(previous ??
+                                      cellSelection(selectedCell)),
+                                    endMeasure: mIdx,
+                                    endBeat: bIdx,
+                                    endString: sIdx,
+                                  }));
+                                  setContextMenu(null);
+                                  return;
+                                }
+
                                 setSelectedCell({
                                   measureIdx: mIdx,
                                   beatIdx: bIdx,
                                   stringIdx: sIdx,
                                 });
                                 selectionStartRef.current = {
-                                  mIdx,
-                                  bIdx,
-                                  sIdx,
                                   x: e.clientX,
                                   y: e.clientY,
                                 };
@@ -2238,31 +2485,15 @@ export default function TabEditor() {
                                   ({ bIdx, sIdx } = cellFromPointer(e, mIdx));
                                 }
 
-                                const isCellInSelection =
-                                  activeSelection &&
-                                  activeSelection.measureIdx === mIdx &&
-                                  bIdx >=
-                                    Math.min(
-                                      activeSelection.startBeat,
-                                      activeSelection.endBeat,
-                                    ) &&
-                                  bIdx <=
-                                    Math.max(
-                                      activeSelection.startBeat,
-                                      activeSelection.endBeat,
-                                    ) &&
-                                  sIdx >=
-                                    Math.min(
-                                      activeSelection.startString,
-                                      activeSelection.endString,
-                                    ) &&
-                                  sIdx <=
-                                    Math.max(
-                                      activeSelection.startString,
-                                      activeSelection.endString,
-                                    );
-
-                                if (!isCellInSelection) {
+                                if (
+                                  !activeSelection ||
+                                  !isCellInSelection(
+                                    activeSelection,
+                                    mIdx,
+                                    bIdx,
+                                    sIdx,
+                                  )
+                                ) {
                                   setSelectedCell({
                                     measureIdx: mIdx,
                                     beatIdx: bIdx,
@@ -2281,19 +2512,14 @@ export default function TabEditor() {
                                   y -= menuHeight;
                                 setContextMenu({ x, y });
                               }}>
-                              {/* Selection Rect Overlay */}
-                              <div
-                                id={`selection-box-${mIdx}`}
-                                className='pointer-events-none absolute z-20 hidden bg-cyan-400/20 ring-1 ring-cyan-400'
-                              />
                               <div className='flex'>
                                 {measure.beats.map((beat, bIdx) => (
                                   <div
                                     key={bIdx}
+                                    style={{ width: widths[bIdx] }}
                                     className={cn(
                                       "flex flex-col",
-                                      bIdx % groupSize === 0 &&
-                                        bIdx !== 0 &&
+                                      startsGroup(bIdx) &&
                                         "border-l border-zinc-800",
                                     )}>
                                     {[0, 1, 2, 3, 4, 5].map((sIdx) => {
@@ -2306,27 +2532,13 @@ export default function TabEditor() {
                                         selectedCell?.stringIdx === sIdx;
                                       const isInActiveSelection =
                                         !isDragging &&
-                                        activeSelection?.measureIdx === mIdx &&
-                                        bIdx >=
-                                          Math.min(
-                                            activeSelection.startBeat,
-                                            activeSelection.endBeat,
-                                          ) &&
-                                        bIdx <=
-                                          Math.max(
-                                            activeSelection.startBeat,
-                                            activeSelection.endBeat,
-                                          ) &&
-                                        sIdx >=
-                                          Math.min(
-                                            activeSelection.startString,
-                                            activeSelection.endString,
-                                          ) &&
-                                        sIdx <=
-                                          Math.max(
-                                            activeSelection.startString,
-                                            activeSelection.endString,
-                                          );
+                                        !!activeSelection &&
+                                        isCellInSelection(
+                                          activeSelection,
+                                          mIdx,
+                                          bIdx,
+                                          sIdx,
+                                        );
                                       const isCrosshair =
                                         selectedCell?.measureIdx === mIdx &&
                                         (selectedCell?.beatIdx === bIdx ||
@@ -2335,10 +2547,12 @@ export default function TabEditor() {
                                       return (
                                         <button
                                           key={sIdx}
+                                          data-midx={mIdx}
                                           data-bidx={bIdx}
                                           data-sidx={sIdx}
                                           className={cn(
-                                            "group-cell relative flex h-8 w-8 cursor-pointer items-center justify-center transition-colors",
+                                            "group-cell relative flex h-8 w-full cursor-pointer items-center transition-colors",
+                                            beatCellAlign(widths[bIdx]),
                                             isSelected
                                               ? "bg-cyan-500/20"
                                               : isInActiveSelection
@@ -2411,6 +2625,78 @@ export default function TabEditor() {
                                 ))}
                               </div>
                             </div>
+                            {/* Rhythm lane — what each beat is worth, note or
+                                rest. Clicking one takes the whole beat (all six
+                                strings), which is the quickest way to grab a
+                                chord or a run and re-time it in one go. */}
+                            <div className='flex select-none border-t border-zinc-800/60'>
+                              {measure.beats.map((beat, bIdx) => {
+                                const isBeatSelected =
+                                  selectedCell?.measureIdx === mIdx &&
+                                  selectedCell?.beatIdx === bIdx;
+                                const isBeatInBlock =
+                                  !isDragging &&
+                                  !!activeSelection &&
+                                  isBeatInSelection(
+                                    activeSelection,
+                                    mIdx,
+                                    bIdx,
+                                  );
+                                const isRest = beat.notes.length === 0;
+
+                                return (
+                                  <button
+                                    key={bIdx}
+                                    type='button'
+                                    style={{ width: widths[bIdx] }}
+                                    onClick={(e) => {
+                                      if (e.shiftKey && selectedCell) {
+                                        setActiveSelection((previous) => ({
+                                          ...(previous ??
+                                            cellSelection(selectedCell)),
+                                          endMeasure: mIdx,
+                                          endBeat: bIdx,
+                                          startString: 0,
+                                          endString: 5,
+                                        }));
+                                        return;
+                                      }
+                                      setSelectedCell({
+                                        measureIdx: mIdx,
+                                        beatIdx: bIdx,
+                                        stringIdx: 0,
+                                      });
+                                      setActiveSelection({
+                                        startMeasure: mIdx,
+                                        startBeat: bIdx,
+                                        endMeasure: mIdx,
+                                        endBeat: bIdx,
+                                        startString: 0,
+                                        endString: 5,
+                                      });
+                                    }}
+                                    title={`${durationLabel(beat.duration)}${
+                                      isRest ? " rest" : ""
+                                    } — click to select the whole beat, shift-click to extend`}
+                                    aria-label={`Beat ${bIdx + 1} of measure ${mIdx + 1}: ${durationLabel(beat.duration)}${isRest ? " rest" : ""}`}
+                                    className={cn(
+                                      "flex h-7 items-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                      beatCellAlign(widths[bIdx]),
+                                      startsGroup(bIdx) &&
+                                        "border-l border-zinc-800",
+                                      isBeatSelected
+                                        ? "bg-cyan-500/20 text-cyan-300"
+                                        : isBeatInBlock
+                                          ? "bg-cyan-500/10 text-zinc-300"
+                                          : isRest
+                                            ? "text-zinc-600 hover:bg-zinc-800/50"
+                                            : "text-zinc-400 hover:bg-zinc-800/50",
+                                    )}>
+                                    <BeatRhythmIcon beat={beat} size={13} />
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
                         );
                       })}
@@ -2431,60 +2717,69 @@ export default function TabEditor() {
         </div>
 
         {/* Note Inspector — mouse-friendly fret & articulation editor for the selected cell */}
-        <div className='fixed right-6 top-1/2 z-40 hidden w-72 -translate-y-1/2 flex-col gap-5 rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
+        <div className='custom-scrollbar fixed right-6 top-1/2 z-40 hidden max-h-[calc(100vh-8rem)] w-72 -translate-y-1/2 flex-col gap-5 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
           {selectedCell ? (
             <>
               <div className='space-y-1'>
                 <span className='text-xs font-bold text-zinc-200'>
-                  Note Editor
+                  {isBlockSelection ? "Selection" : "Note Editor"}
                 </span>
                 <p className='text-[11px] font-semibold text-zinc-500'>
-                  Measure {selectedCell.measureIdx + 1} · Beat{" "}
-                  {selectedCell.beatIdx + 1} · String{" "}
-                  {STRING_LABELS[selectedCell.stringIdx]}
+                  {isBlockSelection ? (
+                    <>
+                      {selectedBeatCount} beat
+                      {selectedBeatCount !== 1 ? "s" : ""} · {selectedNoteCount}{" "}
+                      note{selectedNoteCount !== 1 ? "s" : ""} — every edit
+                      below applies to all of them
+                    </>
+                  ) : (
+                    <>
+                      Measure {selectedCell.measureIdx + 1} · Beat{" "}
+                      {selectedCell.beatIdx + 1} · String{" "}
+                      {STRING_LABELS[selectedCell.stringIdx]}
+                    </>
+                  )}
                 </p>
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
-                  Fret
+                  {isBlockSelection ? "Frets" : "Fret"}
                 </span>
                 <div className='flex items-center gap-2'>
                   <button
-                    onClick={() =>
-                      setSelectedFret(
-                        Math.max(0, (selectedNote?.fret ?? 0) - 1),
-                      )
+                    onClick={() => nudgeSelectedFret(-1)}
+                    disabled={
+                      isBlockSelection ? selectedNoteCount === 0 : !selectedNote
                     }
-                    disabled={!selectedNote}
-                    aria-label='Decrease fret'
+                    aria-label={
+                      isBlockSelection
+                        ? "Transpose the selection down a fret"
+                        : "Decrease fret"
+                    }
                     className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
                     <LucideMinus size={16} />
                   </button>
                   <input
                     type='number'
                     min={0}
-                    max={24}
-                    value={selectedNote?.fret ?? ""}
-                    placeholder='—'
+                    max={FRET_MAX}
+                    value={isBlockSelection ? "" : (selectedNote?.fret ?? "")}
+                    placeholder={isBlockSelection ? "all" : "—"}
                     onChange={(e) =>
-                      setSelectedFret(
-                        Math.max(
-                          0,
-                          Math.min(24, parseInt(e.target.value) || 0),
-                        ),
-                      )
+                      setSelectedFret(clampFret(parseInt(e.target.value) || 0))
                     }
                     className='h-10 w-full rounded border border-zinc-800 bg-zinc-950/60 text-center text-xl font-black text-zinc-100 outline-none focus-visible:ring-1 focus-visible:ring-ring'
                   />
                   <button
-                    onClick={() =>
-                      setSelectedFret(
-                        Math.min(24, (selectedNote?.fret ?? -1) + 1),
-                      )
+                    onClick={() => nudgeSelectedFret(1)}
+                    disabled={isBlockSelection && selectedNoteCount === 0}
+                    aria-label={
+                      isBlockSelection
+                        ? "Transpose the selection up a fret"
+                        : "Increase fret"
                     }
-                    aria-label='Increase fret'
-                    className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
+                    className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
                     <LucidePlus size={16} />
                   </button>
                 </div>
@@ -2495,7 +2790,7 @@ export default function TabEditor() {
                       onClick={() => setSelectedFret(f)}
                       className={cn(
                         "flex h-7 items-center justify-center rounded border text-[11px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        selectedNote?.fret === f
+                        !isBlockSelection && selectedNote?.fret === f
                           ? "border-zinc-600 bg-zinc-700 text-zinc-100"
                           : "border-zinc-800 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                       )}>
@@ -2506,31 +2801,55 @@ export default function TabEditor() {
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
-                <span className='text-[11px] font-semibold text-zinc-500'>
-                  Beat duration
-                </span>
-                <div className='flex gap-1.5'>
+                <div className='flex items-baseline justify-between gap-2'>
+                  <span className='text-[11px] font-semibold text-zinc-500'>
+                    Note value
+                  </span>
+                  <span className='text-[10px] font-semibold text-zinc-400'>
+                    {selectedDuration === null
+                      ? "mixed"
+                      : durationLabel(selectedDuration)}
+                  </span>
+                </div>
+                <div className='grid grid-cols-6 gap-1'>
                   {DURATIONS.map((d) => (
                     <button
                       key={d.value}
-                      onClick={() =>
-                        updateDuration(
-                          selectedCell.measureIdx,
-                          selectedCell.beatIdx,
-                          d.value,
-                        )
-                      }
-                      title={`${d.label} (${d.short})`}
+                      onClick={() => applyDurationToSelection(d.value)}
+                      title={`${d.label} (${d.short}) — a longer note takes over the beats after it, a shorter one leaves a rest`}
                       aria-label={d.label}
                       className={cn(
-                        "flex h-9 flex-1 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        selectedBeat?.duration === d.value
+                        "flex h-9 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        selectedDuration === d.value
                           ? "border-zinc-600 bg-zinc-700 text-zinc-100"
                           : "border-zinc-800 bg-zinc-800/40 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200",
                       )}>
                       <NoteDurationIcon duration={d.value} size={16} />
                     </button>
                   ))}
+                </div>
+                <div className='flex gap-1.5'>
+                  <button
+                    onClick={toggleDotOnSelection}
+                    title='Dotted note — half again as long'
+                    className={cn(
+                      "flex h-8 flex-1 items-center justify-center gap-2 rounded text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      selectedDuration !== null && isDotted(selectedDuration)
+                        ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40"
+                        : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                    )}>
+                    <span className='text-sm font-black leading-none'>·</span>
+                    Dotted
+                  </button>
+                  <button
+                    onClick={restSelection}
+                    title={`Rest — clears the ${
+                      isBlockSelection ? "selected beats" : "beat"
+                    }, keeping the timing`}
+                    className='flex h-8 flex-1 items-center justify-center gap-2 rounded bg-zinc-800/40 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
+                    <RestIcon duration={selectedDuration ?? 1} size={13} />
+                    Rest
+                  </button>
                 </div>
               </div>
 
@@ -2542,11 +2861,14 @@ export default function TabEditor() {
                   {ARTICULATIONS.map((a) => (
                     <button
                       key={a.type}
-                      onClick={() => toggleSelectedArticulation(a.type)}
-                      disabled={!selectedNote}
+                      onClick={() => toggleArticulationOnSelection(a.type)}
+                      disabled={selectedNotes.length === 0}
+                      title={`${a.label}${
+                        isBlockSelection ? " — on every selected note" : ""
+                      }`}
                       className={cn(
                         "flex items-center gap-2 rounded px-2 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30",
-                        selectedNote?.[a.type]
+                        hasArticulation(a.type)
                           ? a.activeClass
                           : "border border-zinc-800 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                       )}>
@@ -2558,7 +2880,7 @@ export default function TabEditor() {
                   ))}
                 </div>
                 <AnimatePresence initial={false}>
-                  {selectedNote?.isBend && (
+                  {bentNotes.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -2572,7 +2894,9 @@ export default function TabEditor() {
                             onClick={() => setSelectedBendAmount(b.value)}
                             className={cn(
                               "flex h-7 flex-1 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                              (selectedNote?.bendSemitones ?? 2) === b.value
+                              bentNotes.every(
+                                (note) => (note.bendSemitones ?? 2) === b.value,
+                              )
                                 ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40"
                                 : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                             )}>
@@ -2600,7 +2924,9 @@ export default function TabEditor() {
                       key={p.value}
                       onClick={() => applyPickStroke(p.value)}
                       title={`${p.label} — marks ${
-                        activeSelection ? "the selection" : "this beat"
+                        isBlockSelection
+                          ? `all ${selectedBeatCount} selected beats`
+                          : "this beat"
                       }`}
                       className={cn(
                         "flex h-9 flex-1 items-center justify-center gap-2 rounded text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -2626,7 +2952,7 @@ export default function TabEditor() {
                   className='flex w-full items-center justify-center gap-2 rounded bg-zinc-800/40 py-2 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
                   <PickStrokeIcon stroke='down' size={13} />
                   <PickStrokeIcon stroke='up' size={13} />
-                  Alternate {activeSelection ? "selection" : "measure"}
+                  Alternate {isBlockSelection ? "selection" : "measure"}
                 </button>
               </div>
 
@@ -2702,11 +3028,11 @@ export default function TabEditor() {
 
               <div className='flex gap-1.5 border-t border-zinc-800 pt-4'>
                 <button
-                  onClick={clearSelectedNote}
-                  disabled={!selectedNote}
+                  onClick={clearSelectedNotesInGrid}
+                  disabled={selectedNoteCount === 0}
                   className='flex flex-1 items-center justify-center gap-2 rounded border border-red-500/20 bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-red-500/20'>
                   <LucideEraser size={13} />
-                  Clear note
+                  Clear note{selectedNoteCount > 1 ? "s" : ""}
                 </button>
                 <button
                   onClick={() => removeMeasure(selectedCell.measureIdx)}
@@ -2724,8 +3050,9 @@ export default function TabEditor() {
                   Note Editor
                 </span>
                 <p className='text-[11px] font-semibold leading-relaxed text-zinc-500'>
-                  Click a cell in the grid to set its fret, duration and
-                  articulations here.
+                  Click a cell in the grid to set its fret, note value and
+                  articulations here. Drag across cells — bar lines included —
+                  to edit a whole run at once.
                 </p>
               </div>
               <div className='space-y-3 text-[11px] font-semibold text-zinc-500'>
@@ -2746,6 +3073,14 @@ export default function TabEditor() {
                   <span className='text-zinc-300'>H P A D V T M</span>
                 </div>
                 <div className='flex items-center justify-between'>
+                  <span>Rest</span>
+                  <span className='text-zinc-300'>R</span>
+                </div>
+                <div className='flex items-center justify-between'>
+                  <span>Select a run</span>
+                  <span className='text-zinc-300'>Shift + ← / →</span>
+                </div>
+                <div className='flex items-center justify-between'>
                   <span>Picking ⊓ / ⋁</span>
                   <span className='text-zinc-300'>Shift + ↓ / ↑</span>
                 </div>
@@ -2754,7 +3089,7 @@ export default function TabEditor() {
                   <span className='text-zinc-300'>Shift + A</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Clear note</span>
+                  <span>Clear notes</span>
                   <span className='text-zinc-300'>Del</span>
                 </div>
                 <div className='flex items-center justify-between'>

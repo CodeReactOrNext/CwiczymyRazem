@@ -2,9 +2,11 @@ import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types
 import { describe, expect, it } from "vitest";
 
 import { createMeasure } from "./measureGrid";
+import { beatCellWidth } from "./tabGridLayout";
 import {
   beatAtScrollLeft,
   beatRangeForCells,
+  beatRangeForSpan,
   type MeasureBox,
 } from "./tabPreviewSync";
 
@@ -61,6 +63,29 @@ describe("beatAtScrollLeft", () => {
     ];
     // The 3/4 bar is 3 quarters long, so the second bar starts at 3.
     expect(beatAtScrollLeft(12 * CELL, measures, layout)).toBeCloseTo(3);
+  });
+
+  it("follows a bar whose beats have different lengths", () => {
+    // Half note, then two quarters — the wide cell covers half the bar.
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 2, notes: [] },
+          { duration: 1, notes: [] },
+          { duration: 1, notes: [] },
+        ],
+      },
+    ];
+    const width = measures[0].beats.reduce(
+      (total, beat) => total + beatCellWidth(beat.duration),
+      0,
+    );
+    const layout: MeasureBox[] = [{ left: 0, width }];
+
+    expect(beatAtScrollLeft(0, measures, layout)).toBeCloseTo(0);
+    expect(beatAtScrollLeft(beatCellWidth(2), measures, layout)).toBeCloseTo(2);
+    expect(beatAtScrollLeft(width / 2, measures, layout)).toBeCloseTo(2);
   });
 
   it("clamps past the end of the piece", () => {
@@ -122,5 +147,25 @@ describe("beatRangeForCells", () => {
 
   it("returns null for a measure that no longer exists", () => {
     expect(beatRangeForCells(bars(1), 3, 0, 0)).toBeNull();
+  });
+});
+
+describe("beatRangeForSpan", () => {
+  it("runs from one measure into another", () => {
+    expect(beatRangeForSpan(bars(3), 0, 14, 1, 1)).toEqual({
+      startBeat: 3.5,
+      endBeat: 4.5,
+    });
+  });
+
+  it("covers whole measures in between", () => {
+    expect(beatRangeForSpan(bars(3), 0, 0, 2, 15)).toEqual({
+      startBeat: 0,
+      endBeat: 12,
+    });
+  });
+
+  it("returns null when the first measure is gone", () => {
+    expect(beatRangeForSpan(bars(1), 4, 0, 4, 0)).toBeNull();
   });
 });
