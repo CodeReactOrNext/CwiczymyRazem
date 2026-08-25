@@ -1105,13 +1105,13 @@ export default function TabEditor() {
       if (!selection) return;
       const current = measuresRef.current;
 
-      const notes = selectionBeatRefs(current, selection).flatMap((ref) => {
-        const { firstString, lastString } = normalizeSelection(selection);
-        return current[ref.measureIdx].beats[ref.beatIdx].notes.filter(
+      const { firstString, lastString } = normalizeSelection(selection);
+      const notes = selectionBeatRefs(current, selection).flatMap((ref) =>
+        current[ref.measureIdx].beats[ref.beatIdx].notes.filter(
           (note) =>
             note.string - 1 >= firstString && note.string - 1 <= lastString,
-        );
-      });
+        ),
+      );
       if (notes.length === 0) return;
 
       const enable = !notes.every((note) => note[type]);
@@ -1285,58 +1285,73 @@ export default function TabEditor() {
     commit(clearSelectedNotes(measuresRef.current, selection));
   }, [commit, selection]);
 
+  /**
+   * Drops the clipboard in beat by beat from the cursor, running on into the
+   * measures that follow. Each pasted beat is re-timed through the same rule
+   * the note-value buttons use, so pasting a half note takes over the beats it
+   * covers instead of stretching the bar past its time signature.
+   */
   const handlePasteAtCursor = useCallback(
-    (
-      rightClickCell?: {
-        measureIdx: number;
-        beatIdx: number;
-        stringIdx: number;
-      } | null,
-    ) => {
+    (rightClickCell?: GridCell | null) => {
       const target = rightClickCell || selectedCell;
       if (!clipboard || !target) return;
 
-      const newMeasures = JSON.parse(JSON.stringify(measures));
+      let next = measuresRef.current;
       const stringOffset = target.stringIdx - clipboard.baseStringIdx;
+      let measureIdx = target.measureIdx;
+      let beatIdx = target.beatIdx;
 
-      clipboard.beats.forEach((beat: TablatureBeat, offset: number) => {
-        let tMIdx = target.measureIdx;
-        let tBIdx = target.beatIdx + offset;
-
+      for (const beat of clipboard.beats) {
         while (
-          tMIdx < newMeasures.length &&
-          tBIdx >= newMeasures[tMIdx].beats.length
+          measureIdx < next.length &&
+          beatIdx >= next[measureIdx].beats.length
         ) {
-          tBIdx -= newMeasures[tMIdx].beats.length;
-          tMIdx++;
+          beatIdx -= next[measureIdx].beats.length;
+          measureIdx += 1;
         }
+        if (measureIdx >= next.length) break;
 
-        if (tMIdx < newMeasures.length) {
-          const targetBeat = newMeasures[tMIdx].beats[tBIdx];
-          targetBeat.duration = beat.duration;
+        const targetBeat = next[measureIdx].beats[beatIdx];
+        const notes = [...targetBeat.notes];
+        beat.notes.forEach((note) => {
+          const string = note.string + stringOffset;
+          if (string < 1 || string > 6) return;
+          const existing = notes.findIndex((n) => n.string === string);
+          const pasted = { ...note, string };
+          if (existing > -1) notes[existing] = pasted;
+          else notes.push(pasted);
+        });
 
-          beat.notes.forEach((note: TablatureNote) => {
-            const newString = note.string + stringOffset;
-            if (newString >= 1 && newString <= 6) {
-              const existingNoteIdx = targetBeat.notes.findIndex(
-                (n: TablatureNote) => n.string === newString,
-              );
-              const newNote = JSON.parse(JSON.stringify(note));
-              newNote.string = newString;
-              if (existingNoteIdx > -1) {
-                targetBeat.notes[existingNoteIdx] = newNote;
-              } else {
-                targetBeat.notes.push(newNote);
-              }
-            }
-          });
-        }
-      });
+        // The pasted beat brings its own picking with it — copying a run of
+        // alternate picking and dropping it elsewhere should keep the ⊓ / ⋁.
+        const { pickStroke: _replaced, ...rest } = targetBeat;
+        const written = beat.pickStroke
+          ? { ...rest, notes, pickStroke: beat.pickStroke }
+          : { ...rest, notes };
 
-      commit(newMeasures);
+        const targetMeasure = measureIdx;
+        const targetBeatIdx = beatIdx;
+        next = next.map((measure, mIdx) =>
+          mIdx !== targetMeasure
+            ? measure
+            : setBeatsDuration(
+                {
+                  ...measure,
+                  beats: measure.beats.map((b, bIdx) =>
+                    bIdx === targetBeatIdx ? written : b,
+                  ),
+                },
+                [targetBeatIdx],
+                beat.duration,
+              ),
+        );
+        beatIdx += 1;
+      }
+
+      commit(next);
       showToast("Pattern applied!", "success");
     },
-    [clipboard, selectedCell, measures, commit, showToast],
+    [clipboard, selectedCell, commit, showToast],
   );
 
   const handleCopySelection = useCallback(() => {
