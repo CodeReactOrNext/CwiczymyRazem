@@ -1,7 +1,9 @@
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { describe, expect, it } from "vitest";
 
 import {
   beatOffsetsInQuarters,
+  fitMeasureToTimeSignature,
   restBeatsAt,
   setBeatsDuration,
   splitIntoNotatableDurations,
@@ -114,5 +116,97 @@ describe("startsCountedBeat", () => {
     expect(startsCountedBeat(0.75, [4, 4])).toBe(false);
     // In 6/8 a counted beat is an eighth — half a quarter note.
     expect(startsCountedBeat(0.5, [6, 8])).toBe(true);
+  });
+});
+
+describe("fitMeasureToTimeSignature", () => {
+  /** The bar Cookie reported: "1 + (2) 3 + (4)" written entirely in eighths,
+   *  so the two quarter rests are half as long as they read — 3 quarters of
+   *  content in a 4/4 bar. */
+  const shortBar = (): TablatureMeasure => ({
+    timeSignature: [4, 4],
+    beats: [
+      { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
+      { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
+      { duration: 0.5, notes: [] },
+      { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
+      { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
+      { duration: 0.5, notes: [] },
+    ],
+  });
+
+  it("pads a short bar without moving a note", () => {
+    const bar = shortBar();
+    const next = fitMeasureToTimeSignature(bar);
+
+    expect(beatsDurationInQuarters(next.beats)).toBeCloseTo(4);
+    expect(beatOffsetsInQuarters(next.beats).slice(0, 6)).toEqual(
+      beatOffsetsInQuarters(bar.beats),
+    );
+    expect(next.beats.slice(0, 5)).toEqual(bar.beats.slice(0, 5));
+  });
+
+  it("grows the trailing rest instead of parking a second one next to it", () => {
+    const next = fitMeasureToTimeSignature(shortBar());
+
+    // The bar's own eighth rest plus the missing quarter, as one dotted rest.
+    expect(next.beats).toHaveLength(6);
+    expect(next.beats[5]).toEqual({ duration: 1.5, notes: [] });
+  });
+
+  it("appends a fresh rest when the bar ends on a note", () => {
+    const next = fitMeasureToTimeSignature({
+      timeSignature: [4, 4],
+      beats: [{ duration: 1, notes: [{ string: 6, fret: 0 }] }],
+    });
+
+    expect(next.beats).toHaveLength(2);
+    expect(next.beats[1]).toEqual({ duration: 3, notes: [] });
+  });
+
+  it("cuts a gap nothing can draw into rests that can be", () => {
+    const next = fitMeasureToTimeSignature({
+      timeSignature: [4, 4],
+      beats: [{ duration: 1.75, notes: [{ string: 6, fret: 0 }] }],
+    });
+
+    expect(next.beats.slice(1)).toEqual([
+      { duration: 2, notes: [] },
+      { duration: 0.25, notes: [] },
+    ]);
+  });
+
+  it("takes an overflow back off the trailing rests", () => {
+    const next = fitMeasureToTimeSignature({
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [{ string: 6, fret: 0 }] },
+        { duration: 0.5, notes: [] },
+        { duration: 1, notes: [] },
+      ],
+    });
+
+    expect(next.beats).toHaveLength(1);
+    expect(beatsDurationInQuarters(next.beats)).toBeCloseTo(4);
+  });
+
+  it("keeps a note the overflow would have cost", () => {
+    const overflowing: TablatureMeasure = {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [{ string: 6, fret: 0 }] },
+        { duration: 1, notes: [{ string: 6, fret: 3 }] },
+      ],
+    };
+
+    expect(fitMeasureToTimeSignature(overflowing)).toBe(overflowing);
+  });
+
+  it("leaves a measure that already fills its signature alone", () => {
+    const bar = filledBar();
+    expect(fitMeasureToTimeSignature(bar)).toBe(bar);
+    // 6/8 counts three quarter notes, not six.
+    const sixEight = createMeasure([6, 8], 6);
+    expect(fitMeasureToTimeSignature(sixEight)).toBe(sixEight);
   });
 });

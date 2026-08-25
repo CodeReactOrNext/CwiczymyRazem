@@ -2,6 +2,10 @@ import type {
   TablatureBeat,
   TablatureMeasure,
 } from "feature/exercisePlan/types/exercise.types";
+import {
+  beatsDurationInQuarters,
+  measureDurationInQuarters,
+} from "feature/exercisePlan/utils/measureDuration";
 
 /** Triplet grids give durations of 1/3, which never sum to an exact integer. */
 const EPSILON = 1e-6;
@@ -168,4 +172,84 @@ export function startsCountedBeat(
   const unit = 4 / timeSignature[1];
   const steps = offsetInQuarters / unit;
   return Math.abs(steps - Math.round(steps)) < 1e-3;
+}
+
+/**
+ * Appends `missing` quarter notes of silence. A rest already sitting at the end
+ * of the bar is grown rather than left with a second rest next to it — "eighth
+ * rest, then quarter rest" and "dotted quarter rest" are the same silence, and
+ * one glyph is what a player expects to read.
+ */
+function padWithRests(
+  measure: TablatureMeasure,
+  missing: number,
+): TablatureMeasure {
+  const beats = [...measure.beats];
+  const last = beats[beats.length - 1];
+  const growable = !!last && last.notes.length === 0;
+  if (growable) beats.pop();
+  const gap = growable ? last.duration : 0;
+
+  return {
+    ...measure,
+    beats: [
+      ...beats,
+      ...splitIntoNotatableDurations(gap + missing).map(restBeat),
+    ],
+  };
+}
+
+/**
+ * Gives `excess` quarter notes back by shortening the bar's trailing rests.
+ * Whatever is left over once the rests run out belongs to a note, so the
+ * measure comes back exactly as it was rather than half-trimmed.
+ */
+function trimTrailingRests(
+  measure: TablatureMeasure,
+  excess: number,
+): TablatureMeasure {
+  const beats = [...measure.beats];
+  let left = excess;
+
+  while (left > EPSILON && beats.length > 0) {
+    const last = beats[beats.length - 1];
+    if (last.notes.length > 0) break;
+    beats.pop();
+    if (last.duration > left + EPSILON) {
+      beats.push(
+        ...splitIntoNotatableDurations(last.duration - left).map(restBeat),
+      );
+      left = 0;
+    } else {
+      left -= last.duration;
+    }
+  }
+
+  return left > EPSILON ? measure : { ...measure, beats };
+}
+
+/**
+ * Makes a measure fill its own time signature again without moving a single
+ * note: time it is missing is appended as rests, and time it overflows by is
+ * taken back off the rests at its end.
+ *
+ * A bar that overflows into its *notes* is returned untouched — dropping a note
+ * to make a bar fit is an edit only the user can make.
+ *
+ * Bars that stopped adding up are what the pre-duration editor left behind: it
+ * wrote a beat's duration straight into the model, so shortening anything
+ * silently took that time out of the bar. The grid hid it (every column was one
+ * fixed-width square back then), but the preview, the playback cursor and the
+ * exported notation all lay beats out at their running sum — which is why a bar
+ * a quarter short drags every bar after it out of place.
+ */
+export function fitMeasureToTimeSignature(
+  measure: TablatureMeasure,
+): TablatureMeasure {
+  const capacity = measureDurationInQuarters(measure.timeSignature);
+  const missing = capacity - beatsDurationInQuarters(measure.beats);
+  if (Math.abs(missing) < EPSILON) return measure;
+  return missing > 0
+    ? padWithRests(measure, missing)
+    : trimTrailingRests(measure, -missing);
 }
