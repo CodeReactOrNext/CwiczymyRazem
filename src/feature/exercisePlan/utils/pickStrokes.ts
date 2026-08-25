@@ -21,7 +21,10 @@ const inRange = (index: number, range: PickStrokeRange) =>
 function mapRange(
   measures: TablatureMeasure[],
   range: PickStrokeRange,
-  next: (stroke: PickStroke | undefined, beatIdx: number) => PickStroke | undefined,
+  next: (
+    stroke: PickStroke | undefined,
+    beatIdx: number,
+  ) => PickStroke | undefined,
 ): TablatureMeasure[] {
   const measure = measures[range.measureIdx];
   if (!measure) return measures;

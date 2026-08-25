@@ -38,7 +38,10 @@ describe("togglePickStroke", () => {
 
   it("clears the range when it already carries that direction", () => {
     const measures = [
-      measure([{ fret: 0, pickStroke: "up" }, { fret: 1, pickStroke: "up" }]),
+      measure([
+        { fret: 0, pickStroke: "up" },
+        { fret: 1, pickStroke: "up" },
+      ]),
     ];
 
     const next = togglePickStroke(
