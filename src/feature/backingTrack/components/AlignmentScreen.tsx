@@ -16,14 +16,15 @@ import {
   Pause,
   Play,
   Plus,
-  Square,
   Target,
   Upload,
+  Volume2,
+  VolumeX,
   X,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { BackingTrackController } from "../hooks/useBackingTrackSession";
 import { useTimelineView } from "../hooks/useTimelineView";
@@ -42,6 +43,7 @@ import { TempoAnchorPopover } from "./TempoAnchorPopover";
 import { TimelineClock } from "./TimelineClock";
 import { TimelineRuler } from "./TimelineRuler";
 import type { MixerTrack } from "./TrackMixer";
+import { WaveformCaptureDialog } from "./WaveformCaptureDialog";
 
 const NUDGE_MS = 20;
 const NUDGE_COARSE_FACTOR = 5;
@@ -120,6 +122,53 @@ function ToolGroup({
       </span>
       <div className='flex items-center gap-2'>{children}</div>
     </div>
+  );
+}
+
+/**
+ * Mute for a whole lane, sitting on the lane's own header.
+ *
+ * The stems have had one each since this screen existed; the two lanes that are
+ * not stems — the tablature and the video — had none, so the one question this
+ * screen is for ("is the tab where the recording is?") could not be answered by
+ * the obvious means of listening to one of them at a time.
+ *
+ * Same shape and same amber as the stems use, because it is the same control.
+ */
+function LaneMuteButton({
+  muted,
+  onToggle,
+  label,
+  hint,
+}: {
+  muted: boolean;
+  onToggle: () => void;
+  /** Names the thing being silenced, for the label a screen reader reads out. */
+  label: string;
+  /** Anything about this particular mute worth knowing before pressing it. */
+  hint?: string;
+}) {
+  const action = muted ? `Unmute ${label}` : `Mute ${label}`;
+  return (
+    <button
+      type='button'
+      onClick={onToggle}
+      aria-pressed={muted}
+      aria-label={action}
+      title={hint ? `${action} — ${hint}` : action}
+      className={cn(
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        muted
+          ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+          : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100",
+      )}>
+      {muted ? (
+        <VolumeX className='h-3.5 w-3.5' />
+      ) : (
+        <Volume2 className='h-3.5 w-3.5' />
+      )}
+    </button>
   );
 }
 
@@ -258,11 +307,10 @@ export function AlignmentScreen({
 
   const isFile = source === "file";
 
-  // Listening runs with the session, not with this screen — but handing the
-  // waveform over is expensive, so it is only handed over often while a screen
-  // is actually drawing it.
-  const watchWaveform = ytWaveform.watch;
-  useEffect(() => watchWaveform(), [watchWaveform]);
+  /** Whether the capture dialog is up — see WaveformCaptureDialog. */
+  const [isCapturing, setIsCapturing] = useState(false);
+  /** Second of the video the capture opens on — the moment being aligned. */
+  const [captureFromSec, setCaptureFromSec] = useState(0);
 
   // A learned waveform is drawn from its attacks rather than its amplitude. A
   // loud mix is a solid block at peak level with nothing in it to put a bar
@@ -462,6 +510,41 @@ export function AlignmentScreen({
   const nudge = (steps: number) =>
     applyOffset(alignment.offsetMs + steps * NUDGE_MS, { realign: true });
 
+  // ── Silencing a whole lane ──────────────────────────────────────────────
+  /**
+   * The tablature has no single volume of its own — it is however many Guitar
+   * Pro instruments the file carries, which is exactly what the mixer beside
+   * this button lists. So its mute is the master of that menu: every track at
+   * once, and muted only when there is nothing left making a sound.
+   */
+  const mixTracks = mixerTracks ?? [];
+  const canMix = mixTracks.length > 0 && !!onMixerChange;
+  const isTabMuted = canMix && mixTracks.every((track) => track.isMuted);
+  /** Which instruments were already off, so unmuting hands back the mix that
+   *  was there rather than turning everything on. */
+  const mutedBeforeRef = useRef<string[] | null>(null);
+
+  const toggleTabMute = () => {
+    if (!onMixerChange || mixTracks.length === 0) return;
+
+    if (isTabMuted) {
+      const before = mutedBeforeRef.current;
+      mutedBeforeRef.current = null;
+      for (const track of mixTracks) {
+        const stayMuted = before?.includes(track.id) ?? false;
+        if (track.isMuted !== stayMuted) onMixerChange(track.id, { isMuted: stayMuted });
+      }
+      return;
+    }
+
+    mutedBeforeRef.current = mixTracks
+      .filter((track) => track.isMuted)
+      .map((track) => track.id);
+    for (const track of mixTracks) {
+      if (!track.isMuted) onMixerChange(track.id, { isMuted: true });
+    }
+  };
+
   const nameOf = (trackId: string) =>
     library.find((track) => track.id === trackId)?.name ?? "Missing file";
   const hasSomethingToAlign =
@@ -607,87 +690,68 @@ export function AlignmentScreen({
           draw. Chrome or Edge can; Firefox and Safari cannot. Align by ear
           below.
         </span>
-      ) : ytWaveform.status === "listening" ? (
-        <span>
-          Listening — the map appears as soon as there is enough of the video to
-          draw.
-        </span>
       ) : (
         <span>
-          Nothing heard yet. The waveform fills itself in while the video plays.
+          No waveform yet — capture a stretch of the video below to see its
+          shape. Aligning by ear works without one.
         </span>
       )}
     </div>
   );
 
   /**
-   * What listening is up to, as a line under the map.
+   * Opens the capture dialog.
    *
-   * There is deliberately no "learn the waveform" button in the ordinary case.
-   * A video's waveform can only come from hearing the video play, and the video
-   * plays during practice anyway — so listening runs with the session and this
-   * row reports on it rather than asking for permission to start. The button
-   * only appears where the platform genuinely needs a click: a browser, which
-   * will not hand over tab audio without one.
+   * The session is stopped on the way in on purpose: a capture hears everything
+   * the tab plays, and the session's own copy of the video playing underneath
+   * would be recorded on top of the dialog's — two takes of the same song, a
+   * few hundred milliseconds apart, blended into one unusable picture.
+   */
+  const openCapture = () => {
+    if (isPlaying) onTogglePlay?.();
+    // Read here rather than while rendering the dialog: the playhead comes off
+    // the session clock, which is a ref, and a render may not touch one.
+    setCaptureFromSec(getPlayheadSec());
+    setIsCapturing(true);
+  };
+
+  /**
+   * How much of the video has a waveform, and the way to get more of it.
+   *
+   * Capturing used to run quietly alongside practice on the reasoning that the
+   * video plays anyway. It is not free — see useYouTubeWaveform — so it is a
+   * deliberate act now, done in a dialog of its own, and this row is where it
+   * is asked for.
    */
   const listeningStrip =
     isFile || ytWaveform.status === "unsupported" ? null : (
       <div className='flex items-center gap-3 px-4 pb-1 pt-2 text-xs text-zinc-400'>
-        {ytWaveform.status === "error" ? (
-          <>
-            <span className='text-amber-400'>{ytWaveform.error}</span>
-            <button type='button' onClick={ytWaveform.start} className={button}>
-              Try again
-            </button>
-          </>
-        ) : (
-          <>
-            {ytWaveform.status === "listening" && (
-              <span
-                aria-hidden
-                className='h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-cyan-400'
-              />
-            )}
-            <span className='tabular-nums'>
-              {ytWaveform.isComplete
-                ? "Whole video heard."
-                : `${Math.round(ytWaveform.coverage * 100)}% of the video heard`}
-            </span>
-            <span className='text-zinc-500'>
-              {ytWaveform.isComplete
-                ? "Nothing left to listen for."
-                : ytWaveform.status === "listening"
-                  ? "Filling in as it plays — the gaps close on their own."
-                  : "Plays fill in the rest."}
-            </span>
-            {ytWaveform.status === "listening" ? (
-              <button type='button' onClick={ytWaveform.stop} className={button}>
-                <Square className='h-3.5 w-3.5' />
-                Stop listening
-              </button>
-            ) : (
-              !ytWaveform.isComplete && (
-                <button
-                  type='button'
-                  onClick={ytWaveform.start}
-                  className={button}>
-                  <AudioLines className='h-3.5 w-3.5' />
-                  Listen
-                </button>
-              )
-            )}
-            {/* The correction that decides whether the picture sits where the
-                song actually is. Worth stating: an uncorrected waveform is a
-                consistent picture in the wrong place, which is far harder to
-                spot than a broken one. */}
-            {ytWaveform.coverage > 0 && (
-              <span className='ml-auto text-zinc-500 tabular-nums'>
-                {ytWaveform.latencyMs === null
-                  ? "capture delay not measured"
-                  : `capture delay ${Math.round(ytWaveform.latencyMs)} ms, corrected`}
-              </span>
-            )}
-          </>
+        <span className='tabular-nums'>
+          {ytWaveform.isComplete
+            ? "Whole video captured."
+            : ytWaveform.coverage > 0
+              ? `${Math.round(ytWaveform.coverage * 100)}% of the video captured`
+              : "No waveform captured yet"}
+        </span>
+        <span className='text-zinc-500'>
+          {ytWaveform.isComplete
+            ? "Nothing left to capture."
+            : "Captured on its own, never while you are playing."}
+        </span>
+        {youtubeVideoId && !ytWaveform.isComplete && (
+          <button type='button' onClick={openCapture} className={button}>
+            <AudioLines className='h-3.5 w-3.5' />
+            {ytWaveform.coverage > 0 ? "Capture more" : "Capture waveform"}
+          </button>
+        )}
+        {/* The correction that decides whether the picture sits where the song
+            actually is. Worth stating: an uncorrected waveform is a consistent
+            picture in the wrong place, which is far harder to spot than a
+            broken one. Only the pass that measured it can report it. */}
+        {ytWaveform.latencyMs !== null && (
+          <span className='ml-auto text-zinc-500 tabular-nums'>
+            capture delay {Math.round(ytWaveform.latencyMs)} ms, corrected
+          </span>
         )}
       </div>
     );
@@ -714,8 +778,13 @@ export function AlignmentScreen({
       }}
       className={cn(
         "fixed inset-0 z-[99999999] flex flex-col bg-zinc-950",
-        // The desktop title bar is pinned above everything, so start below it.
-        isElectron && "pt-10",
+        // The desktop title bar (h-10, portalled to the body above every in-app
+        // z-index) is pinned over this screen, so the screen has to start below
+        // it. Clearing it exactly left the heading and the Done button pressed
+        // flat against the window controls with nothing between them, which
+        // reads as covered and is awkward to click besides — so it is the bar
+        // plus a gap, the same 56px the session view underneath reserves.
+        isElectron && "pt-[56px]",
       )}>
       {isDropping && (
         <div className='pointer-events-none absolute inset-0 z-40 flex items-center justify-center bg-zinc-950/80'>
@@ -1131,15 +1200,21 @@ export function AlignmentScreen({
                   <span className='text-sm font-semibold text-cyan-400'>
                     Tablature
                   </span>
-                  {mixerTracks && mixerTracks.length > 0 && onMixerChange && (
-                    <MixerMenu
-                      tracks={mixerTracks}
-                      onChange={onMixerChange}
-                      className='ml-auto'
-                    />
+                  {canMix && onMixerChange && (
+                    <div className='ml-auto flex items-center gap-1.5'>
+                      <LaneMuteButton
+                        muted={isTabMuted}
+                        onToggle={toggleTabMute}
+                        label='the tablature'
+                        hint='silences every instrument in the file'
+                      />
+                      <MixerMenu tracks={mixTracks} onChange={onMixerChange} />
+                    </div>
                   )}
                 </div>
-                <span className='text-xs text-zinc-400'>what you play</span>
+                <span className='text-xs text-zinc-400'>
+                  {isTabMuted ? "muted" : "what you play"}
+                </span>
               </>,
               <TabLane
                 {...timeline}
@@ -1182,10 +1257,24 @@ export function AlignmentScreen({
                 ))
               : laneRow(
                   <>
-                    <span className='text-sm font-semibold text-zinc-100'>
-                      YouTube
+                    <div className='flex items-center gap-2'>
+                      <span className='text-sm font-semibold text-zinc-100'>
+                        YouTube
+                      </span>
+                      <div className='ml-auto flex items-center gap-1.5'>
+                        <LaneMuteButton
+                          muted={alignment.muted}
+                          onToggle={() =>
+                            setAlignment({ muted: !alignment.muted })
+                          }
+                          label='the video'
+                          hint='the waveform only fills in while it can be heard'
+                        />
+                      </div>
+                    </div>
+                    <span className='text-xs text-zinc-400'>
+                      {alignment.muted ? "muted" : "tap to align"}
                     </span>
-                    <span className='text-xs text-zinc-400'>tap to align</span>
                   </>,
                   <AlignmentGrid
                     {...timeline}
@@ -1297,6 +1386,17 @@ export function AlignmentScreen({
             )}
           </div>
         </>
+      )}
+
+      {isCapturing && youtubeVideoId && (
+        <WaveformCaptureDialog
+          videoId={youtubeVideoId}
+          // Opens where the work is, so the stretch being aligned is the
+          // stretch that gets a picture.
+          startAtSec={captureFromSec}
+          onCaptured={ytWaveform.refresh}
+          onClose={() => setIsCapturing(false)}
+        />
       )}
 
       {showShortcuts && (

@@ -104,6 +104,23 @@ export interface YouTubeWaveform {
    * handing it over is what costs anything. Call from an effect.
    */
   watch: () => () => void;
+  /**
+   * Writes what has been heard so far, and resolves once it is on disk.
+   *
+   * A pass normally files itself when it ends, which is fire-and-forget — fine
+   * when nothing is waiting on it. A capture that hands its result to another
+   * copy of this hook is waiting on it, so it needs the promise.
+   */
+  flush: () => Promise<void>;
+  /**
+   * Re-reads what is stored for this video.
+   *
+   * The copy of this hook that only ever draws the waveform has no way of
+   * knowing that the copy inside the capture dialog just learned more of it.
+   * Discards anything this instance is holding, so never call it on the
+   * instance doing the capturing.
+   */
+  refresh: () => void;
 }
 
 /** What has been learned, and which video it belongs to. */
@@ -193,18 +210,31 @@ function shiftRestore(restore: PeakBuilderRestore, buckets: number): PeakBuilder
  * that shifted the entire waveform late, and aligning a tab against a waveform
  * that is late puts the backing track out by the same amount.
  *
- * Mounted by the backing-track session rather than by the Align screen, so a
- * video that plays during ordinary practice is heard as it plays and the
- * waveform is simply there by the time anyone comes to align it.
+ * Mounted twice, doing two different jobs. The session mounts it with
+ * `listen: false` — that copy only reads back what was captured before, which
+ * costs nothing and is all a lane needs to draw. The capture dialog mounts it
+ * with `listen: true` around a deliberate, time-boxed pass over the video, and
+ * the two meet through the store: the dialog `flush`es, the session
+ * `refresh`es.
  */
 export function useYouTubeWaveform(params: {
   videoId: string | null;
   /** Where the video is and what it is doing — the clock everything is filed under. */
   getClock: () => YouTubeClockReading | null;
-  /** False when there is no video in play, so nothing listens needlessly. */
-  enabled: boolean;
+  /**
+   * Whether this copy of the hook is the one doing the capturing.
+   *
+   * Listening used to run alongside practice, on the reasoning that the video
+   * plays anyway so the waveform may as well be learned for free. It is not
+   * free: a tab capture, a second audio graph and a growing buffer sit on the
+   * same main thread as the session, and the session is the thing that has to
+   * stay smooth. So the session mounts this with `listen: false` — it draws
+   * whatever was captured before and costs nothing — and capturing is a job of
+   * its own, done deliberately in WaveformCaptureDialog.
+   */
+  listen: boolean;
 }): YouTubeWaveform {
-  const { videoId, getClock, enabled } = params;
+  const { videoId, getClock, listen } = params;
 
   // Keyed by video so switching one out can never show the previous one's
   // waveform, and so nothing has to be reset synchronously in an effect.
@@ -214,6 +244,9 @@ export function useYouTubeWaveform(params: {
   const [error, setError] = useState<string | null>(null);
   /** Bumped by `start`, which is how a click reaches the listening effect. */
   const [startKey, setStartKey] = useState(0);
+  /** Bumped by `refresh`, which is how a capture made elsewhere reaches this
+   *  instance — the store is the only thing the two have in common. */
+  const [reloadKey, setReloadKey] = useState(0);
 
   const builderRef = useRef<PeakBuilder | null>(null);
   // What a previous session learned, so a fresh pass fills the gaps in it rather
@@ -253,19 +286,19 @@ export function useYouTubeWaveform(params: {
    * runs *because* the video changed still files what was heard under the
    * outgoing one. A play-through is far too expensive to lose to that.
    */
-  const persistFor = useCallback((id: string | null) => {
+  const persistFor = useCallback((id: string | null): Promise<void> => {
     const builder = builderRef.current;
     // Nothing heard means nothing worth writing — and writing it would stamp an
     // empty waveform over a good one from a previous session.
-    if (!builder || !id || builder.coverage() <= 0) return;
+    if (!builder || !id || builder.coverage() <= 0) return Promise.resolve();
     // Neither is going backwards allowed. A pass only ever adds to what it
     // resumed, so less coverage than was loaded means the resume did not take,
     // and writing that would trade a play-through for whatever this run heard.
-    if (builder.coverage() < restoredCoverageRef.current) return;
+    if (builder.coverage() < restoredCoverageRef.current) return Promise.resolve();
 
     const seen = builder.seenMask();
     const scales = builder.scales();
-    void writeWaveform({
+    return writeWaveform({
       videoId: id,
       peaks: packPeaks(builder.snapshot(), seen),
       onsets: packPeaks(builder.onsetSnapshot(), seen),
@@ -299,6 +332,10 @@ export function useYouTubeWaveform(params: {
     releaseTabAudioCapture();
     setListening(false);
   }, []);
+
+  const flush = useCallback(() => persistFor(videoId), [persistFor, videoId]);
+
+  const refresh = useCallback(() => setReloadKey((key) => key + 1), []);
 
   const start = useCallback(() => {
     listeningDeclined = false;
@@ -365,13 +402,13 @@ export function useYouTubeWaveform(params: {
     // swap still files what was heard under the video it was heard from.
     return () => {
       cancelled = true;
-      persistFor(videoId);
+      void persistFor(videoId);
     };
-  }, [videoId, supported, persistFor]);
+  }, [videoId, supported, persistFor, reloadKey]);
 
   // ── Listen ──────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!videoId || !supported || !enabled) return;
+    if (!videoId || !supported || !listen) return;
 
     let disposed = false;
     let capture: TabAudioCapture | null = null;
@@ -540,7 +577,7 @@ export function useYouTubeWaveform(params: {
       publish(videoId);
     }, PUBLISH_INTERVAL_MS);
 
-    persistTimer = window.setInterval(() => persistFor(videoId), PERSIST_INTERVAL_MS);
+    persistTimer = window.setInterval(() => void persistFor(videoId), PERSIST_INTERVAL_MS);
 
     // Already sharing — attach with no prompt and no ceremony, whatever build
     // this is. This is what makes the second video free.
@@ -569,9 +606,9 @@ export function useYouTubeWaveform(params: {
       if (persistTimer !== null) window.clearInterval(persistTimer);
       unsubscribe?.();
       unsubscribeEnded?.();
-      persistFor(videoId);
+      void persistFor(videoId);
     };
-  }, [videoId, supported, enabled, startKey, persistFor, publish]);
+  }, [videoId, supported, listen, startKey, persistFor, publish]);
 
   // Nothing left to hear. The capture stays open — it is shared, and the next
   // video is free only because it was not handed back.
@@ -601,5 +638,7 @@ export function useYouTubeWaveform(params: {
     start,
     stop,
     watch,
+    flush,
+    refresh,
   };
 }

@@ -188,6 +188,74 @@ describe("beatGridLines", () => {
       beatGridLines({ windowStartSec: 5, windowEndSec: 1, sourceBpm: 120, offsetMs: 0 }),
     ).toEqual([]);
   });
+
+  describe("at a zoom that would put lines on top of each other", () => {
+    /** A 1600px lane showing `sec` seconds — what the lanes actually draw at. */
+    const zoom = (sec: number) => sec / 1600;
+
+    it("keeps every beat while they are still far apart", () => {
+      const lines = beatGridLines({
+        windowStartSec: 0,
+        windowEndSec: 4,
+        sourceBpm: 120,
+        offsetMs: 0,
+        secondsPerPixel: zoom(4),
+      });
+      expect(lines.map((l) => l.index)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    });
+
+    it("drops to bar lines once the beats are within a few pixels", () => {
+      const params = {
+        windowStartSec: 0,
+        windowEndSec: 240,
+        sourceBpm: 120,
+        offsetMs: 0,
+        beatsPerBar: 4,
+      };
+      // Half a second of music per beat, 0.15s per pixel: beats land 3px apart.
+      const thinned = beatGridLines({ ...params, secondsPerPixel: zoom(240) });
+
+      expect(thinned.every((line) => line.isBarStart)).toBe(true);
+      expect(thinned).toHaveLength(121);
+      // Four times the work, for lines nobody can tell apart.
+      expect(beatGridLines(params)).toHaveLength(481);
+    });
+
+    it("thins past bars too, rather than filling the ruler in solid", () => {
+      const lines = beatGridLines({
+        windowStartSec: 0,
+        windowEndSec: 600,
+        sourceBpm: 240,
+        offsetMs: 0,
+        beatsPerBar: 4,
+        secondsPerPixel: zoom(600),
+      });
+
+      // Every other bar, and still numbered from the beat it stands on.
+      expect(lines.slice(0, 3).map((l) => l.bar)).toEqual([1, 3, 5]);
+      expect(lines.every((line) => line.isBarStart)).toBe(true);
+    });
+
+    it("thins an anchored grid by the tempo the window actually runs at", () => {
+      const tempoMap = createRecordingTempoMap({
+        anchors: [{ beat: 240, sec: 120 }],
+        offsetMs: 0,
+        sourceBpm: 120,
+      });
+      const lines = beatGridLines({
+        windowStartSec: 0,
+        windowEndSec: 240,
+        sourceBpm: 120,
+        offsetMs: 0,
+        beatsPerBar: 4,
+        tempoMap,
+        secondsPerPixel: zoom(240),
+      });
+
+      expect(lines.every((line) => line.isBarStart)).toBe(true);
+      expect(lines).toHaveLength(121);
+    });
+  });
 });
 
 describe("offsetDeltaFromDrag", () => {

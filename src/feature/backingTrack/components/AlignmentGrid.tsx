@@ -3,7 +3,7 @@ import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
 import { useCanvasSize, useTimelineFrame } from "../hooks/useTimelineFrame";
-import { beatGridLines, offsetDeltaFromDrag } from "../utils/alignment";
+import { beatGridLines, DRAG_COMMIT_MS, offsetDeltaFromDrag } from "../utils/alignment";
 import type { ScoreClock } from "../utils/backingSync";
 import { sessionBeats } from "../utils/backingSync";
 import type { RecordingTempoMap } from "../utils/tempoMap";
@@ -49,6 +49,15 @@ interface AlignmentGridProps {
    *  `realign: false` while dragging; one seek per pointer event would stutter. */
   onDragOffset: (deltaMs: number, options?: { realign?: boolean }) => void;
   /**
+   * Which of the two offsets `onDragOffset` ends up moving.
+   *
+   * The lane draws a drag before it has been committed (see DRAG_COMMIT_MS), so
+   * it has to know which number to watch for the commit landing — otherwise the
+   * preview and the real thing would be added together and the recording would
+   * move twice as far as the hand.
+   */
+  dragEdits?: "offset" | "stemOffset";
+  /**
    * What a plain left-drag across this lane does.
    *
    * Dragging used to mean one thing — move the audio — which left no way to look
@@ -92,6 +101,7 @@ export function AlignmentGrid({
   heightPx,
   stemOffsetMs = 0,
   onDragOffset,
+  dragEdits = "offset",
   dragMode = "stems",
   onPanStart,
   onPanMove,
@@ -106,6 +116,18 @@ export function AlignmentGrid({
   const gestureRef = useRef<"pan" | "stems" | null>(null);
   /** Signature of the last frame drawn, so an idle lane stops repainting. */
   const lastFrameKeyRef = useRef("");
+  /** One column's half-height per pixel of lane width, reused every frame —
+   *  a fresh array per lane per frame is a megabyte a second of garbage for a
+   *  buffer whose size only changes when the window does. */
+  const columnsRef = useRef<Float32Array | null>(null);
+  /** Total this drag has moved, and the offset it started from. What is drawn
+   *  but not yet committed is the difference between the two — see the draw. */
+  const dragTotalMsRef = useRef(0);
+  const dragFromMsRef = useRef(0);
+  /** How much of the drag has been handed to React, so a throttled commit
+   *  sends the rest exactly once. */
+  const dragSentMsRef = useRef(0);
+  const lastCommitAtRef = useRef(0);
 
   // The frame loop reads the latest values without being torn down and rebuilt
   // on every offset change — dragging changes the offset continuously.
@@ -125,6 +147,7 @@ export function AlignmentGrid({
     windowSec,
     centreSecOverride,
     heightPx,
+    dragEdits,
     stemOffsetMs,
   });
   useEffect(() => {
@@ -144,6 +167,7 @@ export function AlignmentGrid({
       windowSec,
       centreSecOverride,
       heightPx,
+      dragEdits,
       stemOffsetMs,
     };
   });
@@ -175,6 +199,29 @@ export function AlignmentGrid({
     const waveH = height;
     const midY = waveH / 2;
 
+    /**
+     * How far this drag has moved the recording without React having been told.
+     *
+     * Handing every pointer event to React re-rendered the practice session
+     * around sixty times a second, which is what made dragging in here stutter.
+     * The commit is throttled instead (DRAG_COMMIT_MS) and the frames in
+     * between draw the difference themselves.
+     *
+     * Derived from the offset rather than counted down: the instant a commit
+     * lands, the sum comes out at exactly what has already been drawn, so the
+     * picture never jumps back a frame and then forward again.
+     */
+    const dragged = p.dragEdits === "stemOffset" ? p.stemOffsetMs : p.offsetMs;
+    let previewMs = 0;
+    if (dragTotalMsRef.current !== 0) {
+      previewMs = dragTotalMsRef.current - (dragged - dragFromMsRef.current);
+      // Let go, and the last commit landed: back to drawing what is stored.
+      if (dragXRef.current === null && Math.abs(previewMs) < 0.5) {
+        dragTotalMsRef.current = 0;
+        previewMs = 0;
+      }
+    }
+
     // The waveform loop is one pass per pixel of width; with several stems on
     // screen that is the difference between a smooth drag and a stuttering one.
     const frameKey = [
@@ -184,6 +231,7 @@ export function AlignmentGrid({
       // on literally every frame and the early-out never once fired — a parked
       // lane redrew itself sixty times a second to show the same picture.
       Math.round(windowStart / secondsPerPixel), Math.round(playheadSec / secondsPerPixel),
+      Math.round(previewMs / 1000 / secondsPerPixel),
       p.peaks?.length ?? 0, p.revision, p.tempoMap.points.length,
     ].join("|");
     if (frameKey === lastFrameKeyRef.current) return;
@@ -211,6 +259,7 @@ export function AlignmentGrid({
       offsetMs: p.offsetMs,
       beatsPerBar: p.beatsPerBar,
       tempoMap: p.tempoMap,
+      secondsPerPixel,
     });
 
     // One path per pass rather than one per line: a bar of sixteenths at this
@@ -232,22 +281,55 @@ export function AlignmentGrid({
 
     // ── Waveform ──────────────────────────────────────────────────────────
     if (p.peaks && p.peaks.length > 0) {
-      // One path, one fill. Column-by-column `fillRect` asks the rasteriser
-      // for a separate pass per pixel of lane width — sixteen hundred of them
-      // per stem per frame, for a picture that is a single shape.
-      ctx.fillStyle = p.waveColor;
-      ctx.beginPath();
+      const wave = p.peaks;
+      const half = waveH / 2 - 4;
+      const columns =
+        columnsRef.current && columnsRef.current.length >= width
+          ? columnsRef.current
+          : (columnsRef.current = new Float32Array(Math.ceil(width)));
+
+      // Measure first, draw second. `atSec` only grows, so the columns that
+      // have audio behind them are one unbroken run — everything before the
+      // recording starts and after it ends simply isn't part of the shape.
+      let from = -1;
+      let to = -1;
       for (let x = 0; x < width; x += 1) {
         // The axis is the recording's shared timeline; this stem's own audio
         // sits at its shift from it.
-        const atSec = windowStart + x * secondsPerPixel + p.stemOffsetMs / 1000;
+        const atSec =
+          windowStart + previewMs / 1000 + x * secondsPerPixel + p.stemOffsetMs / 1000;
         if (atSec < 0) continue;
-        const bucket = Math.floor(atSec * p.peaksPerSecond);
-        if (bucket >= p.peaks.length) break;
-        const amplitude = p.peaks[bucket] * (waveH / 2 - 4);
-        ctx.rect(x, midY - amplitude, 1, amplitude * 2);
+        const firstBucket = Math.floor(atSec * p.peaksPerSecond);
+        if (firstBucket >= wave.length) break;
+        // Zoomed out a column spans many buckets, and reading only the first
+        // of them drops transients between columns — a snare that lands in the
+        // wrong half of a pixel disappears from the very picture it is being
+        // aligned by. The loudest bucket in the column is what a DAW shows.
+        const lastBucket = Math.min(
+          wave.length,
+          Math.max(firstBucket + 1, Math.floor((atSec + secondsPerPixel) * p.peaksPerSecond)),
+        );
+        let peak = 0;
+        for (let i = firstBucket; i < lastBucket; i += 1) {
+          if (wave[i] > peak) peak = wave[i];
+        }
+        columns[x] = peak * half;
+        if (from < 0) from = x;
+        to = x;
       }
-      ctx.fill();
+
+      // One closed shape rather than a rectangle per column: `rect()` is five
+      // path operations, so a lane's worth was eight thousand of them a frame,
+      // per stem, for what the eye reads as a single silhouette.
+      if (from >= 0) {
+        ctx.fillStyle = p.waveColor;
+        ctx.beginPath();
+        ctx.moveTo(from, midY - columns[from]);
+        for (let x = from + 1; x <= to; x += 1) ctx.lineTo(x, midY - columns[x]);
+        for (let x = to; x >= from; x -= 1) ctx.lineTo(x, midY + columns[x]);
+        ctx.closePath();
+        ctx.fill();
+      }
     }
 
     // ── Bar starts, over the wave they are read against ───────────────────
@@ -277,12 +359,29 @@ export function AlignmentGrid({
     }
   });
 
+  /** Hands React everything dragged since the last time it was told. */
+  const commitDrag = (realign: boolean) => {
+    const unsent = dragTotalMsRef.current - dragSentMsRef.current;
+    dragSentMsRef.current = dragTotalMsRef.current;
+    // A realign with nothing left to send still goes through: that is what
+    // re-seeks the recording to where the user let go.
+    if (unsent !== 0 || realign) onDragOffset(unsent, { realign });
+  };
+
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     // Middle button is the universal "just move the view", whatever the mode.
     const gesture = event.button === 1 || dragMode === "pan" ? "pan" : "stems";
     gestureRef.current = gesture;
     dragXRef.current = event.clientX;
     if (gesture === "pan") onPanStart?.(event.clientX);
+    else {
+      dragTotalMsRef.current = 0;
+      dragSentMsRef.current = 0;
+      dragFromMsRef.current = dragEdits === "stemOffset" ? stemOffsetMs : offsetMs;
+      // The first movement commits at once: the throttle is there to thin out a
+      // continuous drag, not to make the start of one feel late.
+      lastCommitAtRef.current = Number.NEGATIVE_INFINITY;
+    }
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
     } catch {
@@ -302,15 +401,20 @@ export function AlignmentGrid({
 
     const width = event.currentTarget.clientWidth || 1;
     dragXRef.current = event.clientX;
-    onDragOffset(
-      offsetDeltaFromDrag({
-        dragPx: event.clientX - lastX,
-        secondsPerPixel: paramsRef.current.windowSec / width,
-      }),
-      // Mid-drag the corrector absorbs the change smoothly; a forced seek on
-      // every pointer event would stutter the audio all the way across.
-      { realign: false },
-    );
+    dragTotalMsRef.current += offsetDeltaFromDrag({
+      dragPx: event.clientX - lastX,
+      secondsPerPixel: paramsRef.current.windowSec / width,
+    });
+
+    // The frames in between are drawn from `dragTotalMsRef` above, so nothing
+    // is lost by telling React less often — and telling it on every pointer
+    // event is a re-render of the whole session per event.
+    const now = performance.now();
+    if (now - lastCommitAtRef.current < DRAG_COMMIT_MS) return;
+    lastCommitAtRef.current = now;
+    // Mid-drag the corrector absorbs the change smoothly; a forced seek on
+    // every commit would stutter the audio all the way across.
+    commitDrag(false);
   };
 
   const endDrag = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -327,8 +431,8 @@ export function AlignmentGrid({
       onPanEnd?.();
       return;
     }
-    // Nothing more to move — this just re-seeks to where the user let go.
-    onDragOffset(0, { realign: true });
+    // Whatever the throttle was still holding, then a seek to where it landed.
+    commitDrag(true);
   };
 
   return (
