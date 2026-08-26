@@ -28,12 +28,14 @@ interface StandingRowProps {
   name: string;
   avatar: string;
   score: number;
+  /** Tempo the standing score was played at; absent where it isn't known. */
+  bpm?: number;
   isPlayer?: boolean;
   /** Shown on the player's row when the run came in under their standing record. */
   runScore?: number;
 }
 
-function StandingRow({ rank, name, avatar, score, isPlayer = false, runScore }: StandingRowProps) {
+function StandingRow({ rank, name, avatar, score, bpm, isPlayer = false, runScore }: StandingRowProps) {
   return (
     <div
       className={cn(
@@ -59,9 +61,12 @@ function StandingRow({ rank, name, avatar, score, isPlayer = false, runScore }: 
         )}
       </div>
 
-      <span className={cn('shrink-0 text-base font-bold tabular-nums', isPlayer ? 'text-cyan-400' : 'text-zinc-200')}>
-        {score.toLocaleString()}
-      </span>
+      <div className='shrink-0 text-right'>
+        <span className={cn('block text-base font-bold tabular-nums', isPlayer ? 'text-cyan-400' : 'text-zinc-200')}>
+          {score.toLocaleString()}
+        </span>
+        {bpm !== undefined && <span className='text-[11px] font-semibold tabular-nums text-zinc-500'>{bpm} BPM</span>}
+      </div>
     </div>
   );
 }
@@ -112,7 +117,7 @@ function ExerciseStanding({
 
       <div className='space-y-2'>
         {above.map((entry) => (
-          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} />
+          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} bpm={entry.bpm} />
         ))}
 
         <StandingRow
@@ -120,12 +125,15 @@ function ExerciseStanding({
           name={playerName}
           avatar={playerAvatar}
           score={boardScore}
+          // Only this run's tempo is known here. When an older record still holds
+          // the place, that record's tempo isn't loaded — so show none.
+          bpm={boardScore === run.score ? run.bpm : undefined}
           isPlayer
           runScore={boardScore > run.score ? run.score : undefined}
         />
 
         {below.map((entry) => (
-          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} />
+          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} bpm={entry.bpm} />
         ))}
       </div>
     </div>

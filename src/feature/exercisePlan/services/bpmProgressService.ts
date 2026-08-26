@@ -303,6 +303,12 @@ export interface LeaderboardEntry {
   displayName: string;
   avatar: string;
   score: number;
+  /**
+   * Tempo the standing score was played at, speed multiplier included. Absent on
+   * entries written before tempo was recorded, and on exercises with no metronome —
+   * there the score says nothing about speed, so no number beats a made-up one.
+   */
+  bpm?: number;
   updatedAt: Timestamp;
 }
 
@@ -311,7 +317,8 @@ export const saveLeaderboardEntry = async (
   exerciseId: string,
   score: number,
   displayName: string,
-  avatar: string
+  avatar: string,
+  bpm?: number
 ): Promise<void> => {
   try {
     const docRef = doc(db, "exerciseLeaderboards", exerciseId, "entries", userId);
@@ -322,11 +329,14 @@ export const saveLeaderboardEntry = async (
       if (score <= existing.score) return;
     }
 
+    // The tempo belongs to the score being written, never carried over from the
+    // entry it replaces: a beaten record's BPM is not this record's BPM.
     await trackedSetDoc(docRef, {
       userId,
       displayName,
       avatar,
       score,
+      ...(bpm ? { bpm } : {}),
       updatedAt: Timestamp.now(),
     });
   } catch (error) {

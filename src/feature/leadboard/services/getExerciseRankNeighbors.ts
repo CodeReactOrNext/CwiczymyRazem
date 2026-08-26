@@ -7,6 +7,8 @@ export interface RankNeighbor {
   displayName: string;
   avatar: string;
   score: number;
+  /** Tempo the standing score was played at; absent on older entries. */
+  bpm?: number;
   rank: number;
 }
 
@@ -30,6 +32,7 @@ const toNeighbor = (
   displayName: (entry.data().displayName as string) || "Anonymous",
   avatar: (entry.data().avatar as string) || "",
   score: entry.data().score as number,
+  bpm: entry.data().bpm as number | undefined,
   rank,
 });
 

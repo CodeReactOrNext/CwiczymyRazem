@@ -110,8 +110,28 @@ export interface FirebaseLogsInterface {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
     earTrainingHighScore?: { exerciseTitle: string; score: number };
   };
-  micPerformance?: { score: number; accuracy: number };
-  earTrainingPerformance?: { score: number };
+  micPerformance?: {
+    score: number;
+    accuracy: number;
+    /**
+     * Tempo the run was played at, speed multiplier included. Absent on logs
+     * written before tempo was recorded and on exercises with no metronome.
+     */
+    bpm?: number;
+    /**
+     * 1-based place on the exercise leaderboard when this score was reported.
+     * A snapshot, not a live standing — later runs by other players move it.
+     */
+    rank?: number;
+  };
+  earTrainingPerformance?: {
+    score: number;
+    /**
+     * 1-based place on the exercise leaderboard when this score was reported.
+     * A snapshot, not a live standing — later runs by other players move it.
+     */
+    rank?: number;
+  };
 }
 
 interface FirebaseLogsAchievementsInterface {

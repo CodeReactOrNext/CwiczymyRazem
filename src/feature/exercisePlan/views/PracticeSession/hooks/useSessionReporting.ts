@@ -39,8 +39,8 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
         earTrainingHighScore?: { exerciseTitle: string; score: number };
       } | null,
-      micPerformance?: { score: number; accuracy: number } | null,
-      earTrainingPerformance?: { score: number } | null
+      micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number } | null,
+      earTrainingPerformance?: { score: number; rank?: number } | null
     ) => {
       if (isSubmittingRef.current) return;
       isSubmittingRef.current = true;

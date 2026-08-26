@@ -11,7 +11,7 @@ interface AvatarProps {
   name: string;
   lvl?: number;
   avatarURL?: string;
-  size?: "sm" | "2xl";
+  size?: "xs" | "sm" | "2xl";
   className?: string;
   selectedGuitar?: number | string;
   guitarYear?: number;
@@ -29,7 +29,12 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, guitarY
   const [guitarError, setGuitarError] = useState(false);
   const imgPath = selectedGuitar ?? getRankImgPath(lvl ?? 0);
 
+  // The rank/guitar badge only has room to hang off the large avatars, so the
+  // compact sizes render the circle on its own.
+  const isCompact = size === "xs" || size === "sm";
+
   let containerSizeClass = "h-20 w-20 rounded-xl";
+  if (size === "xs") containerSizeClass = "h-8 w-8 rounded-full";
   if (size === "sm") containerSizeClass = "h-10 w-10 rounded-full";
   if (size === "2xl") containerSizeClass = "h-32 w-32 rounded-2xl";
 
@@ -59,13 +64,13 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, guitarY
         ) : (
           <p
             className={`font-openSans font-bold uppercase text-main-opposed ${
-              size === "sm" ? "text-[14px]" : "text-4xl"
+              isCompact ? "text-[14px]" : "text-4xl"
             }`}>
             {name?.[0]}
           </p>
         )}
       </div>
-      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && !specialGuitarDef && !guitarError && (
+      {imgPath !== 0 && isSpecialGuitar && !isCompact && !specialGuitarDef && !guitarError && (
         <img 
           className='absolute z-20 object-contain' 
           style={specialGuitarImgStyle} 
@@ -74,7 +79,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, guitarY
           onError={() => setGuitarError(true)}
         />
       )}
-      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && specialGuitarDef && !guitarError && (
+      {imgPath !== 0 && isSpecialGuitar && !isCompact && specialGuitarDef && !guitarError && (
         <TooltipProvider>
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
@@ -143,7 +148,7 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, guitarY
       {imgPath !== 0 && !isSpecialGuitar && !guitarError && (
         <img 
           className='absolute -rotate-90 z-20' 
-          style={size === "sm" ? { display: "none" } : { ...badgePosition }} 
+          style={isCompact ? { display: "none" } : { ...badgePosition }} 
           src={getRankBadgeSrc(imgPath, "small")} 
           alt='' 
           onError={() => setGuitarError(true)}

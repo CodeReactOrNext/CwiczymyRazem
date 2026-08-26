@@ -63,11 +63,15 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
   const { t } = useTranslation("common");
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
+  // The card is a hover/tap surface and the feeds using it render a dozen at a
+  // time — fetching on mount meant a user doc plus that user's whole exerciseData
+  // collection per row, for cards nobody opens. Load on first open instead.
+  const [hasOpened, setHasOpened] = useState(false);
   const { getSupportMember } = useSupportTeam();
   const supportMember = getSupportMember(userId);
 
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !hasOpened) {
       return;
     }
     let cancelled = false;
@@ -104,7 +108,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, hasOpened]);
 
   if (!userId) return <>{children}</>;
 
@@ -255,6 +259,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
           onClickCapture={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            setHasOpened(true);
             setOpen(true);
           }}
         >
@@ -288,8 +293,19 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
 
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={200}>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <Tooltip
+        delayDuration={200}
+        onOpenChange={(isOpen) => {
+          if (isOpen) setHasOpened(true);
+        }}>
+        <TooltipTrigger
+          asChild
+          // The 200ms open delay would otherwise be dead time — start fetching as
+          // soon as the pointer lands, so the card is usually filled in on open.
+          onPointerEnter={() => setHasOpened(true)}
+          onFocus={() => setHasOpened(true)}>
+          {children}
+        </TooltipTrigger>
         <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
           {panel}
         </TooltipContent>
