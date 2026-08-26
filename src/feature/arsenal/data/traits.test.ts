@@ -422,10 +422,10 @@ describe("conditions", () => {
     const fuzz = pedal({
       itemId: "fuzz",
       effectType: "Fuzz",
-      x: 10,
+      x: 80,
       traits: [{ id: "front-of-chain", value: 6 }],
     });
-    const drive = pedal({ itemId: "od", effectType: "Overdrive", x: 60 });
+    const drive = pedal({ itemId: "od", effectType: "Overdrive", x: 30 });
 
     expect(
       getRigTraitPayout(
@@ -437,7 +437,7 @@ describe("conditions", () => {
     // Same board, fuzz moved behind the drive: the rule it was paid for is gone.
     expect(
       getRigTraitPayout(
-        { guitars: [guitar()], pedals: [{ ...fuzz, x: 90 }, drive] },
+        { guitars: [guitar()], pedals: [{ ...fuzz, x: 10 }, drive] },
         session({ technique: 60 }),
       ).fame,
     ).toBe(0);
@@ -523,7 +523,7 @@ describe("amplifiers and penalties", () => {
     expect(entries.find((e) => e.def.id === "ear-trainer")!.rate).toBe(7);
   });
 
-  it("pays Patchbay only into pedals further right than itself", () => {
+  it("pays Patchbay only into pedals further down the chain than itself", () => {
     const patchbay = pedal({
       itemId: "patchbay",
       x: 50,
@@ -537,9 +537,10 @@ describe("amplifiers and penalties", () => {
         session({ technique: 60 }),
       ).entries.find((e) => e.def.id === "workhorse")!.rate;
 
-    expect(rateOf(80)).toBe(5);
+    // The chain runs right to left, so a neighbour further left is downstream.
+    expect(rateOf(10)).toBe(5);
     // Same board, the neighbour dragged to the other side: the amp stops reaching it.
-    expect(rateOf(10)).toBe(3);
+    expect(rateOf(80)).toBe(3);
   });
 
   it("lets Prima Donna silence every other trait in the rig", () => {

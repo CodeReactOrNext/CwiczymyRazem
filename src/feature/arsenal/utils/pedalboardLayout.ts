@@ -109,23 +109,25 @@ const isOnBoard = (box: LayoutBox) =>
   box.yPct + PEDAL_H_PCT <= 100 + EPSILON;
 
 /**
- * First spot in reading order where a `wPct`-wide pedal fits without touching
- * anything already on the board. `null` means the board is full.
+ * First spot in signal order where a `wPct`-wide pedal fits without touching
+ * anything already on the board. The signal runs right to left, so the scan
+ * starts hard against the input jack's own corner and walks towards the amp.
+ * `null` means the board is full.
  */
 export const findFreeSpot = (
   occupied: LayoutBox[],
   wPct: number,
 ): { xPct: number; yPct: number } | null => {
-  const maxX = 100 - EDGE_PCT - wPct;
-  if (maxX < EDGE_PCT) return null;
+  const startX = 100 - EDGE_PCT - wPct;
+  if (startX < EDGE_PCT) return null;
 
   for (const yPct of ROW_Y_PCT) {
     for (let step = 0; ; step++) {
-      const xPct = Math.min(EDGE_PCT + step * SCAN_STEP_PCT, maxX);
+      const xPct = Math.max(startX - step * SCAN_STEP_PCT, EDGE_PCT);
       if (!collidesWithAny({ xPct, yPct, wPct }, occupied, GAP_PCT)) {
         return { xPct, yPct };
       }
-      if (xPct >= maxX) break;
+      if (xPct <= EDGE_PCT) break;
     }
   }
   return null;
@@ -196,8 +198,8 @@ export interface SwapPlan {
 
 /**
  * Trades the slot a dragged pedal owns for the one it is standing on, which is
- * how the board is reordered: the signal runs in reading order, so exchanging
- * two pedals' places exchanges their places in the chain.
+ * how the board is reordered: the signal runs row by row from the right, so
+ * exchanging two pedals' places exchanges their places in the chain.
  *
  * Both halves have to land somewhere legal or nothing moves — `null` means the
  * pair cannot trade (a wide pedal and the narrow gap it was dragged onto), and
@@ -230,15 +232,17 @@ export const rowIndexOf = (yPct: number) => {
 };
 
 /**
- * Row first, then left to right — the order the player reads the board in, and
- * with it the order the signal runs through it: the input jack sits at the top
- * left and the amp jack at the bottom right, so reading the board and tracing
- * the cable are the same act. `data/signalChain` judges the chain in this order,
- * which is why `tidyBoard` can straighten a board without ever rewiring it.
+ * Row first, then right to left — the order the signal runs through the board,
+ * which is the order a real one is wired in: a pedal takes its input on its
+ * right face and hands its output out of its left, so a chain built out of them
+ * travels leftwards. The input jack sits at the top right and the amp jack at
+ * the bottom left, so tracing the cable and following the chain are the same
+ * act. `data/signalChain` judges the chain in this order, which is why
+ * `tidyBoard` can straighten a board without ever rewiring it.
  */
 export const inChainOrder = (items: PedalboardPlacement[]) =>
   [...items].sort(
-    (a, b) => rowIndexOf(a.yPct) - rowIndexOf(b.yPct) || a.xPct - b.xPct,
+    (a, b) => rowIndexOf(a.yPct) - rowIndexOf(b.yPct) || b.xPct - a.xPct,
   );
 
 export interface BoardLayout {
@@ -325,20 +329,23 @@ export const packInOrder = (
   const placed: PedalboardPlacement[] = [];
   const overflow: PedalboardPlacement[] = [];
   let row = 0;
-  let cursor = EDGE_PCT;
+  // The cursor is the right-hand edge of the next pedal, because the chain
+  // starts at the input jack in the top right and each pedal is laid down to
+  // the left of the one before it.
+  let cursor = 100 - EDGE_PCT;
 
   for (const item of ordered) {
     const wPct = widthOf(item.itemId);
-    if (cursor + wPct > 100 - EDGE_PCT) {
+    if (cursor - wPct < EDGE_PCT) {
       row += 1;
-      cursor = EDGE_PCT;
+      cursor = 100 - EDGE_PCT;
     }
-    if (row >= ROW_Y_PCT.length || cursor + wPct > 100 - EDGE_PCT) {
+    if (row >= ROW_Y_PCT.length || cursor - wPct < EDGE_PCT) {
       overflow.push(item);
       continue;
     }
-    placed.push({ ...item, xPct: cursor, yPct: ROW_Y_PCT[row] });
-    cursor += wPct + GAP_PCT;
+    placed.push({ ...item, xPct: cursor - wPct, yPct: ROW_Y_PCT[row] });
+    cursor -= wPct + GAP_PCT;
   }
 
   return buildLayout(ordered, placed, overflow);
@@ -418,11 +425,18 @@ export const EFFECT_JACK_Y: Record<number | string, number> = {
   27: 0.486,
 };
 
-/** The ordinary enclosure: in on the left face, out on the right, half way up. */
+/**
+ * The ordinary enclosure: in on the right face, out on the left, half way up.
+ *
+ * That is the way the sockets are printed on the artwork — the enclosures that
+ * label theirs at all say `OUTPUT` down the left side — and the way a real
+ * pedal is built, which is why a board is wired right to left rather than the
+ * way it is read.
+ */
 export const SIDE_JACKS: EffectJackLayout = {
   edge: "side",
-  in: { x: 0, y: DEFAULT_JACK_Y },
-  out: { x: 1, y: DEFAULT_JACK_Y },
+  in: { x: 1, y: DEFAULT_JACK_Y },
+  out: { x: 0, y: DEFAULT_JACK_Y },
 };
 
 /** The side-mounted pair at the height this particular enclosure wears them. */
@@ -430,7 +444,7 @@ const sideJacksFor = (imageId?: number | string): EffectJackLayout => {
   const y = (imageId !== undefined && EFFECT_JACK_Y[imageId]) || DEFAULT_JACK_Y;
   return y === DEFAULT_JACK_Y
     ? SIDE_JACKS
-    : { edge: "side", in: { x: 0, y }, out: { x: 1, y } };
+    : { edge: "side", in: { x: 1, y }, out: { x: 0, y } };
 };
 
 /** Resolves a pedalboard placement to where its pedal's sockets are. */

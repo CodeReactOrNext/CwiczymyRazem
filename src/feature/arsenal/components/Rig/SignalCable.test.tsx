@@ -42,14 +42,16 @@ const TOP_JACKS: EffectJackLayout = {
 
 const toViewY = (yPct: number) => (yPct / 100) * 70;
 
-/** A row of pedals, `gap` board percent apart. */
+/** A row of pedals, `gap` board percent apart, laid the way the signal runs:
+ *  the first is hard against the input jack on the right, and the chain walks
+ *  leftwards from there. */
 const row = (yPct: number, count: number, gap = 1.5): ChainNode[] =>
   Array.from({ length: count }, (_, i) => ({
     itemId: `${yPct}-${i}`,
     name: `pedal ${i}`,
     type: "overdrive" as ChainNode["type"],
     stage: i,
-    xPct: 3 + i * (W + gap),
+    xPct: 100 - 3 - W - i * (W + gap),
     yPct,
   }));
 
@@ -179,9 +181,29 @@ describe("SignalCable", () => {
     // The board's own sockets are drawn at life size by `BoardJack` and show
     // only the cable going in, so nothing is plugged into them here.
     expect(parts).toHaveLength(nodes.length * 2);
-    // A pedal's input faces into the enclosure; its output faces back out.
-    expect(parts[0]).not.toContain("scale(-1 1)");
-    expect(parts[1]).toContain("scale(-1 1)");
+    // The input is on the right face, so its plug is the mirrored one; the
+    // output on the left face takes the plug as it is drawn.
+    expect(parts[0]).toContain("scale(-1 1)");
+    expect(parts[1]).not.toContain("scale(-1 1)");
+  });
+
+  it("wires the board right to left, into the faces the artwork prints", () => {
+    const nodes = row(ROW_Y_PCT[0], 3, 6);
+    const { runs } = draw(nodes);
+
+    // Every run travels leftwards — the feed out of the input jack, each link
+    // between two pedals, and the last hop down to the amp.
+    runs.forEach((d) => {
+      const points = pointsOf(d);
+      expect(points[points.length - 1].x).toBeLessThan(points[0].x);
+    });
+
+    // …and a link leaves the left face of one enclosure to arrive at the right
+    // face of the next, which is the side each socket is silkscreened on.
+    const link = pointsOf(runs[1]);
+    const toView = (xPct: number) => (xPct / 100) * 160;
+    expect(link[0].x).toBeCloseTo(toView(nodes[0].xPct), 1);
+    expect(link[link.length - 1].x).toBeCloseTo(toView(nodes[1].xPct + W), 1);
   });
 
   it("drops the verdict colours on a read-only board", () => {
@@ -256,8 +278,9 @@ describe("SignalCable", () => {
   it("leaves the boot straight before the cable starts to hang", () => {
     const link = pointsOf(draw(row(ROW_Y_PCT[0], 2, 10)).runs[1]);
 
-    // The run holds the socket's own height until it is clear of the plug.
+    // The run holds the socket's own height until it is clear of the plug,
+    // travelling leftwards towards the pedal it feeds.
     expect(link[1].y).toBe(link[0].y);
-    expect(link[1].x - link[0].x).toBeGreaterThan(2.65);
+    expect(link[0].x - link[1].x).toBeGreaterThan(2.65);
   });
 });

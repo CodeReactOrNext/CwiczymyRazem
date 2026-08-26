@@ -9,12 +9,13 @@
  *
  * Three decisions worth spelling out:
  *
- *  • **The board is read the way it is looked at.** Chain order is
- *    `inChainOrder`: top row left to right, then bottom row left to right, from
- *    the input jack at the top left to the amp jack at the bottom right. It is
- *    the same order `tidyBoard` packs in, so straightening the board can never
- *    silently rewire it, and the same order the trait conditions compare
- *    positions in.
+ *  • **The board is wired the way a pedal is built.** Every enclosure takes its
+ *    input on the right face and hands its output out of the left, so a chain of
+ *    them runs right to left. Chain order is `inChainOrder`: top row right to
+ *    left, then bottom row right to left, from the input jack at the top right
+ *    to the amp jack at the bottom left. It is the same order `tidyBoard` packs
+ *    in, so straightening the board can never silently rewire it, and the same
+ *    order the trait conditions compare positions in.
  *
  *  • **Stages, not a permutation.** Every effect type belongs to a stage, and
  *    the chain is right when the stages never run backwards. Two Overdrives in

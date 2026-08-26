@@ -17,9 +17,10 @@ import {
  * The whole point of the signal-path system is that a player should not have to
  * read a number to know whether the board is wired properly — they should see
  * it. So the cable is a real object on the surface: it leaves the input jack,
- * runs into the left side of the first pedal, out of its right side, and on to
+ * runs into the right side of the first pedal, out of its left side, and on to
  * the amp, sagging between pedals and taking the long way round when it has to
- * change row.
+ * change row. Right to left, because that is the side of the enclosure each
+ * socket is actually printed on.
  *
  * Every run is coloured on its own. A cable into the pedal that belongs next
  * glows emerald; one running backwards through the chain is red, which is what
@@ -35,10 +36,10 @@ import {
  */
 
 /** Where the cable comes in from the guitar, in board percent. */
-export const INPUT_JACK = { xPct: 2.2, yPct: 7 };
+export const INPUT_JACK = { xPct: 97.8, yPct: 7 };
 
 /** …and where it leaves for the amp. */
-export const OUTPUT_JACK = { xPct: 97.8, yPct: 93 };
+export const OUTPUT_JACK = { xPct: 2.2, yPct: 93 };
 
 /** Copper, the same on both jacks — the board's own accent. */
 const JACK_COPPER = "#b45309";
@@ -81,10 +82,11 @@ interface BoardJackProps {
  *
  * Anchored to the very constants the cable draws from, and in board percent
  * rather than pixels, so the cable meets the socket at every board size instead
- * of near it. The input sits at the top left and the output at the bottom right
- * because that is the order the board is read in: the signal starts where the
- * eye does — which is also why neither is labelled. A socket in the corner the
- * cable leaves from needs no word next to it.
+ * of near it. The input sits at the top right and the output at the bottom left
+ * because that is how a pedal is built — input on the right face, output on the
+ * left — so a chain of them travels leftwards. Which is also why neither is
+ * labelled: a socket in the corner the cable leaves from needs no word next to
+ * it.
  */
 export const BoardJack = ({ kind }: BoardJackProps) => {
   const anchor = kind === "in" ? INPUT_JACK : OUTPUT_JACK;
@@ -365,7 +367,7 @@ const laneTurn = (socket: Anchor, other: Anchor): number => {
  * be laid out in.
  */
 const feedRun = (jack: Point, into: Anchor): string => {
-  const lane = Math.max(EDGE_LANE, Math.min(jack.x, into.outer) - 2.4);
+  const lane = Math.min(VIEW_W - EDGE_LANE, Math.max(jack.x, into.outer) + 2.4);
   return into.fromTop
     ? routed([
         jack,
@@ -378,7 +380,7 @@ const feedRun = (jack: Point, into: Anchor): string => {
 
 /** Last pedal to the amp: out to the far lane at socket height, then down. */
 const exitRun = (from: Anchor, jack: Point): string => {
-  const lane = Math.min(VIEW_W - EDGE_LANE, Math.max(from.outer, jack.x) + 2.4);
+  const lane = Math.max(EDGE_LANE, Math.min(from.outer, jack.x) - 2.4);
   return from.fromTop
     ? routed([
         from.at,
@@ -400,10 +402,13 @@ const exitRun = (from: Anchor, jack: Point): string => {
  * through the enclosure sideways.
  */
 const hopRun = (a: Point, b: Point, reach: number): string => {
-  const span = b.x - a.x;
+  const span = Math.abs(b.x - a.x);
+  // The run travels leftwards, so every step along it is measured against the
+  // way it is going rather than against the board's own x.
+  const along = Math.sign(b.x - a.x) || 1;
   const lead = Math.min(reach + 0.9, span * 0.34);
-  const from = { x: a.x + lead, y: a.y };
-  const to = { x: b.x - lead, y: b.y };
+  const from = { x: a.x + lead * along, y: a.y };
+  const to = { x: b.x - lead * along, y: b.y };
   const sag = Math.min(4.5, 1.2 + span * 0.1);
   const belly = { x: (from.x + to.x) / 2, y: Math.max(a.y, b.y) + sag };
 
@@ -450,29 +455,31 @@ const overRun = (a: Anchor, b: Anchor): string => {
  *
  * Left to a plain curve it cuts a diagonal clean across the middle of the board,
  * which is the one thing no real board has ever looked like. So it takes the
- * detour a real one takes: out to the side rail, down into the channel between
- * the two rows, along it with a shallow dip, and back up into the next row's
- * first pedal. The channel is measured off the pedals themselves rather than off
- * the row constants, so a row dragged out of line still gets a cable that runs
- * between the pedals instead of under them.
+ * detour a real one takes: out to the side rail the row ends at — the left one,
+ * since the signal travels leftwards — down into the channel between the two
+ * rows, along it with a shallow dip, and back up the right rail into the next
+ * row's first pedal. The channel is measured off the pedals themselves rather
+ * than off the row constants, so a row dragged out of line still gets a cable
+ * that runs between the pedals instead of under them.
  */
 const returnRun = (a: Anchor, b: Anchor): string => {
   const from = a.fromTop ? clearOf(a) : a.at;
   const to = b.fromTop ? clearOf(b) : b.at;
   const channel = (a.edgeBottom + b.edgeTop) / 2;
-  const right = Math.min(from.x + TURN, VIEW_W - EDGE_LANE);
-  const left = Math.max(to.x - TURN, EDGE_LANE);
+  /** The rail the row runs out to, and the one the next row is entered from. */
+  const exitLane = Math.max(from.x - TURN, EDGE_LANE);
+  const entryLane = Math.min(to.x + TURN, VIEW_W - EDGE_LANE);
 
   return routed([
     a.at,
     ...(a.fromTop ? riseOf(a) : []),
-    { x: right, y: from.y },
-    { x: right, y: channel },
+    { x: exitLane, y: from.y },
+    { x: exitLane, y: channel },
     // A long run of cable never lies flat. One shallow dip, kept clear of the
     // row below it, is the difference between a cable and a drawn line.
-    { x: (right + left) / 2, y: channel + 1.2 },
-    { x: left, y: channel },
-    { x: left, y: to.y },
+    { x: (exitLane + entryLane) / 2, y: channel + 1.2 },
+    { x: entryLane, y: channel },
+    { x: entryLane, y: to.y },
     ...(b.fromTop ? riseOf(b).reverse() : []),
     b.at,
   ]);
@@ -486,8 +493,11 @@ const returnRun = (a: Anchor, b: Anchor): string => {
 const looseRun = (a: Point, b: Point): string => {
   const reach = Math.max(9, Math.min(Math.abs(b.x - a.x) * 0.45, 26));
   const bow = a.y < VIEW_H / 2 ? -6 : 6;
-  return `M ${at(a)} C ${at({ x: a.x + reach, y: a.y + bow })} ${at({
-    x: b.x - reach,
+  // Both ends reach *away* from the other, which is what throws the loop out
+  // past the pedals instead of pulling it into a straight line between them.
+  const away = Math.sign(a.x - b.x) || 1;
+  return `M ${at(a)} C ${at({ x: a.x + reach * away, y: a.y + bow })} ${at({
+    x: b.x - reach * away,
     y: b.y + bow,
   })} ${at(b)}`;
 };
@@ -498,7 +508,8 @@ const linkRun = (a: Anchor, b: Anchor, reach: number): string => {
     return b.row > a.row ? returnRun(a, b) : looseRun(a.at, b.at);
   }
   if (a.fromTop || b.fromTop) return overRun(a, b);
-  return b.at.x > a.at.x ? hopRun(a.at, b.at, reach) : looseRun(a.at, b.at);
+  // Leftwards is forwards. A run heading the other way is doubling back.
+  return b.at.x < a.at.x ? hopRun(a.at, b.at, reach) : looseRun(a.at, b.at);
 };
 
 const TONES = {
@@ -522,7 +533,7 @@ interface CableRun {
 
 interface PlugProps {
   at: Point;
-  /** 0 into a left face, 180 out of a right one, 90 down into a top edge. */
+  /** 0 into a left face, 180 into a right one, 90 down into a top edge. */
   spin: 0 | 90 | 180;
   /** Paint for the nickel parts, already turned to suit `spin`. */
   metal: string;
@@ -552,10 +563,10 @@ interface PlugProps {
  * its size whatever happens — girth is what says quarter-inch — so it is the
  * boot that gives up the room.
  *
- * A plug facing left is mirrored rather than rotated, because a rotated one
- * would carry its highlight round with it and end up lit from underneath. One
- * facing down has to be turned, so it is handed a gradient already laid the
- * other way to come out top-lit anyway.
+ * A plug standing in a right-hand face is mirrored rather than rotated, because
+ * a rotated one would carry its highlight round with it and end up lit from
+ * underneath. One facing down has to be turned, so it is handed a gradient
+ * already laid the other way to come out top-lit anyway.
  */
 const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
   const turn = spin === 180 ? " scale(-1 1)" : spin === 90 ? " rotate(90)" : "";
@@ -641,7 +652,10 @@ interface CouplerProps {
  * link says exactly what every other link says.
  */
 const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
-  const span = Math.max(0, to.x - from.x);
+  // The pair arrives in signal order, which runs right to left, so the barrel
+  // is laid from whichever of the two sockets is the leftmost.
+  const start = from.x <= to.x ? from : to;
+  const span = Math.abs(to.x - from.x);
   /** Barrel and rings, at the gauge the plugs it stands in for are drawn to. */
   const ring = HANDLE_H / 2;
   const barrel = BOOT_H / 2;
@@ -650,7 +664,7 @@ const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
   const slot = JACKET_W / 4;
 
   return (
-    <g transform={`translate(${at(from)})`}>
+    <g transform={`translate(${at(start)})`}>
       <ellipse
         cx={span / 2}
         cy={ring + 0.55}
@@ -785,7 +799,7 @@ export const SignalCable = ({
       lane: Math.max(1.5, edgeTop - TOP_LANE),
       edgeTop,
       edgeBottom: ((node.yPct + PEDAL_H_PCT) / 100) * VIEW_H,
-      outer: ((which === "in" ? node.xPct : node.xPct + width) / 100) * VIEW_W,
+      outer: ((which === "in" ? node.xPct + width : node.xPct) / 100) * VIEW_W,
       row: rowIndexOf(node.yPct),
     };
   };
@@ -797,7 +811,8 @@ export const SignalCable = ({
   const between = drawn.slice(1).map((entry, offset) => {
     const a = anchorAt(offset, "out");
     const b = anchorAt(offset + 1, "in");
-    const gap = b.outer - a.outer;
+    // The next pedal stands to the left, so the gap opens up the other way.
+    const gap = a.outer - b.outer;
 
     const facing = a.row === b.row && !a.fromTop && !b.fromTop && gap > 0;
 
@@ -848,7 +863,7 @@ export const SignalCable = ({
         ? [
             {
               at: inAnchor.at,
-              spin: (inAnchor.fromTop ? 90 : 0) as 0 | 90,
+              spin: (inAnchor.fromTop ? 90 : 180) as 90 | 180,
               reach: inAnchor.fromTop
                 ? topReach(inAnchor)
                 : (before?.reach ?? PLUG_REACH),
@@ -859,7 +874,7 @@ export const SignalCable = ({
         ? [
             {
               at: outAnchor.at,
-              spin: (outAnchor.fromTop ? 90 : 180) as 90 | 180,
+              spin: (outAnchor.fromTop ? 90 : 0) as 0 | 90,
               reach: outAnchor.fromTop
                 ? topReach(outAnchor)
                 : (after?.reach ?? PLUG_REACH),
