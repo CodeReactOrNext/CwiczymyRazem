@@ -125,13 +125,21 @@ export const EarTrainingLeaderboardDialog = ({
                       {entry.displayName || "Anonymous"}
                     </span>
 
-                    {/* Score */}
-                    <span className={cn(
-                      "shrink-0 text-lg font-bold tabular-nums",
-                      isCurrentUser ? "text-cyan-400" : "text-white"
-                    )}>
-                      {entry.score}
-                    </span>
+                    {/* Score, and the tempo it was set at — older entries and
+                        metronome-less exercises simply have no tempo to show. */}
+                    <div className="shrink-0 text-right">
+                      <span className={cn(
+                        "block text-lg font-bold tabular-nums",
+                        isCurrentUser ? "text-cyan-400" : "text-white"
+                      )}>
+                        {entry.score}
+                      </span>
+                      {entry.bpm != null && (
+                        <span className="text-[11px] font-semibold tabular-nums text-zinc-500">
+                          {entry.bpm} BPM
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}

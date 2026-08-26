@@ -136,10 +136,13 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       }
       if (log.exerciseRecords?.micHighScore) {
         const r = log.exerciseRecords.micHighScore;
+        // The record was set by this session's run, so that run's tempo and place are its own.
+        const atBpm = log.micPerformance?.bpm ? ` @ ${log.micPerformance.bpm} BPM` : "";
+        const place = log.micPerformance?.rank ? ` · #${log.micPerformance.rank}` : "";
         recordLines.push(
           isEn
-            ? `🎤 New mic high score on **${r.exerciseTitle}**: ${r.score} pts (${r.accuracy}%)`
-            : `🎤 Nowy rekord mic w **${r.exerciseTitle}**: ${r.score} pkt (${r.accuracy}%)`
+            ? `🎤 New mic high score on **${r.exerciseTitle}**: ${r.score} pts (${r.accuracy}%)${atBpm}${place}`
+            : `🎤 Nowy rekord mic w **${r.exerciseTitle}**: ${r.score} pkt (${r.accuracy}%)${atBpm}${place}`
         );
       }
       if (log.exerciseRecords?.earTrainingHighScore) {
@@ -166,17 +169,20 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       const hasEtRecord = !!log.exerciseRecords?.earTrainingHighScore;
 
       if (log.micPerformance && !hasMicRecord) {
+        const atBpm = log.micPerformance.bpm ? ` @ ${log.micPerformance.bpm} BPM` : "";
+        const place = log.micPerformance.rank ? ` · #${log.micPerformance.rank}` : "";
         performanceLines.push(
           isEn
-            ? `🎤 Mic: **${log.micPerformance.score}** pts (${log.micPerformance.accuracy}%)`
-            : `🎤 Mic: **${log.micPerformance.score}** pkt (${log.micPerformance.accuracy}%)`
+            ? `🎤 Mic: **${log.micPerformance.score}** pts (${log.micPerformance.accuracy}%)${atBpm}${place}`
+            : `🎤 Mic: **${log.micPerformance.score}** pkt (${log.micPerformance.accuracy}%)${atBpm}${place}`
         );
       }
       if (log.earTrainingPerformance && !hasEtRecord) {
+        const place = log.earTrainingPerformance.rank ? ` · #${log.earTrainingPerformance.rank}` : "";
         performanceLines.push(
           isEn
-            ? `🎧 Ear training: **${log.earTrainingPerformance.score}** correct`
-            : `🎧 Ear training: **${log.earTrainingPerformance.score}** poprawnych`
+            ? `🎧 Ear training: **${log.earTrainingPerformance.score}** correct${place}`
+            : `🎧 Ear training: **${log.earTrainingPerformance.score}** poprawnych${place}`
         );
       }
 

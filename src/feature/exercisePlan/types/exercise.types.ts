@@ -292,4 +292,6 @@ export interface ScoredRun {
   scoreType: ExerciseScoreType;
   /** The player's record on this exercise before the session touched it; 0 on a first run. */
   previousBest: number;
+  /** Tempo the run was played at; absent on exercises without a metronome. */
+  bpm?: number;
 }

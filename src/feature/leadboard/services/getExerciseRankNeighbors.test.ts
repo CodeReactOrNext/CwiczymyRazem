@@ -22,9 +22,9 @@ vi.mock("utils/cache/memoryCache", () => ({
   memoryCache: { get: vi.fn(() => null), set: vi.fn() },
 }));
 
-const entry = (id: string, score: number) => ({
+const entry = (id: string, score: number, bpm?: number) => ({
   id,
-  data: () => ({ score, displayName: id, avatar: `${id}.png` }),
+  data: () => ({ score, displayName: id, avatar: `${id}.png`, ...(bpm ? { bpm } : {}) }),
 });
 
 const mockCounts = ({ above, total }: { above: number; total: number }) => {
@@ -108,6 +108,18 @@ describe("getExerciseRankNeighbors", () => {
 
     expect(neighbors?.rank).toBe(1);
     expect(neighbors?.above).toEqual([]);
+  });
+
+  it("carries the tempo each standing score was set at", async () => {
+    mockCounts({ above: 1, total: 5 });
+    // The player below set their score before tempo was recorded.
+    mockNeighbors([entry("kasia", 31_490, 120)], [entry("bartek", 18_002)]);
+    mockOwnEntry(21_375);
+
+    const neighbors = await getExerciseRankNeighbors("ex1", 21_375, "me");
+
+    expect(neighbors?.above[0].bpm).toBe(120);
+    expect(neighbors?.below[0].bpm).toBeUndefined();
   });
 
   it("skips the leaderboard round-trip for an unscored run", async () => {

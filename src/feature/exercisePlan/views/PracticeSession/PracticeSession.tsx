@@ -577,8 +577,12 @@ export const PracticeSession = ({
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
-  const { saveCurrentScores, exerciseRecordsRef, scoredRuns } = useScoreSaving({
+  // `micStandingRef`/`earTrainingStandingRef` carry the tempo and leaderboard
+  // place of the run that was just saved — every finish path below awaits
+  // saveCurrentScores() first, so they are filled by the time the report goes out.
+  const { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef } = useScoreSaving({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
+    sessionBpm: effectiveBpm,
   });
 
   // Exam mode, hunt exercises only (customGoal set — there's no tablature to
@@ -597,7 +601,7 @@ export const PracticeSession = ({
       await saveCurrentScores();
       autoSubmitReport(
         exerciseRecordsRef.current,
-        hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
+        hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
         null,
       );
       onExamComplete?.(snap?.accuracy ?? 0);
@@ -622,7 +626,7 @@ export const PracticeSession = ({
     // "skip to the end and pass" dev shortcut, not a snapshot of real play.
     autoSubmitReport(
       exerciseRecordsRef.current,
-      hasTrackedPerformance && snap ? { score: snap.maxPossibleScore, accuracy: 100 } : null,
+      hasTrackedPerformance && snap ? { score: snap.maxPossibleScore, accuracy: 100, ...micStandingRef.current } : null,
       null,
     );
     onExamComplete?.(100);
@@ -810,8 +814,12 @@ export const PracticeSession = ({
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              hasTrackedPerformance && !isEarTrainingRiddle ? { score: examMistakeFailed ? 0 : successSnapshot.score, accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy } : null,
-              isEarTrainingRiddle ? { score: earTrainingScore } : null);
+              !hasTrackedPerformance || isEarTrainingRiddle
+                ? null
+                : examMistakeFailed
+                  ? { score: 0, accuracy: 0 }
+                  : { score: successSnapshot.score, accuracy: successSnapshot.accuracy, ...micStandingRef.current },
+              isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null);
             if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy);
           }}
           onRestart={examMistakeFailed ? undefined : () => {
@@ -835,8 +843,8 @@ export const PracticeSession = ({
             const snap = noteMatchingHandle.current?.snapshot();
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
-              hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
-              isEarTrainingRiddle ? { score: earTrainingScore } : null);
+              hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
+              isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null);
             if (isExamMode && snap) onExamComplete?.(snap.accuracy);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}

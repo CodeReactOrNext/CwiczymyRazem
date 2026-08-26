@@ -45,8 +45,8 @@ export interface ReportFormikInterface {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
     earTrainingHighScore?: { exerciseTitle: string; score: number };
   };
-  micPerformance?: { score: number; accuracy: number };
-  earTrainingPerformance?: { score: number };
+  micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number };
+  earTrainingPerformance?: { score: number; rank?: number };
   clientTodayISO?: string;
   clientNowISO?: string;
   clientDisplayStreak?: number;

@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import type { Recording } from "feature/recordings/types/types";
-import { Loader2 } from "lucide-react";
+import { Video } from "lucide-react";
 
 import { RecordingCard } from "./RecordingCard";
 
@@ -13,6 +14,26 @@ interface RecordingsGridProps {
   setPage: (page: number) => void;
 }
 
+const GRID_CLASS =
+  "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
+/** Mirrors RecordingCard's shape so the grid keeps its geometry while loading. */
+const RecordingCardSkeleton = () => (
+  <div className='flex flex-col overflow-hidden rounded-lg bg-zinc-900/40'>
+    <Skeleton className='aspect-video w-full rounded-none' />
+    <div className='flex flex-col gap-3 p-4'>
+      <Skeleton className='h-[2.75rem] w-full rounded' />
+      <Skeleton className='h-[28px] w-2/3 rounded' />
+      <Skeleton className='h-[2.5rem] w-full rounded' />
+      <div className='flex items-center gap-2 pt-1'>
+        <Skeleton className='h-8 w-8 rounded-full' />
+        <Skeleton className='h-3 w-28 rounded' />
+      </div>
+    </div>
+    <div className='h-11 bg-zinc-800/30' />
+  </div>
+);
+
 export const RecordingsGrid = ({
   recordings,
   onViewRecording,
@@ -21,55 +42,60 @@ export const RecordingsGrid = ({
   totalPages,
   setPage,
 }: RecordingsGridProps) => {
-
   if (isLoading && recordings.length === 0) {
-      // Skeleton loading could go here
-      return <div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-cyan-500" /></div>;
+    return (
+      <div className={GRID_CLASS}>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <RecordingCardSkeleton key={i} />
+        ))}
+      </div>
+    );
   }
 
   if (recordings.length === 0) {
-      return (
-          <div className="text-center py-20 text-zinc-500">
-              <h3 className="text-xl font-bold text-white mb-2">No recordings found</h3>
-              <p>Be the first to upload your cover!</p>
-          </div>
-      );
+    return (
+      <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
+        <Video className='h-8 w-8 text-zinc-500' />
+        <h3 className='text-lg font-bold text-zinc-100'>No recordings found</h3>
+        <p className='text-sm text-zinc-400'>
+          Be the first to upload your cover!
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className='flex flex-col gap-10'>
+      <div className={GRID_CLASS}>
         {recordings.map((recording) => (
-          <RecordingCard 
-             key={recording.id} 
-             recording={recording} 
-             onView={() => onViewRecording(recording.id)}
+          <RecordingCard
+            key={recording.id}
+            recording={recording}
+            onView={() => onViewRecording(recording.id)}
           />
         ))}
       </div>
 
       {totalPages > 1 && (
-         <div className="flex justify-center gap-2 mt-8">
-            <Button
-                variant="outline"
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-                className="border-white/10 bg-zinc-900 text-white hover:bg-zinc-800"
-            >
-                Previous
-            </Button>
-            <span className="flex items-center px-4 font-bold text-zinc-500">
-                Page {page} of {totalPages}
-            </span>
-             <Button
-                variant="outline"
-                disabled={page >= totalPages}
-                onClick={() => setPage(page + 1)}
-                className="border-white/10 bg-zinc-900 text-white hover:bg-zinc-800"
-            >
-                Next
-            </Button>
-         </div>
+        <div className='flex items-center justify-center gap-2'>
+          <Button
+            variant='ghost'
+            disabled={page <= 1}
+            onClick={() => setPage(page - 1)}
+            className='bg-zinc-900/60 text-zinc-200 hover:bg-zinc-800'>
+            Previous
+          </Button>
+          <span className='px-4 text-sm font-medium text-zinc-400'>
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant='ghost'
+            disabled={page >= totalPages}
+            onClick={() => setPage(page + 1)}
+            className='bg-zinc-900/60 text-zinc-200 hover:bg-zinc-800'>
+            Next
+          </Button>
+        </div>
       )}
     </div>
   );
