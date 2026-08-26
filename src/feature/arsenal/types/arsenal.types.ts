@@ -22,7 +22,8 @@ export type EffectType =
  *
  * Positions are fractions of the pedal's own box, `0,0` being its top-left
  * corner, which keeps them true at any board size. `side` is the ordinary
- * enclosure — in on the left face, out on the right — and needs no coordinates.
+ * enclosure — in on the right face, out on the left, the way the sockets are
+ * silkscreened on a real one — and needs no coordinates.
  * `top` covers the pedals whose sockets are silkscreened along the top edge,
  * where the cable has to come up and over instead of straight across.
  */

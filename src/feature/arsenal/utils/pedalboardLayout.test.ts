@@ -24,6 +24,9 @@ import {
 /** A plain single pedal is roughly this wide on the board. */
 const W = 15;
 
+/** Where the first pedal of a row lands: hard against the input jack's corner. */
+const HEAD_X = 100 - 3 - W;
+
 const widthOf: WidthResolver = () => W;
 const wideAt =
   (wide: string[], wideW = 28): WidthResolver =>
@@ -54,14 +57,18 @@ const hasOverlap = (
 };
 
 describe("findFreeSpot", () => {
-  it("puts the first pedal at the start of the top row", () => {
-    expect(findFreeSpot([], W)).toEqual({ xPct: 3, yPct: ROW_Y_PCT[0] });
+  it("puts the first pedal at the head of the top row, on the right", () => {
+    expect(findFreeSpot([], W)).toEqual({ xPct: HEAD_X, yPct: ROW_Y_PCT[0] });
   });
 
   it("leaves a gap instead of butting the next pedal against it", () => {
-    const spot = findFreeSpot([{ xPct: 3, yPct: ROW_Y_PCT[0], wPct: W }], W);
+    const spot = findFreeSpot(
+      [{ xPct: HEAD_X, yPct: ROW_Y_PCT[0], wPct: W }],
+      W,
+    );
     expect(spot?.yPct).toBe(ROW_Y_PCT[0]);
-    expect(spot?.xPct).toBeGreaterThan(3 + W);
+    // The next pedal down the chain stands to the left of the first, clear of it.
+    expect((spot?.xPct ?? 0) + W).toBeLessThan(HEAD_X);
   });
 
   it("drops to the second row once the first one is full", () => {
@@ -153,7 +160,7 @@ describe("layoutBoard", () => {
 });
 
 describe("inChainOrder", () => {
-  it("reads the top row before the bottom one, each left to right", () => {
+  it("reads the top row before the bottom one, each right to left", () => {
     const items = [
       at("bottom-right", 70, ROW_Y_PCT[1]),
       at("top-right", 70, ROW_Y_PCT[0]),
@@ -162,10 +169,10 @@ describe("inChainOrder", () => {
     ];
 
     expect(inChainOrder(items).map((i) => i.itemId)).toEqual([
-      "top-left",
       "top-right",
-      "bottom-left",
+      "top-left",
       "bottom-right",
+      "bottom-left",
     ]);
   });
 
@@ -186,7 +193,8 @@ describe("packInOrder", () => {
     const layout = packInOrder(items, widthOf);
 
     expect(layout.placed.map((i) => i.itemId)).toEqual(["second", "first"]);
-    expect(layout.placed[0].xPct).toBeLessThan(layout.placed[1].xPct);
+    // First in the handed order stands nearest the input jack, so furthest right.
+    expect(layout.placed[0].xPct).toBeGreaterThan(layout.placed[1].xPct);
     expect(layout.placed.every((i) => i.yPct === ROW_Y_PCT[0])).toBe(true);
   });
 
@@ -207,11 +215,14 @@ describe("tidyBoard", () => {
     const items = [at("a", 70, ROW_Y_PCT[1]), at("b", 3, ROW_Y_PCT[0])];
     const layout = tidyBoard(items, widthOf);
 
-    // Reading order puts the top-row pedal first, so it stays leftmost.
+    // Signal order puts the top-row pedal first, so it stays rightmost.
     expect(layout.placed[0].itemId).toBe("b");
-    expect(layout.placed[0]).toMatchObject({ xPct: 3, yPct: ROW_Y_PCT[0] });
+    expect(layout.placed[0]).toMatchObject({
+      xPct: HEAD_X,
+      yPct: ROW_Y_PCT[0],
+    });
     expect(layout.placed[1].yPct).toBe(ROW_Y_PCT[0]);
-    expect(layout.placed[1].xPct).toBeGreaterThan(3 + W);
+    expect(layout.placed[1].xPct + W).toBeLessThan(HEAD_X);
   });
 
   it("never leaves two pedals touching", () => {
@@ -334,8 +345,8 @@ describe("createJackResolver", () => {
     const resolve = createJackResolver([owned("echo", 1)]);
     const jacks = resolve("echo");
 
-    expect(jacks.in.x).toBe(0);
-    expect(jacks.out.x).toBe(1);
+    expect(jacks.in.x).toBe(1);
+    expect(jacks.out.x).toBe(0);
     expect(jacks.in.y).toBe(EFFECT_JACK_Y[1]);
   });
 

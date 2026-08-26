@@ -115,9 +115,9 @@ export type TraitCondition =
   /** A drive pedal other than this one shares the board. */
   | { type: "board-second-drive" }
   | { type: "board-rarity"; minRarity: GuitarRarity; min: number }
-  /** This pedal sits left of every drive. */
+  /** This pedal sits ahead of every drive in the chain. */
   | { type: "chain-before-drives" }
-  /** This pedal sits right of every drive. */
+  /** This pedal sits behind every drive in the chain. */
   | { type: "chain-after-drives" }
   | { type: "only-guitar" }
   | { type: "guitar-slots"; count: number }
@@ -150,8 +150,8 @@ export type TraitAmp =
   | { type: "other-pedals" }
   | { type: "category-traits"; categories: PracticeCategory[] }
   | { type: "skill-traits" }
-  /** Pedals further right in the chain than this one. */
-  | { type: "pedals-right" }
+  /** Pedals further down the chain than this one. */
+  | { type: "pedals-downstream" }
   /** Traits on items sharing this item's brand. */
   | { type: "same-brand" }
   /** The single highest-paying trait in the rig. */
@@ -666,7 +666,7 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     id: "front-of-chain",
     label: "Front of Chain",
     description:
-      "Fame/h while this pedal sits to the left of every drive on the board. Fuzz and compression want the raw pickup.",
+      "Fame/h while this pedal sits ahead of every drive on the board. Fuzz and compression want the raw pickup.",
     kind: "effect",
     appliesTo: ["Fuzz"],
     clock: "session",
@@ -678,7 +678,7 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     id: "tail-of-chain",
     label: "Tail of Chain",
     description:
-      "Fame/h while this pedal sits to the right of every drive on the board. Time effects go last or it turns to mud.",
+      "Fame/h while this pedal sits behind every drive on the board. Time effects go last or it turns to mud.",
     kind: "effect",
     appliesTo: ["Delay", "Reverb"],
     clock: "session",
@@ -1139,10 +1139,10 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     id: "patchbay",
     label: "Patchbay",
     description:
-      "Every pedal to the right of this one pays this much more Fame/h on each of its traits.",
+      "Every pedal further down the chain than this one pays this much more Fame/h on each of its traits.",
     kind: "effect",
     clock: "session",
-    amp: { type: "pedals-right" },
+    amp: { type: "pedals-downstream" },
     min: 1.5,
     max: 3,
   },

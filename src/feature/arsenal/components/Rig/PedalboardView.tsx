@@ -578,8 +578,9 @@ export const PedalboardView = ({
             transition: "box-shadow 0.4s ease",
             cursor: dragging ? "grabbing" : "default",
           }}>
-          {/* The signal runs the way the board is read: in at the top left,
-              out at the bottom right. */}
+          {/* The signal runs the way a pedal is built — input on the right
+              face, output on the left — so it comes in at the top right and
+              leaves for the amp at the bottom left. */}
           <BoardJack kind='in' />
           <BoardJack kind='out' />
 

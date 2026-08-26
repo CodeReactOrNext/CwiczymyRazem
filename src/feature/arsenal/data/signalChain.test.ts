@@ -42,7 +42,7 @@ const firstEffectOfType = (type: EffectType) => {
 };
 
 /**
- * Builds a board out of effect types, laid left to right along the top row —
+ * Builds a board out of effect types, laid right to left along the top row —
  * so the array order is the signal order.
  */
 const board = (types: EffectType[]) => {
@@ -54,7 +54,7 @@ const board = (types: EffectType[]) => {
   }));
   const items = types.map((_, index) => ({
     itemId: `item-${index}`,
-    xPct: 3 + index * 10,
+    xPct: 87 - index * 10,
     yPct: ROW_Y_PCT[0],
   }));
   return { items, effectInventory };
@@ -127,7 +127,7 @@ describe("SIGNAL_STAGES", () => {
 });
 
 describe("readChainNodes", () => {
-  it("reads the top row before the bottom one, each left to right", () => {
+  it("reads the top row before the bottom one, each right to left", () => {
     const effectInventory = [
       { id: "a", effectId: firstEffectOfType("Tuner").id, acquiredAt: 0, isNew: false },
       { id: "b", effectId: firstEffectOfType("Delay").id, acquiredAt: 0, isNew: false },
@@ -136,8 +136,8 @@ describe("readChainNodes", () => {
     // Stored in the wrong order on purpose: position decides the chain, not the array.
     const items = [
       { itemId: "c", xPct: 40, yPct: ROW_Y_PCT[1] },
-      { itemId: "b", xPct: 60, yPct: ROW_Y_PCT[0] },
-      { itemId: "a", xPct: 5, yPct: ROW_Y_PCT[0] },
+      { itemId: "b", xPct: 20, yPct: ROW_Y_PCT[0] },
+      { itemId: "a", xPct: 80, yPct: ROW_Y_PCT[0] },
     ];
 
     expect(readChainNodes(items, effectInventory).map((n) => n.itemId)).toEqual([
@@ -292,10 +292,10 @@ describe("wiredOrder", () => {
     ]);
 
     const wired = wiredOrder(items, effectInventory);
-    // Re-laid left to right in the returned order, the chain is flawless.
+    // Re-laid right to left in the returned order, the chain is flawless.
     const relaid = wired.map((item, index) => ({
       ...item,
-      xPct: 3 + index * 10,
+      xPct: 87 - index * 10,
       yPct: ROW_Y_PCT[0],
     }));
 

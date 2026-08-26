@@ -161,9 +161,9 @@ export const buildRigTraitContext = (
     });
   }
 
-  // Chain position rather than raw x, because a two-row board is read row by
-  // row: a pedal at the far left of the bottom row comes *after* one at the far
-  // right of the top row, which comparing x alone gets backwards.
+  // Chain position rather than raw x, because a two-row board is wired row by
+  // row: a pedal at the far right of the bottom row comes *after* one at the
+  // far left of the top row, which comparing x alone gets backwards.
   const chainIndex = new Map(
     inChainOrder(arsenal.rig?.pedalboardItems ?? []).map(
       (placement, index) => [placement.itemId, index] as const,
@@ -200,11 +200,13 @@ const isDrive = (pedal: RigItem): boolean =>
   (DRIVE_TYPES as string[]).includes(pedal.effectType);
 
 /**
- * How far down the signal chain a pedal sits. Falls back to the raw board x for
- * a rig assembled without chain positions, where the two agree anyway: on a
- * single row, left to right *is* the chain.
+ * How far down the signal chain a pedal sits. Falls back to the board x read
+ * backwards for a rig assembled without chain positions, where the two agree
+ * anyway: on a single row, right to left *is* the chain — a pedal takes its
+ * input on its right face, so the one nearest the right edge is played first.
  */
-const chainPos = (pedal: RigItem): number => pedal.chain ?? pedal.x ?? 0;
+const chainPos = (pedal: RigItem): number =>
+  pedal.chain ?? (pedal.x === undefined ? 0 : 100 - pedal.x);
 
 const rarityRank = (rarity: GuitarRarity): number =>
   RARITY_LADDER.indexOf(rarity);
@@ -567,7 +569,7 @@ export const evaluateRigTraits = (
           }
           case "skill-traits":
             return usesSkills(e.def);
-          case "pedals-right": {
+          case "pedals-downstream": {
             const target = rig.pedals.find((p) => p.itemId === e.itemId);
             return !!target && chainPos(target) > chainPos(item);
           }
