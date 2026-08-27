@@ -10,13 +10,15 @@ import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/Ea
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { type BpmProgressData,getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressService";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
+import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
+import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ChevronRight, Ear, Lock,Mic, Network, Search, Star, Trophy, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect,useMemo, useRef,useState } from "react";
 import { FaCheck } from "react-icons/fa";
@@ -76,10 +78,14 @@ export const SkillDashboard = ({
   const [progressMap, setProgressMap] = useState<Map<string, BpmProgressData>>(new Map());
   const [activeDifficulty, setActiveDifficulty] = useState<string | null>(null);
 
+  // Re-read on every return from a session, not just on mount: the session is
+  // rendered by this same component, so closing it never remounts the dashboard —
+  // without this the exercise the player just finished still reads as untouched
+  // until a full page reload.
   useEffect(() => {
-    if (!userAuth) return;
+    if (!userAuth || selectedChallenge) return;
     getAllBpmProgress(userAuth).then(setProgressMap);
-  }, [userAuth]);
+  }, [userAuth, selectedChallenge]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -164,12 +170,7 @@ export const SkillDashboard = ({
       if (!map[skillId]) map[skillId] = { completed: 0, total: 0, states: [] };
       map[skillId].total += 1;
 
-      const progress = progressMap.get(exercise.id);
-      const isCompleted =
-        !!progress &&
-        ((progress.completedBpms?.length ?? 0) > 0 ||
-          (progress.micHighScore != null && progress.micHighScore > 0) ||
-          (progress.earTrainingHighScore != null && progress.earTrainingHighScore > 0));
+      const isCompleted = hasExerciseProgress(progressMap.get(exercise.id));
       map[skillId].states.push({ done: isCompleted, title: exercise.title as string });
       if (isCompleted) map[skillId].completed += 1;
     });
@@ -413,13 +414,11 @@ export const SkillDashboard = ({
                     const micHighScore = progress?.micHighScore;
                     const micAccuracy = progress?.micHighScoreAccuracy;
                     const earTrainingHighScore = progress?.earTrainingHighScore;
-                    const hasLeaderboard = bpmStages.length > 0 || !!exerciseDef?.riddleConfig || (exerciseDef?.tablature && exerciseDef.tablature.length > 0);
+                    const clickHighScore = progress?.clickHighScore;
+                    const clickAccuracy = progress?.clickHighScoreAccuracy;
+                    const hasLeaderboard = bpmStages.length > 0 || !!exerciseDef?.riddleConfig || isClickAnsweredMode(exerciseDef?.noteHuntConfig?.mode) || (exerciseDef?.tablature && exerciseDef.tablature.length > 0);
                     const sp = currentDifficulty === 'beginner' ? 0 : currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 2 : 3;
-                    const hasBeenAttempted = !!progress && (
-                      completedBpms.length > 0 ||
-                      (micHighScore != null && micHighScore > 0) ||
-                      (earTrainingHighScore != null && earTrainingHighScore > 0)
-                    );
+                    const hasBeenAttempted = hasExerciseProgress(progress);
                     const diffColor = currentDifficulty === 'beginner'
                       ? { bar: "bg-sky-500", text: "text-sky-400", badge: "bg-sky-500/10 border-sky-500/20 text-sky-400" }
                       : currentDifficulty === 'easy'
@@ -487,7 +486,7 @@ export const SkillDashboard = ({
                           )}
 
                           {/* Metrics row */}
-                          {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0) || hasLeaderboard) && (
+                          {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0) || (clickHighScore != null && clickHighScore > 0) || hasLeaderboard) && (
                             <div className="flex flex-wrap items-center gap-5 pt-4 mt-3">
                               {hasBpmProgress && (
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-zinc-300">
@@ -508,6 +507,14 @@ export const SkillDashboard = ({
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-cyan-400">
                                   <Ear className="h-4 w-4 text-cyan-400/80" />
                                   <span>{earTrainingHighScore} Pts</span>
+                                </div>
+                              )}
+
+                              {clickHighScore != null && clickHighScore > 0 && (
+                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-purple-400">
+                                  <MousePointerClick className="h-4 w-4 text-purple-400/80" />
+                                  <span>{clickHighScore.toLocaleString()} Pts</span>
+                                  {clickAccuracy != null && <span className="text-purple-400/60 font-medium">({clickAccuracy}%)</span>}
                                 </div>
                               )}
 

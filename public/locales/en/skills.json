@@ -68,8 +68,8 @@
       "description": "Develop the ability to play independent finger movements"
     },
     "phrasing": {
-      "name": "Phrasings",
-      "description": "Develop the ability to play independent finger movements"
+      "name": "Phrasing",
+      "description": "Shape lines with space, dynamics and note choice"
     },
     "articulation": {
       "name": "Articulation",
@@ -120,8 +120,8 @@
       "description": "Master the art of adding expression through string vibration"
     },
     "music_theory": {
-      "name": "Guitar Theory",
-      "description": "Deep understanding of musical concepts and composition"
+      "name": "Fretboard & Theory",
+      "description": "Know every note on the neck and the theory behind it"
     },
     "rhythm_variations": {
       "name": "Advanced Rhythm",
@@ -144,11 +144,11 @@
       "description": "Learn to record and produce guitar tracks"
     },
     "hybrid_picking": {
-      "name": "Picking Control",
+      "name": "Hybrid Picking",
       "description": "Combine pick and fingerpicking techniques"
     },
     "harmony-ear": {
-      "name": "Harmony",
+      "name": "Harmony by Ear",
       "description": "Develop the ability to recognize chords and progressions by ear"
     },
     "chords": {

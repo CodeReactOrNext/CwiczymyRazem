@@ -2,6 +2,7 @@ import roadmaps from "data/roadmaps";
 import { firebaseGetAllUserProgress } from "feature/aiCoach/services/userProgress.service";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressService";
+import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import { journeyModules } from "feature/journey/data/journeyModules";
 import { firebaseGetJourneyProgress } from "feature/journey/services/journey.service";
 import { SCALE_TREE_NODES } from "feature/scaleTree/data/scaleTreeNodes";
@@ -53,16 +54,11 @@ export function usePracticeModeProgress(userId: string | null | undefined) {
         const scaleMapDone = Object.values(statuses).filter((s) => s === "completed").length;
         setProgress((p) => ({ ...p, scaleMap: { done: scaleMapDone, total: SCALE_TREE_NODES.length } }));
 
-        // Same "completed" rule as the Skill Tree checkmarks in SkillDashboard.tsx.
-        const skillsDone = exercisesAgregat.filter((exercise) => {
-          const data = bpmProgress.get(exercise.id);
-          return (
-            !!data &&
-            ((data.completedBpms?.length ?? 0) > 0 ||
-              (data.micHighScore != null && data.micHighScore > 0) ||
-              (data.earTrainingHighScore != null && data.earTrainingHighScore > 0))
-          );
-        }).length;
+        // Same "completed" rule as the Skill Tree checkmarks — one shared helper,
+        // so this count can't drift away from what the tree itself shows.
+        const skillsDone = exercisesAgregat.filter((exercise) =>
+          hasExerciseProgress(bpmProgress.get(exercise.id))
+        ).length;
         setProgress((p) => ({ ...p, skills: { done: skillsDone, total: exercisesAgregat.length } }));
       })
       .catch(() => {});

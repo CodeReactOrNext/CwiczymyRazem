@@ -4,12 +4,13 @@ import { act, renderHook } from "@testing-library/react";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { saveLeaderboardEntry, updateMicHighScore } from "../../../services/bpmProgressService";
+import { markExerciseCompleted, saveLeaderboardEntry, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 import { useScoreSaving } from "./useScoreSaving";
 
 vi.mock("../../../services/bpmProgressService", () => ({
+  markExerciseCompleted: vi.fn(),
   saveLeaderboardEntry: vi.fn(),
   updateClickHighScore: vi.fn(),
   updateEarTrainingHighScore: vi.fn(),
@@ -119,5 +120,39 @@ describe("useScoreSaving standings", () => {
 
     expect(saveLeaderboardEntry).not.toHaveBeenCalled();
     expect(result.current.micStandingRef.current).toEqual({});
+  });
+});
+
+describe("useScoreSaving completion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getExerciseUserRank).mockResolvedValue(2);
+  });
+
+  it("marks the exercise done even when there was nothing to score", async () => {
+    // A play-along / improv prompt: mic off, no hunt, no riddle — every scoring
+    // branch stays shut, and the completion stamp is the only record of the run.
+    const { result } = renderHook(() =>
+      useScoreSaving({
+        activeExercise: untimedExercise,
+        currentExercise: untimedExercise,
+        isMicEnabled: false,
+        earTrainingScore: 0,
+        noteMatchingHandle: handleFor(0),
+        sessionBpm: 60,
+      })
+    );
+
+    await act(async () => {
+      await result.current.saveCurrentScores();
+    });
+
+    expect(updateMicHighScore).not.toHaveBeenCalled();
+    expect(markExerciseCompleted).toHaveBeenCalledWith("me", "ex1", "C Minor Pentatonic", "technique");
+  });
+
+  it("still marks it done alongside a saved score", async () => {
+    await saveRun({ score: 900, previousBest: 0 });
+    expect(markExerciseCompleted).toHaveBeenCalledWith("me", "ex1", "C Minor Pentatonic", "technique");
   });
 });
