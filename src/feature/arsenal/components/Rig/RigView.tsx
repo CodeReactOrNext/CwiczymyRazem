@@ -77,12 +77,12 @@ export const RigView = ({ data }: RigViewProps) => {
       <RigStatsPanel data={data} />
 
       {/* Guitars */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
           <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Instruments</p>
           <p className="text-base font-black text-white capitalize tracking-wide">Guitars</p>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {([0, 1, 2] as const).map((slotIndex) => (
             <GuitarSlot
               key={slotIndex}
@@ -99,7 +99,7 @@ export const RigView = ({ data }: RigViewProps) => {
       </div>
 
       {/* Pedalboard */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
           <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
           <p className="text-base font-black text-white capitalize tracking-wide">Pedalboard</p>

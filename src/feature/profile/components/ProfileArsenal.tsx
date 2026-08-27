@@ -8,7 +8,10 @@ import {
 } from "feature/arsenal/components/Rig/SignalCable";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemLevel } from "feature/arsenal/data/itemStats";
+import {
+  getEffectiveRarity,
+  getItemLevel,
+} from "feature/arsenal/data/itemStats";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import {
   CHAIN_TIERS,
@@ -71,7 +74,10 @@ const GuitarSlotReadonly = ({
   onSelect,
 }: GuitarSlotReadonlyProps) => {
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
-  const rs = guitar ? RARITY_STYLES[guitar.rarity] : null;
+  const rarity = guitar
+    ? getEffectiveRarity(guitar.rarity, item?.buildLevel)
+    : null;
+  const rs = rarity ? RARITY_STYLES[rarity] : null;
   const level = item && guitar ? getItemLevel(item, guitar) : 0;
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -202,7 +208,9 @@ const PedalReadonly = ({
 }: PedalReadonlyProps) => {
   const invItem = effectInventory.find((e) => e.id === placement.itemId);
   const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
-  const rs = effect ? RARITY_STYLES[effect.rarity] : null;
+  const rs = effect
+    ? RARITY_STYLES[getEffectiveRarity(effect.rarity, invItem?.buildLevel)]
+    : null;
   if (!effect || !rs) return null;
 
   const handleMouseMove = (e: React.MouseEvent) => {

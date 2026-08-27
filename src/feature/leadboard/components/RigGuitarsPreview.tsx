@@ -7,7 +7,7 @@ import {
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { getEffectiveRarity, getItemLevel } from "feature/arsenal/data/itemStats";
 import type {
   ArsenalUserData,
   GuitarDefinition,
@@ -57,7 +57,8 @@ const RigGuitarTile = ({
 }) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
-  const rs = RARITY_STYLES[guitar.rarity];
+  // The workshop can promote a guitar past its mint rarity — show what it is now.
+  const rs = RARITY_STYLES[getEffectiveRarity(guitar.rarity, item.buildLevel)];
   const level = getItemLevel(item, guitar);
 
   const tile = (
