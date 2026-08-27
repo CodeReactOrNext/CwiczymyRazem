@@ -690,19 +690,21 @@ export const getRepairQuote = (
 // ─── Mods (fitting named features) ───────────────────────────────────────────
 
 /**
- * The third job on the bench: bolting one more named feature onto the instrument.
+ * The third job on the bench: the mods an instrument carries.
  *
  * Build and repair both move a single number the item already has. A mod changes
- * what the item *is* — it is the only way to put a `+4 Hand-wound pickups` on a
- * guitar that did not roll one out of the case.
+ * what the item *is*, and it is a component in its own right: hand-wound pickups
+ * are a thing the player owns before they are a thing this guitar has.
  *
  * Five rules, all deliberate:
  *
- *  • **Every mod has its own bill, and it is the same on every item.** Unlike a
- *    build — whose recipe is derived from the subject's own BOM — a mod costs
- *    what that mod is made of: brass trem block asks for bridges, a fret level
- *    asks for necks. A Common and a Mythic pay the same price for the same mod,
- *    so the player picks the mod they want and can stockpile for it by name.
+ *  • **A mod is an object, and the bench cannot make one.** Fitting one takes
+ *    owning one: mods arrive on the gear a case drops, come off a teardown
+ *    (`data/salvage.ts`), or cross the trader's counter. The bench used to sell
+ *    any mod in the pool for a bill of parts, which quietly made every mod a
+ *    purchase and the stash a formality — a `+4 Hand-wound pickups` was never
+ *    something a player *found*, only something they ordered. The bench does the
+ *    work now; the player supplies the component.
  *
  *  • **It has to physically fit.** The pool is filtered by the item's own BOM: a
  *    set-neck guitar has no `neck` slot, so no neck mods; a headless one has no
@@ -715,11 +717,14 @@ export const getRepairQuote = (
  *    towards it, and a promotion (every third build level) is what buys more room.
  *    Fill the slots and the item is done taking mods.
  *
- *  • **The value is rolled, and re-rollable.** Which mod goes on is the player's
- *    choice — they are paying a named bill for it. What it is *worth* is not: a
- *    bench mod draws from the feature's own range widened by `MOD_ROLL_BONUS`, so
- *    workshop work can beat anything a case can drop. A re-roll costs that mod's
- *    bill again and *always* replaces the old number, downward included.
+ *  • **The value is re-rollable, and that is what parts buy.** A mod arrives
+ *    worth whatever it was worth where it came from — a case roll, or a case
+ *    roll minus `SALVAGE_POINT_LOSS` off a teardown. A re-roll costs that mod's
+ *    own bill and draws from the feature's range widened by `MOD_ROLL_BONUS`, so
+ *    bench work still rolls the best numbers in the game; it is simply paid one
+ *    step later than it used to be. It *always* replaces the old number,
+ *    downward included — that is the whole risk, and the last thing parts can
+ *    buy at this bench.
  *
  *  • **A mod can be taken back off, and taking it off destroys it.** The only
  *    thing the job hands back is the slot: the mod is not stashed, not refittable
@@ -756,11 +761,23 @@ const bill = (...rows: [PartId, PartTier, number][]): ScrapPart[] =>
  *
  * No Unique parts anywhere: those gate promotions, and a job that can be run
  * forever must not compete for them.
+ *
+ * Two things are priced off this table now that the bench does not sell mods: a
+ * re-roll, and the trader's daily loose mod, whose Fame price is derived from
+ * the bill it saves the player from ever having to own (`getModOfferPrice`).
  */
 const MOD_BILLS: Record<string, ScrapPart[]> = {
   // ─── Guitar · pickups and electronics ──────────────────────────────────────
-  "hand-wound": bill(["pickup", "Legendary", 2], ["pot", "Epic", 2], ["screws", "Standard", 8]),
-  "active-preamp": bill(["pickup", "Epic", 3], ["pot", "Epic", 3], ["screws", "Standard", 6]),
+  "hand-wound": bill(
+    ["pickup", "Legendary", 2],
+    ["pot", "Epic", 2],
+    ["screws", "Standard", 8],
+  ),
+  "active-preamp": bill(
+    ["pickup", "Epic", 3],
+    ["pot", "Epic", 3],
+    ["screws", "Standard", 6],
+  ),
   "coil-split": bill(["pot", "Epic", 3], ["screws", "Standard", 6]),
   "push-pull": bill(["pot", "Epic", 3], ["screws", "Standard", 4]),
   "phase-switch": bill(["pot", "Epic", 2], ["screws", "Standard", 6]),
@@ -789,14 +806,22 @@ const MOD_BILLS: Record<string, ScrapPart[]> = {
   // ─── Pedal · tone ──────────────────────────────────────────────────────────
   "nos-opamp": bill(["opamp", "Legendary", 2], ["screws", "Standard", 6]),
   "germanium-diodes": bill(["diode", "Epic", 3], ["screws", "Standard", 6]),
-  "matched-transistors": bill(["opamp", "Epic", 3], ["diode", "Epic", 2], ["screws", "Standard", 4]),
+  "matched-transistors": bill(
+    ["opamp", "Epic", 3],
+    ["diode", "Epic", 2],
+    ["screws", "Standard", 4],
+  ),
   "asym-clipping": bill(["diode", "Epic", 2], ["screws", "Standard", 4]),
   "led-clipping": bill(["diode", "Epic", 2], ["screws", "Standard", 4]),
   "mosfet-clipping": bill(["diode", "Epic", 2], ["screws", "Standard", 4]),
   "carbon-comp": bill(["diode", "Standard", 4], ["screws", "Standard", 6]),
   "film-caps": bill(["pot", "Standard", 4], ["screws", "Standard", 6]),
   // ─── Pedal · headroom ──────────────────────────────────────────────────────
-  "charge-pump-18v": bill(["opamp", "Epic", 3], ["pot", "Epic", 2], ["screws", "Standard", 6]),
+  "charge-pump-18v": bill(
+    ["opamp", "Epic", 3],
+    ["pot", "Epic", 2],
+    ["screws", "Standard", 6],
+  ),
   "premium-buffer": bill(["opamp", "Epic", 2], ["screws", "Standard", 4]),
   shielding: bill(["enclosure", "Epic", 2], ["screws", "Standard", 10]),
   "true-bypass": bill(["enclosure", "Standard", 2], ["screws", "Standard", 6]),
@@ -804,15 +829,35 @@ const MOD_BILLS: Record<string, ScrapPart[]> = {
   "star-grounding": bill(["pot", "Standard", 2], ["screws", "Standard", 12]),
   "filtered-power": bill(["pot", "Epic", 2], ["screws", "Standard", 6]),
   // ─── Pedal · versatility ───────────────────────────────────────────────────
-  midi: bill(["opamp", "Legendary", 2], ["pot", "Epic", 3], ["screws", "Standard", 6]),
-  presets: bill(["opamp", "Epic", 3], ["pot", "Epic", 2], ["screws", "Standard", 6]),
+  midi: bill(
+    ["opamp", "Legendary", 2],
+    ["pot", "Epic", 3],
+    ["screws", "Standard", 6],
+  ),
+  presets: bill(
+    ["opamp", "Epic", 3],
+    ["pot", "Epic", 2],
+    ["screws", "Standard", 6],
+  ),
   "tap-tempo": bill(["opamp", "Epic", 3], ["screws", "Standard", 6]),
-  "stereo-io": bill(["enclosure", "Epic", 2], ["opamp", "Epic", 2], ["screws", "Standard", 6]),
-  "relay-switch": bill(["opamp", "Epic", 2], ["enclosure", "Standard", 2], ["screws", "Standard", 6]),
+  "stereo-io": bill(
+    ["enclosure", "Epic", 2],
+    ["opamp", "Epic", 2],
+    ["screws", "Standard", 6],
+  ),
+  "relay-switch": bill(
+    ["opamp", "Epic", 2],
+    ["enclosure", "Standard", 2],
+    ["screws", "Standard", 6],
+  ),
   "expression-in": bill(["pot", "Epic", 3], ["screws", "Standard", 6]),
   "trim-pots": bill(["pot", "Epic", 3], ["screws", "Standard", 4]),
   "dip-switches": bill(["pot", "Standard", 4], ["screws", "Standard", 8]),
-  "kill-dry": bill(["opamp", "Epic", 2], ["pot", "Epic", 2], ["screws", "Standard", 4]),
+  "kill-dry": bill(
+    ["opamp", "Epic", 2],
+    ["pot", "Epic", 2],
+    ["screws", "Standard", 4],
+  ),
 };
 
 /**
@@ -866,7 +911,8 @@ export const getFittableMods = (subject: WorkshopSubject): ModFeatureDef[] => {
     return EFFECT_FEATURES.filter(
       (f) =>
         !f.appliesTo ||
-        (subject.effectType != null && f.appliesTo.includes(subject.effectType)),
+        (subject.effectType != null &&
+          f.appliesTo.includes(subject.effectType)),
     ).map(toModDef);
   }
 
@@ -903,12 +949,17 @@ export interface FittedMod extends ModOption {
 
 export interface ModQuote {
   slots: ModSlots;
-  /** Mods that fit this item and are not on it yet — the fit menu. */
-  candidates: ModOption[];
+  /**
+   * Mods this build could physically take and does not carry yet.
+   *
+   * A list to hunt against rather than a menu: nothing here is for sale, so it
+   * comes with no bill and no affordability. What it answers is "would this
+   * instrument even take the mod I am about to go looking for" — the question a
+   * stash board cannot answer, because it only knows the mods already in hand.
+   */
+  compatible: ModFeatureDef[];
   /** What is fitted right now, in the order the item stores it. */
   fitted: FittedMod[];
-  /** At least one free slot and one affordable mod to put in it. */
-  canFit: boolean;
   /** At least one fitted mod whose bill the wallet covers. */
   canReroll: boolean;
   /** Something fitted to pull off, and the Fame to pay the bench for pulling it. */
@@ -940,6 +991,13 @@ const priceMod = (def: ModFeatureDef, wallet: ScrapPart[]): ModOption => {
   return { ...def, recipe, affordable: recipe.every((line) => line.ok) };
 };
 
+/**
+ * Everything the mod bench can say about an instrument on its own.
+ *
+ * There is deliberately no `canFit` here: whether a mod can go on depends on the
+ * player's stash, which this function never sees. Callers pair it with
+ * `getSalvagedModOptions` — see `WorkshopBench`, where the two meet.
+ */
 export const getModQuote = (
   subject: WorkshopSubject,
   wallet: ScrapPart[],
@@ -959,15 +1017,10 @@ export const getModQuote = (
     return def ? [{ ...priceMod(def, wallet), points: f.points }] : [];
   });
 
-  const candidates = fittable
-    .filter((def) => !owned.has(def.id))
-    .map((def) => priceMod(def, wallet));
-
   return {
     slots,
-    candidates,
+    compatible: fittable.filter((def) => !owned.has(def.id)),
     fitted,
-    canFit: slots.free > 0 && candidates.some((c) => c.affordable),
     canReroll: fitted.some((f) => f.affordable),
     // Counted off `subject.features` rather than `fitted`, so a mod the pool has
     // since dropped can still be taken off the instrument carrying it.

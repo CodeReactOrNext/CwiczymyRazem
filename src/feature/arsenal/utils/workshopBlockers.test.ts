@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { ModQuote, RecipeLine, WorkshopCheck } from "../data/workshop";
+import type {
+  ModOption,
+  ModQuote,
+  RecipeLine,
+  WorkshopCheck,
+} from "../data/workshop";
 import type { PartId, PartTier } from "../types/arsenal.types";
 import { describeBlocker, describeModBlocker } from "./workshopBlockers";
 
@@ -71,7 +76,7 @@ const modOption = (
   id: string,
   label: string,
   recipe: RecipeLine[],
-): ModQuote["candidates"][number] => ({
+): ModOption => ({
   id,
   label,
   min: 1,
@@ -81,51 +86,61 @@ const modOption = (
   affordable: recipe.every((l) => l.ok),
 });
 
+const fittedMod = (
+  id: string,
+  label: string,
+  recipe: RecipeLine[],
+  points = 3,
+): ModQuote["fitted"][number] => ({ ...modOption(id, label, recipe), points });
+
 const modQuote = (over: Partial<ModQuote>): ModQuote => ({
   slots: { used: 0, max: 2, free: 2 },
-  candidates: [],
+  compatible: [],
   fitted: [],
-  canFit: false,
   canReroll: false,
   canRemove: false,
   ...over,
 });
 
 describe("describeModBlocker", () => {
-  it("says nothing while any mod job is payable", () => {
-    expect(describeModBlocker(modQuote({ canFit: true }))).toBeUndefined();
+  it("says nothing while a re-roll is payable", () => {
+    expect(describeModBlocker(modQuote({ canReroll: true }))).toBeUndefined();
   });
 
-  it("names the bill the player is closest to paying", () => {
+  it("sends the player to the stash when the instrument carries nothing", () => {
+    // Fitting is not a parts problem any more, so there is no bill to name here.
+    expect(describeModBlocker(modQuote({}))).toBe(
+      "no mod in your stash fits this build",
+    );
+  });
+
+  it("names the promotion when the slots are full and nothing is re-rollable", () => {
+    // Slots used by features the pool no longer knows: nothing to re-roll, and
+    // no room for anything out of the stash either.
+    expect(
+      describeModBlocker(modQuote({ slots: { used: 2, max: 2, free: 0 } })),
+    ).toBe("no mod slots at this rarity — promote it first");
+  });
+
+  it("names the re-roll bill the player is closest to paying", () => {
     const blocker = describeModBlocker(
       modQuote({
-        candidates: [
-          modOption("plek", "Plek", [line("neck", "Legendary", 9, 0)]),
-          modOption("bone-nut", "Bone nut", [line("neck", "Standard", 3, 2)]),
+        fitted: [
+          fittedMod("plek", "Plek", [line("neck", "Legendary", 9, 0)]),
+          fittedMod("bone-nut", "Bone nut", [line("neck", "Standard", 3, 2)]),
         ],
       }),
     );
-    expect(blocker).toBe("Bone nut needs 1 more Standard neck");
+    expect(blocker).toBe("re-rolling Bone nut needs 1 more Standard neck");
   });
 
-  it("switches to the re-roll bill once every slot is filled", () => {
+  it("still names the re-roll bill once every slot is filled", () => {
     const blocker = describeModBlocker(
       modQuote({
         slots: { used: 2, max: 2, free: 0 },
-        fitted: [
-          {
-            ...modOption("plek", "Plek", [line("neck", "Epic", 4, 1)]),
-            points: 3,
-          },
-        ],
+        fitted: [fittedMod("plek", "Plek", [line("neck", "Epic", 4, 1)])],
       }),
     );
     expect(blocker).toBe("re-rolling Plek needs 3 more Epic necks");
-  });
-
-  it("admits when nothing else physically fits", () => {
-    expect(describeModBlocker(modQuote({ candidates: [] }))).toBe(
-      "nothing else fits this build",
-    );
   });
 });

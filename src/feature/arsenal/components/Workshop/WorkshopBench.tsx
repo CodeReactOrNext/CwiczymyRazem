@@ -71,7 +71,12 @@ export const WorkshopBench = ({
 
   const [job, setJob] = useState<WorkshopJob | null>(null);
 
-  /** A rescued mod that fits this instrument, with a slot free for it. */
+  /**
+   * A mod the player owns that fits this instrument, with a slot free for it.
+   *
+   * The only way a mod goes on at all — the bench sells none — which is why the
+   * quote alone can never answer whether this card has a fit in it.
+   */
   const canRefit = modQuote.slots.free > 0 && salvagedOptions.length > 0;
 
   const mintRarity = entry.subject.mintRarity;
@@ -222,25 +227,16 @@ export const WorkshopBench = ({
           />
         }
         readyNote={
-          modQuote.canFit || canRefit
+          canRefit
             ? `${modQuote.slots.free} slot${modQuote.slots.free === 1 ? "" : "s"} free`
             : modQuote.canReroll
               ? "re-roll only"
               : "removal only"
         }
-        ready={
-          modQuote.canFit ||
-          modQuote.canReroll ||
-          modQuote.canRemove ||
-          canRefit
-        }
+        ready={canRefit || modQuote.canReroll || modQuote.canRemove}
         blockedNote={canRefit ? undefined : describeModBlocker(modQuote)}
         accent='purple'
-        disabled={
-          modQuote.fitted.length === 0 &&
-          modQuote.candidates.length === 0 &&
-          salvagedOptions.length === 0
-        }
+        disabled={modQuote.fitted.length === 0 && salvagedOptions.length === 0}
         onClick={() => setJob("mod")}
       />
 

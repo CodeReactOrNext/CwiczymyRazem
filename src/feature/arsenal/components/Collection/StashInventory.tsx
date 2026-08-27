@@ -298,6 +298,12 @@ export const StashInventory = ({
    * one, so they carry what they are instead.
    */
   const [resale, setResale] = useState<ResalePending>(null);
+  /**
+   * A mod on its way to the market. Kept apart from `pending`, which is keyed by
+   * an inventory id a mod does not have — the same reason `resale` carries the
+   * mod itself rather than an id.
+   */
+  const [listMod, setListMod] = useState<SalvagedMod | null>(null);
   /** A rescued mod dropped onto an instrument, waiting on the bill. */
   const [fitPending, setFitPending] = useState<{
     mod: SalvagedMod;
@@ -854,6 +860,13 @@ export const StashInventory = ({
           onSelect: () => setModDetail(piece.mod),
         },
         {
+          id: "list",
+          label: "Market",
+          icon: Store,
+          disabled: isListing,
+          onSelect: () => setListMod(piece.mod),
+        },
+        {
           id: "sell",
           label: "Sell",
           icon: Trash2,
@@ -1178,6 +1191,11 @@ export const StashInventory = ({
               setResale({ kind: "mod", mod: modDetail });
             }}
             isSelling={isSellingMod}
+            onListClick={() => {
+              setModDetail(null);
+              setListMod(modDetail);
+            }}
+            isListing={isListing}
           />
         )}
       </StashItemDialog>
@@ -1251,6 +1269,34 @@ export const StashInventory = ({
           }}
           onCancel={() => setResale(null)}
           isLoading={isSellingMod || isSellingPart}
+        />
+      )}
+
+      {/*
+        A mod goes to the market through the same dialog gear does. The floor is
+        the bin price, which for a component nobody can build is well under what
+        it is worth — so this is the one listing where the asking price is the
+        whole point rather than a formality.
+      */}
+      {listMod && (
+        <ListItemDialog
+          isOpen
+          itemType='Mod'
+          itemName={`${getModDef(listMod.kind, listMod.featureId)?.label ?? listMod.featureId} +${listMod.points}`}
+          minPrice={getModResaleValue(
+            listMod.kind,
+            listMod.featureId,
+            listMod.points,
+          )}
+          currentFame={currentFame}
+          onConfirm={(price) =>
+            listOnMarket(
+              { itemType: "mod", inventoryItemId: listMod.id, price },
+              { onSuccess: () => setListMod(null) },
+            )
+          }
+          onCancel={() => setListMod(null)}
+          isLoading={isListing}
         />
       )}
 

@@ -4,12 +4,18 @@ import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, listingId } = req.body as { idToken: string; listingId: string };
+  const { idToken, listingId } = req.body as {
+    idToken: string;
+    listingId: string;
+  };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (!listingId) return res.status(400).json({ error: "Missing listingId" });
@@ -23,8 +29,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const listingRef = firestore.collection("marketplace").doc(listingId) as DocumentReference;
-    const userRef = firestore.collection("users").doc(userId) as DocumentReference;
+    const listingRef = firestore
+      .collection("marketplace")
+      .doc(listingId) as DocumentReference;
+    const userRef = firestore
+      .collection("users")
+      .doc(userId) as DocumentReference;
 
     await firestore.runTransaction(async (t: Transaction) => {
       const listingDoc = await t.get(listingRef);
@@ -38,16 +48,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
       const data = userDoc.data()!;
 
-      const invKey = listing.itemType === "guitar" ? "inventory" : "effectInventory";
+      if (listing.itemType === "mod") {
+        // Straight back into the stash under the id it left with — nothing could
+        // have claimed that id while the listing was up. Nothing else moves: a
+        // stashed mod sits on no instrument, so there is no rig level to redo.
+        const stash: any[] = data.arsenal?.salvagedMods || [];
+        t.update(userRef, { "arsenal.salvagedMods": [...stash, listing.item] });
+        t.update(listingRef, { status: "cancelled" });
+        return;
+      }
+
+      const invKey =
+        listing.itemType === "guitar" ? "inventory" : "effectInventory";
       const inventory: any[] = data.arsenal?.[invKey] || [];
       // Return the escrowed instance to the seller (5 Fame fee is not refunded).
       const restored = [...inventory, listing.item];
 
       // A rig slot may still reference the restored instance (pre-slot-cleanup listings)
       const rigLevel = getRigLevel({
-        inventory: listing.itemType === "guitar" ? restored : data.arsenal?.inventory ?? [],
+        inventory:
+          listing.itemType === "guitar"
+            ? restored
+            : (data.arsenal?.inventory ?? []),
         effectInventory:
-          listing.itemType === "effect" ? restored : data.arsenal?.effectInventory ?? [],
+          listing.itemType === "effect"
+            ? restored
+            : (data.arsenal?.effectInventory ?? []),
         rig: data.arsenal?.rig ?? DEFAULT_RIG,
       });
 
@@ -63,7 +89,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case "NOT_OWNER":
         return res.status(403).json({ error: "Not your listing" });
       case "LISTING_UNAVAILABLE":
-        return res.status(409).json({ error: "This listing is no longer active" });
+        return res
+          .status(409)
+          .json({ error: "This listing is no longer active" });
       case "USER_NOT_FOUND":
         return res.status(404).json({ error: "User not found" });
       default:

@@ -1,33 +1,26 @@
 import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 
-import type { AnyFirebaseLog, LogGroupType } from "./groupConsecutiveLogs";
-
-/** Fame awarded per activity inside a grouped feed row. */
-export const FAME_PER_ACTIVITY = 5;
-
-/** Cap on the count-based part of a grouped activity, before the practice-time multiplier. */
-export const MAX_GROUPED_ACTIVITY_FAME = 50;
-
-/** Fixed base Fame for Exercise Plan activity — not affected by grouping. */
-export const EXERCISE_PLAN_FAME = 15;
-
-/** Hard ceiling on a single feed row's Fame, after the practice-time multiplier. */
-export const MAX_ACTIVITY_FAME = 100;
+import type { AnyFirebaseLog } from "./groupConsecutiveLogs";
 
 /**
- * Practice-time multipliers, richest tier first. A longer session is worth more to motivate,
- * but the payout is stepped rather than linear on purpose: logged time is self-reported, and a
- * linear reward would pay out proportionally for inflating it.
- *
- * The first step sits at a quarter of an hour, so a real sit-down session is already worth more
- * than a couple of minutes of noodling; everything below that pays the flat base.
+ * Fame for one logged activity that carries no practice time — a case opened, a song rated, a
+ * listing put up, a playlist created. Paid per activity, so a row of five is worth five of them.
  */
-export const TIME_FAME_TIERS: ReadonlyArray<{ minMs: number; multiplier: number }> = [
-  { minMs: 2 * 60 * 60 * 1000, multiplier: 2 },
-  { minMs: 60 * 60 * 1000, multiplier: 1.75 },
-  { minMs: 30 * 60 * 1000, multiplier: 1.5 },
-  { minMs: 15 * 60 * 1000, multiplier: 1.25 },
-];
+export const ACTION_FAME = 3;
+
+/**
+ * Fame per minute of logged practice. One minute, one Fame: the amount a practice row is worth is
+ * the session itself, with nothing else in the formula — not the activity type, not how many
+ * reports the evening arrived in.
+ */
+export const FAME_PER_MINUTE = 1;
+
+/**
+ * Hard ceiling on a single feed row: eight hours of practice in one group. Set clear of any real
+ * day rather than as a balance lever — it exists so a fabricated or malformed log can't hand out an
+ * unbounded amount, which matters because `reactionFame` freezes whatever it pays.
+ */
+export const MAX_ACTIVITY_FAME = 480;
 
 /**
  * Practice time a single log may contribute, mirroring the 24h ceiling `/api/user/report/manage`
@@ -35,37 +28,50 @@ export const TIME_FAME_TIERS: ReadonlyArray<{ minMs: number; multiplier: number 
  */
 export const MAX_TRUSTED_LOG_MS = 24 * 60 * 60 * 1000;
 
-/** Fame reward for a feed row grouping `activityCount` consecutive activities of the same type. */
-export const calculateActivityFame = (activityCount: number): number =>
-  Math.min(MAX_GROUPED_ACTIVITY_FAME, FAME_PER_ACTIVITY * Math.max(1, activityCount));
+/** Trusted practice time on one log. Anything missing, negative or malformed counts as none. */
+const getLogSessionMs = (log: AnyFirebaseLog): number => {
+  const sumTime = (log as FirebaseLogsInterface).timeSumary?.sumTime;
+  if (typeof sumTime !== "number" || !Number.isFinite(sumTime) || sumTime <= 0)
+    return 0;
+
+  return Math.min(sumTime, MAX_TRUSTED_LOG_MS);
+};
 
 /** Total practice time logged across a group. Non-practice logs carry no time and contribute 0. */
 export const getGroupSessionMs = (logs: readonly AnyFirebaseLog[]): number =>
-  logs.reduce((total, log) => {
-    const sumTime = (log as FirebaseLogsInterface).timeSumary?.sumTime;
-    if (typeof sumTime !== "number" || !Number.isFinite(sumTime) || sumTime <= 0) return total;
+  logs.reduce((total, log) => total + getLogSessionMs(log), 0);
 
-    return total + Math.min(sumTime, MAX_TRUSTED_LOG_MS);
-  }, 0);
-
-/** Multiplier the logged practice time earns. Sessions under the lowest tier pay out at 1x. */
-export const getTimeFameMultiplier = (sessionMs: number): number =>
-  TIME_FAME_TIERS.find((tier) => sessionMs >= tier.minMs)?.multiplier ?? 1;
+/** Logs in the group that aren't practice — the ones paid per activity rather than per minute. */
+export const countActionLogs = (logs: readonly AnyFirebaseLog[]): number =>
+  logs.reduce(
+    (count, log) => (getLogSessionMs(log) === 0 ? count + 1 : count),
+    0,
+  );
 
 /**
- * Fame the recipient gets when a feed row is motivated: a count-based (or, for plans, fixed) base,
- * scaled by how much practice time the row represents.
+ * Fame owed for `sessionMs` of practice.
+ *
+ * Applied to the group's summed time rather than to each log, so the number is split-proof: an
+ * evening filed as six short reports prices exactly like the same evening filed in one go. That
+ * matters because the server rebuilds the row's group from whatever logs it can see, and its answer
+ * has to match what the feed previewed.
+ */
+export const calculateTimeFame = (sessionMs: number): number =>
+  Math.round((Math.max(0, sessionMs) / (60 * 1000)) * FAME_PER_MINUTE);
+
+/**
+ * Fame the recipient gets when a feed row is motivated: every minute practised, plus a flat amount
+ * for each activity that has no time to pay for. The two add up rather than branching, so a row
+ * that mixes them — a session and the exam it auto-submitted — pays for both halves.
  *
  * This is the single source of truth for the amount — `/api/logs/react` runs it server-side to
  * decide what to actually award, and the feed runs it only to preview the same number.
  */
 export const calculateGroupFame = (group: {
-  type: LogGroupType;
   logs: readonly AnyFirebaseLog[];
-}): number => {
-  const base =
-    group.type === "exercisePlan" ? EXERCISE_PLAN_FAME : calculateActivityFame(group.logs.length);
-  const multiplier = getTimeFameMultiplier(getGroupSessionMs(group.logs));
-
-  return Math.min(MAX_ACTIVITY_FAME, Math.round(base * multiplier));
-};
+}): number =>
+  Math.min(
+    MAX_ACTIVITY_FAME,
+    calculateTimeFame(getGroupSessionMs(group.logs)) +
+      ACTION_FAME * countActionLogs(group.logs),
+  );

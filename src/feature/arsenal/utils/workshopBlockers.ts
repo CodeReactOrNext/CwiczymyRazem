@@ -73,28 +73,29 @@ const nearestBill = <T extends ModOption>(pool: T[]): T | undefined =>
 /**
  * Why the mod bench is closed.
  *
- * Every mod has its own bill, so "not enough parts" is only true when *none* of
- * them are affordable. When that is the case the nearest bill is the useful
+ * Fitting is not one of the jobs this can answer for: a mod goes on out of the
+ * stash, which a quote never sees, so the bench short-circuits this whole
+ * function whenever a rescued mod is waiting for the instrument. What is left is
+ * a re-roll and a removal.
+ *
+ * Every mod has its own bill, so "not enough parts" is only true when *no* fitted
+ * mod can be re-rolled. When that is the case the nearest bill is the useful
  * answer — it is the one the player is closest to paying.
  */
 export const describeModBlocker = (quote: ModQuote): string | undefined => {
-  if (quote.canFit || quote.canReroll) return undefined;
+  if (quote.canReroll) return undefined;
 
-  if (quote.slots.free === 0) {
-    // Slots full: the only job left is a re-roll of something already fitted.
-    if (quote.fitted.length === 0) {
-      return "no mod slots at this rarity — promote it first";
-    }
-    const nearest = nearestBill(quote.fitted);
-    const missing = nearest && describeBlocker(nearest.recipe);
-    return missing
-      ? `re-rolling ${nearest.label} needs ${missing}`
-      : "no parts for a re-roll";
+  // Nothing on the instrument to work on: the only way forward is a mod, and the
+  // only place one comes from is the stash.
+  if (quote.fitted.length === 0) {
+    return quote.slots.free === 0
+      ? "no mod slots at this rarity — promote it first"
+      : "no mod in your stash fits this build";
   }
 
-  if (quote.candidates.length === 0) return "nothing else fits this build";
-
-  const nearest = nearestBill(quote.candidates);
+  const nearest = nearestBill(quote.fitted);
   const missing = nearest && describeBlocker(nearest.recipe);
-  return missing ? `${nearest.label} needs ${missing}` : undefined;
+  return missing
+    ? `re-rolling ${nearest.label} needs ${missing}`
+    : "no parts for a re-roll";
 };

@@ -1,14 +1,21 @@
+import type { MarketplaceItemType } from "feature/arsenal/types/marketplace.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, listingId } = req.body as { idToken: string; listingId: string };
+  const { idToken, listingId } = req.body as {
+    idToken: string;
+    listingId: string;
+  };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (!listingId) return res.status(400).json({ error: "Missing listingId" });
@@ -22,8 +29,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const listingRef = firestore.collection("marketplace").doc(listingId) as DocumentReference;
-    const buyerRef = firestore.collection("users").doc(buyerId) as DocumentReference;
+    const listingRef = firestore
+      .collection("marketplace")
+      .doc(listingId) as DocumentReference;
+    const buyerRef = firestore
+      .collection("users")
+      .doc(buyerId) as DocumentReference;
 
     const result = await firestore.runTransaction(async (t: Transaction) => {
       const listingDoc = await t.get(listingRef);
@@ -33,7 +44,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (listing.status !== "active") throw new Error("LISTING_UNAVAILABLE");
       if (listing.sellerId === buyerId) throw new Error("OWN_LISTING");
 
-      const sellerRef = firestore.collection("users").doc(listing.sellerId) as DocumentReference;
+      const sellerRef = firestore
+        .collection("users")
+        .doc(listing.sellerId) as DocumentReference;
 
       // All reads before any write.
       const buyerDoc = await t.get(buyerRef);
@@ -47,26 +60,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const buyerFame: number = buyerData.statistics?.fame || 0;
       if (buyerFame < price) throw new Error("INSUFFICIENT_FAME");
 
-      const itemType: "guitar" | "effect" = listing.itemType;
-      const invKey = itemType === "guitar" ? "inventory" : "effectInventory";
-      const dexKey = itemType === "guitar" ? "dexGuitars" : "dexEffects";
-      const definitionId =
-        itemType === "guitar" ? listing.item?.guitarId : listing.item?.effectId;
+      const itemType: MarketplaceItemType = listing.itemType;
 
-      // Transfer the escrowed instance into the buyer's inventory (flagged new).
-      const transferredItem = { ...listing.item, isNew: true, acquiredAt: Date.now() };
-      const buyerInventory: any[] = buyerData.arsenal?.[invKey] || [];
-      const newBuyerInventory = [...buyerInventory, transferredItem];
-
-      t.update(buyerRef, {
-        [`arsenal.${invKey}`]: newBuyerInventory,
+      // Where the escrowed thing lands. Gear goes into an inventory flagged new
+      // and marks the model discovered; a mod goes into the stash, which has no
+      // Dex behind it — mods have never been part of the collection.
+      let transferredItem: any;
+      const buyerUpdate: Record<string, any> = {
         "statistics.fame": buyerFame - price,
+      };
+
+      if (itemType === "mod") {
+        // Re-keyed on the way in. A stash id only has to be unique inside one
+        // player's stash, and a trader mod's is `trader:<window>-mod` — the same
+        // string for everyone who bought that day — so handing one over untouched
+        // could leave the buyer holding two entries nothing can tell apart, and
+        // fitting either would consume both. A listing id cannot repeat.
+        transferredItem = {
+          ...listing.item,
+          id: `market:${listingId}`,
+          salvagedAt: Date.now(),
+        };
+        const stash: any[] = buyerData.arsenal?.salvagedMods || [];
+        buyerUpdate["arsenal.salvagedMods"] = [...stash, transferredItem];
+      } else {
+        const invKey = itemType === "guitar" ? "inventory" : "effectInventory";
+        const dexKey = itemType === "guitar" ? "dexGuitars" : "dexEffects";
+        const definitionId =
+          itemType === "guitar"
+            ? listing.item?.guitarId
+            : listing.item?.effectId;
+
+        // Transfer the escrowed instance into the buyer's inventory (flagged new).
+        transferredItem = {
+          ...listing.item,
+          isNew: true,
+          acquiredAt: Date.now(),
+        };
+        const buyerInventory: any[] = buyerData.arsenal?.[invKey] || [];
+        buyerUpdate[`arsenal.${invKey}`] = [...buyerInventory, transferredItem];
         // The buyer has now held this model — discovery is permanent, so it
         // stays in their Dex even if they flip it straight back onto the market.
-        ...(definitionId != null
-          ? { [`arsenal.${dexKey}`]: FieldValue.arrayUnion(definitionId) }
-          : {}),
-      });
+        if (definitionId != null) {
+          buyerUpdate[`arsenal.${dexKey}`] =
+            FieldValue.arrayUnion(definitionId);
+        }
+      }
+
+      t.update(buyerRef, buyerUpdate);
       t.update(sellerRef, {
         "statistics.fame": FieldValue.increment(price),
       });
@@ -150,9 +191,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case "LISTING_NOT_FOUND":
         return res.status(404).json({ error: "Listing not found" });
       case "LISTING_UNAVAILABLE":
-        return res.status(409).json({ error: "This listing is no longer available" });
+        return res
+          .status(409)
+          .json({ error: "This listing is no longer available" });
       case "OWN_LISTING":
-        return res.status(400).json({ error: "You cannot buy your own listing" });
+        return res
+          .status(400)
+          .json({ error: "You cannot buy your own listing" });
       case "USER_NOT_FOUND":
         return res.status(404).json({ error: "User not found" });
       case "SELLER_NOT_FOUND":

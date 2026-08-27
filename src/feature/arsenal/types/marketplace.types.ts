@@ -1,6 +1,20 @@
-import type { EffectInventoryItem, InventoryItem } from "./arsenal.types";
+import type {
+  EffectInventoryItem,
+  InventoryItem,
+  SalvagedMod,
+} from "./arsenal.types";
 
-export type MarketplaceItemType = "guitar" | "effect";
+/**
+ * What can change hands between players.
+ *
+ * `mod` is the odd one out and the reason it is here: a mod is the one thing in
+ * the arsenal nobody can make. The bench stopped selling them (`data/workshop.ts`),
+ * so the only sources are a case roll, the one that survives a teardown, and the
+ * trader's single daily offer — which leaves a player who needs one specific mod
+ * waiting on a roughly 2%-a-day counter. The market is the answer: mods a player
+ * cannot use are exactly the mods somebody else has been hunting.
+ */
+export type MarketplaceItemType = "guitar" | "effect" | "mod";
 
 export type MarketplaceListingStatus = "active" | "sold" | "cancelled";
 
@@ -12,15 +26,21 @@ export interface MarketplaceListing {
   sellerAvatarUrl: string | null;
   sellerFrame: number;
   itemType: MarketplaceItemType;
-  /** Full rolled instance held in escrow (removed from the seller's inventory). */
-  item: InventoryItem | EffectInventoryItem;
+  /**
+   * The escrowed thing itself, held here while the listing is up and removed
+   * from the seller's stash. A `SalvagedMod` for a mod listing — it carries its
+   * own rolled value, so a listing is a specific `+5 Hand-wound pickups` and not
+   * a generic one.
+   */
+  item: InventoryItem | EffectInventoryItem | SalvagedMod;
   /** Instance id (== item.id) for quick lookups. */
   itemId: string;
-  /** guitarId | effectId — for definition lookups on the client. */
+  /** guitarId | effectId | featureId — for definition lookups on the client. */
   defId: number | string;
   // Denormalized for cards / logs / notifications:
   itemName: string;
   itemBrand: string;
+  /** Empty on a mod: a component has no rarity of its own, only a roll. */
   itemRarity: string;
   itemImageId: number | string;
   /** Normal system sell value at list time — the price floor. */
@@ -44,5 +64,5 @@ export interface ListItemResult {
 export interface BuyItemResult {
   newFame: number;
   itemType: MarketplaceItemType;
-  item: InventoryItem | EffectInventoryItem;
+  item: InventoryItem | EffectInventoryItem | SalvagedMod;
 }

@@ -25,6 +25,7 @@ import {
   getFittableMods,
   getModBill,
   getModDef,
+  getModPool,
   getModQuote,
   getModSlots,
   getRepairQuote,
@@ -138,112 +139,106 @@ describe("mods — what fits", () => {
     expect(ids).not.toContain("led-clipping"); // Overdrive / Distortion only
   });
 
-  it("never offers a mod the item already carries", () => {
+  it("never lists a mod the item already carries as one that would fit", () => {
     const quote = getModQuote(
       subject({ features: [{ id: "hand-wound", points: 4 }] }),
       modWallet(),
     );
 
-    expect(quote.candidates.map((c) => c.id)).not.toContain("hand-wound");
+    expect(quote.compatible.map((c) => c.id)).not.toContain("hand-wound");
     expect(quote.fitted.map((f) => f.id)).toEqual(["hand-wound"]);
+  });
+
+  it("prices nothing on the list of what would fit — it is not a shop", () => {
+    // The bench cannot make a mod, so a bill against this list would advertise
+    // a purchase that has not existed since mods became components.
+    const quote = getModQuote(subject(), modWallet());
+
+    expect(quote.compatible.length).toBeGreaterThan(0);
+    expect(quote.compatible.every((m) => !("affordable" in m))).toBe(true);
+    expect(quote.compatible.every((m) => !("recipe" in m))).toBe(true);
   });
 });
 
 describe("mods — the bill", () => {
-  const candidate = (quote: ReturnType<typeof getModQuote>, id: string) =>
-    quote.candidates.find((c) => c.id === id)!;
+  /**
+   * A fitted mod priced against a wallet — the only place a bill surfaces now
+   * that the bench sells nothing.
+   */
+  const priced = (
+    id: string,
+    wallet: ScrapPart[] = modWallet(),
+    over: Partial<WorkshopSubject> = {},
+  ) =>
+    getModQuote(
+      subject({ features: [{ id, points: 3 }], ...over }),
+      wallet,
+    ).fitted.find((f) => f.id === id)!;
 
   it("charges every mod its own bill, not one flat price", () => {
-    const quote = getModQuote(subject(), modWallet());
-
-    expect(recipeToParts(candidate(quote, "hand-wound").recipe)).not.toEqual(
-      recipeToParts(candidate(quote, "copper-shielding").recipe),
+    expect(getModBill("hand-wound")).not.toEqual(
+      getModBill("copper-shielding"),
     );
   });
 
   it("asks for the part the mod physically is", () => {
-    const quote = getModQuote(subject(), modWallet());
-
     // Hand-wound pickups are pickups; shielding is a box of screws.
-    expect(
-      candidate(quote, "hand-wound").recipe.map((line) => line.partId),
-    ).toContain("pickup");
-    expect(
-      candidate(quote, "copper-shielding").recipe.map((line) => line.partId),
-    ).toContain("screws");
+    expect(getModBill("hand-wound").map((p) => p.partId)).toContain("pickup");
+    expect(getModBill("copper-shielding").map((p) => p.partId)).toContain(
+      "screws",
+    );
   });
 
   it("costs the same on every item, whatever its BOM, rarity or build", () => {
-    const strat = getModQuote(subject({ bom: getGuitarBom(1) }), modWallet());
-    const mythic = getModQuote(
-      subject({ bom: getGuitarBom(1), mintRarity: "Mythic", buildLevel: 6 }),
-      modWallet(),
-    );
+    const strat = priced("hand-wound", modWallet(), { bom: getGuitarBom(1) });
+    const mythic = priced("hand-wound", modWallet(), {
+      bom: getGuitarBom(1),
+      mintRarity: "Mythic",
+      buildLevel: 6,
+    });
 
-    expect(recipeToParts(candidate(strat, "hand-wound").recipe)).toEqual(
-      recipeToParts(candidate(mythic, "hand-wound").recipe),
-    );
-    expect(getModBill("hand-wound")).toEqual(
-      recipeToParts(candidate(strat, "hand-wound").recipe),
-    );
+    expect(recipeToParts(strat.recipe)).toEqual(recipeToParts(mythic.recipe));
+    expect(getModBill("hand-wound")).toEqual(recipeToParts(strat.recipe));
   });
 
-  it("blocks both actions when the wallet covers no mod at all", () => {
+  it("blocks the re-roll when the wallet covers no bill at all", () => {
     // Standard stock only — every bill here wants Epic parts or better.
     const quote = getModQuote(
       subject({ features: [{ id: "hand-wound", points: 4 }] }),
       [part("screws", "Standard", 40)],
     );
 
-    expect(quote.candidates.every((c) => !c.affordable)).toBe(true);
-    expect(quote.canFit).toBe(false);
     expect(quote.canReroll).toBe(false);
   });
 
-  it("lets an affordable mod through while a dearer one stays blocked", () => {
+  it("lets an affordable bill through while a dearer one stays blocked", () => {
     // Enough screws and Standard pots for shielding, nothing for a pickup rewind.
-    const quote = getModQuote(subject(), [
+    const wallet = [
       part("screws", "Standard", 40),
       part("pot", "Standard", 10),
-    ]);
+    ];
 
-    expect(candidate(quote, "copper-shielding").affordable).toBe(true);
-    expect(candidate(quote, "hand-wound").affordable).toBe(false);
-    expect(quote.canFit).toBe(true);
+    expect(priced("copper-shielding", wallet).affordable).toBe(true);
+    expect(priced("hand-wound", wallet).affordable).toBe(false);
   });
 
   it("asks pedals for pedal parts", () => {
-    const pedal = getModQuote(
-      subject({
-        kind: "effect",
-        effectType: "Delay",
-        bom: getEffectBom(1, "Delay"),
-      }),
-      modWallet(),
-    );
+    const midi = priced("midi", modWallet(), {
+      kind: "effect",
+      effectType: "Delay",
+      bom: getEffectBom(1, "Delay"),
+    });
 
     // MIDI control is one of the mods a delay can take, and it is op-amp work.
-    expect(
-      candidate(pedal, "midi").recipe.map((line) => line.partId),
-    ).toContain("opamp");
+    expect(midi.recipe.map((line) => line.partId)).toContain("opamp");
   });
 
   it("gives every mod in either pool a payable bill", () => {
-    const guitar = getModQuote(subject(), modWallet());
-    const pedal = getModQuote(
-      subject({
-        kind: "effect",
-        effectType: "Delay",
-        bom: getEffectBom(1, "Delay"),
-      }),
-      modWallet(),
-    );
-
-    for (const mod of [...guitar.candidates, ...pedal.candidates]) {
-      expect(mod.recipe.length).toBeGreaterThan(0);
-      expect(mod.recipe.every((line) => line.need > 0)).toBe(true);
+    for (const mod of [...getModPool("guitar"), ...getModPool("effect")]) {
+      expect(mod.parts.length).toBeGreaterThan(0);
+      expect(mod.parts.every((p) => p.qty > 0)).toBe(true);
       // Unique parts gate promotions — a repeatable job must never want them.
-      expect(mod.recipe.every((line) => line.tier !== "Unique")).toBe(true);
+      expect(mod.parts.every((p) => p.tier !== "Unique")).toBe(true);
     }
   });
 });
@@ -261,7 +256,6 @@ describe("mods — rarity caps how many", () => {
     );
 
     expect(full.slots).toEqual({ used: 2, max: 2, free: 0 });
-    expect(full.canFit).toBe(false);
   });
 
   it("counts what came out of the case against the same cap", () => {
@@ -282,7 +276,7 @@ describe("mods — rarity caps how many", () => {
     );
 
     expect(promoted.slots.max).toBe(3);
-    expect(promoted.canFit).toBe(true);
+    expect(promoted.slots.free).toBe(1);
   });
 
   it("still allows a re-roll once every slot is filled", () => {
@@ -291,7 +285,7 @@ describe("mods — rarity caps how many", () => {
       modWallet(),
     );
 
-    expect(full.canFit).toBe(false);
+    expect(full.slots.free).toBe(0);
     expect(full.canReroll).toBe(true);
   });
 });

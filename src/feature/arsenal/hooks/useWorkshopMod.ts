@@ -8,8 +8,8 @@ import type { WorkshopKind, WorkshopModAction } from "../types/arsenal.types";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 /**
- * Fits a mod, re-rolls one that is already on the item, refits one rescued from a
- * teardown, or strips one back off.
+ * Fits a mod out of the stash, re-rolls one that is already on the item, or
+ * strips one back off.
  *
  * A re-roll can come out worse and a removal always costs level — both say so
  * plainly rather than dressing a loss up as a success, because the player chose
@@ -29,7 +29,7 @@ export const useWorkshopMod = () => {
     }: {
       itemId: string;
       kind: WorkshopKind;
-      /** Null on a salvaged fit — the stash entry names the feature. */
+      /** Null on a fit — the stash entry names the feature. */
       featureId: string | null;
       action: WorkshopModAction;
       salvagedId?: string;
@@ -40,7 +40,7 @@ export const useWorkshopMod = () => {
       // page is reloaded. Only a removal charges any.
       dispatch(deductFame(data.fameSpent ?? 0));
 
-      if (data.action === "fit" || data.action === "fit-salvaged") {
+      if (data.action === "fit-salvaged") {
         toast.success(`${data.label} fitted — +${data.points} level`);
       } else if (data.action === "remove") {
         toast(`${data.label} taken off — the mod is gone, the slot is free`);

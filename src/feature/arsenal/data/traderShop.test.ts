@@ -239,7 +239,9 @@ describe("trader pricing", () => {
     for (const offers of windows(120)) {
       for (const offer of offers) {
         if (offer.kind !== "guitar") continue;
-        const def = GUITAR_DEFINITIONS.find((g) => g.id === offer.roll.guitarId);
+        const def = GUITAR_DEFINITIONS.find(
+          (g) => g.id === offer.roll.guitarId,
+        );
         expect(def).toBeDefined();
         const sellValue = getItemValue({ ...offer.roll, id: offer.id }, def!);
         const expected = sellValue * ITEM_PRICE_MULTIPLIER[def!.rarity];
@@ -255,7 +257,9 @@ describe("trader pricing", () => {
     for (const offers of windows(120)) {
       for (const offer of offers) {
         if (offer.kind !== "effect") continue;
-        const def = EFFECT_DEFINITIONS.find((e) => e.id === offer.roll.effectId);
+        const def = EFFECT_DEFINITIONS.find(
+          (e) => e.id === offer.roll.effectId,
+        );
         expect(def).toBeDefined();
         const expected =
           getEffectValue(def!) * ITEM_PRICE_MULTIPLIER[def!.rarity];
@@ -326,8 +330,10 @@ describe("the day's mod", () => {
       const mod = modOf(offers)!;
       const def = getModDef(mod.modKind, mod.featureId)!;
       const bill = getModBillValue(def);
-      // The invariant that matters: buying the mod is never cheaper than buying
-      // the parts for it and running the job yourself.
+      // The counter never undercuts what the mod is made of. Nobody can run the
+      // job themselves any more — the bench stopped selling mods — but the bill
+      // is still what anchors the price, and a mod priced under its own parts
+      // would make the shelf the cheapest source of Legendary components.
       expect(mod.unitPrice).toBeGreaterThan(bill);
       // Prices are rounded to 5 / 25, so allow the rounding step itself.
       expect(mod.unitPrice).toBeGreaterThanOrEqual(
@@ -344,7 +350,12 @@ describe("the day's mod", () => {
     for (const offers of windows(120)) {
       const mod = modOf(offers)!;
       const resale = getModResaleValue(mod.modKind, mod.featureId, mod.points);
-      expect(resale / mod.unitPrice).toBeLessThan(0.1);
+      // A fifth, where this used to be a tenth. The bin pays several times what
+      // it did — a mod is a component nobody can build, not clutter — and the
+      // cheapest mods on the shelf are the ones that feel it, since the bin
+      // price ignores the bill entirely. Buying to bin still burns 80% of the
+      // Fame, which is all this guard is for.
+      expect(resale / mod.unitPrice).toBeLessThan(0.2);
     }
   });
 

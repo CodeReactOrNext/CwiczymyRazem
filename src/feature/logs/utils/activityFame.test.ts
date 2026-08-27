@@ -1,14 +1,16 @@
-import type { FirebaseLogsInterface, FirebaseLogsSongsInterface } from "feature/logs/types/logs.type";
+import type {
+  FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
+} from "feature/logs/types/logs.type";
 import { describe, expect, it } from "vitest";
 
 import {
-  calculateActivityFame,
+  ACTION_FAME,
   calculateGroupFame,
-  EXERCISE_PLAN_FAME,
+  calculateTimeFame,
+  countActionLogs,
   getGroupSessionMs,
-  getTimeFameMultiplier,
   MAX_ACTIVITY_FAME,
-  MAX_GROUPED_ACTIVITY_FAME,
 } from "./activityFame";
 
 const minutes = (value: number) => value * 60 * 1000;
@@ -45,87 +47,84 @@ const songLog = (): FirebaseLogsSongsInterface =>
     avatarUrl: undefined,
   }) as FirebaseLogsSongsInterface;
 
-describe("calculateActivityFame", () => {
-  it("pays 5 per grouped activity", () => {
-    expect(calculateActivityFame(1)).toBe(5);
-    expect(calculateActivityFame(4)).toBe(20);
-  });
-
-  it("treats an empty group as a single activity", () => {
-    expect(calculateActivityFame(0)).toBe(5);
-  });
-
-  it("caps the count-based base", () => {
-    expect(calculateActivityFame(10)).toBe(MAX_GROUPED_ACTIVITY_FAME);
-    expect(calculateActivityFame(40)).toBe(MAX_GROUPED_ACTIVITY_FAME);
-  });
-});
-
 describe("getGroupSessionMs", () => {
-  it("sums practice time across the group", () => {
-    expect(getGroupSessionMs([practiceLog(minutes(20)), practiceLog(minutes(25))])).toBe(
-      minutes(45)
-    );
+  it("sums the practice time across the group", () => {
+    expect(
+      getGroupSessionMs([practiceLog(minutes(20)), practiceLog(minutes(25))]),
+    ).toBe(minutes(45));
   });
 
   it("ignores logs that carry no practice time", () => {
     expect(getGroupSessionMs([songLog(), songLog()])).toBe(0);
   });
 
-  it("clamps a single log to the 24h report ceiling", () => {
+  it("clamps a single log to the trusted daily ceiling", () => {
     expect(getGroupSessionMs([practiceLog(hours(400))])).toBe(hours(24));
   });
 
   it("ignores negative and non-finite times", () => {
-    expect(getGroupSessionMs([practiceLog(-minutes(30)), practiceLog(Number.NaN)])).toBe(0);
+    expect(
+      getGroupSessionMs([practiceLog(-minutes(30)), practiceLog(Number.NaN)]),
+    ).toBe(0);
   });
 });
 
-describe("getTimeFameMultiplier", () => {
-  it("pays 1x below the lowest tier", () => {
-    expect(getTimeFameMultiplier(0)).toBe(1);
-    expect(getTimeFameMultiplier(minutes(14))).toBe(1);
+describe("countActionLogs", () => {
+  it("counts only the logs with no practice time on them", () => {
+    expect(
+      countActionLogs([songLog(), practiceLog(minutes(30)), songLog()]),
+    ).toBe(2);
   });
 
-  it("steps up with logged time", () => {
-    expect(getTimeFameMultiplier(minutes(15))).toBe(1.25);
-    expect(getTimeFameMultiplier(minutes(30))).toBe(1.5);
-    expect(getTimeFameMultiplier(hours(1))).toBe(1.75);
-    expect(getTimeFameMultiplier(hours(2))).toBe(2);
-    expect(getTimeFameMultiplier(hours(12))).toBe(2);
+  it("counts a malformed practice log as an action rather than dropping it", () => {
+    expect(countActionLogs([practiceLog(Number.NaN)])).toBe(1);
+  });
+});
+
+describe("calculateTimeFame", () => {
+  it("pays a Fame a minute", () => {
+    expect(calculateTimeFame(minutes(1))).toBe(1);
+    expect(calculateTimeFame(minutes(30))).toBe(30);
+    expect(calculateTimeFame(hours(1))).toBe(60);
   });
 });
 
 describe("calculateGroupFame", () => {
-  it("leaves a couple of minutes of noodling on the count-based amount", () => {
-    expect(calculateGroupFame({ type: "exercise", logs: [practiceLog(minutes(10))] })).toBe(5);
+  it("pays the flat amount for a single action", () => {
+    expect(calculateGroupFame({ logs: [songLog()] })).toBe(ACTION_FAME);
   });
 
-  it("already pays extra for a quarter of an hour", () => {
-    expect(calculateGroupFame({ type: "exercise", logs: [practiceLog(minutes(15))] })).toBe(6);
-    expect(calculateGroupFame({ type: "exercise", logs: [practiceLog(minutes(30))] })).toBe(8);
-  });
-
-  it("scales a practice group by its logged time", () => {
-    expect(calculateGroupFame({ type: "exercise", logs: [practiceLog(hours(1))] })).toBe(9);
+  it("pays per action, so a run of them stacks", () => {
     expect(
-      calculateGroupFame({ type: "exercise", logs: [practiceLog(hours(2)), practiceLog(hours(2))] })
-    ).toBe(20);
+      calculateGroupFame({ logs: Array.from({ length: 5 }, songLog) }),
+    ).toBe(5 * ACTION_FAME);
   });
 
-  it("scales the fixed exercise-plan reward too", () => {
-    expect(calculateGroupFame({ type: "exercisePlan", logs: [practiceLog(minutes(5))] })).toBe(
-      EXERCISE_PLAN_FAME
-    );
-    expect(calculateGroupFame({ type: "exercisePlan", logs: [practiceLog(hours(3))] })).toBe(30);
+  it("prices practice by the minute", () => {
+    expect(calculateGroupFame({ logs: [practiceLog(minutes(30))] })).toBe(30);
+    expect(calculateGroupFame({ logs: [practiceLog(hours(2))] })).toBe(120);
   });
 
-  it("pays timeless activity exactly as before", () => {
-    expect(calculateGroupFame({ type: "song", logs: [songLog(), songLog(), songLog()] })).toBe(15);
+  it("pays the same however the same practice time is split across logs", () => {
+    expect(
+      calculateGroupFame({
+        logs: [
+          practiceLog(minutes(20)),
+          practiceLog(minutes(20)),
+          practiceLog(minutes(20)),
+        ],
+      }),
+    ).toBe(calculateGroupFame({ logs: [practiceLog(hours(1))] }));
   });
 
-  it("caps the multiplied reward", () => {
+  it("adds both halves of a mixed row", () => {
+    expect(
+      calculateGroupFame({ logs: [practiceLog(minutes(30)), songLog()] }),
+    ).toBe(30 + ACTION_FAME);
+  });
+
+  it("caps a single row", () => {
     const logs = Array.from({ length: 12 }, () => practiceLog(hours(1)));
-    expect(calculateGroupFame({ type: "exercise", logs })).toBe(MAX_ACTIVITY_FAME);
+    expect(calculateGroupFame({ logs })).toBe(MAX_ACTIVITY_FAME);
   });
 });

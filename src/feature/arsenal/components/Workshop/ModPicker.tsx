@@ -6,7 +6,11 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
-import type { FittedMod, ModOption } from "feature/arsenal/data/workshop";
+import type {
+  FittedMod,
+  ModFeatureDef,
+  ModOption,
+} from "feature/arsenal/data/workshop";
 import { motion } from "framer-motion";
 import { Dices, Trash2 } from "lucide-react";
 
@@ -223,13 +227,13 @@ const ModRow = ({
 );
 
 /**
- * A mod pulled off something the player scrapped, offered back to this
- * instrument.
+ * A mod the player already owns, offered to this instrument.
  *
  * Deliberately not a `ModRow`: this one has no range to roll and no bill to pay,
  * because it is not being made — it already exists, it was paid for with the
- * instrument it came off, and it arrives at the exact value it survived with.
- * Where the bill would be, the row says where it came from instead.
+ * instrument it came off or with a day's Fame at the Trader, and it arrives at
+ * the exact value it carries. Where the bill would be, the row says where it
+ * came from instead.
  */
 const SalvagedRow = ({
   mod,
@@ -265,7 +269,7 @@ const SalvagedRow = ({
         </span>
       </div>
       <span className='text-sm text-zinc-500'>
-        Salvaged from {mod.sourceName} — free to fit, nothing re-rolled
+        From {mod.sourceName} — goes on as it is, nothing re-rolled
       </span>
     </div>
 
@@ -284,44 +288,87 @@ const SalvagedRow = ({
 );
 
 interface ModPickerProps {
-  candidates: ModOption[];
-  fitted: FittedMod[];
-  /** Mods rescued from teardowns that this instrument could take. */
+  /** Mods the player owns that this instrument could take — the only way one goes on. */
   salvaged: SalvagedModOption[];
-  /** No free slot — the fit menu is shown, but nothing in it can be bought. */
+  fitted: FittedMod[];
+  /** What this build would take and does not carry. Reference, not a menu. */
+  compatible: ModFeatureDef[];
+  /** No free slot — owned mods are still listed, but none of them can go on. */
   slotsFull: boolean;
   /** Flat Fame the bench charges to strip a mod off, whatever it is worth. */
   removeFame: number;
   /** Whether the player's Fame covers that charge. */
   canRemove: boolean;
   busy: boolean;
-  onFit: (featureId: string) => void;
   onReroll: (featureId: string) => void;
   onFitSalvaged: (salvagedId: string) => void;
   onRemove: (featureId: string) => void;
 }
 
 /**
- * The two halves of the mod bench: what can go on, and what is already on.
+ * The three lists on the mod bench: what you own and could bolt on, what is
+ * already on, and what this build would take if one ever turned up.
  *
- * Both are lists of the same row because they are the same transaction — a named
- * mod, its own bill, one button. The only difference is that a re-roll shows the
- * number it is about to overwrite.
+ * Only the first two are transactions. The third is reference — the bench does
+ * not sell mods, so a row there with a bill and a button would advertise a shop
+ * that does not exist, which is exactly what the old fit menu was.
  */
 export const ModPicker = ({
-  candidates,
-  fitted,
   salvaged,
+  fitted,
+  compatible,
   slotsFull,
   removeFame,
   canRemove,
   busy,
-  onFit,
   onReroll,
   onFitSalvaged,
   onRemove,
 }: ModPickerProps) => (
   <div className='flex flex-col gap-7'>
+    <div className='flex flex-col gap-3'>
+      <div className='flex flex-col gap-1.5'>
+        <SectionLabel>From your stash</SectionLabel>
+        {/*
+          The one rule of this bench, written where the player is standing when
+          it matters. It is the thing that changed, and the thing every empty
+          list below is explained by.
+        */}
+        <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+          A mod is a component, and the bench fits the one you hand it — it
+          cannot make one. Mods come off gear you scrap and off the
+          Trader&apos;s counter, and they go on at the value they already carry:
+          nothing is re-rolled and nothing is charged.
+        </p>
+        {slotsFull && salvaged.length > 0 && (
+          <p className='max-w-xl text-sm leading-relaxed text-amber-400/80'>
+            Every mod slot at this rarity is filled — a promotion buys the room
+            for these.
+          </p>
+        )}
+      </div>
+
+      {salvaged.length === 0 ? (
+        <div className='rounded-lg bg-zinc-800/20 p-6 text-base leading-relaxed text-zinc-400'>
+          Nothing you own fits this instrument. Scrap something carrying a mod —
+          one always survives a teardown — or see what the Trader has today.
+        </div>
+      ) : (
+        <div className='flex flex-col gap-2'>
+          {salvaged.map((mod, i) => (
+            <SalvagedRow
+              key={mod.salvagedId}
+              mod={mod}
+              index={i}
+              slotsFull={slotsFull}
+              busy={busy}
+              onFit={() => onFitSalvaged(mod.salvagedId)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+
     {fitted.length > 0 && (
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1.5'>
@@ -332,15 +379,15 @@ export const ModPicker = ({
             where it cannot be missed.
           */}
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            A re-roll buys the mod again for a brand-new value from its range.
-            Whatever comes up replaces what the mod is worth now — there is no
-            keeping the better of the two.
+            A re-roll is the one job here that spends parts. It buys a brand-new
+            value from the mod&apos;s range, and whatever comes up replaces what
+            the mod is worth now — there is no keeping the better of the two.
           </p>
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
             Taking one off costs {removeFame} Fame and frees its slot. The mod
-            comes off the instrument for good: it is not put in your stash, it
-            cannot be fitted anywhere else, and the level it was worth goes with
-            it.
+            comes off the instrument for good: it is not put back in your stash,
+            it cannot be fitted anywhere else, and the level it was worth goes
+            with it.
           </p>
         </div>
         <div className='flex flex-col gap-2'>
@@ -367,50 +414,36 @@ export const ModPicker = ({
       </div>
     )}
 
-    {salvaged.length > 0 && (
+    {compatible.length > 0 && (
       <div className='flex flex-col gap-3'>
-        <SectionLabel>From the stash</SectionLabel>
-        <div className='flex flex-col gap-2'>
-          {salvaged.map((mod, i) => (
-            <SalvagedRow
-              key={mod.salvagedId}
-              mod={mod}
-              index={i}
-              slotsFull={slotsFull}
-              busy={busy}
-              onFit={() => onFitSalvaged(mod.salvagedId)}
-            />
+        <div className='flex flex-col gap-1.5'>
+          <SectionLabel>Would fit this build</SectionLabel>
+          <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+            What to keep an eye out for. Any of these would go onto this
+            instrument the day one reaches your stash.
+          </p>
+        </div>
+        {/*
+          Chips rather than rows: there is no bill to read and no button to press,
+          and twenty of these at row height would bury the two lists that are
+          actually jobs.
+        */}
+        <div className='flex flex-wrap gap-2'>
+          {compatible.map((mod) => (
+            <span
+              key={mod.id}
+              className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 py-2 pl-2 pr-4'>
+              <ModArt modId={mod.id} size={32} />
+              <span className='text-sm font-semibold text-zinc-300'>
+                {mod.label}
+              </span>
+              <span className='text-xs tabular-nums text-zinc-500'>
+                +{mod.min} to +{mod.max}
+              </span>
+            </span>
           ))}
         </div>
       </div>
     )}
-
-    <div className='flex flex-col gap-3'>
-      <SectionLabel>
-        {slotsFull
-          ? "Fits this build — but every slot is taken"
-          : "Fits this build"}
-      </SectionLabel>
-
-      {candidates.length === 0 ? (
-        <div className='rounded-lg bg-zinc-800/20 p-6 text-base text-zinc-400'>
-          Nothing left to fit — this instrument already carries every mod its
-          construction allows.
-        </div>
-      ) : (
-        <div className='flex flex-col gap-2'>
-          {candidates.map((mod, i) => (
-            <ModRow
-              key={mod.id}
-              mod={mod}
-              index={i}
-              actionLabel='Install'
-              disabled={!mod.affordable || slotsFull || busy}
-              onAction={() => onFit(mod.id)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
   </div>
 );

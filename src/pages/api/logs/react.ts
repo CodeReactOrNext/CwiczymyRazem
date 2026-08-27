@@ -1,6 +1,6 @@
 import { calculateGroupFame } from "feature/logs/utils/activityFame";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
-import { getLogGroupType, groupConsecutiveLogs } from "feature/logs/utils/groupConsecutiveLogs";
+import { groupConsecutiveLogs } from "feature/logs/utils/groupConsecutiveLogs";
 import { getGroupReactionAnchor } from "feature/logs/utils/groupReactions";
 import type {
   DocumentReference,
@@ -99,7 +99,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const groupLogs = await loadTargetGroup(target);
-    const groupType = getLogGroupType(groupLogs[0]);
 
     // Whether this user already reacted — and if so, on which member — is decided here rather than
     // taken from the request, so a stale client can't double-award or double-refund.
@@ -108,7 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const targetLogId = (reactedLog ?? anchor ?? target).id as string;
 
     const isRemoving = Boolean(reactedLog);
-    const groupFame = calculateGroupFame({ type: groupType, logs: groupLogs });
+    const groupFame = calculateGroupFame({ logs: groupLogs });
 
     const logRef = firestore.collection("logs").doc(targetLogId) as DocumentReference;
     const recipientRef = firestore.collection("users").doc(recipientId) as DocumentReference;

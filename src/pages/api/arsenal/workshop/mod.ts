@@ -29,17 +29,18 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Fits a mod, re-rolls one already fitted, bolts on one rescued from a teardown,
- * or strips one back off.
+ * Bolts on a mod the player owns, re-rolls one already fitted, or strips one off.
  *
- * The player picks *which* mod — each one has its own bill, so there is nothing
- * random about the price — but the value is rolled here and never on the client.
- * `getModQuote` is deterministic, so the bill shown is the bill charged, and the
- * only thing the request can influence is which named mod it asks for.
+ * Nothing here *sells* a mod. A mod is a component: it comes off a teardown or
+ * over the trader's counter, waits in `salvagedMods`, and this route fits it at
+ * the value it already carries. Nothing is rolled and nothing is charged for
+ * that — the player paid an entire instrument, or a day's Fame, for it already;
+ * see `data/salvage.ts`.
  *
- * A salvaged fit is the one case where nothing is rolled and nothing is charged:
- * the mod already has a value, earned on the instrument it was pulled off, and
- * the player already paid that instrument for it — see `data/salvage.ts`.
+ * A re-roll is the one job left that spends parts, and it is where the bench's
+ * edge over a case roll lives. The value is rolled here and never on the client,
+ * and `getModQuote` is deterministic, so the bill shown is the bill charged and
+ * the only thing the request can influence is which fitted mod it names.
  *
  * A removal is the mirror image: nothing is rolled, nothing is spent out of the
  * wallet, a flat `MOD_REMOVE_FAME_COST` is charged, and the mod is *gone* — it is
@@ -76,7 +77,13 @@ export default async function handler(
   } else if (!featureId) {
     return res.status(400).json({ error: "Missing featureId" });
   }
-  if (action !== "fit" && action !== "reroll" && !isRemove && !isSalvaged) {
+  // A tab left open from before mods became components still asks to buy one.
+  if ((action as string) === "fit") {
+    return res
+      .status(400)
+      .json({ error: "Mods are fitted from your stash now — reload the page" });
+  }
+  if (action !== "reroll" && !isRemove && !isSalvaged) {
     return res.status(400).json({ error: "Invalid action" });
   }
   if (kind !== "guitar" && kind !== "effect") {
@@ -128,7 +135,6 @@ export default async function handler(
             })();
 
       const quote = getModQuote(subject, wallet, fame);
-      const isReroll = action === "reroll";
       const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
 
       const features: ItemFeature[] = subject.features.map((f) => ({ ...f }));
@@ -179,34 +185,19 @@ export default async function handler(
       } else {
         // The priced option is the single source of both the bill and the range —
         // exactly the object the client was looking at when it sent this.
-        const option = isReroll
-          ? quote.fitted.find((f) => f.id === featureId)
-          : quote.candidates.find((c) => c.id === featureId);
-
-        if (!option) {
-          throw new Error(
-            isReroll ? "REQUIREMENT_NOT_FITTED" : "REQUIREMENT_UNAVAILABLE",
-          );
-        }
+        const option = quote.fitted.find((f) => f.id === featureId);
+        if (!option) throw new Error("REQUIREMENT_NOT_FITTED");
         if (!option.affordable) throw new Error("REQUIREMENT_PARTS");
 
-        if (isReroll) {
-          // `option` came out of `quote.fitted`, so the feature is certainly there.
-          target = features.find((f) => f.id === featureId)!;
-          pointsBefore = target.points;
-        } else {
-          if (quote.slots.free <= 0) throw new Error("REQUIREMENT_SLOTS");
-          target = { id: option.id, points: 0 };
-          features.push(target);
-        }
+        // `option` came out of `quote.fitted`, so the feature is certainly there.
+        target = features.find((f) => f.id === featureId)!;
+        pointsBefore = target.points;
 
         // A re-roll always replaces, including downward — that is the whole risk.
         target.points = rollModPoints(option);
         label = option.label;
         spent = recipeToParts(option.recipe);
-        logLine = isReroll
-          ? `${option.label} re-spec`
-          : `${option.label} fitted`;
+        logLine = `${option.label} re-spec`;
       }
 
       const buildLog = appendBuildLog(item.buildLog, logLine);

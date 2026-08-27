@@ -406,11 +406,16 @@ export interface WorkshopBuildResult {
 }
 
 /**
- * Fitting a new mod, re-rolling one already on the item, bolting on a mod rescued
- * from a teardown, or stripping one back off — the third keeps the value it came
- * with instead of rolling a new one, and the fourth destroys the mod outright.
+ * Bolting on a mod the player owns, re-rolling one already on the item, or
+ * stripping one back off.
+ *
+ * There is no "buy a mod at the bench" action: a mod is a component, and fitting
+ * one means owning one first. `fit-salvaged` therefore names every fit there is —
+ * the stash entry it consumes came off a teardown or over the trader's counter,
+ * and it keeps the value it arrived with rather than rolling a new one. A removal
+ * destroys the mod outright.
  */
-export type WorkshopModAction = "fit" | "reroll" | "remove" | "fit-salvaged";
+export type WorkshopModAction = "reroll" | "remove" | "fit-salvaged";
 
 export interface WorkshopModResult {
   action: WorkshopModAction;
@@ -419,7 +424,7 @@ export interface WorkshopModResult {
   label: string;
   /** Zero on a removal — the mod is off the item and worth nothing to it. */
   points: number;
-  /** The value before a re-roll or a removal — absent on a fresh fit. */
+  /** The value before a re-roll or a removal — absent on a fit from the stash. */
   pointsBefore?: number;
   /** Item Level the job was worth. Negative on a removal, or a re-roll gone bad. */
   levelGain: number;

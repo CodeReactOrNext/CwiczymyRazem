@@ -174,6 +174,9 @@ export const WorkshopJobModal = ({
       },
     );
 
+  /** A mod the player owns that fits, with a slot free for it — the only fit there is. */
+  const canRefit = modQuote.slots.free > 0 && salvagedOptions.length > 0;
+
   const conditionCheck = buildQuote.checks.find((c) => c.kind === "condition")!;
   const fameCheck = buildQuote.checks.find((c) => c.kind === "fame")!;
 
@@ -200,10 +203,13 @@ export const WorkshopJobModal = ({
     ...(buildQuote.canBuild
       ? [{ job: "build" as const, label: buildLabel(buildQuote) }]
       : []),
-    ...(modQuote.canFit ||
-    modQuote.canReroll ||
-    (modQuote.slots.free > 0 && salvagedOptions.length > 0)
-      ? [{ job: "mod" as const, label: "Install another mod" }]
+    ...(canRefit || modQuote.canReroll
+      ? [
+          {
+            job: "mod" as const,
+            label: canRefit ? "Install another mod" : "Re-roll a mod",
+          },
+        ]
       : []),
   ];
 
@@ -317,22 +323,23 @@ export const WorkshopJobModal = ({
                   <span className='text-zinc-600'>/{modQuote.slots.max}</span>
                 </span>
                 <span className='text-sm text-zinc-400'>
-                  {modQuote.slots.free > 0
-                    ? `${modQuote.candidates.length} mod${modQuote.candidates.length === 1 ? "" : "s"} still fit this build`
-                    : `${entry.rarity} holds no more — a promotion buys the room`}
+                  {modQuote.slots.free === 0
+                    ? `${entry.rarity} holds no more — a promotion buys the room`
+                    : salvagedOptions.length > 0
+                      ? `${salvagedOptions.length} you own ${salvagedOptions.length === 1 ? "fits" : "fit"} this build`
+                      : "nothing you own fits this build yet"}
                 </span>
               </div>
             </div>
 
             <ModPicker
-              candidates={modQuote.candidates}
-              fitted={modQuote.fitted}
               salvaged={salvagedOptions}
+              fitted={modQuote.fitted}
+              compatible={modQuote.compatible}
               slotsFull={modQuote.slots.free === 0}
               removeFame={MOD_REMOVE_FAME_COST}
               canRemove={modQuote.canRemove}
               busy={isPending}
-              onFit={(featureId) => runMod(featureId, "fit")}
               onReroll={(featureId) => runMod(featureId, "reroll")}
               onFitSalvaged={(salvagedId) =>
                 runMod(null, "fit-salvaged", salvagedId)

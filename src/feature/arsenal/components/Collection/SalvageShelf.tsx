@@ -8,6 +8,7 @@ import {
 } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
 import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
+import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellPart } from "feature/arsenal/hooks/useSellPart";
 import { useSellSalvagedMod } from "feature/arsenal/hooks/useSellSalvagedMod";
 import { groupWalletByPart } from "feature/arsenal/utils/scrap";
@@ -22,6 +23,7 @@ import type {
   ScrapPart,
 } from "../../types/arsenal.types";
 import { SellConfirmDialog } from "../GuitarInventory/SellConfirmDialog";
+import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { PartIcon } from "../Parts/PartIcon";
 import { SectionLabel } from "../SectionLabel";
 import { TierPlate } from "../TierPlate";
@@ -62,9 +64,12 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
+  const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const [detail, setDetail] = useState<Detail>(null);
   const [pending, setPending] = useState<Pending>(null);
+  /** A mod on its way to the market rather than the bin. */
+  const [listMod, setListMod] = useState<SalvagedMod | null>(null);
 
   // One row per part *and* tier: a Rare screw and a Common one are separate
   // stacks everywhere else in the game, and they sell for different money.
@@ -170,6 +175,12 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
               setPending(detail);
             }}
             isSelling={isSellingMod}
+            onListClick={() => {
+              const { mod } = detail;
+              setDetail(null);
+              setListMod(mod);
+            }}
+            isListing={isListing}
           />
         )}
       </StashItemDialog>
@@ -204,6 +215,30 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
           }}
           onCancel={() => setPending(null)}
           isLoading={isSellingPart || isSellingMod}
+        />
+      )}
+
+      {/* The phone's only route to the market for a mod — the stash board this
+          shelf stands in for needs a pointer and a wide screen. */}
+      {listMod && (
+        <ListItemDialog
+          isOpen
+          itemType='Mod'
+          itemName={`${getModDef(listMod.kind, listMod.featureId)?.label ?? listMod.featureId} +${listMod.points}`}
+          minPrice={getModResaleValue(
+            listMod.kind,
+            listMod.featureId,
+            listMod.points,
+          )}
+          currentFame={currentFame}
+          onConfirm={(price) =>
+            listOnMarket(
+              { itemType: "mod", inventoryItemId: listMod.id, price },
+              { onSuccess: () => setListMod(null) },
+            )
+          }
+          onCancel={() => setListMod(null)}
+          isLoading={isListing}
         />
       )}
     </div>
