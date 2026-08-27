@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
+import { stringRow } from "./tablatureStringRows";
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 // World-space design height of the score. The whole drawing is scaled by
@@ -10,6 +11,14 @@ const BASE_H = 300;
 // Vertical gap between strings. Driven by STYLE — the main thread bakes the same
 // value into every note's noteY, so the two must never drift apart.
 let STRING_SPACING = 32;
+// Upside-down staff (low E on the top line). Driven by STYLE — the main thread
+// bakes the same order into every note's noteY, so the two must never drift
+// apart; everything derived from a string NUMBER here goes through stringRow().
+let flipStrings = false;
+// Mirrored board (music running right to left). The flip itself is a CSS
+// transform on the canvas element — the worker only needs to know about it so
+// the text it draws does not come out backwards (see drawText).
+let rightToLeft = false;
 // Width (world px) of the pinned left "tuning gutter" that shows each string's
 // tuned note. Content is inset by this much when tuning data is present so the
 // first notes don't hide behind the labels. Keep in sync with TAB_GUTTER_W in
@@ -92,6 +101,8 @@ const STAFF_LINE_GROUPS: { alpha: number; indices: number[] }[] = [
 // ── Shared types (mirrored from TablatureViewer.tsx) ──────────────────────────
 interface NoteRD {
   noteKey: string;
+  /** 1–6 string number (1 = high e) — which line it lands on depends on flipStrings. */
+  string: number;
   noteY: number;
   fret: number;
   color: string;
@@ -138,6 +149,22 @@ interface TempoPoint { beatPos: number; ratio: number; }
 // ── Worker state ──────────────────────────────────────────────────────────────
 let canvas: OffscreenCanvas | null = null;
 let ctx: OffscreenCanvasRenderingContext2D | null = null;
+
+/**
+ * Every string of text on the board, drawn so it reads forwards on a mirrored
+ * one too: flipping a label about its own anchor cancels the board's mirror
+ * into a pure translation, which leaves alignment and baseline behaving exactly
+ * as they do normally — the label simply lands on the mirrored spot.
+ */
+function drawText(text: string, x: number, y: number) {
+  if (!ctx) return;
+  if (!rightToLeft) { ctx.fillText(text, x, y); return; }
+  ctx.save();
+  ctx.translate(x, 0);
+  ctx.scale(-1, 1);
+  ctx.fillText(text, 0, y);
+  ctx.restore();
+}
 let dpr = 1;
 let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
 
@@ -273,7 +300,7 @@ function drawGlyph(g: string, x: number, y: number, align: CanvasTextAlign = "ce
   ctx.font = `${RHY_GLYPH_PX}px Bravura`;
   ctx.textAlign = align;
   ctx.textBaseline = baseline;
-  ctx.fillText(g, x, y);
+  drawText(g, x, y);
 }
 
 // Lighten a "#rrggbb" colour toward white by `amt` (0..1). Non-hex passes through.
@@ -340,7 +367,7 @@ function drawBendBadge(
   ctx.strokeStyle = textColor; ctx.lineWidth = 2; ctx.stroke();
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(fullText, bx, by + 1);
+  drawText(fullText, bx, by + 1);
 
   const lsy = by + bh / 2;
   const ley = noteY - 1; // noteY = top edge of block passed by caller
@@ -389,7 +416,7 @@ function activeTuningStrings(curBeat: number): Set<number> {
   for (let i = start; i < renderBeats.length; i++) {
     const b = renderBeats[i];
     if (b.offsetX > curBeat + TUNING_LOOKAHEAD_BEATS) break;
-    for (const n of b.notes) active.add(Math.round((n.noteY - STAFF_TOP) / STRING_SPACING) + 1);
+    for (const n of b.notes) active.add(n.string);
   }
   return active;
 }
@@ -420,7 +447,7 @@ function drawTuningGutter(active: Set<number>) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const st of tuningStrings) {
-    const y = STAFF_TOP + (st.string - 1) * STRING_SPACING;
+    const y = STAFF_TOP + stringRow(st.string, flipStrings) * STRING_SPACING;
     const top = y - pillH / 2;
     // Notes are hidden (ear training) → light every string so we don't leak
     // which one is coming next; otherwise only the strings about to be played.
@@ -441,7 +468,7 @@ function drawTuningGutter(active: Set<number>) {
     const litInk = fretTextColor === "auto" ? readableInk(st.color) : fretTextColor;
     ctx.fillStyle = lit ? litInk : "#d4d4d8";
     ctx.font = "bold 13px Inter, sans-serif";
-    ctx.fillText(st.label, pillX + pillW / 2, y + 0.5);
+    drawText(st.label, pillX + pillW / 2, y + 0.5);
   }
   ctx.globalAlpha = 1;
 }
@@ -755,7 +782,7 @@ function render() {
           ctx.fillStyle = "#fbbf24";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("!", beatL, STEM_TOP_Y - 8);
+          drawText("!", beatL, STEM_TOP_Y - 8);
           // Reset colors
           ctx.strokeStyle = RHYTHM_COLOR;
           ctx.fillStyle = RHYTHM_COLOR;
@@ -865,7 +892,7 @@ function render() {
         // ── Slide line from previous block on same string ─────────────────
         const prev = stringLastPos.get(note.noteY);
         if (prev && prev.slideOut > 0) {
-          ctx.strokeStyle = stringColors[Math.round((note.noteY - STAFF_TOP) / STRING_SPACING)] ?? "#fff";
+          ctx.strokeStyle = stringColors[note.string - 1] ?? "#fff";
           ctx.globalAlpha = 0.7;
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -1064,7 +1091,7 @@ function render() {
 
           let text = note.fret.toString();
           if (note.isGhost) text = `(${text})`;
-          ctx.fillText(text, labelX, note.noteY);
+          drawText(text, labelX, note.noteY);
         }
 
         // ── Technique labels ──────────────────────────────────────────────
@@ -1079,7 +1106,7 @@ function render() {
         ctx.font = "bold 9px Inter";
         if (note.isAccented) {
           ctx.fillStyle = withAlpha(inkColor, 0.75);
-          ctx.fillText(">", labelX, blockY - 6);
+          drawText(">", labelX, blockY - 6);
         }
         if (note.isHammerOn || note.isPullOff) {
           const isHP = note.isHammerOn;
@@ -1107,19 +1134,19 @@ function render() {
             ctx.font = "bold 12px Inter";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            ctx.fillText(label, midX, slurY - arcH - 3);
+            drawText(label, midX, slurY - arcH - 3);
           } else {
             // No previous note visible – fallback to label above block
             ctx.fillStyle = hpColor;
             ctx.font = "bold 12px Inter";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            ctx.fillText(label, blockX + blockW / 2, blockY - 3);
+            drawText(label, blockX + blockW / 2, blockY - 3);
           }
         }
         if (note.isTap) {
           ctx.fillStyle = isHit ? "#064e3b" : "#34d399";
-          ctx.fillText("T", blockRX - 7, blockY - 6);
+          drawText("T", blockRX - 7, blockY - 6);
         }
 
         // Harmonic badge
@@ -1128,7 +1155,7 @@ function render() {
           ctx.fillStyle = note.harmonicType === 1 ? "#a3e635" : "#f0abfc";
           const hLabel = note.harmonicType === 1 ? "N.H." : note.harmonicType === 2 ? "A.H."
             : note.harmonicType === 3 ? "T.H." : note.harmonicType === 4 ? "P.H." : "S.H.";
-          ctx.fillText(hLabel, labelX, note.noteY);
+          drawText(hLabel, labelX, note.noteY);
         }
 
         // Palm mute label below block
@@ -1136,7 +1163,7 @@ function render() {
           ctx.font = "bold 7px Inter";
           ctx.fillStyle = "#a8a29e";
           ctx.textAlign = "left";
-          ctx.fillText("PM", blockX + 3, blockY + BLOCK_H + 8);
+          drawText("PM", blockX + 3, blockY + BLOCK_H + 8);
         }
 
         // Staccato: dot above block
@@ -1274,7 +1301,7 @@ function render() {
       ctx.fillStyle    = bgColor;
       ctx.textAlign    = "left";
       ctx.textBaseline = "top";
-      ctx.fillText(label, pillX + padX, pillY + padY);
+      drawText(label, pillX + padX, pillY + padY);
 
       // Restore state used by surrounding draw code
       ctx.textBaseline = "middle";
@@ -1291,8 +1318,8 @@ function render() {
     for (const marker of timeSigMarkers) {
       const mx = marker.x * dynBW + 10;
       if (mx < visL - 40 || mx > visR) continue;
-      ctx.fillText(marker.sig[0].toString(), mx, sigMidY - 10);
-      ctx.fillText(marker.sig[1].toString(), mx, sigMidY + 10);
+      drawText(marker.sig[0].toString(), mx, sigMidY - 10);
+      drawText(marker.sig[1].toString(), mx, sigMidY + 10);
     }
   }
 
@@ -1326,7 +1353,7 @@ function render() {
       ctx.lineTo(x2, bracketY + tickH);
       ctx.stroke();
       // Number
-      ctx.fillText(label, midX, bracketY);
+      drawText(label, midX, bracketY);
     }
   }
 
@@ -1400,7 +1427,7 @@ function render() {
     ctx.font = "bold 9px Inter, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText("⟳", lsx + 4, 3);
+    drawText("⟳", lsx + 4, 3);
   }
 
   // ── Editor selection — mirrors the cell(s) picked in the tab editor grid ─
@@ -1408,8 +1435,10 @@ function render() {
   if (selection && !isPlaying) {
     const selX = selection.startBeat * dynBW;
     const selW = Math.max(6, (selection.endBeat - selection.startBeat) * dynBW);
-    const topY = STAFF_TOP + (selection.startString - 1) * STRING_SPACING;
-    const botY = STAFF_TOP + (selection.endString   - 1) * STRING_SPACING;
+    // Flipped staff swaps which end of the string range is the upper row.
+    const selRows = [stringRow(selection.startString, flipStrings), stringRow(selection.endString, flipStrings)];
+    const topY = STAFF_TOP + Math.min(...selRows) * STRING_SPACING;
+    const botY = STAFF_TOP + Math.max(...selRows) * STRING_SPACING;
 
     // Wash over the whole staff at that beat: an empty cell has no note to ring,
     // and this is what makes the spot findable at a glance.
@@ -1456,7 +1485,7 @@ function render() {
     ctx.font = "bold 10px Inter, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText(`M${measureIdx + 1}`, tx + 12, ty + 1);
+    drawText(`M${measureIdx + 1}`, tx + 12, ty + 1);
   }
 
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
@@ -1628,6 +1657,8 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.hitGlow !== undefined) hitGlow = msg.hitGlow;
       if (msg.background !== undefined) bgColor = msg.background;
       if (msg.stringSpacing !== undefined) STRING_SPACING = msg.stringSpacing;
+      if (msg.flipStrings !== undefined) flipStrings = msg.flipStrings;
+      if (msg.rightToLeft !== undefined) rightToLeft = msg.rightToLeft;
       if (msg.fretText !== undefined) fretTextColor = msg.fretText;
       if (msg.ink !== undefined) {
         inkColor = msg.ink;

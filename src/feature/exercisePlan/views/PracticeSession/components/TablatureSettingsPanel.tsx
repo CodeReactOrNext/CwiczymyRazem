@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
 import type { LucideIcon } from "lucide-react";
 import { AlignJustify, Music, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
@@ -208,6 +209,10 @@ function ResetButton({
 export function TablatureSettingsPanel() {
   const settings = useTablatureSettings();
   const { set, reset } = settings;
+  // Handedness lives in its own store: it is a property of the player rather
+  // than of the tab, and it drives the neck diagrams in the drills too.
+  const leftHanded = useIsLeftHanded();
+  const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
 
   const toggles: {
     key: keyof TablatureSettings;
@@ -442,6 +447,31 @@ export function TablatureSettingsPanel() {
               onChange={(next) => set(key, next as never)}
             />
           ))}
+        </div>
+      </Section>
+
+      <Section
+        title='Handedness'
+        hint='For left-handed players. Applies everywhere on this device.'>
+        <div className='space-y-1'>
+          <ToggleRow
+            label='Mirror fretboard diagrams'
+            desc='Nut on the right in the click and hunt drills. The tab has no neck axis to mirror, so it stays as it is.'
+            checked={leftHanded}
+            onChange={setLeftHanded}
+          />
+          <ToggleRow
+            label='Right-to-left board'
+            desc='The tab starts at the right edge and the cursor runs left, like a mirrored neck. Tab only; the notation view keeps its normal direction.'
+            checked={settings.rightToLeft}
+            onChange={(next) => set("rightToLeft", next)}
+          />
+          <ToggleRow
+            label='Flip string order'
+            desc='Low E on the top line — for a right-handed guitar strung the other way round. Tab only; the notation view keeps standard order.'
+            checked={settings.flipStrings}
+            onChange={(next) => set("flipStrings", next)}
+          />
         </div>
       </Section>
 

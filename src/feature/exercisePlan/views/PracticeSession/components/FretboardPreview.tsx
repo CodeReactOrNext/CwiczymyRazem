@@ -2,6 +2,7 @@
 
 import type { FretPosition } from 'feature/exercisePlan/scales/fretboardMapper';
 import { rootNotes } from 'feature/exercisePlan/scales/scaleDefinitions';
+import { mirrorStyle, uprightTransform, useIsLeftHanded } from 'hooks/useHandedness';
 
 interface FretboardPreviewProps {
   positions: FretPosition[];
@@ -25,6 +26,11 @@ const BOT_PAD = 10;   // space for inlay dots
 export function FretboardPreview({ positions, startFret, endFret, rootMidi, label }: FretboardPreviewProps) {
   const fretCount = endFret - startFret + 1;
 
+  // Same mirror as the big board: nut on the right for left-handed players,
+  // with every label counter-transformed so it still reads left to right.
+  const leftHanded = useIsLeftHanded();
+  const upright = (anchorX: number) => uprightTransform(anchorX, leftHanded);
+
   const vw = LEFT_PAD + fretCount * CELL_W;
   const vh = TOP_PAD + 6 * CELL_H + BOT_PAD;
 
@@ -38,7 +44,8 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
           width="100%"
           height="100%"
           preserveAspectRatio="xMidYMid meet"
-          aria-label="Fretboard diagram"
+          style={{ transform: mirrorStyle(leftHanded) }}
+          aria-label={leftHanded ? 'Fretboard diagram, left-handed' : 'Fretboard diagram'}
         >
           {/* String lines */}
           {STRING_LABELS.map((_, i) => {
@@ -79,7 +86,7 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
             if (fret === 0) return null;
             const x = LEFT_PAD + i * CELL_W + CELL_W / 2;
             return (
-              <text key={i} x={x} y={TOP_PAD - 3} textAnchor="middle" fontSize={9} fill="#9ca3af" fontWeight="500">
+              <text key={i} x={x} y={TOP_PAD - 3} transform={upright(x)} textAnchor="middle" fontSize={9} fill="#9ca3af" fontWeight="500">
                 {fret}
               </text>
             );
@@ -89,7 +96,7 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
           {STRING_LABELS.map((label, i) => {
             const y = TOP_PAD + i * CELL_H + CELL_H / 2 + 2.5;
             return (
-              <text key={i} x={LEFT_PAD - 3} y={y} textAnchor="end" fontSize={7} fill="#6b7280">
+              <text key={i} x={LEFT_PAD - 3} y={y} transform={upright(LEFT_PAD - 3)} textAnchor={leftHanded ? 'start' : 'end'} fontSize={7} fill="#6b7280">
                 {label}
               </text>
             );
@@ -121,6 +128,7 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
                 <text
                   x={cx}
                   y={cy + 3.5}
+                  transform={upright(cx)}
                   textAnchor="middle"
                   fontSize={isRoot ? 7.5 : 7}
                   fontWeight={isRoot ? 'bold' : 'normal'}

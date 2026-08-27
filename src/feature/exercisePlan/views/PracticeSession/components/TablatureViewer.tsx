@@ -4,6 +4,7 @@ import { SkipBack } from "lucide-react";
 import React, { memo, useEffect, useRef, useState } from "react";
 
 import { CountInOverlay } from "./CountInOverlay";
+import { mirrorBoardStyle } from "./tablatureDirection";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
@@ -117,9 +118,10 @@ const TablatureViewerInner = ({
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
 
-  // The worker maps noteY back to a string index, so it must receive the very
-  // same spacing this render data was built with (both come from `style`).
-  const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing);
+  // The worker draws the gutter and the selection at rows it works out itself,
+  // so it must receive the very same spacing and string order this render data
+  // was built with (both come from `style`).
+  const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings);
 
   const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
@@ -188,7 +190,11 @@ const TablatureViewerInner = ({
       onTouchMove={(e)  => handleDragMove(e.touches[0].clientX)}
       onTouchEnd={(e)   => handleDragEnd(e.changedTouches[0]?.clientX)}
     >
-      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block", position: "relative", zIndex: 10 }} />
+      {/* The right-to-left board is this one flip: the renderer keeps drawing
+          left to right in its own coordinates, and the gutter, the cursor and
+          the scrolling all mirror with it. Only pointer coordinates (see the
+          bridge) and the text the worker draws have to be told about it. */}
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block", position: "relative", zIndex: 10, transform: mirrorBoardStyle(!!style?.rightToLeft) }} />
 
       {volumeRef && ambientGlow && (
         <div

@@ -246,6 +246,20 @@ export interface TablatureSettings {
   noteSpacing: number;
   /** Vertical gap between strings, in world px. */
   stringSpacing: number;
+  /**
+   * Turns the staff upside down — low E on the top line.
+   *
+   * Not a handedness setting: tab's string order is the same for both hands
+   * (see `stringRow`). It is for players on a right-handed guitar strung the
+   * other way round, whose lowest string sits where the tab draws the highest.
+   */
+  flipStrings: boolean;
+  /**
+   * Mirrors the board: the piece starts at the right edge and the cursor travels
+   * left. Time still reads in one direction, it is just the other one — for
+   * players who want the tab to face the same way as their neck.
+   */
+  rightToLeft: boolean;
   // ── Colour ──
   palette: PaletteKey;
   hitColor: HitColorKey;
@@ -275,6 +289,8 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   fretTextColor: "black",
   noteSpacing: 1,
   stringSpacing: STRING_SPACING_DEFAULT,
+  flipStrings: false,
+  rightToLeft: false,
   palette: "rainbow",
   hitColor: "emerald",
   background: "midnight",
@@ -314,8 +330,9 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
     {
       name: "practice-tab-settings",
       // v3 dropped the 3D highway; anyone who had it as their default view is
-      // migrated back to the flat tab below.
-      version: 3,
+      // migrated back to the flat tab below. v4 added the flipped-string staff,
+      // which the defaults spread in the migration fills in as "off".
+      version: 4,
       /**
        * Drops stored choices that no longer exist (an option removed between
        * builds) back to their default, so the pickers show a real selection
@@ -390,6 +407,8 @@ export function useTablatureStyle(): {
       background,
       ink: board.ink,
       stringSpacing: settings.stringSpacing,
+      flipStrings: settings.flipStrings,
+      rightToLeft: settings.rightToLeft,
       // "auto" is resolved per pill inside the worker, which knows each note's colour.
       fretText: fretText.color ?? "auto",
       showRhythmLane: settings.showRhythmLane,
@@ -407,6 +426,8 @@ export function useTablatureStyle(): {
     settings.fretFontScale,
     settings.fretTextColor,
     settings.stringSpacing,
+    settings.flipStrings,
+    settings.rightToLeft,
     settings.showRhythmLane,
     settings.showChordNames,
     settings.showMeasureLines,

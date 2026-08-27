@@ -4,7 +4,7 @@ import { FaArrowRight } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
-import { ClickableFretboard, FullNeckToggle, useShowFullNeck } from "./ClickableFretboard";
+import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
 import { HuntChip, HuntStage, HuntStats, HuntTargetCard } from "./HuntStage";
 
@@ -229,7 +229,12 @@ export function NoteHuntDetector({
         )
       )}
 
-      {noteHuntRegion && <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />}
+      {noteHuntRegion && (
+        <>
+          <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
+          <LeftyToggle />
+        </>
+      )}
 
       {/* Manual advance — works with or without the mic */}
       {isRotating && (
