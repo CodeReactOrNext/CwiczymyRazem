@@ -35,6 +35,7 @@ import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
 import useAuthSync from "hooks/useAuthSync";
+import useDailyQuestSync from "hooks/useDailyQuestSync";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import dynamic from "next/dynamic";
 import type { AppPropsWithLayout } from "types/page";
@@ -46,6 +47,7 @@ const PostHogProvider = dynamic(
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     useAuthSync();
+    useDailyQuestSync();
 
     if (typeof window !== "undefined" && !(window as any)._fetchAuthPatched) {
       const originalFetch = window.fetch;

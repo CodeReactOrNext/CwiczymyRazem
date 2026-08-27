@@ -1,4 +1,5 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { AlertTriangle, LayoutGrid, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -597,7 +598,11 @@ export const PedalboardView = ({
               (e) => e.id === placement.itemId,
             );
             const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
-            const rs = effect ? RARITY_STYLES[effect.rarity] : null;
+            const rs = effect
+              ? RARITY_STYLES[
+                  getEffectiveRarity(effect.rarity, invItem?.buildLevel)
+                ]
+              : null;
             if (!effect || !rs) return null;
             const isDragging = dragging?.itemId === placement.itemId;
             const showCollision = isDragging && isColliding;

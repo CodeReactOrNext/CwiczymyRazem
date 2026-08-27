@@ -129,8 +129,16 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
 
           const totalMs = timerData.technique + timerData.theory + timerData.hearing + timerData.creativity;
           if (totalMs > 0) {
-            const { recordPracticeSession } = await import('feature/songs/services/userSongProgress.service');
-            await recordPracticeSession(userAuth as string, plan.song.id, totalMs, null, null);
+            // Kept on its own error path: this await sits in the middle of the
+            // quest dispatches, so a failed song-progress write used to abort
+            // the rest of them (time, categories, exercises) into the outer
+            // catch and silently cost the player those tasks.
+            try {
+              const { recordPracticeSession } = await import('feature/songs/services/userSongProgress.service');
+              await recordPracticeSession(userAuth as string, plan.song.id, totalMs, null, null);
+            } catch (error) {
+              console.error('Failed to record song practice progress:', error);
+            }
           }
         }
 

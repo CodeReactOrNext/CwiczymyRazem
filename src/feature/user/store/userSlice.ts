@@ -253,6 +253,13 @@ const userSlice = createSlice({
         }
       }
     },
+    // Written by the quest sync with whatever the merge against the stored quest
+    // produced — that is how progress made on another device (or a task the
+    // stored copy already had) lands back in the store.
+    setDailyQuest: (state, { payload }: PayloadAction<DailyQuest>) => {
+      if (!state.currentUserStats) return;
+      state.currentUserStats.dailyQuest = payload;
+    },
     claimQuestReward: (state) => {
       if (!state.currentUserStats?.dailyQuest) return;
       const quest = state.currentUserStats.dailyQuest;
@@ -528,6 +535,7 @@ export const {
   updatePoints,
   generateDailyQuest,
   completeQuestTask,
+  setDailyQuest,
   claimQuestReward,
   setActivity,
   setUserRole,

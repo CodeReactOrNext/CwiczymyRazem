@@ -40,6 +40,7 @@ import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil, HoloStripe } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
 import { RARITY_STYLES } from "../RarityBadge";
+import { SpecTags } from "../SpecTags";
 
 interface EffectCardProps {
   item: EffectInventoryItem;
@@ -216,35 +217,10 @@ export const EffectCard = ({
         </div>
 
         {/* Year / country tags on the right */}
-        {(item.year || item.country) && (
-          <div className='absolute right-2 top-3 z-20 flex flex-col gap-1.5'>
-            {[item.year, item.country].filter(Boolean).map((tag, i) => (
-              <div key={i} className='relative flex items-center'>
-                <div
-                  className='absolute left-[3px] z-10 h-[5px] w-[5px] rounded-full'
-                  style={{
-                    background: "#0f0f12",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                />
-                <div
-                  className='text-[9px] font-semibold tracking-wide text-zinc-300'
-                  style={{
-                    background: "linear-gradient(135deg, #28282e, #1b1b21)",
-                    borderRadius: "2px 3px 3px 2px",
-                    clipPath:
-                      "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
-                    paddingLeft: "14px",
-                    paddingRight: "8px",
-                    paddingTop: "3px",
-                    paddingBottom: "3px",
-                  }}>
-                  {tag}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <SpecTags
+          tags={[item.year, item.country]}
+          className='absolute right-2 top-3 z-20'
+        />
 
         <img
           src={getEffectImageSrc(effect.imageId, "medium")}
