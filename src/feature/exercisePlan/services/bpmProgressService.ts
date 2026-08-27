@@ -22,6 +22,15 @@ export interface BpmProgressData {
   recordBpmAccuracy?: number;
   /** Key the record was set in; the shape is the same in every key. */
   recordBpmRoot?: string;
+  /**
+   * Last time the exercise was played through to a finish, whatever it scored.
+   * The only mark the open exercises ever get — improv prompts, play-alongs, ear
+   * quizzes and the mic-less drills have nothing to score, so without this they
+   * would read as never attempted forever. See `markExerciseCompleted`.
+   */
+  completedAt?: Timestamp;
+  /** How many times the exercise has been finished, counted alongside `completedAt`. */
+  completionCount?: number;
 }
 
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
@@ -64,10 +73,10 @@ export const toggleBpmStage = async (
     );
     const snapshot = await trackedGetDoc(docRef);
 
-    let completedBpms: number[] = [];
-    if (snapshot.exists()) {
-      completedBpms = [...(snapshot.data().completedBpms || [])];
-    }
+    // Spread what's already there: this doc also holds the high scores and the
+    // completion stamp, and ticking a tempo checkbox must not wipe them.
+    const existing = snapshot.exists() ? snapshot.data() : {};
+    const completedBpms: number[] = [...(existing.completedBpms || [])];
 
     const index = completedBpms.indexOf(bpm);
     if (index > -1) {
@@ -78,6 +87,7 @@ export const toggleBpmStage = async (
     }
 
     await trackedSetDoc(docRef, {
+      ...existing,
       completedBpms,
       exerciseTitle,
       exerciseCategory,
@@ -132,6 +142,51 @@ export const addBpmStage = async (
   } catch (error) {
     logger.error(error, { context: "addBpmStage" });
     throw error;
+  }
+};
+
+/**
+ * Records that the exercise was played through, independent of any score.
+ *
+ * Roughly a fifth of the catalogue can't be scored at all — improvisation
+ * prompts, play-alongs, ear quizzes, the `disableMic` phrasing drills — and
+ * before this stamp existed nothing was ever written for them, so they stayed
+ * unticked in the skill tree however many times a player did them. Merges into
+ * the doc, so a completion never costs a player a high score or a cleared tempo.
+ */
+export const markExerciseCompleted = async (
+  userId: string,
+  exerciseId: string,
+  exerciseTitle: string,
+  exerciseCategory: string
+): Promise<void> => {
+  try {
+    const docRef = doc(
+      db,
+      "users",
+      userId,
+      BPM_PROGRESS_SUBCOLLECTION,
+      exerciseId
+    );
+    const snapshot = await trackedGetDoc(docRef);
+    const previousCount = snapshot.exists()
+      ? (snapshot.data().completionCount ?? 0)
+      : 0;
+    const now = Timestamp.now();
+
+    await trackedSetDoc(
+      docRef,
+      {
+        exerciseTitle,
+        exerciseCategory,
+        completedAt: now,
+        completionCount: previousCount + 1,
+        lastUpdated: now,
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    logger.error(error, { context: "markExerciseCompleted" });
   }
 };
 

@@ -4,7 +4,7 @@ import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-import { saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
+import { markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -139,6 +139,13 @@ export function useScoreSaving({
         };
       }
     }
+
+    // Last, so it merges on top of whatever the branches above wrote: the exercise
+    // was played through, and that alone is what marks it done in the skill tree.
+    // Every branch above is conditional on a score, and a good part of the
+    // catalogue — improv prompts, play-alongs, ear quizzes, the mic-less drills —
+    // has no score to earn, so without this nothing would ever be recorded for them.
+    if (userAuth) await markExerciseCompleted(userAuth, exId, exTitle, exCategory);
   };
 
   return { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef };

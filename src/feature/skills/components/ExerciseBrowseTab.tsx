@@ -1,4 +1,4 @@
-import { Chip, chipVariants, getChipCustomStyle } from "assets/components/ui/chip";
+import { Chip, chipVariants } from "assets/components/ui/chip";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
@@ -7,18 +7,20 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
+import { getExerciseFamily, getVariantLabel } from "feature/exercisePlan/utils/getExerciseFamily";
+import { getExerciseModes, PRACTICE_MODE_LABELS, PRACTICE_MODES, type PracticeMode } from "feature/exercisePlan/utils/getExerciseModes";
+import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
-import { isNoGuitarExercise } from "feature/exercisePlan/utils/isNoGuitarExercise";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
+import { getSkillAccentClass, SkillIconTile } from "feature/skills/components/SkillIconTile";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import type { GuitarSkillId } from "feature/skills/skills.types";
+import type { GuitarSkill, GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, Hand,Heart, Info, Lock,Search, SlidersHorizontal, Trophy, X } from "lucide-react";
-import { useEffect,useMemo, useRef,useState } from "react";
-import { FaCheck } from "react-icons/fa";
+import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Search, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import type { DashboardExercise } from "./SkillDashboard";
@@ -31,18 +33,6 @@ interface ExerciseBrowseTabProps {
   onShowLeaderboard: (id: string, title: string) => void;
 }
 
-const PAGE_SIZE = 15;
-
-// Hex values match this app's usual tinted-Chip look for hues that have no
-// named Chip variant (see `getChipCustomStyle`).
-const CATEGORY_HEX: Record<string, string> = {
-  technique: "#60a5fa", // blue-400
-  theory: "#a78bfa", // violet-400
-  hearing: "#22d3ee", // cyan-400
-  creativity: "#4ade80", // green-400
-  mixed: "#a1a1aa", // zinc-400
-};
-
 const DIFFICULTY_HEX: Record<string, string> = {
   beginner: "#38bdf8", // sky-400
   easy: "#34d399", // emerald-400
@@ -50,20 +40,127 @@ const DIFFICULTY_HEX: Record<string, string> = {
   hard: "#fb7185", // rose-400
 };
 
-const CATEGORIES = ["all", "technique", "theory", "hearing", "creativity", "mixed"] as const;
-const DIFFICULTIES = ["all", "beginner", "easy", "medium", "hard"] as const;
-
-type SortKey = "default" | "name" | "difficulty" | "time";
 const DIFFICULTY_RANK: Record<string, number> = { beginner: 0, easy: 1, medium: 2, hard: 3 };
+
+/** Accuracy that counts an unladdered exercise (ear quiz, click hunt) as mastered. */
+const MASTERY_ACCURACY = 90;
+
 const exTitle = (ex: { title: unknown; id: string }): string =>
-  typeof ex.title === "string" ? ex.title : ((ex.title as any)?.en ?? ex.id);
+  typeof ex.title === "string" ? ex.title : ex.id;
+
+/** Everything the browse tab is allowed to show, resolved once. */
+const LIBRARY_EXERCISES = exercisesAgregat.filter(
+  ex => !ex.isHiddenFromLibrary && !ex.isPlayalong
+) as Exercise[];
+
+/** BPM ladders and modes never change, so they are built once, not per render. */
+const BPM_STAGES = new Map<string, number[]>(
+  LIBRARY_EXERCISES.map(ex => [ex.id, generateBpmStages(ex.metronomeSpeed)])
+);
+
+const EXERCISE_MODES = new Map<string, PracticeMode[]>(
+  LIBRARY_EXERCISES.map(ex => [ex.id, getExerciseModes(ex)])
+);
+
+/**
+ * A set is one drill with different settings — the 34 Strumming patterns, the 24
+ * finger permutations, the fretboard hunts per string. Every member carries
+ * identical category/difficulty/skill metadata, so a flat table could never tell
+ * them apart and four consecutive pages read as the same exercise. Grouping is
+ * what makes the library scannable. See getExerciseFamily.
+ */
+interface ExerciseSet {
+  id: string;
+  title: string;
+  exercises: Exercise[];
+}
+
+const EXERCISE_SETS: ExerciseSet[] = (() => {
+  const byId = new Map<string, ExerciseSet>();
+  LIBRARY_EXERCISES.forEach(ex => {
+    const family = getExerciseFamily(ex);
+    const existing = byId.get(family.id);
+    if (existing) existing.exercises.push(ex);
+    else byId.set(family.id, { id: family.id, title: family.title, exercises: [ex] });
+  });
+  // Inside a set the variants read as a progression, so order by difficulty.
+  byId.forEach(set =>
+    set.exercises.sort((a, b) => {
+      const rank = (DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99);
+      return rank !== 0 ? rank : exTitle(a).localeCompare(exTitle(b));
+    })
+  );
+  return Array.from(byId.values());
+})();
+
+type StatusId = "new" | "untouched" | "inProgress" | "mastered" | "favorite";
+
+const STATUSES: { id: StatusId; label: string }[] = [
+  { id: "new", label: "New" },
+  { id: "untouched", label: "Not tried" },
+  { id: "inProgress", label: "In progress" },
+  { id: "mastered", label: "Mastered" },
+  { id: "favorite", label: "Favorites" },
+];
+
+type LengthId = "short" | "mid" | "long";
+
+const LENGTHS: { id: LengthId; label: string; test: (minutes: number) => boolean }[] = [
+  { id: "short", label: "Under 2 min", test: m => m < 2 },
+  { id: "mid", label: "2–5 min", test: m => m >= 2 && m <= 5 },
+  { id: "long", label: "Over 5 min", test: m => m > 5 },
+];
+
+const MODE_ICONS: Record<PracticeMode, typeof Timer> = {
+  bpm: Timer,
+  tab: Music,
+  strum: ArrowUpDown,
+  fretboard: LayoutGrid,
+  ear: Ear,
+  open: Lightbulb,
+  noGuitar: Hand,
+};
+
+/**
+ * Words players type that appear nowhere in a title or description. Keyed by
+ * skill id and by practice mode, so an exercise inherits the aliases of
+ * everything it is. Without them "shred", "warm up" and "no guitar" all return
+ * nothing at all — the average description is only ~90 characters long.
+ */
+const SEARCH_ALIASES: Record<string, string> = {
+  alternate_picking: "shred speed fast picking hand right hand tremolo",
+  finger_independence: "warm up warmup spider stretch fingers dexterity chromatic",
+  rhythm: "metronome timing strum strumming groove pocket subdivision",
+  music_theory: "fretboard neck note names frets intervals memorize",
+  ear_training: "ear hearing listening aural relative pitch",
+  bending: "bend bends expression pitch",
+  improvisation: "solo soloing jam improv licks",
+  sweep_picking: "sweep arpeggio arpeggios neoclassical",
+  tapping: "tap two hand",
+  audio_production: "tone sound pick attack",
+  chords: "chord changes voicings voice leading progression",
+  scales: "scale pentatonic modes",
+  legato: "hammer on pull off slur",
+  string_skipping: "skip wide intervals",
+  hybrid_picking: "fingers and pick chicken country",
+  articulation: "muting palm mute dynamics clean attack",
+  phrasing: "melody space breathing licks",
+  vibrato: "expression wobble sustain",
+  bpm: "metronome tempo bpm speed ladder click",
+  tab: "tab tablature notation read sheet",
+  strum: "strum strumming rhythm guitar campfire",
+  fretboard: "fretboard neck note finder",
+  ear: "quiz listening ear test",
+  open: "free practice open exploration",
+  noGuitar: "no guitar without guitar bus couch silent phone unplugged",
+};
 
 const filterPill = (active: boolean, big = false) =>
   cn(
     chipVariants({ color: active ? "cyan" : "gray" }),
-    "cursor-pointer whitespace-nowrap capitalize focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+    "cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     // The sheet's pills are finger-sized; the desktop bar keeps its compact look.
-    big ? "px-3.5 py-2 text-xs" : "px-3 py-1 text-[11px]"
+    big ? "px-3.5 py-2 text-[13px]" : "px-3 py-1.5 text-[12px]"
   );
 
 export const ExerciseBrowseTab = ({
@@ -76,32 +173,27 @@ export const ExerciseBrowseTab = ({
   const { t } = useTranslation(["common", "skills"]);
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
+  const userAuth = useAppSelector(selectUserAuth);
   const favoriteExerciseIds = useMemo(
     () => userInfo?.favoriteExerciseIds ?? [],
     [userInfo?.favoriteExerciseIds]
   );
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const [selectedSkill, setSelectedSkill] = useState("all");
-  // Screen-answered exercises only (ear quizzes, fretboard click hunts) - for
-  // practising on the bus with no instrument at hand.
-  const [noGuitarOnly, setNoGuitarOnly] = useState(false);
-  const [page, setPage] = useState(1);
+  const [selectedSkills, setSelectedSkills] = useState<GuitarSkillId[]>([]);
+  const [selectedModes, setSelectedModes] = useState<PracticeMode[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<StatusId[]>([]);
+  const [selectedLength, setSelectedLength] = useState<LengthId | null>(null);
+  const [expandedSets, setExpandedSets] = useState<string[]>([]);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
-  const [isLoadingRanks, setIsLoadingRanks] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>("default");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   // Mobile only - filters live in a bottom sheet so the list keeps the screen.
-  // From `sm` up they are laid out inline and this stays unused.
   const [showFilters, setShowFilters] = useState(false);
+  // Desktop only - the 22 skill pills open on demand instead of filling three rows.
+  const [showSkills, setShowSkills] = useState(false);
 
   const activeFilterCount =
-    (selectedCategory !== "all" ? 1 : 0) +
-    (selectedDifficulty !== "all" ? 1 : 0) +
-    (selectedSkill !== "all" ? 1 : 0) +
-    (noGuitarOnly ? 1 : 0);
+    selectedSkills.length + selectedModes.length + selectedStatuses.length + (selectedLength ? 1 : 0);
 
   // The sheet is hidden from `sm` up, so a rotation/resize while it is open
   // would otherwise leave an invisible overlay swallowing clicks.
@@ -114,163 +206,330 @@ export const ExerciseBrowseTab = ({
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const listRef = useRef<HTMLDivElement>(null);
-
-  // Paging from the bottom of a long phone list would otherwise leave the user
-  // stranded at the end of the new page.
-  const goToPage = (p: number) => {
-    setPage(p);
-    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const clearFilters = () => {
-    setSelectedCategory("all");
-    setSelectedDifficulty("all");
-    setSelectedSkill("all");
-    setNoGuitarOnly(false);
-    setPage(1);
+    setSelectedSkills([]);
+    setSelectedModes([]);
+    setSelectedStatuses([]);
+    setSelectedLength(null);
   };
 
-  const toggleSort = (key: Exclude<SortKey, "default">) => {
-    if (sortKey === key) {
-      setSortDir(d => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-    setPage(1);
-  };
+  const toggle = <T,>(values: T[], value: T): T[] =>
+    values.includes(value) ? values.filter(v => v !== value) : [...values, value];
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setPage(1);
-  };
+  // ── Per-exercise state ───────────────────────────────────────────────────
+  const isMastered = useMemo(() => {
+    return (exercise: Exercise): boolean => {
+      const progress = progressMap.get(exercise.id);
+      if (!progress) return false;
+      const stages = BPM_STAGES.get(exercise.id) ?? [];
+      // A laddered exercise is finished when every tempo has been cleared.
+      if (stages.length > 0) return (progress.completedBpms?.length ?? 0) >= stages.length;
+      const accuracy = progress.micHighScoreAccuracy ?? progress.clickHighScoreAccuracy;
+      return accuracy != null && accuracy >= MASTERY_ACCURACY;
+    };
+  }, [progressMap]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setPage(1);
-  };
-
-  const handleDifficultyChange = (difficulty: string) => {
-    setSelectedDifficulty(difficulty);
-    setPage(1);
-  };
-
-  const handleSkillChange = (skill: string) => {
-    setSelectedSkill(skill);
-    setPage(1);
-  };
-
-  const handleNoGuitarChange = (value: boolean) => {
-    setNoGuitarOnly(value);
-    setPage(1);
-  };
-
-  const availableSkills = useMemo(() => {
-    const skillSet = new Set<GuitarSkillId>();
-    exercisesAgregat.forEach(ex => {
-      if (ex.isHiddenFromLibrary) return;
-      ex.relatedSkills.forEach(s => skillSet.add(s as GuitarSkillId));
+  // Searchable text per exercise. Rebuilt only when the translator changes, so
+  // typing does not re-derive skill labels for 200 exercises on every keystroke.
+  const searchIndex = useMemo(() => {
+    const index = new Map<string, string>();
+    LIBRARY_EXERCISES.forEach(ex => {
+      const modes = EXERCISE_MODES.get(ex.id) ?? [];
+      const parts = [
+        exTitle(ex),
+        getExerciseFamily(ex).title,
+        typeof ex.description === "string" ? ex.description : "",
+        ex.whyItMatters ?? "",
+        ...ex.relatedSkills.map(skill => String(t(`skills:skills.${skill}.name` as never))),
+        ...ex.relatedSkills.map(skill => SEARCH_ALIASES[skill] ?? ""),
+        ...modes.map(mode => PRACTICE_MODE_LABELS[mode]),
+        ...modes.map(mode => SEARCH_ALIASES[mode] ?? ""),
+      ];
+      index.set(ex.id, parts.join(" ").toLowerCase());
     });
-    return Array.from(skillSet).sort((a, b) => {
-      const na = t(`skills:skills.${a}.name` as any) as string;
-      const nb = t(`skills:skills.${b}.name` as any) as string;
-      return na.localeCompare(nb);
-    });
+    return index;
   }, [t]);
 
-  const filteredExercises = useMemo(() => {
-    const q = searchQuery.toLowerCase();
-    return exercisesAgregat
-      .filter(ex => {
-        if (ex.isHiddenFromLibrary) return false;
-        if (ex.isPlayalong) return false;
-        if (selectedCategory !== "all" && ex.category !== selectedCategory) return false;
-        if (selectedDifficulty !== "all" && ex.difficulty !== selectedDifficulty) return false;
-        if (selectedSkill !== "all" && !ex.relatedSkills.includes(selectedSkill as GuitarSkillId)) return false;
-        if (noGuitarOnly && !isNoGuitarExercise(ex)) return false;
-        if (q) {
-          const title = (typeof ex.title === "string" ? ex.title : (ex.title as any)?.en ?? "").toLowerCase();
-          const desc = (typeof ex.description === "string" ? ex.description : "").toLowerCase();
-          if (!title.includes(q) && !desc.includes(q)) return false;
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        const dir = sortDir === "asc" ? 1 : -1;
-        if (sortKey === "name") return exTitle(a).localeCompare(exTitle(b)) * dir;
-        if (sortKey === "difficulty")
-          return ((DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99)) * dir;
-        if (sortKey === "time")
-          return ((a.timeInMinutes ?? 0) - (b.timeInMinutes ?? 0)) * dir;
-        // default: favorites pinned to the very top, then newest, attempted, alphabetical
-        const aFav = favoriteExerciseIds.includes(a.id);
-        const bFav = favoriteExerciseIds.includes(b.id);
-        if (aFav !== bFav) return aFav ? -1 : 1;
-        const aNew = isExerciseNew(a);
-        const bNew = isExerciseNew(b);
-        if (aNew !== bNew) return aNew ? -1 : 1;
-        if (aNew && bNew) {
-          const diff = new Date(b.addedAt!).getTime() - new Date(a.addedAt!).getTime();
-          if (diff !== 0) return diff;
-        }
-        const aAttempted = !!progressMap.get(a.id);
-        const bAttempted = !!progressMap.get(b.id);
-        if (aAttempted !== bAttempted) return aAttempted ? -1 : 1;
-        return exTitle(a).localeCompare(exTitle(b));
-      });
-  }, [searchQuery, selectedCategory, selectedDifficulty, selectedSkill, noGuitarOnly, progressMap, sortKey, sortDir, favoriteExerciseIds]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredExercises.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  // Memoized so the rank-fetching effect below doesn't re-run on every render.
-  const pageExercises = useMemo(
-    () => filteredExercises.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filteredExercises, safePage]
+  const searchWords = useMemo(
+    () => searchQuery.toLowerCase().split(/\s+/).filter(Boolean),
+    [searchQuery]
   );
 
-  const userAuth = useAppSelector(selectUserAuth);
+  /**
+   * One exercise against the filter bar. `skip` lets a facet leave itself out of
+   * the test, so each pill can show how many exercises it would bring in rather
+   * than how many survive its own selection.
+   */
+  const matchesFilters = useMemo(() => {
+    return (
+      exercise: Exercise,
+      skip?: "skills" | "modes" | "statuses" | "length"
+    ): boolean => {
+      if (skip !== "skills" && selectedSkills.length > 0) {
+        if (!exercise.relatedSkills.some(skill => selectedSkills.includes(skill))) return false;
+      }
+      if (skip !== "modes" && selectedModes.length > 0) {
+        const modes = EXERCISE_MODES.get(exercise.id) ?? [];
+        if (!modes.some(mode => selectedModes.includes(mode))) return false;
+      }
+      if (skip !== "length" && selectedLength) {
+        const length = LENGTHS.find(l => l.id === selectedLength);
+        if (length && !length.test(exercise.timeInMinutes ?? 0)) return false;
+      }
+      if (skip !== "statuses" && selectedStatuses.length > 0) {
+        const attempted = hasExerciseProgress(progressMap.get(exercise.id));
+        const matched = selectedStatuses.some(status => {
+          if (status === "new") return isExerciseNew(exercise);
+          if (status === "untouched") return !attempted;
+          if (status === "mastered") return isMastered(exercise);
+          if (status === "inProgress") return attempted && !isMastered(exercise);
+          return favoriteExerciseIds.includes(exercise.id);
+        });
+        if (!matched) return false;
+      }
+      if (searchWords.length > 0) {
+        const haystack = searchIndex.get(exercise.id) ?? "";
+        if (!searchWords.every(word => haystack.includes(word))) return false;
+      }
+      return true;
+    };
+  }, [
+    selectedSkills,
+    selectedModes,
+    selectedLength,
+    selectedStatuses,
+    searchWords,
+    searchIndex,
+    progressMap,
+    favoriteExerciseIds,
+    isMastered,
+  ]);
+
+  // ── Sets to render ───────────────────────────────────────────────────────
+  const visibleSets = useMemo(
+    () =>
+      EXERCISE_SETS.map(set => {
+        const cleared = set.exercises.filter(isMastered).length;
+        const started = set.exercises.filter(
+          ex => hasExerciseProgress(progressMap.get(ex.id)) && !isMastered(ex)
+        ).length;
+        return {
+          set,
+          cleared,
+          started,
+          matches: set.exercises.filter(ex => matchesFilters(ex)),
+        };
+      })
+        .filter(entry => entry.matches.length > 0)
+        .sort((a, b) => {
+          // Sets holding something new come first, then anything half-finished
+          // (picking practice back up beats starting over), then alphabetically
+          // — a stable order the player can learn. Sorting by size instead would
+          // just front-load the three biggest families every single visit.
+          const aNew = a.matches.some(ex => isExerciseNew(ex));
+          const bNew = b.matches.some(ex => isExerciseNew(ex));
+          if (aNew !== bNew) return aNew ? -1 : 1;
+          if (a.started !== b.started) return b.started - a.started;
+          return a.set.title.localeCompare(b.set.title);
+        }),
+    [matchesFilters, isMastered, progressMap]
+  );
+
+  const totalMatches = visibleSets.reduce((sum, entry) => sum + entry.matches.length, 0);
+
+  /** Mastered / started across everything currently on screen. */
+  const matchedProgress = useMemo(() => {
+    const matched = visibleSets.flatMap(entry => entry.matches);
+    return {
+      mastered: matched.filter(isMastered).length,
+      started: matched.filter(
+        ex => hasExerciseProgress(progressMap.get(ex.id)) && !isMastered(ex)
+      ).length,
+    };
+  }, [visibleSets, isMastered, progressMap]);
+
+  /**
+   * Sets grouped under the skill they train. Without this the list is 45 cards
+   * in a flat alphabetical run, where four Ear Training sets sit apart from each
+   * other and every card has to repeat its own skill name and icon. The group
+   * header carries both once, so a card is left with just its name.
+   */
+  const skillGroupedSets = useMemo(() => {
+    const bySkill = new Map<GuitarSkillId, typeof visibleSets>();
+    visibleSets.forEach(entry => {
+      const skill = entry.set.exercises[0].relatedSkills[0];
+      const bucket = bySkill.get(skill);
+      if (bucket) bucket.push(entry);
+      else bySkill.set(skill, [entry]);
+    });
+
+    const categoryOrder = ["technique", "theory", "hearing", "creativity"];
+    return Array.from(bySkill.entries())
+      .map(([skillId, sets]) => {
+        const skill = guitarSkills.find(s => s.id === skillId);
+        return {
+          skillId,
+          skill,
+          label: String(t(`skills:skills.${skillId}.name` as never)),
+          category: skill?.category ?? "technique",
+          sets,
+        };
+      })
+      // Category first so the browser reads in the same order as the Skill Tree,
+      // then alphabetically — a fixed order that does not move between visits.
+      .sort((a, b) => {
+        const byCategory =
+          categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category);
+        return byCategory !== 0 ? byCategory : a.label.localeCompare(b.label);
+      });
+  }, [visibleSets, t]);
+
+  /**
+   * Ten of the nineteen skills own exactly one set, and a full header wrapping a
+   * single one-line card is more chrome than content. Those fall into one group
+   * at the end, where the cards carry their own tile and skill name instead.
+   */
+  const { groupedSkills, looseSets } = useMemo(
+    () => ({
+      groupedSkills: skillGroupedSets.filter(group => group.sets.length > 1),
+      looseSets: skillGroupedSets
+        .filter(group => group.sets.length === 1)
+        .flatMap(group => group.sets.map(entry => ({ ...entry, group }))),
+    }),
+    [skillGroupedSets]
+  );
+
+  // ── Facet counts, so a pill never leads to an empty screen ───────────────
+  const skillCounts = useMemo(() => {
+    const counts = new Map<GuitarSkillId, number>();
+    LIBRARY_EXERCISES.forEach(ex => {
+      if (!matchesFilters(ex, "skills")) return;
+      ex.relatedSkills.forEach(skill => counts.set(skill, (counts.get(skill) ?? 0) + 1));
+    });
+    return counts;
+  }, [matchesFilters]);
+
+  const modeCounts = useMemo(() => {
+    const counts = new Map<PracticeMode, number>();
+    LIBRARY_EXERCISES.forEach(ex => {
+      if (!matchesFilters(ex, "modes")) return;
+      (EXERCISE_MODES.get(ex.id) ?? []).forEach(mode =>
+        counts.set(mode, (counts.get(mode) ?? 0) + 1)
+      );
+    });
+    return counts;
+  }, [matchesFilters]);
+
+  // Every pill row carries a count, not just the modes — a row without them read
+  // as the less important one.
+  const statusCounts = useMemo(() => {
+    const counts = new Map<StatusId, number>();
+    LIBRARY_EXERCISES.forEach(ex => {
+      if (!matchesFilters(ex, "statuses")) return;
+      const attempted = hasExerciseProgress(progressMap.get(ex.id));
+      const mastered = isMastered(ex);
+      const bump = (id: StatusId) => counts.set(id, (counts.get(id) ?? 0) + 1);
+      if (isExerciseNew(ex)) bump("new");
+      if (!attempted) bump("untouched");
+      if (mastered) bump("mastered");
+      if (attempted && !mastered) bump("inProgress");
+      if (favoriteExerciseIds.includes(ex.id)) bump("favorite");
+    });
+    return counts;
+  }, [matchesFilters, progressMap, isMastered, favoriteExerciseIds]);
+
+  const lengthCounts = useMemo(() => {
+    const counts = new Map<LengthId, number>();
+    LIBRARY_EXERCISES.forEach(ex => {
+      if (!matchesFilters(ex, "length")) return;
+      const length = LENGTHS.find(l => l.test(ex.timeInMinutes ?? 0));
+      if (length) counts.set(length.id, (counts.get(length.id) ?? 0) + 1);
+    });
+    return counts;
+  }, [matchesFilters]);
+
+  /** How many skills the picker would show — the number on its collapsed row. */
+  const availableSkillCount = useMemo(
+    () => guitarSkills.filter(skill => (skillCounts.get(skill.id) ?? 0) > 0).length,
+    [skillCounts]
+  );
+
+  /** Skills grouped under their category, with the empty ones dropped. */
+  const skillGroups = useMemo(() => {
+    const categories: { category: string; label: string }[] = [
+      { category: "technique", label: "Technique" },
+      { category: "theory", label: "Theory" },
+      { category: "hearing", label: "Hearing" },
+      { category: "creativity", label: "Creativity" },
+    ];
+    return categories
+      .map(({ category, label }) => ({
+        label,
+        skills: guitarSkills
+          .filter(skill => skill.category === category)
+          .filter(skill => (skillCounts.get(skill.id) ?? 0) > 0 || selectedSkills.includes(skill.id))
+          .sort((a, b) =>
+            String(t(`skills:skills.${a.id}.name` as never)).localeCompare(
+              String(t(`skills:skills.${b.id}.name` as never))
+            )
+          ),
+      }))
+      .filter(group => group.skills.length > 0);
+  }, [skillCounts, selectedSkills, t]);
+
+  // ── Leaderboard ranks, fetched only for rows actually on screen ──────────
+  // The old table fetched a rank per row of the current page; with no paging
+  // that would be 200 count queries, so ranks load when a set is opened.
+  const expandedExerciseIds = useMemo(
+    () =>
+      visibleSets
+        .filter(entry => expandedSets.includes(entry.set.id))
+        .flatMap(entry => entry.matches.map(ex => ex.id)),
+    [visibleSets, expandedSets]
+  );
 
   useEffect(() => {
-    if (!userAuth || pageExercises.length === 0) return;
+    let cancelled = false;
 
     const fetchRanks = async () => {
-      setIsLoadingRanks(true);
-      const rankPromises = pageExercises.map(async (ex) => {
-        const progress = progressMap.get(ex.id);
-        const score = progress?.micHighScore || progress?.earTrainingHighScore || progress?.clickHighScore;
-        if (score && score > 0) {
-          const rank = await getExerciseUserRank(ex.id, score);
-          if (rank !== null) {
-            return { id: ex.id, rank };
-          }
-        }
-        return null;
-      });
+      const results = await Promise.all(
+        expandedExerciseIds.map(async id => {
+          const progress = progressMap.get(id);
+          const score =
+            progress?.micHighScore || progress?.earTrainingHighScore || progress?.clickHighScore;
+          if (!score || score <= 0) return null;
+          const rank = await getExerciseUserRank(id, score);
+          return rank === null ? null : { id, rank };
+        })
+      );
 
-      const results = await Promise.all(rankPromises);
-      const newRanks: Record<string, number> = {};
-      results.forEach(res => {
-        if (res) newRanks[res.id] = res.rank;
+      if (cancelled) return;
+      const fetched: Record<string, number> = {};
+      results.forEach(result => {
+        if (result) fetched[result.id] = result.rank;
       });
-      setLeaderboardRanks(prev => ({ ...prev, ...newRanks }));
-      setIsLoadingRanks(false);
+      if (Object.keys(fetched).length > 0) {
+        setLeaderboardRanks(prev => ({ ...prev, ...fetched }));
+      }
     };
 
-    if (pageExercises.length > 0) {
-      fetchRanks();
-    }
-  }, [pageExercises, progressMap]);
+    if (userAuth && expandedExerciseIds.length > 0) fetchRanks();
 
-  const buildChallenge = (exercise: typeof exercisesAgregat[0]): DashboardExercise => {
+    return () => {
+      cancelled = true;
+    };
+  }, [expandedExerciseIds, progressMap, userAuth]);
+
+  const buildChallenge = (exercise: Exercise): DashboardExercise => {
     const skillId = exercise.relatedSkills[0] || "general";
     const skillData = guitarSkills.find(s => s.id === skillId);
-    const category = skillData?.category || (exercise.category !== "mixed" ? exercise.category : "technique");
+    const category =
+      skillData?.category || (exercise.category !== "mixed" ? exercise.category : "technique");
     return {
       id: exercise.id,
-      title: exercise.title as any,
-      description: exercise.description as any,
-      category: category as any,
+      title: exTitle(exercise),
+      description: typeof exercise.description === "string" ? exercise.description : "",
+      category,
       requiredSkillId: skillId,
       requiredLevel: exercise.difficulty === "hard" ? 2 : exercise.difficulty === "medium" ? 1 : 0,
       rewardDescription: "Practice complete",
@@ -287,791 +546,674 @@ export const ExerciseBrowseTab = ({
 
   const handleToggleFavorite = (exerciseId: string) => {
     if (!userAuth) return;
-    dispatch(toggleFavoriteExercise({ exerciseId, isFavorite: !favoriteExerciseIds.includes(exerciseId) }));
+    dispatch(
+      toggleFavoriteExercise({
+        exerciseId,
+        isFavorite: !favoriteExerciseIds.includes(exerciseId),
+      })
+    );
+  };
+
+  const handleStart = (exercise: Exercise) => {
+    if (exercise.premium && !isPremium) {
+      onShowUpgrade();
+      return;
+    }
+    onStartExercise(buildChallenge(exercise));
   };
 
   const handleStartPreview = () => {
     if (!previewExercise) return;
     const exercise = previewExercise;
     setPreviewExercise(null);
-    if (exercise.premium && !isPremium) {
-      onShowUpgrade();
-      return;
-    }
-    onStartExercise(buildChallenge(exercise as typeof exercisesAgregat[0]));
+    handleStart(exercise);
   };
 
-  // Pill sets shared by the desktop filter bar and the mobile filter sheet.
-  const categoryPills = (big = false) =>
-    CATEGORIES.map(cat => (
-      <button key={cat} onClick={() => handleCategoryChange(cat)} className={filterPill(selectedCategory === cat, big)}>
-        {cat === "all" ? "All" : cat}
-      </button>
+  const formatMinutes = (minutes: number) =>
+    minutes < 1 ? `${Math.round(minutes * 60)} s` : `${Number(minutes.toFixed(1))} min`;
+
+  const rankClass = (rank: number) =>
+    rank === 1
+      ? "bg-amber-500/20 text-amber-500"
+      : rank === 2
+        ? "bg-zinc-300/20 text-zinc-300"
+        : rank === 3
+          ? "bg-amber-700/20 text-amber-600"
+          : "bg-zinc-800/60 text-zinc-400";
+
+  // ── Filter controls, shared by the desktop bar and the mobile sheet ──────
+  const groupLabel = "text-[11px] font-bold tracking-wider text-zinc-500";
+
+  const skillPills = (big = false) =>
+    skillGroups.map(group => (
+      <div key={group.label} className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-semibold text-zinc-600">{group.label}</span>
+        {group.skills.map(skill => {
+          const Icon = skill.icon;
+          const active = selectedSkills.includes(skill.id);
+          return (
+            <button
+              key={skill.id}
+              onClick={() => setSelectedSkills(prev => toggle(prev, skill.id))}
+              aria-pressed={active}
+              className={cn(filterPill(active, big), "flex items-center gap-1.5")}
+            >
+              {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
+              {String(t(`skills:skills.${skill.id}.name` as never))}
+              <span className="tabular-nums opacity-50">{skillCounts.get(skill.id) ?? 0}</span>
+            </button>
+          );
+        })}
+      </div>
     ));
 
-  const difficultyPills = (big = false) =>
-    DIFFICULTIES.map(diff => (
-      <button key={diff} onClick={() => handleDifficultyChange(diff)} className={filterPill(selectedDifficulty === diff, big)}>
-        {diff === "all" ? "All" : diff}
-      </button>
-    ));
-
-  const skillPills = (big = false) => [
-    <button key="all" onClick={() => handleSkillChange("all")} className={filterPill(selectedSkill === "all", big)}>
-      All
-    </button>,
-    ...availableSkills.map(skillId => {
-      const Icon = guitarSkills.find(s => s.id === skillId)?.icon;
+  const modePills = (big = false) =>
+    PRACTICE_MODES.filter(
+      mode => (modeCounts.get(mode) ?? 0) > 0 || selectedModes.includes(mode)
+    ).map(mode => {
+      const Icon = MODE_ICONS[mode];
+      const active = selectedModes.includes(mode);
       return (
         <button
-          key={skillId}
-          onClick={() => handleSkillChange(skillId)}
-          className={cn(filterPill(selectedSkill === skillId, big), "flex items-center gap-1")}
+          key={mode}
+          onClick={() => setSelectedModes(prev => toggle(prev, mode))}
+          aria-pressed={active}
+          className={cn(filterPill(active, big), "flex items-center gap-1.5")}
         >
-          {Icon && <Icon className="h-3 w-3 shrink-0" />}
-          {t(`skills:skills.${skillId}.name` as any)}
+          <Icon className="h-3.5 w-3.5 shrink-0" />
+          {PRACTICE_MODE_LABELS[mode]}
+          <span className="tabular-nums opacity-50">{modeCounts.get(mode) ?? 0}</span>
+        </button>
+      );
+    });
+
+  const statusPills = (big = false) =>
+    STATUSES.map(status => (
+      <button
+        key={status.id}
+        onClick={() => setSelectedStatuses(prev => toggle(prev, status.id))}
+        aria-pressed={selectedStatuses.includes(status.id)}
+        className={cn(filterPill(selectedStatuses.includes(status.id), big), "flex items-center gap-1.5")}
+      >
+        {status.label}
+        <span className="tabular-nums opacity-50">{statusCounts.get(status.id) ?? 0}</span>
+      </button>
+    ));
+
+  const lengthPills = (big = false) => [
+    <button
+      key="any"
+      onClick={() => setSelectedLength(null)}
+      aria-pressed={selectedLength === null}
+      className={filterPill(selectedLength === null, big)}
+    >
+      Any length
+    </button>,
+    ...LENGTHS.map(length => {
+      const active = selectedLength === length.id;
+      return (
+        <button
+          key={length.id}
+          onClick={() => setSelectedLength(active ? null : length.id)}
+          aria-pressed={active}
+          className={cn(filterPill(active, big), "flex items-center gap-1.5")}
+        >
+          {length.label}
+          <span className="tabular-nums opacity-50">{lengthCounts.get(length.id) ?? 0}</span>
         </button>
       );
     }),
   ];
 
-  const noGuitarPill = (big = false) => (
-    <button
-      onClick={() => handleNoGuitarChange(!noGuitarOnly)}
-      aria-pressed={noGuitarOnly}
-      // normal-case: `capitalize` would turn the multi-word label into Title Case.
-      className={cn(filterPill(noGuitarOnly, big), "flex items-center gap-1.5 normal-case")}
-    >
-      <Hand className="h-3 w-3 shrink-0" />
-      No guitar needed
-    </button>
-  );
-
-  const groupLabel = "text-[10px] font-bold capitalize tracking-wider text-zinc-500";
-
-  // Shown under the search box on mobile so applied filters stay visible while
-  // the sheet is closed - each chip removes its own filter.
   const activeFilterChips = [
-    selectedCategory !== "all" && { key: "cat", label: selectedCategory, clear: () => handleCategoryChange("all") },
-    selectedDifficulty !== "all" && { key: "diff", label: selectedDifficulty, clear: () => handleDifficultyChange("all") },
-    selectedSkill !== "all" && {
-      key: "skill",
-      label: t(`skills:skills.${selectedSkill}.name` as any),
-      clear: () => handleSkillChange("all"),
-    },
-    noGuitarOnly && {
-      key: "noGuitar",
-      label: "No guitar needed",
-      clear: () => handleNoGuitarChange(false),
-      className: "normal-case",
-    },
-  ].filter(Boolean) as { key: string; label: string; clear: () => void; className?: string }[];
+    ...selectedSkills.map(skill => ({
+      key: `skill-${skill}`,
+      label: String(t(`skills:skills.${skill}.name` as never)),
+      clear: () => setSelectedSkills(prev => prev.filter(s => s !== skill)),
+    })),
+    ...selectedModes.map(mode => ({
+      key: `mode-${mode}`,
+      label: PRACTICE_MODE_LABELS[mode],
+      clear: () => setSelectedModes(prev => prev.filter(m => m !== mode)),
+    })),
+    ...selectedStatuses.map(status => ({
+      key: `status-${status}`,
+      label: STATUSES.find(s => s.id === status)?.label ?? status,
+      clear: () => setSelectedStatuses(prev => prev.filter(s => s !== status)),
+    })),
+    ...(selectedLength
+      ? [
+          {
+            key: "length",
+            label: LENGTHS.find(l => l.id === selectedLength)?.label ?? "",
+            clear: () => setSelectedLength(null),
+          },
+        ]
+      : []),
+  ];
 
-  // Everything both the desktop table row and the mobile card need, derived
-  // once per exercise so the two layouts can't drift apart.
-  const rows = pageExercises.map((exercise) => {
+  // ── One variant row inside an expanded set ──────────────────────────────
+  const renderExerciseRow = (exercise: Exercise, showVariantLabel: boolean) => {
     const progress = progressMap.get(exercise.id);
-    const bpmStages = exercise.metronomeSpeed ? generateBpmStages(exercise.metronomeSpeed) : [];
-    const completedBpms = progress?.completedBpms || [];
+    const stages = BPM_STAGES.get(exercise.id) ?? [];
+    const completedBpms = progress?.completedBpms ?? [];
+    const hasBpmProgress = stages.length > 0 && completedBpms.length > 0;
+    const bpmPct = hasBpmProgress ? Math.round((completedBpms.length / stages.length) * 100) : 0;
     const micScore = progress?.micHighScore;
     const earScore = progress?.earTrainingHighScore;
     const clickScore = progress?.clickHighScore;
-    const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
-    const micAccuracy = progress?.micHighScoreAccuracy;
-    const clickAccuracy = progress?.clickHighScoreAccuracy;
-    const maxBpm = completedBpms.length > 0 ? Math.max(...completedBpms) : null;
-    const skillId = exercise.relatedSkills[0];
+    const attempted = hasExerciseProgress(progress);
+    const mastered = isMastered(exercise);
+    const isLocked = !!exercise.premium && !isPremium;
+    const isFavorite = favoriteExerciseIds.includes(exercise.id);
+    const rank = leaderboardRanks[exercise.id];
+    const hasLeaderboard =
+      stages.length > 0 ||
+      !!exercise.riddleConfig ||
+      isClickAnsweredMode(exercise.noteHuntConfig?.mode) ||
+      (!!exercise.tablature && exercise.tablature.length > 0);
 
-    return {
-      exercise,
-      isLocked: !!exercise.premium && !isPremium,
-      title: typeof exercise.title === "string"
-        ? exercise.title
-        : (exercise.title as any)?.en ?? exercise.id,
-      isNew: isExerciseNew(exercise),
-      skillId,
-      SkillIcon: skillId ? guitarSkills.find(s => s.id === skillId)?.icon : null,
-      isFavorite: favoriteExerciseIds.includes(exercise.id),
-      rank: leaderboardRanks[exercise.id],
-      hasLeaderboard: bpmStages.length > 0 || !!exercise.riddleConfig || isClickAnsweredMode(exercise.noteHuntConfig?.mode) || (!!exercise.tablature && exercise.tablature.length > 0),
-      hasBpmProgress,
-      bpmStages,
-      completedBpms,
-      bpmPct: hasBpmProgress ? Math.round((completedBpms.length / bpmStages.length) * 100) : 0,
-      hasBeenAttempted: !!progress && (
-        completedBpms.length > 0 ||
-        (micScore != null && micScore > 0) ||
-        (earScore != null && earScore > 0) ||
-        (clickScore != null && clickScore > 0)
-      ),
-      resultText: hasBpmProgress
-        ? `${maxBpm} BPM`
-        : micScore != null && micScore > 0
-          ? micAccuracy != null ? `${micAccuracy}%` : `${micScore} pts`
-          : earScore != null && earScore > 0
-            ? `${earScore} pts`
-            : clickScore != null && clickScore > 0
-              ? clickAccuracy != null ? `${clickAccuracy}%` : `${clickScore} pts`
-              : null,
-    };
-  });
+    const resultText = hasBpmProgress
+      ? `${Math.max(...completedBpms)} BPM`
+      : micScore != null && micScore > 0
+        ? progress?.micHighScoreAccuracy != null
+          ? `${progress.micHighScoreAccuracy}%`
+          : `${micScore} pts`
+        : earScore != null && earScore > 0
+          ? `${earScore} pts`
+          : clickScore != null && clickScore > 0
+            ? progress?.clickHighScoreAccuracy != null
+              ? `${progress.clickHighScoreAccuracy}%`
+              : `${clickScore} pts`
+            // Open exercises — improv prompts, play-alongs, ear quizzes — have no
+            // number to show, so the fact it was played is the whole result.
+            : progress?.completedAt
+              ? "Done"
+              : null;
 
-  const rankClass = (rank: number) =>
-    rank === 1 ? "bg-amber-500/20 text-amber-500" :
-    rank === 2 ? "bg-zinc-300/20 text-zinc-300" :
-    rank === 3 ? "bg-amber-700/20 text-amber-600" :
-    "bg-zinc-800/40 text-zinc-400";
-
-  const renderSortHead = (
-    col: Exclude<SortKey, "default">,
-    label: string,
-    align: "left" | "right" = "left",
-    widthClass?: string,
-  ) => {
-    const active = sortKey === col;
     return (
-      <th className={cn("px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500", widthClass, align === "right" ? "text-right" : "text-left")}>
+      <div
+        key={exercise.id}
+        // The row is the unit you act on, so it marks itself under the pointer.
+        // Its hover step stays below the icon buttons' own, which sit on top of
+        // it — otherwise hovering an icon would look like hovering the row.
+        className="flex items-center gap-2.5 rounded px-2 py-3 transition-colors duration-150 hover:bg-zinc-800/60 active:bg-zinc-800/40 sm:gap-3 sm:bg-zinc-800/30 sm:px-3"
+      >
+        {/* Only a finished or started exercise gets a mark. An empty circle on
+            every untouched row said nothing and was most of what the eye saw.
+            The slot keeps its width so the names stay in one column. */}
+        <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+          {mastered ? (
+            <Check className="h-3 w-3 text-emerald-400" strokeWidth={3} />
+          ) : attempted ? (
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" title="In progress" />
+          ) : null}
+        </span>
+
+        {/* Name, level and length travel together, so the row reads as one
+            phrase instead of two islands with a blank gap between them.
+            No "New" chip here — the set header already carries it, and the New
+            filter narrows the rows to exactly those. */}
         <button
-          onClick={() => toggleSort(col)}
-          className={cn(
-            "group/sort inline-flex items-center gap-1 rounded transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
-            align === "right" && "flex-row-reverse",
-            active && "text-zinc-300",
-          )}
+          onClick={() => setPreviewExercise(exercise)}
+          // The colour sits here, not on the span: an explicit `text-zinc-300`
+          // on the child ignored the button's `hover:text-white`, so the name
+          // never actually reacted to the pointer.
+          className="flex min-w-0 flex-1 items-baseline gap-2.5 truncate text-left text-zinc-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+          title={exTitle(exercise)}
         >
-          {label}
-          {active ? (
-            sortDir === "asc"
-              ? <ChevronUp className="h-3 w-3 text-cyan-400" />
-              : <ChevronDown className="h-3 w-3 text-cyan-400" />
-          ) : (
-            <ChevronsUpDown className="h-3 w-3 opacity-0 transition-opacity group-hover/sort:opacity-50" />
-          )}
+          <span className="truncate text-[14px]">
+            {showVariantLabel ? getVariantLabel(exercise) : exTitle(exercise)}
+          </span>
+          <span
+            className="hidden shrink-0 text-[12px] font-semibold capitalize lg:inline"
+            style={{ color: DIFFICULTY_HEX[exercise.difficulty] ?? DIFFICULTY_HEX.easy }}
+          >
+            {exercise.difficulty}
+          </span>
+          <span className="hidden shrink-0 text-[12px] tabular-nums text-zinc-600 lg:inline">
+            {formatMinutes(exercise.timeInMinutes ?? 0)}
+          </span>
         </button>
-      </th>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          {rank != null && (
+            <span
+              className={cn(
+                "flex h-[22px] min-w-[30px] items-center justify-center rounded px-1 text-[12px] font-bold tabular-nums",
+                rankClass(rank)
+              )}
+            >
+              #{rank}
+            </span>
+          )}
+          {resultText ? (
+            hasBpmProgress ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="w-[72px] text-right text-[12px] font-bold tabular-nums text-zinc-300">
+                    {resultText}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-zinc-200">
+                      {completedBpms.length} / {stages.length} tempos · {bpmPct}%
+                    </span>
+                    <div className="h-1 w-32 overflow-hidden rounded-full bg-zinc-700">
+                      <div
+                        className="h-full rounded-full bg-cyan-400"
+                        style={{ width: `${bpmPct}%` }}
+                      />
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <span className="w-[72px] text-right text-[12px] font-bold tabular-nums text-zinc-300">
+                {resultText}
+              </span>
+            )
+          ) : (
+            <span className="hidden w-16 sm:block" />
+          )}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-0.5">
+          {userAuth && (
+            <button
+              onClick={() => handleToggleFavorite(exercise.id)}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50",
+                isFavorite
+                  ? "text-rose-400 hover:bg-rose-500/20"
+                  : "text-zinc-500 hover:bg-white/10 hover:text-rose-300"
+              )}
+              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              aria-pressed={isFavorite}
+            >
+              <Heart size={15} className={cn(isFavorite && "fill-current")} />
+            </button>
+          )}
+          <button
+            onClick={() => setPreviewExercise(exercise)}
+            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+            title="Exercise details"
+            aria-label="Exercise details"
+          >
+            <Info size={15} />
+          </button>
+          {hasLeaderboard && (
+            <button
+              onClick={() => onShowLeaderboard(exercise.id, exTitle(exercise))}
+              className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-amber-500/20 hover:text-amber-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+              title="Leaderboard"
+              aria-label="Leaderboard"
+            >
+              <Trophy size={15} />
+            </button>
+          )}
+        </div>
+
+        {isLocked ? (
+          <button
+            onClick={onShowUpgrade}
+            className="flex shrink-0 items-center gap-1 rounded bg-amber-500/10 px-3 py-2 text-[13px] font-bold text-amber-500 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+          >
+            <Lock size={12} />
+            Pro
+          </button>
+        ) : (
+          <button
+            onClick={() => handleStart(exercise)}
+            className="flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <ChevronRight size={14} strokeWidth={2.5} />
+            Start
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  /**
+   * One collapsible set. `skill` is passed only for the sets that sit outside a
+   * skill group — inside a group the header already names the skill, so a badge
+   * on every card would just repeat it.
+   */
+  const renderSetCard = (
+    entry: (typeof visibleSets)[number],
+    skill?: { category: string; icon?: GuitarSkill["icon"]; label: string }
+  ) => {
+    const { set, matches } = entry;
+    const isExpanded = expandedSets.includes(set.id);
+    const isSingle = set.exercises.length === 1;
+
+    return (
+      <div
+        key={set.id}
+        className="overflow-hidden rounded-lg border border-white/[0.02] bg-white/[0.02] backdrop-blur-sm"
+      >
+        {/* `group` and the hover live on the header, not on the card. On the card
+            they fired from anywhere inside it, so pointing at a variant row lit
+            up the header and nudged its chevron while the row itself stayed
+            dead — the pointer never marked what it was actually over. */}
+        <button
+          onClick={() => setExpandedSets(prev => toggle(prev, set.id))}
+          aria-expanded={isExpanded}
+          className="group flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors duration-200 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 sm:px-4"
+        >
+          {skill && (
+            <SkillIconTile category={skill.category} icon={skill.icon} size="sm" />
+          )}
+
+          <span className="truncate text-[15px] font-semibold text-zinc-100">{set.title}</span>
+
+          {!isSingle && (
+            <span className="shrink-0 text-[12px] tabular-nums text-zinc-600">
+              {matches.length < set.exercises.length
+                ? `${matches.length}/${set.exercises.length}`
+                : set.exercises.length}
+            </span>
+          )}
+
+          {matches.some(ex => isExerciseNew(ex)) && (
+            <Chip color="cyan" className="shrink-0 rounded px-1.5 py-0 text-[10px] tracking-wider">
+              New
+            </Chip>
+          )}
+
+          {skill && (
+            <span
+              className={cn(
+                "hidden truncate text-[12px] font-semibold sm:inline",
+                getSkillAccentClass(skill.category)
+              )}
+            >
+              {skill.label}
+            </span>
+          )}
+
+          <ChevronRight
+            className={cn(
+              "ml-auto h-4 w-4 shrink-0 text-zinc-700 transition-all duration-300 group-hover:text-zinc-200",
+              isExpanded ? "rotate-90" : "group-hover:translate-x-1"
+            )}
+          />
+        </button>
+
+        {isExpanded && (
+          <div className="flex flex-col gap-1 px-2 pb-3 sm:px-3">
+            {/* Shown here rather than on every collapsed card: 45 of these
+                paragraphs at once is the wall we came from. Padding matches a row
+                so the left edges line up. */}
+            {set.exercises[0].whyItMatters && (
+              <p className="max-w-2xl px-2 pb-2 text-[13px] leading-relaxed text-zinc-500 sm:px-3">
+                {set.exercises[0].whyItMatters}
+              </p>
+            )}
+            {matches.map(exercise => renderExerciseRow(exercise, !isSingle))}
+          </div>
+        )}
+      </div>
     );
   };
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-5 sm:pt-6 pb-24 flex flex-col gap-5 sm:gap-6">
-
-      {/* ── Filters bar ── */}
-      <div className="flex flex-col gap-3 sm:gap-4 bg-zinc-900/60 rounded-lg p-3 sm:p-5">
-
-        {/* Search + (mobile) filters trigger */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
-            <input
-              value={searchQuery}
-              onChange={e => handleSearchChange(e.target.value)}
-              placeholder="Search exercises…"
-              // text-base on mobile stops iOS Safari zooming in on focus.
-              className="w-full pl-9 pr-9 h-11 sm:h-9 rounded-lg bg-zinc-800/70 text-base sm:text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-colors"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => handleSearchChange("")}
-                className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded text-zinc-500 hover:text-zinc-300 transition-colors"
-                aria-label="Clear search"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-          <button
-            onClick={() => setShowFilters(true)}
-            className={cn(
-              "sm:hidden flex shrink-0 items-center gap-1.5 h-11 px-3.5 rounded-lg text-xs font-bold transition-colors",
-              activeFilterCount > 0 ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800/70 text-zinc-400"
-            )}
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cyan-500/25 px-1 text-[10px] tabular-nums">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Active filters stay visible on mobile while the sheet is closed */}
-        {activeFilterChips.length > 0 && (
-          <div className="flex sm:hidden flex-wrap gap-1.5">
-            {activeFilterChips.map(chip => (
-              <button
-                key={chip.key}
-                onClick={chip.clear}
-                className={cn(filterPill(true), "flex items-center gap-1 pr-2", chip.className)}
-              >
-                {chip.label}
-                <X className="h-3 w-3 opacity-60" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Desktop: filters inline */}
-        <div className="hidden sm:flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className={cn(groupLabel, "mr-1")}>Category</span>
-            {categoryPills()}
-          </div>
-
-          <div className="flex flex-wrap gap-4">
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className={cn(groupLabel, "mr-1")}>Difficulty</span>
-              {difficultyPills()}
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 pb-24 pt-5 sm:gap-6 sm:pt-6 lg:px-6">
+        {/* ── Filters ── */}
+        <div className="flex flex-col gap-3 rounded-lg bg-zinc-900/60 p-3 sm:gap-4 sm:p-5">
+          <div className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search: shred, warm up, no guitar, chord changes…"
+                // text-base on mobile stops iOS Safari zooming in on focus.
+                className="h-11 w-full rounded-lg bg-zinc-800/70 pl-9 pr-9 text-base text-zinc-200 transition-colors placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 sm:h-10 sm:text-[15px]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded text-zinc-500 transition-colors hover:text-zinc-300"
+                  aria-label="Clear search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
-
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className={cn(groupLabel, "mr-1")}>Skill</span>
-              {skillPills()}
-            </div>
-
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className={cn(groupLabel, "mr-1")}>Gear</span>
-              {noGuitarPill()}
-            </div>
-          </div>
-
-          {activeFilterCount > 0 && (
             <button
-              onClick={clearFilters}
-              className="self-start flex items-center gap-1.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-300 transition-colors"
+              onClick={() => setShowFilters(true)}
+              className={cn(
+                "flex h-11 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-bold transition-colors sm:hidden",
+                activeFilterCount > 0 ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800/70 text-zinc-400"
+              )}
             >
-              <X className="h-3 w-3" />
-              Clear filters
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cyan-500/25 px-1 text-[11px] tabular-nums">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
+          </div>
+
+          {/* Applied filters stay visible on mobile while the sheet is closed */}
+          {activeFilterChips.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 sm:hidden">
+              {activeFilterChips.map(chip => (
+                <button
+                  key={chip.key}
+                  onClick={chip.clear}
+                  className={cn(filterPill(true), "flex items-center gap-1 pr-2")}
+                >
+                  {chip.label}
+                  <X className="h-3 w-3 opacity-60" />
+                </button>
+              ))}
+            </div>
           )}
+
+          {/* Desktop: filters inline */}
+          <div className="hidden flex-col gap-3.5 sm:flex">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={cn(groupLabel, "mr-1")}>How you practice</span>
+                {modePills()}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={cn(groupLabel, "mr-1")}>Status</span>
+                {statusPills()}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={cn(groupLabel, "mr-1")}>Length</span>
+                {lengthPills()}
+              </div>
+            </div>
+
+            {/* All 22 skills laid out flat took three rows and buried everything
+                under it, so they open on demand and the chosen ones stay in view. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setShowSkills(open => !open)}
+                aria-expanded={showSkills}
+                className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-zinc-500 transition-colors hover:text-zinc-300"
+              >
+                <ChevronRight
+                  className={cn("h-3.5 w-3.5 transition-transform", showSkills && "rotate-90")}
+                />
+                Skill
+                {/* Without a number this row was a grey word with a chevron and
+                    nothing to say it hid 22 filters. */}
+                {selectedSkills.length > 0 ? (
+                  <span className="tabular-nums text-cyan-400">
+                    {selectedSkills.length} selected
+                  </span>
+                ) : (
+                  <span className="tabular-nums font-medium text-zinc-600">
+                    {availableSkillCount}
+                  </span>
+                )}
+              </button>
+
+              {!showSkills &&
+                selectedSkills.map(skill => (
+                  <button
+                    key={skill}
+                    onClick={() => setSelectedSkills(prev => toggle(prev, skill))}
+                    className={cn(filterPill(true), "flex items-center gap-1 pr-2")}
+                  >
+                    {String(t(`skills:skills.${skill}.name` as never))}
+                    <X className="h-3 w-3 opacity-60" />
+                  </button>
+                ))}
+            </div>
+
+            {showSkills && (
+              <div className="flex flex-col gap-2.5 rounded-lg bg-zinc-950/40 p-3">{skillPills()}</div>
+            )}
+
+            {activeFilterCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1.5 self-start text-[12px] font-bold text-zinc-500 transition-colors hover:text-zinc-300"
+              >
+                <X className="h-3 w-3" />
+                Clear filters
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Mobile: filters live in a bottom sheet so the list keeps the screen */}
-      <Sheet open={showFilters} onOpenChange={setShowFilters}>
-        <SheetContent
-          side="bottom"
-          className="sm:hidden flex max-h-[85vh] flex-col gap-0 rounded-t-2xl bg-zinc-950 p-0"
-        >
-          <SheetTitle className="px-5 pt-5 pb-2 text-lg font-bold text-white">Filters</SheetTitle>
+        {/* Mobile: filters live in a bottom sheet so the list keeps the screen */}
+        <Sheet open={showFilters} onOpenChange={setShowFilters}>
+          <SheetContent
+            side="bottom"
+            className="flex max-h-[85vh] flex-col gap-0 rounded-t-lg bg-zinc-950 p-0 sm:hidden"
+          >
+            <SheetTitle className="px-5 pb-2 pt-5 text-lg font-bold text-white">Filters</SheetTitle>
 
-          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 flex flex-col gap-6">
-            <div className="flex flex-col gap-2.5">
-              <span className={groupLabel}>Category</span>
-              <div className="flex flex-wrap gap-2">{categoryPills(true)}</div>
+            <div className="flex flex-1 flex-col gap-6 overflow-y-auto overscroll-contain px-5 py-4">
+              <div className="flex flex-col gap-2.5">
+                <span className={groupLabel}>Skill</span>
+                <div className="flex flex-col gap-3">{skillPills(true)}</div>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <span className={groupLabel}>How you practice</span>
+                <div className="flex flex-wrap gap-2">{modePills(true)}</div>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <span className={groupLabel}>Status</span>
+                <div className="flex flex-wrap gap-2">{statusPills(true)}</div>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <span className={groupLabel}>Length</span>
+                <div className="flex flex-wrap gap-2">{lengthPills(true)}</div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2.5">
-              <span className={groupLabel}>Difficulty</span>
-              <div className="flex flex-wrap gap-2">{difficultyPills(true)}</div>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <span className={groupLabel}>Skill</span>
-              <div className="flex flex-wrap gap-2">{skillPills(true)}</div>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <span className={groupLabel}>Gear</span>
-              <div className="flex flex-wrap gap-2">{noGuitarPill(true)}</div>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3 px-5 pt-4 pb-6 bg-zinc-950">
-            <button
-              onClick={clearFilters}
-              disabled={activeFilterCount === 0}
-              className="h-11 px-4 rounded-lg bg-zinc-900 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40"
-            >
-              Clear
-            </button>
-            <button
-              onClick={() => setShowFilters(false)}
-              className="flex-1 h-11 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300"
-            >
-              Show {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
+            <div className="flex items-center gap-3 bg-zinc-950 px-5 pb-6 pt-4">
+              <button
+                onClick={clearFilters}
+                disabled={activeFilterCount === 0}
+                className="h-11 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="h-11 flex-1 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300"
+              >
+                Show {totalMatches} exercise{totalMatches !== 1 ? "s" : ""}
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
 
-      {/* ── Table ── */}
-      <div ref={listRef} className="flex flex-col gap-3 scroll-mt-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-zinc-500">
-            {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
-            {totalPages > 1 && <span className="ml-1">— page {safePage} / {totalPages}</span>}
+        {/* ── Sets ── */}
+        <div className="flex flex-col gap-3">
+          <p className="text-[13px] text-zinc-500">
+            {visibleSets.length} set{visibleSets.length !== 1 ? "s" : ""} · {totalMatches} exercise
+            {totalMatches !== 1 ? "s" : ""}
+            {/* The library size alone said nothing about the player. */}
+            {matchedProgress.mastered > 0 && (
+              <span className="text-emerald-400"> · {matchedProgress.mastered} mastered</span>
+            )}
+            {matchedProgress.started > 0 && (
+              <span className="text-amber-400"> · {matchedProgress.started} in progress</span>
+            )}
           </p>
 
-          {/* The card layout has no sortable headers, so mobile gets its own sort pills. */}
-          <div className="flex lg:hidden items-center gap-1.5">
-            <span className="text-[10px] font-bold capitalize tracking-wider text-zinc-500">Sort</span>
-            {([["name", "Name"], ["difficulty", "Level"], ["time", "Time"]] as const).map(([key, label]) => {
-              const active = sortKey === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => toggleSort(key)}
-                  className={cn(
-                    "flex items-center gap-1 rounded px-2 py-1 text-[11px] font-bold transition-colors",
-                    active ? "bg-zinc-800 text-zinc-200" : "text-zinc-500"
-                  )}
-                >
-                  {label}
-                  {active && (sortDir === "asc"
-                    ? <ChevronUp className="h-3 w-3 text-cyan-400" />
-                    : <ChevronDown className="h-3 w-3 text-cyan-400" />)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Mobile / tablet: cards ── */}
-        <div className="flex flex-col gap-2 lg:hidden">
-          {rows.map(({
-            exercise, isLocked, title, isNew, skillId, SkillIcon, isFavorite, rank,
-            hasLeaderboard, hasBeenAttempted, resultText,
-          }) => (
-            <div
-              key={exercise.id}
-              onClick={() => setPreviewExercise(exercise as Exercise)}
-              className={cn(
-                "flex items-center gap-3 rounded-lg py-3 pl-3.5 pr-3 transition-colors cursor-pointer select-none",
-                hasBeenAttempted ? "bg-zinc-900/70 active:bg-zinc-800/70" : "bg-zinc-900/30 active:bg-zinc-900/60"
-              )}
-            >
-              <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                {/* Title */}
-                <div className="flex items-start gap-2">
-                  {hasBeenAttempted && (
-                    <div className="mt-[3px] flex-shrink-0 flex items-center justify-center bg-emerald-500/10 rounded-full h-4 w-4">
-                      <FaCheck className="h-2 w-2 text-emerald-400" />
-                    </div>
-                  )}
-                  <span className={cn("min-w-0 text-[15px] font-semibold leading-snug line-clamp-2", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
-                    {title}
+          <div className="flex flex-col gap-8">
+            {groupedSkills.map(group => (
+              <div key={group.skillId} className="flex flex-col gap-2">
+                {/* The skill is stated once here instead of on every card, which
+                    also stops identical tiles stacking up inside a group. */}
+                <div className="flex items-center gap-3 px-1">
+                  <SkillIconTile category={group.category} icon={group.skill?.icon} size="sm" />
+                  <span className={cn('text-base font-bold', getSkillAccentClass(group.category))}>
+                    {group.label}
+                  </span>
+                  <span className="text-[12px] tabular-nums text-zinc-600">
+                    {group.sets.length} sets
                   </span>
                 </div>
 
-                {/* Meta: badges, then plain text so the row stays quiet */}
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  {isNew && (
-                    <Chip color="cyan" className="flex-shrink-0 px-1.5 py-0 text-[9px] tracking-wider">New</Chip>
-                  )}
-                  {isLocked && (
-                    <span className="flex-shrink-0 flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/25">
-                      <Lock className="h-2.5 w-2.5 text-amber-500" />
-                      <span className="text-[9px] font-bold capitalize tracking-wider text-amber-500">Pro</span>
-                    </span>
-                  )}
-                  <Chip
-                    color="custom"
-                    style={getChipCustomStyle(CATEGORY_HEX[exercise.category] ?? CATEGORY_HEX.mixed)}
-                    className="px-1.5 py-0 text-[10px] capitalize tracking-wider"
-                  >
-                    {exercise.category}
-                  </Chip>
-                  <Chip
-                    color="custom"
-                    style={getChipCustomStyle(DIFFICULTY_HEX[exercise.difficulty])}
-                    className="px-1.5 py-0 text-[10px] capitalize tracking-wider"
-                  >
-                    {exercise.difficulty}
-                  </Chip>
-                  {SkillIcon && (
-                    <span className="flex items-center gap-1 text-[11px] text-zinc-500 min-w-0">
-                      <SkillIcon className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{t(`skills:skills.${skillId}.name` as any)}</span>
-                    </span>
-                  )}
-                  <span className="text-[11px] text-zinc-500 tabular-nums whitespace-nowrap">
-                    {exercise.timeInMinutes < 1
-                      ? `${Math.round(exercise.timeInMinutes * 60)} s`
-                      : `${exercise.timeInMinutes} min`}
-                  </span>
-                </div>
-
-                {/* Result + secondary actions share one row to keep cards short */}
-                <div className="flex items-center gap-1">
-                  {hasBeenAttempted && resultText != null && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); if (hasLeaderboard) onShowLeaderboard(exercise.id, title); }}
-                      className="flex items-center gap-1.5 pr-2 rounded"
-                    >
-                      {rank && (
-                        <span className={cn("flex items-center justify-center min-w-[22px] h-5 px-1 rounded font-bold text-[11px]", rankClass(rank))}>
-                          #{rank}
-                        </span>
-                      )}
-                      <span className="text-[11px] font-bold text-zinc-300 tabular-nums whitespace-nowrap">{resultText}</span>
-                    </button>
-                  )}
-                  {userAuth && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleToggleFavorite(exercise.id); }}
-                      className={cn(
-                        "flex items-center justify-center h-8 w-8 -ml-1.5 rounded transition-colors",
-                        isFavorite ? "text-rose-400" : "text-zinc-600 active:text-zinc-400"
-                      )}
-                      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                      aria-pressed={isFavorite}
-                    >
-                      <Heart size={15} className={cn(isFavorite && "fill-current")} />
-                    </button>
-                  )}
-                  {hasLeaderboard && !hasBeenAttempted && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
-                      className="flex items-center justify-center h-8 w-8 rounded text-zinc-600 active:text-zinc-400 transition-colors"
-                      aria-label="Leaderboard"
-                    >
-                      <Trophy size={15} />
-                    </button>
-                  )}
-                </div>
+                {group.sets.map(entry => renderSetCard(entry))}
               </div>
+            ))}
 
-              {/* Primary action, thumb-height and vertically centred */}
-              {isLocked ? (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onShowUpgrade(); }}
-                  className="flex shrink-0 items-center gap-1 h-10 px-4 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-bold transition-colors active:bg-amber-500/20"
-                >
-                  <Lock size={12} />
-                  Pro
-                </button>
-              ) : (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onStartExercise(buildChallenge(exercise)); }}
-                  className="flex shrink-0 items-center gap-0.5 h-10 pl-3 pr-4 rounded-lg bg-zinc-100 text-zinc-950 text-xs font-bold transition-colors active:bg-zinc-300"
-                >
-                  <ChevronRight size={14} strokeWidth={2.5} />
-                  Start
-                </button>
-              )}
-            </div>
-          ))}
+            {looseSets.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3 px-1">
+                  <span className="text-base font-bold text-zinc-400">One-off skills</span>
+                  <span className="text-[12px] tabular-nums text-zinc-600">
+                    {looseSets.length} sets
+                  </span>
+                </div>
 
-          {filteredExercises.length === 0 && (
-            <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-4 py-12 text-center">
-              <p className="text-zinc-500 text-sm">No exercises match the current filters.</p>
-              {(activeFilterCount > 0 || searchQuery) && (
-                <button
-                  onClick={() => { clearFilters(); handleSearchChange(""); }}
-                  className="h-9 px-4 rounded-lg bg-zinc-800 text-xs font-bold text-zinc-200 transition-colors active:bg-zinc-700"
-                >
-                  Reset filters
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+                {looseSets.map(entry =>
+                  renderSetCard(entry, {
+                    category: entry.group.category,
+                    icon: entry.group.skill?.icon,
+                    label: entry.group.label,
+                  })
+                )}
+              </div>
+            )}
 
-        {/* ── Desktop: table ── */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full min-w-[980px] table-fixed border-separate border-spacing-y-3 text-sm">
-            <thead>
-              <tr>
-                <th className="text-left px-4 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">
+            {visibleSets.length === 0 && (
+              <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-4 py-12 text-center">
+                <p className="text-sm text-zinc-500">No exercises match the current filters.</p>
+                {(activeFilterCount > 0 || searchQuery) && (
                   <button
-                    onClick={() => toggleSort("name")}
-                    className={cn(
-                      "group/sort inline-flex items-center gap-1 rounded transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
-                      sortKey === "name" && "text-zinc-300",
-                    )}
+                    onClick={() => {
+                      clearFilters();
+                      setSearchQuery("");
+                    }}
+                    className="h-9 rounded-lg bg-zinc-800 px-4 text-[13px] font-bold text-zinc-200 transition-colors hover:bg-zinc-700"
                   >
-                    Name
-                    {sortKey === "name" ? (
-                      sortDir === "asc"
-                        ? <ChevronUp className="h-3 w-3 text-cyan-400" />
-                        : <ChevronDown className="h-3 w-3 text-cyan-400" />
-                    ) : (
-                      <ChevronsUpDown className="h-3 w-3 opacity-0 transition-opacity group-hover/sort:opacity-50" />
-                    )}
+                    Reset filters
                   </button>
-                </th>
-                <th className="w-28 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Category</th>
-                {renderSortHead("difficulty", "Difficulty", "left", "w-28")}
-                <th className="w-36 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Skill</th>
-                {renderSortHead("time", "Time", "right", "w-20")}
-                <th className="w-32 text-left px-3 pb-2 text-[11px] font-bold capitalize tracking-wider text-zinc-500">Result</th>
-                <th className="w-56 px-3 pb-2 text-right text-[11px] font-bold capitalize tracking-wider text-zinc-500">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({
-                exercise, isLocked, title, isNew, skillId, SkillIcon, isFavorite, rank,
-                hasLeaderboard, hasBeenAttempted, resultText, hasBpmProgress, bpmStages,
-                completedBpms, bpmPct,
-              }) => {
-                const cellBg = cn(
-                  "border-y border-zinc-800 transition-colors",
-                  hasBeenAttempted
-                    ? "bg-zinc-900/60 group-hover:bg-zinc-800/60"
-                    : "bg-zinc-950/40 group-hover:bg-zinc-900/60"
-                );
-
-                return (
-                  <tr
-                    key={exercise.id}
-                    onClick={() => setPreviewExercise(exercise as Exercise)}
-                    className="group cursor-pointer"
-                  >
-                    {/* Name */}
-                    <td className={cn(cellBg, "rounded-l-lg border-l py-4 pl-4 pr-3")}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 cursor-pointer">
-                            {hasBeenAttempted && (
-                              <div className="flex-shrink-0 flex items-center justify-center bg-emerald-500/10 rounded-full h-4 w-4 border border-emerald-500/20">
-                                <FaCheck className="h-2 w-2 text-emerald-400" />
-                              </div>
-                            )}
-                            <span className={cn("font-semibold leading-snug", hasBeenAttempted ? "text-white" : "text-zinc-300")}>
-                              {title}
-                            </span>
-                            {isNew && (
-                              <Chip color="cyan" className="flex-shrink-0 px-2 py-0.5 text-[9px] tracking-wider">
-                                New
-                              </Chip>
-                            )}
-                            {isLocked && (
-                              <span className="flex-shrink-0 flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 ring-1 ring-amber-500/25">
-                                <Lock className="h-2.5 w-2.5 text-amber-500" />
-                                <span className="text-[9px] font-bold capitalize tracking-wider text-amber-500">Pro</span>
-                              </span>
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        {exercise.description && (
-                          <TooltipContent side="right" className="max-w-[280px] whitespace-normal font-normal text-xs leading-relaxed">
-                            {typeof exercise.description === "string"
-                              ? exercise.description
-                              : (exercise.description as any)?.en ?? ""}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </td>
-
-                    {/* Category */}
-                    <td className={cn(cellBg, "px-3 py-4")}>
-                      <Chip
-                        color="custom"
-                        style={getChipCustomStyle(CATEGORY_HEX[exercise.category] ?? CATEGORY_HEX.mixed)}
-                        className="px-2 py-0.5 text-[10px] capitalize tracking-wider"
-                      >
-                        {exercise.category}
-                      </Chip>
-                    </td>
-
-                    {/* Difficulty */}
-                    <td className={cn(cellBg, "px-3 py-4")}>
-                      <Chip
-                        color="custom"
-                        style={getChipCustomStyle(DIFFICULTY_HEX[exercise.difficulty])}
-                        className="px-2 py-0.5 text-[10px] capitalize tracking-wider"
-                      >
-                        {exercise.difficulty}
-                      </Chip>
-                    </td>
-
-                    {/* Skill */}
-                    <td className={cn(cellBg, "px-3 py-4")}>
-                      {SkillIcon ? (
-                        <span className="flex items-center gap-1.5 text-zinc-400 text-xs">
-                          <SkillIcon className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate max-w-[90px]">{t(`skills:skills.${skillId}.name` as any)}</span>
-                        </span>
-                      ) : (
-                        <span className="text-zinc-500 text-xs">—</span>
-                      )}
-                    </td>
-
-                    {/* Time */}
-                    <td className={cn(cellBg, "px-3 py-4 text-right text-zinc-400 text-xs tabular-nums whitespace-nowrap")}>
-                      {exercise.timeInMinutes < 1
-                        ? `${Math.round(exercise.timeInMinutes * 60)} s`
-                        : `${exercise.timeInMinutes} min`
-                      }
-                    </td>
-
-                    {/* Result (best score + leaderboard rank) */}
-                    <td className={cn(cellBg, "px-3 py-4")}>
-                      {hasBeenAttempted && resultText != null ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); if (hasLeaderboard) onShowLeaderboard(exercise.id, title); }}
-                              className={cn(
-                                "flex items-center gap-2 rounded transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
-                                hasLeaderboard ? "cursor-pointer hover:opacity-80" : "cursor-default"
-                              )}
-                              title={hasLeaderboard ? "View Leaderboard" : undefined}
-                            >
-                              {rank ? (
-                                <span className={cn(
-                                  "flex items-center justify-center min-w-[24px] h-6 px-1 rounded font-bold text-[11px]",
-                                  rank === 1 ? "bg-amber-500/20 text-amber-500" :
-                                  rank === 2 ? "bg-zinc-300/20 text-zinc-300" :
-                                  rank === 3 ? "bg-amber-700/20 text-amber-600" :
-                                  "bg-zinc-800/40 text-zinc-400"
-                                )}>
-                                  #{rank}
-                                </span>
-                              ) : isLoadingRanks ? (
-                                <span className="h-6 w-6 rounded bg-zinc-800 animate-pulse" />
-                              ) : null}
-                              <span className="text-[11px] font-bold text-zinc-300 tabular-nums whitespace-nowrap">{resultText}</span>
-                            </button>
-                          </TooltipTrigger>
-                          {hasBpmProgress && (
-                            <TooltipContent side="top" className="font-normal text-xs">
-                              <div className="flex flex-col gap-1.5">
-                                <span className="text-zinc-200">{completedBpms.length} / {bpmStages.length} tempos · {bpmPct}%</span>
-                                <div className="h-1 w-32 rounded-full bg-zinc-700 overflow-hidden">
-                                  <div className="h-full rounded-full bg-cyan-400" style={{ width: `${bpmPct}%` }} />
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                      ) : (
-                        <span className="text-zinc-500 text-xs ml-1">—</span>
-                      )}
-                    </td>
-
-                    {/* Actions */}
-                    <td className={cn(cellBg, "rounded-r-lg border-r py-4 pl-3 pr-4")}>
-                      <div className="flex items-center justify-end gap-1.5">
-                        {userAuth && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleToggleFavorite(exercise.id); }}
-                            className={cn(
-                              "flex items-center justify-center h-7 w-7 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50",
-                              isFavorite
-                                ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
-                                : "bg-zinc-800/40 text-zinc-400 hover:text-rose-300 hover:bg-rose-500/10"
-                            )}
-                            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                            aria-pressed={isFavorite}
-                          >
-                            <Heart size={13} className={cn(isFavorite && "fill-current")} />
-                          </button>
-                        )}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setPreviewExercise(exercise as Exercise); }}
-                          className="flex items-center justify-center h-7 w-7 rounded bg-zinc-800/40 text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-                          title="Exercise details"
-                        >
-                          <Info size={13} />
-                        </button>
-                        {hasLeaderboard && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); onShowLeaderboard(exercise.id, title); }}
-                            className="flex items-center justify-center h-7 w-7 rounded bg-zinc-800/40 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
-                            title="Leaderboard"
-                            aria-label="Leaderboard"
-                          >
-                            <Trophy size={13} />
-                          </button>
-                        )}
-                        {isLocked ? (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); onShowUpgrade(); }}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-500/10 text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
-                          >
-                            <Lock size={10} />
-                            Pro
-                          </button>
-                        ) : (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); onStartExercise(buildChallenge(exercise)); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                          >
-                            <ChevronRight size={12} strokeWidth={2.5} />
-                            Start
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {filteredExercises.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-12 text-center text-zinc-500 text-sm">
-                    No exercises match the current filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ── Pagination ── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-1">
-            <button
-              onClick={() => goToPage(Math.max(1, safePage - 1))}
-              disabled={safePage === 1}
-              className="flex items-center gap-1.5 h-9 sm:h-auto px-4 sm:px-3 sm:py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
-            >
-              <ChevronLeft size={13} />
-              Previous
-            </button>
-
-            {/* Numbered pages need too much room on a phone - show a counter instead. */}
-            <span className="sm:hidden text-xs font-semibold text-zinc-400 tabular-nums">
-              {safePage} / {totalPages}
-            </span>
-
-            <div className="hidden sm:flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
-                const isActive = p === safePage;
-                const isNear = Math.abs(p - safePage) <= 2 || p === 1 || p === totalPages;
-                if (!isNear) {
-                  const isGap = Math.abs(p - safePage) === 3;
-                  return isGap ? (
-                    <span key={p} className="text-zinc-500 text-xs px-1">…</span>
-                  ) : null;
-                }
-                return (
-                  <button
-                    key={p}
-                    onClick={() => goToPage(p)}
-                    className={cn(
-                      "h-7 min-w-[28px] px-2 rounded text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                      isActive
-                        ? "bg-zinc-700 text-white"
-                        : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-                    )}
-                  >
-                    {p}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => goToPage(Math.min(totalPages, safePage + 1))}
-              disabled={safePage === totalPages}
-              className="flex items-center gap-1.5 h-9 sm:h-auto px-4 sm:px-3 sm:py-1.5 rounded bg-zinc-800/50 text-zinc-400 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200"
-            >
-              Next
-              <ChevronRight size={13} />
-            </button>
+                )}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <ExercisePreviewDialog
-        exercise={previewExercise}
-        onClose={() => setPreviewExercise(null)}
-        onStart={handleStartPreview}
-      />
-    </div>
+        <ExercisePreviewDialog
+          exercise={previewExercise}
+          onClose={() => setPreviewExercise(null)}
+          onStart={handleStartPreview}
+        />
+      </div>
     </TooltipProvider>
   );
 };

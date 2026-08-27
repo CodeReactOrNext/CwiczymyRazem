@@ -1,13 +1,15 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
-/** How long (in days) an exercise stays flagged as "New" after its addedAt date. */
-export const NEW_EXERCISE_WINDOW_DAYS = 60;
+/** How long (in days) an exercise stays flagged as "New" after its addedAt date.
+ *  Kept short on purpose: with a 60-day window most of the library carried the
+ *  badge at once, which made it point at nothing. */
+export const NEW_EXERCISE_WINDOW_DAYS = 30;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Returns true when the exercise was added within the last
- * NEW_EXERCISE_WINDOW_DAYS (≈2 months). Exercises without an `addedAt` date are
+ * NEW_EXERCISE_WINDOW_DAYS (a month). Exercises without an `addedAt` date are
  * treated as not new.
  */
 export const isExerciseNew = (

@@ -18,7 +18,7 @@ export const downPickingDoomPulseExercise: Exercise = {
     "Focus on uniform attack velocity to ensure every pulse sounds identical."
   ],
   metronomeSpeed: { min: 40, max: 120, recommended: 60 },
-  relatedSkills: ["hybrid_picking"],
+  relatedSkills: ["alternate_picking"],
   tablature: [
     // M1: E(0) G(3) A(5) G(3) — basic groove
     {
