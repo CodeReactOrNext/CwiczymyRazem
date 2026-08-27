@@ -2,6 +2,7 @@ import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { boardOffsetX, scrollAfterDrag } from "./tablatureDirection";
 import type { TablatureRenderData } from "./useTablatureRenderData";
 
 const REST_VOLUME_THRESHOLD = 0.05;
@@ -95,6 +96,10 @@ export interface TablatureStylePatch {
   ink?: string;
   /** Vertical gap between strings, in world px. */
   stringSpacing?: number;
+  /** Draw the staff upside down — low E on the top line. */
+  flipStrings?: boolean;
+  /** Mirror the board so the music runs right to left. */
+  rightToLeft?: boolean;
   /** Fret-number colour, or "auto" to pick per pill from its brightness. */
   fretText?: string;
   showRhythmLane?: boolean;
@@ -271,6 +276,11 @@ export function useTablatureWorkerBridge({
     }
   }, [startTime, isPlaying]);
 
+  // Pointer coordinates arrive in page space, which the board's CSS mirror
+  // does not touch — so every one of them is measured from the edge the music
+  // starts at instead of unconditionally from the left.
+  const rightToLeft = !!style?.rightToLeft;
+
   const handleDragStart = (clientX: number) => {
     if (isPlaying) return;
     isDraggingRef.current    = true;
@@ -286,7 +296,7 @@ export function useTablatureWorkerBridge({
   };
   const handleDragMove = (clientX: number) => {
     if (!isDraggingRef.current) return;
-    const newScrollX = Math.max(0, initScrollXRef.current - (clientX - dragStartXRef.current) / vscale);
+    const newScrollX = scrollAfterDrag(initScrollXRef.current, (clientX - dragStartXRef.current) / vscale, rightToLeft);
     pausedScrollRef.current = { ...pausedScrollRef.current, scrollX: newScrollX };
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: pausedScrollRef.current.cursorPos });
   };
@@ -301,9 +311,9 @@ export function useTablatureWorkerBridge({
       Math.abs(clientX - mouseDownXRef.current) < 5 &&
       Date.now() - mouseDownTimeRef.current < 400
     ) {
-      const containerLeft = containerRef.current.getBoundingClientRect().left;
+      const rect = containerRef.current.getBoundingClientRect();
       const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-      const worldX = (clientX - containerLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
+      const worldX = boardOffsetX(clientX, rect, rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
       let beatPos = Math.max(0, worldX / dynBW);
 
       // Snap to start of the measure that was clicked
@@ -331,9 +341,9 @@ export function useTablatureWorkerBridge({
 
   const handleHover = (clientX: number) => {
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
-    const containerLeft = containerRef.current.getBoundingClientRect().left;
+    const rect = containerRef.current.getBoundingClientRect();
     const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-    const worldX = (clientX - containerLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
+    const worldX = boardOffsetX(clientX, rect, rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
     const beatPos = Math.max(0, worldX / dynBW);
 
     // Find which measure start this position snaps to

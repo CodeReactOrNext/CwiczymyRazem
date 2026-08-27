@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { mirrorStyle, uprightTransform, useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
 import { type CSSProperties, useCallback, useId, useState } from "react";
 
 interface ClickableFretboardProps {
@@ -84,6 +85,25 @@ export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: 
       )}
       title="Show the whole neck instead of just the search window">
       Whole neck
+    </button>
+  );
+}
+
+/** Mirrors every neck diagram for left-handed players — nut on the right. */
+export function LeftyToggle() {
+  const leftHanded = useIsLeftHanded();
+  const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
+  return (
+    <button
+      type="button"
+      aria-pressed={leftHanded}
+      onClick={() => setLeftHanded(!leftHanded)}
+      className={cn(
+        "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        leftHanded ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
+      )}
+      title="Mirror the neck the way a left-handed player sees it — nut on the right">
+      Left-handed
     </button>
   );
 }
@@ -191,6 +211,14 @@ export function ClickableFretboard({
   const sheenId = `ckfb-sheen-${reactId}`;
   const clipId = `ckfb-clip-${reactId}`;
 
+  // Left-handed mode mirrors the neck about its vertical centre — nut on the
+  // right, frets running right-to-left, string rows untouched. Only the drawing
+  // is flipped (a CSS transform on the <svg>), so every coordinate below, the
+  // click targets and the hit testing stay exactly as they are; text gets an
+  // `upright()` counter-transform so labels never read backwards.
+  const leftHanded = useIsLeftHanded();
+  const upright = (anchorX: number) => uprightTransform(anchorX, leftHanded);
+
   return (
     <div className="w-full overflow-x-auto">
         <svg
@@ -202,8 +230,9 @@ export function ClickableFretboard({
             display: "block",
             margin: "0 auto",
             "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
+            transform: mirrorStyle(leftHanded),
           } as CSSProperties}
-          aria-label="Clickable fretboard"
+          aria-label={leftHanded ? "Clickable fretboard, left-handed" : "Clickable fretboard"}
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -408,6 +437,7 @@ export function ClickableFretboard({
                 key={i}
                 x={x}
                 y={TOP_PAD - 22}
+                transform={upright(x)}
                 textAnchor="middle"
                 fontSize={inTarget ? 30 : 22}
                 fontWeight={inTarget ? "bold" : "600"}
@@ -430,7 +460,8 @@ export function ClickableFretboard({
                 key={i}
                 x={LEFT_PAD - 20}
                 y={y}
-                textAnchor="end"
+                transform={upright(LEFT_PAD - 20)}
+                textAnchor={leftHanded ? "start" : "end"}
                 fontSize={active ? 32 : 20}
                 fontWeight={active ? "800" : "600"}
                 fill={active ? (stringScoped ? "#67e8f9" : STRING_ACTIVE_COLOR) : STRING_INACTIVE_COLOR}
@@ -500,7 +531,7 @@ export function ClickableFretboard({
                       <circle cx={cx} cy={cy} r={32} fill="#f59e0b" opacity={0.15} />
                       <circle cx={cx} cy={cy} r={24} fill="#f59e0b" stroke="#432003" strokeWidth={3} />
                       {markedLabel && (
-                        <text x={cx} y={cy + 9} textAnchor="middle" fontSize={25} fontWeight="bold" fill="#432003">
+                        <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={25} fontWeight="bold" fill="#432003">
                           {markedLabel}
                         </text>
                       )}
@@ -511,7 +542,7 @@ export function ClickableFretboard({
                       <circle cx={cx} cy={cy} r={42} fill="#10b981" opacity={0.12} />
                       <circle cx={cx} cy={cy} r={32} fill="#10b981" opacity={0.2} />
                       <circle cx={cx} cy={cy} r={24} fill="#10b981" stroke="#052e1f" strokeWidth={3} />
-                      <text x={cx} y={cy + 9} textAnchor="middle" fontSize={27} fontWeight="bold" fill="#052e1f">
+                      <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={27} fontWeight="bold" fill="#052e1f">
                         ✓
                       </text>
                     </g>
@@ -557,14 +588,16 @@ export function ClickableFretboard({
                 transition={{ duration: 1.4, times: [0, 0.15, 0.75, 1] }}
                 className="pointer-events-none"
               >
-                <rect x={pillX} y={pillY} width={TIME_PILL_W} height={TIME_PILL_H} rx={12} fill="#18181b" stroke="#10b981" strokeWidth={2.5} />
-                <circle cx={pillX + 32} cy={pillY + TIME_PILL_H / 2} r={17} fill="#10b981" />
-                <text x={pillX + 32} y={pillY + TIME_PILL_H / 2 + 7} textAnchor="middle" fontSize={20} fontWeight="bold" fill="#052e1f">
-                  ✓
-                </text>
-                <text x={pillX + 58} y={pillY + TIME_PILL_H / 2 + 9} textAnchor="start" fontSize={27} fontWeight="800" fill="#ffffff">
-                  {lastClick.elapsedSeconds.toFixed(1)}s
-                </text>
+                <g transform={upright(cellCenterX)}>
+                  <rect x={pillX} y={pillY} width={TIME_PILL_W} height={TIME_PILL_H} rx={12} fill="#18181b" stroke="#10b981" strokeWidth={2.5} />
+                  <circle cx={pillX + 32} cy={pillY + TIME_PILL_H / 2} r={17} fill="#10b981" />
+                  <text x={pillX + 32} y={pillY + TIME_PILL_H / 2 + 7} textAnchor="middle" fontSize={20} fontWeight="bold" fill="#052e1f">
+                    ✓
+                  </text>
+                  <text x={pillX + 58} y={pillY + TIME_PILL_H / 2 + 9} textAnchor="start" fontSize={27} fontWeight="800" fill="#ffffff">
+                    {lastClick.elapsedSeconds.toFixed(1)}s
+                  </text>
+                </g>
               </motion.g>
             );
           })()}

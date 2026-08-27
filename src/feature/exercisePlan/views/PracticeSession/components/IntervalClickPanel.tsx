@@ -16,7 +16,7 @@ import {
 } from "../helpers/clickHuntNoteSound";
 import { isWithinReach, reachZoneKeys } from "../helpers/clickTargets";
 import { INTERVAL_PHRASE_HOLD_MS, playIntervalPhrase } from "../helpers/intervalPreview";
-import { ClickableFretboard, FullNeckToggle, useShowFullNeck } from "./ClickableFretboard";
+import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
 import { HuntStage, HuntStats } from "./HuntStage";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
 
@@ -374,6 +374,7 @@ export function IntervalClickPanel({
               {showSemitones ? "Hide the distance" : "How far is it?"}
             </button>
             <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
+            <LeftyToggle />
             <div className="flex items-center gap-2 px-1">
               <Checkbox
                 id="interval-click-note-sound"

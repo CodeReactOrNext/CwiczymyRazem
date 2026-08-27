@@ -1,6 +1,8 @@
 import type { PickStroke, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { useMemo } from "react";
 
+import { stringRow } from "./tablatureStringRows";
+
 export const STRING_SPACING = 32;
 export const NOTE_RADIUS    = 11;
 export const STAFF_TOP      = 62;
@@ -77,8 +79,10 @@ const EMPTY: TablatureRenderData = {
 export function useTablatureRenderData(
   measures: TablatureMeasure[] | undefined,
   palette: readonly string[] = STRING_COLORS,
-  /** Must match the worker's STRING_SPACING — it maps noteY back to a string index. */
+  /** Must match the worker's STRING_SPACING — it draws the gutter at the same rows. */
   stringSpacing: number = STRING_SPACING,
+  /** Upside-down staff (low E on top). Must match the worker's own flag. */
+  flipStrings: boolean = false,
 ): TablatureRenderData {
   return useMemo(() => {
     if (!measures) return EMPTY;
@@ -109,7 +113,7 @@ export function useTablatureRenderData(
           return {
             noteKey:       `${mIdx}-${bIdx}-${nIdx}`,
             string:        note.string,
-            noteY:         STAFF_TOP + (note.string - 1) * stringSpacing,
+            noteY:         STAFF_TOP + stringRow(note.string, flipStrings) * stringSpacing,
             fret:          note.fret,
             color:         palette[note.string - 1] ?? "#ffffff",
             isAccented:    note.isAccented,
@@ -133,11 +137,13 @@ export function useTablatureRenderData(
           };
         });
 
-        const topString = beat.notes.length > 0 ? Math.min(...beat.notes.map(n => n.string)) : 1;
+        // Highest note = smallest row, which is the LOW E once the staff is
+        // flipped — so this has to be picked by row, not by string number.
+        const topRow = beat.notes.length > 0 ? Math.min(...beat.notes.map(n => stringRow(n.string, flipStrings))) : 0;
         renderBeats.push({
           offsetX:        currentX,
           duration:       beat.duration,
-          topNoteY:       STAFF_TOP + (topString - 1) * stringSpacing,
+          topNoteY:       STAFF_TOP + topRow * stringSpacing,
           chordName:      beat.chordName,
           beamRight:      beat.duration <= 0.5  && !!next && next.duration <= 0.5,
           beamRight2:     beat.duration <= 0.25 && !!next && next.duration <= 0.25,
@@ -181,5 +187,5 @@ export function useTablatureRenderData(
     });
 
     return { totalBeats: currentX, renderBeats, measureEndXs, timeSigMarkers, tupletGroups, tempoMap, hasAccentedNotes: hasAccents, hasDynamics: hasDyn };
-  }, [measures, palette, stringSpacing]);
+  }, [measures, palette, stringSpacing, flipStrings]);
 }

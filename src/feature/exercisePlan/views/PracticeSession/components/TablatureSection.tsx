@@ -186,6 +186,7 @@ export const TablatureSection = memo(function TablatureSection({
     activeTablature,
     palette,
     settings.stringSpacing,
+    settings.flipStrings,
   );
   const { measureEndXs, totalBeats } = renderData;
 

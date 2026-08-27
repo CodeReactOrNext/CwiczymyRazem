@@ -12,7 +12,7 @@ import {
   pickReferenceMidi,
   saveClickHuntNoteSoundPreference,
 } from "../helpers/clickHuntNoteSound";
-import { ClickableFretboard, FullNeckToggle, useShowFullNeck } from "./ClickableFretboard";
+import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
 import { HuntStage, HuntStats, HuntTargetCard } from "./HuntStage";
 
 interface ClickHuntPanelProps {
@@ -175,6 +175,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear it
             </button>
             <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
+            <LeftyToggle />
             <div className="flex items-center gap-2 px-1">
               <Checkbox
                 id="click-hunt-note-sound"
